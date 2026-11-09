@@ -17,6 +17,16 @@ Excel opens each workbook read-only and invisibly (links not updated, macros dis
 sheet it opens on as PDF and closes it without saving. No Excel setting is changed and no keys are sent, so it can run
 while you work. Workbooks already printed are skipped. Keep the PDFs: Excel's output only changes when Excel does.
 
+## Formula results
+
+```sh
+pwsh tools/excel-compare/excel-values.ps1 <book.xlsx> <out.json>
+```
+
+Excel opens the workbook read-only and invisibly (links not updated, macros off for this instance), works out every
+formula (`CalculateFull`) and the script writes each formula cell's sheet, address, formula and value to JSON; closed
+without saving. `test/formulas-excel.json` came from `test/fixtures/formulas.xlsx` this way (docs/CALC.md).
+
 ## Each change: a run
 
 ```powershell
