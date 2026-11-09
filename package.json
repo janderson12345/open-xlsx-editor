@@ -11,7 +11,7 @@
     "fixtures": "node test/fixtures/make-fixtures.mjs",
     "test:e2e": "npm run build && node test/e2e.mjs && node test/a11y.mjs",
     "check": "node tools/check-ooxml.mjs test/fixtures test/out",
-    "lint": "eslint src test tools"
+    "lint": "eslint src test tools && node tools/scan-bytes.mjs"
   },
   "keywords": [
     "xlsx",
