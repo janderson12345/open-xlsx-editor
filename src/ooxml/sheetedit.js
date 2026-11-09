@@ -68,7 +68,8 @@ function growDimension(root, ns, r, c) {
 
 /** Set a cell to a number, a boolean, a string (written inline, so the shared string table isn't rewritten) or
  *  null (emptied; its style stays). Formula cells are refused until formulas and the calculation chain are modelled:
- *  dropping a formula leaves calcChain.xml pointing at a plain cell, and a shared formula's other cells depend on it. */
+ *  dropping a formula leaves calcChain.xml pointing at a plain cell, and a shared formula's other cells depend on it.
+ *  Returns the cell's element. */
 export function setCellXml(doc, r, c, value) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
@@ -97,4 +98,5 @@ export function setCellXml(doc, r, c, value) {
     if (/^\s|\s$|[\t\n]/.test(String(value))) t.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
   }
   growDimension(root, ns, r, c);
+  return cEl;
 }

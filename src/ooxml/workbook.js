@@ -3,7 +3,7 @@
 import { OpcPackage } from './package.js';
 import { kids, kid, attr, serializeXml, NS } from './xml.js';
 import { readSharedStrings } from './strings.js';
-import { readSheet } from './sheet.js';
+import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
 import { readTheme } from './theme.js';
 import { setCellXml } from './sheetedit.js';
@@ -92,8 +92,13 @@ export class Workbook {
     const at = typeof ref === 'string' ? parseRef(ref) : ref;
     if (!at) throw new Error(`not a cell reference: ${ref}`);
     const part = this._part(i);
-    setCellXml(part.doc, at.r, at.c, value);
-    part.model = readSheet(part.doc, this.sharedStrings);
+    const el = setCellXml(part.doc, at.r, at.c, value);
+    // Only this cell of the model changes (re-reading the sheet would cost a pass over all its cells per keystroke).
+    const model = part.model;
+    if (!model.cells.has(at.r)) model.cells.set(at.r, new Map());
+    model.cells.get(at.r).set(at.c, readCell(el, part.doc.documentElement.namespaceURI, this.sharedStrings));
+    model.maxRow = Math.max(model.maxRow, at.r);
+    model.maxCol = Math.max(model.maxCol, at.c);
     this.dirty.add(this.sheets[i].path);
   }
 
