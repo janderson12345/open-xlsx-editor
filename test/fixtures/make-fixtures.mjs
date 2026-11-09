@@ -389,7 +389,63 @@ function numfmts() {
   });
 }
 
+// A probe for row heights Excel works out itself: rows without customHeight, sized by their fonts and wrapped text;
+// two rows whose stored ht disagrees with their content. Column A of every row is filled (two colours in turn), so
+// the fills' edges in Excel's PDF give each row's printed height exactly. Each sample: [label, cells, row attributes];
+// a cell is [column, value, font index, wrap].
+export const PROBE_ROW_FONTS = [['Calibri', 11, 'minor'], ['Calibri', 8, 'minor'], ['Calibri', 14, 'minor'], ['Calibri', 20, 'minor'],
+  ['Calibri', 36, 'minor'], ['Cambria', 20], ['Times New Roman', 16], ['Arial', 14], ['Courier New', 11]];
+const LONG = 'Several words of text that wrap inside a cell of twenty characters and go on';
+export const PROBE_ROWS = [
+  ['empty', [], {}], ['Calibri 8', [['B', 'Small', 1]], {}], ['Calibri 11', [['B', 'Normal', 0]], {}], ['Calibri 14', [['B', 'Bigger', 2]], {}],
+  ['Calibri 20', [['B', 'Large', 3]], {}], ['Calibri 36', [['B', 'Huge', 4]], {}], ['Cambria 20', [['B', 'Serif', 5]], {}],
+  ['Times 16', [['B', 'Times', 6]], {}], ['Arial 14', [['B', 'Arial', 7]], {}], ['Courier 11', [['B', 'Mono', 8]], {}],
+  ['mixed 11 and 20', [['B', 'Small one', 0], ['C', 'Large one', 3]], {}], ['styled, empty', [['B', null, 3]], {}],
+  ['wrap 2 lines', [['B', LONG.slice(0, 32), 0, true]], {}], ['wrap 3 lines', [['B', LONG.slice(0, 52), 0, true]], {}],
+  ['wrap 5 lines', [['B', LONG + ' and on and on further', 0, true]], {}], ['wrap Calibri 14', [['B', LONG.slice(0, 40), 2, true]], {}],
+  ['ht 30, not custom', [['B', 'Normal', 0]], { ht: 30 }], ['ht 10, not custom', [['B', 'Large', 3]], { ht: 10 }],
+  ['wrap line breaks', [['B', 'one\ntwo\nthree', 0, true]], {}], ['number 20', [['B', 12345, 3]], {}],
+];
+function rowHeights() {
+  const font = ([name, sz, scheme]) => `<font><sz val="${sz}"/><color theme="1"/><name val="${name}"/>${scheme ? `<scheme val="${scheme}"/>` : ''}</font>`;
+  // cellXfs: 0 normal, 1 and 2 the two fills, then per font: plain (3 + 2k) and wrapped (4 + 2k).
+  const xfs = ['<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>', '<xf numFmtId="0" fontId="0" fillId="2" borderId="0" xfId="0" applyFill="1"/>',
+    '<xf numFmtId="0" fontId="0" fillId="3" borderId="0" xfId="0" applyFill="1"/>',
+    ...PROBE_ROW_FONTS.flatMap((_, k) => [`<xf numFmtId="0" fontId="${k}" fillId="0" borderId="0" xfId="0" applyFont="1"/>`,
+      `<xf numFmtId="0" fontId="${k}" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment wrapText="1"/></xf>`])];
+  const styles = `${DECL}<styleSheet xmlns="${X}"><fonts count="${PROBE_ROW_FONTS.length}">${PROBE_ROW_FONTS.map(font).join('')}</fonts>` +
+    '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFDDEBF7"/><bgColor indexed="64"/></patternFill></fill>' +
+    '<fill><patternFill patternType="solid"><fgColor rgb="FFFCE4D6"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    `<cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs>` +
+    '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>';
+  const rows = PROBE_ROWS.map(([label, cells, attrs], i) => {
+    const r = i + 1;
+    const cellXml = cells.map(([c, v, f, wrap]) => {
+      const s = 3 + 2 * f + (wrap ? 1 : 0);
+      if (v == null) return `<c r="${c}${r}" s="${s}"/>`;
+      if (typeof v === 'number') return `<c r="${c}${r}" s="${s}"><v>${v}</v></c>`;
+      return `<c r="${c}${r}" s="${s}" t="inlineStr"><is><t${/\n/.test(v) ? ' xml:space="preserve"' : ''}>${esc(v)}</t></is></c>`;
+    }).join('');
+    const ht = attrs.ht ? ` ht="${attrs.ht}"` : '';
+    return `<row r="${r}"${ht}><c r="A${r}" s="${1 + (i % 2)}" t="inlineStr"><is><t>${esc(label)}</t></is></c>${cellXml}</row>`;
+  });
+  write('rows.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Rows" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', RT('theme'), 'theme/theme1.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="1" width="18.7109375" customWidth="1"/><col min="2" max="2" width="20.7109375" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': styles,
+    'xl/theme/theme1.xml': THEME,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  rowHeights();
   numfmts();
   align();
   fills();
