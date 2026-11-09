@@ -1,16 +1,25 @@
 // What a person types into a cell, as the value it stores: Excel's reading of an entry, for the common cases. Dates,
-// times, currency and fractions typed as text are read as text for now; formulas are not accepted until there is a
-// calculation engine (they would need a value, and calcChain.xml, to be right).
+// times, currency and fractions typed as text are read as text for now. An entry starting with = is a formula.
+import { normalizeFormula, displayFormula } from '../calc/tokens.js';
+import { parseFormula } from '../calc/parse.js';
 
-/** A typed entry as { value } (a number, a boolean, a string, or null for an empty entry) or { error } when it can't be
- *  stored yet. Numbers: an optional sign, digits with or without thousands separators in groups of three, a decimal
+/** A typed entry as { value } (a number, a boolean, a string, or null for an empty entry), { formula } (as the file has
+ *  it, without "=": normalizeFormula) or { error } when it isn't a formula Excel would take. Numbers: an optional sign, digits with or without thousands separators in groups of three, a decimal
  *  point, an exponent, a trailing % (divided by 100). TRUE and FALSE in any case are booleans. A leading apostrophe
  *  keeps the rest as text ('007), as in Excel. */
 export function parseInput(text) {
   const s = String(text ?? '');
   if (s === '') return { value: null };
   if (s.startsWith("'")) return { value: s.slice(1) };
-  if (s.startsWith('=')) return { error: 'Formulas are not supported yet' };
+  if (s.startsWith('=')) {
+    try {
+      const formula = normalizeFormula(s.slice(1));
+      parseFormula(formula);
+      return { formula };
+    } catch {
+      return { error: "There's a problem with this formula" };
+    }
+  }
   const t = s.trim();
   if (/^(true|false)$/i.test(t)) return { value: t.toLowerCase() === 'true' };
   const m = /^([+-]?)(\d{1,3}(?:,\d{3})+|\d+)?(\.\d*)?(?:[eE]([+-]?\d+))?(%?)$/.exec(t);
@@ -26,7 +35,7 @@ export function parseInput(text) {
  *  with its = sign. */
 export function editText(cell) {
   if (!cell) return '';
-  if (cell.f) return `=${cell.f}`;
+  if (cell.f) return `=${displayFormula(cell.f)}`;
   if (cell.v == null) return '';
   if (cell.t === 'b') return cell.v ? 'TRUE' : 'FALSE';
   if (cell.t === 'n') return String(cell.v);

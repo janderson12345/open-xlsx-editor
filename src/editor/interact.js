@@ -24,7 +24,8 @@ export function attachEditing(root, ctx) {
   const editor = createCellEditor({
     grid,
     onFinish: (text, move) => {
-      cmd.run('enter', text);
+      // (An entry refused, a formula with a mistake in it, goes back into the editor to be put right, as in Excel.)
+      if (!cmd.run('enter', text)) { reopen(text); return; }
       if (move) cmd.run('move', move[0], move[1]);
       view.focus({ preventScroll: true });
     },
@@ -45,11 +46,19 @@ export function attachEditing(root, ctx) {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
     bar.show(refName(s.ar, s.ac), editText(cellAt(s.ar, s.ac)));
   }
+  const reopen = (text) => {
+    const s = cmd.selection;
+    const cell = cellAt(s.ar, s.ac);
+    editor.open(s.ar, s.ac, text, 'edit', ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '');
+  };
   const startEdit = (mode, seed = null) => {
     if (ctx.readOnly()) { announce('The workbook is read-only'); return; }
     const s = cmd.selection;
     const cell = cellAt(s.ar, s.ac);
-    if (cell && cell.f != null) { announce(`${refName(s.ar, s.ac)} holds a formula; formulas can't be changed yet`); return; }
+    if (ctx.workbook().sheet(ctx.sheetIndex()).arrays.some((a) => s.ar >= a.r0 && s.ar <= a.r1 && s.ac >= a.c0 && s.ac <= a.c1)) {
+      announce("You can't change part of an array");
+      return;
+    }
     const cls = ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '';
     editor.open(s.ar, s.ac, seed != null ? seed : editText(cell), mode, cls);
   };

@@ -1,5 +1,6 @@
 // Browser check of editing: selection by keys and mouse, typing over a cell, F2, Esc, Tab, Delete, undo and redo,
-// typed numbers and text, formula cells refused, read-only; the saved workbook read back. Standards mode asserted.
+// typed numbers and text, formulas typed and worked out again, read-only; the saved workbook read back. Standards mode
+// asserted.
 // Run after `npm run build`: node test/editing.mjs [outDir]
 import fs from 'node:fs';
 import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
@@ -78,11 +79,36 @@ await page.keyboard.press('Control+y');
 check(await value('E2') === null, 'Ctrl+Y empties them again');
 await page.keyboard.press('Control+z');
 
-// Formula cells are refused until there is a calculation engine.
-await clickCell(2, 2); // C3, a shared formula's cell
-await page.keyboard.type('5');
+// Formulas: shown in the bar and the editor, worked out again when what they read changes, typed as Excel takes them.
+const bar = () => page.evaluate(() => document.querySelector('.oxe-formula').value);
+await clickCell(2, 2); // C3, a shared formula's cell (C2:C10 share B2*2)
+check(await bar() === '=B3*2', 'the bar shows C3\'s own formula, moved from the shared one in C2', await bar());
+await page.keyboard.press('F2');
+check(await page.evaluate(() => document.querySelector('.oxe-editor').value) === '=B3*2', 'F2 edits the formula');
+await page.keyboard.press('Escape');
+await clickCell(2, 1); // B3
+await page.keyboard.type('10');
+await page.keyboard.press('Enter');
+check(await value('C3') === 20 && await shown(2, 2) === '20', 'B3 set to 10: C3 (=B3*2) shows 20');
+check(await value('B11') === 129 && await shown(10, 1) === '129', 'and the total in B11 (=SUM(B2:B10)) is 129', String(await value('B11')));
+await clickCell(15, 4); // E16
+await page.keyboard.type('=sum(b2:b3');
+await page.keyboard.press('Enter');
+check(await value('E16') === 87 && await shown(15, 4) === '87', '=sum(b2:b3 typed: 87');
+await clickCell(15, 4);
+check(await bar() === '=SUM(B2:B3)', 'and kept as Excel keeps it, =SUM(B2:B3)', await bar());
+await page.keyboard.type('=1+');
+await page.keyboard.press('Enter');
 await page.waitForTimeout(250);
-check(await value('C3') === 4 && /formula/.test(await live()), 'typing over a formula cell is refused and said so', await live());
+check(await value('E16') === 87 && /problem with this formula/.test(await live()), '=1+ is refused and said so', await live());
+check(await page.evaluate(() => document.querySelector('.oxe-editor')?.value) === '=1+', 'and stays in the editor to be put right');
+await page.keyboard.press('Escape');
+await clickCell(1, 1); // B2
+await page.keyboard.type('=B3/0');
+await page.keyboard.press('Enter');
+check(await shown(1, 1) === '#DIV/0!' && await value('B11') === '#DIV/0!', 'an error in B2 reaches the total', String(await value('B11')));
+await page.keyboard.press('Control+z');
+check(await value('B2') === 77 && await value('B11') === 129, 'Ctrl+Z puts back 77, and the total with it');
 
 // Moving: Ctrl+Down to the end of a block, Ctrl+Home back.
 await clickCell(0, 0);
@@ -126,6 +152,8 @@ const wb = Workbook.fromBytes(bytes);
 const sh = wb.sheet(0);
 const v = (r, c) => sh.cells.get(r)?.get(c)?.v ?? null;
 check(v(1, 1) === 77 && v(1, 0) === 'Item 1 x' && v(15, 0) === 0.5 && v(15, 2) === '007' && v(15, 3) === true && v(1, 4) === 'No', 'saved: the edits are in the file');
+check(sh.cells.get(15).get(4).f === 'SUM(B2:B3)' && v(15, 4) === 87 && v(2, 2) === 20 && v(10, 1) === 129, 'saved: the formula and the results worked out');
+check(!wb.pkg.has('xl/calcChain.xml'), 'saved: calcChain.xml left out (Excel works the order out again)');
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();

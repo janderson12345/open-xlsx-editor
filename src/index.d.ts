@@ -42,7 +42,11 @@ export declare class Workbook {
   readonly activeSheet: number;
   sheet(index: number): SheetModel;
   /** Set a cell ("B2" or { r, c }, 0-based) to a number, boolean, string (written inline) or null. */
-  setCell(index: number, ref: string | { r: number; c: number }, value: number | boolean | string | null): void;
+  setCell(index: number, ref: string | { r: number; c: number }, value: number | boolean | string | null): { circular: unknown[] };
+  /** Give a cell a formula as the file has it ("SUM(A1:A3)", without "="); the formulas that read it are worked out again. */
+  setFormula(index: number, ref: string | { r: number; c: number }, formula: string): { circular: unknown[] };
+  /** Work out every formula again. */
+  calculate(): { circular: unknown[] };
   toBytes(): Uint8Array;
 }
 
@@ -62,9 +66,9 @@ export interface XlsxEditor {
   save(): Uint8Array;
   /** Select a cell. */
   select(ref: CellRef): void;
-  /** Enter text into a cell as if typed ("12", "50%", "TRUE", "'007"); false if refused. */
+  /** Enter text into a cell as if typed ("12", "50%", "TRUE", "'007", "=SUM(A1:A3)"); false if refused. */
   enter(ref: CellRef, text: string): boolean;
-  /** Set a cell's value; false if refused (read-only, or a formula cell). */
+  /** Set a cell's value; false if refused (read-only, or part of an array formula). */
   setCell(ref: CellRef, value: number | boolean | string | null): boolean;
   undo(): boolean;
   redo(): boolean;

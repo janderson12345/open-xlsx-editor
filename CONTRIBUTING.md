@@ -23,6 +23,7 @@ CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull req
 - `docs/ARCHITECTURE.md`: a map of every module. Start there.
 - `docs/LAYOUT.md`: how layout is matched to Excel, the rules found and what was tried and dropped. Read it before
   changing how columns, rows or cell text are placed.
+- `docs/CALC.md`: how formulas are worked out and what Excel was seen to do.
 - `LESSONS.md` and `CLAUDE.md`: what the sister project (open-docx-editor) taught, and the rules that follow from it.
 
 ## How the code is written
@@ -41,6 +42,12 @@ CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull req
 
 Layout is measured against Excel's own PDFs, never another program's output. Keep a change only if the total doesn't
 get worse and every workbook that got worse is understood, and add the rule it establishes to `docs/LAYOUT.md`.
+
+## Changing calculation
+
+Results are measured against Excel's own: `tools/excel-compare/excel-values.ps1` has Excel work out a workbook's
+formulas. Add a formula to `PROBE_FORMULAS` in `test/fixtures/make-fixtures.mjs`, regenerate the fixtures, refresh
+`test/formulas-excel.json` from Excel, and add any rule it shows to `docs/CALC.md`.
 
 ## Saved files
 

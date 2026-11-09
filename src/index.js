@@ -64,9 +64,9 @@ export function mountXlsxEditor(host, options = {}) {
     },
     /** Select a cell ("B2" or { r, c }, 0-based). */
     select(ref) { const p = at(ref); editing().run('select', p.r, p.c); },
-    /** Enter text into a cell as if typed there ("12", "TRUE", "50%", "'007"); false if refused. */
+    /** Enter text into a cell as if typed there ("12", "TRUE", "50%", "'007", "=SUM(A1:A3)"); false if refused. */
     enter(ref, text) { return editing().run('enter', String(text), at(ref)); },
-    /** Set a cell to a number, boolean, string or null; false if refused (read-only, or a formula cell). */
+    /** Set a cell to a number, boolean, string or null; false if refused (read-only, or part of an array formula). */
     setCell(ref, value) { const p = at(ref); return editing().run('setValue', p.r, p.c, value); },
     undo: () => editing().run('undo'),
     redo: () => editing().run('redo'),

@@ -1,7 +1,7 @@
 // Every action is a named command, shared by the keyboard, the mouse, the formula bar and the API: moving and
-// extending the selection, entering and clearing values, undo and redo. Changes go through the workbook (only the
-// sheet's XML is touched, as everywhere) and into an undo history of cell values; the selection is view state and
-// never reaches the history or the file.
+// extending the selection, entering and clearing values and formulas, undo and redo. Changes go through the workbook
+// (only the sheet's XML is touched, as everywhere; the formulas that read a changed cell are worked out again) and into
+// an undo history of cell contents; the selection is view state and never reaches the history or the file.
 import { cellSelection, extendSelection } from './selection.js';
 import { step, jump, lastCell } from './navigate.js';
 import { parseInput } from '../ooxml/input.js';
@@ -22,21 +22,25 @@ export function createCommands(ctx) {
     ctx.grid.scrollIntoView(state.focus.r, state.focus.c);
     ctx.selected?.(sel);
   };
-  const raw = (r, c) => {
+  /** What a cell holds, as a change that would put it back: { r, c, formula } or { r, c, value }. */
+  const contents = (r, c) => {
     const cell = sheet().cells.get(r)?.get(c);
-    return cell ? { v: cell.v ?? null, f: cell.f } : { v: null, f: null };
+    if (cell && cell.f != null && cell.f !== '') return { r, c, formula: cell.f };
+    return { r, c, value: cell && cell.f == null ? cell.v ?? null : null };
   };
+  const inArray = (r, c) => sheet().arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1);
 
-  /** Apply cell values [{ r, c, value }] as one step of the history; refused, whole, if a cell holds a formula. */
+  /** Apply changes [{ r, c, value } or { r, c, formula }] as one step of the history; refused, whole, if a cell is part
+   *  of an array formula. */
   function apply(changes, record = true) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-    const formula = changes.find((ch) => raw(ch.r, ch.c).f != null);
-    if (formula) { ctx.announce(`${refName(formula.r, formula.c)} holds a formula; formulas can't be changed yet`); return false; }
-    const before = changes.map((ch) => ({ r: ch.r, c: ch.c, value: raw(ch.r, ch.c).v }));
-    for (const ch of changes) ctx.workbook().setCell(ctx.sheetIndex(), { r: ch.r, c: ch.c }, ch.value);
+    if (changes.some((ch) => inArray(ch.r, ch.c))) { ctx.announce("You can't change part of an array"); return false; }
+    const before = changes.map((ch) => contents(ch.r, ch.c));
+    const { circular } = ctx.workbook().apply(ctx.sheetIndex(), changes);
     if (record) { state.undo.push({ sheet: ctx.sheetIndex(), before, after: changes }); state.redo = []; }
     ctx.grid.refresh();
     ctx.changed?.();
+    if (circular.length) ctx.announce(`Circular reference: ${circular.map((e) => refName(e.r, e.c)).join(', ')} read themselves and weren't worked out`);
     return true;
   }
 
@@ -58,12 +62,13 @@ export function createCommands(ctx) {
     /** Home (the row's first cell), Ctrl+Home (A1), Ctrl+End (the last used cell). */
     home({ sheetStart = false } = {}) { commands.select(sheetStart ? 0 : state.sel.ar, 0); },
     end() { const { r, c } = lastCell(sheet()); commands.select(r, c); },
-    /** Enter what was typed into the active cell (or `at`): parsed as Excel reads an entry (input.js). */
+    /** Enter what was typed into the active cell (or `at`): parsed as Excel reads an entry (input.js), a formula if
+     *  it starts with =. */
     enter(text, at = null) {
       const { r, c } = at || { r: state.sel.ar, c: state.sel.ac };
       const parsed = parseInput(text);
       if (parsed.error) { ctx.announce(parsed.error); return false; }
-      return apply([{ r, c, value: parsed.value }]);
+      return apply([parsed.formula != null ? { r, c, formula: parsed.formula } : { r, c, value: parsed.value }]);
     },
     /** Set a cell to a value as given (a number, boolean, string or null), as the API does. */
     setValue(r, c, value) { return apply([{ r, c, value }]); },
@@ -71,7 +76,12 @@ export function createCommands(ctx) {
     clear() {
       const s = state.sel;
       const changes = [];
-      for (let r = s.r0; r <= s.r1; r++) for (let c = s.c0; c <= s.c1; c++) if (raw(r, c).v != null) changes.push({ r, c, value: null });
+      for (let r = s.r0; r <= s.r1; r++) {
+        for (let c = s.c0; c <= s.c1; c++) {
+          const cell = sheet().cells.get(r)?.get(c);
+          if (cell && (cell.v != null || cell.f != null)) changes.push({ r, c, value: null });
+        }
+      }
       return changes.length ? apply(changes) : false;
     },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },

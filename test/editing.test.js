@@ -10,7 +10,8 @@ test('typed entries read as Excel reads them', () => {
   const v = (s) => parseInput(s).value;
   assert.deepEqual(['12', '-3.5', '1,234', '1,234.5', '50%', '1e3', '.5', 'TRUE', 'false', "'007", '', 'abc', '1,23', '12 apples'].map(v),
     [12, -3.5, 1234, 1234.5, 0.5, 1000, 0.5, true, false, '007', null, 'abc', '1,23', '12 apples']);
-  assert.match(parseInput('=A1+1').error, /Formulas/);
+  assert.equal(parseInput('=a1+sum(b1:b2').formula, 'A1+SUM(B1:B2)');
+  assert.match(parseInput('=1+').error, /problem with this formula/);
   assert.equal(editText({ t: 'n', v: 0.1 + 0.2 }), String(0.1 + 0.2));
   assert.equal(editText({ t: 'b', v: true }), 'TRUE');
   assert.equal(editText({ t: 'n', v: 4, f: 'B2*2' }), '=B2*2');
