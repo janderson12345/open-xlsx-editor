@@ -262,7 +262,57 @@ function fonts() {
   });
 }
 
+// A probe for fills and borders: each sample is one cell with empty cells around it (every other row and column), with
+// the theme above. Fills in columns B and D (RGB, theme colours 0-9, tints, indexed colours, a pattern), boxes in each
+// border style in F and H, and the sample's number in J.
+export const PROBE_FILLS = [['rgb', 'FFFF0000'], ['rgb', 'FF00B050'], ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((t) => ['theme', t, 0]),
+  ['theme', 4, -0.5], ['theme', 4, -0.25], ['theme', 4, 0.4], ['theme', 4, 0.6], ['theme', 4, 0.8], ['theme', 1, 0.5],
+  ['theme', 0, -0.15], ['theme', 9, -0.249977111117893], ['indexed', 10], ['indexed', 13], ['indexed', 22], ['indexed', 30],
+  ['pattern', 'darkGray', 'FF4472C4', 'FFFFFF00']];
+export const PROBE_BORDERS = [['thin'], ['medium'], ['thick'], ['hair'], ['dotted'], ['dashed'], ['double'], ['mediumDashed'],
+  ['dashDot'], ['thin', 'rgb', 'FFFF0000'], ['medium', 'theme', 5], ['thick', 'indexed', 12]];
+function fills() {
+  const color = (tag, kind, a, b) => (kind === 'rgb' ? `<${tag} rgb="${a}"/>` : kind === 'theme' ? `<${tag} theme="${a}"${b ? ` tint="${b}"` : ''}/>` : kind === 'indexed' ? `<${tag} indexed="${a}"/>` : `<${tag} auto="1"/>`);
+  const fillXml = PROBE_FILLS.map(([kind, a, b, c]) => (kind === 'pattern'
+    ? `<fill><patternFill patternType="${a}">${color('fgColor', 'rgb', b)}${color('bgColor', 'rgb', c)}</patternFill></fill>`
+    : `<fill><patternFill patternType="solid">${color('fgColor', kind, a, b)}<bgColor indexed="64"/></patternFill></fill>`));
+  const side = (name, [style, kind, a]) => `<${name} style="${style}">${kind ? color('color', kind, a) : '<color indexed="64"/>'}</${name}>`;
+  const borderXml = PROBE_BORDERS.map((b) => `<border>${side('left', b)}${side('right', b)}${side('top', b)}${side('bottom', b)}<diagonal/></border>`);
+  const nf = PROBE_FILLS.length;
+  const styles = `${DECL}<styleSheet xmlns="${X}"><fonts count="1"><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>` +
+    `<fills count="${nf + 2}"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>${fillXml.join('')}</fills>` +
+    `<borders count="${PROBE_BORDERS.length + 1}"><border><left/><right/><top/><bottom/><diagonal/></border>${borderXml.join('')}</borders>` +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    `<cellXfs count="${1 + nf + PROBE_BORDERS.length}"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>` +
+    PROBE_FILLS.map((_, i) => `<xf numFmtId="0" fontId="0" fillId="${i + 2}" borderId="0" xfId="0" applyFill="1"/>`).join('') +
+    PROBE_BORDERS.map((_, i) => `<xf numFmtId="0" fontId="0" fillId="0" borderId="${i + 1}" xfId="0" applyBorder="1"/>`).join('') + '</cellXfs>' +
+    '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>';
+  const rows = new Map();
+  const put = (r, c, xml) => rows.set(r, (rows.get(r) || []).concat([[c, xml]]));
+  PROBE_FILLS.forEach((_, i) => {
+    const r = 2 + 2 * Math.floor(i / 2);
+    put(r, i % 2 ? 3 : 1, `<c r="${col(i % 2 ? 3 : 1)}${r}" s="${1 + i}"/>`);
+  });
+  PROBE_BORDERS.forEach((_, i) => {
+    const r = 2 + 2 * Math.floor(i / 2);
+    put(r, i % 2 ? 7 : 5, `<c r="${col(i % 2 ? 7 : 5)}${r}" s="${1 + nf + i}"/>`);
+  });
+  for (const r of rows.keys()) put(r, 9, `<c r="J${r}"><v>${r}</v></c>`);
+  const data = [...rows].sort((a, b) => a[0] - b[0]).map(([r, cells]) => `<row r="${r}">${cells.sort((a, b) => a[0] - b[0]).map((x) => x[1]).join('')}</row>`);
+  write('fills.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Fills" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', RT('theme'), 'theme/theme1.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><sheetData>${data.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': styles,
+    'xl/theme/theme1.xml': THEME,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  fills();
   fonts();
   general();
   basic();
