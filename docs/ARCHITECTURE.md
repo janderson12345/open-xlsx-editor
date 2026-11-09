@@ -26,8 +26,8 @@ other's insides:
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |
-| `src/editor/celltext.js` | The one place cell text size and line height are set (`--oxe-cell-fs`, `--oxe-cell-lh`). |
-| `src/editor/fonts.js` | Font stacks with metric-compatible stand-ins; `cellLineHeight`, the line height that puts the browser's baseline where Excel's is. |
+| `src/editor/celltext.js` | The one place cell text is sized and placed: font size, line height, baseline shifts for top, middle and wrapped text, on screen and in print (custom properties). |
+| `src/editor/fonts.js` | Font stacks with metric-compatible stand-ins; `cellTextMetrics`, the line heights and shifts that put the browser's baselines where Excel's are. |
 | `src/editor/decor.js` | Fill rectangles and border edges for the cells in view (and on each printed page), with Excel's printed geometry and dash patterns. |
 | `src/editor/cellstyles.js` | Each cell format as a CSS class (`.oxe-s3`) in a `<style>` scoped to one editor; the Normal font on the root. |
 | `src/editor/editor.css` | Theme variables (light, dark, host-overridable) and the grid's layout. Geometry through custom properties; no `!important`. |

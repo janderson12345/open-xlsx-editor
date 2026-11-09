@@ -111,35 +111,80 @@ function drawGridlines(st, win) {
 /** The merged range a cell is inside, if any. */
 export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
 
-/** One cell's element: text, alignment (numbers right, text left and running on over empty cells), extent. */
+const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0 };
+/** An indent level in px: 10.08 in print (Excel's PDF of test/fixtures/align.xlsx: one, two and three levels from
+ *  either side), 9 on screen (not yet measured). */
+const INDENT_PX = { screen: 9, print: 10.08 };
+
+/** Where a cell's text sits across: general alignment puts numbers right, booleans and errors in the middle and text
+ *  left; fill, justify and distributed are drawn left for now, centre-across-selection as centre. */
+function horizontalOf(align, cell) {
+  const h = align.horizontal;
+  if (h === 'general') return cell.t === 'n' ? 'right' : cell.t === 'b' || cell.t === 'e' ? 'center' : 'left';
+  if (h === 'center' || h === 'centerContinuous') return 'center';
+  return h === 'right' ? 'right' : 'left';
+}
+
+/** The columns either side of c that text may run on into: up to the nearest cell with something in it, a merged
+ *  range or the edge of what is drawn. Returns [first, last + 1). */
+function runOn(st, r, c, line, win) {
+  let end = c + 1;
+  while (end <= win.c1 + 1 && end < st.cols.count && !(line.get(end)?.v != null) && !mergeAt(st, r, end)) end++;
+  let begin = c;
+  while (begin - 1 >= Math.max(0, win.c0 - 1) && !(line.get(begin - 1)?.v != null) && !mergeAt(st, r, begin - 1)) begin--;
+  return [begin, end];
+}
+
+/** One cell's element: its text in an inner span (which carries the line height and the baseline shifts), placed by
+ *  the cell format's alignment and indent; text runs on over empty neighbours (left text to the right, right text to
+ *  the left, centred text both ways, as far as the nearer side allows), wrapped text and numbers never do. */
 export function cellElement(st, r, c, cell, line, win, rowTop) {
   const merge = mergeAt(st, r, c);
+  const align = (st.deco && st.deco(cell.s || 0).align) || NO_ALIGN;
+  const isText = cell.t === 's' || cell.t === 'str';
+  const wrap = align.wrap && isText;
+  const h = horizontalOf(align, cell);
   // (A General number gets the characters that fit its cell on screen, in print too: st.screenCols when printing.)
   const screen = st.screenCols || st.cols;
   const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
-  const text = cellText(cell, colChars(screenW, MDW)).replace(/[\r\n]/g, ''); // (without wrapping, a line break shows as nothing)
-  const el = div('oxe-cell', 'gridcell');
+  const raw = cellText(cell, colChars(screenW, MDW));
+  // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)
+  const text = wrap ? raw.replace(/\r/g, '') : raw.replace(/[\r\n]/g, '');
+  const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}`, 'gridcell');
   if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
   el.setAttribute('aria-colindex', String(c + 2));
+  let x = st.cols.start(c);
   let w = st.cols.size(c);
-  let h = st.rows.size(r);
+  let hgt = st.rows.size(r);
   if (merge) {
     el.classList.add('oxe-merged');
     el.setAttribute('aria-colspan', String(merge.c1 - merge.c0 + 1));
     el.setAttribute('aria-rowspan', String(merge.r1 - merge.r0 + 1));
-    w = st.cols.start(merge.c1 + 1) - st.cols.start(c);
-    h = st.rows.start(merge.r1 + 1) - st.rows.start(r);
-  } else if (cell.t === 's' || cell.t === 'str') {
-    // Text runs on to the right up to the next cell with something in it (or a merged range), as in Excel.
-    let end = c + 1;
-    while (end <= win.c1 + 1 && end < st.cols.count && !(line.get(end)?.v != null) && !mergeAt(st, r, end)) end++;
-    w = st.cols.start(end) - st.cols.start(c);
-    el.classList.add('oxe-text');
+    w = st.cols.start(merge.c1 + 1) - x;
+    hgt = st.rows.start(merge.r1 + 1) - st.rows.start(r);
+  } else if (isText && !wrap) {
+    const [begin, end] = runOn(st, r, c, line, win);
+    const left = st.cols.start(begin);
+    const right = st.cols.start(end);
+    if (h === 'left') w = right - x;
+    else if (h === 'right') { w = x + w - left; x = left; }
+    else {
+      const centre = x + w / 2;
+      const half = Math.min(centre - left, right - centre);
+      x = centre - half;
+      w = 2 * half;
+    }
   }
-  if (cell.t === 'n') el.classList.add('oxe-num');
-  else if (cell.t === 'b' || cell.t === 'e') el.classList.add('oxe-center');
-  el.textContent = text;
-  setVars(el, { '--oxe-x': st.cols.start(c), '--oxe-y': st.rows.start(r) - rowTop, '--oxe-w': w, '--oxe-h': h });
+  const vars = { '--oxe-x': x, '--oxe-y': st.rows.start(r) - rowTop, '--oxe-w': w, '--oxe-h': hgt };
+  if (align.indent && h !== 'center') {
+    el.classList.add(h === 'right' ? 'oxe-indent-r' : 'oxe-indent-l');
+    vars['--oxe-indent'] = align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen);
+  }
+  const span = document.createElement('span');
+  span.className = 'oxe-tx';
+  span.textContent = text;
+  el.appendChild(span);
+  setVars(el, vars);
   return el;
 }
 

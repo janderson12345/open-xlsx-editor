@@ -28,9 +28,9 @@ function fillColor(fill, theme, palette) {
 }
 
 /** The CSS declarations for one font. */
-function fontRules(font, theme, palette) {
+function fontRules(font, theme, palette, normalFamily) {
   const family = fontFamily(font, theme);
-  const vars = cellTextVars(font.size, family);
+  const vars = cellTextVars(font.size, family, normalFamily);
   const decoration = [font.u ? 'underline' : '', font.strike ? 'line-through' : ''].filter(Boolean).join(' ');
   const color = resolveColor(font.color, theme, palette);
   return [
@@ -45,7 +45,7 @@ function fontRules(font, theme, palette) {
 }
 
 /** Write a workbook's cell formats into `root` (replacing the last workbook's) and set the Normal style's font on it.
- *  Returns { classOf(s): the cell class, deco(s): { fill, fillClass, sides: [{ name, style, cls }] } }. */
+ *  Returns { classOf(s): the cell class, deco(s): { fill, fillClass, sides: [{ name, style, cls }], align } }. */
 export function applyCellStyles(root, workbook) {
   if (!root.dataset.oxeId) root.dataset.oxeId = String(nextId++);
   const scope = `.oxe-root[data-oxe-id="${root.dataset.oxeId}"]`;
@@ -53,10 +53,10 @@ export function applyCellStyles(root, workbook) {
   const { palette } = styles;
   const normalFamily = fontFamily(styles.normal, theme);
   root.style.setProperty('--oxe-font', fontStack(normalFamily));
-  setCellText(root, styles.normal.size, normalFamily);
+  setCellText(root, styles.normal.size, normalFamily, normalFamily);
   const css = [];
   const decos = styles.cellXfs.map((xf, i) => {
-    css.push(`${scope} .oxe-s${i} { ${fontRules(styles.fonts[xf.fontId], theme, palette)}; }`);
+    css.push(`${scope} .oxe-s${i} { ${fontRules(styles.fonts[xf.fontId], theme, palette, normalFamily)}; }`);
     const fill = fillColor(styles.fills[xf.fillId], theme, palette);
     if (fill) css.push(`${scope} .oxe-f${i} { background-color: ${fill}; }`);
     const border = styles.borders[xf.borderId];
@@ -70,7 +70,7 @@ export function applyCellStyles(root, workbook) {
       css.push(`${scope} .${cls} { --oxe-es: ${LINE[side.style] || 'solid'}; --oxe-ec: ${color}; }`);
       sides.push({ name, style: side.style, cls });
     }
-    return { fill, fillClass: `oxe-f${i}`, sides };
+    return { fill, fillClass: `oxe-f${i}`, sides, align: xf.align };
   });
   let el = root.querySelector(':scope > style.oxe-styles');
   if (!el) {

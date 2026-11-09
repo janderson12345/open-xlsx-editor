@@ -35,15 +35,49 @@ export function fontStack(name) {
 const BASELINE_ABOVE_DESCENT = 0.15;
 const BASELINE_STAND_IN = { 'aptos narrow': 0.85 };
 
-/** The line height (px) that puts the browser's baseline where Excel's is, for a font at `sizePx`. Chromium places
- *  text by the font's hhea ascent and descent and centres them in the line (half the leading above, half below), so
- *  a line of L px has its baseline (L - (ascent + descent)) / 2 + descent above its bottom; solved for Excel's
- *  baseline. Metrics from engine/metrics.js (the installed fonts); the stand-in's when the font isn't in the table
- *  (it is the stand-in that the browser draws), Calibri's when neither is. */
-export function cellLineHeight(name, sizePx) {
+/** Top-aligned text's baseline is the font's Windows ascent plus this far below the row's top (Excel's PDF of
+ *  test/fixtures/align.xlsx, Calibri 11 in a 45pt row: 14.76px = 13.96 + 0.8). */
+const TOP_INSET = 0.8;
+
+/** The font's metrics in px at `sizePx`: Chromium's (hhea ascent and descent, by which it places text) and Excel's
+ *  (Windows ascent and descent), from engine/metrics.js (the installed fonts); the stand-in's when the font isn't in
+ *  the table (it is the stand-in that the browser draws), Calibri's when neither is. */
+function fontMetrics(name, sizePx) {
   const key = name.toLowerCase();
-  const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
-  const [ascent, descent] = m.hhea;
-  const target = m.win[1] * sizePx + (metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT);
-  return (ascent + descent) * sizePx + 2 * (target - descent * sizePx);
+  const own = metrics[key];
+  const m = own || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
+  return {
+    ha: m.hhea[0] * sizePx, hd: m.hhea[1] * sizePx, wa: m.win[0] * sizePx, wd: m.win[1] * sizePx,
+    base: own ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT,
+  };
 }
+
+/** The line height (px) that puts the browser's baseline where Excel's is for bottom-aligned text. Chromium centres
+ *  the hhea ascent and descent in the line (half the leading above, half below), so a line of L px has its baseline
+ *  (L - (ascent + descent)) / 2 + descent above its bottom; solved for Excel's baseline. */
+export function cellLineHeight(name, sizePx) {
+  const f = fontMetrics(name, sizePx);
+  return f.ha + f.hd + 2 * (f.wd + f.base - f.hd);
+}
+
+/** Everything that places a font's text in a cell, in px: the single line's height (`lh`); how far to move the text
+ *  down from where the browser puts it, for top- and middle-aligned single lines (`top`, `mid`); and for wrapped text,
+ *  the line pitch and the shifts for bottom, top and middle alignment, on screen and in print (`pitch` gives the
+ *  pitch, the font's default row height, in each). Excel places a top-aligned line's baseline TOP_INSET + ascent below
+ *  the top, centres a line's ascent + descent in the cell, and steps wrapped lines by the font's default row height
+ *  (align.xlsx: Calibri 11 wraps every 19.36px in print, its 15pt row). */
+export function cellTextMetrics(name, sizePx, pitch) {
+  const f = fontMetrics(name, sizePx);
+  const lh = cellLineHeight(name, sizePx);
+  const chromeTop = (L) => (L - f.ha - f.hd) / 2 + f.ha; // baseline below the top of a line of L
+  const chromeBottom = (L) => (L - f.ha - f.hd) / 2 + f.hd; // baseline above the bottom
+  const mid = (f.wa - f.wd) / 2 - (f.ha - f.hd) / 2; // (a centred line box puts the baseline (ha - hd) / 2 below centre)
+  const wrap = (P) => ({ lh: P, bottom: chromeBottom(P) - (f.wd + f.base), top: TOP_INSET + f.wa - chromeTop(P), mid });
+  return { lh, top: TOP_INSET + f.wa - chromeTop(lh), mid, wrap: wrap(pitch.screen), printWrap: wrap(pitch.print) };
+}
+
+/** The font's Windows ascent + descent in px (the height Excel sizes rows by). */
+export const fontMetricsWinLine = (name, sizePx) => {
+  const f = fontMetrics(name, sizePx);
+  return f.wa + f.wd;
+};

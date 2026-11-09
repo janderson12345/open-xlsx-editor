@@ -60,9 +60,17 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   Runs 10 -> 13: Excel's fill and border shapes within 1px 32 -> 122 of 153; the rest are double lines (Excel
   shortens the inner line at corners), dash pieces cut by Chromium's whole-pixel snapping, and the hatched fill.
 - **Gridlines.** The right and bottom pixel of each cell, inside its width and height.
-- **Cell text.** Bottom-aligned, 2px side padding on screen (3.2 and 1.9 in print), numbers right, text left,
-  booleans and errors centred, no wrapping; text runs on to the right over empty cells. Size and line height only
-  through `--oxe-cell-fs` and `--oxe-cell-lh` (`celltext.js`).
+- **Cell text.** 2px side padding on screen (3.2 and 1.9 in print); general alignment puts numbers right, text left,
+  booleans and errors in the middle. Size, line height and baseline shifts only through `celltext.js`'s custom
+  properties, on an inner span (`.oxe-tx`).
+- **Alignment and wrapping** (*measured* in print, align.xlsx). Centred text is centred on the cell; right-aligned
+  text ends where numbers do; an indent level is 10.08px from either side (9 on screen, unmeasured). Top-aligned
+  text's baseline is the Windows ascent + 0.8px below the row's top; middle-aligned text centres one line's ascent +
+  descent in the row. Text runs on over empty neighbours: left text to the right, right text to the left, centred
+  both ways as far as the nearer side allows; numbers and wrapped text never. Wrapped lines step by the font's
+  default row height (Calibri 11: 15pt, 19.36px in print), not its line height, and break where Excel's do (text
+  widths already match). Run 17: align.xlsx 32 of 32 pieces matched, 30 within 1px both ways. Fill, justify and
+  distributed are drawn left, rotation and shrink-to-fit not yet.
 - **General format** (*measured*). Probe `test/fixtures/general.xlsx`: 43 values in columns of 30, 8.43, 6, 4 and 2.5
   characters, all 215 as Excel shows them (`test/general-excel.json`, checked by `npm test`). The room is the
   characters of the digit width that fit the cell less its 5px padding (`colChars`: 64px holds 8), at most 11 plus a
@@ -84,6 +92,7 @@ The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures
 9  (fonts)   page counts 6/6 on same page 100423/100423 x within 1px 100418/100423 (100.0%) y within 1px 100405/100423 (100.0%) both 100402/100423 (100.0%) width within 1px 99390/100423 (99.0%)
 14 (fills)   page counts 7/7 on same page 100436/100436 x within 1px 100431/100436 (100.0%) y within 1px 100420/100436 (100.0%) both 100417/100436 (100.0%) width within 1px 99403/100436 (99.0%)
 14 shapes    fills and borders within 1px 122/153 (79.7%), colour only 26, missing 5
+17 (align)   page counts 8/8 on same page 100465/100465 x within 1px 100459/100465 (100.0%) y within 1px 100447/100465 (100.0%) both 100443/100465 (100.0%) width within 1px 99420/100465 (99.0%)
 ```
 
 Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures. fonts.xlsx joined
@@ -91,14 +100,17 @@ at run 5; text width is measured from run 5 (run 4 had 109 of 100,364 within 1px
 (the cell text size was set on the screen grid only, and print pages sit outside it): its baselines were right by
 accident, and runs 6-8 show the real work.
 
-From run 10 text is matched page by page (Excel's PDF keeps text clipped past a page's edge). Next: alignment and
-wrapped text, then number format codes (GridCraft's `crates/numfmt` is a reference, checked
+From run 10 text is matched page by page (Excel's PDF keeps text clipped past a page's edge). From run 17 pieces a
+space apart are joined (Chromium writes wrapped words as runs of their own); widths.xlsx shows 4 fewer matches for
+it, its 1-2 character columns now reading as one piece with their neighbours, not a change in layout. Next: number
+format codes (GridCraft's `crates/numfmt` is a reference, checked
 against Excel). All of this so far is on generated fixtures; the numbers that matter come from real workbooks
 (`..\samples`).
 
 ## Open differences
 
-- Alignment, wrapping, indents and number format codes are not read yet; fonts, colours, fills and borders are.
+- Number format codes, text rotation and shrink-to-fit are not read yet; fonts, colours, fills, borders and alignment
+  are.
 - Row and column styles (a whole column's fill) are not applied to cells that aren't in the file.
 - Row heights don't grow to the tallest font in the row (rows without `ht` use the sheet default).
 - The maximum digit width is fixed at 7px (right for Calibri 11 and Aptos Narrow 11); other Normal fonts need theirs.
