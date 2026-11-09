@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { emuToPx, pxToEmu, ptToPx, colWidthToPx, pxToColWidth, charsToColWidth, colWidthToChars, defaultColPx, rowHeightToPx } from '../src/ooxml/units.js';
+import { emuToPx, pxToEmu, ptToPx, colWidthToPx, pxToColWidth, charsToColWidth, colWidthToChars, defaultColPx, rowHeightToPx, printColPx, printRowPx } from '../src/ooxml/units.js';
 
 test('EMUs and points', () => {
   assert.equal(emuToPx(914400), 96);
@@ -21,4 +21,11 @@ test('the default column: 8 characters plus padding, up to a multiple of 8px', (
   assert.equal(defaultColPx({}, 7), 64);
   assert.equal(defaultColPx({ baseColWidth: 10 }, 7), 80);
   assert.equal(defaultColPx({ defaultColWidth: 9.140625 }, 7), 64);
+});
+
+// Excel's PDFs of test/fixtures/widths.xlsx and large.xlsx (docs/LAYOUT.md).
+test('printed sizes: columns x 1.075, rows in whole 600 dpi device pixels of pt x 1.3565', () => {
+  assert.equal(printColPx(64), 68.8);
+  assert.equal(printRowPx(15), 127 / 6.25);
+  assert.equal(printRowPx(60), 508 / 6.25);
 });

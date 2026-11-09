@@ -22,7 +22,14 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
 - **Default column width.** `defaultColWidth` when given; else `baseColWidth` (8) characters plus 5px padding, rounded
   up to a multiple of 8px: 64px for Calibri 11. The multiple of 8 is from [MS-OI29500]'s note on `baseColWidth`.
 - **Row height.** Points to pixels at 96 dpi, rounded: 15pt is 20px. `customHeight` and the tallest font in the row
-  are not used yet (all rows use `ht` or the sheet default).
+  are not used yet (all rows use `ht` or the sheet default). On screen; still to be checked against Excel's screen.
+- **Printed row height** (*measured*). Whole device pixels of a 600 dpi printer (6.25 to a CSS pixel) of
+  pt x 1.3565 px, truncated (`printRowPx`): 15pt prints as 127 device pixels, 20.32px. Fitted on the probe's 21 rows
+  of 8 to 60pt (baselines all within 0.12px of one offset from their row's bottom; plain pt x 1.353 spreads 0.43px)
+  and on large.xlsx's 43 steps of 15pt rows. Same printer caveat as the columns. Run 3: page counts 3/4 -> 4/4, cells
+  on the same page 9059 -> 100147, both ways within 1px 51 -> 100145.
+- **Printed baseline** (*measured*, Calibri 11). 4.15px above the row's bottom edge. In print the cell takes the row's
+  full height and 0.15px of bottom padding lifts Edge's baseline (4px above the bottom of an 18px line box) to it.
 - **Gridlines.** The right and bottom pixel of each cell, inside its width and height.
 - **Cell text.** Bottom-aligned, 2px side padding, numbers right, text left, booleans and errors centred, no wrapping;
   text runs on to the right over empty cells. Line height is Calibri's hhea ascent + descent + gap (1.2207 em),
@@ -37,17 +44,24 @@ The four generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fix
 ```
 1b (before)  page counts 1/4 on same page 9027/85124 x within 1px   18/9027 (0.2%)   y within 1px 32/9027 (0.4%) both  3/9027 (0.0%)
 2  (columns) page counts 3/4 on same page 9059/100147 x within 1px 9057/9059 (100.0%) y within 1px 51/9059 (0.6%) both 51/9059 (0.6%)
+3  (rows)    page counts 4/4 on same page 100147/100147 x within 1px 100145/100147 (100.0%) y within 1px 100147/100147 (100.0%) both 100145/100147 (100.0%)
 ```
+
+Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures.
 
 The two cells still off across: a centred TRUE (our text 3.4px wider than Excel's) and a number in an 8px column
 that doesn't fit, which Excel starts at the left instead of right-aligning.
 
-Next, from the same probe:
+The 10 of Excel's 100,157 cells not matched at all, and why:
 
-- Printed rows: 15pt steps 20.3px (20 here), 60pt 81.3px, about x 1.015 but not as cleanly as columns (20pt steps
-  27.0). That decides rows per page: large.xlsx is 114 rows of pages in Excel, 112 here.
-- Text baseline in a row: Excel 4.3px above the row's bottom edge, 5px here.
-- Excel's text is narrower than ours in the same font ("Amount" 47.7px against 52.5): fonts are not mapped yet.
+- General format: Excel shows 0.000012345 as `0.000012345` (the rule here gives `1.2345E-05`), and fits
+  123456789012 into a 64px column as `1.23E+11` where this clips `1.23457E+11`.
+- A number too wide for its column is filled with `#` in Excel (the probe's 1.29-character column).
+- Text that reaches its cell's edge here (ours is wider: fonts are not mapped yet, "Amount" 47.7px in Excel against
+  52.5) reads as one piece with the next cell's in the extraction (`c3c4`, `ColumnMColumnN`).
+
+Next: the General format's switch-over points and narrow-column digits, then fonts (text widths). All of this so far
+is on generated fixtures; the numbers that matter come from real workbooks.
 
 The fixtures are a start; the numbers that matter come from real workbooks (`..\samples`).
 

@@ -26,9 +26,10 @@ test('pages down then over: large.xlsx splits its 5,000 rows down and its 20 col
   const { pages, paper, area } = paginate(sheet);
   assert.deepEqual(paper, { w: 816, h: 1056 });
   assert.equal(area.x, 0.7 * 96);
-  // 9.5in of 20px rows is 45 rows a page; 7.1in of columns printed at 68.8px (64 x 1.075) is 9 columns, as in Excel.
-  assert.deepEqual(pages[0], { r0: 0, r1: 44, c0: 0, c1: 8 });
-  assert.deepEqual(pages[1], { r0: 45, r1: 89, c0: 0, c1: 8 });
-  assert.equal(pages.length, Math.ceil(5000 / 45) * 3);
+  // 9.5in of rows printed at 20.32px (15pt) is 44 rows a page; 7.1in of columns printed at 68.8px (64 x 1.075) is 9
+  // columns: 114 down by 3 across, Excel's 342 pages.
+  assert.deepEqual(pages[0], { r0: 0, r1: 43, c0: 0, c1: 8 });
+  assert.deepEqual(pages[1], { r0: 44, r1: 87, c0: 0, c1: 8 });
+  assert.equal(pages.length, 342);
   assert.equal(pages[pages.length / 3].c0, 9);
 });

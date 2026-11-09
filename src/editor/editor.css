@@ -215,10 +215,13 @@
   height: var(--oxe-ah);
   overflow: hidden;
 }
-/* Printed cell text starts 3.2px into its cell and right-aligned text ends 1.9px before the cell's right edge (Excel's
-   PDF of test/fixtures/widths.xlsx: every column's text and number). */
+/* Printed cell text starts 3.2px into its cell and right-aligned text ends 1.9px before the cell's right edge, and
+   Calibri 11's baseline sits 4.15px above the row's bottom edge (Excel's PDF of test/fixtures/widths.xlsx: every
+   column's text and number, and rows of 8 to 60pt). The cell takes the row's full height in print; in Edge its 18px
+   line box puts the baseline 4px above its bottom, and the 0.15px of padding makes up the rest. */
 .oxe-page-cells .oxe-cell {
-  padding: 0 1.9px 0 3.2px;
+  height: var(--oxe-h);
+  padding: 0 1.9px 0.15px 3.2px;
 }
 .oxe-page-cells {
   position: absolute;

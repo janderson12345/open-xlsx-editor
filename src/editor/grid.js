@@ -9,7 +9,7 @@ import { Axis } from './axis.js';
 import { setCellText } from './celltext.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
-import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx } from '../ooxml/units.js';
+import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx } from '../ooxml/units.js';
 
 /** Calibri 11's maximum digit width at 96 dpi; it will come from the Normal style's font once styles are read. */
 const MDW = 7;
@@ -33,16 +33,17 @@ export const div = (cls, role) => {
 };
 
 /** The grid's rows and columns for a sheet: sizes from its rows, cols and defaults, hidden ones of no size. With
- *  `print`, columns at their printed width (units.js printColPx) instead of their width on screen. */
+ *  `print`, columns and rows at their printed sizes (units.js printColPx, printRowPx) instead of their sizes on screen. */
 export function sheetGeometry(sheet, { print = false } = {}) {
   const colPx = print ? printColPx : (px) => px;
+  const rowPx = print ? printRowPx : rowHeightToPx;
   const rowCount = Math.min(MAX_ROWS, Math.max(sheet.maxRow + 1 + PAD_ROWS, 200));
   const colCount = Math.min(MAX_COLS, Math.max(sheet.maxCol + 1 + PAD_COLS, 26));
   const rowSizes = new Map();
   for (const [r, info] of sheet.rows) {
     if (r >= rowCount) continue;
     if (info.hidden) rowSizes.set(r, 0);
-    else if (info.ht != null) rowSizes.set(r, rowHeightToPx(info.ht));
+    else if (info.ht != null) rowSizes.set(r, rowPx(info.ht));
   }
   const colSizes = new Map();
   for (const col of sheet.cols) {
@@ -51,7 +52,7 @@ export function sheetGeometry(sheet, { print = false } = {}) {
       else if (col.width != null) colSizes.set(c, colPx(colWidthToPx(col.width, MDW)));
     }
   }
-  const rows = new Axis(rowCount, rowHeightToPx(sheet.format.defaultRowHeight), rowSizes);
+  const rows = new Axis(rowCount, rowPx(sheet.format.defaultRowHeight), rowSizes);
   const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, MDW)), colSizes);
   return { rows, cols, rowHeadW: Math.max(3, String(rowCount).length) * MDW + 12 };
 }
