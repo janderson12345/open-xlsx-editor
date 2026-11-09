@@ -347,6 +347,32 @@ check(await value('J32') === null && await formulaAt('K32') === 'L33&"!"' && !(a
 await page.keyboard.press('Control+z');
 check(await value('J32') === 'moved' && await value('L33') === null && await formulaAt('K32') === 'J32&"!"', 'Ctrl+Z: back in J32, the formula too');
 
+// Rows and columns: row 5's heading clicked, Ctrl++ inserts a row there; Ctrl+Z takes it away. Column E's heading, then
+// Home, Delete, Delete Sheet Columns.
+const headAt = (axis, i) => page.evaluate(([axis, i]) => {
+  const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); const rc = g.cellRect(axis === 'row' ? i : 0, axis === 'row' ? 0 : i);
+  return axis === 'row' ? { x: v.x + geo.rowHeadW / 2, y: v.y + geo.colHeadH + rc.y - g.el.scrollTop + rc.h / 2 } : { x: v.x + geo.rowHeadW + rc.x - g.el.scrollLeft + rc.w / 2, y: v.y + geo.colHeadH / 2 };
+}, [axis, i]);
+await page.evaluate(() => { window.oxe.select('A1'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+const a5 = await value('A5');
+let h = await headAt('row', 4);
+await page.mouse.click(h.x, h.y);
+check((await sel()).r0 === 4 && (await sel()).c1 === 16383, 'the heading of row 5: the whole row selected', JSON.stringify(await sel()));
+await page.keyboard.press('Control+Shift+Equal');
+await page.waitForFunction((a5) => window.oxe.workbook.sheet(0).cells.get(5)?.get(0)?.v === a5, a5);
+check(await value('A5') === null && await value('A6') === a5, 'Ctrl++: a row inserted at 5, the rows below moved down');
+await page.keyboard.press('Control+z');
+check(await value('A5') === a5, 'Ctrl+Z: the row taken away again');
+const f11 = await value('F11');
+h = await headAt('col', 4);
+await page.mouse.click(h.x, h.y);
+check((await sel()).c0 === 4 && (await sel()).c1 === 4 && (await sel()).r1 === 1048575, 'the heading of column E: the whole column selected', JSON.stringify(await sel()));
+await page.click('.oxe-toolbar button[title="Delete"]');
+await page.click('.oxe-pop >> text=Delete Sheet Columns');
+check(f11 != null && await value('E11') === f11, 'Delete Sheet Columns: column E gone, F moved into its place', String(await value('E11')));
+await page.keyboard.press('Control+z');
+check(await value('F11') === f11, 'Ctrl+Z: column E back');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

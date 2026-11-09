@@ -450,6 +450,12 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       draw(st, true);
       drawClip(st);
     },
+    /** The sheet read again (rows or columns inserted or deleted, or undone): drawn where the view is. */
+    setModel(next) {
+      measure(next, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
+      draw(st, true);
+      drawClip(st);
+    },
     /** The workbook's cell formats changed (new ones added): drawn again with them, where the view is. */
     setLooks(nextLooks) {
       measure(st.sheet, nextLooks);

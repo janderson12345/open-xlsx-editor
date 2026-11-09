@@ -39,6 +39,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Row heights from fonts and wrapping | Done | As Excel works them out (docs/LAYOUT.md). |
 | Gridlines on or off | Shown | From the sheet's view settings. |
 | Selecting: keys, mouse, Shift, Ctrl+arrow, Ctrl+End | Done | |
+| Selecting whole rows and columns | Done | Headings, Shift+Space, Ctrl+Space, Ctrl+A, the corner. |
 | Selecting several ranges (Ctrl+click) | Missing | |
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
 | Entries read as Excel reads them | Partly | Numbers, separators, %, TRUE/FALSE, 'text. Dates and times typed as text aren't turned into dates yet. |
@@ -82,7 +83,8 @@ which is dropped when formulas change (Excel rebuilds it).
 | Styles (`styles`) | Conditional Formatting | Kept | |
 | | Format as Table | Kept | |
 | | Cell Styles | Kept | Cells show their style's formatting. |
-| Cells (`cells`) | Insert and delete rows, columns, cells | Missing | Formulas, names and merges would have to follow. |
+| Cells (`cells`) | Insert and delete rows and columns | Partly | Formulas on every sheet, names, chart series, merges, widths and the sheet's ranges follow (docs/ROWCOL.md). Refused for now on a sheet with pictures, charts, comments, tables or pivot tables. |
+| | Insert and delete cells (shifting the rest) | Missing | |
 | | Insert and delete sheets | Done | Cells > Insert, Delete; also on the tab menu. |
 | | Row height, column width (and AutoFit) | Missing | Read and shown; no dragging the headings yet. |
 | | Hide and unhide rows, columns | Missing | Hidden ones are hidden. |

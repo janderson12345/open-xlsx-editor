@@ -13,6 +13,7 @@ import { homeTab } from './editor/hometab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
+import { MAX_ROWS, MAX_COLS } from './ooxml/refs.js';
 import { parseRef } from './ooxml/refs.js';
 
 export { Workbook };
@@ -20,6 +21,7 @@ export { Workbook };
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
 const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
+  lines: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing' };
 const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
@@ -119,6 +121,8 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'renameShownSheet') return sheetActs.rename(i);
     if (name === 'hideShownSheet') return editing().run('hideSheet', i);
     if (name === 'unhideSheet') return sheetActs.unhide();
+    if (name === 'insertRows' || name === 'deleteRows') return editing().run('lines', 'row', name === 'insertRows' ? 1 : -1);
+    if (name === 'insertColumns' || name === 'deleteColumns') return editing().run('lines', 'col', name === 'insertColumns' ? 1 : -1);
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
     if (name === 'merge') {
@@ -130,6 +134,25 @@ export function mountXlsxEditor(host, options = {}) {
       }
     }
     return editing().run(name, ...args);
+  };
+  /** Ctrl++ (dir 1) and Ctrl+- (-1): whole rows or columns selected are inserted or deleted; otherwise Excel's question
+   *  (its Insert and Delete boxes, without shifting cells, which isn't there yet). */
+  const lines = async (dir) => {
+    if (state.readOnly || !allowed('lines')) return false;
+    const s = editing().selection;
+    if (s.c0 === 0 && s.c1 >= MAX_COLS - 1) return editing().run('lines', 'row', dir);
+    if (s.r0 === 0 && s.r1 >= MAX_ROWS - 1) return editing().run('lines', 'col', dir);
+    const b = await messageBox(root, dir > 0 ? 'Insert' : 'Delete', ['Entire row', 'Entire column', 'Cancel']);
+    if (b === 'Entire row' || b === 'Entire column') return editing().run('lines', b === 'Entire row' ? 'row' : 'col', dir);
+    state.grid.el.focus({ preventScroll: true });
+    return false;
+  };
+  /** The menu of a row or column heading. */
+  const headerMenu = (axis, point) => {
+    const run = (...a) => () => editing().run(...a);
+    const ro = state.readOnly;
+    menu.open([{ label: 'Insert', run: run('lines', axis, 1), disabled: ro }, { label: 'Delete', run: run('lines', axis, -1), disabled: ro },
+      'separator', { label: 'Clear Contents', run: run('clear'), disabled: ro }], point, { label: axis === 'row' ? 'Row' : 'Column' });
   };
   /** The ribbon showing what the active cell has. */
   const lookChanged = () => {
@@ -194,6 +217,9 @@ export function mountXlsxEditor(host, options = {}) {
           lookChanged,
           restyled,
           clipShown: (c) => { state.clip = c; showClip(); },
+          reloaded: () => { state.grid.setModel(state.workbook.sheet(state.sheetIndex)); lookChanged(); },
+          lines,
+          headerMenu,
           shownText: (r, c) => state.grid.shownText(r, c),
           allowed,
         });

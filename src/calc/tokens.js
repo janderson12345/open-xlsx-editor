@@ -202,6 +202,50 @@ export function shiftFormula(text, dr, dc) {
   });
 }
 
+/** A row or column index after `n` lines were inserted at `at` (n > 0) or deleted from `at` (n < 0: at to at - n - 1);
+ *  null when deleted. */
+export function shiftLine(i, at, n) {
+  if (n > 0) return i >= at ? i + n : i;
+  const last = at - n - 1;
+  return i < at ? i : i > last ? i + n : null;
+}
+
+/** A span of lines [a, b] after an insert or delete (see shiftLine), as Excel changes a range: an insert at or before
+ *  its end moves the end (inside, the range grows); a delete shrinks it, and takes it away when every line goes. Null
+ *  then. */
+export function shiftSpan(a, b, at, n) {
+  if (n > 0) return [shiftLine(a, at, n), shiftLine(b, at, n)];
+  const last = at - n - 1;
+  if (a >= at && b <= last) return null;
+  return [a < at ? a : a > last ? a + n : at, b > last ? b + n : b < at ? b : at - 1];
+}
+
+/**
+ * A formula after rows or columns of sheet `sheet` were inserted or deleted (`axis` 'row' or 'col'; `at`, `n` as in
+ * shiftLine), as Excel rewrites it: references move, $ or not; a range grows or shrinks; a reference whose cells were
+ * all deleted becomes #REF! (its sheet kept: Sheet1!#REF!). `here`: the formula's own sheet (null for a defined name,
+ * whose references name their sheet). Text that doesn't read as a formula comes back as it was.
+ */
+export function shiftRefs(text, { here, sheet, axis, at, n }) {
+  const same = (a, b) => a != null && b != null && String(a).toLowerCase() === String(b).toLowerCase();
+  const rows = axis === 'row';
+  try {
+    return mapRefs(text, (t) => {
+      if (t.type !== 'ref' || t.book != null || !t.area || !same(t.sheet ?? here, sheet)) return null;
+      const a = t.area;
+      if (rows ? a.kind === 'cols' : a.kind === 'rows') return null;
+      const span = rows ? shiftSpan(a.r0, a.r1, at, n) : shiftSpan(a.c0, a.c1, at, n);
+      if (!span) return `${t.prefix}#REF!`;
+      const next = rows ? { ...a, r0: span[0], r1: span[1] } : { ...a, c0: span[0], c1: span[1] };
+      if ((rows ? !okRow(next.r1) : !okCol(next.c1))) return `${t.prefix}#REF!`;
+      if (next.r0 === a.r0 && next.r1 === a.r1 && next.c0 === a.c0 && next.c1 === a.c1) return null;
+      return t.prefix + areaText(next);
+    });
+  } catch {
+    return text;
+  }
+}
+
 /**
  * A formula after cells were cut and pasted (Excel's move), as Excel rewrites it. `here`: the sheet the formula was on;
  * `home`: the sheet it is on now (moved with the cells, or `here`); `from`: { sheet, r0, c0, r1, c1 }, the cells cut;

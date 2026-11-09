@@ -9,7 +9,7 @@ import { createCellEditor } from './celleditor.js';
 import { createFormulaBar } from './formulabar.js';
 import { createPointing } from './pointing.js';
 import { announce } from './live.js';
-import { refName } from '../ooxml/refs.js';
+import { refName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
 
@@ -153,6 +153,12 @@ export function attachEditing(root, ctx) {
     else if (key === 'Delete') cmd.run('clear');
     else if (key === 'Escape') { if (cmd.run('dropClip')) announce('Copy cancelled'); }
     else if (key === 'Backspace') startEdit('enter', '');
+    // (Shift+Space the rows, Ctrl+Space the columns, Ctrl+A the sheet; Ctrl++ inserts, Ctrl+- deletes, as in Excel.)
+    else if (key === ' ' && e.shiftKey && !ctrl) cmd.run('selectRows');
+    else if (key === ' ' && ctrl) cmd.run('selectColumns');
+    else if (ctrl && (key === 'a' || key === 'A') && !e.shiftKey) cmd.run('selectAll');
+    else if (ctrl && (key === '+' || (key === '=' && e.shiftKey))) ctx.lines?.(1);
+    else if (ctrl && key === '-') ctx.lines?.(-1);
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');
     else if (ctrl && (key === 'y' || ((key === 'z' || key === 'Z') && e.shiftKey))) cmd.run('redo');
     // (Ctrl+C, X and V: the browser's copy and paste go on after the key, so its default isn't stopped.)
@@ -229,7 +235,17 @@ export function attachEditing(root, ctx) {
   view.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || e.target.closest('.oxe-editor')) return;
     const at = grid.hitTest(e.clientX, e.clientY);
-    if (!at || at.r < 0 || at.c < 0) return;
+    if (!at) return;
+    // (A row or column heading selects the whole line, Shift extends; the corner selects the sheet.)
+    if ((at.r < 0 || at.c < 0) && !pointing.control) {
+      e.preventDefault();
+      view.focus({ preventScroll: true });
+      if (at.r < 0 && at.c < 0) cmd.run('selectAll');
+      else if (at.r < 0) cmd.run('selectLines', 'col', at.c, e.shiftKey);
+      else cmd.run('selectLines', 'row', at.r, e.shiftKey);
+      return;
+    }
+    if (at.r < 0 || at.c < 0) return;
     e.preventDefault();
     // (A formula being typed where a reference can go: the cell is pointed at, and the text box keeps focus.)
     if (pointing.control && pointing.press(at.r, at.c, e.shiftKey)) { pointingDrag = true; return; }
@@ -240,6 +256,18 @@ export function attachEditing(root, ctx) {
     // which wants both clicks on one element, doesn't come.)
     if (e.detail === 2 && !e.shiftKey) { startEdit('edit'); return; }
     dragging = true;
+  });
+  // Right-click on a row or column heading: its menu (Insert, Delete, Clear Contents), the line selected first unless
+  // it is already part of the selection, as in Excel.
+  view.addEventListener('contextmenu', (e) => {
+    const at = grid.hitTest(e.clientX, e.clientY);
+    if (!at || (at.r >= 0 && at.c >= 0) || (at.r < 0 && at.c < 0)) return;
+    e.preventDefault();
+    const axis = at.r < 0 ? 'col' : 'row';
+    const s = cmd.selection;
+    const whole = axis === 'col' ? s.r0 === 0 && s.r1 >= MAX_ROWS - 1 && at.c >= s.c0 && at.c <= s.c1 : s.c0 === 0 && s.c1 >= MAX_COLS - 1 && at.r >= s.r0 && at.r <= s.r1;
+    if (!whole) cmd.run('selectLines', axis, axis === 'col' ? at.c : at.r);
+    ctx.headerMenu?.(axis, { x: e.clientX, y: e.clientY });
   });
   const onMove = (e) => {
     if (!dragging && !pointingDrag) return;

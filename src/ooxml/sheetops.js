@@ -88,42 +88,63 @@ const FORMULA_ELEMENTS = ['f', 'formula', 'formula1', 'formula2'];
  *  data validations, hyperlinks), the defined names, the charts and, for a rename, the pivot caches' sources. Returns
  *  the formula cells whose text changed, [{ si, r, c }]. */
 function rewriteRefs(wb, from, to) {
-  const map = (text) => renameSheetRefs(text, from, to);
+  return mapFormulas(wb, (text) => renameSheetRefs(text, from, to), { name: from, renameTo: to });
+}
+
+/**
+ * Every formula of the workbook passed through `map(text, here)` (`here`: the name of the sheet it is on; null for a
+ * defined name and a chart): cells, conditional formats, data validations, hyperlinks, defined names, chart series.
+ * Only parts that mention sheet `name` are read, and sheet `target` (its own formulas name no sheet). With `shared`,
+ * a shared formula whose cells would change differently is first written out cell by cell (all of them on `target`,
+ * whose cells move). `renameTo`: the pivot caches' sources follow a rename. Returns the formula cells changed.
+ */
+export function mapFormulas(wb, map, { name, target = -1, shared = false, renameTo = null }) {
   const changed = [];
   // (A part that doesn't mention the name, escaped as the XML has it, can't refer to the sheet: it isn't parsed.)
-  const xmlName = lower(from).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, "''");
+  const xmlName = lower(name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, "''");
   const mentions = (path) => {
     const text = lower(wb.pkg.text(path) || '');
     return text.includes(xmlName) || text.includes(xmlName.replace(/'/g, '&apos;'));
   };
+  const from = name;
+  const to = renameTo;
   wb.sheets.forEach((info, si) => {
     if (info.kind !== 'worksheet' || !info.path || !wb.pkg.has(info.path)) return;
-    if (!wb._parsed.has(info) && !mentions(info.path)) return;
+    if (si !== target && !wb._parsed.has(info) && !mentions(info.path)) return;
     const { doc, model } = wb._part(si);
+    const here = info.name;
+    if (shared) {
+      const groups = new Set();
+      for (const line of model.cells.values()) {
+        for (const cell of line.values()) if (cell.shared != null && (si === target || map(cell.f, here) !== cell.f)) groups.add(cell.shared);
+      }
+      for (const g of groups) wb._unshare(si, g);
+      if (groups.size) wb.dirty.add(info.path);
+    }
     let dirty = false;
     for (const name of FORMULA_ELEMENTS) {
       for (const el of [...doc.getElementsByTagNameNS('*', name)]) {
         const text = el.textContent;
-        const next = text ? map(text) : text;
+        const next = text ? map(text, here) : text;
         if (next !== text) { el.textContent = next; dirty = true; }
       }
     }
     for (const el of [...doc.getElementsByTagNameNS('*', 'hyperlink')]) {
       const loc = el.getAttribute('location');
-      const next = loc ? map(loc) : loc;
+      const next = loc ? map(loc, here) : loc;
       if (next !== loc) { el.setAttribute('location', next); dirty = true; }
     }
     for (const [r, line] of model.cells) {
       for (const [c, cell] of line) {
         if (cell.f == null || cell.f === '') continue;
-        const next = map(cell.f);
+        const next = map(cell.f, here);
         if (next !== cell.f) { cell.f = next; changed.push({ si, r, c }); }
       }
     }
     if (dirty) wb.dirty.add(info.path);
   });
   for (const d of wb.definedNames) {
-    const next = map(d.text);
+    const next = map(d.text, null);
     if (next !== d.text) { d.text = next; d.el.textContent = next; wb.bookDirty = true; }
   }
   for (const path of Object.keys(wb.pkg.files)) {
@@ -134,7 +155,7 @@ function rewriteRefs(wb, from, to) {
     let dirty = false;
     if (chart) {
       for (const el of [...doc.getElementsByTagNameNS('*', 'f')]) {
-        const next = map(el.textContent);
+        const next = map(el.textContent, null);
         if (next !== el.textContent) { el.textContent = next; dirty = true; }
       }
     } else {

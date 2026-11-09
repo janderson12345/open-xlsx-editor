@@ -9,7 +9,7 @@ const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.pref
 
 /** Give every row and cell of sheetData an explicit `r` where the file left it implied, so inserting one doesn't move
  *  the ones after it. (Allowed by the schema and kept by Excel; changes nothing a reader sees.) */
-function pinRefs(sheetData, ns) {
+export function pinRefs(sheetData, ns) {
   let r = -1;
   for (const rowEl of kids(sheetData, 'row', ns)) {
     r = attr(rowEl, 'r') ? Number(attr(rowEl, 'r')) - 1 : r + 1;
@@ -26,6 +26,8 @@ function pinRefs(sheetData, ns) {
 // The row elements of each edited part by row, made at its first edit (after pinRefs): a recalculation writes many
 // cells, and finding each one's row by walking sheetData would cost a pass over the sheet per cell.
 const rowIndexes = new WeakMap();
+/** Forget a part's row index (its rows moved). */
+export const forgetRows = (doc) => rowIndexes.delete(doc);
 
 /** The `row` element for row r, made (in order) if there isn't one. */
 function rowElement(doc, sheetData, ns, r) {

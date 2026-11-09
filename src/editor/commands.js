@@ -7,7 +7,7 @@
 import { cellSelection, extendSelection } from './selection.js';
 import { step, jump, lastCell } from './navigate.js';
 import { parseInput } from '../ooxml/input.js';
-import { refName } from '../ooxml/refs.js';
+import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
 import { mergeChange } from '../ooxml/mergeops.js';
@@ -139,17 +139,58 @@ export function createCommands(ctx) {
     },
     /** Set a cell to a value as given (a number, boolean, string or null), as the API does. */
     setValue(r, c, value) { return apply([{ r, c, value }]); },
-    /** Delete: empty the selected cells that have something in them (their formats stay). */
+    /** Delete: empty the selected cells that have something in them (their formats stay). Only the cells there are
+     *  are looked at, so a whole column is quick. */
     clear() {
       const s = state.sel;
       const changes = [];
-      for (let r = s.r0; r <= s.r1; r++) {
-        for (let c = s.c0; c <= s.c1; c++) {
-          const cell = sheet().cells.get(r)?.get(c);
-          if (cell && (cell.v != null || cell.f != null)) changes.push({ r, c, value: null });
-        }
+      for (const [r, line] of sheet().cells) {
+        if (r < s.r0 || r > s.r1) continue;
+        for (const [c, cell] of line) if (c >= s.c0 && c <= s.c1 && (cell.v != null || cell.f != null)) changes.push({ r, c, value: null });
       }
       return changes.length ? apply(changes) : false;
+    },
+    /** Whole rows ('row') or columns ('col') selected: line i, or from the anchor's line to i (`extend`). The active
+     *  cell is the first one of the line, as in Excel. */
+    selectLines(axis, i, extend = false) {
+      const rows = axis === 'row';
+      const anchor = extend ? (rows ? state.sel.ar : state.sel.ac) : i;
+      const a = Math.min(anchor, i);
+      const b = Math.max(anchor, i);
+      const sel = rows ? { ar: anchor, ac: 0, r0: a, r1: b, c0: 0, c1: MAX_COLS - 1 } : { ar: 0, ac: anchor, r0: 0, r1: MAX_ROWS - 1, c0: a, c1: b };
+      if (extend) { sel.ar = state.sel.ar; sel.ac = state.sel.ac; }
+      const what = rows ? (a === b ? `Row ${a + 1}` : `Rows ${a + 1} to ${b + 1}`) : (a === b ? `Column ${colName(a)}` : `Columns ${colName(a)} to ${colName(b)}`);
+      show(sel, { r: sel.ar, c: sel.ac }, `${what}, `);
+    },
+    /** Shift+Space (the selection's rows) and Ctrl+Space (its columns). */
+    selectRows() { const s = state.sel; show({ ...s, c0: 0, c1: MAX_COLS - 1 }, state.focus); },
+    selectColumns() { const s = state.sel; show({ ...s, r0: 0, r1: MAX_ROWS - 1 }, state.focus); },
+    /** Ctrl+A: the whole sheet. */
+    selectAll() { show({ ...state.sel, r0: 0, c0: 0, r1: MAX_ROWS - 1, c1: MAX_COLS - 1 }, state.focus); },
+    /** Insert (dir 1) or delete (-1) as many whole rows ('row') or columns ('col') as the selection spans, at its
+     *  first one (rowcol.js), as one step of the history; Excel's refusals said in its words. */
+    lines(axis, dir) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const s = state.sel;
+      const rows = axis === 'row';
+      const count = rows ? s.r1 - s.r0 + 1 : s.c1 - s.c0 + 1;
+      if (count >= (rows ? MAX_ROWS : MAX_COLS)) return false;
+      const wb = ctx.workbook();
+      const before = wb.snapshot();
+      try {
+        wb.changeLines(ctx.sheetIndex(), axis, rows ? s.r0 : s.c0, dir * count);
+      } catch (e) {
+        if (!(e instanceof SheetError)) throw e;
+        ctx.alert(e.message);
+        return false;
+      }
+      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+      state.redo = [];
+      commands.dropClip();
+      ctx.reloaded?.();
+      ctx.changed?.();
+      show(state.sel, state.focus, `${dir > 0 ? 'Inserted' : 'Deleted'} ${count} ${rows ? 'row' : 'column'}${count > 1 ? 's' : ''}, `);
+      return true;
     },
     /** Every selected cell with the same format change (stylesedit.js: font, fill, border, align, numFmt, style). */
     format(change) { return formatting(fmt.formatEach, change); },
@@ -291,6 +332,14 @@ export function createCommands(ctx) {
     // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
     const at = indexOf(entry.sheet);
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
+    if (entry.snap) {
+      ctx.workbook().restore(entry[side]);
+      ctx.reloaded?.();
+      ctx.changed?.();
+      to.push(entry);
+      show(state.sel, state.focus, `${word}, `);
+      return true;
+    }
     const done = entry.steps ? applySteps(entry[side]) : entry.styles ? restyle(entry[side], false) || true : apply(entry[side], false);
     if (!done) { from.push(entry); return false; }
     to.push(entry);

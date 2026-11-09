@@ -1,7 +1,7 @@
 // An .xlsx workbook: its sheets in order, the shared strings, and each sheet's model read when first asked for.
 // Saving rewrites only the sheets that were changed; every other part goes back byte for byte.
 import { OpcPackage } from './package.js';
-import { kids, kid, attr, serializeXml, NS } from './xml.js';
+import { kids, kid, attr, serializeXml, parseXml, NS } from './xml.js';
 import { readSharedStrings } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
@@ -10,6 +10,7 @@ import { setCellXml, setFormulaXml, setResultXml, setStyleXml, setMergesXml, uns
 import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
+import { changeLines } from './rowcol.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 
@@ -235,6 +236,42 @@ export class Workbook {
     for (const m of merges) { part.model.maxRow = Math.max(part.model.maxRow, m.r1); part.model.maxCol = Math.max(part.model.maxCol, m.c1); }
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
+  }
+
+  /** Insert `n` rows ('row') or columns ('col') of sheet i before index `at`, or delete -n from `at` (rowcol.js; a
+   *  refusal throws a SheetError with Excel's words). */
+  changeLines(i, axis, at, n) { changeLines(this, i, axis, at, n); }
+
+  /** The workbook as it is now, to go back to (restore): the parts, the sheets read so far and the workbook part. */
+  snapshot() {
+    return {
+      files: { ...this.pkg.files }, rels: this.pkg.rels, book: serializeXml(this.doc), dirty: new Set(this.dirty), bookDirty: this.bookDirty,
+      parsed: [...this._parsed].map(([info, part]) => [info, serializeXml(part.doc)]),
+    };
+  }
+
+  /** Back to a snapshot: its parts, its sheets (read again) and its defined names. Cell formats added since stay (no
+   *  cell of the snapshot uses them). */
+  restore(snap) {
+    this.pkg.files = { ...snap.files };
+    this.pkg.rels = snap.rels;
+    this._parsed = new Map(snap.parsed.map(([info, text]) => {
+      const doc = parseXml(text);
+      return [info, { doc, model: readSheet(doc, this.sharedStrings) }];
+    }));
+    this.doc = parseXml(snap.book);
+    const root = this.doc.documentElement;
+    const els = kids(kid(root, 'sheets', this.ns), 'sheet', this.ns);
+    for (const info of this.sheets) info.el = els.find((el) => Number(attr(el, 'sheetId')) === info.sheetId) || info.el;
+    this.definedNames = kids(kid(root, 'definedNames', this.ns), 'definedName', this.ns).map((el) => withEl({
+      name: attr(el, 'name'),
+      sheet: attr(el, 'localSheetId') == null ? null : Number(attr(el, 'localSheetId')),
+      text: el.textContent,
+    }, el));
+    this.dirty = new Set(snap.dirty);
+    this.bookDirty = true;
+    this.edited = true;
+    this.resetCalc();
   }
 
   /** Sheets added, renamed, moved, hidden or shown, coloured and deleted as Excel does it (sheetops.js; a refusal
