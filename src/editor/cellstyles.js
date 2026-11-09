@@ -1,7 +1,7 @@
 // The workbook's cell formats as CSS: one class per cellXfs index (.oxe-s3: font, size, colour), fill classes
 // (.oxe-f3) and border-side classes (.oxe-e3-left: line style and colour, as --oxe-es and --oxe-ec), scoped to one editor in a <style> of its
 // own. Cells carry the classes of their `s`; nothing about a cell's look is written on the cell itself.
-import { fontFamily } from '../ooxml/styles.js';
+import { fontFamily, formatCodeOf } from '../ooxml/styles.js';
 import { resolveColor } from '../ooxml/theme.js';
 import { fontStack } from './fonts.js';
 import { cellTextVars, setCellText } from './celltext.js';
@@ -45,7 +45,8 @@ function fontRules(font, theme, palette, normalFamily) {
 }
 
 /** Write a workbook's cell formats into `root` (replacing the last workbook's) and set the Normal style's font on it.
- *  Returns { classOf(s): the cell class, deco(s): { fill, fillClass, sides: [{ name, style, cls }], align } }. */
+ *  Returns { classOf(s): the cell class, deco(s): { fill, fillClass, sides: [{ name, style, cls }], align, code },
+ *  date1904, color(formatColour) }. */
 export function applyCellStyles(root, workbook) {
   if (!root.dataset.oxeId) root.dataset.oxeId = String(nextId++);
   const scope = `.oxe-root[data-oxe-id="${root.dataset.oxeId}"]`;
@@ -70,7 +71,7 @@ export function applyCellStyles(root, workbook) {
       css.push(`${scope} .${cls} { --oxe-es: ${LINE[side.style] || 'solid'}; --oxe-ec: ${color}; }`);
       sides.push({ name, style: side.style, cls });
     }
-    return { fill, fillClass: `oxe-f${i}`, sides, align: xf.align };
+    return { fill, fillClass: `oxe-f${i}`, sides, align: xf.align, code: formatCodeOf(styles, i) };
   });
   let el = root.querySelector(':scope > style.oxe-styles');
   if (!el) {
@@ -80,5 +81,11 @@ export function applyCellStyles(root, workbook) {
   }
   el.textContent = css.join('\n');
   const valid = (s) => (s < styles.cellXfs.length ? s : 0);
-  return { classOf: (s) => `oxe-s${valid(s)}`, deco: (s) => decos[valid(s)] };
+  return {
+    classOf: (s) => `oxe-s${valid(s)}`,
+    deco: (s) => decos[valid(s)],
+    date1904: workbook.date1904,
+    // (A number format's colour: [Red] comes as '#FF0000', [ColorN] as an indexed colour of the workbook's palette.)
+    color: (c) => (!c ? null : typeof c === 'string' ? c : resolveColor(c, theme, palette)),
+  };
 }

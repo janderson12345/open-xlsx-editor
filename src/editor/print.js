@@ -3,7 +3,7 @@
 // margins. Built only for printing (and for tools/excel-compare); hidden on screen. No scaling, fit-to-page, print
 // titles, manual breaks, headers or footers yet: those come with the print model. Everything here is to be measured
 // against Excel's own PDFs.
-import { sheetGeometry, cellElement, mergeAt, setVars, div } from './grid.js';
+import { sheetGeometry, cellElement, mergeAt, setVars, div, fitNumbers } from './grid.js';
 import { decorations } from './decor.js';
 
 const DPI = 96;
@@ -77,7 +77,7 @@ function drawPage(st, block, layout) {
 export function renderPrint(root, sheet, looks = {}, normalFamily = undefined) {
   const geometry = sheetGeometry(sheet, { print: true, normalFamily });
   const layout = paginate(sheet, geometry);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols, classOf: looks.classOf, deco: looks.deco, print: true };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');
@@ -85,6 +85,7 @@ export function renderPrint(root, sheet, looks = {}, normalFamily = undefined) {
     root.appendChild(el);
   }
   el.replaceChildren(...layout.pages.map((b) => drawPage(st, b, layout)));
+  fitNumbers(el);
   // (The paper size can only be given to the browser in an @page rule.)
   let style = document.getElementById('oxe-page-style');
   if (!style) {

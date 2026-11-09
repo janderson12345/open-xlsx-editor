@@ -79,6 +79,17 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   a value too small to show is `0` (`-0` when negative). Merged cells use the merged width; print uses the screen
   width, so both show the same text. The textbook rule (scientific below 1E-4, also GridCraft's) is wrong: Excel
   shows 0.00001 as `0.00001` in a wide column.
+- **Number formats** (*measured*). Probe `test/fixtures/numfmt.xlsx`: 27 built-in formats and 30 custom codes with 14
+  values, all 798 pairs as Excel shows them (`test/numfmt-excel.json`, in `npm test`; `format.js`). Sections by sign
+  or condition, a minus first and none when every digit shown is zero, decimal half-up rounding, separators through
+  zero padding, scaling commas after the decimals too, engineering notation (0 in `##0.0E+0` is `000.0E+0`),
+  fractions by continued fractions within the denominator's digits, dates in the 1900 system with its 29 February
+  (and 1904), times rounded to the second or to the fractions shown, `[h]` `[mm]` elapsed, `@` and text sections.
+  Built-ins 37-40 pad positives with `_)` as Excel does, not ECMA-376's space. In the view (run 21, the probe's 1583
+  pieces all within 1px across): `_x` is a hidden x, `?` a blank a digit wide, a fraction with no fractional part
+  keeps the room of its space, digits and slash, `*x` repeats x across the room left, a format's colour beats the
+  font's, a number in `@` sits left, negative dates and formatted numbers wider than their cell show centred #s (as
+  many as fit, measured in the cell's font).
 
 ## Where it stands
 
@@ -93,6 +104,7 @@ The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures
 14 (fills)   page counts 7/7 on same page 100436/100436 x within 1px 100431/100436 (100.0%) y within 1px 100420/100436 (100.0%) both 100417/100436 (100.0%) width within 1px 99403/100436 (99.0%)
 14 shapes    fills and borders within 1px 122/153 (79.7%), colour only 26, missing 5
 17 (align)   page counts 8/8 on same page 100465/100465 x within 1px 100459/100465 (100.0%) y within 1px 100447/100465 (100.0%) both 100443/100465 (100.0%) width within 1px 99420/100465 (99.0%)
+21 (numfmt)  page counts 9/9 on same page 102048/102048 x within 1px 102042/102048 (100.0%) y within 1px 101963/102048 (99.9%) both 101959/102048 (99.9%) width within 1px 100924/102048 (98.9%)
 ```
 
 Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures. fonts.xlsx joined
@@ -102,15 +114,15 @@ accident, and runs 6-8 show the real work.
 
 From run 10 text is matched page by page (Excel's PDF keeps text clipped past a page's edge). From run 17 pieces a
 space apart are joined (Chromium writes wrapped words as runs of their own); widths.xlsx shows 4 fewer matches for
-it, its 1-2 character columns now reading as one piece with their neighbours, not a change in layout. Next: number
-format codes (GridCraft's `crates/numfmt` is a reference, checked
+it, its 1-2 character columns now reading as one piece with their neighbours, not a change in layout. numfmt.xlsx
+joined at run 18: 85 of its baselines are 1.1px off, 4 rows a page at the same two places on every page, Chromium's
+whole-pixel snapping landing just past the line. Next (GridCraft's `crates/numfmt` is a reference, checked
 against Excel). All of this so far is on generated fixtures; the numbers that matter come from real workbooks
 (`..\samples`).
 
 ## Open differences
 
-- Number format codes, text rotation and shrink-to-fit are not read yet; fonts, colours, fills, borders and alignment
-  are.
+- Text rotation, shrink-to-fit, conditional formats and East Asian date formats are not drawn yet.
 - Row and column styles (a whole column's fill) are not applied to cells that aren't in the file.
 - Row heights don't grow to the tallest font in the row (rows without `ht` use the sheet default).
 - The maximum digit width is fixed at 7px (right for Calibri 11 and Aptos Narrow 11); other Normal fonts need theirs.

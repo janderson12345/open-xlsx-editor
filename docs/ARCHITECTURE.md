@@ -22,7 +22,8 @@ other's insides:
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
 | `src/ooxml/theme.js` | The theme's fonts and colours (Excel 365's default theme without a theme part); `resolveColor`, the one colour resolver (theme swap, integer-HLS tints, indexed palette). |
-| `src/ooxml/numfmt.js` | Display text of a value. Only the General format so far. |
+| `src/ooxml/numfmt.js` | What a cell shows (`cellDisplay`): the General format, and format codes through format.js. |
+| `src/ooxml/format.js` | Excel's number format codes: sections, digits, scaling, scientific, fractions, dates and times, text; built-in formats; serial dates (1900 and 1904). |
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |

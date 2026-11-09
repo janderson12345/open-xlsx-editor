@@ -1,7 +1,8 @@
 // The workbook's styles (xl/styles.xml): fonts, fills, borders and the cell formats (cellXfs) a cell's `s` points to.
-// Read once; the editor turns each cell format into CSS. Number formats come next.
+// Read once; the editor turns each cell format into CSS.
 import { kids, kid, attr, onOff } from './xml.js';
 import { INDEXED } from './theme.js';
+import { BUILTIN_FORMATS } from './format.js';
 
 /** Excel's font when styles.xml is missing or has none: the body font of the theme, 11pt. */
 const FALLBACK_FONT = { name: 'Calibri', size: 11, scheme: 'minor', b: false, i: false, u: null, strike: false, color: null };
@@ -72,11 +73,11 @@ export function fontFamily(font, theme) {
   return font.name;
 }
 
-/** { fonts, fills, borders, cellXfs: [{ fontId, fillId, borderId, align }], normal, palette } from a styles part (null:
+/** { fonts, fills, borders, cellXfs: [{ fontId, fillId, borderId, numFmtId, align }], normal, palette, numFmts } from a styles part (null:
  *  Excel's defaults). `normal` is the Normal style's font (cellStyleXfs 0), the one column widths are measured in;
  *  `palette` the indexed colours (the workbook's own `indexedColors`, else the legacy palette). */
 export function readStyles(doc) {
-  if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, align: NO_ALIGN }], normal: FALLBACK_FONT, palette: INDEXED };
+  if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN }], normal: FALLBACK_FONT, palette: INDEXED, numFmts: {} };
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const fonts = kids(kid(root, 'fonts', ns), 'font', ns).map((el) => readFont(el, ns));
@@ -86,16 +87,23 @@ export function readStyles(doc) {
   const borders = kids(kid(root, 'borders', ns), 'border', ns).map((el) => readBorder(el, ns));
   if (!borders.length) borders.push(NO_BORDER);
   const id = (el, name, list) => Math.min(Number(attr(el, name) || 0), list.length - 1);
-  const xf = (el) => ({ fontId: id(el, 'fontId', fonts), fillId: id(el, 'fillId', fills), borderId: id(el, 'borderId', borders), align: readAlignment(kid(el, 'alignment', ns)) });
+  const xf = (el) => ({ fontId: id(el, 'fontId', fonts), fillId: id(el, 'fillId', fills), borderId: id(el, 'borderId', borders), numFmtId: Number(attr(el, 'numFmtId') || 0), align: readAlignment(kid(el, 'alignment', ns)) });
   const cellXfs = kids(kid(root, 'cellXfs', ns), 'xf', ns).map(xf);
-  if (!cellXfs.length) cellXfs.push({ fontId: 0, fillId: 0, borderId: 0, align: NO_ALIGN });
+  if (!cellXfs.length) cellXfs.push({ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN });
   const styleXfs = kids(kid(root, 'cellStyleXfs', ns), 'xf', ns).map(xf);
   const custom = kids(kid(kid(root, 'colors', ns), 'indexedColors', ns), 'rgbColor', ns).map((el) => (attr(el, 'rgb') || '').slice(-6));
   const palette = custom.length ? [...custom, ...INDEXED.slice(custom.length)] : INDEXED;
-  return { fonts, fills, borders, cellXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette };
+  const numFmts = {};
+  for (const el of kids(kid(root, 'numFmts', ns), 'numFmt', ns)) numFmts[Number(attr(el, 'numFmtId'))] = attr(el, 'formatCode') || 'General';
+  return { fonts, fills, borders, cellXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette, numFmts };
 }
 
 /** The cell format `s` (out-of-range indexes take format 0, as Excel does). */
 export const xfOf = (styles, s) => styles.cellXfs[s] || styles.cellXfs[0];
+/** The format code of cell format `s`: the workbook's own (numFmts), else a built-in one, else General. */
+export const formatCodeOf = (styles, s) => {
+  const id = xfOf(styles, s).numFmtId;
+  return styles.numFmts[id] ?? BUILTIN_FORMATS[id] ?? 'General';
+};
 /** The font of cell format `s`. */
 export const fontOfXf = (styles, s) => styles.fonts[xfOf(styles, s).fontId];

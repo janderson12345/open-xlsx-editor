@@ -8,7 +8,7 @@
 import { Axis } from './axis.js';
 import { decorations } from './decor.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
-import { cellText } from '../ooxml/numfmt.js';
+import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
 
 /** Calibri 11's maximum digit width at 96 dpi; it will come from the Normal style's font once styles are read. */
@@ -140,16 +140,18 @@ function runOn(st, r, c, line, win) {
  *  the left, centred text both ways, as far as the nearer side allows), wrapped text and numbers never do. */
 export function cellElement(st, r, c, cell, line, win, rowTop) {
   const merge = mergeAt(st, r, c);
-  const align = (st.deco && st.deco(cell.s || 0).align) || NO_ALIGN;
+  const look = st.deco ? st.deco(cell.s || 0) : null;
+  const align = (look && look.align) || NO_ALIGN;
   const isText = cell.t === 's' || cell.t === 'str';
   const wrap = align.wrap && isText;
-  const h = horizontalOf(align, cell);
   // (A General number gets the characters that fit its cell on screen, in print too: st.screenCols when printing.)
   const screen = st.screenCols || st.cols;
   const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
-  const raw = cellText(cell, colChars(screenW, MDW));
+  const shown = cellDisplay(cell, colChars(screenW, MDW), look ? look.code : 'General', st.date1904);
+  // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
+  const h = shown.hashes ? 'center' : shown.textFormat && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
   // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)
-  const text = wrap ? raw.replace(/\r/g, '') : raw.replace(/[\r\n]/g, '');
+  const clean = (t) => (wrap ? t.replace(/\r/g, '') : t.replace(/[\r\n]/g, ''));
   const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}`, 'gridcell');
   if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
   el.setAttribute('aria-colindex', String(c + 2));
@@ -180,12 +182,65 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     el.classList.add(h === 'right' ? 'oxe-indent-r' : 'oxe-indent-l');
     vars['--oxe-indent'] = align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen);
   }
-  const span = document.createElement('span');
-  span.className = 'oxe-tx';
-  span.textContent = text;
-  el.appendChild(span);
+  el.appendChild(textSpan(shown, clean));
+  const color = shown.color && st.color ? st.color(shown.color) : null;
+  if (color) {
+    el.classList.add('oxe-nf-color');
+    el.style.setProperty('--oxe-nf-color', color);
+  }
+  // (A formatted number wider than its cell shows #s instead; fitNumbers checks once the cell is in the page.)
+  if (shown.fit) el.dataset.oxeFit = '1';
   setVars(el, vars);
   return el;
+}
+
+/** The text span: plain text, or for formats with padding (_x: a space as wide as x, drawn as a hidden x) and fill
+ *  (*x: x repeated across the room left in the cell) the pieces in a row. */
+function textSpan(shown, clean) {
+  const span = document.createElement('span');
+  span.className = 'oxe-tx';
+  if (shown.parts.every((p) => typeof p === 'string')) {
+    span.textContent = clean(shown.text);
+    return span;
+  }
+  span.classList.add('oxe-parts');
+  if (shown.parts.some((p) => p && p.fill)) span.classList.add('oxe-parts-fill');
+  for (const p of shown.parts) {
+    if (typeof p === 'string') span.append(clean(p));
+    else {
+      const piece = document.createElement('span');
+      piece.className = p.pad ? 'oxe-pad' : 'oxe-repeat';
+      piece.textContent = p.pad || p.fill.repeat(200);
+      span.appendChild(piece);
+    }
+  }
+  return span;
+}
+
+let measure = null;
+/** Replace formatted numbers wider than their cells with #s, as Excel does (as many as fit). Run once the cells are in
+ *  the page, so one layout serves them all; the width is measured in the cell's own font. */
+export function fitNumbers(container) {
+  const cells = container.querySelectorAll('.oxe-cell[data-oxe-fit]');
+  if (!cells.length) return;
+  measure = measure || document.createElement('canvas').getContext('2d');
+  const jobs = [];
+  for (const el of cells) {
+    const span = el.firstElementChild;
+    const cs = getComputedStyle(span);
+    const box = getComputedStyle(el);
+    const room = parseFloat(el.style.getPropertyValue('--oxe-w')) - parseFloat(box.paddingLeft) - parseFloat(box.paddingRight);
+    measure.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    // (Padding pieces count; a fill shrinks to nothing.)
+    const text = [...span.childNodes].map((n) => (n.classList && n.classList.contains('oxe-repeat') ? '' : n.textContent)).join('');
+    if (measure.measureText(text).width > room + 0.5) jobs.push([span, Math.max(1, Math.floor(room / measure.measureText('#').width))]);
+  }
+  for (const [span, n] of jobs) {
+    span.classList.remove('oxe-parts', 'oxe-parts-fill');
+    span.textContent = '#'.repeat(n);
+    span.parentElement.classList.remove('oxe-h-left', 'oxe-h-right');
+    span.parentElement.classList.add('oxe-h-center');
+  }
 }
 
 function drawRows(st, win) {
@@ -232,6 +287,7 @@ function drawRows(st, win) {
     kids.push(row);
   }
   st.body.replaceChildren(...kids);
+  fitNumbers(st.body);
 }
 
 /** Redraw if the window in view changed (or `force`). */
@@ -270,11 +326,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {} }) {
   canvas.append(colheads, lines, fills, body, edges);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
-  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco }) => {
-    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco }, sheetGeometry(next));
+  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color }) => {
+    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color }, sheetGeometry(next));
     view.setAttribute('aria-label', nextLabel);
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));

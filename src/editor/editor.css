@@ -218,6 +218,27 @@
 .oxe-wrap.oxe-h-right > .oxe-tx {
   text-align: right;
 }
+/* Number formats: a section's colour ([Red]) over the font's; padding (_x) as a hidden x; fill (*x) as x repeated
+   across whatever room is left, pushing what follows it to the right (format.js, grid.js textSpan). */
+.oxe-root .oxe-cell.oxe-nf-color.oxe-nf-color {
+  color: var(--oxe-nf-color);
+}
+.oxe-tx.oxe-parts {
+  display: flex;
+}
+.oxe-tx.oxe-parts-fill {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.oxe-pad {
+  visibility: hidden;
+}
+.oxe-repeat {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: pre;
+}
 .oxe-cell.oxe-merged {
   height: calc(var(--oxe-h) - 1px);
   width: calc(var(--oxe-w) - 1px);
