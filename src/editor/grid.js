@@ -6,7 +6,6 @@
 // coordinates. Geometry goes through custom properties (--oxe-x, --oxe-y, --oxe-w, --oxe-h), never through styles
 // written for state.
 import { Axis } from './axis.js';
-import { setCellText } from './celltext.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -33,10 +32,11 @@ export const div = (cls, role) => {
 };
 
 /** The grid's rows and columns for a sheet: sizes from its rows, cols and defaults, hidden ones of no size. With
- *  `print`, columns and rows at their printed sizes (units.js printColPx, printRowPx) instead of their sizes on screen. */
-export function sheetGeometry(sheet, { print = false } = {}) {
+ *  `print`, columns and rows at their printed sizes (units.js printColPx, printRowPx, which needs the Normal style's
+ *  typeface) instead of their sizes on screen. */
+export function sheetGeometry(sheet, { print = false, normalFamily } = {}) {
   const colPx = print ? printColPx : (px) => px;
-  const rowPx = print ? printRowPx : rowHeightToPx;
+  const rowPx = print ? (pt) => printRowPx(pt, normalFamily) : rowHeightToPx;
   const rowCount = Math.min(MAX_ROWS, Math.max(sheet.maxRow + 1 + PAD_ROWS, 200));
   const colCount = Math.min(MAX_COLS, Math.max(sheet.maxCol + 1 + PAD_COLS, 26));
   const rowSizes = new Map();
@@ -118,6 +118,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
   const text = cellText(cell, colChars(screenW, MDW)).replace(/[\r\n]/g, ''); // (without wrapping, a line break shows as nothing)
   const el = div('oxe-cell', 'gridcell');
+  if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
   el.setAttribute('aria-colindex', String(c + 2));
   let w = st.cols.size(c);
   let h = st.rows.size(r);
@@ -199,7 +200,7 @@ function draw(st, force = false) {
 }
 
 /** A read-only grid of one sheet in `host`. Returns the handle the editor and the tests use. */
-export function createGrid(host, { sheet, label = 'Sheet' }) {
+export function createGrid(host, { sheet, label = 'Sheet', classOf = null }) {
   const view = div('oxe-grid', 'grid');
   view.tabIndex = 0;
   view.setAttribute('aria-readonly', 'true');
@@ -215,11 +216,11 @@ export function createGrid(host, { sheet, label = 'Sheet' }) {
   canvas.append(colheads, lines, body);
   view.appendChild(canvas);
   host.appendChild(view);
-  setCellText(view);
-  const st = { view, canvas, colheads, corner, lines, body, sheet: null, win: null, frame: 0 };
+  const st = { view, canvas, colheads, corner, lines, body, sheet: null, win: null, frame: 0, classOf };
 
-  const setSheet = (next, nextLabel = label) => {
-    Object.assign(st, { sheet: next, win: null }, sheetGeometry(next));
+  /** Show another sheet (`nextClassOf`: its workbook's cell format classes, from cellstyles.js). */
+  const setSheet = (next, nextLabel = label, nextClassOf = st.classOf) => {
+    Object.assign(st, { sheet: next, win: null, classOf: nextClassOf }, sheetGeometry(next));
     view.setAttribute('aria-label', nextLabel);
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));

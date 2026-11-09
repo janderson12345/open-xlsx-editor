@@ -54,14 +54,22 @@ export const PRINT_COL_SCALE = 1.075;
 /** A column's printed width in pixels at 96 dpi, from its width on screen (unrounded). */
 export const printColPx = (screenPx) => screenPx * PRINT_COL_SCALE;
 
-/** Excel prints a row a little taller than its height in points: whole device pixels of a 600 dpi printer (6.25 to a
- *  CSS pixel) of pt x 1.3565 px, truncated. Fitted on Excel's PDF of test/fixtures/widths.xlsx (21 rows of 8 to 60pt:
- *  text baselines all within 0.12px of one offset from their row's bottom) and of large.xlsx (43 steps of 15pt rows,
- *  20.32px each = 127 device pixels). Same printer caveat as the columns. */
-export const PRINT_ROW_PX_PER_PT = 1.3565;
+/** Excel prints rows at a scale that depends on the workbook's Normal style font (measured, not derived):
+ *  - Aptos Narrow (Excel 365's default theme): whole device pixels of a 600 dpi printer (6.25 to a CSS pixel) of
+ *    pt x 1.3565, truncated. Excel's PDFs of test/fixtures/widths.xlsx (21 rows of 8 to 60pt, baselines within 0.12px of
+ *    one offset from their row's bottom) and large.xlsx (43 steps of 15pt rows, 20.32px each = 127 device pixels).
+ *  - Calibri: pt x 1.288 (the 23 Calibri-Normal rows of test/fixtures/fonts.xlsx, 8 to 60pt, within 0.32px; rounding
+ *    to device pixels fits no better there).
+ *  Other Normal fonts are printed at their height in points until measured. Same printer caveat as the columns. */
+export const PRINT_ROW_SCALE = { 'aptos narrow': { pxPerPt: 1.3565, device: true }, calibri: { pxPerPt: 1.288, device: false } };
 const PRINT_DEVICE_PER_PX = 600 / 96;
-/** A row's printed height in pixels at 96 dpi, from its height in points. */
-export const printRowPx = (pt) => Math.trunc(Number(pt) * PRINT_ROW_PX_PER_PT * PRINT_DEVICE_PER_PX) / PRINT_DEVICE_PER_PX;
+/** A row's printed height in pixels at 96 dpi, from its height in points and the Normal style's typeface. */
+export function printRowPx(pt, normalFamily = 'Aptos Narrow') {
+  const scale = PRINT_ROW_SCALE[String(normalFamily).toLowerCase()];
+  if (!scale) return ptToPx(pt);
+  const px = Number(pt) * scale.pxPerPt;
+  return scale.device ? Math.trunc(px * PRINT_DEVICE_PER_PX) / PRINT_DEVICE_PER_PX : px;
+}
 
 /** A row height in points to whole pixels (15pt, the Calibri 11 default, is 20px). */
 export const rowHeightToPx = (pt) => Math.round(ptToPx(pt));

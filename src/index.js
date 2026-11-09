@@ -2,6 +2,8 @@
 import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
+import { applyCellStyles } from './editor/cellstyles.js';
+import { fontFamily } from './ooxml/styles.js';
 
 export { Workbook };
 
@@ -15,7 +17,7 @@ export function mountXlsxEditor(host, options = {}) {
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { workbook: null, grid: null, sheetIndex: 0, fileName: null };
+  const state = { workbook: null, grid: null, sheetIndex: 0, fileName: null, classOf: null };
 
   const api = {
     /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). */
@@ -26,8 +28,9 @@ export function mountXlsxEditor(host, options = {}) {
       state.workbook = wb;
       state.sheetIndex = i;
       state.fileName = fileName;
-      if (state.grid) state.grid.setSheet(sheet, wb.sheets[i].name);
-      else state.grid = createGrid(root, { sheet, label: wb.sheets[i].name });
+      state.classOf = applyCellStyles(root, wb);
+      if (state.grid) state.grid.setSheet(sheet, wb.sheets[i].name, state.classOf);
+      else state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, classOf: state.classOf });
       return api;
     },
     /** The workbook as .xlsx bytes (unchanged parts byte for byte). */
@@ -38,7 +41,8 @@ export function mountXlsxEditor(host, options = {}) {
     /** Build the printed pages of the sheet shown (done before the browser prints, too); returns the page count. */
     preparePrint() {
       if (!state.workbook) return 0;
-      return renderPrint(root, state.workbook.sheet(state.sheetIndex));
+      const wb = state.workbook;
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.classOf, fontFamily(wb.styles.normal, wb.theme));
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },

@@ -67,12 +67,13 @@ function drawPage(st, block, layout) {
   return pageEl;
 }
 
-/** Build the printed pages of a sheet into `root` (replacing any from before) and set the paper size for printing.
- *  Returns the number of pages. */
-export function renderPrint(root, sheet) {
-  const geometry = sheetGeometry(sheet, { print: true });
+/** Build the printed pages of a sheet into `root` (replacing any from before) and set the paper size for printing;
+ *  `classOf` gives a cell format's class (cellstyles.js), `normalFamily` the Normal style's typeface (printed row
+ *  heights depend on it). Returns the number of pages. */
+export function renderPrint(root, sheet, classOf = null, normalFamily = undefined) {
+  const geometry = sheetGeometry(sheet, { print: true, normalFamily });
   const layout = paginate(sheet, geometry);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols, classOf };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');
