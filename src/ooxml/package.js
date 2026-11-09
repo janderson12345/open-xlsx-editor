@@ -1,10 +1,10 @@
-// The OPC package (the zip) behind a .docx. Every part is kept byte-for-byte;
-// only the parts we change are rewritten on save, so anything we don't
-// understand (headers, footers, comments, custom XML, macros...) survives.
+// The OPC package (the zip) behind an .xlsx (or any Office Open XML file). Every part is kept byte-for-byte;
+// only the parts we change are rewritten on save, so anything we don't understand (drawings, pivot caches,
+// comments, custom XML, macros...) survives.
 import { unzipSync, zipSync, strFromU8, strToU8 } from 'fflate';
 import { parseXml, serializeXml, kids, NS, REL_TYPES, esc } from './xml.js';
 
-export class DocxPackage {
+export class OpcPackage {
   constructor(files) {
     /** @type {Record<string, Uint8Array>} */
     this.files = files;
@@ -19,10 +19,10 @@ export class DocxPackage {
     try {
       files = unzipSync(u8);
     } catch (e) {
-      throw new Error('Not a .docx file (could not unzip): ' + e.message);
+      throw new Error('Not an Office Open XML file (could not unzip): ' + e.message);
     }
-    if (!files['[Content_Types].xml']) throw new Error('Not a .docx file: [Content_Types].xml missing');
-    return new DocxPackage(files);
+    if (!files['[Content_Types].xml']) throw new Error('Not an Office Open XML file: [Content_Types].xml missing');
+    return new OpcPackage(files);
   }
 
   has(path) {
@@ -42,7 +42,7 @@ export class DocxPackage {
   _findMainPart() {
     const rels = this.readRels('');
     const main = rels.find((r) => r.type === REL_TYPES.officeDocument || r.type.endsWith('/officeDocument'));
-    if (!main) throw new Error('Not a .docx file: no main document relationship');
+    if (!main) throw new Error('Not an Office Open XML file: no main part (officeDocument relationship)');
     return main.target.replace(/^\//, '');
   }
 
@@ -74,8 +74,8 @@ export class DocxPackage {
     return r ? r.target : null;
   }
 
-  /** Add a relationship to the main document; returns the new rId (`want`, when it's free: the id another editor of a
-   *  shared document gave the same part). */
+  /** Add a relationship to a part (the main part, xl/workbook.xml, by default); returns the new rId (`want`, when it's
+   *  free: the id another editor of a shared workbook gave the same part). */
   addRel(type, target, external = false, partPath = this.mainPath, want = null) {
     const dir = partPath.slice(0, partPath.lastIndexOf('/') + 1);
     const relsPath = `${dir}_rels/${partPath.slice(dir.length)}.rels`;
@@ -124,7 +124,7 @@ export class DocxPackage {
   }
 
   toBytes() {
-    // Store [Content_Types].xml first, as Word itself does.
+    // Store [Content_Types].xml first, as Office itself does.
     const ordered = { '[Content_Types].xml': this.files['[Content_Types].xml'] };
     for (const [k, v] of Object.entries(this.files)) if (k !== '[Content_Types].xml') ordered[k] = v;
     return zipSync(ordered, { level: 6 });
