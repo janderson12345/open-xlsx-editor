@@ -42,6 +42,7 @@ insides:
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
 | `src/editor/formulabar.js` | The active cell's name and contents; Enter there enters into the cell. |
 | `src/editor/interact.js` | Keys and mouse on the grid wired to the commands, the editor and the bar; screen-reader announcements (`live.js`). |
+| `src/editor/pointing.js` | Pointing at cells while a formula is typed (Excel's Point mode): arrows, clicks and drags put references in where one can go, F4 cycles $, the formula's ranges outlined in colours, references on another sheet with its name. |
 | `src/editor/tabs.js` | The sheet tabs: an ARIA tablist under the grid, sheets whose tabs aren't hidden, in their tab colours (text black or white, whichever reads better); chart sheets' tabs there but not shown yet; the New sheet button, renaming in place, dragging a tab to move it. |
 | `src/editor/sheetmenu.js` | A menu of buttons (arrows, Home, End, Esc, a colour submenu) and the tab's entries: Insert, Delete, Rename, Move Left/Right, Tab Color (theme and standard colours), Hide, Unhide. |
 | `src/editor/dialogs.js` | Modal message boxes (Excel's refusals, the question before a delete) and the Unhide list, as `<dialog>` elements. |

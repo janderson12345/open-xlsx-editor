@@ -9,7 +9,7 @@ import { Axis } from './axis.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontDescentPx } from './fonts.js';
-import { drawSelection } from './selection.js';
+import { drawSelection, drawMarks } from './selection.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -320,6 +320,7 @@ function draw(st, force = false) {
   drawRows(st, win);
   st.edges.replaceChildren(...edges);
   drawSelection(st);
+  drawMarks(st);
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
   if (active) st.view.setAttribute('aria-activedescendant', active.id);
   else st.view.removeAttribute('aria-activedescendant');
@@ -349,10 +350,14 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   // (The selection overlay sits over the borders and under the sticky headings.)
   const overlay = div('oxe-overlay');
   overlay.setAttribute('aria-hidden', 'true');
+  // (Layers of their own for the selection and a formula's ranges: redrawing them leaves an in-cell editor alone.)
+  const selLayer = div('oxe-layer');
+  const markLayer = div('oxe-layer');
+  overlay.append(selLayer, markLayer);
   canvas.append(colheads, lines, fills, body, edges, overlay);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -390,6 +395,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       view.scrollTop = st.rows.start(r);
       view.scrollLeft = st.cols.start(c);
       draw(st);
+    },
+    /** Outline a formula's ranges (selection.js drawMarks; [] for none). */
+    setMarks(marks) {
+      st.marks = marks;
+      drawMarks(st);
     },
     /** Show a selection (selection.js; null for none) and draw it. */
     setSelection(sel) {

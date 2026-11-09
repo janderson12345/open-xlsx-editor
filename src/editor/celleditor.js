@@ -1,13 +1,15 @@
 // Editing a cell in place: a text box over the active cell in the cell's own font, which grows with what is typed.
 // Two modes, as in Excel: typing over a cell (enter mode, where the arrow keys finish and move) and F2 or a double
-// click (edit mode, where they move the caret). Enter, Tab and their Shift forms finish and move; Esc gives up;
-// Alt+Enter is a line break.
+// click (edit mode, where they move the caret); F2 switches between them, as in Excel. Enter, Tab and their Shift forms
+// finish and move; Esc gives up; Alt+Enter is a line break. `onKey` sees each key first (pointing.js takes the arrows
+// while a formula is pointing).
 import { setVars } from './grid.js';
 
 const MOVES = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
-/** `grid` (its overlay and cell boxes), `onFinish(text, [dr, dc])` and `onCancel()`. */
-export function createCellEditor({ grid, onFinish, onCancel }) {
+/** `grid` (its overlay and cell boxes), `onFinish(text, [dr, dc])`, `onCancel()`, `onKey(e)` (true: taken) and
+ *  `onClose()`. */
+export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClose = null }) {
   const box = document.createElement('textarea');
   box.className = 'oxe-editor';
   box.spellcheck = false;
@@ -28,6 +30,8 @@ export function createCellEditor({ grid, onFinish, onCancel }) {
 
   box.addEventListener('keydown', (e) => {
     if (!open) return;
+    if (onKey?.(e)) { e.preventDefault(); return; }
+    if (e.key === 'F2') { e.preventDefault(); open.mode = open.mode === 'enter' ? 'edit' : 'enter'; return; }
     if (e.key === 'Escape') { e.preventDefault(); close(); onCancel(); return; }
     if (e.key === 'Enter' && e.altKey) {
       e.preventDefault();
@@ -46,6 +50,7 @@ export function createCellEditor({ grid, onFinish, onCancel }) {
     if (!open) return;
     open = null;
     box.remove();
+    onClose?.();
   }
 
   return {
@@ -64,7 +69,12 @@ export function createCellEditor({ grid, onFinish, onCancel }) {
       box.setSelectionRange(text.length, text.length);
     },
     close,
+    /** Enter what is typed, without moving (another sheet is about to be shown). */
+    commit: () => finish(null),
     get isOpen() { return !!open; },
+    /** 'enter' or 'edit' (null when closed), and the cell being edited. */
+    get mode() { return open ? open.mode : null; },
+    get at() { return open ? { r: open.r, c: open.c } : null; },
     el: box,
   };
 }

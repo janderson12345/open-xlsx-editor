@@ -41,6 +41,20 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
   - missing closing brackets are added
   - a formula that doesn't parse is refused with Excel's words, "There's a problem with this formula", and stays in
     the editor
+- **Pointing** (`src/editor/pointing.js`), as Excel's Point mode works:
+  - **Where.** A reference can go after `=`, an operator, `(`, `,` or `:`, before the end, `)` or another operator,
+    and not inside quotes.
+  - **Arrow keys.** In Enter mode (typing over a cell) they point: from the active cell, Shift extends, Ctrl jumps
+    over data. In Edit mode (F2, which switches between the two) they move the caret.
+  - **Mouse.** A click or a drag on the grid points too, and Shift+click extends.
+  - **Ending.** Typing anything else ends the reference, and the next arrow starts a new one.
+  - **F4** cycles the reference at the caret: A1, $A$1, A$1, $A1.
+  - **Range finder.** The formula's ranges are outlined in colours, and the one being pointed at is dashed. Excel's
+    own colours aren't in any file to measure, so these are ours. The reference text isn't coloured in the box.
+  - **Other sheets.** A sheet tab clicked where a reference can go shows that sheet. The sheet's name goes into the
+    formula at once (`'Notes & more'!`), and the formula goes on in the formula bar. The arrows start from that
+    sheet's active cell. Enter puts the formula into its own cell, on its own sheet; Esc goes back without it.
+  - **Merged cells.** A merged cell is pointed at by its top-left cell. Excel's behaviour here isn't measured.
 
 ## What Excel does (measured)
 
@@ -68,5 +82,4 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
 - **Intersection and 3D references.** The space operator (intersection) and 3D references (`Sheet1:Sheet3!A1`)
   aren't read, nor are structured references to tables. Formulas using them keep Excel's values.
 - **Iterative calculation.** Circular references are left as they were and announced.
-- **Pointing.** References can't be entered by clicking cells while typing a formula.
 - **Dates and times typed as entries.** Inside a formula, text such as "2024-01-02" or "1/2/2024" reads as a date.

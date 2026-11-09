@@ -1,10 +1,13 @@
 // Keyboard and mouse on the grid, as Excel answers them: arrows (Shift extends, Ctrl jumps), Tab, Enter, Home, End,
 // Page Up and Down (with Ctrl, the next or previous sheet), F2 and double click to edit, typing to replace, Delete to
-// empty, Ctrl+Z and Ctrl+Y, Shift+F11 for a new sheet; click and drag to select. Everything goes through the named commands; the cell editor and
-// formula bar enter what is typed.
+// empty, Ctrl+Z and Ctrl+Y, Shift+F11 for a new sheet; click and drag to select. Everything goes through the named
+// commands; the cell editor and formula bar enter what is typed. While a formula is typed, the arrows, clicks and drags
+// point at cells (pointing.js); a sheet tab clicked then shows that sheet and the formula goes on in the formula bar,
+// entered into its own cell, on its own sheet, with Enter (as in Excel).
 import { createCommands } from './commands.js';
 import { createCellEditor } from './celleditor.js';
 import { createFormulaBar } from './formulabar.js';
+import { createPointing } from './pointing.js';
 import { announce } from './live.js';
 import { refName } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
@@ -18,12 +21,34 @@ export function attachEditing(root, ctx) {
   const view = grid.el;
   let cmd = null;
   const cellAt = (r, c) => ctx.workbook().sheet(ctx.sheetIndex()).cells.get(r)?.get(c) || null;
+  // (A formula carried to the bar while another sheet is shown: { si, r, c }, the cell it is for.)
+  let carried = null;
   const bar = createFormulaBar(root, {
-    onEnter: (text) => { cmd.run('enter', text); view.focus(); },
-    onCancel: () => { refreshBar(); view.focus(); },
+    onEnter: (text) => {
+      if (carried) { finishCarried(text); return; }
+      cmd.run('enter', text);
+      view.focus();
+    },
+    onCancel: () => {
+      if (carried) { const o = carried; carried = null; pointing.attach(null); cmd.run('showSheet', o.si); }
+      refreshBar();
+      view.focus();
+    },
+    onKey: (e) => pointing.key(e),
+    onFocus: () => pointing.attach(bar.input),
+    onBlur: () => {
+      // (Leaving the bar while a formula is carried enters it, as leaving the cell editor does.)
+      if (carried) finishCarried(bar.input.value);
+      else if (pointing.control === bar.input) pointing.attach(null);
+    },
   });
   const editor = createCellEditor({
     grid,
+    onKey: (e) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'PageDown' || e.key === 'PageUp') && pointing.ready) { cmd.run('nextSheet', e.key === 'PageDown' ? 1 : -1); return true; }
+      return pointing.key(e);
+    },
+    onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
     onFinish: (text, move) => {
       // (An entry refused, a formula with a mistake in it, goes back into the editor to be put right, as in Excel.)
       if (!cmd.run('enter', text)) { reopen(text); return; }
@@ -41,9 +66,50 @@ export function attachEditing(root, ctx) {
       const range = sel.r0 !== sel.r1 || sel.c0 !== sel.c1 ? `, ${refName(sel.r0, sel.c0)} to ${refName(sel.r1, sel.c1)} selected` : '';
       announce(`${note}${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}`);
     },
-    showSheet: (i) => { editor.close(); ctx.showSheet(i); },
+    showSheet: (i) => {
+      if (pointing.ready && !carried) carry();
+      else if (editor.isOpen) editor.commit();
+      ctx.showSheet(i);
+      if (carried) pointing.sheetShown();
+    },
     changed: () => refreshBar(),
   });
+  const pointing = createPointing({
+    grid,
+    workbook: ctx.workbook,
+    shown: ctx.sheetIndex,
+    origin: () => {
+      if (carried) return carried;
+      const at = editor.at || { r: cmd.selection.ar, c: cmd.selection.ac };
+      return { si: ctx.sheetIndex(), ...at };
+    },
+    active: () => ({ r: cmd.selection.ar, c: cmd.selection.ac }),
+    say: announce,
+    keys: () => (pointing.control === editor.el && editor.mode === 'enter') || (pointing.control === bar.input && !!carried),
+  });
+  /** Carry the formula being typed to the bar: another sheet is about to be shown. */
+  function carry() {
+    const box = pointing.control;
+    const text = box.value;
+    const caret = box.selectionStart;
+    carried = box === editor.el ? { si: ctx.sheetIndex(), ...editor.at } : { si: ctx.sheetIndex(), r: cmd.selection.ar, c: cmd.selection.ac };
+    if (box === editor.el) editor.close();
+    bar.input.value = text;
+    bar.input.focus();
+    bar.input.setSelectionRange(caret, caret);
+    pointing.attach(bar.input);
+  }
+  /** Enter a carried formula into its cell, on its sheet (shown again). Refused, it goes back into the cell's editor. */
+  function finishCarried(text) {
+    const o = carried;
+    carried = null;
+    pointing.attach(null);
+    cmd.run('showSheet', o.si);
+    cmd.run('select', o.r, o.c);
+    if (!cmd.run('enter', text, { r: o.r, c: o.c })) { reopen(text); return; }
+    view.focus({ preventScroll: true });
+    refreshBar();
+  }
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
     bar.show(refName(s.ar, s.ac), editText(cellAt(s.ar, s.ac)));
@@ -52,6 +118,7 @@ export function attachEditing(root, ctx) {
     const s = cmd.selection;
     const cell = cellAt(s.ar, s.ac);
     editor.open(s.ar, s.ac, text, 'edit', ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '');
+    pointing.attach(editor.el);
   };
   const startEdit = (mode, seed = null) => {
     if (ctx.readOnly()) { announce('The workbook is read-only'); return; }
@@ -63,6 +130,7 @@ export function attachEditing(root, ctx) {
     }
     const cls = ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '';
     editor.open(s.ar, s.ac, seed != null ? seed : editText(cell), mode, cls);
+    pointing.attach(editor.el);
   };
 
   view.addEventListener('keydown', (e) => {
@@ -89,11 +157,14 @@ export function attachEditing(root, ctx) {
   });
 
   let dragging = false;
+  let pointingDrag = false;
   view.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || e.target.closest('.oxe-editor')) return;
     const at = grid.hitTest(e.clientX, e.clientY);
     if (!at || at.r < 0 || at.c < 0) return;
     e.preventDefault();
+    // (A formula being typed where a reference can go: the cell is pointed at, and the text box keeps focus.)
+    if (pointing.control && pointing.press(at.r, at.c, e.shiftKey)) { pointingDrag = true; return; }
     view.focus({ preventScroll: true });
     if (e.shiftKey) cmd.run('extendTo', at.r, at.c);
     else cmd.run('select', at.r, at.c);
@@ -103,11 +174,13 @@ export function attachEditing(root, ctx) {
     dragging = true;
   });
   const onMove = (e) => {
-    if (!dragging) return;
+    if (!dragging && !pointingDrag) return;
     const at = grid.hitTest(e.clientX, e.clientY);
-    if (at && at.r >= 0 && at.c >= 0) cmd.run('extendTo', at.r, at.c);
+    if (!at || at.r < 0 || at.c < 0) return;
+    if (pointingDrag) pointing.drag(at.r, at.c);
+    else cmd.run('extendTo', at.r, at.c);
   };
-  const onUp = () => { dragging = false; };
+  const onUp = () => { dragging = false; pointingDrag = false; };
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onUp);
 
@@ -115,6 +188,8 @@ export function attachEditing(root, ctx) {
     commands: cmd,
     editor,
     bar,
+    /** Whether focus should stay where a formula is typed when a sheet tab is pressed (the formula goes on there). */
+    keepsFocus: () => pointing.ready || !!carried,
     setReadOnly(flag) { bar.setReadOnly(flag); grid.setReadOnly(flag); if (flag) editor.close(); },
     reset() { editor.close(); cmd.reset(); },
     destroy() {

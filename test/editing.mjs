@@ -238,6 +238,48 @@ await page.evaluate(() => window.oxe.showSheet('Data'));
 check(await names() === 'Data,Notes' && await label() === 'Data', 'deleted from the API without a question');
 await page.focus('.oxe-grid');
 
+// Pointing while a formula is typed: arrows (Shift extends), F4, the formula carried to another sheet and entered back
+// on its own, a drag on the grid; the formula's ranges outlined, the one pointed at dashed.
+const editorText = () => page.evaluate(() => document.querySelector('.oxe-editor')?.value ?? null);
+const outlines = () => page.evaluate(() => [...document.querySelectorAll('.oxe-mark')].map((m) => (m.classList.contains('oxe-mark-point') ? 'dashed' : 'solid')).join());
+await page.evaluate(() => window.oxe.select('H2'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('=');
+await page.keyboard.press('ArrowLeft');
+check(await editorText() === '=G2' && await outlines() === 'dashed', '= then Left: G2 pointed at, outlined dashed', await editorText());
+await page.keyboard.press('ArrowLeft');
+await page.keyboard.press('Shift+ArrowDown');
+check(await editorText() === '=F2:F3', 'Left, Shift+Down: F2:F3', await editorText());
+await page.keyboard.type('+');
+await page.keyboard.press('ArrowUp');
+await page.keyboard.press('F4');
+check(await editorText() === '=F2:F3+$H$1' && await outlines() === 'solid,dashed', '+, Up, F4: $H$1; F2:F3 outlined too', `${await editorText()} ${await outlines()}`);
+await page.keyboard.type('*');
+await page.click('.oxe-tab >> text=Notes');
+check(await label() === 'Notes' && await bar() === '=F2:F3+$H$1*Notes!' && await page.evaluate(() => document.activeElement.className) === 'oxe-formula', 'a tab clicked: Notes shown, its name in the formula, which goes on in the bar', await bar());
+await page.keyboard.press('ArrowDown');
+check(await bar() === '=F2:F3+$H$1*Notes!B3', 'Down from Notes\'s active cell (B2, from before): Notes!B3', await bar());
+await page.keyboard.press('Enter');
+check(await label() === 'Data' && await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(1).get(7).f) === 'F2:F3+$H$1*Notes!B3' && await value('H2') === 0, 'Enter: back on Data, entered into H2');
+await page.evaluate(() => window.oxe.select('H5'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('=SUM(');
+const p0 = await pointAt(1, 1);
+const p1 = await pointAt(4, 2);
+await page.mouse.move(p0.x, p0.y);
+await page.mouse.down();
+await page.mouse.move(p1.x, p1.y, { steps: 5 });
+await page.mouse.up();
+check(await editorText() === '=SUM(B2:C5', 'a drag from B2 to C5 points at B2:C5', await editorText());
+await page.keyboard.press('Enter');
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(4).get(7).f) === 'SUM(B2:C5)' && await value('H5') === 282 && await outlines() === '', 'Enter: =SUM(B2:C5) is 282 (B2 77 and B3 10 by now), the outlines gone', String(await value('H5')));
+await page.evaluate(() => window.oxe.select('H5'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('F2');
+await page.keyboard.press('ArrowLeft');
+check(await editorText() === '=SUM(B2:C5)' && await page.evaluate(() => document.querySelector('.oxe-editor').selectionStart) === 10, 'F2 (Edit mode): Left moves the caret, nothing pointed at');
+await page.keyboard.press('Escape');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

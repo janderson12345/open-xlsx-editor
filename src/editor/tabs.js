@@ -84,8 +84,11 @@ export function createSheetTabs(root, { controls, on }) {
     return { after: tabs[tabs.length - 1] };
   };
   const unmark = () => strip.querySelectorAll('.oxe-drop-before, .oxe-drop-after').forEach((el) => el.classList.remove('oxe-drop-before', 'oxe-drop-after'));
+  // (A formula being typed keeps focus when a tab is pressed: it goes on, pointing at the other sheet.)
+  strip.addEventListener('mousedown', (e) => { if (e.button === 0 && on.keepFocus?.()) e.preventDefault(); });
   strip.addEventListener('pointerdown', (e) => {
     const el = tabAt(e.target);
+    dragged = false; // (a drag's click may never come: each press starts afresh)
     if (e.button !== 0 || !el) return;
     drag = { from: Number(el.dataset.sheet), x: e.clientX, moved: false, id: e.pointerId };
   });

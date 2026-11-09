@@ -8,8 +8,8 @@ move, colour, hide and delete sheets from the tab menu, with formulas and names 
 prints a sheet as Excel lays it out (measured against Excel's own PDFs), and lets you edit cell values: select with the
 keyboard or mouse, type over a cell or press F2, Delete, undo and redo. Formulas are worked out as Excel works them
 out (about 130 functions; 399 of 399 test formulas give Excel's results), again whenever what they read changes, and
-can be typed. Saving rewrites only the sheets you changed; every other part goes back byte for byte. The ribbon comes
-next.
+can be typed, pointing at cells with the arrow keys or the mouse, on this sheet or another, as in Excel. Saving
+rewrites only the sheets you changed; every other part goes back byte for byte. The ribbon comes next.
 Sister project of open-docx-editor, built the same way.
 
 ```js

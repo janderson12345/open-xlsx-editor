@@ -610,6 +610,26 @@
   border: 2px solid var(--oxe-sel);
 }
 
+/* A formula's ranges while it is typed (selection.js drawMarks): each in its colour, the one pointed at dashed. */
+.oxe-layer {
+  position: absolute;
+  inset: 0;
+}
+.oxe-mark {
+  position: absolute;
+  box-sizing: border-box;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x) - 1px);
+  top: calc(var(--oxe-y) - 1px);
+  width: calc(var(--oxe-w) + 1px);
+  height: calc(var(--oxe-h) + 1px);
+  border: 2px solid var(--oxe-mark);
+  background: color-mix(in srgb, var(--oxe-mark) 10%, transparent);
+}
+.oxe-mark-point {
+  border-style: dashed;
+  background: transparent;
+}
+
 /* Editing in a cell (celleditor.js): a box over it in the cell's font, growing with its text. */
 .oxe-editor {
   position: absolute;

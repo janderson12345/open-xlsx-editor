@@ -14,16 +14,30 @@ export function extendSelection(sel, r, c) {
  *  active cell (or the merged range it is in). */
 export function drawSelection(st) {
   const sel = st.sel;
-  if (!st.overlay) return;
-  if (!sel) return st.overlay.replaceChildren();
-  const box = (r0, c0, r1, c1, cls) => {
-    const el = div(cls);
-    setVars(el, { '--oxe-x': st.cols.start(c0), '--oxe-y': st.rows.start(r0), '--oxe-w': st.cols.start(c1 + 1) - st.cols.start(c0), '--oxe-h': st.rows.start(r1 + 1) - st.rows.start(r0) });
-    return el;
-  };
+  if (!st.selLayer) return;
+  if (!sel) return st.selLayer.replaceChildren();
+  const box = (r0, c0, r1, c1, cls) => rangeBox(st, r0, c0, r1, c1, cls);
   const kids = [];
   if (sel.r0 !== sel.r1 || sel.c0 !== sel.c1) kids.push(box(sel.r0, sel.c0, sel.r1, sel.c1, 'oxe-sel-range'));
   const m = st.sheet.merges.find((x) => sel.ar >= x.r0 && sel.ar <= x.r1 && sel.ac >= x.c0 && sel.ac <= x.c1);
   kids.push(m ? box(m.r0, m.c0, m.r1, m.c1, 'oxe-sel-active') : box(sel.ar, sel.ac, sel.ar, sel.ac, 'oxe-sel-active'));
-  st.overlay.replaceChildren(...kids);
+  st.selLayer.replaceChildren(...kids);
+}
+
+/** A box over cells r0..r1, c0..c1 in the overlay's coordinates. */
+export function rangeBox(st, r0, c0, r1, c1, cls) {
+  const el = div(cls);
+  setVars(el, { '--oxe-x': st.cols.start(c0), '--oxe-y': st.rows.start(r0), '--oxe-w': st.cols.start(c1 + 1) - st.cols.start(c0), '--oxe-h': st.rows.start(r1 + 1) - st.rows.start(r0) });
+  return el;
+}
+
+/** The ranges a formula being typed refers to, as Excel's range finder shows them: each outlined in its colour, the
+ *  one being pointed at dashed (marks: [{ r0, c0, r1, c1, color, dashed }]). */
+export function drawMarks(st) {
+  if (!st.markLayer) return;
+  st.markLayer.replaceChildren(...(st.marks || []).map((m) => {
+    const el = rangeBox(st, m.r0, m.c0, m.r1, m.c1, m.dashed ? 'oxe-mark oxe-mark-point' : 'oxe-mark');
+    el.style.setProperty('--oxe-mark', m.color);
+    return el;
+  }));
 }

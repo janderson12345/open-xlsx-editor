@@ -123,6 +123,7 @@ export function mountXlsxEditor(host, options = {}) {
             rename: sheetActs.rename,
             move: (from, to) => editing().run('moveSheet', from, to),
             add: () => editing().run('insertSheet', { after: true }),
+            keepFocus: () => !!state.editing?.keepsFocus(),
           },
         });
       }

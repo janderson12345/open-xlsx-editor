@@ -6,6 +6,7 @@ import { parseInput, editText } from '../src/ooxml/input.js';
 import { step, jump, lastCell } from '../src/editor/navigate.js';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { textOn } from '../src/editor/tabs.js';
+import { insertable, rangeText, cycleRef } from '../src/editor/pointing.js';
 
 test('typed entries read as Excel reads them', () => {
   const v = (s) => parseInput(s).value;
@@ -49,4 +50,22 @@ test('sheet tabs: the sheets that can be shown, tab colours resolved as cell col
   // (theme 5 is accent 2, E97132 in the default theme, lightened 40%: Excel's "Orange, Accent 2, Lighter 40%")
   assert.deepEqual(wb.sheets.map((_, i) => wb.tabColor(i)), [null, '#F1A983', null]);
   assert.deepEqual(['#F1A983', '#C00000', '#FFFF00', '#002060'].map(textOn), ['#000000', '#ffffff', '#000000', '#ffffff']);
+});
+
+test('pointing: where a reference can go, a range as text, F4 cycling $ as Excel does', () => {
+  const ok = (text, at = text.length) => insertable(text, at);
+  assert.deepEqual(['=', '=A1+', '=SUM(', '=SUM(A1,', '=A1:', '=1 * ', '=A1&'].map((t) => ok(t)), [true, true, true, true, true, true, true]);
+  assert.deepEqual(['=A1', '=SUM(A1', '="a+', 'A1+', '=A1%', '=2'].map((t) => ok(t)), [false, false, false, false, false, false]);
+  assert.equal(ok('=+A1', 2), false); // (a reference just after the caret)
+  assert.equal(ok('=SUM(,A1)', 5), true);
+  assert.equal(rangeText({ r: 4, c: 2 }, { r: 1, c: 1 }), 'B2:C5');
+  assert.equal(rangeText({ r: 0, c: 0 }, { r: 0, c: 0 }), 'A1');
+  let text = '=SUM(B2:C5)+H1';
+  const seen = [];
+  for (let k = 0; k < 4; k++) { text = cycleRef(text, text.length).text; seen.push(text.slice(text.indexOf(')+') + 2)); }
+  assert.deepEqual(seen, ['$H$1', 'H$1', '$H1', 'H1']);
+  assert.equal(cycleRef('=SUM(B2:C5)', 7).text, '=SUM($B$2:$C$5)');
+  assert.equal(cycleRef("='My Data'!A1", 13).text, "='My Data'!$A$1");
+  assert.equal(cycleRef('=A:A', 4).text, '=$A:$A');
+  assert.equal(cycleRef('=1+2', 4), null);
 });
