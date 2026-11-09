@@ -11,7 +11,10 @@ for f in sorted(os.listdir(xd)):
     if not f.endswith('.json') or not os.path.exists(os.path.join(od, f)): continue
     x = json.load(open(os.path.join(xd, f), encoding='utf8')); o = json.load(open(os.path.join(od, f), encoding='utf8'))
     # (Matched page by page: text past a page's edge, clipped out of sight, is still in Excel's PDF, and would otherwise
-    # pair with the same text on the next page.)
+    # pair with the same text on the next page. Within a page, in reading order by row bands of 6px, so that text of
+    # different sizes in one row, whose baselines differ a little, keeps its order across.)
+    band = lambda a: (a[1], round(a[3] / 6), a[2])
+    x = sorted(x, key=band); o = sorted(o, key=band)
     sm = difflib.SequenceMatcher(None, [(a[1], a[0]) for a in x], [(a[1], a[0]) for a in o], autojunk=False)
     pairs = [(x[b.a + i], o[b.b + i]) for b in sm.get_matching_blocks() for i in range(b.size)]
     same = [(a, b) for a, b in pairs if a[1] == b[1]]
