@@ -117,6 +117,16 @@ export function setCellXml(doc, r, c, value) {
   return cEl;
 }
 
+/** Give a cell cell format `s` (0, the default, is written by leaving `s` out, as Excel does). */
+export function setStyleXml(doc, r, c, s) {
+  const root = doc.documentElement;
+  const cEl = cellEl(doc, r, c);
+  if (s) cEl.setAttribute('s', String(s));
+  else cEl.removeAttribute('s');
+  growDimension(root, root.namespaceURI, r, c);
+  return cEl;
+}
+
 /** Give a cell a formula (its text as the file has it, without "="); its value comes with setResultXml. */
 export function setFormulaXml(doc, r, c, formula) {
   const root = doc.documentElement;

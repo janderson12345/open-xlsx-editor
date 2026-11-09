@@ -14,7 +14,7 @@ const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, inden
 /** A cell format's `alignment`: horizontal (general, left, center, right, fill, justify, centerContinuous,
  *  distributed), vertical (top, center, bottom, justify, distributed), wrapping and indent (in levels). Rotation and
  *  shrink-to-fit are not read yet. */
-function readAlignment(el) {
+export function readAlignment(el) {
   if (!el) return NO_ALIGN;
   return {
     horizontal: attr(el, 'horizontal') || 'general',
@@ -32,7 +32,7 @@ export function readColor(el) {
 }
 
 /** One `font` element. */
-function readFont(el, ns) {
+export function readFont(el, ns) {
   const val = (name) => attr(kid(el, name, ns), 'val');
   const u = kid(el, 'u', ns);
   return {
@@ -49,20 +49,27 @@ function readFont(el, ns) {
 
 /** One `fill`: its pattern (solid, a hatch, or none) with foreground and background colours. Gradient fills are read
  *  as none for now. (In a solid fill the colour is the foreground's, as Excel writes it.) */
-function readFill(el, ns) {
+export function readFill(el, ns) {
   const p = kid(el, 'patternFill', ns);
   if (!p) return NO_FILL;
   return { pattern: attr(p, 'patternType') || 'none', fg: readColor(kid(p, 'fgColor', ns)), bg: readColor(kid(p, 'bgColor', ns)) };
 }
 
 /** One `border`: each side's style (thin, medium, thick, hair, dotted, dashed, double, ...) and colour. */
-function readBorder(el, ns) {
+export function readBorder(el, ns) {
   const side = (name) => {
     const s = kid(el, name, ns);
     const style = s && attr(s, 'style');
     return style && style !== 'none' ? { style, color: readColor(kid(s, 'color', ns)) } : NO_SIDE;
   };
   return { left: side('left') === NO_SIDE ? side('start') : side('left'), right: side('right') === NO_SIDE ? side('end') : side('right'), top: side('top'), bottom: side('bottom') };
+}
+
+/** One `xf` of cellXfs or cellStyleXfs: its font, fill, border (indexes kept inside the lists), number format,
+ *  alignment and cell style (`xfId`). */
+export function readXf(el, ns, { fonts, fills, borders }) {
+  const id = (name, list) => Math.min(Number(attr(el, name) || 0), list.length - 1);
+  return { fontId: id('fontId', fonts), fillId: id('fillId', fills), borderId: id('borderId', borders), numFmtId: Number(attr(el, 'numFmtId') || 0), align: readAlignment(kid(el, 'alignment', ns)), xfId: Number(attr(el, 'xfId') || 0) };
 }
 
 /** The typeface a font is drawn in: the theme's for a scheme font (Excel uses the theme's font whatever `name` says),
@@ -86,8 +93,7 @@ export function readStyles(doc) {
   if (!fills.length) fills.push(NO_FILL);
   const borders = kids(kid(root, 'borders', ns), 'border', ns).map((el) => readBorder(el, ns));
   if (!borders.length) borders.push(NO_BORDER);
-  const id = (el, name, list) => Math.min(Number(attr(el, name) || 0), list.length - 1);
-  const xf = (el) => ({ fontId: id(el, 'fontId', fonts), fillId: id(el, 'fillId', fills), borderId: id(el, 'borderId', borders), numFmtId: Number(attr(el, 'numFmtId') || 0), align: readAlignment(kid(el, 'alignment', ns)) });
+  const xf = (el) => readXf(el, ns, { fonts, fills, borders });
   const cellXfs = kids(kid(root, 'cellXfs', ns), 'xf', ns).map(xf);
   if (!cellXfs.length) cellXfs.push({ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN });
   const styleXfs = kids(kid(root, 'cellStyleXfs', ns), 'xf', ns).map(xf);

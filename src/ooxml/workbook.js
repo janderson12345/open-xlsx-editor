@@ -6,7 +6,8 @@ import { readSharedStrings } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
-import { setCellXml, setFormulaXml, setResultXml, unshareXml } from './sheetedit.js';
+import { setCellXml, setFormulaXml, setResultXml, setStyleXml, unshareXml } from './sheetedit.js';
+import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { Calc } from '../calc/engine.js';
@@ -53,7 +54,10 @@ export class Workbook {
     this.sharedStrings = readSharedStrings(sstPath ? pkg.xml(sstPath) : null);
     const part = (kind) => rels.find((x) => x.type.endsWith('/' + kind) && !x.external && pkg.has(x.target))?.target;
     /** Fonts and cell formats (styles.js), and the theme's fonts and colours (theme.js; Excel's default without one). */
-    this.styles = readStyles(part('styles') ? pkg.xml(part('styles')) : null);
+    this.stylesPath = part('styles') || null;
+    /** The styles part, parsed once; formatting cells adds to it (stylesedit.js). */
+    this.stylesDoc = this.stylesPath ? pkg.xml(this.stylesPath) : null;
+    this.styles = readStyles(this.stylesDoc);
     this.theme = readTheme(part('theme') ? pkg.xml(part('theme')) : null);
     /** Defined names: { name, sheet (the index of the sheet it belongs to, or null for the whole workbook), text }. */
     this.definedNames = kids(kid(root, 'definedNames', this.ns), 'definedName', this.ns).map((el) => withEl({
@@ -199,6 +203,30 @@ export class Workbook {
     return this.calc.recalc(rects, changes.filter((ch) => ch.formula != null).map(({ r, c }) => ({ si: i, r, c })));
   }
 
+  /** Cell format `s` with a change (stylesedit.js: font, fill, border, alignment, number format, cell style): the
+   *  index of the cell format that has it, added to the styles part if there's none. */
+  styleWith(s, change) {
+    return formatsOf(this).xf(s, change);
+  }
+
+  /** Give cells of sheet i the cell formats [{ r, c, s }]. A cell that doesn't exist is made, holding only its format
+   *  (as Excel keeps a formatted empty cell). */
+  setStyles(i, cells) {
+    const part = this._part(i);
+    const model = part.model;
+    for (const { r, c, s } of cells) {
+      setStyleXml(part.doc, r, c, s);
+      if (!model.cells.has(r)) model.cells.set(r, new Map());
+      const cell = model.cells.get(r).get(c);
+      if (cell) cell.s = s;
+      else model.cells.get(r).set(c, { t: 'n', v: null, s, f: null });
+      model.maxRow = Math.max(model.maxRow, r);
+      model.maxCol = Math.max(model.maxCol, c);
+    }
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
+  }
+
   /** Sheets added, renamed, moved, hidden or shown, coloured and deleted as Excel does it (sheetops.js; a refusal
    *  throws a SheetError with Excel's words). `addSheet` returns the new sheet's index. */
   addSheet(at, name) { return addSheet(this, at, name); }
@@ -259,6 +287,7 @@ export class Workbook {
     for (const [info, part] of this._parsed) {
       if (this.dirty.has(info.path) && this.sheets.includes(info)) this.pkg.setText(info.path, partText(part.doc, this.pkg.text(info.path)));
     }
+    if (this.stylesPath && this.dirty.has(this.stylesPath)) this.pkg.setText(this.stylesPath, partText(this.stylesDoc, this.pkg.text(this.stylesPath)));
     if (this.bookDirty) this.pkg.setText(this.pkg.mainPath, partText(this.doc, this.pkg.text(this.pkg.mainPath)));
     this.bookDirty = false;
     return this.pkg.toBytes();
