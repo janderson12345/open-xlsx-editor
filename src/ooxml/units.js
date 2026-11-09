@@ -58,10 +58,12 @@ export const printColPx = (screenPx) => screenPx * PRINT_COL_SCALE;
  *  - Aptos Narrow (Excel 365's default theme): whole device pixels of a 600 dpi printer (6.25 to a CSS pixel) of
  *    pt x 1.3565, truncated. Excel's PDFs of test/fixtures/widths.xlsx (21 rows of 8 to 60pt, baselines within 0.12px of
  *    one offset from their row's bottom) and large.xlsx (43 steps of 15pt rows, 20.32px each = 127 device pixels).
- *  - Calibri: pt x 1.288 (the 23 Calibri-Normal rows of test/fixtures/fonts.xlsx, 8 to 60pt, within 0.32px; rounding
- *    to device pixels fits no better there).
+ *  - Calibri: the same, of pt x 1.291. Excel's PDF of test/fixtures/fills.xlsx gives 15pt rows exactly from its fill
+ *    boundaries (19.36px = 121 device pixels; plain pt x 1.288, fitted earlier on text baselines, drifted 0.04px a row
+ *    and lost fills further down the page), and fonts.xlsx's rows of 8 to 60pt step within about 0.1px of it (10pt
+ *    12.8, 18pt 23.2, 30pt 38.72, 60pt 77.44; 8pt and 11pt 0.16 and 0.12 short).
  *  Other Normal fonts are printed at their height in points until measured. Same printer caveat as the columns. */
-export const PRINT_ROW_SCALE = { 'aptos narrow': { pxPerPt: 1.3565, device: true }, calibri: { pxPerPt: 1.288, device: false } };
+export const PRINT_ROW_SCALE = { 'aptos narrow': { pxPerPt: 1.3565, device: true }, calibri: { pxPerPt: 1.291, device: true } };
 const PRINT_DEVICE_PER_PX = 600 / 96;
 /** A row's printed height in pixels at 96 dpi, from its height in points and the Normal style's typeface. */
 export function printRowPx(pt, normalFamily = 'Aptos Narrow') {

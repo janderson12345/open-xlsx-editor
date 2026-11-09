@@ -20,14 +20,15 @@ other's insides:
 | `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults. Implied `r` positions followed. |
 | `src/ooxml/sheetedit.js` | Changing one cell in the worksheet's XML in place: implied positions pinned first, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. Formula cells refused until formulas and calcChain are modelled. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
-| `src/ooxml/styles.js` | Fonts and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
-| `src/ooxml/theme.js` | The theme's heading and body fonts and colour scheme; Excel 365's default theme (Aptos Narrow) when there is no theme part. |
+| `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
+| `src/ooxml/theme.js` | The theme's fonts and colours (Excel 365's default theme without a theme part); `resolveColor`, the one colour resolver (theme swap, integer-HLS tints, indexed palette). |
 | `src/ooxml/numfmt.js` | Display text of a value. Only the General format so far. |
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |
 | `src/editor/celltext.js` | The one place cell text size and line height are set (`--oxe-cell-fs`, `--oxe-cell-lh`). |
 | `src/editor/fonts.js` | Font stacks with metric-compatible stand-ins; `cellLineHeight`, the line height that puts the browser's baseline where Excel's is. |
+| `src/editor/decor.js` | Fill rectangles and border edges for the cells in view (and on each printed page), with Excel's printed geometry and dash patterns. |
 | `src/editor/cellstyles.js` | Each cell format as a CSS class (`.oxe-s3`) in a `<style>` scoped to one editor; the Normal font on the root. |
 | `src/editor/editor.css` | Theme variables (light, dark, host-overridable) and the grid's layout. Geometry through custom properties; no `!important`. |
 
@@ -39,7 +40,7 @@ other's insides:
 | `test/*.test.js` | Unit tests in Node (`npm test`): round trips byte for byte, edits, units, references, geometry, the checker. |
 | `test/e2e.mjs`, `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; axe in light and dark at 1280 and 320px. Both assert standards mode. |
 | `tools/check-ooxml.mjs` | Structural check of .xlsx files (what makes Excel offer a repair). |
-| `tools/excel-compare/` | Comparison with Excel's own PDFs: `excel-print.ps1` (Excel through COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions from both), `compare.py`, `diff.py`, `run.ps1`. See its README. |
+| `tools/excel-compare/` | Comparison with Excel's own PDFs: `excel-print.ps1` (Excel through COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions), `shapes.cjs` (filled rectangles and lines), `compare.py`, `compare-shapes.py`, `diff.py`, `run.ps1`. See its README. |
 | `tools/scan-bytes.mjs` | Control characters and byte order marks in source text (part of `npm run lint`). |
 
 ## How a file becomes a grid

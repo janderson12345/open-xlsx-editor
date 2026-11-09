@@ -27,9 +27,11 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   - Aptos Narrow: whole device pixels of a 600 dpi printer (6.25 to a CSS pixel) of pt x 1.3565 px, truncated: 15pt
     prints as 127 device pixels, 20.32px. widths.xlsx's 21 rows of 8 to 60pt (baselines within 0.12px of one offset;
     plain pt x 1.353 spreads 0.43px) and large.xlsx's 43 steps of 15pt rows. Run 3: page counts 3/4 -> 4/4.
-  - Calibri: pt x 1.288 (fonts.xlsx's 23 Calibri-Normal rows within 0.32px; device rounding fits no better).
-  - Other Normal fonts: points, unscaled, until measured. No formula relating the two was found (columns print at
-    x 1.075 under both). Same printer caveat as the columns.
+  - Calibri: the same of pt x 1.291: 15pt is 121 device pixels, 19.36px, read exactly off fills.xlsx's fill
+    boundaries; fonts.xlsx's rows of 8 to 60pt step within about 0.1px of it. (A first fit of plain pt x 1.288 on
+    text baselines drifted 0.04px a row; run 12 replaced it.)
+  - Other Normal fonts: points, unscaled, until measured. No formula relating the two factors was found (columns
+    print at x 1.075 under both). Same printer caveat as the columns.
 - **Fonts** (*measured*). A cell's typeface is its font's, except that a font of scheme `minor` or `major` is the
   theme's body or heading font whatever its `name` says. A workbook without a theme part gets Excel 365's default
   theme, whose body font is Aptos Narrow (basic.xlsx prints in Aptos Narrow though its fonts say Calibri). Stacks add
@@ -39,11 +41,24 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   99.0% of all cells; fonts.xlsx 30 -> 53 of 55.
 - **Printed baseline** (*measured*). Excel puts bottom-aligned text's baseline the font's Windows descent plus about
   0.15px above the row's bottom (fonts.xlsx: Calibri 11 to 20, Cambria, Arial, Times New Roman; Calibri 8 sits 1.1px
-  higher, Courier New lower). Chromium places text by the font's hhea ascent and descent with half the leading above
-  and below, and snaps the baseline to whole pixels, 0.7px lower than that model says: the line height is solved for
-  a baseline aimed 0.85px above the descent (`cellLineHeight`), fitted on large.xlsx. Runs 8 -> 9: baselines within
-  1px 81.8% -> 100.0%. What is left on fonts.xlsx (34 of 55 within 1px both ways) is the Calibri row scale drifting
-  over the page, Calibri 8 and Courier New.
+  higher, Courier New lower), and Aptos Narrow's 0.85px above the descent of Calibri, its stand-in (large.xlsx).
+  Chromium places text by the font's hhea ascent and descent with half the leading above and below and snaps the
+  baseline to whole pixels; the line height is solved for Excel's baseline (`cellLineHeight`). Runs 8 -> 9 (Aptos
+  Narrow) baselines within 1px 81.8% -> 100.0%; run 14 (Calibri at 0.15 instead of 0.85) fonts.xlsx both ways 34 ->
+  37 of 55. What is left there is Calibri 8, Courier New, and Chromium's whole-pixel snapping.
+- **Colours** (*measured*). Theme indexes swap the first two pairs (0 lt1, 1 dk1, 2 lt2, 3 dk2, then the accents);
+  tints work in Windows' integer HLS (0-240, Microsoft KB Q29240) and reproduce all 8 of fills.xlsx's tints exactly,
+  where floating-point HLS misses 5 by a step; indexed colours from the legacy palette or the workbook's own.
+  `theme.js resolveColor` is the one resolver. Patterned fills are drawn as the blend of their two colours for now.
+- **Fills and borders** (*measured* in print, fills.xlsx). Excel's printed grid starts half a point (0.67px across,
+  0.7px down) beyond margin + sizes; fills run boundary to boundary; border lines are 1.28px a unit (thin 1, medium
+  2, thick and double 3) and hair 0.16px, centred on the boundary; the left edge owns both left corners, the top and
+  bottom edges start after it and run past the right one. Dotted and hair print solid; dashes are 3.84 on 1.28 off
+  (medium dashed 11.52/3.84, dash-dot 11.52/3.84/3.84/3.84), laid along the page. In print solid lines are filled
+  boxes (Chromium rounds a border's width down, a box's edges to the nearest pixel). On screen: 1px a unit on the
+  gridline pixel, CSS dashes (unmeasured). A filled cell hides its gridlines; the sheet stays white in dark mode.
+  Runs 10 -> 13: Excel's fill and border shapes within 1px 32 -> 122 of 153; the rest are double lines (Excel
+  shortens the inner line at corners), dash pieces cut by Chromium's whole-pixel snapping, and the hatched fill.
 - **Gridlines.** The right and bottom pixel of each cell, inside its width and height.
 - **Cell text.** Bottom-aligned, 2px side padding on screen (3.2 and 1.9 in print), numbers right, text left,
   booleans and errors centred, no wrapping; text runs on to the right over empty cells. Size and line height only
@@ -67,6 +82,8 @@ The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures
 3  (rows)    page counts 4/4 on same page 100147/100147 x within 1px 100145/100147 (100.0%) y within 1px 100147/100147 (100.0%) both 100145/100147 (100.0%)
 4  (General) page counts 5/5 on same page 100364/100364 x within 1px 100363/100364 (100.0%) y within 1px 100364/100364 (100.0%) both 100363/100364 (100.0%)
 9  (fonts)   page counts 6/6 on same page 100423/100423 x within 1px 100418/100423 (100.0%) y within 1px 100405/100423 (100.0%) both 100402/100423 (100.0%) width within 1px 99390/100423 (99.0%)
+14 (fills)   page counts 7/7 on same page 100436/100436 x within 1px 100431/100436 (100.0%) y within 1px 100420/100436 (100.0%) both 100417/100436 (100.0%) width within 1px 99403/100436 (99.0%)
+14 shapes    fills and borders within 1px 122/153 (79.7%), colour only 26, missing 5
 ```
 
 Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures. fonts.xlsx joined
@@ -74,13 +91,15 @@ at run 5; text width is measured from run 5 (run 4 had 109 of 100,364 within 1px
 (the cell text size was set on the screen grid only, and print pages sit outside it): its baselines were right by
 accident, and runs 6-8 show the real work.
 
-Next: fills, borders and alignment, then number format codes (GridCraft's `crates/numfmt` is a reference, checked
+From run 10 text is matched page by page (Excel's PDF keeps text clipped past a page's edge). Next: alignment and
+wrapped text, then number format codes (GridCraft's `crates/numfmt` is a reference, checked
 against Excel). All of this so far is on generated fixtures; the numbers that matter come from real workbooks
 (`..\samples`).
 
 ## Open differences
 
-- Fills, borders, alignment, font colours and number format codes are not read yet; fonts are.
+- Alignment, wrapping, indents and number format codes are not read yet; fonts, colours, fills and borders are.
+- Row and column styles (a whole column's fill) are not applied to cells that aren't in the file.
 - Row heights don't grow to the tallest font in the row (rows without `ht` use the sheet default).
 - The maximum digit width is fixed at 7px (right for Calibri 11 and Aptos Narrow 11); other Normal fonts need theirs.
 - Gridlines show under text that runs on into empty cells; Excel hides them there.

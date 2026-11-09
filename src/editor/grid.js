@@ -6,6 +6,7 @@
 // coordinates. Geometry goes through custom properties (--oxe-x, --oxe-y, --oxe-w, --oxe-h), never through styles
 // written for state.
 import { Axis } from './axis.js';
+import { decorations } from './decor.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -196,11 +197,14 @@ function draw(st, force = false) {
   st.win = win;
   drawColumnHeadings(st, win);
   drawGridlines(st, win);
+  const { fills, edges } = decorations(st, win);
+  st.fills.replaceChildren(...fills);
   drawRows(st, win);
+  st.edges.replaceChildren(...edges);
 }
 
 /** A read-only grid of one sheet in `host`. Returns the handle the editor and the tests use. */
-export function createGrid(host, { sheet, label = 'Sheet', classOf = null }) {
+export function createGrid(host, { sheet, label = 'Sheet', looks = {} }) {
   const view = div('oxe-grid', 'grid');
   view.tabIndex = 0;
   view.setAttribute('aria-readonly', 'true');
@@ -212,15 +216,20 @@ export function createGrid(host, { sheet, label = 'Sheet', classOf = null }) {
   corner.setAttribute('aria-hidden', 'true');
   const lines = div('oxe-lines');
   lines.setAttribute('aria-hidden', 'true');
+  // (Fills over the gridlines and under the text, borders over the text.)
+  const fills = div('oxe-fills');
+  fills.setAttribute('aria-hidden', 'true');
   const body = div('oxe-rows');
-  canvas.append(colheads, lines, body);
+  const edges = div('oxe-edges');
+  edges.setAttribute('aria-hidden', 'true');
+  canvas.append(colheads, lines, fills, body, edges);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, body, sheet: null, win: null, frame: 0, classOf };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco };
 
-  /** Show another sheet (`nextClassOf`: its workbook's cell format classes, from cellstyles.js). */
-  const setSheet = (next, nextLabel = label, nextClassOf = st.classOf) => {
-    Object.assign(st, { sheet: next, win: null, classOf: nextClassOf }, sheetGeometry(next));
+  /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
+  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco }) => {
+    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco }, sheetGeometry(next));
     view.setAttribute('aria-label', nextLabel);
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));
@@ -237,7 +246,7 @@ export function createGrid(host, { sheet, label = 'Sheet', classOf = null }) {
   view.addEventListener('scroll', onScroll, { passive: true });
   const resize = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => draw(st)) : null;
   resize?.observe(view);
-  setSheet(sheet, label);
+  setSheet(sheet, label, looks);
 
   return {
     el: view,

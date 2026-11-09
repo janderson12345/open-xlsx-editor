@@ -26,13 +26,14 @@ export function fontStack(name) {
   return [name, ...(STAND_INS[name.toLowerCase()] || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
 }
 
-/** Where the baseline is aimed, above the cell's bottom edge, beyond the font's Windows descent. Excel's own baseline
- *  is about 0.15px above the descent (test/fixtures/fonts.xlsx: Calibri 11 to 20, Cambria, Arial, Times New Roman;
- *  small sizes sit higher, Calibri 8 by 1.1px, Courier New lower). Aimed at 0.85 because Chromium, which snaps
- *  baselines to whole pixels, puts the text 0.7px lower than the formula below says: fitted on large.xlsx (100,000
- *  cells, rows validated over 43 steps), which it centres within half a pixel of Excel's (runs 8 -> 9: baselines
- *  within 1px 81.8% -> 100.0%). */
-const BASELINE_ABOVE_DESCENT = 0.85;
+/** Where Excel's baseline sits above the cell's bottom edge, beyond the descent of the font the browser draws:
+ *  0.15px for a font drawn as itself (test/fixtures/fonts.xlsx: Calibri 11 to 20, Cambria, Arial, Times New Roman;
+ *  small sizes sit higher, Calibri 8 by 1.1px, Courier New lower), and for Aptos Narrow, drawn in Calibri, 0.85px:
+ *  Excel's Aptos Narrow baseline is that much higher than Calibri's descent (large.xlsx, 100,000 cells, rows
+ *  validated over 43 steps; runs 8 -> 9: baselines within 1px 81.8% -> 100.0%). Run 13 showed the 0.85 is Aptos
+ *  Narrow's, not the browser's: applied to Calibri workbooks it put fonts.xlsx's baselines 0.7px high. */
+const BASELINE_ABOVE_DESCENT = 0.15;
+const BASELINE_STAND_IN = { 'aptos narrow': 0.85 };
 
 /** The line height (px) that puts the browser's baseline where Excel's is, for a font at `sizePx`. Chromium places
  *  text by the font's hhea ascent and descent and centres them in the line (half the leading above, half below), so
@@ -43,6 +44,6 @@ export function cellLineHeight(name, sizePx) {
   const key = name.toLowerCase();
   const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   const [ascent, descent] = m.hhea;
-  const target = m.win[1] * sizePx + BASELINE_ABOVE_DESCENT;
+  const target = m.win[1] * sizePx + (metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT);
   return (ascent + descent) * sizePx + 2 * (target - descent * sizePx);
 }

@@ -17,7 +17,7 @@ export function mountXlsxEditor(host, options = {}) {
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { workbook: null, grid: null, sheetIndex: 0, fileName: null, classOf: null };
+  const state = { workbook: null, grid: null, sheetIndex: 0, fileName: null, looks: {} };
 
   const api = {
     /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). */
@@ -28,9 +28,9 @@ export function mountXlsxEditor(host, options = {}) {
       state.workbook = wb;
       state.sheetIndex = i;
       state.fileName = fileName;
-      state.classOf = applyCellStyles(root, wb);
-      if (state.grid) state.grid.setSheet(sheet, wb.sheets[i].name, state.classOf);
-      else state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, classOf: state.classOf });
+      state.looks = applyCellStyles(root, wb);
+      if (state.grid) state.grid.setSheet(sheet, wb.sheets[i].name, state.looks);
+      else state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks });
       return api;
     },
     /** The workbook as .xlsx bytes (unchanged parts byte for byte). */
@@ -42,7 +42,7 @@ export function mountXlsxEditor(host, options = {}) {
     preparePrint() {
       if (!state.workbook) return 0;
       const wb = state.workbook;
-      return renderPrint(root, wb.sheet(state.sheetIndex), state.classOf, fontFamily(wb.styles.normal, wb.theme));
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme));
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },

@@ -4,6 +4,7 @@
 // titles, manual breaks, headers or footers yet: those come with the print model. Everything here is to be measured
 // against Excel's own PDFs.
 import { sheetGeometry, cellElement, mergeAt, setVars, div } from './grid.js';
+import { decorations } from './decor.js';
 
 const DPI = 96;
 
@@ -62,18 +63,21 @@ function drawPage(st, block, layout) {
       layer.appendChild(cellElement(st, r, c, cell || { t: 'n', v: null }, line || new Map(), block, 0));
     }
   }
+  const { fills, edges } = decorations({ ...st, pageOrigin: { x: layout.area.x - st.cols.start(block.c0), y: layout.area.y - st.rows.start(block.r0) } }, block);
+  layer.prepend(...fills);
+  layer.append(...edges);
   area.appendChild(layer);
   pageEl.appendChild(area);
   return pageEl;
 }
 
 /** Build the printed pages of a sheet into `root` (replacing any from before) and set the paper size for printing;
- *  `classOf` gives a cell format's class (cellstyles.js), `normalFamily` the Normal style's typeface (printed row
+ *  `looks` gives cell format classes and decorations (cellstyles.js), `normalFamily` the Normal style's typeface (printed row
  *  heights depend on it). Returns the number of pages. */
-export function renderPrint(root, sheet, classOf = null, normalFamily = undefined) {
+export function renderPrint(root, sheet, looks = {}, normalFamily = undefined) {
   const geometry = sheetGeometry(sheet, { print: true, normalFamily });
   const layout = paginate(sheet, geometry);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols, classOf };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols, classOf: looks.classOf, deco: looks.deco, print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');
