@@ -34,12 +34,36 @@ test('font stacks: metric-compatible stand-ins, Calibri for Aptos Narrow, a gene
   assert.equal(fontStack('Aptos Narrow'), "'Aptos Narrow', Calibri, Carlito, sans-serif");
   assert.equal(fontStack('Times New Roman'), "'Times New Roman', 'Liberation Serif', Tinos, serif");
   assert.equal(fontStack('Courier New'), "'Courier New', 'Liberation Mono', Cousine, monospace");
-  // A font not in the metrics table measures as its stand-in (the font the browser draws).
-  assert.equal(cellLineHeight('Aptos Narrow', 14.667), cellLineHeight('Calibri', 14.667));
+  // A font not in the metrics table is laid out by its stand-in's metrics (the font the browser draws); Aptos Narrow's
+  // baseline sits 0.7px higher than Calibri's in Excel, so its line is 1.4px taller (half of it goes below the text).
+  assert.ok(Math.abs(cellLineHeight('Aptos Narrow', 14.667) - cellLineHeight('Calibri', 14.667) - 1.4) < 1e-9);
 });
 
-test('printed rows by the Normal style\'s font: Aptos Narrow in 600 dpi device pixels, Calibri x 1.288, others in points', () => {
+test('printed rows by the Normal style\'s font: Aptos Narrow in 600 dpi device pixels, Calibri x 1.291, others in points', () => {
   assert.equal(printRowPx(15, 'Aptos Narrow'), 127 / 6.25);
-  assert.equal(printRowPx(15, 'Calibri'), 15 * 1.288);
+  assert.equal(printRowPx(15, 'Calibri'), 121 / 6.25);
   assert.equal(printRowPx(15, 'Verdana'), 20);
+});
+
+// Excel's printed colours for test/fixtures/fills.xlsx (its PDF, read with tools/excel-compare/shapes.cjs).
+test('colours as Excel draws them: theme indexes with the first two pairs swapped, tints in integer HLS, indexed', async () => {
+  const { resolveColor, applyTint } = await import('../src/ooxml/theme.js');
+  const theme = open('fills.xlsx').theme;
+  assert.deepEqual([0, 1, 2, 3, 4, 9].map((t) => resolveColor({ theme: t }, theme)), ['#FFFFFF', '#000000', '#E7E6E6', '#1F3864', '#4472C4', '#70AD47']);
+  const tints = [['4472C4', -0.5, '203764'], ['4472C4', -0.25, '305496'], ['4472C4', 0.4, '8EA9DB'], ['4472C4', 0.6, 'B4C6E7'],
+    ['4472C4', 0.8, 'D9E1F2'], ['000000', 0.5, '808080'], ['FFFFFF', -0.15, 'D9D9D9'], ['70AD47', -0.249977111117893, '548235']];
+  for (const [rgb, t, want] of tints) assert.equal(applyTint(rgb, t), want, `${rgb} ${t}`);
+  assert.deepEqual([10, 13, 22, 30, 64].map((i) => resolveColor({ indexed: i }, theme)), ['#FF0000', '#FFFF00', '#C0C0C0', '#0066CC', '#000000']);
+  assert.equal(resolveColor({ rgb: 'FF00B050' }, theme), '#00B050');
+  assert.equal(resolveColor({ auto: true }, theme), null);
+});
+
+test('fills and borders from styles.xml', () => {
+  const { styles } = open('fills.xlsx');
+  const xf = (s) => styles.cellXfs[s];
+  assert.deepEqual(styles.fills[xf(1).fillId].pattern, 'solid');
+  assert.deepEqual(styles.fills[xf(1).fillId].fg.rgb, 'FFFF0000');
+  const box = styles.borders[styles.cellXfs[styles.cellXfs.length - 1].borderId];
+  assert.deepEqual(['left', 'right', 'top', 'bottom'].map((k) => box[k].style), ['thick', 'thick', 'thick', 'thick']);
+  assert.equal(box.left.color.indexed, 12);
 });
