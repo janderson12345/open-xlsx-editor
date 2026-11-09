@@ -112,6 +112,27 @@ export class OpcPackage {
     this.setText('[Content_Types].xml', serializeXml(doc));
   }
 
+  /** Take a part out of the package: the part, its own relationships, the main part's relationships to it and its
+   *  content-type override. */
+  removePart(path) {
+    delete this.files[path];
+    const name = path.slice(path.lastIndexOf('/') + 1);
+    delete this.files[`${path.slice(0, path.length - name.length)}_rels/${name}.rels`];
+    const dir = this.mainDir;
+    const relsPath = `${dir}_rels/${this.mainPath.slice(dir.length)}.rels`;
+    const rels = this.xml(relsPath);
+    if (rels) {
+      for (const r of kids(rels.documentElement, 'Relationship', NS.rel)) {
+        if (r.getAttribute('TargetMode') !== 'External' && resolvePath(dir, r.getAttribute('Target')) === path) r.parentNode.removeChild(r);
+      }
+      this.setText(relsPath, serializeXml(rels));
+      this.rels = this.readRels(this.mainPath);
+    }
+    const ct = this.xml('[Content_Types].xml');
+    for (const o of kids(ct.documentElement, 'Override', NS.ct)) if (o.getAttribute('PartName') === '/' + path) o.parentNode.removeChild(o);
+    this.setText('[Content_Types].xml', serializeXml(ct));
+  }
+
   /** Resolve an image relationship to a data blob for display. */
   media(rId) {
     const rel = this.relById(rId);

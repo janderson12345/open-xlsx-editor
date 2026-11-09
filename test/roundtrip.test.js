@@ -51,10 +51,17 @@ for (const f of fixtures) {
     const again = Workbook.fromBytes(out);
     assert.equal(text(again, i, 99, 25), 'edited');
     assert.equal(text(again, i, 1, 0), '42');
-    // The other cells read as before.
+    // The other cells read as before (formulas as well; their results may be worked out again, as a volatile
+    // formula's are at every change).
     const m0 = wb.sheet(i);
     const m1 = Workbook.fromBytes(src).sheet(i);
-    for (const [r, line] of m1.cells) for (const [c, cell] of line) if (!(r === 1 && c === 0)) assert.deepEqual(cellAt(m0, r, c), cell, `${r},${c}`);
+    for (const [r, line] of m1.cells) {
+      for (const [c, cell] of line) {
+        if (r === 1 && c === 0) continue;
+        if (cell.f != null) assert.deepEqual([cellAt(m0, r, c).f, cellAt(m0, r, c).s], [cell.f, cell.s], `${r},${c}`);
+        else assert.deepEqual(cellAt(m0, r, c), cell, `${r},${c}`);
+      }
+    }
   });
 }
 
@@ -70,7 +77,8 @@ test('basic.xlsx: sheets, strings, values, sizes and merges as written', () => {
   assert.equal(text(wb, 0, 0, 0), 'Item');
   assert.equal(cellAt(sh, 0, 0).s, 1);
   assert.equal(text(wb, 0, 1, 1), '1');
-  assert.equal(cellAt(sh, 2, 2).f, ''); // (a shared formula's later cells carry only `si`)
+  assert.equal(cellAt(sh, 2, 2).f, 'B3*2'); // (a shared formula's later cells carry only `si`: read moved from C2)
+  assert.equal(cellAt(sh, 2, 2).shared, 0);
   assert.equal(cellAt(sh, 1, 2).f, 'B2*2');
   assert.equal(text(wb, 0, 10, 2), 'TRUE');
   assert.equal(text(wb, 0, 10, 3), '#DIV/0!');
@@ -108,7 +116,15 @@ test('a cell outside a row\'s `spans` hint drops the hint; one inside keeps it',
   assert.match(xml, /<row r="3" spans="1:6">/);
 });
 
-test('formula cells are refused for now, and nothing is changed', () => {
+test("a value over a shared formula's first cell: the group's other cells written out, calcChain.xml dropped", () => {
   const wb = Workbook.fromBytes(bytes('basic.xlsx'));
-  assert.throws(() => wb.setCell(0, 'C2', 1), /formula/);
+  wb.setCell(0, 'C2', 1);
+  const files = unzipSync(wb.toBytes());
+  const xml = strFromU8(files['xl/worksheets/sheet1.xml']);
+  assert.match(xml, /<c r="C2"><v>1<\/v><\/c>/);
+  assert.match(xml, /<c r="C3"><f>B3\*2<\/f><v>4<\/v><\/c>/);
+  assert.doesNotMatch(xml, /t="shared"/);
+  assert.equal(files['xl/calcChain.xml'], undefined);
+  assert.doesNotMatch(strFromU8(files['[Content_Types].xml']), /calcChain/);
+  assert.doesNotMatch(strFromU8(files['xl/_rels/workbook.xml.rels']), /calcChain/);
 });

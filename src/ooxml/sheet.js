@@ -5,9 +5,13 @@
 import { kids, kid, attr } from './xml.js';
 import { parseRef, parseRange } from './refs.js';
 import { stringItemText } from './strings.js';
+import { shiftFormula } from '../calc/tokens.js';
 
 /** A cell as stored: `t` its type (n number, s string, b boolean, e error, str formula text, d ISO date), `v` its
- *  value (null for a cell that only carries a style), `s` its style (an index into cellXfs), `f` its formula text. */
+ *  value (null for a cell that only carries a style), `s` its style (an index into cellXfs), `f` its formula text.
+ *  readSheet adds, where they apply: `shared` (the index of the shared formula the cell belongs to; `f` is then its
+ *  own text, worked out from the group's first cell), `array` (an array formula's range, on its first cell) and
+ *  `dataTable`. */
 const makeCell = (t, v, s, f) => ({ t, v, s, f });
 
 /** Read one `c` element's value, resolving shared strings. */
@@ -37,6 +41,8 @@ export function readSheet(doc, sst = []) {
   let maxRow = -1;
   let maxCol = -1;
   let r = -1;
+  const shared = new Map(); // si -> the group's first cell { r, c, text }
+  const arrays = [];
   for (const rowEl of kids(kid(root, 'sheetData', ns), 'row', ns)) {
     // (`r` may be left out: rows and cells then follow on from the one before.)
     r = attr(rowEl, 'r') ? Number(attr(rowEl, 'r')) - 1 : r + 1;
@@ -49,7 +55,9 @@ export function readSheet(doc, sst = []) {
       const at = parseRef(attr(cEl, 'r'));
       c = at ? at.c : c + 1;
       if (!line) cells.set(r, (line = new Map()));
-      line.set(c, readCell(cEl, ns, sst));
+      const cell = readCell(cEl, ns, sst);
+      if (cell.f != null) formulaKind(cell, kid(cEl, 'f', ns), r, c, shared, arrays);
+      line.set(c, cell);
       if (c > maxCol) maxCol = c;
     }
     if (line && r > maxRow) maxRow = r;
@@ -79,12 +87,32 @@ export function readSheet(doc, sst = []) {
     rows,
     cols,
     merges,
+    /** The ranges of array formulas (their cells can't be changed one at a time). */
+    arrays,
     format: { defaultRowHeight: num('defaultRowHeight') ?? 15, defaultColWidth: num('defaultColWidth'), baseColWidth: num('baseColWidth') },
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
     page: readPageSetup(root, ns),
     maxRow,
     maxCol,
   };
+}
+
+/** What kind of formula a cell holds. A shared formula is written out on its group's first cell only (the one with
+ *  `ref`); the others read it as moved to where they are. */
+function formulaKind(cell, fEl, r, c, shared, arrays) {
+  const t = attr(fEl, 't');
+  if (t === 'shared') {
+    const si = attr(fEl, 'si');
+    cell.shared = Number(si);
+    if (cell.f !== '') shared.set(si, { r, c, text: cell.f });
+    else if (shared.has(si)) {
+      const first = shared.get(si);
+      try { cell.f = shiftFormula(first.text, r - first.r, c - first.c); } catch { /* (left '': not worked out) */ }
+    }
+  } else if (t === 'array') {
+    cell.array = parseRange(attr(fEl, 'ref')) || { r0: r, c0: c, r1: r, c1: c };
+    arrays.push(cell.array);
+  } else if (t === 'dataTable') cell.dataTable = true;
 }
 
 /** Paper sizes by `paperSize` code, in inches (ECMA-376 Part 1, 18.3.1.63): only the common ones so far. */

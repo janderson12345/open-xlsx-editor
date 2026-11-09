@@ -23,14 +23,25 @@ function pinRefs(sheetData, ns) {
   }
 }
 
+// The row elements of each edited part by row, made at its first edit (after pinRefs): a recalculation writes many
+// cells, and finding each one's row by walking sheetData would cost a pass over the sheet per cell.
+const rowIndexes = new WeakMap();
+
 /** The `row` element for row r, made (in order) if there isn't one. */
 function rowElement(doc, sheetData, ns, r) {
-  for (const rowEl of kids(sheetData, 'row', ns)) {
-    const n = Number(attr(rowEl, 'r')) - 1;
-    if (n === r) return rowEl;
-    if (n > r) return sheetData.insertBefore(newRow(doc, ns, r), rowEl);
+  let index = rowIndexes.get(doc);
+  if (!index) {
+    pinRefs(sheetData, ns);
+    index = new Map(kids(sheetData, 'row', ns).map((el) => [Number(attr(el, 'r')) - 1, el]));
+    rowIndexes.set(doc, index);
   }
-  return sheetData.appendChild(newRow(doc, ns, r));
+  if (index.has(r)) return index.get(r);
+  const el = newRow(doc, ns, r);
+  const after = kids(sheetData, 'row', ns).find((x) => Number(attr(x, 'r')) - 1 > r);
+  if (after) sheetData.insertBefore(el, after);
+  else sheetData.appendChild(el);
+  index.set(r, el);
+  return el;
 }
 const newRow = (doc, ns, r) => {
   const el = make(doc, ns, 'row');
@@ -66,25 +77,30 @@ function growDimension(root, ns, r, c) {
   if (grown.r0 !== range.r0 || grown.c0 !== range.c0 || grown.r1 !== range.r1 || grown.c1 !== range.c1) dim.setAttribute('ref', rangeName(grown));
 }
 
-/** Set a cell to a number, a boolean, a string (written inline, so the shared string table isn't rewritten) or
- *  null (emptied; its style stays). Formula cells are refused until formulas and the calculation chain are modelled:
- *  dropping a formula leaves calcChain.xml pointing at a plain cell, and a shared formula's other cells depend on it.
- *  Returns the cell's element. */
-export function setCellXml(doc, r, c, value) {
+/** The `c` element of a cell, made (with its row) if there isn't one. */
+function cellEl(doc, r, c) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const sheetData = kid(root, 'sheetData', ns);
   if (!sheetData) throw new Error('worksheet without sheetData');
-  pinRefs(sheetData, ns);
-  const cEl = cellElement(doc, rowElement(doc, sheetData, ns, r), ns, r, c);
-  if (kid(cEl, 'f', ns)) throw new Error(`${refName(r, c)} holds a formula; changing formula cells is not supported yet`);
+  return cellElement(doc, rowElement(doc, sheetData, ns, r), ns, r, c);
+}
+const adder = (doc, ns) => (parent, name, text) => {
+  const el = parent.appendChild(make(doc, ns, name));
+  if (text != null) el.appendChild(doc.createTextNode(text));
+  return el;
+};
+
+/** Set a cell to a number, a boolean, a string (written inline, so the shared string table isn't rewritten) or
+ *  null (emptied; its style stays). A formula the cell held goes (the caller takes it out of a shared formula's group
+ *  first, and out of calcChain.xml). Returns the cell's element. */
+export function setCellXml(doc, r, c, value) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const cEl = cellEl(doc, r, c);
   for (const k of [...cEl.childNodes]) cEl.removeChild(k);
   cEl.removeAttribute('t');
-  const add = (parent, name, text) => {
-    const el = parent.appendChild(make(doc, ns, name));
-    if (text != null) el.appendChild(doc.createTextNode(text));
-    return el;
-  };
+  const add = adder(doc, ns);
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) throw new Error('not a finite number');
     add(cEl, 'v', String(value));
@@ -99,4 +115,53 @@ export function setCellXml(doc, r, c, value) {
   }
   growDimension(root, ns, r, c);
   return cEl;
+}
+
+/** Give a cell a formula (its text as the file has it, without "="); its value comes with setResultXml. */
+export function setFormulaXml(doc, r, c, formula) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const cEl = cellEl(doc, r, c);
+  for (const k of [...cEl.childNodes]) cEl.removeChild(k);
+  cEl.removeAttribute('t');
+  adder(doc, ns)(cEl, 'f', formula);
+  growDimension(root, ns, r, c);
+  return cEl;
+}
+
+/** Write a formula's result into its cell, keeping the formula: a number, text (t="str"), TRUE or FALSE, or an error
+ *  ({ code }). A cell of an array formula's range that has no element yet gets one. */
+export function setResultXml(doc, r, c, value) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const cEl = cellEl(doc, r, c);
+  for (const k of [...cEl.childNodes]) if (k.nodeType === 1 && (k.localName === 'v' || k.localName === 'is')) cEl.removeChild(k);
+  const add = adder(doc, ns);
+  if (typeof value === 'number') { cEl.removeAttribute('t'); add(cEl, 'v', String(value)); }
+  else if (typeof value === 'boolean') { cEl.setAttribute('t', 'b'); add(cEl, 'v', value ? '1' : '0'); }
+  else if (typeof value === 'string') {
+    cEl.setAttribute('t', 'str');
+    const v = add(cEl, 'v', value);
+    if (/^\s|\s$|[\t\n]/.test(value)) v.setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:space', 'preserve');
+  } else { cEl.setAttribute('t', 'e'); add(cEl, 'v', value.code); }
+  return cEl;
+}
+
+/** Write out every cell of shared formula `si` with its own text (`texts`: "r:c" -> text), so that one of them can
+ *  change without the others, which read the group's first cell. */
+export function unshareXml(doc, si, texts) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  for (const rowEl of kids(kid(root, 'sheetData', ns), 'row', ns)) {
+    const r = Number(attr(rowEl, 'r')) - 1;
+    for (const cEl of kids(rowEl, 'c', ns)) {
+      const f = kid(cEl, 'f', ns);
+      if (!f || attr(f, 't') !== 'shared' || attr(f, 'si') !== String(si)) continue;
+      const text = texts.get(`${r}:${parseRef(attr(cEl, 'r')).c}`);
+      if (text == null) continue;
+      for (const name of ['t', 'si', 'ref']) f.removeAttribute(name);
+      while (f.firstChild) f.removeChild(f.firstChild);
+      f.appendChild(doc.createTextNode(text));
+    }
+  }
 }

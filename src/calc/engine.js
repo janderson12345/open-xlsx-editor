@@ -1,0 +1,228 @@
+// Recalculation: which formulas a change reaches, the order to work them out in (each after the formulas it reads),
+// and their results written back into the cells. Formulas Excel saved are trusted until something they read changes.
+import { parseFormula } from './parse.js';
+import { evaluate, result, pick } from './evaluate.js';
+import { Unsupported, E, cellValue } from './values.js';
+import { FUNCTIONS } from './functions.js';
+
+const key = (si, r, c) => `${si}:${r}:${c}`;
+/** References wider than this many columns are checked against every change instead of being indexed by column. */
+const WIDE = 64;
+const overlaps = (a, b) => a.si === b.si && a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
+
+/** The calculation state of a workbook. `book` is the Workbook (workbook.js): its sheets' models, sheetIndexOf(name),
+ *  definedName(name, si), date1904 and writeResult(si, r, c, value). */
+export class Calc {
+  constructor(book) {
+    this.book = book;
+    /** Formula cells by key: { si, r, c, text, tree, deps, volatile, array, unsupported }. */
+    this.entries = null;
+    /** Some formula can't be worked out here (unknown function, a link to another workbook): Excel should recalculate
+     *  the workbook when it opens it. */
+    this.incomplete = false;
+    this._names = new Map();
+  }
+
+  /** Read every worksheet's formulas (done once, at the first change). */
+  build() {
+    if (this.entries) return;
+    this.entries = new Map();
+    this.byCol = new Map(); // si -> col -> Set of entries
+    this.wide = new Map(); // si -> Set of entries
+    this.at = new Map(); // key of every cell a formula fills (an array formula's whole range) -> entry
+    this.book.sheets.forEach((info, si) => {
+      if (info.kind !== 'worksheet' || !info.path) return;
+      for (const [r, line] of this.book.sheet(si).cells) for (const [c, cell] of line) if (cell.f != null) this.add(si, r, c, cell);
+    });
+  }
+
+  /** A defined name's formula as a tree (null if there is no such name or it doesn't parse). */
+  nameTree(name, si) {
+    const n = this.book.definedName(name, si);
+    if (!n) return null;
+    if (!this._names.has(n)) {
+      let tree = null;
+      try { tree = parseFormula(n.text); } catch { /* (kept as null: #NAME?) */ }
+      this._names.set(n, tree);
+    }
+    return this._names.get(n);
+  }
+
+  /** What a formula reads, and whether it can be worked out here. */
+  _collect(e, tree, si, seen = new Set()) {
+    const walk = (n) => {
+      if (!n) return;
+      switch (n.k) {
+        case 'ref': {
+          if (n.book != null) { e.unsupported = true; return; }
+          const s = n.sheet == null ? si : this.book.sheetIndexOf(n.sheet);
+          if (s >= 0) e.deps.push({ si: s, r0: Math.min(n.area.r0, n.area.r1), c0: Math.min(n.area.c0, n.area.c1), r1: Math.max(n.area.r0, n.area.r1), c1: Math.max(n.area.c0, n.area.c1) });
+          return;
+        }
+        case 'name': {
+          const t = this.nameTree(n.name, si);
+          if (t && !seen.has(n.name.toUpperCase())) { seen.add(n.name.toUpperCase()); walk(t); }
+          return;
+        }
+        case 'fn':
+          if (!FUNCTIONS[n.name]) e.unsupported = true;
+          else if (FUNCTIONS[n.name].volatile) e.volatile = true;
+          n.args.forEach(walk);
+          return;
+        case 'bin': walk(n.a); walk(n.b); return;
+        case 'neg': case 'pos': case 'pct': case 'paren': walk(n.a); return;
+        case 'union': n.items.forEach(walk);
+      }
+    };
+    walk(tree);
+  }
+
+  /** Take in a formula cell (from the file, or just entered). */
+  add(si, r, c, cell) {
+    if (!this.entries) return;
+    this.remove(si, r, c);
+    const e = { si, r, c, text: cell.f, tree: null, deps: [], volatile: false, unsupported: false, array: cell.array || null };
+    if (cell.dataTable || cell.f === '') e.unsupported = true;
+    else {
+      try { e.tree = parseFormula(cell.f); } catch { e.unsupported = true; }
+      if (e.tree) this._collect(e, e.tree, si);
+    }
+    if (e.unsupported) this.incomplete = true;
+    this.entries.set(key(si, r, c), e);
+    const span = e.array || { r0: r, c0: c, r1: r, c1: c };
+    for (let rr = span.r0; rr <= span.r1; rr++) for (let cc = span.c0; cc <= span.c1; cc++) this.at.set(key(si, rr, cc), e);
+    for (const d of e.deps) {
+      if (d.c1 - d.c0 >= WIDE) { if (!this.wide.has(d.si)) this.wide.set(d.si, new Set()); this.wide.get(d.si).add(e); continue; }
+      if (!this.byCol.has(d.si)) this.byCol.set(d.si, new Map());
+      const cols = this.byCol.get(d.si);
+      for (let cc = d.c0; cc <= d.c1; cc++) { if (!cols.has(cc)) cols.set(cc, new Set()); cols.get(cc).add(e); }
+    }
+  }
+
+  /** Forget a formula cell (it was cleared or given a value). */
+  remove(si, r, c) {
+    if (!this.entries) return;
+    const e = this.entries.get(key(si, r, c));
+    if (!e) return;
+    this.entries.delete(key(si, r, c));
+    const span = e.array || { r0: r, c0: c, r1: r, c1: c };
+    for (let rr = span.r0; rr <= span.r1; rr++) for (let cc = span.c0; cc <= span.c1; cc++) if (this.at.get(key(si, rr, cc)) === e) this.at.delete(key(si, rr, cc));
+    for (const d of e.deps) {
+      this.wide.get(d.si)?.delete(e);
+      const cols = this.byCol.get(d.si);
+      if (cols) for (let cc = d.c0; cc <= Math.min(d.c1, d.c0 + WIDE); cc++) cols.get(cc)?.delete(e);
+    }
+  }
+
+  /** The formulas that read any cell of a rectangle { si, r0, c0, r1, c1 }. */
+  *readers(rect) {
+    const seen = new Set();
+    const cols = this.byCol.get(rect.si);
+    const lists = [this.wide.get(rect.si)];
+    if (cols) for (let cc = rect.c0; cc <= rect.c1 && cc - rect.c0 < 16384; cc++) if (cols.has(cc)) lists.push(cols.get(cc));
+    for (const list of lists) {
+      if (!list) continue;
+      for (const e of list) if (!seen.has(e) && (seen.add(e), e.deps.some((d) => overlaps(d, rect)))) yield e;
+    }
+  }
+
+  /** The formulas among `dirty` that `e` reads. */
+  _precedents(e, dirty) {
+    const out = new Set();
+    for (const d of e.deps) {
+      const size = (d.r1 - d.r0 + 1) * (d.c1 - d.c0 + 1);
+      if (size <= 4096) {
+        for (let r = d.r0; r <= d.r1; r++) for (let c = d.c0; c <= d.c1; c++) { const p = this.at.get(key(d.si, r, c)); if (p && p !== e && dirty.has(p)) out.add(p); }
+      } else {
+        for (const p of dirty) if (p !== e && p.si === d.si && overlaps(d, p.array ? { si: p.si, ...p.array } : { si: p.si, r0: p.r, c0: p.c, r1: p.r, c1: p.c })) out.add(p);
+      }
+    }
+    return out;
+  }
+
+  /** Work out again every formula that the changed rectangles reach, and the volatile ones; `also`: formula cells
+   *  to work out in any case (just entered). Returns { circular: [entries] }. */
+  recalc(changed, also = []) {
+    this.build();
+    const dirty = new Set();
+    const queue = [...changed];
+    const take = (e) => {
+      if (dirty.has(e)) return;
+      dirty.add(e);
+      queue.push(e.array ? { si: e.si, ...e.array } : { si: e.si, r0: e.r, c0: e.c, r1: e.r, c1: e.c });
+    };
+    for (const a of also) { const e = this.entries.get(key(a.si, a.r, a.c)); if (e) take(e); }
+    for (const e of this.entries.values()) if (e.volatile) take(e);
+    while (queue.length) for (const e of this.readers(queue.pop())) take(e);
+    return this._run(dirty);
+  }
+
+  /** Work out every formula in the workbook. */
+  calculateAll() {
+    this.build();
+    return this._run(new Set(this.entries.values()));
+  }
+
+  _run(dirty) {
+    // Depth first, each formula after those it reads (with an explicit stack: a column of formulas each reading the one
+    // above is as deep as it is long).
+    const state = new Map();
+    const order = [];
+    const circular = new Set();
+    for (const start of dirty) {
+      if (state.has(start)) continue;
+      state.set(start, 1);
+      const stack = [[start, this._precedents(start, dirty).values()]];
+      while (stack.length) {
+        const top = stack[stack.length - 1];
+        const next = top[1].next();
+        if (next.done) { state.set(top[0], 2); order.push(top[0]); stack.pop(); continue; }
+        const p = next.value;
+        if (state.get(p) === 1) { for (const [x] of stack.slice(stack.findIndex(([y]) => y === p))) circular.add(x); continue; }
+        if (state.get(p) === 2) continue;
+        state.set(p, 1);
+        stack.push([p, this._precedents(p, dirty).values()]);
+      }
+    }
+    for (const e of order) if (!circular.has(e)) this._evaluate(e);
+    return { circular: [...circular] };
+  }
+
+  /** The context a formula is worked out in (evaluate.js). */
+  context(e) {
+    const book = this.book;
+    const ctx = {
+      here: { si: e.si, r: e.r, c: e.c },
+      date1904: book.date1904,
+      volatile: false,
+      cellValue: (si, r, c) => cellValue(book.sheet(si).cells.get(r)?.get(c)),
+      rowsOf: (si) => book.sheet(si).cells,
+      extent: (si) => { const m = book.sheet(si); return { maxRow: m.maxRow, maxCol: m.maxCol }; },
+      sheetIndex: (name) => book.sheetIndexOf(name),
+      name: (name, mode) => {
+        const t = this.nameTree(name, e.si);
+        return t ? evaluate(t, ctx, mode) : E.name;
+      },
+    };
+    return ctx;
+  }
+
+  _evaluate(e) {
+    if (!e.tree) return;
+    const ctx = this.context(e);
+    let v;
+    try {
+      v = result(e.tree, ctx, !!e.array);
+    } catch (err) {
+      if (!(err instanceof Unsupported)) throw err;
+      e.unsupported = true;
+      this.incomplete = true;
+      // (A formula just entered has no saved value to keep: Excel will show what it makes of it.)
+      if (cellValue(this.book.sheet(e.si).cells.get(e.r)?.get(e.c)) === null) this.book.writeResult(e.si, e.r, e.c, E.name);
+      return;
+    }
+    if (!e.array) { this.book.writeResult(e.si, e.r, e.c, v); return; }
+    const a = e.array;
+    for (let r = a.r0; r <= a.r1; r++) for (let c = a.c0; c <= a.c1; c++) this.book.writeResult(e.si, r, c, pick(v, r - a.r0, c - a.c0));
+  }
+}

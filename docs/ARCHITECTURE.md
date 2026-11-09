@@ -1,10 +1,11 @@
 # Architecture
 
-A browser viewer (and, to come, editor) for .xlsx files in plain JavaScript. Three layers that don't know about each
-other's insides:
+A browser viewer and editor for .xlsx files in plain JavaScript. Four layers that don't know about each other's
+insides:
 
 - `src/ooxml/` reads and writes the file. No DOM rendering; runs in Node too (unit tests use @xmldom/xmldom).
-- `src/editor/` is the view: the grid, and later selection, editing and the ribbon.
+- `src/calc/` works out formulas: parsing, functions, recalculation (docs/CALC.md). No DOM; runs in Node.
+- `src/editor/` is the view: the grid, selection, editing, and later the ribbon.
 - `src/engine/` holds measured data: `metrics.js`, the vertical metrics of installed fonts (`tools/fontmetrics.mjs`).
 
 ## Module map
@@ -16,10 +17,16 @@ other's insides:
 | `src/ooxml/xml.js` | Parsing and serialising XML (injectable DOMParser for Node), namespace-aware lookups defaulting to SpreadsheetML, `_xHHHH_` decoding. From open-docx-editor. |
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
 | `src/ooxml/refs.js` | A1 references and ranges; rows and columns are 0-based in code. |
-| `src/ooxml/workbook.js` | `Workbook`: sheets in order, shared strings, each sheet's model read on first use, `setCell`, `toBytes` (only dirty sheets serialised, with their XML declaration). |
-| `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults. Implied `r` positions followed. |
-| `src/ooxml/input.js` | A typed entry as a value (numbers, separators, %, TRUE/FALSE, 'text); formulas refused for now. |
-| `src/ooxml/sheetedit.js` | Changing one cell in the worksheet's XML in place: implied positions pinned first, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. Formula cells refused until formulas and calcChain are modelled. |
+| `src/ooxml/workbook.js` | `Workbook`: sheets in order, shared strings, defined names, each sheet's model read on first use, `setCell`, `setFormula` and `apply` (then recalculation), `calculate`, `toBytes` (only dirty sheets serialised, with their XML declaration; calcChain.xml dropped when formulas change; `fullCalcOnLoad` when a formula couldn't be worked out). |
+| `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults, array formula ranges. Implied `r` positions followed; a shared formula's later cells get their own formula text. |
+| `src/ooxml/input.js` | A typed entry as a value (numbers, separators, %, TRUE/FALSE, 'text) or a formula (=..., in the file's form). |
+| `src/ooxml/sheetedit.js` | Changing cells in the worksheet's XML in place: values, formulas, formula results (the formula kept), shared formulas written out cell by cell. Implied positions pinned first, rows indexed, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. |
+| `src/calc/tokens.js` | Formulas as tokens; moving a formula (`shiftFormula`), the typed form to the file's (`normalizeFormula`, `_xlfn.` prefixes) and back (`displayFormula`). |
+| `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
+| `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
+| `src/calc/evaluate.js` | Operators, references, names and function calls; implicit intersection outside array formulas, element by element inside. |
+| `src/calc/functions.js` | The worksheet functions, as Excel defines them. |
+| `src/calc/engine.js` | `Calc`: what each formula reads, what a change reaches, the order to work them out in, results written back. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
 | `src/ooxml/theme.js` | The theme's fonts and colours (Excel 365's default theme without a theme part); `resolveColor`, the one colour resolver (theme swap, integer-HLS tints, indexed palette). |
@@ -30,7 +37,7 @@ other's insides:
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
 | `src/editor/selection.js` | The selection (active cell and range) and its overlay; view state only. |
 | `src/editor/navigate.js` | Moving as Excel does: a step (over merged ranges), Ctrl+arrow to the edges of blocks, Ctrl+End. |
-| `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo), with the undo history of cell values. |
+| `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo), with the undo history of cell contents (values and formulas). |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
 | `src/editor/formulabar.js` | The active cell's name and contents; Enter there enters into the cell. |
 | `src/editor/interact.js` | Keys and mouse on the grid wired to the commands, the editor and the bar; screen-reader announcements (`live.js`). |
@@ -46,10 +53,10 @@ other's insides:
 | File | What it does |
 |---|---|
 | `test/fixtures/make-fixtures.mjs` | Generates the test workbooks (deterministic zips). CI checks the committed files match. |
-| `test/*.test.js` | Unit tests in Node (`npm test`): round trips byte for byte, edits, units, references, geometry, the checker. |
+| `test/*.test.js` | Unit tests in Node (`npm test`): round trips byte for byte, edits, units, references, geometry, the checker, every formula of formulas.xlsx against Excel's results (`test/formulas-excel.json`). |
 | `test/e2e.mjs`, `test/editing.mjs`, `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; editing by keys and mouse, undo, read-only, the saved file read back; axe in light and dark at 1280 and 320px. All assert standards mode. |
 | `tools/check-ooxml.mjs` | Structural check of .xlsx files (what makes Excel offer a repair). |
-| `tools/excel-compare/` | Comparison with Excel's own PDFs: `excel-print.ps1` (Excel through COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions), `shapes.cjs` (filled rectangles and lines), `compare.py`, `compare-shapes.py`, `diff.py`, `run.ps1`. See its README. |
+| `tools/excel-compare/` | Comparison with Excel's own PDFs and values: `excel-print.ps1` (Excel through COM, read-only), `excel-values.ps1` (Excel's results of a workbook's formulas, COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions), `shapes.cjs` (filled rectangles and lines), `compare.py`, `compare-shapes.py`, `diff.py`, `run.ps1`. See its README. |
 | `tools/scan-bytes.mjs` | Control characters and byte order marks in source text (part of `npm run lint`). |
 
 ## How a file becomes a grid
@@ -59,4 +66,6 @@ other's insides:
 3. `wb.sheet(i)` parses that sheet's part once and keeps the XML document with the model.
 4. `createGrid` turns the model into row and column axes (`sheetGeometry`), then draws the window the scroll
    position shows; scrolling redraws on the next animation frame when the window changes.
-5. `save()` serialises only the sheets that `setCell` touched; every other part goes out as it came in.
+5. An edit changes the cell in the sheet's XML and its model, then `Calc` works out again the formulas it reaches.
+6. `save()` serialises only the sheets that changed; every other part goes out as it came in (calcChain.xml apart, which
+   is dropped when formulas change).
