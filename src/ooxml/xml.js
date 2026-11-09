@@ -3,10 +3,14 @@
 // runs in the browser (native) and in Node (@xmldom/xmldom) for tests.
 
 export const NS = {
-  w: 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
+  // SpreadsheetML, the default for the lookups below.
+  x: 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
+  // (The same vocabulary in Strict OOXML, ISO/IEC 29500 Strict; read by taking the root's namespace.)
+  xStrict: 'http://purl.oclc.org/ooxml/spreadsheetml/main',
   r: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships',
   a: 'http://schemas.openxmlformats.org/drawingml/2006/main',
-  wp: 'http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing',
+  xdr: 'http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing',
+  mc: 'http://schemas.openxmlformats.org/markup-compatibility/2006',
   pic: 'http://schemas.openxmlformats.org/drawingml/2006/picture',
   rel: 'http://schemas.openxmlformats.org/package/2006/relationships',
   ct: 'http://schemas.openxmlformats.org/package/2006/content-types',
@@ -14,12 +18,17 @@ export const NS = {
 
 export const REL_TYPES = {
   officeDocument: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument',
+  worksheet: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet',
+  chartsheet: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chartsheet',
+  sharedStrings: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings',
   styles: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles',
-  numbering: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering',
+  theme: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme',
+  calcChain: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain',
+  drawing: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing',
+  comments: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments',
+  table: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/table',
   hyperlink: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink',
   image: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
-  theme: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme',
-  settings: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings',
 };
 
 let impl = {
@@ -45,8 +54,8 @@ export function serializeXml(node) {
 
 export const isEl = (n) => n && n.nodeType === 1;
 
-/** Element children, optionally filtered by w: local name. */
-export function kids(el, name, ns = NS.w) {
+/** Element children, optionally filtered by local name in a namespace (SpreadsheetML by default). */
+export function kids(el, name, ns = NS.x) {
   const out = [];
   if (!el) return out;
   for (let c = el.firstChild; c; c = c.nextSibling) {
@@ -57,16 +66,16 @@ export function kids(el, name, ns = NS.w) {
   return out;
 }
 
-export const kid = (el, name, ns = NS.w) => kids(el, name, ns)[0] || null;
+export const kid = (el, name, ns = NS.x) => kids(el, name, ns)[0] || null;
 
-/** Read a w:-namespaced attribute (falls back to the unprefixed name). */
-export function attr(el, name, ns = NS.w) {
+/** Read an attribute in a namespace, falling back to the unprefixed name (SpreadsheetML's attributes are unprefixed). */
+export function attr(el, name, ns = NS.x) {
   if (!el) return null;
   if (el.hasAttributeNS && el.hasAttributeNS(ns, name)) return el.getAttributeNS(ns, name);
   return el.hasAttribute && el.hasAttribute(name) ? el.getAttribute(name) : null;
 }
 
-/** OOXML on/off properties: <w:b/> is on, <w:b w:val="0|false|off"/> is off. */
+/** OOXML on/off properties: <b/> is on, <b val="0|false"/> is off. */
 export function onOff(el) {
   if (!el) return null;
   const v = attr(el, 'val');
@@ -111,3 +120,7 @@ export const childrenNamed = (el, name) => elementKids(el).filter((n) => n.local
 
 /** An attribute value's entities decoded (&quot; &apos; &lt; &gt; &amp;), as the XML parser would. */
 export const unescapeXml = (s) => (s == null ? s : s.replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
+
+/** SpreadsheetML's escaped characters in strings (ST_Xstring): `_x000D_` is a carriage return, `_x005F_` a literal
+ *  underscore so that `_x005F_x000D_` reads as the text `_x000D_`. */
+export const decodeXstring = (s) => (s && s.includes('_x') ? s.replace(/_x([0-9A-Fa-f]{4})_/g, (m, h) => String.fromCharCode(parseInt(h, 16))) : s);
