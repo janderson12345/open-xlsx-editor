@@ -42,5 +42,13 @@ export function defaultColPx({ defaultColWidth, baseColWidth } = {}, mdw = 7) {
   return Math.ceil(colWidthToPx(charsToColWidth(base, mdw), mdw) / 8) * 8;
 }
 
+/** Excel prints a column wider than it shows it: printed width = screen pixels x 1.075 (fitted on Excel's PDF of
+ *  test/fixtures/widths.xlsx: 30 columns of 8 to 285 screen pixels, every one within 0.15px; 64px prints as 68.8,
+ *  145 as 155.9). Measured with Excel 365 exporting through the default printer's driver (a 600 dpi inkjet); the
+ *  factor may belong to the printer rather than to Excel, which a second machine would show. */
+export const PRINT_COL_SCALE = 1.075;
+/** A column's printed width in pixels at 96 dpi, from its width on screen (unrounded). */
+export const printColPx = (screenPx) => screenPx * PRINT_COL_SCALE;
+
 /** A row height in points to whole pixels (15pt, the Calibri 11 default, is 20px). */
 export const rowHeightToPx = (pt) => Math.round(ptToPx(pt));

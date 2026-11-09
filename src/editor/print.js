@@ -26,7 +26,7 @@ export function breakAxis(axis, last, room) {
 }
 
 /** The pages of a sheet: each { r0, r1, c0, c1 } in printing order, with the paper and printable area in pixels. */
-export function paginate(sheet, geometry = sheetGeometry(sheet)) {
+export function paginate(sheet, geometry = sheetGeometry(sheet, { print: true })) {
   const { page } = sheet;
   const [pw, ph] = page.landscape ? [page.paper[1], page.paper[0]] : page.paper;
   const m = page.margins;
@@ -70,7 +70,7 @@ function drawPage(st, block, layout) {
 /** Build the printed pages of a sheet into `root` (replacing any from before) and set the paper size for printing.
  *  Returns the number of pages. */
 export function renderPrint(root, sheet) {
-  const geometry = sheetGeometry(sheet);
+  const geometry = sheetGeometry(sheet, { print: true });
   const layout = paginate(sheet, geometry);
   const st = { sheet, rows: geometry.rows, cols: geometry.cols };
   let el = root.querySelector(':scope > .oxe-print');

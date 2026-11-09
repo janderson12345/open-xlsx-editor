@@ -215,6 +215,11 @@
   height: var(--oxe-ah);
   overflow: hidden;
 }
+/* Printed cell text starts 3.2px into its cell and right-aligned text ends 1.9px before the cell's right edge (Excel's
+   PDF of test/fixtures/widths.xlsx: every column's text and number). */
+.oxe-page-cells .oxe-cell {
+  padding: 0 1.9px 0 3.2px;
+}
 .oxe-page-cells {
   position: absolute;
   left: calc(-1 * var(--oxe-ox));
