@@ -1,33 +1,96 @@
 // Turning a cell's value into the text a sheet shows. Only Excel's General format so far; format codes (`0.00`,
 // dates, `[Red]`, sections) come with styles.xml's numFmts.
 
-/** A number in the General format: as many digits as fit in 11 characters (a default-width column), trailing zeros
- *  dropped; scientific with up to 5 decimals ("1.23457E+11") from 1E+11 up and below 0.0001 ("1E-05"). (Excel's
- *  behaviour as commonly described; the exact switch-over points are still to be measured on Excel's output.) */
-export function formatGeneral(n) {
-  if (!Number.isFinite(n)) return '#NUM!';
-  if (n === 0) return '0';
-  const a = Math.abs(n);
-  const sign = n < 0 ? '-' : '';
-  const intDigits = Math.floor(Math.log10(a)) + 1;
-  if (intDigits <= 11 && a >= 1e-4) {
-    // ("0." takes two characters below 1; an integer part of d digits leaves 10 - d for the point and decimals.)
-    const decimals = intDigits <= 0 ? 9 : Math.max(0, 10 - intDigits);
-    let s = a.toFixed(decimals);
-    if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
-    return sign + s;
-  }
-  const [m, e] = a.toExponential(5).split('e');
-  const ei = Number(e);
-  return `${sign}${m.replace(/\.?0+$/, '')}E${ei < 0 ? '-' : '+'}${String(Math.abs(ei)).padStart(2, '0')}`;
+/** The most characters General uses, not counting a minus sign ("0.333333333", "-0.666666667"). */
+const GENERAL_MAX = 11;
+
+/** |n| as Excel holds it, 15 significant decimal digits: { digits: '15', exp: -10 } for 1.5E-10 (value 0.15 x 10^-9:
+ *  the point goes after the first digit, times 10^exp). Rounding works on these digits, half up, as Excel rounds:
+ *  1.5E-10 to no decimals is 2E-10, where binary rounding gives 1E-10. */
+function decimal(a) {
+  const [m, e] = a.toExponential(14).split('e');
+  return { digits: m.replace('.', '').replace(/0+$/, '') || '0', exp: Number(e) };
 }
 
-/** The text a cell shows, from what the reader stored ({ t, v }). */
-export function cellText(cell) {
+/** Round a digit string to `keep` digits, half up; { digits, carried } (carried: it became one digit longer). */
+function roundTo(digits, keep) {
+  if (keep >= digits.length) return { digits, carried: false };
+  if (keep < 0) return { digits: '', carried: false };
+  const up = digits.charCodeAt(keep) >= 53; // ('5')
+  let d = digits.slice(0, keep).split('').map(Number);
+  if (up) {
+    let i = d.length - 1;
+    while (i >= 0 && d[i] === 9) d[i--] = 0;
+    if (i < 0) return { digits: '1' + d.join(''), carried: true };
+    d[i]++;
+  }
+  return { digits: d.join(''), carried: false };
+}
+
+/** Significant digits a fixed form with this many characters has room for (the digits after any leading zeros; 0 or
+ *  less when the value is too small to show any), or null when its integer part doesn't fit. */
+function fixedRoom(v, room) {
+  const intDigits = v.exp >= 0 ? v.exp + 1 : 1;
+  if (intDigits > room) return null;
+  const decimals = Math.max(0, room - intDigits - 1);
+  return v.exp + 1 + decimals;
+}
+
+/** Fixed notation with `keep` significant digits kept (from fixedRoom), trailing zeros dropped; null if rounding
+ *  carried it past `room` characters (99999999999.5 in 11). */
+function fixedText(v, keep, room) {
+  let { digits, carried } = roundTo(v.digits, keep);
+  let exp = v.exp + (carried ? 1 : 0);
+  if (!digits.replace(/0/g, '')) return '0';
+  // (Place the point: `digits` stand for 0.d1d2... x 10^(exp+1).)
+  let s;
+  if (exp < 0) s = '0.' + '0'.repeat(-exp - 1) + digits;
+  else if (digits.length <= exp + 1) s = digits + '0'.repeat(exp + 1 - digits.length);
+  else s = digits.slice(0, exp + 1) + '.' + digits.slice(exp + 1);
+  if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  return s.length > room ? null : s;
+}
+
+/** Scientific notation ("1.23E+08", "1E-300") with as many digits as fit in `room` characters; null if none fit. */
+function sciText(v, room) {
+  for (let keep = Math.max(1, room - 5); keep >= 1; keep--) {
+    const { digits, carried } = roundTo(v.digits, keep);
+    const exp = v.exp + (carried ? 1 : 0);
+    const d = digits.replace(/0+$/, '') || '0';
+    const s = `${d[0]}${d.length > 1 ? '.' + d.slice(1) : ''}E${exp < 0 ? '-' : '+'}${String(Math.abs(exp)).padStart(2, '0')}`;
+    if (s.length <= room) return { s, keep };
+  }
+  return null;
+}
+
+/** A number in the General format, in a cell `width` characters wide (units.js colChars; Infinity for no limit).
+ *  Fitted on Excel's PDF of test/fixtures/general.xlsx (43 values in columns of 30, 8.43, 6, 4 and 2.5 characters,
+ *  all 215 as Excel shows them): at most 11 characters plus a minus sign, and no more than the cell's width. Fixed
+ *  notation when it shows the value exactly; otherwise whichever form has room for more significant digits, fixed on
+ *  a tie (0.000012345 stays fixed, 0.0000123456789 becomes 1.23457E-05; in 6 characters 0.00012345678 is 0.0001 but
+ *  0.00005 is 5E-05). When neither fits, the cell is filled with #. Rounding keeps the sign: -0.12 in two characters
+ *  is "-0", as in Excel. */
+export function formatGeneral(n, width = Infinity) {
+  if (!Number.isFinite(n)) return '#NUM!';
+  if (n === 0) return width >= 1 ? '0' : '';
+  const sign = n < 0 ? '-' : '';
+  const room = Math.min(GENERAL_MAX, width - sign.length);
+  const v = decimal(Math.abs(n));
+  const fRoom = room >= 1 ? fixedRoom(v, room) : null;
+  const f = fRoom != null ? fixedText(v, fRoom, room) : null;
+  const e = room >= 1 ? sciText(v, room) : null;
+  const exact = f != null && v.digits.length <= fRoom;
+  if (f != null && (exact || !e || fRoom >= e.keep)) return sign + f;
+  if (e) return sign + e.s;
+  return Number.isFinite(width) ? '#'.repeat(Math.max(0, width)) : sign + Math.abs(n);
+}
+
+/** The text a cell shows, from what the reader stored ({ t, v }), in a cell `width` characters wide (numbers only). */
+export function cellText(cell, width = Infinity) {
   if (!cell || cell.v == null) return '';
   switch (cell.t) {
     case 'b': return cell.v ? 'TRUE' : 'FALSE';
-    case 'n': return formatGeneral(cell.v);
+    case 'n': return formatGeneral(cell.v, width);
     default: return String(cell.v);
   }
 }

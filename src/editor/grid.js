@@ -9,7 +9,7 @@ import { Axis } from './axis.js';
 import { setCellText } from './celltext.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
-import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx } from '../ooxml/units.js';
+import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
 
 /** Calibri 11's maximum digit width at 96 dpi; it will come from the Normal style's font once styles are read. */
 const MDW = 7;
@@ -112,8 +112,11 @@ export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r 
 
 /** One cell's element: text, alignment (numbers right, text left and running on over empty cells), extent. */
 export function cellElement(st, r, c, cell, line, win, rowTop) {
-  const text = cellText(cell).replace(/[\r\n]/g, ''); // (without wrapping, a line break shows as nothing)
   const merge = mergeAt(st, r, c);
+  // (A General number gets the characters that fit its cell on screen, in print too: st.screenCols when printing.)
+  const screen = st.screenCols || st.cols;
+  const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
+  const text = cellText(cell, colChars(screenW, MDW)).replace(/[\r\n]/g, ''); // (without wrapping, a line break shows as nothing)
   const el = div('oxe-cell', 'gridcell');
   el.setAttribute('aria-colindex', String(c + 2));
   let w = st.cols.size(c);

@@ -33,6 +33,10 @@ export const charsToColWidth = (chars, mdw) => Math.trunc(((chars * mdw + 5) / m
 /** The stored width to the characters the user sees, to Excel's two decimals. */
 export const colWidthToChars = (width, mdw) => Math.round(((colWidthToPx(width, mdw) - 5) / mdw) * 100) / 100;
 
+/** How many characters of the maximum digit width fit in a column, its 5px of padding taken off: the room Excel gives
+ *  a General number (64px holds 8, 22px holds 2; fitted with numfmt.js formatGeneral on test/fixtures/general.xlsx). */
+export const colChars = (px, mdw) => Math.max(0, Math.floor((px - 5) / mdw));
+
 /** A sheet's default column width in pixels: `defaultColWidth` when given, else `baseColWidth` (8) characters plus
  *  padding, rounded up to a multiple of 8 pixels, which is how Excel's untouched columns come to be 64px (8.43) in
  *  Calibri 11 rather than 61. (The multiple of 8 is [MS-OI29500]'s note on `baseColWidth`, not yet measured.) */

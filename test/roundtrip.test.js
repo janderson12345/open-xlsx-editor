@@ -78,7 +78,7 @@ test('basic.xlsx: sheets, strings, values, sizes and merges as written', () => {
   assert.equal(text(wb, 0, 10, 5), '1234567.891');
   assert.equal(text(wb, 0, 11, 4), 'Rich bold'); // (the phonetic run's "ruby" is not cell text)
   assert.equal(text(wb, 0, 11, 5), 'Line\rend');
-  assert.equal(text(wb, 0, 12, 5), '1.2345E-05');
+  assert.equal(text(wb, 0, 12, 5), '0.000012345'); // (as Excel shows it: test/general-excel.json)
   assert.equal(text(wb, 0, 39, 7), '1.23457E+11');
   assert.deepEqual(sh.rows.get(3), { ht: 30, hidden: false, customHeight: true });
   assert.equal(sh.rows.get(5).hidden, true);

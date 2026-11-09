@@ -34,36 +34,34 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
 - **Cell text.** Bottom-aligned, 2px side padding, numbers right, text left, booleans and errors centred, no wrapping;
   text runs on to the right over empty cells. Line height is Calibri's hhea ascent + descent + gap (1.2207 em),
   through `--oxe-cell-lh` only.
-- **General format.** Up to 11 characters; scientific from 1E+11 and below 0.0001. A number too wide for its column
-  is clipped; Excel shows fewer digits or `###` instead.
+- **General format** (*measured*). Probe `test/fixtures/general.xlsx`: 43 values in columns of 30, 8.43, 6, 4 and 2.5
+  characters, all 215 as Excel shows them (`test/general-excel.json`, checked by `npm test`). The room is the
+  characters of the digit width that fit the cell less its 5px padding (`colChars`: 64px holds 8), at most 11 plus a
+  minus sign. Fixed notation when it shows the value exactly, else whichever form has room for more significant
+  digits, fixed on a tie; rounding is decimal, half up, on 15 digits; a cell where nothing fits is filled with `#`;
+  a value too small to show is `0` (`-0` when negative). Merged cells use the merged width; print uses the screen
+  width, so both show the same text. The textbook rule (scientific below 1E-4, also GridCraft's) is wrong: Excel
+  shows 0.00001 as `0.00001` in a wide column.
 
 ## Where it stands
 
-The four generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures`):
+The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures`; general.xlsx joined at run 4):
 
 ```
 1b (before)  page counts 1/4 on same page 9027/85124 x within 1px   18/9027 (0.2%)   y within 1px 32/9027 (0.4%) both  3/9027 (0.0%)
 2  (columns) page counts 3/4 on same page 9059/100147 x within 1px 9057/9059 (100.0%) y within 1px 51/9059 (0.6%) both 51/9059 (0.6%)
 3  (rows)    page counts 4/4 on same page 100147/100147 x within 1px 100145/100147 (100.0%) y within 1px 100147/100147 (100.0%) both 100145/100147 (100.0%)
+4  (General) page counts 5/5 on same page 100364/100364 x within 1px 100363/100364 (100.0%) y within 1px 100364/100364 (100.0%) both 100363/100364 (100.0%)
 ```
 
 Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures.
 
-The two cells still off across: a centred TRUE (our text 3.4px wider than Excel's) and a number in an 8px column
-that doesn't fit, which Excel starts at the left instead of right-aligning.
+The one cell still off: a centred TRUE (our text 3.4px wider than Excel's). The 8 of Excel's 100,372 cells not
+matched at all are text that reaches its cell's edge here (ours is wider: fonts are not mapped yet, "Amount" 47.7px
+in Excel against 52.5), which the extraction reads as one piece with the next cell's (`c3c4`, `ColumnMColumnN`).
 
-The 10 of Excel's 100,157 cells not matched at all, and why:
-
-- General format: Excel shows 0.000012345 as `0.000012345` (the rule here gives `1.2345E-05`), and fits
-  123456789012 into a 64px column as `1.23E+11` where this clips `1.23457E+11`.
-- A number too wide for its column is filled with `#` in Excel (the probe's 1.29-character column).
-- Text that reaches its cell's edge here (ours is wider: fonts are not mapped yet, "Amount" 47.7px in Excel against
-  52.5) reads as one piece with the next cell's in the extraction (`c3c4`, `ColumnMColumnN`).
-
-Next: the General format's switch-over points and narrow-column digits, then fonts (text widths). All of this so far
-is on generated fixtures; the numbers that matter come from real workbooks.
-
-The fixtures are a start; the numbers that matter come from real workbooks (`..\samples`).
+Next: fonts (the Normal style's font, Carlito for Calibri where Calibri is missing, text widths). All of this so far
+is on generated fixtures; the numbers that matter come from real workbooks (`..\samples`).
 
 ## Open differences
 

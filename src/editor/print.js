@@ -72,7 +72,7 @@ function drawPage(st, block, layout) {
 export function renderPrint(root, sheet) {
   const geometry = sheetGeometry(sheet, { print: true });
   const layout = paginate(sheet, geometry);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');
