@@ -18,10 +18,11 @@ insides:
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
 | `src/ooxml/refs.js` | A1 references and ranges; rows and columns are 0-based in code. |
 | `src/ooxml/workbook.js` | `Workbook`: sheets in order (`canShow`, `tabColor` read from the part's start), shared strings, defined names, each sheet's model read on first use, `setCell`, `setFormula` and `apply` (then recalculation), `calculate`, `toBytes` (only dirty sheets serialised, with their XML declaration; calcChain.xml dropped when formulas change; `fullCalcOnLoad` when a formula couldn't be worked out). |
+| `src/ooxml/sheetops.js` | Sheets added, renamed, moved, hidden, coloured and deleted as Excel does it, with Excel's refusals; references rewritten (formulas, names, charts, hyperlinks, pivot sources) or made #REF!, sheet-local names and the active tab kept with their sheets, a deleted sheet's own parts removed (docs/SHEETS.md). |
 | `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults, array formula ranges. Implied `r` positions followed; a shared formula's later cells get their own formula text. |
 | `src/ooxml/input.js` | A typed entry as a value (numbers, separators, %, TRUE/FALSE, 'text) or a formula (=..., in the file's form). |
 | `src/ooxml/sheetedit.js` | Changing cells in the worksheet's XML in place: values, formulas, formula results (the formula kept), shared formulas written out cell by cell. Implied positions pinned first, rows indexed, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. |
-| `src/calc/tokens.js` | Formulas as tokens; moving a formula (`shiftFormula`), the typed form to the file's (`normalizeFormula`, `_xlfn.` prefixes) and back (`displayFormula`). |
+| `src/calc/tokens.js` | Formulas as tokens; moving a formula (`shiftFormula`), a sheet's references renamed or made #REF! (`renameSheetRefs`, `sheetPrefix`), the typed form to the file's (`normalizeFormula`, `_xlfn.` prefixes) and back (`displayFormula`). |
 | `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
 | `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
 | `src/calc/evaluate.js` | Operators, references, names and function calls; implicit intersection outside array formulas, element by element inside. |

@@ -8,6 +8,7 @@ import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
 import { setCellXml, setFormulaXml, setResultXml, unshareXml } from './sheetedit.js';
 import { parseRef } from './refs.js';
+import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 
@@ -25,6 +26,9 @@ export class Workbook {
   constructor(pkg) {
     this.pkg = pkg;
     const doc = pkg.xml(pkg.mainPath);
+    /** The workbook part, parsed once; written back on save only when changed (`bookDirty`). */
+    this.doc = doc;
+    this.bookDirty = false;
     const root = doc.documentElement;
     this.ns = root.namespaceURI;
     if (this.ns !== NS.x && this.ns !== NS.xStrict) throw new Error('Not a workbook: the main part is ' + root.localName);
@@ -36,14 +40,14 @@ export class Workbook {
       // (The relationship id is r:id in Transitional, and in Strict's own relationships namespace.)
       const rId = [...el.attributes].find((a) => a.localName === 'id' && a.namespaceURI !== null)?.value || null;
       const rel = rId ? rels.find((x) => x.id === rId) : null;
-      return {
+      return withEl({
         name: attr(el, 'name'),
         sheetId: Number(attr(el, 'sheetId')),
         state: attr(el, 'state') || 'visible',
         rId,
         path: rel && !rel.external ? rel.target : null,
         kind: rel ? rel.type.slice(rel.type.lastIndexOf('/') + 1) : null, // worksheet, chartsheet, dialogsheet...
-      };
+      }, el);
     });
     const sstPath = rels.find((x) => x.type.endsWith('/sharedStrings'))?.target;
     this.sharedStrings = readSharedStrings(sstPath ? pkg.xml(sstPath) : null);
@@ -52,13 +56,15 @@ export class Workbook {
     this.styles = readStyles(part('styles') ? pkg.xml(part('styles')) : null);
     this.theme = readTheme(part('theme') ? pkg.xml(part('theme')) : null);
     /** Defined names: { name, sheet (the index of the sheet it belongs to, or null for the whole workbook), text }. */
-    this.definedNames = kids(kid(root, 'definedNames', this.ns), 'definedName', this.ns).map((el) => ({
+    this.definedNames = kids(kid(root, 'definedNames', this.ns), 'definedName', this.ns).map((el) => withEl({
       name: attr(el, 'name'),
       sheet: attr(el, 'localSheetId') == null ? null : Number(attr(el, 'localSheetId')),
       text: el.textContent,
-    }));
-    /** Parsed sheets by index: { doc, model }. */
+    }, el));
+    /** Parsed sheets by their entry in `sheets` (indexes change when sheets are added, moved or deleted): { doc, model }. */
     this._parsed = new Map();
+    /** The number the next new sheet tries (Sheet1, Sheet2...: Excel counts from 1 each time it opens a workbook). */
+    this.nextSheetNumber = 1;
     /** Paths of the parts changed since opening (the only ones rewritten on save). */
     this.dirty = new Set();
   }
@@ -71,7 +77,7 @@ export class Workbook {
 
   /** The index of the sheet a workbook opens on: the active tab if it is a visible worksheet, else the first one. */
   get activeSheet() {
-    const view = kid(kid(this.pkg.xml(this.pkg.mainPath).documentElement, 'bookViews', this.ns), 'workbookView', this.ns);
+    const view = kid(kid(this.doc.documentElement, 'bookViews', this.ns), 'workbookView', this.ns);
     const active = Number(attr(view, 'activeTab') || 0);
     if (this.canShow(active)) return active;
     const i = this.sheets.findIndex((_, k) => this.canShow(k));
@@ -79,14 +85,14 @@ export class Workbook {
   }
 
   _part(i) {
-    if (!this._parsed.has(i)) {
-      const info = this.sheets[i];
-      if (!info) throw new Error(`no sheet ${i}`);
+    const info = this.sheets[i];
+    if (!info) throw new Error(`no sheet ${i}`);
+    if (!this._parsed.has(info)) {
       if (info.kind !== 'worksheet' || !info.path || !this.pkg.has(info.path)) throw new Error(`sheet "${info.name}" is not a worksheet`);
       const doc = this.pkg.xml(info.path);
-      this._parsed.set(i, { doc, model: readSheet(doc, this.sharedStrings) });
+      this._parsed.set(info, { doc, model: readSheet(doc, this.sharedStrings) });
     }
-    return this._parsed.get(i);
+    return this._parsed.get(info);
   }
 
   /** The model of sheet i (see readSheet). */
@@ -103,12 +109,22 @@ export class Workbook {
   /** Sheet i's tab colour as '#RRGGBB', or null. Its `sheetPr` comes first in the part, so only the part's start is
    *  read (a tab strip shouldn't parse every sheet). */
   tabColor(i) {
-    const bytes = this.sheets[i]?.path && this.pkg.files[this.sheets[i].path];
-    if (!bytes) return null;
-    const head = new TextDecoder().decode(bytes.subarray(0, 8192)).split(/<(?:\w+:)?sheetData\b/)[0];
-    const el = /<(?:\w+:)?tabColor\b([^>]*)>/.exec(head);
-    if (!el) return null;
-    const at = Object.fromEntries([...el[1].matchAll(/([\w:]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+    const info = this.sheets[i];
+    let at;
+    if (this._parsed.has(info)) {
+      // (Parsed, it may have been given a colour since.)
+      const root = this._parsed.get(info).doc.documentElement;
+      const el = kid(kid(root, 'sheetPr', root.namespaceURI), 'tabColor', root.namespaceURI);
+      if (!el) return null;
+      at = Object.fromEntries([...el.attributes].map((a) => [a.name, a.value]));
+    } else {
+      const bytes = info?.path && this.pkg.files[info.path];
+      if (!bytes) return null;
+      const head = new TextDecoder().decode(bytes.subarray(0, 8192)).split(/<(?:\w+:)?sheetData\b/)[0];
+      const el = /<(?:\w+:)?tabColor\b([^>]*)>/.exec(head);
+      if (!el) return null;
+      at = Object.fromEntries([...el[1].matchAll(/([\w:]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+    }
     const num = (name) => (at[name] != null ? Number(at[name]) : null);
     return resolveColor({ rgb: at.rgb || null, theme: num('theme'), indexed: num('indexed'), auto: at.auto === '1', tint: num('tint') || 0 }, this.theme, this.styles.palette);
   }
@@ -183,6 +199,22 @@ export class Workbook {
     return this.calc.recalc(rects, changes.filter((ch) => ch.formula != null).map(({ r, c }) => ({ si: i, r, c })));
   }
 
+  /** Sheets added, renamed, moved, hidden or shown, coloured and deleted as Excel does it (sheetops.js; a refusal
+   *  throws a SheetError with Excel's words). `addSheet` returns the new sheet's index. */
+  addSheet(at, name) { return addSheet(this, at, name); }
+  renameSheet(i, name) { renameSheet(this, i, name); }
+  moveSheet(from, to) { moveSheet(this, from, to); }
+  setSheetHidden(i, hidden) { setSheetHidden(this, i, hidden); }
+  setTabColor(i, color) { setTabColor(this, i, color); }
+  deleteSheet(i) { deleteSheet(this, i); }
+
+  /** Start the calculation state again (sheets' indexes or names changed), remembering that some formula couldn't be
+   *  worked out here. */
+  resetCalc() {
+    if (this._calc && this._calc.incomplete) this._incomplete = true;
+    this._calc = null;
+  }
+
   /** Work out every formula of the workbook again (Excel's Ctrl+Alt+F9). */
   calculate() {
     return this.calc.calculateAll();
@@ -223,18 +255,17 @@ export class Workbook {
   /** The workbook as .xlsx bytes: changed sheets serialised, every other part as it was read. */
   toBytes() {
     // (A formula the engine couldn't work out may read a changed cell: have Excel recalculate the workbook on opening.)
-    if (this.edited && this._calc && this._calc.incomplete) this._fullCalcOnLoad();
-    for (const [i, part] of this._parsed) {
-      const path = this.sheets[i].path;
-      if (this.dirty.has(path)) this.pkg.setText(path, partText(part.doc, this.pkg.text(path)));
+    if (this.edited && ((this._calc && this._calc.incomplete) || this._incomplete)) this._fullCalcOnLoad();
+    for (const [info, part] of this._parsed) {
+      if (this.dirty.has(info.path) && this.sheets.includes(info)) this.pkg.setText(info.path, partText(part.doc, this.pkg.text(info.path)));
     }
+    if (this.bookDirty) this.pkg.setText(this.pkg.mainPath, partText(this.doc, this.pkg.text(this.pkg.mainPath)));
+    this.bookDirty = false;
     return this.pkg.toBytes();
   }
 
   _fullCalcOnLoad() {
-    const path = this.pkg.mainPath;
-    const original = this.pkg.text(path);
-    const doc = this.pkg.xml(path);
+    const doc = this.doc;
     const root = doc.documentElement;
     let pr = kid(root, 'calcPr', this.ns);
     if (pr && attr(pr, 'fullCalcOnLoad') === '1') return;
@@ -246,6 +277,6 @@ export class Workbook {
       root.insertBefore(pr, next || null);
     }
     pr.setAttribute('fullCalcOnLoad', '1');
-    this.pkg.setText(path, partText(doc, original));
+    this.bookDirty = true;
   }
 }

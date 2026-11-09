@@ -202,6 +202,31 @@ export function shiftFormula(text, dr, dc) {
   });
 }
 
+/** A sheet name as a formula writes it before a reference: plain (Data!) when it reads as a name, quoted otherwise
+ *  ('My Data'!, 'A1'!, '2024'!, 'R1C1'!, 'TRUE'!; XFE1, past the last column, stays plain, as Excel has it), an
+ *  apostrophe doubled. */
+export function sheetPrefix(name) {
+  const cell = /^([A-Za-z]{1,3})([0-9]+)$/.exec(name);
+  const plain = /^[\p{L}_\\][\p{L}\p{N}_.\\]*$/u.test(name) && !(cell && okCol(colIndex(cell[1])) && okRow(Number(cell[2]) - 1)) &&
+    !/^(R[0-9]*|C[0-9]*|R[0-9]*C[0-9]*)$/i.test(name) && !/^(TRUE|FALSE)$/i.test(name);
+  return plain ? `${name}!` : `'${name.replace(/'/g, "''")}'!`;
+}
+
+/** A formula with its references to sheet `from` (case ignored, this workbook's only) pointing at sheet `to`, or, with
+ *  `to` null, become #REF! (a deleted sheet: Excel writes the whole reference as #REF!). Text that doesn't read as a
+ *  formula comes back as it was. */
+export function renameSheetRefs(text, from, to) {
+  const was = from.toLowerCase();
+  try {
+    return mapRefs(text, (t) => {
+      if (t.type !== 'ref' || t.book != null || t.sheet == null || t.sheet.toLowerCase() !== was) return null;
+      return to == null ? '#REF!' : sheetPrefix(to) + text.slice(t.start + t.prefix.length, t.end);
+    });
+  } catch {
+    return text;
+  }
+}
+
 /** A formula from the file as Excel shows it: without the _xlfn. and _xlws. prefixes of newer functions. */
 export function displayFormula(text) {
   try {

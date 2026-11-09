@@ -133,6 +133,24 @@ export class OpcPackage {
     this.setText('[Content_Types].xml', serializeXml(ct));
   }
 
+  /** Take a part out with the parts only it leads to (a deleted sheet's drawings, comments, tables, printer
+   *  settings): whatever another part still reaches through its relationships stays. */
+  removeTree(path) {
+    const walk = (from, skip) => {
+      const seen = new Set();
+      const queue = [...from];
+      while (queue.length) {
+        const p = queue.pop();
+        if (seen.has(p) || p === skip) continue;
+        seen.add(p);
+        for (const r of this.readRels(p)) if (!r.external && this.has(r.target)) queue.push(r.target);
+      }
+      return seen;
+    };
+    const kept = walk(this.readRels('').filter((r) => !r.external).map((r) => r.target), path);
+    for (const p of walk([path], null)) if (!kept.has(p)) this.removePart(p);
+  }
+
   /** Resolve an image relationship to a data blob for display. */
   media(rId) {
     const rel = this.relById(rId);
