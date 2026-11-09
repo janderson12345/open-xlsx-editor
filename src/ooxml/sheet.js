@@ -81,8 +81,37 @@ export function readSheet(doc, sst = []) {
     merges,
     format: { defaultRowHeight: num('defaultRowHeight') ?? 15, defaultColWidth: num('defaultColWidth'), baseColWidth: num('baseColWidth') },
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
+    page: readPageSetup(root, ns),
     maxRow,
     maxCol,
+  };
+}
+
+/** Paper sizes by `paperSize` code, in inches (ECMA-376 Part 1, 18.3.1.63): only the common ones so far. */
+const PAPER = { 1: [8.5, 11], 5: [8.5, 14], 8: [11.69, 16.54], 9: [8.27, 11.69], 11: [5.83, 8.27] };
+
+/** What the sheet says about printing: paper, orientation, margins (inches), gridlines and headings. Without
+ *  `pageMargins` Excel uses its Normal margins, 0.7in at the sides and 0.75in top and bottom. Scaling and fit-to-page
+ *  are read but not applied yet. */
+function readPageSetup(root, ns) {
+  const m = kid(root, 'pageMargins', ns);
+  const ps = kid(root, 'pageSetup', ns);
+  const po = kid(root, 'printOptions', ns);
+  const sheetPr = kid(root, 'sheetPr', ns);
+  const fitToPage = attr(kid(sheetPr, 'pageSetUpPr', ns), 'fitToPage') === '1';
+  const margin = (name, d) => (m && attr(m, name) != null ? Number(attr(m, name)) : d);
+  const on = (el, name) => !!el && (attr(el, name) === '1' || attr(el, name) === 'true');
+  const code = Number(attr(ps, 'paperSize') || 1);
+  return {
+    paperSize: code,
+    paper: PAPER[code] || PAPER[1],
+    landscape: attr(ps, 'orientation') === 'landscape',
+    scale: Number(attr(ps, 'scale') || 100),
+    fitToPage,
+    margins: { left: margin('left', 0.7), right: margin('right', 0.7), top: margin('top', 0.75), bottom: margin('bottom', 0.75), header: margin('header', 0.3), footer: margin('footer', 0.3) },
+    gridLines: on(po, 'gridLines'),
+    headings: on(po, 'headings'),
+    pageOrder: attr(ps, 'pageOrder') || 'downThenOver',
   };
 }
 

@@ -24,8 +24,8 @@ const OVERSCAN = 3;
 const SPILL_BACK = 64;
 
 const px = (n) => `${n}px`;
-const setVars = (el, vars) => { for (const k in vars) el.style.setProperty(k, px(vars[k])); };
-const div = (cls, role) => {
+export const setVars = (el, vars) => { for (const k in vars) el.style.setProperty(k, px(vars[k])); };
+export const div = (cls, role) => {
   const el = document.createElement('div');
   el.className = cls;
   if (role) el.setAttribute('role', role);
@@ -105,10 +105,10 @@ function drawGridlines(st, win) {
 }
 
 /** The merged range a cell is inside, if any. */
-const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
+export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
 
 /** One cell's element: text, alignment (numbers right, text left and running on over empty cells), extent. */
-function cellElement(st, r, c, cell, line, win, rowTop) {
+export function cellElement(st, r, c, cell, line, win, rowTop) {
   const text = cellText(cell).replace(/[\r\n]/g, ''); // (without wrapping, a line break shows as nothing)
   const merge = mergeAt(st, r, c);
   const el = div('oxe-cell', 'gridcell');

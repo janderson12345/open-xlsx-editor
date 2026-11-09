@@ -55,6 +55,8 @@ export interface GridHandle {
 export interface XlsxEditor {
   open(bytes: Uint8Array | ArrayBuffer, fileName?: string | null): XlsxEditor;
   save(): Uint8Array;
+  /** Build the printed pages of the sheet shown; returns the page count. */
+  preparePrint(): number;
   readonly workbook: Workbook | null;
   readonly grid: GridHandle | null;
   readonly sheetIndex: number;

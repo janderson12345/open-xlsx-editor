@@ -1,6 +1,7 @@
 // open-xlsx-editor: open .xlsx bytes in a page and show them. Read-only for now: one sheet in a virtualised grid.
 import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
+import { renderPrint } from './editor/print.js';
 
 export { Workbook };
 
@@ -34,6 +35,11 @@ export function mountXlsxEditor(host, options = {}) {
       if (!state.workbook) throw new Error('no workbook open');
       return state.workbook.toBytes();
     },
+    /** Build the printed pages of the sheet shown (done before the browser prints, too); returns the page count. */
+    preparePrint() {
+      if (!state.workbook) return 0;
+      return renderPrint(root, state.workbook.sheet(state.sheetIndex));
+    },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },
     get sheetIndex() { return state.sheetIndex; },
@@ -43,10 +49,13 @@ export function mountXlsxEditor(host, options = {}) {
       else delete root.dataset.theme;
     },
     destroy() {
+      window.removeEventListener('beforeprint', beforePrint);
       state.grid?.destroy();
       root.remove();
     },
   };
+  const beforePrint = () => api.preparePrint();
+  window.addEventListener('beforeprint', beforePrint);
   if (options.bytes) api.open(options.bytes, options.fileName || null);
   return api;
 }

@@ -176,3 +176,47 @@
   width: calc(var(--oxe-w) - 1px);
   background: var(--oxe-bg);
 }
+
+/* Printing: the pages renderPrint built, one sheet of paper each; the grid and the host's chrome are not printed. */
+.oxe-print {
+  display: none;
+}
+@media print {
+  .oxe-root {
+    display: block;
+    height: auto;
+    background: #ffffff;
+    --oxe-bg: #ffffff;
+    --oxe-fg: #000000;
+  }
+  .oxe-root > .oxe-grid {
+    display: none;
+  }
+  .oxe-print {
+    display: block;
+    --oxe-rowhead-w: 0px;
+  }
+}
+.oxe-page {
+  position: relative;
+  width: var(--oxe-page-w);
+  height: var(--oxe-page-h);
+  overflow: hidden;
+  break-after: page;
+}
+.oxe-page:last-child {
+  break-after: auto;
+}
+.oxe-page-area {
+  position: absolute;
+  left: var(--oxe-ml);
+  top: var(--oxe-mt);
+  width: var(--oxe-aw);
+  height: var(--oxe-ah);
+  overflow: hidden;
+}
+.oxe-page-cells {
+  position: absolute;
+  left: calc(-1 * var(--oxe-ox));
+  top: calc(-1 * var(--oxe-oy));
+}

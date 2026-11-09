@@ -78,6 +78,19 @@ check(n1 < 1500, `large: still ${n1} cell elements after scrolling`);
 const sticky = await box('.oxe-colheads');
 check(sticky && Math.abs(sticky.y - (await box('.oxe-grid')).y) < 0.5, 'large: column headings stay at the top while scrolled');
 
+// Printing: the pages are built, the grid is hidden in print media, the paper size reaches @page.
+const printed = await page.evaluate(() => window.oxe.preparePrint());
+check(printed === 224, `large: printed as ${printed} pages (112 down by 2 across)`);
+await page.emulateMedia({ media: 'print' });
+const printView = await page.evaluate(() => ({
+  grid: getComputedStyle(document.querySelector('.oxe-grid')).display,
+  pages: document.querySelectorAll('.oxe-page').length,
+  first: document.querySelector('.oxe-page .oxe-cell')?.textContent,
+  size: document.getElementById('oxe-page-style')?.textContent,
+}));
+check(printView.grid === 'none' && printView.pages === 224 && printView.first === 'Column A' && /size: 8.5in 11in/.test(printView.size), 'large: print media shows the pages, not the grid', JSON.stringify(printView));
+await page.emulateMedia({ media: 'screen' });
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

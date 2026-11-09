@@ -16,6 +16,11 @@
     html, body { background: #1f1f1f; color: #f0f0f0; }
     .bar { border-bottom-color: #4a4a4a; }
   }
+  @media print {
+    html, body { height: auto; background: #ffffff; }
+    #app { display: block; height: auto; }
+    .bar { display: none; }
+  }
 </style>
 </head>
 <body>
