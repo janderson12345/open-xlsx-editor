@@ -44,6 +44,21 @@ for (const colorScheme of ['light', 'dark']) {
       const box = await axe();
       t.check(!box.length && await page.evaluate(() => document.activeElement.tagName) === 'SELECT', `${colorScheme}: the Unhide box, no axe violations, the list focused`, box.join('\n     '));
       await page.keyboard.press('Escape');
+      // The ribbon's colour palette and Borders menu open: axe on each; the ribbon's tabs a labelled tablist.
+      await page.click('.oxe-split-more[aria-label="Fill Color options"]');
+      const palette = await axe();
+      t.check(!palette.length && await page.isVisible('.oxe-pop .oxe-swatches-theme'), `${colorScheme}: the Fill Color palette, no axe violations`, palette.join('\n     '));
+      await page.keyboard.press('Escape');
+      await page.click('.oxe-split-more[aria-label="Bottom Border options"]');
+      const borders = await axe();
+      t.check(!borders.length, `${colorScheme}: the Borders menu, no axe violations`, borders.join('\n     '));
+      await page.keyboard.press('Escape');
+      const ribbon = await page.evaluate(() => {
+        const list = document.querySelector('.oxe-rtablist');
+        const tab = list.querySelector('[role=tab]');
+        return `${list.getAttribute('role')}:${list.getAttribute('aria-label')}:${tab.getAttribute('aria-selected')}:${document.getElementById(tab.getAttribute('aria-controls'))?.getAttribute('role')}`;
+      });
+      t.check(ribbon === 'tablist:Ribbon tabs:true:tabpanel', `${colorScheme}: the ribbon's tabs are a labelled tablist, each controlling its panel`, ribbon);
     }
     t.check(!errors.length, `${colorScheme}, ${width}px: no page errors`, errors.join('\n     '));
     await close();

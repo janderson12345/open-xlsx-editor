@@ -19,9 +19,9 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Option | Status | Notes |
 |---|---|---|
-| `readOnly` | Done | `setReadOnly()` at any time. Nothing editable; the tab menu shows only what doesn't change the workbook. |
-| `toolbar: false` | Missing | Hides the ribbon but keeps editing. Comes with the ribbon. |
-| `features: { tab or group: false }` | Missing | Hides a tab or group; `setFeatures()` at any time. Comes with the ribbon. A hidden feature's keys and menu entries are blocked too. |
+| `readOnly` | Done | `setReadOnly()` at any time. No ribbon, nothing editable; the tab menu shows only what doesn't change the workbook. |
+| `toolbar: false` | Done | Hides the ribbon but keeps editing. |
+| `features: { tab or group: false }` | Done | Hides a tab or group; `setFeatures()` at any time. A formatting group turned off also turns off its keys (Ctrl+B with `font: false`). |
 
 ## Outside the ribbon
 
@@ -32,7 +32,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Save .xlsx | Done | Only changed sheets rewritten; opened in Excel with no repair (`tools/check-ooxml.mjs`). |
 | Formula results on open when the file has none | Partly | Worked out by `calculate()`; the editor doesn't call it on open yet (the preview page does). |
 | Virtualised grid | Done | 5,000 rows by 20 columns scroll smoothly. |
-| Fonts, fills, borders, alignment, number formats | Shown | Measured against Excel's PDFs (docs/LAYOUT.md). |
+| Fonts, fills, borders, alignment, number formats | Done | Shown as measured against Excel's PDFs (docs/LAYOUT.md); changed from the Home tab (below). |
 | Rich text in a cell (runs in several fonts) | Partly | The text is shown in the cell's own font; the runs' formatting isn't. |
 | Merged cells | Shown | Navigation steps over them. |
 | Hidden rows and columns | Shown | Hidden; no way to unhide yet. |
@@ -42,7 +42,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Selecting several ranges (Ctrl+click) | Missing | |
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
 | Entries read as Excel reads them | Partly | Numbers, separators, %, TRUE/FALSE, 'text. Dates and times typed as text aren't turned into dates yet. |
-| Undo and redo | Done | Cell contents across sheets; a sheet rename or delete clears the history, as Excel does. |
+| Undo and redo | Done | Cell contents and formats across sheets; a sheet rename or delete clears the history, as Excel does. |
 | Formula bar and name box | Partly | The name box shows the active cell; typing a reference or name there to go to it is missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
 | Recalculation | Done | 399 of 399 test formulas give Excel's results; about 130 functions. |
@@ -51,6 +51,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Copy, cut, paste (and paste from Excel or the web) | Missing | |
 | Fill handle, Ctrl+D, Ctrl+R | Missing | |
 | Right-click menu on cells | Missing | |
+| Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
 | Find and Replace (Ctrl+F, Ctrl+H) | Missing | |
 | Status bar (Sum, Average, Count of the selection) | Missing | |
 | Zoom | Missing | |
@@ -64,29 +65,30 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Clipboard (`clipboard`) | Cut, Copy, Paste, Paste Special | Missing | |
 | | Format Painter | Missing | |
-| Font (`font`) | Font, size, grow and shrink | Shown | |
-| | Bold, italic, underline (single, double), strikethrough | Shown | |
-| | Borders | Shown | Every line style, measured. |
-| | Fill colour, font colour | Shown | Theme colours with tints, indexed colours. |
+| Undo (`undo`) | Undo, Redo | Done | |
+| Font (`font`) | Font, size, grow and shrink | Done | Grow and Shrink step through Excel's sizes. The font list is a fixed one with the theme's fonts first. |
+| | Bold, italic, underline, strikethrough | Done | Ctrl+B, I, U, 5 (and 2, 3, 4). Double underline is shown, not offered. |
+| | Borders | Done | Excel's 13 presets. Line colour and style, and Draw Borders, missing. |
+| | Fill colour, font colour | Done | Excel's palette: the theme's colours and tints, the standard ones. More Colors missing. |
 | | Pattern and gradient fills | Partly | Solid and pattern fills shown; gradients not. |
-| Alignment (`alignment`) | Horizontal and vertical | Shown | |
-| | Wrap text | Shown | |
-| | Indent | Shown | |
+| Alignment (`alignment`) | Horizontal and vertical | Done | Left, center, right; top, middle, bottom. Justify, distributed, fill and center across selection are shown, not offered. |
+| | Wrap text | Done | |
+| | Indent | Done | |
 | | Orientation (rotated text) | Missing | |
 | | Merge & Center, Merge Across, Unmerge | Missing | Merges are shown. |
 | | Shrink to fit | Missing | |
-| Number (`number`) | Number format list, currency, %, comma, decimals | Shown | Every format code Excel has, dates in 1900 and 1904. |
+| Number (`number`) | Number format list, currency, %, comma, decimals | Done | Every format code Excel has is shown; the list offers Excel's eleven. $, % and comma apply Excel's cell styles. The Format Cells dialog missing. |
 | Styles (`styles`) | Conditional Formatting | Kept | |
 | | Format as Table | Kept | |
 | | Cell Styles | Kept | Cells show their style's formatting. |
 | Cells (`cells`) | Insert and delete rows, columns, cells | Missing | Formulas, names and merges would have to follow. |
-| | Insert and delete sheets | Done | Also on the tab menu. |
+| | Insert and delete sheets | Done | Cells > Insert, Delete; also on the tab menu. |
 | | Row height, column width (and AutoFit) | Missing | Read and shown; no dragging the headings yet. |
 | | Hide and unhide rows, columns | Missing | Hidden ones are hidden. |
-| | Rename, move, tab colour, hide sheet | Done | |
+| | Rename, hide and unhide sheet | Done | Cells > Format; moving and tab colour on the tab menu. |
 | Editing (`editing`) | AutoSum | Missing | |
 | | Fill (down, right, series) | Missing | |
-| | Clear (all, formats, contents) | Partly | Delete clears contents; formats can't be cleared yet. |
+| | Clear (all, formats, contents) | Partly | Clear Formats and Clear Contents; Clear All missing. |
 | | Sort & Filter | Missing | Autofilters kept. |
 | | Find & Select | Missing | |
 

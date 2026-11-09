@@ -9,9 +9,11 @@ import { step, jump, lastCell } from './navigate.js';
 import { parseInput } from '../ooxml/input.js';
 import { refName } from '../ooxml/refs.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
+import * as fmt from '../ooxml/formatops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
- *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note) }. */
+ *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
+ *  workbook has new cell formats), shownText(r, c) (a cell's text as the grid shows it) }. */
 export function createCommands(ctx) {
   // (`views`: each sheet's selection and scroll position while another is shown.)
   const state = { sel: cellSelection(0, 0), focus: { r: 0, c: 0 }, undo: [], redo: [], views: new Map() };
@@ -50,6 +52,22 @@ export function createCommands(ctx) {
     if (circular.length) ctx.announce(`Circular reference: ${circular.map((e) => refName(e.r, e.c)).join(', ')} read themselves and weren't worked out`);
     return true;
   }
+
+  /** Give cells new formats [{ r, c, s }] as one step of the history (formatops.js works them out). */
+  function restyle(cells, record = true) {
+    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    const sh = sheet();
+    const now = cells.filter(({ r, c, s }) => (sh.cells.get(r)?.get(c)?.s || 0) !== s);
+    if (!now.length) return false;
+    const before = now.map(({ r, c }) => ({ r, c, s: sh.cells.get(r)?.get(c)?.s || 0 }));
+    ctx.workbook().setStyles(ctx.sheetIndex(), now);
+    if (record) { state.undo.push({ sheet: idOf(ctx.sheetIndex()), styles: true, before, after: now }); state.redo = []; }
+    ctx.restyled?.();
+    ctx.changed?.();
+    return true;
+  }
+  /** A format command: formatops.js's function over the selection on the sheet shown. */
+  const formatting = (fn, ...args) => (ctx.readOnly() ? (ctx.announce('The workbook is read-only'), false) : restyle(fn(ctx.workbook(), ctx.sheetIndex(), state.sel, ...args)));
 
   const commands = {
     /** Select one cell. */
@@ -91,6 +109,23 @@ export function createCommands(ctx) {
       }
       return changes.length ? apply(changes) : false;
     },
+    /** Every selected cell with the same format change (stylesedit.js: font, fill, border, align, numFmt, style). */
+    format(change) { return formatting(fmt.formatEach, change); },
+    /** Bold (b), Italic (i), Underline (u) or Strikethrough (strike), following the active cell. */
+    toggleFont(key) { return formatting(fmt.toggleFont, key); },
+    /** Grow (1) or Shrink (-1) Font. */
+    stepFont(dir) { return formatting(fmt.stepFont, dir); },
+    toggleWrap() { return formatting(fmt.toggleWrap); },
+    /** Increase (1) or Decrease (-1) Indent. */
+    stepIndent(dir) { return formatting(fmt.stepIndent, dir); },
+    /** Horizontal ('left', 'center', 'right') or vertical ('top', 'center', 'bottom') alignment. */
+    align(key, value) { return formatting(fmt.setAlign, key, value); },
+    /** A preset of the Borders menu (formatops.js BORDER_PRESETS). */
+    borders(preset) { return formatting(fmt.setBorders, preset); },
+    /** Increase (1) or Decrease (-1) Decimal. */
+    stepDecimal(dir) { return formatting(fmt.stepDecimal, dir, ctx.shownText?.(state.sel.ar, state.sel.ac) ?? null); },
+    /** Clear Formats: the selected cells back to the Normal style's format. */
+    clearFormats() { return formatting((wb, si, sel) => fmt.cellsOf(wb.sheet(si), sel).map(({ r, c }) => ({ r, c, s: 0 }))); },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },
     redo() { return replay(state.redo, state.undo, 'after', 'Redone'); },
     /** Show sheet i, with the selection and scroll position it had (A1 the first time); false if it can't be shown
@@ -173,7 +208,7 @@ export function createCommands(ctx) {
     // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
     const at = indexOf(entry.sheet);
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
-    if (!apply(entry[side], false)) { from.push(entry); return false; }
+    if (!(entry.styles ? restyle(entry[side], false) || true : apply(entry[side], false))) { from.push(entry); return false; }
     to.push(entry);
     const first = entry[side][0];
     commands.select(first.r, first.c);
@@ -189,6 +224,8 @@ export function createCommands(ctx) {
       return commands[name](...args);
     },
     get selection() { return { ...state.sel }; },
+    /** The active cell's look (formatops.js activeLook) for the ribbon. */
+    look: () => fmt.activeLook(ctx.workbook(), ctx.sheetIndex(), state.sel),
     canUndo: () => state.undo.length > 0,
     canRedo: () => state.redo.length > 0,
     /** Start again (a new workbook): A1 selected, no history, no sheet's view kept. */

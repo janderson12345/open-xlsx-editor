@@ -662,3 +662,227 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* ==== The ribbon (ribbon.js, hometab.js): from open-docx-editor's, in the headings' colours. A pressed toggle is
+   tinted with the selection's green, as Excel's are. ==== */
+.oxe-toolbar {
+  position: relative;
+  flex: none;
+  border-bottom: 1px solid var(--oxe-head-line);
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-toolbar[hidden],
+.oxe-toolbar [hidden] {
+  display: none;
+}
+.oxe-toolbar button {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.oxe-toolbar button:hover:not(:disabled) {
+  background: var(--oxe-sel-fill);
+}
+.oxe-toolbar button.on {
+  border-color: var(--oxe-sel);
+  background: var(--oxe-sel-fill);
+}
+.oxe-toolbar button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.oxe-toolbar select {
+  height: 28px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+  background: var(--oxe-head-bg);
+  color: inherit;
+  font: inherit;
+}
+.oxe-toolbar button:focus-visible,
+.oxe-toolbar select:focus-visible,
+.oxe-pop button:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-toolbar .oxe-font { width: 130px; }
+.oxe-toolbar .oxe-size { width: 58px; }
+.oxe-toolbar .oxe-numfmt { width: 128px; }
+.oxe-rtabs {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  padding: 4px 8px 0;
+}
+.oxe-rtablist {
+  display: flex;
+  flex-wrap: wrap; /* (a narrow window, 320px at 400% zoom: the tabs wrap, 1.4.10) */
+  gap: 2px;
+  min-width: 0;
+}
+.oxe-rtabs-fill { flex: 1; }
+.oxe-toolbar button.oxe-rtab {
+  height: 30px;
+  padding: 0 12px;
+  border-width: 0 0 3px;
+  border-radius: 0;
+  border-bottom-color: transparent;
+}
+.oxe-toolbar button.oxe-rtab.on {
+  border-bottom-color: var(--oxe-sel);
+  background: transparent;
+  font-weight: 600;
+}
+.oxe-ribbon {
+  position: relative;
+  padding: 4px 8px 6px;
+}
+.oxe-panel {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  align-items: stretch;
+  overflow: hidden;
+}
+.oxe-panel > .oxe-group { flex: none; }
+.oxe-panel > .oxe-group.oxe-cut { visibility: hidden; }
+.oxe-ribbon.oxe-expand .oxe-panel {
+  flex-wrap: wrap;
+  row-gap: 6px;
+  padding-right: 36px;
+}
+.oxe-toolbar .oxe-more {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 1;
+  font-size: 16px;
+  line-height: 1;
+}
+.oxe-ribbon.oxe-expand .oxe-more { background: var(--oxe-sel-fill); }
+.oxe-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 0 8px 0 4px;
+  border-right: 1px solid var(--oxe-head-line);
+}
+.oxe-group:last-child { border-right: 0; }
+.oxe-group > .oxe-rrow {
+  display: flex;
+  flex: 1;
+  gap: 2px;
+  align-items: center;
+}
+.oxe-rcol {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.oxe-rline {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+.oxe-toolbar .oxe-rcol > button { text-align: left; }
+.oxe-glabel {
+  padding-top: 2px;
+  font-size: 11px;
+  text-align: center;
+  opacity: 0.8;
+}
+.oxe-toolbar button.oxe-big {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-height: 56px;
+  padding: 2px 6px;
+}
+.oxe-big .oxe-ico { font-size: 20px; line-height: 1; }
+.oxe-lbl { margin-left: 4px; font-size: 12px; white-space: nowrap; }
+.oxe-big .oxe-lbl { margin-left: 0; }
+.oxe-caret { margin-left: 2px; font-size: 9px; opacity: 0.7; }
+.oxe-toolbar .oxe-b { font-weight: 700; }
+.oxe-toolbar .oxe-i { font-style: italic; font-family: Georgia, serif; }
+.oxe-toolbar .oxe-u { text-decoration: underline; }
+.oxe-toolbar .oxe-s { text-decoration: line-through; }
+/* A split button: the part that applies the last choice and its ▾. */
+.oxe-split { display: inline-flex; }
+.oxe-toolbar .oxe-split > button:first-child { border-radius: 4px 0 0 4px; }
+.oxe-toolbar .oxe-split > .oxe-split-more {
+  min-width: 16px;
+  padding: 0 2px;
+  border-radius: 0 4px 4px 0;
+}
+/* The colour buttons show the colour they apply as a bar under the glyph. */
+.oxe-toolbar button.oxe-colorbtn .oxe-ico {
+  display: inline-block;
+  border-bottom: 4px solid var(--oxe-swatch, #000000);
+  line-height: 1.1;
+}
+.oxe-fontcolor .oxe-ico { font-weight: 700; }
+/* The ribbon's drop-down menu. */
+.oxe-pop {
+  position: absolute;
+  z-index: 20;
+  min-width: 170px;
+  padding: 4px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 6px;
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+.oxe-pop[hidden] { display: none; }
+.oxe-pop hr {
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid var(--oxe-head-line);
+}
+.oxe-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.oxe-item > span:last-of-type { flex: 1; }
+.oxe-item small { opacity: 0.75; font-size: 11px; }
+.oxe-item:hover,
+.oxe-item.on { background: var(--oxe-sel-fill); }
+.oxe-cap { padding: 6px 6px 2px; font-size: 11px; opacity: 0.85; }
+.oxe-pop .oxe-swatches { padding: 2px 6px 4px; grid-template-columns: repeat(10, 24px); gap: 2px; }
+.oxe-pop .oxe-swatches-theme { row-gap: 0; }
+.oxe-pop .oxe-swatch { width: 24px; height: 24px; }
+/* Simplified (one-line) ribbon. */
+.oxe-simple .oxe-ribbon { padding: 3px 8px; }
+.oxe-simple .oxe-panel { gap: 2px; align-items: center; }
+.oxe-simple .oxe-more { top: 3px; }
+.oxe-simple .oxe-group { flex-direction: row; align-items: center; padding: 0 6px 0 2px; }
+.oxe-simple .oxe-glabel { display: none; }
+.oxe-simple .oxe-rcol { flex-direction: row; align-items: center; }
+.oxe-simple .oxe-rcol > button .oxe-lbl { display: none; }
+@media print {
+  .oxe-toolbar { display: none; }
+}

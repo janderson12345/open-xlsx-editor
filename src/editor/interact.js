@@ -13,6 +13,7 @@ import { refName } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
 
+const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
 /** Make the grid in `root` editable. `ctx` = { workbook(), sheetIndex(), showSheet(i), grid, looks(), readOnly() }. */
@@ -62,6 +63,7 @@ export function attachEditing(root, ctx) {
     announce,
     selected: (sel, note) => {
       refreshBar();
+      ctx.lookChanged?.();
       const cell = cellAt(sel.ar, sel.ac);
       const range = sel.r0 !== sel.r1 || sel.c0 !== sel.c1 ? `, ${refName(sel.r0, sel.c0)} to ${refName(sel.r1, sel.c1)} selected` : '';
       announce(`${note}${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}`);
@@ -72,7 +74,7 @@ export function attachEditing(root, ctx) {
       ctx.showSheet(i);
       if (carried) pointing.sheetShown();
     },
-    changed: () => refreshBar(),
+    changed: () => { refreshBar(); ctx.lookChanged?.(); ctx.changed?.(); },
   });
   const pointing = createPointing({
     grid,
@@ -151,6 +153,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'Backspace') startEdit('enter', '');
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');
     else if (ctrl && (key === 'y' || ((key === 'z' || key === 'Z') && e.shiftKey))) cmd.run('redo');
+    // (Excel's font shortcuts: Ctrl+B or 2 bold, I or 3 italic, U or 4 underline, 5 strikethrough.)
+    else if (ctrl && !e.shiftKey && !e.altKey && FONT_KEYS[key.toLowerCase()]) { if (ctx.allowed?.('toggleFont') !== false) cmd.run('toggleFont', FONT_KEYS[key.toLowerCase()]); }
     else if (key.length === 1 && !ctrl && !e.altKey) startEdit('enter', key);
     else handled = false;
     if (handled) e.preventDefault();

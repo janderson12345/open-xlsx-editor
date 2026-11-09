@@ -1,5 +1,5 @@
-// open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. A sheet at a time in a virtualised
-// grid, the sheet tabs under it (with their menu: insert, delete, rename, move, colour, hide, unhide).
+// open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. The ribbon over a sheet at a time
+// in a virtualised grid, the sheet tabs under it (with their menu: insert, delete, rename, move, colour, hide, unhide).
 import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
@@ -8,23 +8,38 @@ import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox } from './editor/dialogs.js';
+import { createRibbon } from './editor/ribbon.js';
+import { homeTab } from './editor/hometab.js';
 import { fontFamily } from './ooxml/styles.js';
+import { resolveColor } from './ooxml/theme.js';
 import { parseRef } from './ooxml/refs.js';
 
 export { Workbook };
 
+/** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
+ *  ribbon or the keyboard. */
+const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment',
+  stepDecimal: 'number', clearFormats: 'editing' };
+const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
+
 /**
  * Mount the editor in `host`.
+ * - `readOnly`: show the workbook only (no ribbon, nothing editable); `setReadOnly()` changes it.
+ * - `features`: turn parts of the ribbon off: a tab by name ({ home: false }) or a group by its label in lower case
+ *   with dashes, on any tab ({ font: false, number: false }); `setFeatures()` changes them. A group turned off also
+ *   turns off its keys (Ctrl+B with `font: false`).
+ * - `toolbar`: false hides the ribbon but keeps editing.
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
- *   onChange?: () => void }} [options]
+ *   features?: Record<string, boolean>, toolbar?: boolean, onChange?: () => void }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
   const root = document.createElement('div');
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { workbook: null, grid: null, tabs: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null };
+  const state = { workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
+    features: { ...(options.features || {}) }, toolbar: options.toolbar !== false };
   const at = (ref) => {
     const p = typeof ref === 'string' ? parseRef(ref) : ref;
     if (!p) throw new Error(`not a cell reference: ${ref}`);
@@ -80,6 +95,49 @@ export function mountXlsxEditor(host, options = {}) {
       if (pick != null) editing().run('hideSheet', hidden[pick].k, false);
     },
   };
+  /** Whether a formatting command's ribbon group is on (`features`); every other command always is. */
+  const allowed = (name, change) => {
+    const group = groupOf(name, change || {});
+    return !group || (state.features[group] !== false && state.features.home !== false);
+  };
+  /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
+  const act = (name, ...args) => {
+    if (!state.workbook) return false;
+    if (!allowed(name, args[0])) return false;
+    const i = state.sheetIndex;
+    if (name === 'deleteShownSheet') return sheetActs.remove(i);
+    if (name === 'renameShownSheet') return sheetActs.rename(i);
+    if (name === 'hideShownSheet') return editing().run('hideSheet', i);
+    if (name === 'unhideSheet') return sheetActs.unhide();
+    return editing().run(name, ...args);
+  };
+  /** The ribbon showing what the active cell has. */
+  const lookChanged = () => {
+    if (!state.ribbon || !state.workbook || !state.editing) return;
+    const wb = state.workbook;
+    const look = state.editing.commands.look();
+    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo() });
+  };
+  /** The workbook has new cell formats: their CSS again, and the grid drawn with them. */
+  const restyled = () => {
+    state.looks = applyCellStyles(root, state.workbook);
+    state.grid.setLooks(state.looks);
+  };
+  const placeRibbon = () => {
+    if (!state.ribbon) return;
+    state.ribbon.el.hidden = state.readOnly || !state.toolbar;
+    state.ribbon.setFeatures(state.features);
+  };
+  const makeRibbon = () => {
+    const el = document.createElement('div');
+    root.prepend(el);
+    state.ribbon = createRibbon(el, {
+      tabs: { Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }) },
+      home: () => state.grid?.el.focus({ preventScroll: true }),
+    });
+    placeRibbon();
+  };
+
   const openMenu = (i, point, byKeyboard) => {
     // (As in Excel, the tab right-clicked becomes the sheet shown.)
     if (state.workbook.canShow(i)) editing().run('showSheet', i);
@@ -113,6 +171,10 @@ export function mountXlsxEditor(host, options = {}) {
           looks: () => state.looks,
           readOnly: () => state.readOnly,
           changed: () => options.onChange?.(),
+          lookChanged,
+          restyled,
+          shownText: (r, c) => state.grid.shownText(r, c),
+          allowed,
         });
         state.editing.setReadOnly(state.readOnly);
         state.tabs = createSheetTabs(root, {
@@ -127,8 +189,10 @@ export function mountXlsxEditor(host, options = {}) {
           },
         });
       }
+      if (!state.ribbon) makeRibbon();
       state.tabs.set(tabList(wb), i);
       state.editing.reset();
+      lookChanged();
       return api;
     },
     /** The workbook as .xlsx bytes (unchanged parts byte for byte, changed sheets rewritten in place). */
@@ -175,7 +239,14 @@ export function mountXlsxEditor(host, options = {}) {
     setReadOnly(flag) {
       state.readOnly = !!flag;
       state.editing?.setReadOnly(state.readOnly);
+      placeRibbon();
     },
+    /** Turn ribbon features on or off (see mountXlsxEditor's `features`). */
+    setFeatures(f) {
+      state.features = { ...state.features, ...f };
+      placeRibbon();
+    },
+    get features() { return { ...state.features }; },
     setTheme(theme) {
       if (theme) root.dataset.theme = theme;
       else delete root.dataset.theme;
@@ -183,6 +254,7 @@ export function mountXlsxEditor(host, options = {}) {
     destroy() {
       window.removeEventListener('beforeprint', beforePrint);
       menu.close();
+      state.ribbon?.destroy();
       state.editing?.destroy();
       state.grid?.destroy();
       root.remove();

@@ -98,11 +98,16 @@ export interface XlsxEditor {
   /** Delete a sheet without asking; false if refused (the last sheet shown). */
   deleteSheet(sheet: number | string): boolean;
   /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo, showSheet, nextSheet,
-   *  insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet. */
+   *  insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet; on the selection, as the Home tab does:
+   *  format(change), toggleFont('b' | 'i' | 'u' | 'strike'), stepFont(1 | -1), toggleWrap, stepIndent(1 | -1),
+   *  align('horizontal' | 'vertical', value), borders(preset), stepDecimal(1 | -1), clearFormats. */
   command(name: string, ...args: unknown[]): unknown;
   readonly selection: Selection | null;
   readonly readOnly: boolean;
   setReadOnly(flag: boolean): void;
+  /** Turn ribbon features on or off: a tab by name ({ home: false }) or a group by its label ({ font: false }). */
+  setFeatures(features: Record<string, boolean>): void;
+  readonly features: Record<string, boolean>;
   /** Build the printed pages of the sheet shown; returns the page count. */
   preparePrint(): number;
   readonly workbook: Workbook | null;
@@ -115,5 +120,14 @@ export interface XlsxEditor {
 
 export declare function mountXlsxEditor(
   host: HTMLElement,
-  options?: { bytes?: Uint8Array | ArrayBuffer; fileName?: string; theme?: 'light' | 'dark'; readOnly?: boolean; onChange?: () => void },
+  options?: {
+    bytes?: Uint8Array | ArrayBuffer; fileName?: string; theme?: 'light' | 'dark';
+    /** Show the workbook only: no ribbon, nothing editable. */
+    readOnly?: boolean;
+    /** Ribbon tabs or groups turned off: { home: false }, { font: false, number: false }. */
+    features?: Record<string, boolean>;
+    /** false hides the ribbon but keeps editing. */
+    toolbar?: boolean;
+    onChange?: () => void;
+  },
 ): XlsxEditor;

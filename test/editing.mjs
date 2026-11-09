@@ -280,12 +280,43 @@ await page.keyboard.press('ArrowLeft');
 check(await editorText() === '=SUM(B2:C5)' && await page.evaluate(() => document.querySelector('.oxe-editor').selectionStart) === 10, 'F2 (Edit mode): Left moves the caret, nothing pointed at');
 await page.keyboard.press('Escape');
 
+// The ribbon's Home tab: Bold, Fill Color and a border preset on G20:H20, Ctrl+B, undo, F6, and features turned off.
+const looksOf = (ref) => page.evaluate((ref) => {
+  const wb = window.oxe.workbook;
+  const cell = wb.sheet(window.oxe.sheetIndex).cells.get(Number(ref.slice(1)) - 1)?.get(ref.charCodeAt(0) - 65);
+  const xf = wb.styles.cellXfs[cell?.s || 0];
+  return { b: wb.styles.fonts[xf.fontId].b, fill: wb.styles.fills[xf.fillId].fg?.rgb ?? null, bottom: wb.styles.borders[xf.borderId].bottom.style };
+}, ref);
+await page.evaluate(() => window.oxe.select('G20'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowRight');
+await page.click('.oxe-toolbar .oxe-b');
+check((await looksOf('G20')).b && (await looksOf('H20')).b && await page.getAttribute('.oxe-toolbar .oxe-b', 'aria-pressed') === 'true', 'Bold on G20:H20, the button pressed');
+await page.keyboard.press('Control+b');
+check(!(await looksOf('G20')).b && !(await looksOf('H20')).b, 'Ctrl+B in the sheet (focus back there after a click): bold off');
+await page.click('.oxe-toolbar .oxe-fillcolor');
+check((await looksOf('H20')).fill === 'FFFFFF00', 'Fill Color: yellow, as Excel starts');
+await page.click('.oxe-split-more[aria-label="Bottom Border options"]');
+await page.click('.oxe-pop >> text=Thick Bottom Border');
+check((await looksOf('G20')).bottom === 'medium' && (await looksOf('H20')).bottom === 'medium', 'Borders, Thick Bottom Border: a medium line under both');
+await page.keyboard.press('Control+z');
+check((await looksOf('G20')).bottom === null && (await looksOf('H20')).fill === 'FFFFFF00', 'Ctrl+Z takes the border away, the fill stays');
+await page.keyboard.press('F6');
+check(await page.evaluate(() => document.activeElement.getAttribute('role')) === 'tab', 'F6: to the ribbon tab');
+await page.keyboard.press('Escape');
+check(await page.evaluate(() => document.activeElement.classList.contains('oxe-grid')), 'Esc: back to the sheet');
+await page.evaluate(() => window.oxe.setFeatures({ font: false }));
+await page.keyboard.press('Control+b');
+check(await page.isHidden('.oxe-group[data-feature="font"]') && !(await looksOf('G20')).b, 'features { font: false }: the Font group hidden, Ctrl+B does nothing');
+await page.evaluate(() => window.oxe.setFeatures({ font: true }));
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);
 await page.keyboard.type('nope');
 await page.keyboard.press('Delete');
 check(await value('A2') === 'Item 1 x' && await page.evaluate(() => document.querySelector('.oxe-grid').getAttribute('aria-readonly')) === 'true', 'read-only: typing and Delete change nothing');
+check(await page.isHidden('.oxe-toolbar'), 'read-only: no ribbon');
 await page.evaluate(() => window.oxe.setReadOnly(false));
 
 // The saved workbook has the edits, and only its sheet changed.
@@ -296,6 +327,7 @@ const sh = wb.sheet(0);
 const v = (r, c) => sh.cells.get(r)?.get(c)?.v ?? null;
 check(v(1, 1) === 77 && v(1, 0) === 'Item 1 x' && v(15, 0) === 0.5 && v(15, 2) === '007' && v(15, 3) === true && v(1, 4) === 'No', 'saved: the edits are in the file');
 check(sh.cells.get(15).get(4).f === 'SUM(B2:B3)' && v(15, 4) === 87 && v(2, 2) === 20 && v(10, 1) === 129, 'saved: the formula and the results worked out');
+check(wb.styles.fills[wb.styles.cellXfs[sh.cells.get(19).get(7).s].fillId].fg.rgb === 'FFFFFF00', 'saved: H20 filled yellow');
 check(!wb.pkg.has('xl/calcChain.xml'), 'saved: calcChain.xml left out (Excel works the order out again)');
 check(wb.sheet(1).cells.get(1).get(1).v === -3.5, 'saved: the change on the second sheet undone');
 check(wb.sheets.map((s) => `${s.name}:${s.state}`).join() === 'Data:visible,Notes:visible,Hidden:hidden' && !Object.keys(wb.pkg.files).some((p) => /sheet[45]\.xml/.test(p)), 'saved: the sheets as left (Summary and Sheet2 gone with their parts)', wb.sheets.map((s) => s.name).join());

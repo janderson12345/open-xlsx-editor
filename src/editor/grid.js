@@ -438,6 +438,18 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
       draw(st, true);
     },
+    /** The workbook's cell formats changed (new ones added): drawn again with them, where the view is. */
+    setLooks(nextLooks) {
+      measure(st.sheet, nextLooks);
+      draw(st, true);
+    },
+    /** A cell's text as the grid shows it (a General number to the width of its column). */
+    shownText(r, c) {
+      const cell = st.sheet.cells.get(r)?.get(c);
+      if (!cell) return null;
+      const look = st.deco ? st.deco(cell.s || 0) : null;
+      return cellDisplay(cell, colChars(st.cols.size(c), MDW), look ? look.code : 'General', st.date1904).text;
+    },
     setReadOnly: (flag) => view.setAttribute('aria-readonly', String(flag)),
     /** The overlay element, which an in-cell editor joins. */
     overlay,
