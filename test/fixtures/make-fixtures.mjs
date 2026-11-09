@@ -166,6 +166,32 @@ function large() {
   });
 }
 
-basic();
-prefixed();
-large();
+// A probe for measuring Excel's printed geometry: 40 columns of different widths, each with left-aligned text in
+// row 1 (where it starts gives the column's left edge) and a right-aligned number in row 2 (its right edge), and rows
+// of different heights with text in column A (baselines step by the row heights).
+export const PROBE_CHARS = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 8.43, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 22, 25, 28, 30, 33, 36, 40, 1.29, 2.71, 4.57, 10.14, 12.71, 19.29, 26.86, 3.86, 6.43, 7.71];
+export const PROBE_HEIGHTS = [8, 9, 10, 11, 12, 12.75, 13.5, 14.25, 15, 15.75, 16.5, 18, 20, 22.5, 24, 27, 30, 36, 45, 60];
+function widths() {
+  const stored = (chars) => Math.trunc(((chars * 7 + 5) / 7) * 256) / 256;
+  const cols = PROBE_CHARS.map((ch, i) => `<col min="${i + 1}" max="${i + 1}" width="${stored(ch)}" customWidth="1"/>`).join('');
+  const is = (ref, t) => `<c r="${ref}" t="inlineStr"><is><t>${esc(t)}</t></is></c>`;
+  const rows = [`<row r="1">${PROBE_CHARS.map((_, i) => is(`${col(i)}1`, `c${i + 1}`)).join('')}</row>`,
+    `<row r="2">${PROBE_CHARS.map((_, i) => `<c r="${col(i)}2"><v>${i + 1}</v></c>`).join('')}</row>`,
+    ...PROBE_HEIGHTS.map((ht, i) => `<row r="${i + 4}" ht="${ht}" customHeight="1">${is(`A${i + 4}`, `h${ht}`)}</row>`)];
+  write('widths.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Widths" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols>${cols}</cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': STYLES,
+  });
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  basic();
+  prefixed();
+  large();
+  widths();
+}
