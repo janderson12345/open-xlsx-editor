@@ -4,6 +4,8 @@ import { OpcPackage } from './package.js';
 import { kids, kid, attr, serializeXml, NS } from './xml.js';
 import { readSharedStrings } from './strings.js';
 import { readSheet } from './sheet.js';
+import { readStyles } from './styles.js';
+import { readTheme } from './theme.js';
 import { setCellXml } from './sheetedit.js';
 import { parseRef } from './refs.js';
 
@@ -43,6 +45,10 @@ export class Workbook {
     });
     const sstPath = rels.find((x) => x.type.endsWith('/sharedStrings'))?.target;
     this.sharedStrings = readSharedStrings(sstPath ? pkg.xml(sstPath) : null);
+    const part = (kind) => rels.find((x) => x.type.endsWith('/' + kind) && !x.external && pkg.has(x.target))?.target;
+    /** Fonts and cell formats (styles.js), and the theme's fonts and colours (theme.js; Excel's default without one). */
+    this.styles = readStyles(part('styles') ? pkg.xml(part('styles')) : null);
+    this.theme = readTheme(part('theme') ? pkg.xml(part('theme')) : null);
     /** Parsed sheets by index: { doc, model }. */
     this._parsed = new Map();
     /** Paths of the parts changed since opening (the only ones rewritten on save). */
