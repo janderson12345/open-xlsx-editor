@@ -189,7 +189,32 @@ function widths() {
   });
 }
 
+// A probe for Excel's General format: each value in five columns of different widths (with empty columns between,
+// so the extracted texts stay apart), to see how many digits Excel shows and when it switches to scientific.
+export const GENERAL_VALUES = [0, 1, -1, 0.5, 1 / 3, 2 / 3, -2 / 3, 0.1, 0.1 + 0.2, 0.0001, 0.00001, 0.000015, 0.000012345,
+  0.0000123456789, 0.000001, 0.00012345678, 1e-9, 1.5e-10, 1e-15, 1.23456789e-300, 0.123456789012, -0.123456789012, 12.3456789012,
+  3.14159265358979, 1234.5, 100000, 123456.7891234, 1234567.891, 123456789, 1000000000, 1234567890, 12345678901,
+  -12345678901, 99999999999, 99999999999.5, 123456789012, 1234567890123, 1e15, 1e20, 1e100, 9.99999999999e10, 5e-5, 0.00099999];
+export const GENERAL_CHARS = [30, 8.43, 6, 4, 2.5];
+function general() {
+  const stored = (chars) => Math.trunc(((chars * 7 + 5) / 7) * 256) / 256;
+  // Value columns A, C, E, G, I; the empty ones between are 1 character wide.
+  const cols = GENERAL_CHARS.flatMap((ch, i) => [`<col min="${2 * i + 1}" max="${2 * i + 1}" width="${stored(ch)}" customWidth="1"/>`,
+    `<col min="${2 * i + 2}" max="${2 * i + 2}" width="${stored(1)}" customWidth="1"/>`]).join('');
+  const rows = GENERAL_VALUES.map((v, r) => `<row r="${r + 1}">${GENERAL_CHARS.map((_, i) => `<c r="${col(2 * i)}${r + 1}"><v>${v}</v></c>`).join('')}</row>`);
+  write('general.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="General" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols>${cols}</cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': STYLES,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  general();
   basic();
   prefixed();
   large();
