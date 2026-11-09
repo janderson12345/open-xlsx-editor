@@ -22,6 +22,7 @@ other's insides:
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/numfmt.js` | Display text of a value. Only the General format so far. |
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines. An ARIA grid (rows, row and column headers, gridcells with indexes). |
+| `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |
 | `src/editor/celltext.js` | The one place cell text size and line height are set (`--oxe-cell-fs`, `--oxe-cell-lh`). |
 | `src/editor/editor.css` | Theme variables (light, dark, host-overridable) and the grid's layout. Geometry through custom properties; no `!important`. |
@@ -34,6 +35,7 @@ other's insides:
 | `test/*.test.js` | Unit tests in Node (`npm test`): round trips byte for byte, edits, units, references, geometry, the checker. |
 | `test/e2e.mjs`, `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; axe in light and dark at 1280 and 320px. Both assert standards mode. |
 | `tools/check-ooxml.mjs` | Structural check of .xlsx files (what makes Excel offer a repair). |
+| `tools/excel-compare/` | Comparison with Excel's own PDFs: `excel-print.ps1` (Excel through COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions from both), `compare.py`, `diff.py`, `run.ps1`. See its README. |
 | `tools/scan-bytes.mjs` | Control characters and byte order marks in source text (part of `npm run lint`). |
 
 ## How a file becomes a grid

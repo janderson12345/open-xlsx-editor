@@ -32,6 +32,7 @@
     "esbuild": "^0.28.2",
     "eslint": "9.39.1",
     "globals": "15.15.0",
+    "pdfjs-dist": "^2.16.105",
     "playwright": "^1.64.1"
   },
   "exports": {
