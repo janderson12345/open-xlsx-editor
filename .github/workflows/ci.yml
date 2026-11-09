@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Mistakes the tests might not reach: names used but undefined, defined but unused; stray control characters.
+      - run: npm run lint
+      # Unit tests: reading, round trips (untouched parts byte for byte), edits, units, references, the checker.
+      - run: npm test
+      # The fixtures are what the generator makes: nobody edited one by hand.
+      - run: npm run fixtures && git diff --exit-code test/fixtures
+      # Browser tests: open, scroll and save each fixture in the demo (standards mode asserted); axe in light and dark.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      # Fixtures and saved workbooks: well-formed parts, relationships, content types, indexes in range.
+      - run: node tools/check-ooxml.mjs test/fixtures test/out
