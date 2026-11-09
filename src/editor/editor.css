@@ -155,7 +155,7 @@
   width: var(--oxe-w);
   height: calc(var(--oxe-h) - 1px);
   box-sizing: border-box;
-  padding: 0 var(--oxe-pad-r) 0 var(--oxe-pad-l);
+  padding: 0 calc(var(--oxe-pad-r) + var(--oxe-pad-x, 0px)) 0 calc(var(--oxe-pad-l) + var(--oxe-pad-x, 0px));
   display: flex;
   align-items: flex-end;
   overflow: hidden;
@@ -193,10 +193,10 @@
   top: var(--oxe-mid-shift);
 }
 .oxe-indent-l {
-  padding-left: calc(var(--oxe-pad-l) + var(--oxe-indent));
+  padding-left: calc(var(--oxe-pad-l) + var(--oxe-pad-x, 0px) + var(--oxe-indent));
 }
 .oxe-indent-r {
-  padding-right: calc(var(--oxe-pad-r) + var(--oxe-indent));
+  padding-right: calc(var(--oxe-pad-r) + var(--oxe-pad-x, 0px) + var(--oxe-indent));
 }
 /* Wrapped text: lines step by the font's default row height, broken within the cell's width. */
 .oxe-wrap > .oxe-tx {

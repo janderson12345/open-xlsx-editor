@@ -3,7 +3,7 @@
 // the grid looks the same whatever the host page sets (LESSONS.md section 4: in standards mode every line box gets a
 // strut of its parent's font, and an inherited line-height moves text).
 import { ptToPx, printRowPx } from '../ooxml/units.js';
-import { cellTextMetrics, fontRowPx } from './fonts.js';
+import { cellTextMetrics, fontRowPx, extraPadPx } from './fonts.js';
 
 const px3 = (v) => `${+v.toFixed(3)}px`;
 
@@ -17,7 +17,7 @@ export function cellTextVars(sizePt, family, normalFamily) {
   const rowPx = fontRowPx(family, px);
   const m = cellTextMetrics(family, px, { screen: rowPx, print: printRowPx(rowPx * 0.75, normalFamily) });
   return {
-    '--oxe-cell-fs': `${px}px`, '--oxe-cell-lh': px3(m.lh), '--oxe-top-shift': px3(m.top), '--oxe-mid-shift': px3(m.mid),
+    '--oxe-cell-fs': `${px}px`, '--oxe-cell-lh': px3(m.lh), '--oxe-pad-x': px3(extraPadPx(px)), '--oxe-top-shift': px3(m.top), '--oxe-mid-shift': px3(m.mid),
     '--oxe-wrap-lh': px3(m.wrap.lh), '--oxe-wrap-bottom': px3(m.wrap.bottom), '--oxe-wrap-top': px3(m.wrap.top), '--oxe-wrap-mid': px3(m.wrap.mid),
     '--oxe-pwrap-lh': px3(m.printWrap.lh), '--oxe-pwrap-bottom': px3(m.printWrap.bottom), '--oxe-pwrap-top': px3(m.printWrap.top), '--oxe-pwrap-mid': px3(m.printWrap.mid),
   };

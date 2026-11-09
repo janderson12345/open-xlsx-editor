@@ -26,53 +26,78 @@ export function fontStack(name) {
   return [name, ...(STAND_INS[name.toLowerCase()] || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
 }
 
-/** Where Excel's baseline sits above the cell's bottom edge, beyond the font's Windows descent: 0.9px. Read off
- *  Excel's PDF of test/fixtures/rows.xlsx, where fills give every row's bottom exactly: Calibri 11, 14 and 20, Arial 14,
- *  Times New Roman 16 and Cambria 20 all within about 0.3px of it (Calibri 36 sits 0.6px higher, Courier New lower);
- *  large.xlsx, drawn in Aptos Narrow, fitted 0.85 independently. An earlier 0.15 came from fonts.xlsx's rows, whose
- *  positions carried the drift of an early row-height fit. */
-const BASELINE_ABOVE_DESCENT = 0.9;
+/** Where Excel's baseline sits above the cell's bottom edge, beyond the Windows descent of the font the browser draws,
+ *  in this grid's coordinates. Excel's own is about 0.9px above its printed row boundary (rows.xlsx, whose fills give
+ *  every boundary exactly: Calibri 11, 14, 20, Arial 14, Times New Roman 16, Cambria 20 within about 0.3px), but
+ *  Excel's printed grid starts 0.7px lower than this one (decor.js PRINT_GRID_ORIGIN), and text is placed in this
+ *  grid: 0.9 - 0.7, fitted at 0.15 by centring numfmt.xlsx's and align.xlsx's 1615 baselines on Excel's (Chromium
+ *  snaps baselines to whole pixels, so the best is a band of a pixel centred on Excel's). Aptos Narrow, drawn in
+ *  Calibri, sits higher in Excel: 0.3, centring large.xlsx's 100,000. */
+const BASELINE_ABOVE_DESCENT = 0.15;
+const BASELINE_STAND_IN = { 'aptos narrow': 0.3 };
 
 /** Top-aligned text's baseline is the font's Windows ascent plus this far below the row's top (Excel's PDF of
- *  test/fixtures/align.xlsx, Calibri 11 in a 45pt row: 14.76px = 13.96 + 0.8). */
+ *  test/fixtures/align.xlsx, Calibri 11 in a 45pt row: 14.76px = 13.96 + 0.8, from Excel's printed row boundary). */
 const TOP_INSET = 0.8;
+/** Excel's printed grid starts this much lower than this one (decor.js PRINT_GRID_ORIGIN): targets read from Excel's
+ *  boundaries move down by it here. */
+const GRID_ORIGIN_Y = 0.7;
 
-/** The font's metrics in px at `sizePx`: Chromium's (hhea ascent and descent, by which it places text) and Excel's
- *  (Windows ascent and descent), from engine/metrics.js (the installed fonts); the stand-in's when the font isn't in
- *  the table (it is the stand-in that the browser draws), Calibri's when neither is. */
+/** The font's metrics in px at `sizePx`, from engine/metrics.js (the installed fonts), the stand-in's when the font
+ *  isn't in the table (it is the stand-in that the browser draws), Calibri's when neither is: Windows ascent and
+ *  descent (`wa`, `wd`: where Excel places text) and the same rounded to whole pixels (`ar`, `dr`: where Chromium
+ *  does). */
 function fontMetrics(name, sizePx) {
   const key = name.toLowerCase();
-  const own = metrics[key];
-  const m = own || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
-  return {
-    ha: m.hhea[0] * sizePx, hd: m.hhea[1] * sizePx, wa: m.win[0] * sizePx, wd: m.win[1] * sizePx,
-    base: BASELINE_ABOVE_DESCENT,
-  };
+  const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
+  const wa = m.win[0] * sizePx;
+  const wd = m.win[1] * sizePx;
+  return { wa, wd, ar: Math.round(wa), dr: Math.round(wd), base: metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT };
 }
 
-/** The line height (px) that puts the browser's baseline where Excel's is for bottom-aligned text. Chromium centres
- *  the hhea ascent and descent in the line (half the leading above, half below), so a line of L px has its baseline
- *  (L - (ascent + descent)) / 2 + descent above its bottom; solved for Excel's baseline. */
+/** Where Chromium puts the baseline in a line box of L px: floor((L - (ascent + descent)) / 2) + ascent below its top,
+ *  with the Windows ascent and descent each rounded to a whole pixel and half the leading rounded down. Measured in
+ *  Edge on Calibri 11 to 36, Cambria 20, Times New Roman 16, Arial 14 and Courier New 11 at several line heights (a
+ *  zero-size marker on the baseline), exact for all; an earlier model with the hhea metrics drifted with the size
+ *  (Calibri 36 placed 3.7px low, Arial 14 2px high). */
+const chromeTop = (f, L) => Math.floor((L - f.ar - f.dr) / 2) + f.ar;
+
+/** The line height (px) that puts the browser's baseline where Excel's is for bottom-aligned text, the font's Windows
+ *  descent + BASELINE_ABOVE_DESCENT above the line's bottom. A line of ar + dr + 2k + t px (k whole, 0 <= t < 2) has
+ *  its baseline dr + k + t above its bottom, so any height can be reached. */
 export function cellLineHeight(name, sizePx) {
   const f = fontMetrics(name, sizePx);
-  return f.ha + f.hd + 2 * (f.wd + f.base - f.hd);
+  const above = f.wd + f.base - f.dr;
+  const k = Math.floor(above);
+  return f.ar + f.dr + 2 * k + (above - k);
 }
 
 /** Everything that places a font's text in a cell, in px: the single line's height (`lh`); how far to move the text
  *  down from where the browser puts it, for top- and middle-aligned single lines (`top`, `mid`); and for wrapped text,
  *  the line pitch and the shifts for bottom, top and middle alignment, on screen and in print (`pitch` gives the
- *  pitch, the font's default row height, in each). Excel places a top-aligned line's baseline TOP_INSET + ascent below
- *  the top, centres a line's ascent + descent in the cell, and steps wrapped lines by the font's default row height
- *  (align.xlsx: Calibri 11 wraps every 19.36px in print, its 15pt row). */
+ *  pitch, the font's row height, in each). Excel places a top-aligned line's baseline TOP_INSET + ascent below the
+ *  top, centres a line's ascent + descent in the cell, and steps wrapped lines by the font's row height (align.xlsx:
+ *  Calibri 11 wraps every 19.36px in print, its 15pt row). Chromium centres a line box of L in the cell (middle) or
+ *  stacks lines of the pitch (wrapped), each with its baseline chromeTop below its top. */
 export function cellTextMetrics(name, sizePx, pitch) {
   const f = fontMetrics(name, sizePx);
   const lh = cellLineHeight(name, sizePx);
-  const chromeTop = (L) => (L - f.ha - f.hd) / 2 + f.ha; // baseline below the top of a line of L
-  const chromeBottom = (L) => (L - f.ha - f.hd) / 2 + f.hd; // baseline above the bottom
-  const mid = (f.wa - f.wd) / 2 - (f.ha - f.hd) / 2; // (a centred line box puts the baseline (ha - hd) / 2 below centre)
-  const wrap = (P) => ({ lh: P, bottom: chromeBottom(P) - (f.wd + f.base), top: TOP_INSET + f.wa - chromeTop(P), mid });
-  return { lh, top: TOP_INSET + f.wa - chromeTop(lh), mid, wrap: wrap(pitch.screen), printWrap: wrap(pitch.print) };
+  // (Excel's baseline below the top of a centred box of L, in this grid's coordinates.)
+  const excelMid = (L) => (L - f.wa - f.wd) / 2 + f.wa + GRID_ORIGIN_Y;
+  const excelTop = TOP_INSET + GRID_ORIGIN_Y + f.wa;
+  const wrap = (P) => ({
+    lh: P,
+    bottom: P - chromeTop(f, P) - (f.wd + f.base),
+    top: excelTop - chromeTop(f, P),
+    mid: excelMid(P) - chromeTop(f, P),
+  });
+  return { lh, top: excelTop - chromeTop(f, lh), mid: excelMid(lh) - chromeTop(f, lh), wrap: wrap(pitch.screen), printWrap: wrap(pitch.print) };
 }
+
+/** Extra padding each side of a cell's text for fonts above 11pt: Excel's grows with the font, about 0.13px for each
+ *  pixel of size beyond 11pt (Excel's PDF of rows.xlsx: Calibri 20 starts 1.6px further in, Calibri 36 4.2px,
+ *  Cambria 20 1.8px; the right side alike, a Calibri 20 number ending 2px earlier). Smaller fonts get none. */
+export const extraPadPx = (sizePx) => Math.max(0, 0.13 * (sizePx - 44 / 3));
 
 /** A font's Windows descent in px (where Excel's baseline sits above a row's bottom, plus BASELINE_ABOVE_DESCENT). */
 export const fontDescentPx = (name, sizePx) => fontMetrics(name, sizePx).wd;

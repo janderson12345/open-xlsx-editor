@@ -40,15 +40,22 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   within a pixel. Each cell format is a CSS class (`cellstyles.js`). Runs 5 -> 9: text width within 1px 0.3% ->
   99.0% of all cells; fonts.xlsx 30 -> 53 of 55.
 - **Printed baseline** (*measured*). Excel puts all the bottom-aligned text of a row on one baseline: the Windows
-  descent of the row's tallest font plus 0.9px above the row's bottom (rows.xlsx, whose fills give every row's bottom
-  exactly: Calibri 11, 14, 20, Arial 14, Times New Roman 16, Cambria 20 within about 0.3px of it; Calibri 36 0.6px
-  higher, Courier New lower). Smaller text in the row is lifted onto it (`rowheights.js rowDescents`); a styled empty
-  cell's font counts. Chromium places text by the font's hhea ascent and descent with half the leading above and
-  below and snaps the baseline to whole pixels; the line height is solved for Excel's baseline (`cellLineHeight`).
-  Runs 21 -> 27: numfmt.xlsx both ways 1516 -> 1583 of 1583, align.xlsx 30 -> 32 of 32. (An earlier 0.15 came from
-  fonts.xlsx's rows, which carried an early row fit's drift, and a separate 0.85 for Aptos Narrow was the same value.)
-  Open: text in fonts and sizes other than Calibri 11 is placed by a model that drifts (Calibri 20 1.3px low, 36 3.7px
-  low, Arial 14 and Times 16 2px high); fonts.xlsx is 2 cells below its run-21 count for it.
+  descent of the row's tallest font plus about 0.9px above its printed row boundary (rows.xlsx, whose fills give
+  every boundary exactly; Calibri 11, 14, 20, Arial 14, Times New Roman 16, Cambria 20 within about 0.3px). Excel's
+  printed grid starts 0.7px lower than ours (the half-point origin, decor.js), and text is placed in our grid, so the
+  offset here is 0.15px (Aptos Narrow, drawn in Calibri: 0.3), fitted by centring 1615 Calibri and 100,000 Aptos
+  Narrow baselines; top and middle targets take the 0.7px too. Smaller text in a row is lifted onto its baseline
+  (`rowheights.js rowDescents`); a styled empty cell's font counts.
+- **Where Chromium puts a baseline** (*measured* in Edge, a zero-size marker on the baseline at several line
+  heights): floor((L - (ascent + descent)) / 2) + ascent below the top of a line box of L px, with the font's Windows
+  ascent and descent each rounded to a whole pixel. Exact for Calibri 11 to 36, Cambria, Times New Roman, Arial and
+  Courier New; the line height is solved from it (`fonts.js cellLineHeight`), and every font's baseline then lands
+  where it is aimed within 0.01px. An earlier model with the hhea metrics drifted with size (Calibri 36 3.7px low,
+  Arial 14 2px high, even Calibri 11 0.82px low); its errors had been absorbed into the offsets above.
+- **Padding for large fonts** (*measured*, rows.xlsx). Excel's cell padding grows with the font: 0.13px more each side
+  for every pixel of size above 11pt (Calibri 20 starts 1.6px further in, Calibri 36 4.2px, Cambria 20 1.8px).
+  Runs 27 -> 30: text within 1px across 102082 -> 102093 of 102095; rows.xlsx both ways 36 -> 45 of 47, fonts.xlsx
+  35 -> 43 of 56, no workbook worse.
 - **Automatic row heights** (*measured*, rows.xlsx: all 20 rows' fills within 1px). A row without customHeight is as
   tall as its tallest cell whatever its `ht` says (ht 30 printed at 15pt; ht 10 with a 20pt cell at 26.25pt): the
   font's row height (`fontRowPx`: round(max(Windows ascent + descent, hhea line) x size + 1.6 + 0.035 x size) px,
@@ -115,6 +122,7 @@ The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures
 17 (align)   page counts 8/8 on same page 100465/100465 x within 1px 100459/100465 (100.0%) y within 1px 100447/100465 (100.0%) both 100443/100465 (100.0%) width within 1px 99420/100465 (99.0%)
 21 (numfmt)  page counts 9/9 on same page 102048/102048 x within 1px 102042/102048 (100.0%) y within 1px 101963/102048 (99.9%) both 101959/102048 (99.9%) width within 1px 100924/102048 (98.9%)
 27 (rows)    page counts 10/10 on same page 102094/102094 x within 1px 102082/102094 (100.0%) y within 1px 102067/102094 (100.0%) both 102063/102094 (100.0%) width within 1px 100961/102094 (98.9%)
+30 (fonts)   page counts 10/10 on same page 102095/102095 x within 1px 102093/102095 (100.0%) y within 1px 102082/102095 (100.0%) both 102080/102095 (100.0%) width within 1px 100962/102095 (98.9%)
 ```
 
 Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures. fonts.xlsx joined
