@@ -34,6 +34,10 @@ basic        pages   2/1   samePage 47/47/49 x1px 2 y1px 5 both 1 meanAbs x 14.0
 `pages` is Excel's count / ours; `samePage` is cells on the same page / cells matched / Excel's cells; `x1px`, `y1px`
 and `both` count cells within 1px. Right-aligned text is compared at its right end, left-aligned at its start.
 
+It also extracts the filled shapes of both (`shapes.cjs`: cell fills, and borders, which Excel draws as filled
+rectangles) and writes `report-shapes-2.txt`: per workbook, Excel's shapes matched by one of ours of the same colour
+with every edge within 1px, those whose colour is there but not the place, and those missing.
+
 Compare two runs, workbook by workbook:
 
 ```powershell

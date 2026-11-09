@@ -10,7 +10,9 @@ rows = []
 for f in sorted(os.listdir(xd)):
     if not f.endswith('.json') or not os.path.exists(os.path.join(od, f)): continue
     x = json.load(open(os.path.join(xd, f), encoding='utf8')); o = json.load(open(os.path.join(od, f), encoding='utf8'))
-    sm = difflib.SequenceMatcher(None, [a[0] for a in x], [a[0] for a in o], autojunk=False)
+    # (Matched page by page: text past a page's edge, clipped out of sight, is still in Excel's PDF, and would otherwise
+    # pair with the same text on the next page.)
+    sm = difflib.SequenceMatcher(None, [(a[1], a[0]) for a in x], [(a[1], a[0]) for a in o], autojunk=False)
     pairs = [(x[b.a + i], o[b.b + i]) for b in sm.get_matching_blocks() for i in range(b.size)]
     same = [(a, b) for a, b in pairs if a[1] == b[1]]
     # Right-aligned text (numbers) is compared at its right end, left-aligned at its start: whichever end is closer.

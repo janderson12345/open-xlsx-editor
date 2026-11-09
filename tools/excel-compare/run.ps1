@@ -27,5 +27,11 @@ if (-not (Test-Path "$Out\cells-excel")) { Step $Node @('tools\excel-compare\cel
 Step $Node @('tools\excel-compare\print-ours.mjs', "`"$Books`"", "`"$Out\pdf-$Run`"") 60 "$Out\print-$Run"
 Step $Node @('tools\excel-compare\cells.cjs', "`"$Out\pdf-$Run`"", "`"$Out\cells-$Run`"") 20 "$Out\cells-$Run"
 Step 'python' @('tools\excel-compare\compare.py', "`"$Out\cells-excel`"", "`"$Out\cells-$Run`"") 5 "$Out\compare-$Run"
+# Fills and borders: the filled shapes of both sets of PDFs (Excel's once), compared in a report of their own.
+if (-not (Test-Path "$Out\shapes-excel")) { Step $Node @('tools\excel-compare\shapes.cjs', "`"$Excel`"", "`"$Out\shapes-excel`"") 20 "$Out\shapes-excel" }
+Step $Node @('tools\excel-compare\shapes.cjs', "`"$Out\pdf-$Run`"", "`"$Out\shapes-$Run`"") 20 "$Out\shapes-$Run"
+Step 'python' @('tools\excel-compare\compare-shapes.py', "`"$Out\shapes-excel`"", "`"$Out\shapes-$Run`"") 5 "$Out\compare-shapes-$Run"
 Copy-Item "$Out\compare-$Run.out" "$Out\report-$Run.txt"
+Copy-Item "$Out\compare-shapes-$Run.out" "$Out\report-shapes-$Run.txt"
 Get-Content "$Out\report-$Run.txt" -Tail 1
+Get-Content "$Out\report-shapes-$Run.txt" -Tail 1
