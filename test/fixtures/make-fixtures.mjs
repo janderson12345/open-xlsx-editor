@@ -311,7 +311,49 @@ function fills() {
   });
 }
 
+// A probe for alignment: one sample per row (45pt tall, wrapped ones 75pt), in column B (20 characters wide) or, for
+// text running on, in D with empty neighbours; with our theme. Each sample is [text or number, alignment attributes].
+const WRAP_TEXT = 'Wrapped words flow onto several lines within one cell when they do not fit its width';
+export const PROBE_ALIGN = [
+  ['L bottom', { horizontal: 'left' }], ['C bottom', { horizontal: 'center' }], ['R bottom', { horizontal: 'right' }],
+  ['G text', {}], [12345, {}], [12346, { horizontal: 'left' }], [12347, { horizontal: 'center' }],
+  ['L top', { horizontal: 'left', vertical: 'top' }], ['L middle', { horizontal: 'left', vertical: 'center' }],
+  ['C middle', { horizontal: 'center', vertical: 'center' }], ['R top', { horizontal: 'right', vertical: 'top' }],
+  ['Indent one', { horizontal: 'left', indent: 1 }], ['Indent two', { horizontal: 'left', indent: 2 }],
+  ['Indent R three', { horizontal: 'right', indent: 3 }],
+  [WRAP_TEXT, { wrapText: 1, vertical: 'top' }], [WRAP_TEXT, { wrapText: 1, horizontal: 'center' }],
+  [WRAP_TEXT, { wrapText: 1, vertical: 'center' }], [WRAP_TEXT, { wrapText: 1, horizontal: 'right', vertical: 'bottom' }],
+  ['Centred text running both ways', { horizontal: 'center' }, 'D'], ['Right text running to the left', { horizontal: 'right' }, 'D'],
+];
+function align() {
+  const attrs = (a) => Object.entries(a).map(([k, v]) => ` ${k}="${v}"`).join('');
+  const styles = `${DECL}<styleSheet xmlns="${X}"><fonts count="1"><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>` +
+    '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    `<cellXfs count="${PROBE_ALIGN.length + 1}"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>` +
+    PROBE_ALIGN.map(([, a]) => `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment${attrs(a)}/></xf>`).join('') + '</cellXfs>' +
+    '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>';
+  const rows = PROBE_ALIGN.map(([v, a, where = 'B'], i) => {
+    const r = 2 + 2 * i;
+    const ht = a.wrapText ? 75 : 45;
+    const cell = typeof v === 'number' ? `<c r="${where}${r}" s="${i + 1}"><v>${v}</v></c>` : `<c r="${where}${r}" s="${i + 1}" t="inlineStr"><is><t>${esc(v)}</t></is></c>`;
+    return `<row r="${r}" ht="${ht}" customHeight="1">${cell}</row>`;
+  });
+  write('align.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Align" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', RT('theme'), 'theme/theme1.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols><col min="2" max="2" width="20.7109375" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': styles,
+    'xl/theme/theme1.xml': THEME,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  align();
   fills();
   fonts();
   general();
