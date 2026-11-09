@@ -1,6 +1,6 @@
 // Keyboard and mouse on the grid, as Excel answers them: arrows (Shift extends, Ctrl jumps), Tab, Enter, Home, End,
 // Page Up and Down (with Ctrl, the next or previous sheet), F2 and double click to edit, typing to replace, Delete to
-// empty, Ctrl+Z and Ctrl+Y; click and drag to select. Everything goes through the named commands; the cell editor and
+// empty, Ctrl+Z and Ctrl+Y, Shift+F11 for a new sheet; click and drag to select. Everything goes through the named commands; the cell editor and
 // formula bar enter what is typed.
 import { createCommands } from './commands.js';
 import { createCellEditor } from './celleditor.js';
@@ -78,6 +78,7 @@ export function attachEditing(root, ctx) {
     else if ((key === 'PageDown' || key === 'PageUp') && ctrl) cmd.run('nextSheet', key === 'PageDown' ? 1 : -1);
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
     else if (key === 'F2') startEdit('edit');
+    else if (key === 'F11' && e.shiftKey) cmd.run('insertSheet');
     else if (key === 'Delete') cmd.run('clear');
     else if (key === 'Backspace') startEdit('enter', '');
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');

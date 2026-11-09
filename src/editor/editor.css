@@ -303,7 +303,9 @@
   }
   .oxe-root > .oxe-grid,
   .oxe-root > .oxe-bar,
-  .oxe-root > .oxe-tabs {
+  .oxe-root > .oxe-tabbar,
+  .oxe-menu,
+  .oxe-dialog {
     display: none;
   }
   .oxe-print {
@@ -387,14 +389,53 @@
 }
 
 /* The sheet tabs (tabs.js) under the grid: the sheet shown on the sheet's own white with the selection's green, as
-   Excel marks it; a tab colour fills the other tabs and underlines the one shown. Too many to fit: the strip scrolls. */
-.oxe-tabs {
+   Excel marks it; a tab colour fills the other tabs and underlines the one shown. Too many to fit: the strip scrolls,
+   the New sheet button stays. */
+.oxe-tabbar {
   display: flex;
   flex: none;
-  overflow-x: auto;
+  min-width: 0;
   border-top: 1px solid var(--oxe-head-line);
   background: var(--oxe-head-bg);
   font: 13px var(--oxe-ui-font);
+}
+.oxe-tabs {
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+}
+.oxe-tab-add {
+  flex: none;
+  width: 30px;
+  border: 0;
+  background: transparent;
+  color: var(--oxe-head-fg);
+  font: 18px/1 var(--oxe-ui-font);
+  cursor: pointer;
+}
+.oxe-tab-add:hover {
+  color: var(--oxe-sel);
+}
+.oxe-tab-add:focus-visible,
+.oxe-tab-edit:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: -2px;
+}
+.oxe-tab-edit {
+  flex: none;
+  margin: 2px 4px;
+  padding: 1px 4px;
+  border: 1px solid var(--oxe-sel);
+  background: #ffffff;
+  color: #1b1b1b;
+  font: inherit;
+}
+.oxe-tab.oxe-drop-before {
+  box-shadow: inset 3px 0 0 var(--oxe-sel);
+}
+.oxe-tab.oxe-drop-after {
+  box-shadow: inset -3px 0 0 var(--oxe-sel);
 }
 .oxe-tab {
   flex: none;
@@ -428,6 +469,123 @@
 .oxe-tab:focus-visible {
   outline: 2px solid var(--oxe-focus);
   outline-offset: -2px;
+}
+
+/* The tab menu (sheetmenu.js) and the message boxes (dialogs.js), in the headings' colours. */
+.oxe-menu {
+  position: fixed;
+  z-index: 20;
+  min-width: 160px;
+  padding: 4px 0;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 6px;
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-menuitem {
+  display: block;
+  width: 100%;
+  padding: 5px 24px 5px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.oxe-menuitem-sub::after {
+  content: '\25B8';
+  float: right;
+  margin-right: -14px;
+}
+.oxe-menuitem:hover:not(:disabled),
+.oxe-menuitem:focus-visible {
+  background: var(--oxe-sel-fill);
+  outline: none;
+}
+.oxe-menuitem:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.oxe-menu hr {
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid var(--oxe-head-line);
+}
+.oxe-swatches {
+  display: grid;
+  grid-template-columns: repeat(10, 18px);
+  gap: 4px;
+  padding: 6px 10px;
+}
+.oxe-swatch {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--oxe-head-line);
+  cursor: pointer;
+}
+.oxe-swatch:focus-visible,
+.oxe-swatch:hover {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-swatch-none {
+  width: auto;
+  height: auto;
+  margin: 2px 10px 4px;
+  padding: 3px 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.oxe-dialog {
+  max-width: min(440px, calc(100vw - 32px));
+  padding: 16px 18px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 8px;
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.25);
+}
+.oxe-dialog-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+.oxe-dialog-text {
+  display: block;
+  margin: 0 0 12px;
+  white-space: pre-line;
+}
+.oxe-dialog-list {
+  width: 100%;
+  min-width: 220px;
+  font: inherit;
+}
+.oxe-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.oxe-dialog-button {
+  min-width: 76px;
+  padding: 4px 12px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+  background: var(--oxe-bg);
+  color: #1b1b1b;
+  font: inherit;
+}
+.oxe-dialog-button:focus-visible,
+.oxe-dialog-list:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
 }
 
 /* The selection (selection.js): view state over the cells and under the sticky headings. */

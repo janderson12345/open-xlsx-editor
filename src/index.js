@@ -1,11 +1,13 @@
 // open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. A sheet at a time in a virtualised
-// grid, the sheet tabs under it.
+// grid, the sheet tabs under it (with their menu: insert, delete, rename, move, colour, hide, unhide).
 import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
+import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
+import { messageBox, unhideBox } from './editor/dialogs.js';
 import { fontFamily } from './ooxml/styles.js';
 import { parseRef } from './ooxml/refs.js';
 
@@ -38,6 +40,52 @@ export function mountXlsxEditor(host, options = {}) {
     state.grid.setSheet(state.workbook.sheet(i), state.workbook.sheets[i].name, state.looks);
     state.tabs.activate(i);
   };
+  /** A sheet by index or name (case ignored), as an index (-1 for none). */
+  const sheetAt = (sheet) => {
+    if (typeof sheet === 'number') return sheet;
+    const n = String(sheet).toLowerCase();
+    return state.workbook ? state.workbook.sheets.findIndex((s) => s.name.toLowerCase() === n) : -1;
+  };
+  /** After sheets changed (commands.js): the tabs again, the sheet shown now at index `now` (-1: it went). */
+  const sheetsChanged = (now) => {
+    state.sheetIndex = now;
+    state.tabs.set(tabList(state.workbook), now);
+    if (now >= 0) state.grid.el.setAttribute('aria-label', state.workbook.sheets[now].name);
+  };
+  /** A refusal Excel shows in a message box; `state.alert` resolves when it is closed. */
+  const alert = (msg) => { state.alert = messageBox(root, msg); };
+  const menu = createMenu(root);
+  const sheetActs = {
+    run: (name, ...args) => editing().run(name, ...args),
+    rename: (i) => {
+      if (state.readOnly) return;
+      state.tabs.editName(i, async (name) => {
+        // (Renamed, focus goes back to the sheet, as in Excel.)
+        if (editing().run('renameSheet', i, name)) { state.grid.el.focus({ preventScroll: true }); return true; }
+        await state.alert;
+        return false;
+      });
+    },
+    remove: async (i) => {
+      const wb = state.workbook;
+      // (Excel asks first when the sheet has something in it.)
+      const filled = wb.sheets[i].kind !== 'worksheet' || [...wb.sheet(i).cells.values()].some((line) => [...line.values()].some((c) => c.v != null || c.f != null));
+      if (filled && await messageBox(root, 'This sheet will be permanently deleted. Do you want to continue?', ['Delete', 'Cancel']) !== 'Delete') return;
+      editing().run('deleteSheet', i);
+    },
+    unhide: async () => {
+      const wb = state.workbook;
+      const hidden = wb.sheets.map((s, k) => ({ s, k })).filter((x) => x.s.state === 'hidden');
+      const pick = await unhideBox(root, hidden.map((x) => x.s.name));
+      if (pick != null) editing().run('hideSheet', hidden[pick].k, false);
+    },
+  };
+  const openMenu = (i, point, byKeyboard) => {
+    // (As in Excel, the tab right-clicked becomes the sheet shown.)
+    if (state.workbook.canShow(i)) editing().run('showSheet', i);
+    menu.open(tabMenuEntries(state.workbook, i, { act: sheetActs, color: (c) => state.looks.color(c), readOnly: state.readOnly }), point,
+      { label: `${state.workbook.sheets[i].name} sheet`, byKeyboard });
+  };
   /** The tabs a workbook shows: every sheet that isn't hidden, chart sheets as tabs that can't be shown yet. */
   const tabList = (wb) => wb.sheets.map((s, index) => ({ index, name: s.name, state: s.state, color: wb.tabColor(index), disabled: !wb.canShow(index) }))
     .filter((t) => t.state === 'visible');
@@ -59,13 +107,24 @@ export function mountXlsxEditor(host, options = {}) {
           workbook: () => state.workbook,
           sheetIndex: () => state.sheetIndex,
           showSheet,
+          sheetsChanged,
+          alert,
           grid: state.grid,
           looks: () => state.looks,
           readOnly: () => state.readOnly,
           changed: () => options.onChange?.(),
         });
         state.editing.setReadOnly(state.readOnly);
-        state.tabs = createSheetTabs(root, { controls: state.grid.el.id, onSelect: (k) => state.editing.commands.run('showSheet', k) });
+        state.tabs = createSheetTabs(root, {
+          controls: state.grid.el.id,
+          on: {
+            select: (k) => editing().run('showSheet', k),
+            menu: openMenu,
+            rename: sheetActs.rename,
+            move: (from, to) => editing().run('moveSheet', from, to),
+            add: () => editing().run('insertSheet', { after: true }),
+          },
+        });
       }
       state.tabs.set(tabList(wb), i);
       state.editing.reset();
@@ -85,11 +144,19 @@ export function mountXlsxEditor(host, options = {}) {
     undo: () => editing().run('undo'),
     redo: () => editing().run('redo'),
     /** Show a sheet (its index, or its name); false if it can't be shown (hidden, or a chart sheet). */
-    showSheet(sheet) {
-      const n = String(sheet).toLowerCase();
-      const i = typeof sheet === 'number' ? sheet : state.workbook ? state.workbook.sheets.findIndex((s) => s.name.toLowerCase() === n) : -1;
-      return editing().run('showSheet', i);
-    },
+    showSheet: (sheet) => editing().run('showSheet', sheetAt(sheet)),
+    /** A new sheet before the one shown (`after`: after it), shown; false if read-only. */
+    insertSheet: ({ after = false } = {}) => editing().run('insertSheet', { after }),
+    /** Rename a sheet (index or name); false if refused (Excel's message shown, as Excel shows it). */
+    renameSheet: (sheet, name) => editing().run('renameSheet', sheetAt(sheet), name),
+    /** Move a sheet to index `to`. */
+    moveSheet: (sheet, to) => editing().run('moveSheet', sheetAt(sheet), to),
+    /** Hide a sheet's tab, or show it again (`hidden` false); false if refused (the last sheet shown). */
+    hideSheet: (sheet, hidden = true) => editing().run('hideSheet', sheetAt(sheet), hidden),
+    /** A sheet's tab colour: { rgb: 'FFRRGGBB' }, { theme, tint }, or null for none. */
+    setTabColor: (sheet, color) => editing().run('tabColor', sheetAt(sheet), color),
+    /** Delete a sheet, without asking (the tab menu asks first); false if refused (the last sheet shown). */
+    deleteSheet: (sheet) => editing().run('deleteSheet', sheetAt(sheet)),
     /** Run a named command (commands.js) with its arguments. */
     command: (name, ...args) => editing().run(name, ...args),
     get selection() { return state.editing ? state.editing.commands.selection : null; },
@@ -114,6 +181,7 @@ export function mountXlsxEditor(host, options = {}) {
     },
     destroy() {
       window.removeEventListener('beforeprint', beforePrint);
+      menu.close();
       state.editing?.destroy();
       state.grid?.destroy();
       root.remove();

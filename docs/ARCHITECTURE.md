@@ -12,7 +12,7 @@ insides:
 
 | Module | What it does |
 |---|---|
-| `src/index.js` | `mountXlsxEditor(host, { bytes, fileName, theme })`: opens a workbook and shows the sheet it opens on, with the sheet tabs; `showSheet` changes sheet; `save()` gives the bytes back. Types in `src/index.d.ts`. |
+| `src/index.js` | `mountXlsxEditor(host, { bytes, fileName, theme })`: opens a workbook and shows the sheet it opens on, with the sheet tabs; `showSheet` changes sheet; `insertSheet`, `renameSheet`, `moveSheet`, `hideSheet`, `setTabColor`, `deleteSheet`; the tab menu's actions; `save()` gives the bytes back. Types in `src/index.d.ts`. |
 | `src/ooxml/package.js` | The OPC package (the zip): every part kept byte for byte, relationships, content types; only changed parts rewritten. From open-docx-editor. |
 | `src/ooxml/xml.js` | Parsing and serialising XML (injectable DOMParser for Node), namespace-aware lookups defaulting to SpreadsheetML, `_xHHHH_` decoding. From open-docx-editor. |
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
@@ -38,11 +38,13 @@ insides:
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
 | `src/editor/selection.js` | The selection (active cell and range) and its overlay; view state only. |
 | `src/editor/navigate.js` | Moving as Excel does: a step (over merged ranges), Ctrl+arrow to the edges of blocks, Ctrl+End. |
-| `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo, showSheet, nextSheet), with the workbook's undo history of cell contents (values and formulas; undoing a change on another sheet shows it) and each sheet's selection and scroll position. |
+| `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo, showSheet, nextSheet, insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet), with the workbook's undo history of cell contents (values and formulas; undoing a change on another sheet shows it; cleared by a rename or delete) and each sheet's selection and scroll position, both by sheetId. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
 | `src/editor/formulabar.js` | The active cell's name and contents; Enter there enters into the cell. |
 | `src/editor/interact.js` | Keys and mouse on the grid wired to the commands, the editor and the bar; screen-reader announcements (`live.js`). |
-| `src/editor/tabs.js` | The sheet tabs: an ARIA tablist under the grid, sheets whose tabs aren't hidden, in their tab colours (text black or white, whichever reads better); chart sheets' tabs there but not shown yet. |
+| `src/editor/tabs.js` | The sheet tabs: an ARIA tablist under the grid, sheets whose tabs aren't hidden, in their tab colours (text black or white, whichever reads better); chart sheets' tabs there but not shown yet; the New sheet button, renaming in place, dragging a tab to move it. |
+| `src/editor/sheetmenu.js` | A menu of buttons (arrows, Home, End, Esc, a colour submenu) and the tab's entries: Insert, Delete, Rename, Move Left/Right, Tab Color (theme and standard colours), Hide, Unhide. |
+| `src/editor/dialogs.js` | Modal message boxes (Excel's refusals, the question before a delete) and the Unhide list, as `<dialog>` elements. |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |
 | `src/editor/celltext.js` | The one place cell text is sized and placed: font size, line height, baseline shifts for top, middle and wrapped text, on screen and in print (custom properties). |
 | `src/editor/fonts.js` | Font stacks with metric-compatible stand-ins; `cellTextMetrics`, the line heights and shifts that put the browser's baselines where Excel's are. |

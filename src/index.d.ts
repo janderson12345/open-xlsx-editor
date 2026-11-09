@@ -45,6 +45,13 @@ export declare class Workbook {
   canShow(index: number): boolean;
   /** A sheet's tab colour as '#RRGGBB', or null. */
   tabColor(index: number): string | null;
+  /** Sheets changed as Excel changes them; a refusal throws an Error with Excel's message. */
+  addSheet(at?: number, name?: string): number;
+  renameSheet(index: number, name: string): void;
+  moveSheet(from: number, to: number): void;
+  setSheetHidden(index: number, hidden: boolean): void;
+  setTabColor(index: number, color: { rgb: string } | { theme: number; tint?: number } | null): void;
+  deleteSheet(index: number): void;
   /** Set a cell ("B2" or { r, c }, 0-based) to a number, boolean, string (written inline) or null. */
   setCell(index: number, ref: string | { r: number; c: number }, value: number | boolean | string | null): { circular: unknown[] };
   /** Give a cell a formula as the file has it ("SUM(A1:A3)", without "="); the formulas that read it are worked out again. */
@@ -78,7 +85,20 @@ export interface XlsxEditor {
   redo(): boolean;
   /** Show a sheet by index or name, with the selection it had; false if it can't be shown (hidden, or a chart sheet). */
   showSheet(sheet: number | string): boolean;
-  /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo, showSheet, nextSheet. */
+  /** A new sheet before the one shown (or after it), then shown; false if read-only. */
+  insertSheet(options?: { after?: boolean }): boolean;
+  /** Rename a sheet; false if refused (Excel's message is shown). */
+  renameSheet(sheet: number | string, name: string): boolean;
+  /** Move a sheet to index `to`. */
+  moveSheet(sheet: number | string, to: number): boolean;
+  /** Hide a sheet's tab, or show it again; false if refused (the last sheet shown). */
+  hideSheet(sheet: number | string, hidden?: boolean): boolean;
+  /** A sheet's tab colour; null for none. */
+  setTabColor(sheet: number | string, color: { rgb: string } | { theme: number; tint?: number } | null): boolean;
+  /** Delete a sheet without asking; false if refused (the last sheet shown). */
+  deleteSheet(sheet: number | string): boolean;
+  /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo, showSheet, nextSheet,
+   *  insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet. */
   command(name: string, ...args: unknown[]): unknown;
   readonly selection: Selection | null;
   readonly readOnly: boolean;

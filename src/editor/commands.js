@@ -1,15 +1,17 @@
 // Every action is a named command, shared by the keyboard, the mouse, the formula bar and the API: moving and
-// extending the selection, entering and clearing values and formulas, undo and redo, changing sheet. Changes go
-// through the workbook (only the sheet's XML is touched, as everywhere; the formulas that read a changed cell are
-// worked out again) and into an undo history of cell contents, one for the workbook, as in Excel; the selection, kept
-// for each sheet, is view state and never reaches the history or the file.
+// extending the selection, entering and clearing values and formulas, undo and redo, changing sheet, and adding,
+// renaming, moving, hiding, colouring and deleting sheets. Cell changes go through the workbook (only the sheet's XML
+// is touched, as everywhere; the formulas that read a changed cell are worked out again) and into an undo history of
+// cell contents, one for the workbook, as in Excel; the selection, kept for each sheet, is view state and never reaches
+// the history or the file. Sheets are known by their sheetId in both, as indexes change when sheets move.
 import { cellSelection, extendSelection } from './selection.js';
 import { step, jump, lastCell } from './navigate.js';
 import { parseInput } from '../ooxml/input.js';
 import { refName } from '../ooxml/refs.js';
+import { SheetError, nearest } from '../ooxml/sheetops.js';
 
-/** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), grid, readOnly(), announce(msg),
- *  changed(), selected(sel, note) }. */
+/** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
+ *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note) }. */
 export function createCommands(ctx) {
   // (`views`: each sheet's selection and scroll position while another is shown.)
   const state = { sel: cellSelection(0, 0), focus: { r: 0, c: 0 }, undo: [], redo: [], views: new Map() };
@@ -32,6 +34,8 @@ export function createCommands(ctx) {
     return { r, c, value: cell && cell.f == null ? cell.v ?? null : null };
   };
   const inArray = (r, c) => sheet().arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1);
+  const idOf = (i) => ctx.workbook().sheets[i]?.sheetId;
+  const indexOf = (id) => ctx.workbook().sheets.findIndex((s) => s.sheetId === id);
 
   /** Apply changes [{ r, c, value } or { r, c, formula }] as one step of the history; refused, whole, if a cell is part
    *  of an array formula. */
@@ -40,7 +44,7 @@ export function createCommands(ctx) {
     if (changes.some((ch) => inArray(ch.r, ch.c))) { ctx.announce("You can't change part of an array"); return false; }
     const before = changes.map((ch) => contents(ch.r, ch.c));
     const { circular } = ctx.workbook().apply(ctx.sheetIndex(), changes);
-    if (record) { state.undo.push({ sheet: ctx.sheetIndex(), before, after: changes }); state.redo = []; }
+    if (record) { state.undo.push({ sheet: idOf(ctx.sheetIndex()), before, after: changes }); state.redo = []; }
     ctx.grid.refresh();
     ctx.changed?.();
     if (circular.length) ctx.announce(`Circular reference: ${circular.map((e) => refName(e.r, e.c)).join(', ')} read themselves and weren't worked out`);
@@ -100,9 +104,9 @@ export function createCommands(ctx) {
       const from = ctx.sheetIndex();
       if (i === from) return true;
       const view = ctx.grid.el;
-      state.views.set(from, { sel: state.sel, focus: state.focus, top: view.scrollTop, left: view.scrollLeft });
+      if (from >= 0) state.views.set(idOf(from), { sel: state.sel, focus: state.focus, top: view.scrollTop, left: view.scrollLeft });
       ctx.showSheet(i);
-      const back = state.views.get(i);
+      const back = state.views.get(idOf(i));
       if (back) { view.scrollTop = back.top; view.scrollLeft = back.left; }
       show(back ? back.sel : cellSelection(0, 0), back?.focus, `${wb.sheets[i].name}, `);
       return true;
@@ -114,13 +118,61 @@ export function createCommands(ctx) {
       for (let i = ctx.sheetIndex() + dir; i >= 0 && i < wb.sheets.length; i += dir) if (wb.canShow(i)) return commands.showSheet(i);
       return false;
     },
+    /** A new sheet before the one shown (Insert, Shift+F11), or after it (`after`: the + button), shown. */
+    insertSheet({ after = false } = {}) {
+      let at = -1;
+      return sheetOp((wb) => { at = wb.addSheet(ctx.sheetIndex() + (after ? 1 : 0)); }, () => at);
+    },
+    /** Rename sheet i (Excel's refusals said in its words). */
+    renameSheet(i, name) { return sheetOp((wb) => wb.renameSheet(i, name), null, true); },
+    /** Move sheet i to index `to`. */
+    moveSheet(i, to) {
+      if (to < 0 || to >= ctx.workbook().sheets.length) return false;
+      return sheetOp((wb) => wb.moveSheet(i, to));
+    },
+    /** Hide sheet i's tab (showing the next sheet if it was the one shown), or show it again (`hidden` false). */
+    hideSheet(i, hidden = true) {
+      const id = idOf(i);
+      return sheetOp((wb) => wb.setSheetHidden(i, hidden), hidden ? null : () => indexOf(id));
+    },
+    /** Sheet i's tab colour ({ rgb } or { theme, tint }; null for none). */
+    tabColor(i, color) { return sheetOp((wb) => wb.setTabColor(i, color)); },
+    /** Delete sheet i (no question asked here: the tab menu asks first, as Excel does). */
+    deleteSheet(i) { return sheetOp((wb) => wb.deleteSheet(i), null, true); },
   };
+
+  /** Run a change to the workbook's sheets. Afterwards the sheet shown is `show()` if given, else the same sheet
+   *  wherever it went, else (gone or hidden) its nearest neighbour. A rename or delete clears the undo history (a
+   *  change in it could name the sheet as it was). */
+  function sheetOp(run, show = null, clearsHistory = false) {
+    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    const wb = ctx.workbook();
+    const was = ctx.sheetIndex();
+    const shownId = idOf(was);
+    try {
+      run(wb);
+    } catch (e) {
+      if (!(e instanceof SheetError)) throw e;
+      ctx.alert(e.message);
+      return false;
+    }
+    if (clearsHistory) { state.undo = []; state.redo = []; }
+    for (const id of state.views.keys()) if (indexOf(id) < 0) state.views.delete(id);
+    const now = indexOf(shownId);
+    ctx.sheetsChanged(now); // (the tabs again, and the sheet shown at its new index, or -1 if it went)
+    let target = show ? show() : now;
+    if (target < 0 || !wb.canShow(target)) target = nearest(wb, target < 0 ? Math.min(was, wb.sheets.length - 1) : target);
+    if (target !== now || now < 0) commands.showSheet(target);
+    ctx.changed?.();
+    return true;
+  }
 
   function replay(from, to, side, word) {
     const entry = from.pop();
     if (!entry) return false;
     // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
-    if (entry.sheet !== ctx.sheetIndex() && !commands.showSheet(entry.sheet)) { from.push(entry); return false; }
+    const at = indexOf(entry.sheet);
+    if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
     if (!apply(entry[side], false)) { from.push(entry); return false; }
     to.push(entry);
     const first = entry[side][0];

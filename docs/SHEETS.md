@@ -26,6 +26,21 @@ and invisibly; copies saved outside the repository). Then the workbooks written 
 | The last sheet shown can't be hidden or deleted. | Excel refuses over COM. Its dialog says "A workbook must contain at least one visible worksheet." |
 | Tab colours resolve like cell colours. | Theme 5, tint 0.4 is #F1A983; theme 4, tint 0.4 is #44B3E1 (Tab.Color). |
 
+## In the editor
+
+The tab menu (right click, Shift+F10 or the Menu key on a tab) has Excel's entries: Insert, Delete, Rename, Move
+Left, Move Right, Tab Color, Hide, Unhide.
+- **Right click.** Right-clicking a tab shows that sheet first, as in Excel.
+- **New sheets.** The + button adds a sheet after the one shown, and Shift+F11 adds one before it.
+- **Renaming.**
+  - Double-click a tab to rename it in place.
+  - A refused name brings up Excel's message. After OK the name box stays open to correct it.
+  - After a rename, focus goes back to the sheet.
+- **Moving.** Drag a tab to move the sheet. Move Left and Move Right do the same from the keyboard.
+- **Deleting.** If the sheet has something in it, the editor asks first. The API's `deleteSheet` doesn't ask.
+- **Tab colours.** The palette has the theme's ten colours (written as `theme="n"`), Excel's ten standard colours
+  and No Color. Excel's palette also has lighter and darker shades of the theme colours; those aren't offered yet.
+
 ## What else changes in the file
 
 - **Renames reach other parts too:**

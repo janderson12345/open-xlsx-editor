@@ -1,5 +1,6 @@
 // Browser check of editing: selection by keys and mouse, typing over a cell, F2, Esc, Tab, Delete, undo and redo,
-// typed numbers and text, formulas typed and worked out again, sheet tabs, read-only; the saved workbook read back.
+// typed numbers and text, formulas typed and worked out again, sheet tabs and managing sheets, read-only; the saved
+// workbook read back.
 // Standards mode asserted.
 // Run after `npm run build`: node test/editing.mjs [outDir]
 import fs from 'node:fs';
@@ -168,6 +169,75 @@ check(await label() === 'Notes & more' && await page.evaluate(() => [...document
 await page.keyboard.press('ArrowLeft');
 await page.focus('.oxe-grid');
 
+// Managing sheets: the + button, renaming in place (a refused name said in Excel's words, the box kept), the tab menu
+// by mouse and keyboard (colour, hide, unhide, delete with a question first), dragging a tab, Shift+F11.
+const names = async () => (await tabs()).map((x) => x.name).join(',');
+const menuItem = (label) => page.click(`.oxe-menu [role="menuitem"]:text-is("${label}")`);
+const dialogText = () => page.evaluate(() => document.querySelector('.oxe-dialog')?.textContent || '');
+await page.click('.oxe-tab-add');
+check(await names() === 'Data,Sheet1,Notes & more' && await label() === 'Sheet1', 'the + button: Sheet1 after the sheet shown, and shown', await names());
+await page.dblclick('.oxe-tab >> text=Sheet1');
+await page.keyboard.type('a/b');
+await page.keyboard.press('Enter');
+await page.waitForTimeout(100);
+check(/invalid name for a sheet/.test(await dialogText()) && await page.evaluate(() => document.activeElement.textContent) === 'OK', 'a/b refused in a message box, Excel\'s words, OK focused');
+await page.keyboard.press('Enter');
+await page.waitForTimeout(100);
+check(await page.evaluate(() => document.activeElement.className) === 'oxe-tab-edit', 'OK: back in the name box to put it right');
+await page.keyboard.type('Summary');
+await page.keyboard.press('Enter');
+check(await names() === 'Data,Summary,Notes & more' && await label() === 'Summary', 'renamed Summary in place');
+await page.evaluate(() => window.oxe.select('A1'));
+await page.keyboard.type("='Notes & more'!B2*2");
+await page.keyboard.press('Enter');
+check(await value('A1') === -7, 'a formula reading Notes & more');
+await page.click('.oxe-tab >> text=Notes & more', { button: 'right' });
+check(await label() === 'Notes & more' && await page.evaluate(() => document.activeElement.textContent) === 'Insert', 'right click: the sheet shown, the menu open on Insert');
+await menuItem('Rename');
+await page.keyboard.press('Control+a');
+await page.keyboard.type('Notes');
+await page.keyboard.press('Enter');
+check(await page.evaluate(() => window.oxe.workbook.sheet(1).cells.get(0).get(0).f) === 'Notes!B2*2', 'renamed Notes: the formula on Summary follows (Notes!B2*2)', await page.evaluate(() => window.oxe.workbook.sheet(1).cells.get(0).get(0).f));
+await page.click('.oxe-tab >> text=Summary', { button: 'right' });
+await menuItem('Tab Color');
+await page.click('.oxe-swatch[aria-label="Red"]');
+check((await tabs())[1].color === '#FF0000', 'Tab Color, Red: the tab is red');
+const box = async (name) => page.evaluate((n) => { const r = [...document.querySelectorAll('.oxe-tab')].find((t) => t.textContent === n).getBoundingClientRect(); return { x: r.left, y: r.top + r.height / 2, w: r.width }; }, name);
+const from = await box('Summary');
+const past = await box('Notes');
+await page.mouse.move(from.x + 10, from.y);
+await page.mouse.down();
+await page.mouse.move(from.x + 40, from.y, { steps: 4 });
+await page.mouse.move(past.x + past.w - 4, past.y, { steps: 4 });
+await page.mouse.up();
+check(await names() === 'Data,Notes,Summary' && await label() === 'Summary', 'dragging Summary past Notes moves it there', await names());
+await page.focus('.oxe-tab >> text=Notes');
+await page.keyboard.press('Shift+F10');
+check(await page.evaluate(() => document.activeElement.textContent) === 'Insert', 'Shift+F10 on a tab opens its menu');
+await page.keyboard.press('Escape');
+check(await page.evaluate(() => document.activeElement.textContent) === 'Notes' && !(await page.$('.oxe-menu')), 'Esc closes it, focus back on the tab');
+await page.keyboard.press('Shift+F10');
+for (const k of ['End', 'ArrowUp']) await page.keyboard.press(k);
+await page.keyboard.press('Enter'); // (Hide)
+check(await names() === 'Data,Summary' && await label() === 'Summary', 'Hide from the keyboard: Notes hidden, the next sheet shown', await names());
+await page.click('.oxe-tab >> text=Data', { button: 'right' });
+await menuItem('Unhide...');
+check(await page.evaluate(() => [...document.querySelectorAll('.oxe-dialog option')].map((o) => o.textContent).join()) === 'Notes,Hidden', 'Unhide lists the hidden sheets');
+await page.keyboard.press('Enter');
+check(await names() === 'Data,Notes,Summary' && await label() === 'Notes', 'Enter: Notes back, and shown');
+await page.click('.oxe-tab >> text=Summary', { button: 'right' });
+await menuItem('Delete');
+check(/permanently deleted/.test(await dialogText()), 'Delete on a sheet with something in it asks first');
+await page.click('.oxe-dialog-button >> text=Delete');
+check(await names() === 'Data,Notes' && await label() === 'Notes', 'deleted; the sheet before it shown', await names());
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+F11');
+check(await names() === 'Data,Sheet2,Notes' && await label() === 'Sheet2', 'Shift+F11: Sheet2 before the sheet shown', await names());
+await page.evaluate(() => window.oxe.deleteSheet('Sheet2'));
+await page.evaluate(() => window.oxe.showSheet('Data'));
+check(await names() === 'Data,Notes' && await label() === 'Data', 'deleted from the API without a question');
+await page.focus('.oxe-grid');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);
@@ -186,6 +256,7 @@ check(v(1, 1) === 77 && v(1, 0) === 'Item 1 x' && v(15, 0) === 0.5 && v(15, 2) =
 check(sh.cells.get(15).get(4).f === 'SUM(B2:B3)' && v(15, 4) === 87 && v(2, 2) === 20 && v(10, 1) === 129, 'saved: the formula and the results worked out');
 check(!wb.pkg.has('xl/calcChain.xml'), 'saved: calcChain.xml left out (Excel works the order out again)');
 check(wb.sheet(1).cells.get(1).get(1).v === -3.5, 'saved: the change on the second sheet undone');
+check(wb.sheets.map((s) => `${s.name}:${s.state}`).join() === 'Data:visible,Notes:visible,Hidden:hidden' && !Object.keys(wb.pkg.files).some((p) => /sheet[45]\.xml/.test(p)), 'saved: the sheets as left (Summary and Sheet2 gone with their parts)', wb.sheets.map((s) => s.name).join());
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
