@@ -1,0 +1,160 @@
+# Features: what Excel does and what this editor does
+
+The editor's features listed against Excel 365's, by its ribbon tabs and groups. The tab and group keys are the names
+the `features` option will take (as in open-docx-editor: a tab by name, a group by its label in lower case with
+dashes), so this list is also the ribbon's plan. Update a row in the commit that changes it.
+
+| Mark | Meaning |
+|---|---|
+| Done | Works as in Excel, measured against Excel where there is something to measure. |
+| Partly | Some of it works; the note says what is missing. |
+| Shown | Read from the file and shown, but there is no way to change it yet. |
+| Kept | Not shown, but saved back as it came in (every part we don't change goes out byte for byte, and an edited sheet is changed in place). |
+| Missing | Not there. |
+
+Nothing is lost on save: what this editor doesn't understand is Kept, never dropped. The exception is calcChain.xml,
+which is dropped when formulas change (Excel rebuilds it).
+
+## Options (planned, as in open-docx-editor)
+
+| Option | Status | Notes |
+|---|---|---|
+| `readOnly` | Done | `setReadOnly()` at any time. Nothing editable; the tab menu shows only what doesn't change the workbook. |
+| `toolbar: false` | Missing | Hides the ribbon but keeps editing. Comes with the ribbon. |
+| `features: { tab or group: false }` | Missing | Hides a tab or group; `setFeatures()` at any time. Comes with the ribbon. A hidden feature's keys and menu entries are blocked too. |
+
+## Outside the ribbon
+
+| Feature | Status | Notes |
+|---|---|---|
+| Open .xlsx | Done | Any workbook; sheets parsed on first view. |
+| Open .xlsm, .xltx, .xlsb, .xls, .csv | Missing | .xlsm and .xltx are the same format and would mostly need their content types kept. |
+| Save .xlsx | Done | Only changed sheets rewritten; opened in Excel with no repair (`tools/check-ooxml.mjs`). |
+| Formula results on open when the file has none | Partly | Worked out by `calculate()`; the editor doesn't call it on open yet (the preview page does). |
+| Virtualised grid | Done | 5,000 rows by 20 columns scroll smoothly. |
+| Fonts, fills, borders, alignment, number formats | Shown | Measured against Excel's PDFs (docs/LAYOUT.md). |
+| Rich text in a cell (runs in several fonts) | Partly | The text is shown in the cell's own font; the runs' formatting isn't. |
+| Merged cells | Shown | Navigation steps over them. |
+| Hidden rows and columns | Shown | Hidden; no way to unhide yet. |
+| Row heights from fonts and wrapping | Done | As Excel works them out (docs/LAYOUT.md). |
+| Gridlines on or off | Shown | From the sheet's view settings. |
+| Selecting: keys, mouse, Shift, Ctrl+arrow, Ctrl+End | Done | |
+| Selecting several ranges (Ctrl+click) | Missing | |
+| Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
+| Entries read as Excel reads them | Partly | Numbers, separators, %, TRUE/FALSE, 'text. Dates and times typed as text aren't turned into dates yet. |
+| Undo and redo | Done | Cell contents across sheets; a sheet rename or delete clears the history, as Excel does. |
+| Formula bar and name box | Partly | The name box shows the active cell; typing a reference or name there to go to it is missing. |
+| Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
+| Recalculation | Done | 399 of 399 test formulas give Excel's results; about 130 functions. |
+| Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
+| Chart sheets | Kept | Tab shown, sheet not opened. |
+| Copy, cut, paste (and paste from Excel or the web) | Missing | |
+| Fill handle, Ctrl+D, Ctrl+R | Missing | |
+| Right-click menu on cells | Missing | |
+| Find and Replace (Ctrl+F, Ctrl+H) | Missing | |
+| Status bar (Sum, Average, Count of the selection) | Missing | |
+| Zoom | Missing | |
+| Print | Done | Pages as Excel lays them out, measured against its PDFs. |
+| Accessibility | Done | ARIA grid and tablist, announcements, axe clean in light and dark at 1280 and 320px. |
+| Light and dark | Done | The chrome follows the theme; the sheet stays white, as in Excel. |
+
+## Home (`home`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Clipboard (`clipboard`) | Cut, Copy, Paste, Paste Special | Missing | |
+| | Format Painter | Missing | |
+| Font (`font`) | Font, size, grow and shrink | Shown | |
+| | Bold, italic, underline (single, double), strikethrough | Shown | |
+| | Borders | Shown | Every line style, measured. |
+| | Fill colour, font colour | Shown | Theme colours with tints, indexed colours. |
+| | Pattern and gradient fills | Partly | Solid and pattern fills shown; gradients not. |
+| Alignment (`alignment`) | Horizontal and vertical | Shown | |
+| | Wrap text | Shown | |
+| | Indent | Shown | |
+| | Orientation (rotated text) | Missing | |
+| | Merge & Center, Merge Across, Unmerge | Missing | Merges are shown. |
+| | Shrink to fit | Missing | |
+| Number (`number`) | Number format list, currency, %, comma, decimals | Shown | Every format code Excel has, dates in 1900 and 1904. |
+| Styles (`styles`) | Conditional Formatting | Kept | |
+| | Format as Table | Kept | |
+| | Cell Styles | Kept | Cells show their style's formatting. |
+| Cells (`cells`) | Insert and delete rows, columns, cells | Missing | Formulas, names and merges would have to follow. |
+| | Insert and delete sheets | Done | Also on the tab menu. |
+| | Row height, column width (and AutoFit) | Missing | Read and shown; no dragging the headings yet. |
+| | Hide and unhide rows, columns | Missing | Hidden ones are hidden. |
+| | Rename, move, tab colour, hide sheet | Done | |
+| Editing (`editing`) | AutoSum | Missing | |
+| | Fill (down, right, series) | Missing | |
+| | Clear (all, formats, contents) | Partly | Delete clears contents; formats can't be cleared yet. |
+| | Sort & Filter | Missing | Autofilters kept. |
+| | Find & Select | Missing | |
+
+## Insert (`insert`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Tables (`tables`) | Table, PivotTable | Kept | Pivot sources follow a sheet rename. |
+| Illustrations (`illustrations`) | Pictures, shapes, icons | Kept | Not drawn on the grid. |
+| Charts (`charts`) | Charts | Kept | Series follow a sheet rename. |
+| Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
+| Links (`links`) | Hyperlinks | Kept | Not clickable yet; follow a sheet rename. |
+| Comments (`comments`) | Comments and notes | Kept | Not shown. |
+| Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers not printed yet. |
+
+## Page Layout (`layout`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Themes (`themes`) | Theme colours and fonts | Shown | Excel 365's default theme when the file has none. |
+| Page Setup (`page-setup`) | Margins, orientation, paper size, page order | Shown | Used when printing. |
+| | Print area, print titles, page breaks | Missing | |
+| Scale to Fit (`scale-to-fit`) | Width, height, scale | Missing | |
+| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Partly | Gridlines on screen follow the file; nothing can be changed. |
+
+## Formulas (`formulas`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Function Library (`function-library`) | Insert Function, the function lists | Missing | About 130 functions work when typed (docs/CALC.md). |
+| | Dynamic arrays (spilling), LAMBDA, LET | Missing | Legacy array formulas are worked out. |
+| Defined Names (`defined-names`) | Name Manager, define, use in formula | Partly | Names in formulas work out and follow sheet renames; no way to add or change one. |
+| Formula Auditing (`formula-auditing`) | Trace precedents and dependents, show formulas, evaluate | Missing | |
+| Calculation (`calculation`) | Automatic, manual, Calculate Now | Partly | Always automatic. |
+
+## Data (`data`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
+| Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Missing | Autofilters kept. |
+| Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Missing | |
+| | Data Validation (lists, rules) | Kept | Not checked when typing; no drop-down. |
+| Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |
+
+## Review (`review`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Proofing (`proofing`) | Spelling | Missing | |
+| Accessibility (`accessibility`) | Check Accessibility | Missing | |
+| Comments (`comments`) | New, show, delete comments; notes | Kept | |
+| Protect (`protect`) | Protect sheet, protect workbook | Kept | Not enforced: a protected sheet can be edited. |
+
+## View (`view`)
+
+| Group | Feature | Status | Notes |
+|---|---|---|---|
+| Workbook Views (`workbook-views`) | Normal, Page Break Preview, Page Layout | Partly | Normal only. |
+| Show (`show`) | Gridlines, formula bar, headings | Partly | Gridlines follow the file; none can be switched. |
+| Zoom (`zoom`) | Zoom, 100%, zoom to selection | Missing | |
+| Window (`window`) | Freeze Panes | Missing | Frozen panes in a file aren't frozen yet. |
+| | Split, new window | Missing | |
+
+## File (`file`)
+
+| Feature | Status | Notes |
+|---|---|---|
+| Open, Save | Done | Through the host: `open(bytes)`, `save()`. |
+| Print | Done | |
+| Properties (title, author) | Kept | |

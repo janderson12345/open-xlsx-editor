@@ -27,6 +27,7 @@ const saved = editor.save(); // Uint8Array
 - `npm run dev`: the demo at http://localhost:8080 (drag an .xlsx onto it).
 - `CONTRIBUTING.md`: setup and tests. `docs/ARCHITECTURE.md`: the module map. `docs/LAYOUT.md`: matching Excel's
   layout. `docs/CALC.md`: matching Excel's calculation. `docs/SHEETS.md`: matching Excel's sheet operations.
+  `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab.
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
   Word editor modules carry over.
 
