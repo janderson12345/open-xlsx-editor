@@ -52,9 +52,27 @@ export interface GridHandle {
   scrollToCell(r: number, c: number): void;
 }
 
+/** The selection: the active cell (ar, ac) and the range r0..r1, c0..c1, 0-based. */
+export interface Selection { ar: number; ac: number; r0: number; c0: number; r1: number; c1: number; }
+
+export type CellRef = string | { r: number; c: number };
+
 export interface XlsxEditor {
   open(bytes: Uint8Array | ArrayBuffer, fileName?: string | null): XlsxEditor;
   save(): Uint8Array;
+  /** Select a cell. */
+  select(ref: CellRef): void;
+  /** Enter text into a cell as if typed ("12", "50%", "TRUE", "'007"); false if refused. */
+  enter(ref: CellRef, text: string): boolean;
+  /** Set a cell's value; false if refused (read-only, or a formula cell). */
+  setCell(ref: CellRef, value: number | boolean | string | null): boolean;
+  undo(): boolean;
+  redo(): boolean;
+  /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo. */
+  command(name: string, ...args: unknown[]): unknown;
+  readonly selection: Selection | null;
+  readonly readOnly: boolean;
+  setReadOnly(flag: boolean): void;
   /** Build the printed pages of the sheet shown; returns the page count. */
   preparePrint(): number;
   readonly workbook: Workbook | null;
@@ -67,5 +85,5 @@ export interface XlsxEditor {
 
 export declare function mountXlsxEditor(
   host: HTMLElement,
-  options?: { bytes?: Uint8Array | ArrayBuffer; fileName?: string; theme?: 'light' | 'dark' },
+  options?: { bytes?: Uint8Array | ArrayBuffer; fileName?: string; theme?: 'light' | 'dark'; readOnly?: boolean; onChange?: () => void },
 ): XlsxEditor;

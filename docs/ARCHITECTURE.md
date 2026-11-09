@@ -18,6 +18,7 @@ other's insides:
 | `src/ooxml/refs.js` | A1 references and ranges; rows and columns are 0-based in code. |
 | `src/ooxml/workbook.js` | `Workbook`: sheets in order, shared strings, each sheet's model read on first use, `setCell`, `toBytes` (only dirty sheets serialised, with their XML declaration). |
 | `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults. Implied `r` positions followed. |
+| `src/ooxml/input.js` | A typed entry as a value (numbers, separators, %, TRUE/FALSE, 'text); formulas refused for now. |
 | `src/ooxml/sheetedit.js` | Changing one cell in the worksheet's XML in place: implied positions pinned first, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. Formula cells refused until formulas and calcChain are modelled. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
@@ -27,6 +28,12 @@ other's insides:
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
+| `src/editor/selection.js` | The selection (active cell and range) and its overlay; view state only. |
+| `src/editor/navigate.js` | Moving as Excel does: a step (over merged ranges), Ctrl+arrow to the edges of blocks, Ctrl+End. |
+| `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo), with the undo history of cell values. |
+| `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
+| `src/editor/formulabar.js` | The active cell's name and contents; Enter there enters into the cell. |
+| `src/editor/interact.js` | Keys and mouse on the grid wired to the commands, the editor and the bar; screen-reader announcements (`live.js`). |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |
 | `src/editor/celltext.js` | The one place cell text is sized and placed: font size, line height, baseline shifts for top, middle and wrapped text, on screen and in print (custom properties). |
 | `src/editor/fonts.js` | Font stacks with metric-compatible stand-ins; `cellTextMetrics`, the line heights and shifts that put the browser's baselines where Excel's are. |
@@ -40,7 +47,7 @@ other's insides:
 |---|---|
 | `test/fixtures/make-fixtures.mjs` | Generates the test workbooks (deterministic zips). CI checks the committed files match. |
 | `test/*.test.js` | Unit tests in Node (`npm test`): round trips byte for byte, edits, units, references, geometry, the checker. |
-| `test/e2e.mjs`, `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; axe in light and dark at 1280 and 320px. Both assert standards mode. |
+| `test/e2e.mjs`, `test/editing.mjs`, `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; editing by keys and mouse, undo, read-only, the saved file read back; axe in light and dark at 1280 and 320px. All assert standards mode. |
 | `tools/check-ooxml.mjs` | Structural check of .xlsx files (what makes Excel offer a repair). |
 | `tools/excel-compare/` | Comparison with Excel's own PDFs: `excel-print.ps1` (Excel through COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions), `shapes.cjs` (filled rectangles and lines), `compare.py`, `compare-shapes.py`, `diff.py`, `run.ps1`. See its README. |
 | `tools/scan-bytes.mjs` | Control characters and byte order marks in source text (part of `npm run lint`). |

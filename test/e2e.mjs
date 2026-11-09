@@ -22,7 +22,8 @@ const domCells = () => page.evaluate(() => document.querySelectorAll('.oxe-cell'
 for (const f of fs.readdirSync('test/fixtures').filter((n) => n.endsWith('.xlsx'))) {
   await openFixture(page, f);
   await page.screenshot({ path: `${outDir}/${f}.png` });
-  const first = await page.evaluate(() => document.querySelector('.oxe-row .oxe-cell')?.textContent ?? null);
+  // (The first cell with text: the active cell, A1, is drawn even when empty.)
+  const first = await page.evaluate(() => [...document.querySelectorAll('.oxe-row .oxe-cell')].find((e) => e.textContent)?.textContent ?? null);
   check(first != null && first.length > 0, `${f}: first sheet drawn ("${first}")`);
   // Unchanged save: every part byte for byte.
   const src = unzipSync(new Uint8Array(fs.readFileSync(`test/fixtures/${f}`)));

@@ -10,7 +10,7 @@ npm install
 npm test            # unit tests in Node: reading, round trips, unit conversions
 npm run lint        # ESLint: mistakes (unused or undefined names), not formatting
 npm run dev         # demo at http://localhost:8080 (drag an .xlsx onto it)
-npm run test:e2e    # Chromium: open each fixture in the demo, scroll the grid, accessibility in light and dark
+npm run test:e2e    # Chromium: open, scroll and save each fixture, edit by keys and mouse, accessibility in light and dark
 node tools/check-ooxml.mjs test/fixtures test/out   # structural check of the fixtures and the files the tests saved
 ```
 

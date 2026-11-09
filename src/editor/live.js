@@ -2,10 +2,10 @@
 
 export function liveRegion() {
   if (typeof document === 'undefined') return null;
-  let live = document.querySelector('body > .odx-live');
+  let live = document.querySelector('body > .oxe-live');
   if (!live) {
     live = document.createElement('div');
-    live.className = 'odx-live odx-sr';
+    live.className = 'oxe-live oxe-sr';
     document.body.append(live);
   }
   return live;

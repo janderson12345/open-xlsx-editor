@@ -17,6 +17,8 @@
   --oxe-head-fg: #333333;
   --oxe-head-line: #c8c8c8;
   --oxe-focus: #1a73e8;
+  --oxe-sel: #217346;
+  --oxe-sel-fill: rgba(33, 115, 70, 0.12);
   --oxe-font: Calibri, Carlito, 'Liberation Sans', Arial, sans-serif;
   --oxe-ui-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
   display: flex;
@@ -102,7 +104,8 @@
 .oxe-rows,
 .oxe-lines,
 .oxe-fills,
-.oxe-edges {
+.oxe-edges,
+.oxe-overlay {
   position: absolute;
   top: var(--oxe-colhead-h);
   left: 0;
@@ -298,7 +301,8 @@
     --oxe-bg: #ffffff;
     --oxe-fg: #000000;
   }
-  .oxe-root > .oxe-grid {
+  .oxe-root > .oxe-grid,
+  .oxe-root > .oxe-bar {
     display: none;
   }
   .oxe-print {
@@ -346,4 +350,92 @@
   position: absolute;
   left: calc(-1 * var(--oxe-ox));
   top: calc(-1 * var(--oxe-oy));
+}
+
+/* The formula bar: the active cell's name, then its contents to edit. */
+.oxe-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--oxe-head-line);
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-namebox {
+  min-width: 64px;
+  padding: 3px 6px;
+  border: 1px solid var(--oxe-head-line);
+  background: var(--oxe-bg);
+  color: #1b1b1b;
+}
+.oxe-formula {
+  flex: 1;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid var(--oxe-head-line);
+  background: #ffffff;
+  color: #1b1b1b;
+  font: inherit;
+}
+.oxe-formula:focus-visible,
+.oxe-namebox:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: -1px;
+}
+
+/* The selection (selection.js): view state over the cells and under the sticky headings. */
+.oxe-overlay {
+  z-index: 1;
+  pointer-events: none;
+}
+.oxe-sel-range,
+.oxe-sel-active {
+  position: absolute;
+  box-sizing: border-box;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x) - 1px);
+  top: calc(var(--oxe-y) - 1px);
+  width: calc(var(--oxe-w) + 1px);
+  height: calc(var(--oxe-h) + 1px);
+}
+.oxe-sel-range {
+  background: var(--oxe-sel-fill);
+  border: 1px solid var(--oxe-sel);
+}
+.oxe-sel-active {
+  border: 2px solid var(--oxe-sel);
+}
+
+/* Editing in a cell (celleditor.js): a box over it in the cell's font, growing with its text. */
+.oxe-editor {
+  position: absolute;
+  box-sizing: border-box;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x) - 1px);
+  top: calc(var(--oxe-y) - 1px);
+  width: calc(var(--oxe-edit-w) + 2px);
+  height: calc(var(--oxe-edit-h) + 1px);
+  margin: 0;
+  padding: 0 2px;
+  border: 2px solid var(--oxe-sel);
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  white-space: pre;
+  pointer-events: auto;
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--oxe-font);
+  font-size: var(--oxe-cell-fs);
+  line-height: var(--oxe-cell-lh);
+}
+
+/* Read by screen readers only (live.js announcements). */
+.oxe-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

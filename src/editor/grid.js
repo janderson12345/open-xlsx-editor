@@ -9,6 +9,7 @@ import { Axis } from './axis.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontDescentPx } from './fonts.js';
+import { drawSelection } from './selection.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -159,6 +160,8 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}`, 'gridcell');
   if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
   el.setAttribute('aria-colindex', String(c + 2));
+  if (st.idBase) el.id = `${st.idBase}-${r}-${c}`;
+  if (st.sel && r >= st.sel.r0 && r <= st.sel.r1 && c >= st.sel.c0 && c <= st.sel.c1) el.setAttribute('aria-selected', 'true');
   let x = st.cols.start(c);
   let w = st.cols.size(c);
   let hgt = st.rows.size(r);
@@ -290,8 +293,13 @@ function drawRows(st, win) {
       // (Inside a merged range only the top-left cell shows; the others are kept in the file but not drawn.)
       if (merge && (merge.r0 !== cr || merge.c0 !== cc)) continue;
       const cell = sheet.cells.get(cr)?.get(cc) || { t: 'n', v: null };
-      if (cell.v == null && !merge) continue;
+      if (cell.v == null && !merge && !(st.sel && st.sel.ar === cr && st.sel.ac === cc)) continue;
       row.appendChild(cellElement(st, cr, cc, cell, sheet.cells.get(cr) || new Map(), win, top));
+    }
+    // (The active cell is drawn even when it is empty, so that the grid can name it as its active descendant.)
+    const sel = st.sel;
+    if (sel && sel.ar === r && sel.ac >= win.c0 && sel.ac <= win.c1 && !seen.has(`${r},${sel.ac}`) && !mergeAt(st, r, sel.ac)) {
+      row.appendChild(cellElement(st, r, sel.ac, { t: 'n', v: null }, line || new Map(), win, top));
     }
     kids.push(row);
   }
@@ -311,13 +319,19 @@ function draw(st, force = false) {
   st.fills.replaceChildren(...fills);
   drawRows(st, win);
   st.edges.replaceChildren(...edges);
+  drawSelection(st);
+  const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
+  if (active) st.view.setAttribute('aria-activedescendant', active.id);
+  else st.view.removeAttribute('aria-activedescendant');
 }
 
-/** A read-only grid of one sheet in `host`. Returns the handle the editor and the tests use. */
-export function createGrid(host, { sheet, label = 'Sheet', looks = {} }) {
+let gridCount = 0;
+
+/** A grid of one sheet in `host`. Returns the handle the editor and the tests use. */
+export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly = true }) {
   const view = div('oxe-grid', 'grid');
   view.tabIndex = 0;
-  view.setAttribute('aria-readonly', 'true');
+  view.setAttribute('aria-readonly', String(readOnly));
   view.setAttribute('aria-label', label);
   const canvas = div('oxe-sheet');
   const colheads = div('oxe-colheads', 'row');
@@ -332,20 +346,26 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {} }) {
   const body = div('oxe-rows');
   const edges = div('oxe-edges');
   edges.setAttribute('aria-hidden', 'true');
-  canvas.append(colheads, lines, fills, body, edges);
+  // (The selection overlay sits over the borders and under the sticky headings.)
+  const overlay = div('oxe-overlay');
+  overlay.setAttribute('aria-hidden', 'true');
+  canvas.append(colheads, lines, fills, body, edges, overlay);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
-  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color }) => {
+  const measure = (next, nextLooks) => {
     const auto = autoRowHeights(next, nextLooks.deco, sheetGeometry(next).cols);
     Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color, rowDesc: rowDescents(next, nextLooks.deco) }, sheetGeometry(next, { auto }));
-    view.setAttribute('aria-label', nextLabel);
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));
     setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': COLHEAD_H });
     setVars(canvas, { '--oxe-sheet-w': st.rowHeadW + st.cols.end, '--oxe-sheet-h': COLHEAD_H + st.rows.end });
+  };
+  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color }) => {
+    measure(next, nextLooks);
+    view.setAttribute('aria-label', nextLabel);
     view.scrollTop = 0;
     view.scrollLeft = 0;
     draw(st, true);
@@ -370,6 +390,46 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {} }) {
       view.scrollLeft = st.cols.start(c);
       draw(st);
     },
+    /** Show a selection (selection.js; null for none) and draw it. */
+    setSelection(sel) {
+      st.sel = sel;
+      draw(st, true);
+    },
+    /** The cell under a point of the page: { r, c }, -1 for a heading (or null outside the grid). */
+    hitTest(clientX, clientY) {
+      const rect = view.getBoundingClientRect();
+      const lx = clientX - rect.left;
+      const ly = clientY - rect.top;
+      if (lx < 0 || ly < 0 || lx > view.clientWidth || ly > view.clientHeight) return null;
+      return {
+        r: ly < COLHEAD_H ? -1 : st.rows.indexAt(ly - COLHEAD_H + view.scrollTop),
+        c: lx < st.rowHeadW ? -1 : st.cols.indexAt(lx - st.rowHeadW + view.scrollLeft),
+      };
+    },
+    /** A cell's box in the sheet's coordinates (the overlay's): { x, y, w, h }. */
+    cellRect: (r, c) => ({ x: st.cols.start(c), y: st.rows.start(r), w: st.cols.size(c), h: st.rows.size(r) }),
+    /** Scroll as little as needed for cell (r, c) to be in full view, past the headings. */
+    scrollIntoView(r, c) {
+      const x = st.cols.start(c);
+      const y = st.rows.start(r);
+      const w = view.clientWidth - st.rowHeadW;
+      const h = view.clientHeight - COLHEAD_H;
+      if (x < view.scrollLeft) view.scrollLeft = x;
+      else if (x + st.cols.size(c) > view.scrollLeft + w) view.scrollLeft = x + st.cols.size(c) - w;
+      if (y < view.scrollTop) view.scrollTop = y;
+      else if (y + st.rows.size(r) > view.scrollTop + h) view.scrollTop = y + st.rows.size(r) - h;
+      draw(st, true);
+    },
+    /** Rows in view, for paging. */
+    rowsInView: () => Math.max(1, st.rows.indexAt(view.scrollTop + view.clientHeight - COLHEAD_H) - st.rows.indexAt(view.scrollTop)),
+    /** After cells changed: sizes worked out again (row heights follow their fonts), drawn where the view is. */
+    refresh() {
+      measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
+      draw(st, true);
+    },
+    setReadOnly: (flag) => view.setAttribute('aria-readonly', String(flag)),
+    /** The overlay element, which an in-cell editor joins. */
+    overlay,
     /** Where a column and a row start and how large they are, in pixels (for tests and, later, layout checks). */
     geometry: () => ({ rows: st.rows, cols: st.cols, rowHeadW: st.rowHeadW, colHeadH: COLHEAD_H }),
     destroy() {
