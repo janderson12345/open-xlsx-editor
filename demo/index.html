@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>open-xlsx-editor demo</title>
+<link rel="stylesheet" href="./dist/open-xlsx-editor.css">
+<style>
+  html, body { margin: 0; height: 100%; font-family: 'Segoe UI', system-ui, sans-serif; background: #ffffff; color: #1b1b1b; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  .bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 8px 16px; border-bottom: 1px solid #c8c8c8; }
+  .bar h1 { font-size: 16px; margin: 0; font-weight: 600; }
+  #host { flex: 1; min-height: 0; }
+  .drop { outline: 3px dashed #2b6cdf; outline-offset: -8px; }
+  @media (prefers-color-scheme: dark) {
+    html, body { background: #1f1f1f; color: #f0f0f0; }
+    .bar { border-bottom-color: #4a4a4a; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <h1>open-xlsx-editor</h1>
+    <label>Open a workbook <input type="file" accept=".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
+    <span id="status" role="status">Drop an .xlsx file here or choose one.</span>
+  </header>
+  <main id="host"></main>
+</div>
+<script type="module" src="./dist/demo.js"></script>
+</body>
+</html>

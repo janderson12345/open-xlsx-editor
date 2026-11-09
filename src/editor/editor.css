@@ -1,0 +1,178 @@
+/* open-xlsx-editor. A host page may set these on .oxe-root (or an ancestor) to restyle the editor:
+ *   --oxe-bg            the sheet's background            --oxe-fg            cell text
+ *   --oxe-gridline      gridlines                         --oxe-head-bg       row and column headings
+ *   --oxe-head-fg       heading text                      --oxe-head-line     lines between headings
+ *   --oxe-font          the cell font stack (Calibri, then its metric-compatible stand-in Carlito)
+ *   --oxe-ui-font       headings and other chrome
+ * Light and dark follow the system unless data-theme="light" or "dark" is set on .oxe-root.
+ * Geometry (--oxe-x, --oxe-y, --oxe-w, --oxe-h and the sheet size) is set by the grid; cell text size by celltext.js. */
+
+.oxe-root {
+  --oxe-bg: #ffffff;
+  --oxe-fg: #000000;
+  --oxe-gridline: #d4d4d4;
+  --oxe-head-bg: #f3f3f3;
+  --oxe-head-fg: #333333;
+  --oxe-head-line: #c8c8c8;
+  --oxe-focus: #1a73e8;
+  --oxe-font: Calibri, Carlito, 'Liberation Sans', Arial, sans-serif;
+  --oxe-ui-font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  background: var(--oxe-bg);
+  color: var(--oxe-fg);
+}
+@media (prefers-color-scheme: dark) {
+  .oxe-root:not([data-theme="light"]) {
+    --oxe-bg: #1f1f1f;
+    --oxe-fg: #f0f0f0;
+    --oxe-gridline: #3d3d3d;
+    --oxe-head-bg: #2b2b2b;
+    --oxe-head-fg: #d6d6d6;
+    --oxe-head-line: #4a4a4a;
+    --oxe-focus: #8ab4f8;
+  }
+}
+.oxe-root[data-theme="dark"] {
+  --oxe-bg: #1f1f1f;
+  --oxe-fg: #f0f0f0;
+  --oxe-gridline: #3d3d3d;
+  --oxe-head-bg: #2b2b2b;
+  --oxe-head-fg: #d6d6d6;
+  --oxe-head-line: #4a4a4a;
+  --oxe-focus: #8ab4f8;
+}
+
+/* The scrolling view and the sheet-sized canvas inside it. */
+.oxe-grid {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--oxe-bg);
+}
+.oxe-grid:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: -2px;
+}
+.oxe-sheet {
+  position: relative;
+  width: var(--oxe-sheet-w);
+  height: var(--oxe-sheet-h);
+}
+
+/* Headings: the column headings stick to the top, each row's heading to the left, the corner to both. */
+.oxe-colheads {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: var(--oxe-colhead-h);
+  width: var(--oxe-sheet-w);
+}
+.oxe-corner {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  width: var(--oxe-rowhead-w);
+  height: var(--oxe-colhead-h);
+  box-sizing: border-box;
+  background: var(--oxe-head-bg);
+  border-right: 1px solid var(--oxe-head-line);
+  border-bottom: 1px solid var(--oxe-head-line);
+}
+.oxe-colhead,
+.oxe-rowhead {
+  box-sizing: border-box;
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 12px/1 var(--oxe-ui-font);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.oxe-colhead {
+  position: absolute;
+  top: 0;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
+  width: var(--oxe-w);
+  height: var(--oxe-colhead-h);
+  border-right: 1px solid var(--oxe-head-line);
+  border-bottom: 1px solid var(--oxe-head-line);
+}
+.oxe-rows,
+.oxe-lines {
+  position: absolute;
+  top: var(--oxe-colhead-h);
+  left: 0;
+  width: var(--oxe-sheet-w);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+}
+.oxe-row {
+  position: absolute;
+  left: 0;
+  top: var(--oxe-y);
+  width: var(--oxe-sheet-w);
+  height: var(--oxe-h);
+}
+.oxe-rowhead {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: var(--oxe-rowhead-w);
+  height: 100%;
+  border-right: 1px solid var(--oxe-head-line);
+  border-bottom: 1px solid var(--oxe-head-line);
+}
+
+/* Gridlines: each cell's right and bottom pixel. */
+.oxe-vline,
+.oxe-hline {
+  position: absolute;
+  background: var(--oxe-gridline);
+}
+.oxe-vline {
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
+  top: var(--oxe-y);
+  width: 1px;
+  height: var(--oxe-h);
+}
+.oxe-hline {
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
+  top: var(--oxe-y);
+  width: var(--oxe-w);
+  height: 1px;
+}
+
+/* Cells: bottom-aligned (Excel's default), text left, numbers right, booleans and errors centred, never wrapped. */
+.oxe-cell {
+  position: absolute;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
+  top: var(--oxe-y);
+  width: var(--oxe-w);
+  height: calc(var(--oxe-h) - 1px);
+  box-sizing: border-box;
+  padding: 0 2px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  white-space: pre;
+  font-family: var(--oxe-font);
+  font-size: var(--oxe-cell-fs);
+  line-height: var(--oxe-cell-lh);
+  color: var(--oxe-fg);
+}
+.oxe-cell.oxe-num {
+  justify-content: flex-end;
+}
+.oxe-cell.oxe-center {
+  justify-content: center;
+}
+.oxe-cell.oxe-merged {
+  height: calc(var(--oxe-h) - 1px);
+  width: calc(var(--oxe-w) - 1px);
+  background: var(--oxe-bg);
+}

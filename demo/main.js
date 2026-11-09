@@ -1,0 +1,29 @@
+// The demo page: open an .xlsx from the file input or by dropping it, show it read-only. `window.oxe` is the editor's
+// API, which the browser tests drive.
+import { mountXlsxEditor } from '../src/index.js';
+
+const host = document.getElementById('host');
+const status = document.getElementById('status');
+const input = document.querySelector('input[type=file]');
+const editor = mountXlsxEditor(host);
+window.oxe = editor;
+
+async function openFile(file) {
+  try {
+    editor.open(new Uint8Array(await file.arrayBuffer()), file.name);
+    const wb = editor.workbook;
+    status.textContent = `${file.name}: sheet "${wb.sheets[editor.sheetIndex].name}" of ${wb.sheets.length}`;
+  } catch (e) {
+    status.textContent = `Could not open ${file.name}: ${e.message}`;
+  }
+}
+
+input.addEventListener('change', () => input.files[0] && openFile(input.files[0]));
+document.addEventListener('dragover', (e) => { e.preventDefault(); document.body.classList.add('drop'); });
+document.addEventListener('dragleave', () => document.body.classList.remove('drop'));
+document.addEventListener('drop', (e) => {
+  e.preventDefault();
+  document.body.classList.remove('drop');
+  const file = e.dataTransfer.files[0];
+  if (file) openFile(file);
+});
