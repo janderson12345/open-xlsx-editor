@@ -14,7 +14,8 @@ npm run test:e2e    # Chromium: open each fixture in the demo, scroll the grid, 
 node tools/check-ooxml.mjs test/fixtures test/out   # structural check of the fixtures and the files the tests saved
 ```
 
-The browser tests need Playwright's Chromium: `npx playwright install chromium`.
+The browser tests need Node 20 or later (Playwright) and a Chromium: `npx playwright install chromium`, or point
+`CHROMIUM_PATH` at an installed Edge or Chrome.
 CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull request.
 
 ## Where things are
