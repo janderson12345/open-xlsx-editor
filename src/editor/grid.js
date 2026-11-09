@@ -7,6 +7,8 @@
 // written for state.
 import { Axis } from './axis.js';
 import { decorations } from './decor.js';
+import { autoRowHeights, rowDescents } from './rowheights.js';
+import { fontDescentPx } from './fonts.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -34,8 +36,9 @@ export const div = (cls, role) => {
 
 /** The grid's rows and columns for a sheet: sizes from its rows, cols and defaults, hidden ones of no size. With
  *  `print`, columns and rows at their printed sizes (units.js printColPx, printRowPx, which needs the Normal style's
- *  typeface) instead of their sizes on screen. */
-export function sheetGeometry(sheet, { print = false, normalFamily } = {}) {
+ *  typeface) instead of their sizes on screen. With `auto` (rowheights.js), rows without customHeight take Excel's
+ *  own heights instead of their stored `ht`. */
+export function sheetGeometry(sheet, { print = false, normalFamily, auto = null } = {}) {
   const colPx = print ? printColPx : (px) => px;
   const rowPx = print ? (pt) => printRowPx(pt, normalFamily) : rowHeightToPx;
   const rowCount = Math.min(MAX_ROWS, Math.max(sheet.maxRow + 1 + PAD_ROWS, 200));
@@ -44,8 +47,9 @@ export function sheetGeometry(sheet, { print = false, normalFamily } = {}) {
   for (const [r, info] of sheet.rows) {
     if (r >= rowCount) continue;
     if (info.hidden) rowSizes.set(r, 0);
-    else if (info.ht != null) rowSizes.set(r, rowPx(info.ht));
+    else if (info.ht != null && (!auto || info.customHeight)) rowSizes.set(r, rowPx(info.ht));
   }
+  if (auto) for (const [r, pt] of auto) if (r < rowCount && !rowSizes.has(r)) rowSizes.set(r, rowPx(pt));
   const colSizes = new Map();
   for (const col of sheet.cols) {
     for (let c = col.min; c <= Math.min(col.max, colCount - 1); c++) {
@@ -178,6 +182,11 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     }
   }
   const vars = { '--oxe-x': x, '--oxe-y': st.rows.start(r) - rowTop, '--oxe-w': w, '--oxe-h': hgt };
+  // Bottom-aligned text sits on its row's baseline, which the row's tallest font sets (rowheights.js rowDescents).
+  if (!wrap && align.vertical !== 'top' && align.vertical !== 'center' && look && st.rowDesc) {
+    const lift = (st.rowDesc.get(r) ?? 0) - fontDescentPx(look.font.family, look.font.sizePx);
+    if (lift > 0.01) vars['--oxe-row-shift'] = -lift;
+  }
   if (align.indent && h !== 'center') {
     el.classList.add(h === 'right' ? 'oxe-indent-r' : 'oxe-indent-l');
     vars['--oxe-indent'] = align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen);
@@ -330,7 +339,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {} }) {
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
   const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color }) => {
-    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color }, sheetGeometry(next));
+    const auto = autoRowHeights(next, nextLooks.deco, sheetGeometry(next).cols);
+    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color, rowDesc: rowDescents(next, nextLooks.deco) }, sheetGeometry(next, { auto }));
     view.setAttribute('aria-label', nextLabel);
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));

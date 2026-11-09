@@ -167,6 +167,7 @@
    (celltext.js); the cell itself only places it. */
 .oxe-tx {
   position: relative;
+  top: var(--oxe-row-shift, 0px);
   white-space: pre;
   line-height: var(--oxe-cell-lh);
 }

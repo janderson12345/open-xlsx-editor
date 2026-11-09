@@ -26,14 +26,12 @@ export function fontStack(name) {
   return [name, ...(STAND_INS[name.toLowerCase()] || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
 }
 
-/** Where Excel's baseline sits above the cell's bottom edge, beyond the descent of the font the browser draws:
- *  0.15px for a font drawn as itself (test/fixtures/fonts.xlsx: Calibri 11 to 20, Cambria, Arial, Times New Roman;
- *  small sizes sit higher, Calibri 8 by 1.1px, Courier New lower), and for Aptos Narrow, drawn in Calibri, 0.85px:
- *  Excel's Aptos Narrow baseline is that much higher than Calibri's descent (large.xlsx, 100,000 cells, rows
- *  validated over 43 steps; runs 8 -> 9: baselines within 1px 81.8% -> 100.0%). Run 13 showed the 0.85 is Aptos
- *  Narrow's, not the browser's: applied to Calibri workbooks it put fonts.xlsx's baselines 0.7px high. */
-const BASELINE_ABOVE_DESCENT = 0.15;
-const BASELINE_STAND_IN = { 'aptos narrow': 0.85 };
+/** Where Excel's baseline sits above the cell's bottom edge, beyond the font's Windows descent: 0.9px. Read off
+ *  Excel's PDF of test/fixtures/rows.xlsx, where fills give every row's bottom exactly: Calibri 11, 14 and 20, Arial 14,
+ *  Times New Roman 16 and Cambria 20 all within about 0.3px of it (Calibri 36 sits 0.6px higher, Courier New lower);
+ *  large.xlsx, drawn in Aptos Narrow, fitted 0.85 independently. An earlier 0.15 came from fonts.xlsx's rows, whose
+ *  positions carried the drift of an early row-height fit. */
+const BASELINE_ABOVE_DESCENT = 0.9;
 
 /** Top-aligned text's baseline is the font's Windows ascent plus this far below the row's top (Excel's PDF of
  *  test/fixtures/align.xlsx, Calibri 11 in a 45pt row: 14.76px = 13.96 + 0.8). */
@@ -48,7 +46,7 @@ function fontMetrics(name, sizePx) {
   const m = own || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   return {
     ha: m.hhea[0] * sizePx, hd: m.hhea[1] * sizePx, wa: m.win[0] * sizePx, wd: m.win[1] * sizePx,
-    base: own ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT,
+    base: BASELINE_ABOVE_DESCENT,
   };
 }
 
@@ -76,8 +74,15 @@ export function cellTextMetrics(name, sizePx, pitch) {
   return { lh, top: TOP_INSET + f.wa - chromeTop(lh), mid, wrap: wrap(pitch.screen), printWrap: wrap(pitch.print) };
 }
 
-/** The font's Windows ascent + descent in px (the height Excel sizes rows by). */
-export const fontMetricsWinLine = (name, sizePx) => {
-  const f = fontMetrics(name, sizePx);
-  return f.wa + f.wd;
-};
+/** A font's Windows descent in px (where Excel's baseline sits above a row's bottom, plus BASELINE_ABOVE_DESCENT). */
+export const fontDescentPx = (name, sizePx) => fontMetrics(name, sizePx).wd;
+
+/** A font's row height in px, the height Excel gives a row of it (and the pitch of its wrapped lines): its line,
+ *  the larger of Windows ascent + descent and hhea ascent + descent + gap, plus 1.6px and 0.035 of its size, rounded.
+ *  Fitted on Excel's PDF of test/fixtures/rows.xlsx: Calibri 11, 14, 20, 36 (15, 18.75, 26.25, 46.5pt), Cambria 20
+ *  (25.5), Times New Roman 16 (20.25), Arial 14 (18), all exact; a fit, not Excel's own formula. */
+export function fontRowPx(name, sizePx) {
+  const key = name.toLowerCase();
+  const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
+  return Math.round(Math.max(m.win[0] + m.win[1], m.line) * sizePx + 1.6 + 0.035 * sizePx);
+}

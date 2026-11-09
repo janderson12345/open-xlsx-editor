@@ -39,13 +39,22 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   and for Aptos Narrow, which browsers don't have (Office keeps it in its own cloud-font cache), Calibri: as wide
   within a pixel. Each cell format is a CSS class (`cellstyles.js`). Runs 5 -> 9: text width within 1px 0.3% ->
   99.0% of all cells; fonts.xlsx 30 -> 53 of 55.
-- **Printed baseline** (*measured*). Excel puts bottom-aligned text's baseline the font's Windows descent plus about
-  0.15px above the row's bottom (fonts.xlsx: Calibri 11 to 20, Cambria, Arial, Times New Roman; Calibri 8 sits 1.1px
-  higher, Courier New lower), and Aptos Narrow's 0.85px above the descent of Calibri, its stand-in (large.xlsx).
-  Chromium places text by the font's hhea ascent and descent with half the leading above and below and snaps the
-  baseline to whole pixels; the line height is solved for Excel's baseline (`cellLineHeight`). Runs 8 -> 9 (Aptos
-  Narrow) baselines within 1px 81.8% -> 100.0%; run 14 (Calibri at 0.15 instead of 0.85) fonts.xlsx both ways 34 ->
-  37 of 55. What is left there is Calibri 8, Courier New, and Chromium's whole-pixel snapping.
+- **Printed baseline** (*measured*). Excel puts all the bottom-aligned text of a row on one baseline: the Windows
+  descent of the row's tallest font plus 0.9px above the row's bottom (rows.xlsx, whose fills give every row's bottom
+  exactly: Calibri 11, 14, 20, Arial 14, Times New Roman 16, Cambria 20 within about 0.3px of it; Calibri 36 0.6px
+  higher, Courier New lower). Smaller text in the row is lifted onto it (`rowheights.js rowDescents`); a styled empty
+  cell's font counts. Chromium places text by the font's hhea ascent and descent with half the leading above and
+  below and snaps the baseline to whole pixels; the line height is solved for Excel's baseline (`cellLineHeight`).
+  Runs 21 -> 27: numfmt.xlsx both ways 1516 -> 1583 of 1583, align.xlsx 30 -> 32 of 32. (An earlier 0.15 came from
+  fonts.xlsx's rows, which carried an early row fit's drift, and a separate 0.85 for Aptos Narrow was the same value.)
+  Open: text in fonts and sizes other than Calibri 11 is placed by a model that drifts (Calibri 20 1.3px low, 36 3.7px
+  low, Arial 14 and Times 16 2px high); fonts.xlsx is 2 cells below its run-21 count for it.
+- **Automatic row heights** (*measured*, rows.xlsx: all 20 rows' fills within 1px). A row without customHeight is as
+  tall as its tallest cell whatever its `ht` says (ht 30 printed at 15pt; ht 10 with a 20pt cell at 26.25pt): the
+  font's row height (`fontRowPx`: round(max(Windows ascent + descent, hhea line) x size + 1.6 + 0.035 x size) px,
+  fitted on Calibri 11, 14, 20, 36, Cambria 20, Times New Roman 16, Arial 14, all exact), times the lines of wrapped
+  text, never below the sheet's default. Styled empty cells count, merged cells don't. Wrapped lines are counted in
+  the screen column's width with the browser's font measurement, and step by the same row height.
 - **Colours** (*measured*). Theme indexes swap the first two pairs (0 lt1, 1 dk1, 2 lt2, 3 dk2, then the accents);
   tints work in Windows' integer HLS (0-240, Microsoft KB Q29240) and reproduce all 8 of fills.xlsx's tints exactly,
   where floating-point HLS misses 5 by a step; indexed colours from the legacy palette or the workbook's own.
@@ -105,6 +114,7 @@ The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures
 14 shapes    fills and borders within 1px 122/153 (79.7%), colour only 26, missing 5
 17 (align)   page counts 8/8 on same page 100465/100465 x within 1px 100459/100465 (100.0%) y within 1px 100447/100465 (100.0%) both 100443/100465 (100.0%) width within 1px 99420/100465 (99.0%)
 21 (numfmt)  page counts 9/9 on same page 102048/102048 x within 1px 102042/102048 (100.0%) y within 1px 101963/102048 (99.9%) both 101959/102048 (99.9%) width within 1px 100924/102048 (98.9%)
+27 (rows)    page counts 10/10 on same page 102094/102094 x within 1px 102082/102094 (100.0%) y within 1px 102067/102094 (100.0%) both 102063/102094 (100.0%) width within 1px 100961/102094 (98.9%)
 ```
 
 Run 3 repeated with no change (3b) gave the same report to the cell: no noise seen on the fixtures. fonts.xlsx joined
@@ -124,7 +134,6 @@ against Excel). All of this so far is on generated fixtures; the numbers that ma
 
 - Text rotation, shrink-to-fit, conditional formats and East Asian date formats are not drawn yet.
 - Row and column styles (a whole column's fill) are not applied to cells that aren't in the file.
-- Row heights don't grow to the tallest font in the row (rows without `ht` use the sheet default).
 - The maximum digit width is fixed at 7px (right for Calibri 11 and Aptos Narrow 11); other Normal fonts need theirs.
 - Gridlines show under text that runs on into empty cells; Excel hides them there.
 - The grid ends 100 rows and 10 columns past the used range; Excel's goes on to row 1,048,576 and column XFD.

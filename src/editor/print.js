@@ -5,6 +5,7 @@
 // against Excel's own PDFs.
 import { sheetGeometry, cellElement, mergeAt, setVars, div, fitNumbers } from './grid.js';
 import { decorations } from './decor.js';
+import { autoRowHeights, rowDescents } from './rowheights.js';
 
 const DPI = 96;
 
@@ -75,9 +76,11 @@ function drawPage(st, block, layout) {
  *  `looks` gives cell format classes and decorations (cellstyles.js), `normalFamily` the Normal style's typeface (printed row
  *  heights depend on it). Returns the number of pages. */
 export function renderPrint(root, sheet, looks = {}, normalFamily = undefined) {
-  const geometry = sheetGeometry(sheet, { print: true, normalFamily });
+  const screen = sheetGeometry(sheet);
+  const auto = autoRowHeights(sheet, looks.deco, screen.cols);
+  const geometry = sheetGeometry(sheet, { print: true, normalFamily, auto });
   const layout = paginate(sheet, geometry);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: sheetGeometry(sheet).cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, print: true };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, rowDesc: rowDescents(sheet, looks.deco), print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');

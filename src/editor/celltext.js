@@ -3,20 +3,18 @@
 // the grid looks the same whatever the host page sets (LESSONS.md section 4: in standards mode every line box gets a
 // strut of its parent's font, and an inherited line-height moves text).
 import { ptToPx, printRowPx } from '../ooxml/units.js';
-import { cellTextMetrics, fontMetricsWinLine } from './fonts.js';
+import { cellTextMetrics, fontRowPx } from './fonts.js';
 
 const px3 = (v) => `${+v.toFixed(3)}px`;
 
-/** A font's default row height in screen pixels: its Windows ascent + descent rounded up, plus 2 (Calibri 11: 18 + 2 =
- *  20px, 15pt). Wrapped lines step by it. (Measured for Calibri 11 only.) */
-export const defaultRowPx = (family, sizePx) => Math.ceil(fontMetricsWinLine(family, sizePx)) + 2;
 
 /** The custom properties that size and place cell text (fonts.js cellTextMetrics): font size, line height, the shifts
  *  for top- and middle-aligned text, and wrapped text's pitch and shifts on screen (--oxe-wrap-*) and in print
  *  (--oxe-pwrap-*). `normalFamily` is the workbook's Normal font, which printed row heights depend on. */
 export function cellTextVars(sizePt, family, normalFamily) {
   const px = ptToPx(sizePt);
-  const rowPx = defaultRowPx(family, px);
+  // (Wrapped lines step by the font's row height: fonts.js fontRowPx.)
+  const rowPx = fontRowPx(family, px);
   const m = cellTextMetrics(family, px, { screen: rowPx, print: printRowPx(rowPx * 0.75, normalFamily) });
   return {
     '--oxe-cell-fs': `${px}px`, '--oxe-cell-lh': px3(m.lh), '--oxe-top-shift': px3(m.top), '--oxe-mid-shift': px3(m.mid),

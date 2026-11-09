@@ -34,9 +34,8 @@ test('font stacks: metric-compatible stand-ins, Calibri for Aptos Narrow, a gene
   assert.equal(fontStack('Aptos Narrow'), "'Aptos Narrow', Calibri, Carlito, sans-serif");
   assert.equal(fontStack('Times New Roman'), "'Times New Roman', 'Liberation Serif', Tinos, serif");
   assert.equal(fontStack('Courier New'), "'Courier New', 'Liberation Mono', Cousine, monospace");
-  // A font not in the metrics table is laid out by its stand-in's metrics (the font the browser draws); Aptos Narrow's
-  // baseline sits 0.7px higher than Calibri's in Excel, so its line is 1.4px taller (half of it goes below the text).
-  assert.ok(Math.abs(cellLineHeight('Aptos Narrow', 14.667) - cellLineHeight('Calibri', 14.667) - 1.4) < 1e-9);
+  // A font not in the metrics table is laid out by its stand-in's metrics (the font the browser draws).
+  assert.equal(cellLineHeight('Aptos Narrow', 14.667), cellLineHeight('Calibri', 14.667));
 });
 
 test('printed rows by the Normal style\'s font: Aptos Narrow in 600 dpi device pixels, Calibri x 1.291, others in points', () => {

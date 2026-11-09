@@ -71,7 +71,12 @@ export function applyCellStyles(root, workbook) {
       css.push(`${scope} .${cls} { --oxe-es: ${LINE[side.style] || 'solid'}; --oxe-ec: ${color}; }`);
       sides.push({ name, style: side.style, cls });
     }
-    return { fill, fillClass: `oxe-f${i}`, sides, align: xf.align, code: formatCodeOf(styles, i) };
+    const f = styles.fonts[xf.fontId];
+    const family = fontFamily(f, theme);
+    const sizePx = (f.size * 4) / 3;
+    // (The font as canvas text measures it, for counting wrapped lines: rowheights.js.)
+    const fontCss = `${f.i ? 'italic ' : ''}${f.b ? 'bold ' : ''}${sizePx}px ${fontStack(family)}`;
+    return { fill, fillClass: `oxe-f${i}`, sides, align: xf.align, code: formatCodeOf(styles, i), font: { family, sizePx, css: fontCss } };
   });
   let el = root.querySelector(':scope > style.oxe-styles');
   if (!el) {
