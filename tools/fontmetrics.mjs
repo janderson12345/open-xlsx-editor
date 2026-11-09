@@ -1,13 +1,13 @@
 // Reads the vertical metrics of the fonts installed on this machine (TrueType/OpenType files and collections) and writes
-// them as a table of numbers for the layout engine (src/engine/metrics.json). Only numbers leave the font files: the
-// fonts themselves are never copied. Word's single line for a font is its hhea ascender + descender + line gap, its
+// them as a table of numbers for the layout engine (src/engine/metrics.js, a module so that it imports anywhere; a
+// .json name writes plain JSON). Only numbers leave the font files: the fonts themselves are never copied. Word's single line for a font is its hhea ascender + descender + line gap, its
 // baseline the ascender + line gap below the line's top (checked against Word's PDFs: Calibri 1.2207em, Times New Roman
 // 1.1499em).
 // usage: node tools/fontmetrics.mjs [out.json] [fontDir ...]
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const out = process.argv[2] || 'src/engine/metrics.json';
+const out = process.argv[2] || 'src/engine/metrics.js';
 const dirs = process.argv.length > 3 ? process.argv.slice(3) : [
   'C:/Windows/Fonts',
   join(process.env.LOCALAPPDATA || '', 'Microsoft/Windows/Fonts'),
@@ -81,5 +81,6 @@ for (const dir of dirs) {
 }
 for (const v of Object.values(fonts)) delete v.regular;
 const sorted = Object.fromEntries(Object.entries(fonts).sort((a, b) => a[0].localeCompare(b[0])));
-writeFileSync(out, JSON.stringify(sorted, null, 0).replace(/\},"/g, '},\n"') + '\n');
+const table = JSON.stringify(sorted, null, 0).replace(/\},"/g, '},\n"');
+writeFileSync(out, out.endsWith('.json') ? table + '\n' : `// Vertical metrics of installed fonts, written by tools/fontmetrics.mjs (numbers only; no font is copied).\nexport default ${table};\n`);
 console.log(`${Object.keys(sorted).length} families -> ${out}`);

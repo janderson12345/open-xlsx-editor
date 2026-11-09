@@ -1,4 +1,5 @@
-{"agency fb":{"line":1.1841,"ascent":0.9839,"hhea":[0.9839,0.2002,0],"win":[0.9224,0.2002],"typo":[0.7642,0.1802,0.0801,false]},
+// Vertical metrics of installed fonts, written by tools/fontmetrics.mjs (numbers only; no font is copied).
+export default {"agency fb":{"line":1.1841,"ascent":0.9839,"hhea":[0.9839,0.2002,0],"win":[0.9224,0.2002],"typo":[0.7642,0.1802,0.0801,false]},
 "algerian":{"line":1.3198,"ascent":1.0962,"hhea":[0.8882,0.2236,0.208],"win":[0.8882,0.2236],"typo":[0.8882,0.2236,0.208,false]},
 "arial":{"line":1.1499,"ascent":0.938,"hhea":[0.9053,0.2119,0.0327],"win":[0.9053,0.2119],"typo":[0.728,0.2104,0.1499,false]},
 "arial rounded mt bold":{"line":1.1572,"ascent":0.9463,"hhea":[0.9463,0.2109,0],"win":[0.9463,0.2109],"typo":[0.728,0.21,0.1318,false]},
@@ -208,4 +209,4 @@
 "wingdings 2":{"line":1.0542,"ascent":0.8433,"hhea":[0.8433,0.2109,0],"win":[0.8433,0.2109],"typo":[0.771,-0.2051,0.0239,false]},
 "wingdings 3":{"line":1.1387,"ascent":0.9277,"hhea":[0.9277,0.2109,0],"win":[0.9277,0.2109],"typo":[0.771,-0.2051,0.0239,false]},
 "yu gothic":{"line":1.6021,"ascent":1.3799,"hhea":[0.8799,0.2222,0.5],"win":[0.9849,0.3022],"typo":[0.8799,0.1201,0.5,false]},
-"yu gothic ui":{"line":1.3301,"ascent":1.0791,"hhea":[1.0791,0.251,0],"win":[1.0791,0.251],"typo":[0.728,0.2104,0.1313,false]}}
+"yu gothic ui":{"line":1.3301,"ascent":1.0791,"hhea":[1.0791,0.251,0],"win":[1.0791,0.251],"typo":[0.728,0.2104,0.1313,false]}};
