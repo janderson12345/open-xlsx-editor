@@ -1,6 +1,6 @@
 // The text of every PDF in a folder, as JSON beside them: [[key, page, x, baseline y, width], ...] in pixels at 96 dpi
-// from the page's top left, one entry per piece of cell text. Pieces on one baseline that touch (a gap of -0.5 to
-// 1.5pt) are joined, since a PDF may split one cell's text into several runs; the key is the text without spaces, to 40
+// from the page's top left, one entry per piece of cell text. Pieces on one baseline that touch or are a space apart
+// (a gap of -0.5pt to 0.3 em) are joined, since a PDF may split one cell's text into several runs; the key is the text without spaces, to 40
 // characters (what entries are matched by). Excel's PDFs and ours go through this alike.
 // usage: node tools/excel-compare/cells.cjs <pdfDir> <outDir>
 const fs = require('fs');
@@ -24,16 +24,19 @@ const SPACES = new RegExp('[' + String.fromCharCode(92) + 's' + String.fromCharC
         const h = page.view[3];
         const items = (await page.getTextContent()).items
           .filter((it) => it.str)
-          .map((it) => ({ x: it.transform[4], y: h - it.transform[5], w: it.width, s: it.str }))
+          .map((it) => ({ x: it.transform[4], y: h - it.transform[5], w: it.width, s: it.str, size: Math.hypot(it.transform[0], it.transform[1]) }))
           .sort((a, b) => a.y - b.y || a.x - b.x);
         const joined = [];
         let last = null;
         for (const it of items) {
-          // (Excel writes the gap between two cells' text as a run of spaces: a run of only spaces ends a piece.)
-          if (!it.s.trim()) { last = null; continue; }
+          // (Excel writes the gap between two cells' text as a run of spaces, wide: a run of only spaces wider than half an
+          // em ends a piece. A single space, as Chromium writes at a wrapped line's break, doesn't.)
+          if (!it.s.trim()) { if (it.w > 0.5 * it.size) last = null; continue; }
           const gap = last ? it.x - (last.x + last.w) : 0;
-          // (Touching, not overlapping: text clipped by a narrow column overlaps the next cell's, and isn't joined.)
-          if (last && Math.abs(last.y - it.y) <= 0.6 && gap > -0.5 && gap < 1.5) {
+          // (Touching or a space apart, not overlapping: text clipped by a narrow column overlaps the next cell's, and
+          // isn't joined. Chromium writes wrapped words as runs of their own and leaves the space out, a gap of about
+          // 0.23 em in Calibri; the gap between two cells' text is wider than 0.3 em.)
+          if (last && Math.abs(last.y - it.y) <= 0.6 && gap > -0.5 && gap < Math.max(1.5, 0.3 * it.size)) {
             last.s += it.s;
             last.w = it.x + it.w - last.x;
           } else joined.push((last = { ...it }));
