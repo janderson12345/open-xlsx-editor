@@ -82,6 +82,8 @@ export function homeTab(kit, { act, color }) {
   const sheetMenu = (icon, label, title, items) => menu(icon, title, items, { label, big: false });
   const groups = [
     grp('Undo', col(b.undo, b.redo)),
+    grp('Clipboard', btn('📋', 'Paste (Ctrl+V)', f('clipPaste'), { label: 'Paste', big: true }),
+      col(btn('✂', 'Cut (Ctrl+X)', f('clipCut'), { label: 'Cut' }), btn('⧉', 'Copy (Ctrl+C)', f('clipCopy'), { label: 'Copy' }))),
     grp('Font', col(
       line(fontSel, sizeSel, btn('A⁺', 'Increase Font Size', f('stepFont', 1)), btn('A⁻', 'Decrease Font Size', f('stepFont', -1))),
       line(b.bold, b.italic, b.underline, b.strike, bordersBtn, fillBtn, fontColorBtn))),

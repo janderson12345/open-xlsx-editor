@@ -11,6 +11,7 @@ import { refName } from '../ooxml/refs.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
 import { mergeChange } from '../ooxml/mergeops.js';
+import * as clip from '../ooxml/clipops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -67,11 +68,44 @@ export function createCommands(ctx) {
     ctx.changed?.();
     return true;
   }
-  /** Values, formats and merged ranges changed together (a merge, or its undo). */
-  function mergeStep({ contents: ch, styles, merges }) {
-    if (ch.length && !apply(ch, false)) return false;
-    ctx.workbook().setMerges(ctx.sheetIndex(), merges);
-    if (!restyle(styles, false)) { ctx.restyled?.(); ctx.changed?.(); }
+  /** What a cell of any sheet holds, as a change that would put it back. */
+  const contentsOn = (sh, r, c) => {
+    const cell = sh.cells.get(r)?.get(c);
+    if (cell && cell.f != null && cell.f !== '') return { r, c, formula: cell.f };
+    return { r, c, value: cell && cell.f == null ? cell.v ?? null : null };
+  };
+  /** Values, formats and merged ranges changed together, sheet by sheet ([{ sheet (its sheetId), contents, styles,
+   *  merges }]: a merge, a paste, or their undo). Refused, whole, if a cell is part of an array formula. */
+  function applySteps(list) {
+    const wb = ctx.workbook();
+    for (const st of list) {
+      const sh = wb.sheet(indexOf(st.sheet));
+      if (st.contents.some(({ r, c }) => sh.arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1))) { ctx.announce("You can't change part of an array"); return false; }
+    }
+    const circular = [];
+    for (const st of list) {
+      const k = indexOf(st.sheet);
+      if (st.contents.length) circular.push(...wb.apply(k, st.contents).circular);
+      if (st.merges) wb.setMerges(k, st.merges);
+      if (st.styles.length) wb.setStyles(k, st.styles);
+    }
+    ctx.restyled?.();
+    ctx.changed?.();
+    if (circular.length) ctx.announce(`Circular reference: ${circular.map((e) => refName(e.r, e.c)).join(', ')} read themselves and weren't worked out`);
+    return true;
+  }
+  /** Changes of several sheets ([{ si, contents, styles, merges }]) made, as one step of the history. */
+  function runSteps(raw) {
+    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    const wb = ctx.workbook();
+    const list = raw.map((x) => ({ sheet: idOf(x.si), contents: x.contents, styles: x.styles, merges: x.merges }));
+    const before = list.map((x) => {
+      const sh = wb.sheet(indexOf(x.sheet));
+      return { sheet: x.sheet, contents: x.contents.map(({ r, c }) => contentsOn(sh, r, c)), styles: x.styles.map(({ r, c }) => ({ r, c, s: sh.cells.get(r)?.get(c)?.s || 0 })), merges: sh.merges.map((m) => ({ ...m })) };
+    });
+    if (!applySteps(list)) return false;
+    state.undo.push({ sheet: idOf(ctx.sheetIndex()), steps: true, before, after: list });
+    state.redo = [];
     return true;
   }
   /** A format command: formatops.js's function over the selection on the sheet shown. */
@@ -137,18 +171,40 @@ export function createCommands(ctx) {
     merge(kind) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const change = mergeChange(ctx.workbook(), ctx.sheetIndex(), state.sel, kind);
-      if (!change) return false;
-      const sh = sheet();
-      const before = {
-        contents: change.contents.map(({ r, c }) => contents(r, c)),
-        styles: change.styles.map(({ r, c }) => ({ r, c, s: sh.cells.get(r)?.get(c)?.s || 0 })),
-        merges: sh.merges.map((m) => ({ ...m })),
-      };
-      if (!mergeStep(change)) return false;
-      state.undo.push({ sheet: idOf(ctx.sheetIndex()), steps: true, before, after: change });
-      state.redo = [];
+      if (!change || !runSteps([{ si: ctx.sheetIndex(), ...change }])) return false;
       // (The selection becomes the merged area it is in, as the grid shows it.)
       show(state.sel, state.focus);
+      return true;
+    },
+    /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
+     *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
+    copy(cut = false) {
+      if (cut && ctx.readOnly()) { ctx.announce('The workbook is read-only'); return null; }
+      state.clip = clip.snapshot(ctx.workbook(), ctx.sheetIndex(), state.sel, cut);
+      ctx.clipShown?.(state.clip);
+      return state.clip;
+    },
+    cut() { return commands.copy(true); },
+    /** Let the copy or cut go (Esc): its outline goes. */
+    dropClip() {
+      if (!state.clip) return false;
+      state.clip = null;
+      ctx.clipShown?.(null);
+      return true;
+    },
+    /** Paste (Ctrl+V) at the selection: the cells copied or cut here, or, when `text` from the system clipboard isn't
+     *  what was copied here, that text read cell by cell as if typed. A paste of a cut moves the cells and lets the cut
+     *  go. The pasted cells are selected. */
+    paste(text = null) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const mine = state.clip && (text == null || text === state.clip.text || !text) && (!state.clip.cut || state.clip.wb === wb);
+      const steps = mine ? (state.clip.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, state.clip) : text ? clip.pasteText(wb, si, state.sel, text) : null;
+      if (!steps || !runSteps(steps)) return false;
+      if (mine && state.clip.cut) commands.dropClip();
+      const area = steps.find((x) => x.si === si)?.area;
+      if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');
       return true;
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */
@@ -235,7 +291,7 @@ export function createCommands(ctx) {
     // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
     const at = indexOf(entry.sheet);
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
-    const done = entry.steps ? mergeStep(entry[side]) : entry.styles ? restyle(entry[side], false) || true : apply(entry[side], false);
+    const done = entry.steps ? applySteps(entry[side]) : entry.styles ? restyle(entry[side], false) || true : apply(entry[side], false);
     if (!done) { from.push(entry); return false; }
     to.push(entry);
     const first = entry.steps ? { r: state.sel.ar, c: state.sel.ac } : entry[side][0];
@@ -257,6 +313,6 @@ export function createCommands(ctx) {
     canUndo: () => state.undo.length > 0,
     canRedo: () => state.redo.length > 0,
     /** Start again (a new workbook): A1 selected, no history, no sheet's view kept. */
-    reset() { state.undo = []; state.redo = []; state.views.clear(); show(cellSelection(0, 0)); },
+    reset() { state.undo = []; state.redo = []; state.views.clear(); commands.dropClip(); show(cellSelection(0, 0)); },
   };
 }

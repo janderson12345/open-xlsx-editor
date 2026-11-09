@@ -40,15 +40,15 @@ editor.setReadOnly(false);              // switch at any time
 editor.setFeatures({ number: true });
 ```
 
-Tab names: `home` (the other tabs come later). Group names are their labels in lower case with dashes: `undo`, `font`,
-`alignment`, `number`, `cells`, `editing`. A group turned off also turns off its keys (`font: false`: Ctrl+B does
-nothing). F6 moves between the sheet and the ribbon, Esc goes back to the sheet; the ⌃ at the right switches to a
+Tab names: `home` (the other tabs come later). Group names are their labels in lower case with dashes: `undo`,
+`clipboard`, `font`, `alignment`, `number`, `cells`, `editing`. A group turned off also turns off its keys (`font: false`:
+Ctrl+B does nothing; `clipboard: false`: Ctrl+C, X and V). F6 moves between the sheet and the ribbon, Esc goes back to the sheet; the ⌃ at the right switches to a
 one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
 
 - `npm run dev`: the demo at http://localhost:8080 (drag an .xlsx onto it).
 - `CONTRIBUTING.md`: setup and tests. `docs/ARCHITECTURE.md`: the module map. `docs/LAYOUT.md`: matching Excel's
   layout. `docs/CALC.md`: matching Excel's calculation. `docs/SHEETS.md`: matching Excel's sheet operations.
-  `docs/FORMATS.md`: matching Excel's Home tab.
+  `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut and paste.
   `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab.
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
   Word editor modules carry over.

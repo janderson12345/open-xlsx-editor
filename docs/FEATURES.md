@@ -48,7 +48,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Recalculation | Done | 399 of 399 test formulas give Excel's results; about 130 functions. |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
 | Chart sheets | Kept | Tab shown, sheet not opened. |
-| Copy, cut, paste (and paste from Excel or the web) | Missing | |
+| Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |
 | Fill handle, Ctrl+D, Ctrl+R | Missing | |
 | Right-click menu on cells | Missing | |
 | Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
@@ -63,7 +63,8 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Clipboard (`clipboard`) | Cut, Copy, Paste, Paste Special | Missing | |
+| Clipboard (`clipboard`) | Cut, Copy, Paste | Done | As Excel moves formulas, and the formulas that read cut cells. |
+| | Paste Special | Missing | |
 | | Format Painter | Missing | |
 | Undo (`undo`) | Undo, Redo | Done | |
 | Font (`font`) | Font, size, grow and shrink | Done | Grow and Shrink step through Excel's sizes. The font list is a fixed one with the theme's fonts first. |

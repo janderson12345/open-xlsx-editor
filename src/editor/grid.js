@@ -9,7 +9,7 @@ import { Axis } from './axis.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontDescentPx } from './fonts.js';
-import { drawSelection, drawMarks } from './selection.js';
+import { drawSelection, drawMarks, rangeBox } from './selection.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -328,6 +328,11 @@ function draw(st, force = false) {
 
 let gridCount = 0;
 
+/** The outline of the cells copied or cut. */
+function drawClip(st) {
+  st.clipLayer.replaceChildren(...(st.clip ? [rangeBox(st, st.clip.r0, st.clip.c0, st.clip.r1, st.clip.c1, 'oxe-clip')] : []));
+}
+
 /** A grid of one sheet in `host`. Returns the handle the editor and the tests use. */
 export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly = true }) {
   const view = div('oxe-grid', 'grid');
@@ -353,11 +358,12 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   // (Layers of their own for the selection and a formula's ranges: redrawing them leaves an in-cell editor alone.)
   const selLayer = div('oxe-layer');
   const markLayer = div('oxe-layer');
-  overlay.append(selLayer, markLayer);
+  const clipLayer = div('oxe-layer');
+  overlay.append(selLayer, markLayer, clipLayer);
   canvas.append(colheads, lines, fills, body, edges, overlay);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -395,6 +401,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       view.scrollTop = st.rows.start(r);
       view.scrollLeft = st.cols.start(c);
       draw(st);
+    },
+    /** Outline the cells copied or cut, dashed, until they are pasted or let go ({ r0, c0, r1, c1 }; null for none). */
+    setClip(rect) {
+      st.clip = rect;
+      drawClip(st);
     },
     /** Outline a formula's ranges (selection.js drawMarks; [] for none). */
     setMarks(marks) {
@@ -437,11 +448,13 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     refresh() {
       measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
       draw(st, true);
+      drawClip(st);
     },
     /** The workbook's cell formats changed (new ones added): drawn again with them, where the view is. */
     setLooks(nextLooks) {
       measure(st.sheet, nextLooks);
       draw(st, true);
+      drawClip(st);
     },
     /** A cell's text as the grid shows it (a General number to the width of its column). */
     shownText(r, c) {

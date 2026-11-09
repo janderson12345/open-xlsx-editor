@@ -202,6 +202,36 @@ export function shiftFormula(text, dr, dc) {
   });
 }
 
+/**
+ * A formula after cells were cut and pasted (Excel's move), as Excel rewrites it. `here`: the sheet the formula was on;
+ * `home`: the sheet it is on now (moved with the cells, or `here`); `from`: { sheet, r0, c0, r1, c1 }, the cells cut;
+ * `to`: { sheet, dr, dc }, where they went. A reference wholly inside the cut cells moves with them, $ or not; a
+ * reference to a single cell that was pasted over becomes #REF!; other references stay, with their sheet named when
+ * the formula has moved to another sheet. Text that doesn't read as a formula comes back as it was.
+ */
+export function moveRefs(text, { here, home = here, from, to }) {
+  const same = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
+  const over = { r0: from.r0 + to.dr, c0: from.c0 + to.dc, r1: from.r1 + to.dr, c1: from.c1 + to.dc };
+  const inside = (a, r) => a.r0 >= r.r0 && a.r1 <= r.r1 && a.c0 >= r.c0 && a.c1 <= r.c1;
+  try {
+    return mapRefs(text, (t) => {
+      if (t.type !== 'ref' || t.book != null || !t.area) return null;
+      const sheet = t.sheet ?? here;
+      const body = text.slice(t.start + t.prefix.length, t.end);
+      const named = (name, area) => (same(name, home) && t.sheet == null ? '' : sheetPrefix(name)) + area;
+      if (same(sheet, from.sheet) && t.area.kind !== 'cols' && t.area.kind !== 'rows' && inside(t.area, from)) {
+        const a = { ...t.area, r0: t.area.r0 + to.dr, r1: t.area.r1 + to.dr, c0: t.area.c0 + to.dc, c1: t.area.c1 + to.dc };
+        return named(to.sheet, areaText(a));
+      }
+      if (same(sheet, to.sheet) && t.area.kind === 'cell' && inside(t.area, over)) return '#REF!';
+      if (t.sheet == null && !same(here, home)) return sheetPrefix(here) + body;
+      return null;
+    });
+  } catch {
+    return text;
+  }
+}
+
 /** A sheet name as a formula writes it before a reference: plain (Data!) when it reads as a name, quoted otherwise
  *  ('My Data'!, 'A1'!, '2024'!, 'R1C1'!, 'TRUE'!; XFE1, past the last column, stays plain, as Excel has it), an
  *  apostrophe doubled. */

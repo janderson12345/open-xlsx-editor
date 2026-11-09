@@ -322,6 +322,31 @@ await page.focus('.oxe-grid');
 await page.keyboard.press('Control+z');
 check(await value('H22') === 'right' && !(await page.evaluate(() => window.oxe.workbook.sheet(0).merges.some((m) => m.r0 === 21))), 'Ctrl+Z: unmerged, H22 back');
 
+// Copy and paste: C2 (=B2*2) to C30, its reference moved; Esc lets the copy go. Cut J32 and paste at L33: the formula
+// that reads it follows; Ctrl+Z puts it back.
+const formulaAt = (ref) => page.evaluate((ref) => window.oxe.workbook.sheet(0).cells.get(Number(ref.slice(1)) - 1)?.get(ref.charCodeAt(0) - 65)?.f ?? null, ref);
+await page.evaluate(() => window.oxe.select('C2'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+c');
+check(await page.isVisible('.oxe-clip'), 'Ctrl+C: the copied cell outlined');
+await page.evaluate(() => window.oxe.select('C30'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+v');
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).cells.get(29)?.get(2)?.f != null);
+check(await formulaAt('C30') === 'B30*2' && await page.isVisible('.oxe-clip'), 'Ctrl+V: =B30*2 in C30, the copy kept for another paste', await formulaAt('C30'));
+await page.keyboard.press('Escape');
+check(!(await page.isVisible('.oxe-clip')), 'Esc: the copy let go');
+await page.evaluate(() => { window.oxe.enter('J32', 'moved'); window.oxe.enter('K32', '=J32&"!"'); window.oxe.select('J32'); });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+x');
+await page.evaluate(() => window.oxe.select('L33'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+v');
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).cells.get(32)?.get(11)?.v === 'moved');
+check(await value('J32') === null && await formulaAt('K32') === 'L33&"!"' && !(await page.isVisible('.oxe-clip')), 'Ctrl+X, Ctrl+V: moved to L33, the formula that read it follows, the cut let go', await formulaAt('K32'));
+await page.keyboard.press('Control+z');
+check(await value('J32') === 'moved' && await value('L33') === null && await formulaAt('K32') === 'J32&"!"', 'Ctrl+Z: back in J32, the formula too');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

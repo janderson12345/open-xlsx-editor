@@ -630,6 +630,24 @@
   background: transparent;
 }
 
+/* The cells copied or cut, until pasted or let go (Esc): a dashed outline that moves, as Excel's does. */
+.oxe-clip {
+  position: absolute;
+  box-sizing: border-box;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x) - 1px);
+  top: calc(var(--oxe-y) - 1px);
+  width: calc(var(--oxe-w) + 1px);
+  height: calc(var(--oxe-h) + 1px);
+  border: 2px dashed var(--oxe-sel);
+  animation: oxe-ants 0.6s steps(2) infinite;
+}
+@keyframes oxe-ants {
+  50% { border-color: color-mix(in srgb, var(--oxe-sel) 35%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oxe-clip { animation: none; }
+}
+
 /* Editing in a cell (celleditor.js): a box over it in the cell's font, growing with its text. */
 .oxe-editor {
   position: absolute;

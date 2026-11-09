@@ -20,6 +20,7 @@ export { Workbook };
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
 const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
+  clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing' };
 const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
 
@@ -55,6 +56,12 @@ export function mountXlsxEditor(host, options = {}) {
     state.sheetIndex = i;
     state.grid.setSheet(state.workbook.sheet(i), state.workbook.sheets[i].name, state.looks);
     state.tabs.activate(i);
+    showClip();
+  };
+  /** The outline of what was copied or cut, on its own sheet only. */
+  const showClip = () => {
+    const c = state.clip;
+    state.grid.setClip(c && c.si === state.sheetIndex && c.wb === state.workbook ? c.rect : null);
   };
   /** A sheet by index or name (case ignored), as an index (-1 for none). */
   const sheetAt = (sheet) => {
@@ -65,6 +72,8 @@ export function mountXlsxEditor(host, options = {}) {
   /** After sheets changed (commands.js): the tabs again, the sheet shown now at index `now` (-1: it went). */
   const sheetsChanged = (now) => {
     state.sheetIndex = now;
+    // (A copy is let go when sheets change: its sheet may have moved or gone.)
+    state.editing?.commands.run('dropClip');
     state.tabs.set(tabList(state.workbook), now);
     if (now >= 0) state.grid.el.setAttribute('aria-label', state.workbook.sheets[now].name);
   };
@@ -110,6 +119,8 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'renameShownSheet') return sheetActs.rename(i);
     if (name === 'hideShownSheet') return editing().run('hideSheet', i);
     if (name === 'unhideSheet') return sheetActs.unhide();
+    if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
+    if (name === 'clipPaste') return state.editing.pasteIn();
     if (name === 'merge') {
       // (Excel asks first when values would be discarded.)
       const sel = editing().selection;
@@ -182,6 +193,7 @@ export function mountXlsxEditor(host, options = {}) {
           changed: () => options.onChange?.(),
           lookChanged,
           restyled,
+          clipShown: (c) => { state.clip = c; showClip(); },
           shownText: (r, c) => state.grid.shownText(r, c),
           allowed,
         });
