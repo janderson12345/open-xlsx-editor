@@ -352,7 +352,45 @@ function align() {
   });
 }
 
+// A probe for number formats: every format with every value, one pair per row: the pair's number as text in A
+// ("f3v7") and the value in B (40 characters wide) in that format. Built-in formats by id, the rest as custom codes.
+export const PROBE_NUMFMT_BUILTIN = [1, 2, 3, 4, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 37, 38, 39, 40, 45, 46, 47, 48, 49];
+export const PROBE_NUMFMT_CUSTOM = ['0.000', '#,##0.0,,"M"', '$#,##0.00', '[Red]-0.00;[Blue]0.00', '0.00;(0.00);"zero";"text: "@',
+  '[>=100]"big";[<0]"neg";"small"', 'yyyy-mm-dd', 'dddd, mmmm d, yyyy', 'mmm d', 'hh:mm:ss.000', '[mm]:ss', 'h "h" mm "m"',
+  '000-00-0000', '# ?/8', '0.0%', '"Total: "0', '\\$0', '0_);(0)', '#,##0_);[Red](#,##0)', '#', '#.##', '0.#', '???.???',
+  '"x"General', ';;;', 'm/d/yy h:mm AM/PM', '[$-409]mmmm yyyy', '0.00E+00', '##0.00E+0', 'd'];
+export const PROBE_NUMFMT_VALUES = [0, 1, -1, 0.5, 1234.5678, -1234.5678, 0.001234, 1234567.891, 45678.75, 0.75, 2.5, 60, 61, 'text'];
+function numfmts() {
+  const custom = PROBE_NUMFMT_CUSTOM.map((code, i) => `<numFmt numFmtId="${164 + i}" formatCode="${esc(code)}"/>`).join('');
+  const ids = [...PROBE_NUMFMT_BUILTIN, ...PROBE_NUMFMT_CUSTOM.map((_, i) => 164 + i)];
+  const styles = `${DECL}<styleSheet xmlns="${X}"><numFmts count="${PROBE_NUMFMT_CUSTOM.length}">${custom}</numFmts>` +
+    '<fonts count="1"><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>' +
+    '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    `<cellXfs count="${ids.length + 1}"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>` +
+    ids.map((id) => `<xf numFmtId="${id}" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>`).join('') + '</cellXfs>' +
+    '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>';
+  const rows = [];
+  ids.forEach((_, f) => PROBE_NUMFMT_VALUES.forEach((v, k) => {
+    const r = rows.length + 1;
+    const cell = typeof v === 'number' ? `<c r="B${r}" s="${f + 1}"><v>${v}</v></c>` : `<c r="B${r}" s="${f + 1}" t="inlineStr"><is><t>${v}</t></is></c>`;
+    rows.push(`<row r="${r}"><c r="A${r}" t="inlineStr"><is><t>f${f}v${k}</t></is></c>${cell}</row>`);
+  }));
+  write('numfmt.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Formats" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', RT('theme'), 'theme/theme1.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols><col min="2" max="2" width="40.7109375" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': styles,
+    'xl/theme/theme1.xml': THEME,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  numfmts();
   align();
   fills();
   fonts();
