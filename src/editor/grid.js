@@ -230,6 +230,8 @@ function textSpan(shown, clean) {
 }
 
 let measure = null;
+/** The canvas AutoFit measures text with. */
+let fitCtx = null;
 /** Replace formatted numbers wider than their cells with #s, as Excel does (as many as fit). Run once the cells are in
  *  the page, so one layout serves them all; the width is measured in the cell's own font. */
 export function fitNumbers(container) {
@@ -449,6 +451,65 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
       draw(st, true);
       drawClip(st);
+    },
+    /** The heading edge under a point, which a drag resizes: { axis: 'col' | 'row', index, size } (the line before the
+     *  edge), or null. Within 4 pixels of the edge, as Excel's cursor changes. */
+    edgeAt(clientX, clientY) {
+      const rect = view.getBoundingClientRect();
+      const lx = clientX - rect.left;
+      const ly = clientY - rect.top;
+      const near = 4;
+      const find = (axis, pos) => {
+        let i = axis.indexAt(pos);
+        if (pos - axis.start(i) <= near && i > 0) i -= 1;
+        else if (axis.start(i + 1) - pos > near) return null;
+        return i;
+      };
+      if (ly >= 0 && ly < COLHEAD_H && lx >= st.rowHeadW && lx <= view.clientWidth) {
+        const c = find(st.cols, lx - st.rowHeadW + view.scrollLeft);
+        return c == null ? null : { axis: 'col', index: c, size: st.cols.size(c) };
+      }
+      if (lx >= 0 && lx < st.rowHeadW && ly >= COLHEAD_H && ly <= view.clientHeight) {
+        const r = find(st.rows, ly - COLHEAD_H + view.scrollTop);
+        return r == null ? null : { axis: 'row', index: r, size: st.rows.size(r) };
+      }
+      return null;
+    },
+    /** While a heading edge is dragged: a line where the edge will be and Excel's tip ("Width: 20.00 (145 pixels)",
+     *  "Height: 30.00 (40 pixels)"); no axis takes them away. */
+    showGuide(axis, index, size) {
+      st.canvas.querySelectorAll(':scope > .oxe-guide, :scope > .oxe-guide-tip').forEach((el) => el.remove());
+      if (axis == null) return;
+      const line = div('oxe-guide');
+      const tip = div('oxe-guide-tip');
+      if (axis === 'col') {
+        const x = st.rowHeadW + st.cols.start(index) + size;
+        setVars(line, { '--oxe-x': x, '--oxe-y': view.scrollTop, '--oxe-w': 1, '--oxe-h': view.clientHeight });
+        setVars(tip, { '--oxe-x': x + 4, '--oxe-y': view.scrollTop + 2 });
+        tip.textContent = `Width: ${(Math.max(0, size - 5) / MDW).toFixed(2)} (${Math.round(size)} pixels)`;
+      } else {
+        const y = COLHEAD_H + st.rows.start(index) + size;
+        setVars(line, { '--oxe-x': view.scrollLeft, '--oxe-y': y, '--oxe-w': view.clientWidth, '--oxe-h': 1 });
+        setVars(tip, { '--oxe-x': view.scrollLeft + st.rowHeadW + 4, '--oxe-y': y + 4 });
+        tip.textContent = `Height: ${(Math.round(size) * 0.75).toFixed(2)} (${Math.round(size)} pixels)`;
+      }
+      st.canvas.append(line, tip);
+    },
+    /** The pixels AutoFit gives column c: its widest text as shown (a General number in full, the longest line of
+     *  wrapped text), measured in each cell's font, plus 9 of padding (docs/SIZES.md); null when the column is empty. */
+    fitWidth(c) {
+      if (!fitCtx) fitCtx = document.createElement('canvas').getContext('2d');
+      let widest = 0;
+      for (const [r, line] of st.sheet.cells) {
+        const cell = line.get(c);
+        if (!cell || cell.v == null || mergeAt(st, r, c)) continue;
+        const look = st.deco ? st.deco(cell.s || 0) : null;
+        const text = cellDisplay(cell, Infinity, look ? look.code : 'General', st.date1904).text;
+        if (!text) continue;
+        fitCtx.font = look ? look.font.css : '14.6667px sans-serif';
+        for (const part of String(text).split('\n')) widest = Math.max(widest, fitCtx.measureText(part.replace(/\r/g, '')).width);
+      }
+      return widest ? Math.ceil(widest) + 9 : null;
     },
     /** The sheet read again (rows or columns inserted or deleted, or undone): drawn where the view is. */
     setModel(next) {

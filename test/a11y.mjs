@@ -53,6 +53,11 @@ for (const colorScheme of ['light', 'dark']) {
       const borders = await axe();
       t.check(!borders.length, `${colorScheme}: the Borders menu, no axe violations`, borders.join('\n     '));
       await page.keyboard.press('Escape');
+      await page.click('.oxe-toolbar button[title="Format"]');
+      await page.click('.oxe-pop >> text=Row Height...');
+      const sizeBox = await axe();
+      t.check(!sizeBox.length && await page.evaluate(() => document.activeElement.classList.contains('oxe-dialog-field')), `${colorScheme}: the Row Height box, no axe violations, its field focused`, sizeBox.join('\n     '));
+      await page.keyboard.press('Escape');
       const ribbon = await page.evaluate(() => {
         const list = document.querySelector('.oxe-rtablist');
         const tab = list.querySelector('[role=tab]');

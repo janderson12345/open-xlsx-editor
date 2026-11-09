@@ -35,7 +35,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Fonts, fills, borders, alignment, number formats | Done | Shown as measured against Excel's PDFs (docs/LAYOUT.md); changed from the Home tab (below). |
 | Rich text in a cell (runs in several fonts) | Partly | The text is shown in the cell's own font; the runs' formatting isn't. |
 | Merged cells | Done | Navigation steps over them; merged and unmerged from the Home tab. |
-| Hidden rows and columns | Shown | Hidden; no way to unhide yet. |
+| Hidden rows and columns | Done | Hidden and shown from the headings' menu, Format, Ctrl+9 and Ctrl+0 (docs/SIZES.md). |
 | Row heights from fonts and wrapping | Done | As Excel works them out (docs/LAYOUT.md). |
 | Gridlines on or off | Shown | From the sheet's view settings. |
 | Selecting: keys, mouse, Shift, Ctrl+arrow, Ctrl+End | Done | |
@@ -86,8 +86,8 @@ which is dropped when formulas change (Excel rebuilds it).
 | Cells (`cells`) | Insert and delete rows and columns | Partly | Formulas on every sheet, names, chart series, merges, widths and the sheet's ranges follow (docs/ROWCOL.md). Refused for now on a sheet with pictures, charts, comments, tables or pivot tables. |
 | | Insert and delete cells (shifting the rest) | Missing | |
 | | Insert and delete sheets | Done | Cells > Insert, Delete; also on the tab menu. |
-| | Row height, column width (and AutoFit) | Missing | Read and shown; no dragging the headings yet. |
-| | Hide and unhide rows, columns | Missing | Hidden ones are hidden. |
+| | Row height, column width (and AutoFit) | Done | Dragging a heading's edge, double-click and Format's AutoFit, the Row Height and Column Width boxes; stored as Excel stores them. AutoFit's width is within a few pixels of Excel's (docs/SIZES.md). |
+| | Hide and unhide rows, columns | Done | |
 | | Rename, hide and unhide sheet | Done | Cells > Format; moving and tab colour on the tab menu. |
 | Editing (`editing`) | AutoSum | Missing | |
 | | Fill (down, right, series) | Missing | |

@@ -7,7 +7,7 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox } from './editor/dialogs.js';
 import { createRibbon } from './editor/ribbon.js';
 import { homeTab } from './editor/hometab.js';
 import { fontFamily } from './ooxml/styles.js';
@@ -21,6 +21,7 @@ export { Workbook };
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
 const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
+  resizeLines: 'cells', columnWidth: 'cells', rowHeight: 'cells', fitLines: 'cells', hideLines: 'cells', rowHeightBox: 'cells', columnWidthBox: 'cells',
   lines: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing' };
@@ -123,6 +124,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'unhideSheet') return sheetActs.unhide();
     if (name === 'insertRows' || name === 'deleteRows') return editing().run('lines', 'row', name === 'insertRows' ? 1 : -1);
     if (name === 'insertColumns' || name === 'deleteColumns') return editing().run('lines', 'col', name === 'insertColumns' ? 1 : -1);
+    if (name === 'rowHeightBox' || name === 'columnWidthBox') return sizeBox(name === 'rowHeightBox' ? 'row' : 'col');
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
     if (name === 'merge') {
@@ -152,7 +154,24 @@ export function mountXlsxEditor(host, options = {}) {
     const run = (...a) => () => editing().run(...a);
     const ro = state.readOnly;
     menu.open([{ label: 'Insert', run: run('lines', axis, 1), disabled: ro }, { label: 'Delete', run: run('lines', axis, -1), disabled: ro },
-      'separator', { label: 'Clear Contents', run: run('clear'), disabled: ro }], point, { label: axis === 'row' ? 'Row' : 'Column' });
+      'separator', { label: 'Clear Contents', run: run('clear'), disabled: ro }, 'separator',
+      { label: axis === 'row' ? 'Row Height...' : 'Column Width...', run: () => sizeBox(axis), disabled: ro },
+      { label: 'Hide', run: run('hideLines', axis, true), disabled: ro }, { label: 'Unhide', run: run('hideLines', axis, false), disabled: ro }],
+    point, { label: axis === 'row' ? 'Row' : 'Column' });
+  };
+  /** Excel's Row Height or Column Width box for the selection, holding the active cell's row height (points) or column
+   *  width (characters). */
+  const sizeBox = async (axis) => {
+    if (state.readOnly) return false;
+    const s = editing().selection;
+    const g = state.grid.geometry();
+    const rows = axis === 'row';
+    const value = rows ? g.rows.size(s.ar) * 0.75 : Math.max(0, g.cols.size(s.ac) - 5) / 7;
+    const n = await numberBox(root, rows
+      ? { title: 'Row Height', label: 'Row height:', value: String(Math.round(value * 100) / 100), max: 409, refusal: 'Row height must be between 0 and 409.' }
+      : { title: 'Column Width', label: 'Column width:', value: String(Math.round(value * 100) / 100), max: 255, refusal: 'Column width must be between 0 and 255.' });
+    if (n == null) return false;
+    return editing().run(rows ? 'rowHeight' : 'columnWidth', n);
   };
   /** The ribbon showing what the active cell has. */
   const lookChanged = () => {
@@ -220,6 +239,7 @@ export function mountXlsxEditor(host, options = {}) {
           reloaded: () => { state.grid.setModel(state.workbook.sheet(state.sheetIndex)); lookChanged(); },
           lines,
           headerMenu,
+          fitWidth: (c) => state.grid.fitWidth(c),
           shownText: (r, c) => state.grid.shownText(r, c),
           allowed,
         });

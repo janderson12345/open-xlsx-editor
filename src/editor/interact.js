@@ -159,6 +159,8 @@ export function attachEditing(root, ctx) {
     else if (ctrl && (key === 'a' || key === 'A') && !e.shiftKey) cmd.run('selectAll');
     else if (ctrl && (key === '+' || (key === '=' && e.shiftKey))) ctx.lines?.(1);
     else if (ctrl && key === '-') ctx.lines?.(-1);
+    // (Ctrl+9 hides the rows, Ctrl+0 the columns; with Shift they show again. Taken from the key's code: Shift+9 is "(".)
+    else if (ctrl && (e.code === 'Digit9' || e.code === 'Digit0')) cmd.run('hideLines', e.code === 'Digit9' ? 'row' : 'col', !e.shiftKey);
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');
     else if (ctrl && (key === 'y' || ((key === 'z' || key === 'Z') && e.shiftKey))) cmd.run('redo');
     // (Ctrl+C, X and V: the browser's copy and paste go on after the key, so its default isn't stopped.)
@@ -269,14 +271,49 @@ export function attachEditing(root, ctx) {
     if (!whole) cmd.run('selectLines', axis, axis === 'col' ? at.c : at.r);
     ctx.headerMenu?.(axis, { x: e.clientX, y: e.clientY });
   });
+  // A heading edge: the resize cursor over it; dragged, the row or column resized (a guide and Excel's tip while
+  // dragging); double-clicked, AutoFit. Captured before the heading's own selecting.
+  let resizing = null;
+  view.addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || pointing.control) return;
+    const edge = grid.edgeAt(e.clientX, e.clientY);
+    if (!edge) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    view.focus({ preventScroll: true });
+    if (ctx.readOnly()) return;
+    if (e.detail === 2) { cmd.run('fitLines', edge.axis, edge.index); return; }
+    resizing = { ...edge, from: edge.axis === 'col' ? e.clientX : e.clientY, now: edge.size };
+    grid.showGuide(edge.axis, edge.index, edge.size);
+  }, true);
+  view.addEventListener('mousemove', (e) => {
+    if (resizing || dragging || pointingDrag) return;
+    const edge = e.buttons ? null : grid.edgeAt(e.clientX, e.clientY);
+    view.classList.toggle('oxe-resize-col', edge?.axis === 'col');
+    view.classList.toggle('oxe-resize-row', edge?.axis === 'row');
+  });
   const onMove = (e) => {
+    if (resizing) {
+      resizing.now = Math.max(0, resizing.size + (resizing.axis === 'col' ? e.clientX : e.clientY) - resizing.from);
+      grid.showGuide(resizing.axis, resizing.index, resizing.now);
+      return;
+    }
     if (!dragging && !pointingDrag) return;
     const at = grid.hitTest(e.clientX, e.clientY);
     if (!at || at.r < 0 || at.c < 0) return;
     if (pointingDrag) pointing.drag(at.r, at.c);
     else cmd.run('extendTo', at.r, at.c);
   };
-  const onUp = () => { dragging = false; pointingDrag = false; };
+  const onUp = () => {
+    if (resizing) {
+      const r = resizing;
+      resizing = null;
+      grid.showGuide(null);
+      if (Math.round(r.now) !== Math.round(r.size)) cmd.run('resizeLines', r.axis, r.index, r.now);
+    }
+    dragging = false;
+    pointingDrag = false;
+  };
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onUp);
 

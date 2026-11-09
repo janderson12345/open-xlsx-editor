@@ -11,6 +11,7 @@ import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { changeLines } from './rowcol.js';
+import { setColumns, setRows } from './sizes.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 
@@ -241,6 +242,18 @@ export class Workbook {
   /** Insert `n` rows ('row') or columns ('col') of sheet i before index `at`, or delete -n from `at` (rowcol.js; a
    *  refusal throws a SheetError with Excel's words). */
   changeLines(i, axis, at, n) { changeLines(this, i, axis, at, n); }
+
+  /** Rows ('row') or columns ('col') a to b of sheet i resized, hidden or shown (sizes.js setRows and setColumns: { width },
+   *  { height }, { hidden }, { bestFit }); the sheet read again. */
+  setLines(i, axis, a, b, change) {
+    const part = this._part(i);
+    if (axis === 'col') setColumns(part.doc, a, b, change, part.model.format);
+    else setRows(part.doc, a, b, change);
+    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
+    this.resetCalc();
+  }
 
   /** The workbook as it is now, to go back to (restore): the parts, the sheets read so far and the workbook part. */
   snapshot() {

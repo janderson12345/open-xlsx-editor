@@ -373,6 +373,43 @@ check(f11 != null && await value('E11') === f11, 'Delete Sheet Columns: column E
 await page.keyboard.press('Control+z');
 check(await value('F11') === f11, 'Ctrl+Z: column E back');
 
+// Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
+// Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
+const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);
+const colOf = (c) => page.evaluate((c) => window.oxe.workbook.sheet(0).cols.find((x) => x.min <= c && x.max >= c) || null, c);
+await page.evaluate(() => { window.oxe.select('A1'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+const edgeX = (c) => page.evaluate((c) => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); return { x: v.left + geo.rowHeadW + geo.cols.start(c + 1) - 1, y: v.top + geo.colHeadH / 2 }; }, c);
+const bWas = await colPx(1);
+let edge = await edgeX(1);
+await page.mouse.move(edge.x, edge.y);
+await page.mouse.down();
+await page.mouse.move(edge.x + 20, edge.y, { steps: 3 });
+const tip = await page.textContent('.oxe-guide-tip');
+await page.mouse.move(edge.x + 40, edge.y, { steps: 3 });
+await page.mouse.up();
+const bNow = await colPx(1);
+check(bNow === bWas + 40 && (await colOf(1)).width === Math.trunc((bNow / 7) * 256) / 256 && /^Width: [\d.]+ \(\d+ pixels\)$/.test(tip), 'column B dragged 40px wider: its width stored in Excel’s units, Excel’s tip while dragging', `${bWas} -> ${bNow} ${tip}`);
+await page.keyboard.press('Control+z');
+check(await colPx(1) === bWas, 'Ctrl+Z: column B as it was');
+edge = await edgeX(0);
+await page.mouse.dblclick(edge.x, edge.y);
+const colA = await colOf(0);
+check(colA && colA.width > 0 && await colPx(0) > 30, 'column A’s edge double-clicked: AutoFit to its text', JSON.stringify(colA));
+await page.keyboard.press('Control+z');
+await page.evaluate(() => window.oxe.select('A3'));
+await page.focus('.oxe-grid');
+await page.click('.oxe-toolbar button[title="Format"]');
+await page.click('.oxe-pop >> text=Row Height...');
+await page.fill('.oxe-dialog-field', '30');
+await page.keyboard.press('Enter');
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).rows.get(2)?.ht === 30);
+check(await page.evaluate(() => window.oxe.grid.geometry().rows.size(2)) === 40, 'Format, Row Height... 30: row 3 is 30pt (40 pixels)');
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+9');
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).rows.get(2)?.hidden === true && window.oxe.grid.geometry().rows.size(2) === 0), 'Ctrl+9: row 3 hidden');
+await page.keyboard.press('Control+Shift+9');
+check(await page.evaluate(() => window.oxe.grid.geometry().rows.size(2)) === 40, 'Ctrl+Shift+9: shown again, still 30pt');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

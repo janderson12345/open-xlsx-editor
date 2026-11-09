@@ -562,6 +562,34 @@
   margin: 0 0 12px;
   white-space: pre-line;
 }
+.oxe-dialog-field {
+  width: 100%;
+  min-width: 200px;
+  box-sizing: border-box;
+  padding: 3px 6px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+  background: var(--oxe-head-bg);
+  color: inherit;
+  font: inherit;
+}
+.oxe-dialog-field:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-dialog-label {
+  display: block;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  margin-bottom: 4px;
+  white-space: normal;
+}
+.oxe-dialog-note {
+  min-height: 1.2em;
+  margin: 4px 0 0;
+  font-size: 12px;
+}
 .oxe-dialog-list {
   width: 100%;
   min-width: 220px;
@@ -646,6 +674,34 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .oxe-clip { animation: none; }
+}
+
+/* Resizing a row or column from its heading's edge: the cursor, the guide where the edge will be, Excel's tip. */
+.oxe-grid.oxe-resize-col { cursor: col-resize; }
+.oxe-grid.oxe-resize-row { cursor: row-resize; }
+.oxe-guide {
+  position: absolute;
+  z-index: 5;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  width: var(--oxe-w);
+  height: var(--oxe-h);
+  border-left: 1px dashed var(--oxe-fg);
+  border-top: 1px dashed var(--oxe-fg);
+  pointer-events: none;
+}
+.oxe-guide-tip {
+  position: absolute;
+  z-index: 5;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  padding: 2px 6px;
+  border: 1px solid var(--oxe-head-line);
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 12px var(--oxe-ui-font);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 /* Editing in a cell (celleditor.js): a box over it in the cell's font, growing with its text. */

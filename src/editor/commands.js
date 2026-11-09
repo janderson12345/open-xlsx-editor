@@ -12,6 +12,7 @@ import { SheetError, nearest } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
 import { mergeChange } from '../ooxml/mergeops.js';
 import * as clip from '../ooxml/clipops.js';
+import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -106,6 +107,31 @@ export function createCommands(ctx) {
     if (!applySteps(list)) return false;
     state.undo.push({ sheet: idOf(ctx.sheetIndex()), steps: true, before, after: list });
     state.redo = [];
+    return true;
+  }
+  /** The selection's rows or columns, [first, last] (past the used range cut to it, as formatting is), or just line
+   *  `index` when it isn't one of the selected whole lines. */
+  function linesOf(axis, index = null) {
+    const s = state.sel;
+    const sh = sheet();
+    const rows = axis === 'row';
+    const whole = rows ? s.c0 === 0 && s.c1 >= MAX_COLS - 1 : s.r0 === 0 && s.r1 >= MAX_ROWS - 1;
+    const [a, b] = rows ? [s.r0, s.r1] : [s.c0, s.c1];
+    if (index != null && !(whole && index >= a && index <= b)) return [index, index];
+    const last = rows ? (b - a > 10000 ? Math.max(a, Math.min(b, sh.maxRow)) : b) : (b - a > 1000 ? Math.max(a, Math.min(b, sh.maxCol)) : b);
+    return [a, last];
+  }
+  /** Sizes changed by `apply(wb, si)`, as one step of the history (a snapshot of the workbook before and after). */
+  function sizeStep(apply, note) {
+    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    const wb = ctx.workbook();
+    const before = wb.snapshot();
+    apply(wb, ctx.sheetIndex());
+    state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+    state.redo = [];
+    ctx.reloaded?.();
+    ctx.changed?.();
+    ctx.announce(note);
     return true;
   }
   /** A format command: formatops.js's function over the selection on the sheet shown. */
@@ -216,6 +242,38 @@ export function createCommands(ctx) {
       // (The selection becomes the merged area it is in, as the grid shows it.)
       show(state.sel, state.focus);
       return true;
+    },
+    /** A heading edge dragged to `px` pixels: line `index`, or every selected whole line when it is one of them (as
+     *  in Excel). 0 hides. */
+    resizeLines(axis, index, px) {
+      const [a, b] = linesOf(axis, index);
+      const size = Math.max(0, Math.round(px));
+      const change = axis === 'col' ? { width: size ? pxWidth(size) : 0 } : { height: size ? size * 0.75 : 0 };
+      return sizeStep((wb, si) => wb.setLines(si, axis, a, b, change), `${axis === 'col' ? 'Column width' : 'Row height'} changed`);
+    },
+    /** Column Width (characters) and Row Height (points) of the selection's columns or rows; 0 hides. */
+    columnWidth(chars) {
+      const [a, b] = linesOf('col');
+      return sizeStep((wb, si) => wb.setLines(si, 'col', a, b, { width: chars > 0 ? typedWidth(chars) : 0 }), 'Column width changed');
+    },
+    rowHeight(points) {
+      const [a, b] = linesOf('row');
+      return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: points }), 'Row height changed');
+    },
+    /** AutoFit: columns as wide as their widest text (an empty one left as it is); rows back to the height their text
+     *  needs. A heading edge's double click fits line `index` (or the selected lines it is one of). */
+    fitLines(axis, index = null) {
+      const [a, b] = linesOf(axis, index);
+      if (axis === 'row') return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: null }), 'Row height fitted');
+      const widths = [];
+      for (let c = a; c <= b; c++) { const px = ctx.fitWidth?.(c); if (px) widths.push([c, px]); }
+      if (!widths.length) return false;
+      return sizeStep((wb, si) => { for (const [c, px] of widths) wb.setLines(si, 'col', c, c, { width: pxWidth(px), bestFit: true }); }, 'Column width fitted');
+    },
+    /** Hide (Ctrl+9 rows, Ctrl+0 columns) or show again (Ctrl+Shift+9, Ctrl+Shift+0) the selection's rows or columns. */
+    hideLines(axis, hidden = true) {
+      const [a, b] = linesOf(axis);
+      return sizeStep((wb, si) => wb.setLines(si, axis, a, b, { hidden }), `${axis === 'col' ? 'Columns' : 'Rows'} ${hidden ? 'hidden' : 'shown'}`);
     },
     /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
      *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */

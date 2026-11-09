@@ -76,3 +76,45 @@ export function unhideBox(root, names) {
     dlg.append(title, label, list, row);
   });
 }
+
+/** Excel's Row Height and Column Width boxes: a title, a labelled number field holding `value`, OK and Cancel. Resolves
+ *  to the number typed (checked against 0 to `max`: `refusal` said under the field otherwise, and the box kept),
+ *  or null for Cancel and Esc. */
+export function numberBox(root, { title, label, value, max, refusal }) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    const h = document.createElement('h2');
+    h.id = `${id}-title`;
+    h.className = 'oxe-dialog-title';
+    h.textContent = title;
+    const lab = document.createElement('label');
+    lab.className = 'oxe-dialog-text oxe-dialog-label';
+    lab.htmlFor = `${id}-field`;
+    lab.textContent = label;
+    const field = document.createElement('input');
+    field.id = `${id}-field`;
+    field.className = 'oxe-dialog-field';
+    field.inputMode = 'decimal';
+    field.value = value;
+    field.dataset.first = '';
+    const note = document.createElement('p');
+    note.className = 'oxe-dialog-note';
+    note.setAttribute('role', 'alert');
+    const ok = () => {
+      const n = Number(field.value.trim());
+      if (field.value.trim() === '' || !Number.isFinite(n) || n < 0 || n > max) {
+        note.textContent = refusal;
+        field.focus();
+        field.select();
+        return;
+      }
+      done(n);
+    };
+    field.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); ok(); } });
+    const row = document.createElement('div');
+    row.className = 'oxe-dialog-buttons';
+    row.append(button('OK', ok), button('Cancel', () => done(null)));
+    dlg.append(h, lab, field, note, row);
+    setTimeout(() => field.select());
+  });
+}
