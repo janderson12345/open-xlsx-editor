@@ -1,5 +1,5 @@
-// Turning a cell's value into the text a sheet shows. Only Excel's General format so far; format codes (`0.00`,
-// dates, `[Red]`, sections) come with styles.xml's numFmts.
+// Turning a cell's value into the text a sheet shows: Excel's General format here, format codes in format.js.
+import { formatValue } from './format.js';
 
 /** The most characters General uses, not counting a minus sign ("0.333333333", "-0.666666667"). */
 const GENERAL_MAX = 11;
@@ -7,13 +7,13 @@ const GENERAL_MAX = 11;
 /** |n| as Excel holds it, 15 significant decimal digits: { digits: '15', exp: -10 } for 1.5E-10 (value 0.15 x 10^-9:
  *  the point goes after the first digit, times 10^exp). Rounding works on these digits, half up, as Excel rounds:
  *  1.5E-10 to no decimals is 2E-10, where binary rounding gives 1E-10. */
-function decimal(a) {
+export function decimal(a) {
   const [m, e] = a.toExponential(14).split('e');
   return { digits: m.replace('.', '').replace(/0+$/, '') || '0', exp: Number(e) };
 }
 
 /** Round a digit string to `keep` digits, half up; { digits, carried } (carried: it became one digit longer). */
-function roundTo(digits, keep) {
+export function roundTo(digits, keep) {
   if (keep >= digits.length) return { digits, carried: false };
   if (keep < 0) return { digits: '', carried: false };
   const up = digits.charCodeAt(keep) >= 53; // ('5')
@@ -85,12 +85,26 @@ export function formatGeneral(n, width = Infinity) {
   return Number.isFinite(width) ? '#'.repeat(Math.max(0, width)) : sign + Math.abs(n);
 }
 
-/** The text a cell shows, from what the reader stored ({ t, v }), in a cell `width` characters wide (numbers only). */
-export function cellText(cell, width = Infinity) {
-  if (!cell || cell.v == null) return '';
-  switch (cell.t) {
-    case 'b': return cell.v ? 'TRUE' : 'FALSE';
-    case 'n': return formatGeneral(cell.v, width);
-    default: return String(cell.v);
+/** What a cell shows, from what the reader stored ({ t, v }), in a cell `width` characters wide, in format `code`
+ *  (format.js; General when none): { text, parts, color, fit }. `fit`: a formatted number, which the view replaces
+ *  with #s when it is wider than its cell (General fits itself to the width). */
+export function cellDisplay(cell, width = Infinity, code = 'General', date1904 = false) {
+  if (!cell || cell.v == null) return { text: '', parts: [], color: null, fit: false };
+  const plain = (text) => ({ text, parts: [text], color: null, fit: false });
+  if (cell.t === 'b') return plain(cell.v ? 'TRUE' : 'FALSE');
+  if (cell.t === 'e') return plain(String(cell.v));
+  if (cell.t === 'n') {
+    if (!code || code === 'General') return plain(formatGeneral(cell.v, width));
+    // A number in a text format (@) is shown as General, and to the left as text is (Excel's PDF of numfmt.xlsx).
+    if (code === '@') return { ...plain(formatGeneral(cell.v, width)), textFormat: true };
+    const r = formatValue(cell.v, code, { date1904, width });
+    if (r.hashes) return { text: '#'.repeat(Number.isFinite(width) ? width : 1), parts: ['#'.repeat(Number.isFinite(width) ? width : 1)], color: r.color, fit: false, hashes: true };
+    return { ...r, fit: true };
   }
+  if (!code || code === 'General') return plain(String(cell.v));
+  // (A text format, @, leaves text as it is.)
+  return { ...formatValue(String(cell.v), code, { date1904 }), fit: false };
 }
+
+/** The text a cell shows (cellDisplay's, padding as spaces). */
+export const cellText = (cell, width = Infinity, code = 'General', date1904 = false) => cellDisplay(cell, width, code, date1904).text;
