@@ -34,8 +34,18 @@ which reads back every font, fill, alignment, border, number format and cell sty
 | Increase and Decrease Decimal change the active cell's format and give it to every selected cell. From General they start from the decimals the cell shows; each section of a format gets one place more or fewer; a date, a time, text or a General cell that isn't a number doesn't change. | 1.5: `0.00`, `0.000`. 2.123456789 (shown 2.123457) down: `0.00000`. `0.00%` down: `0.0%`, `0%`. `#,##0.00 "kg";[Red]-#,##0.00` up: both sections. `m/d/yyyy` unchanged. |
 | Font Color and Fill Color start as red (`FFFF0000`) and yellow (`FFFFFF00`, solid, background `indexed="64"`). | `Font.Color` 255, `Interior.Color` 65535. |
 
+## Merging (`src/ooxml/mergeops.js`)
+
+| Rule | Seen |
+|---|---|
+| Merging keeps one value, the first in reading order, and puts it in the top-left cell; the others are emptied. Excel asks first: "Merging cells only keeps the upper-left value and discards other values." | A1, B1, A2 filled in, A1:B2 merged: `a1` in A1, the rest empty. A1 and B1 empty: A2's `a2` moves to A1. |
+| Every cell of the area gets the format of the cell whose value is kept (Excel writes them all with it). | A1 filled yellow, B2 bold: all four filled, none bold. A2's value kept: all four plain. |
+| Merge & Center also centres; Merge Cells and Merge Across leave the alignment. Merge Across merges each row of the selection on its own. | A1:B2 across: A1:B1 and A2:B2, A2 keeping `a2`. |
+| A selection that overlaps a merged range is merged with it into one. | A1:B2 merged, then B2:C3: A1:C3. |
+| Merge & Center on a selection with a merged range in it unmerges, and sets the alignment back to General. Unmerge Cells leaves the alignment. | A1 after Merge & Center, pressed again: not merged, General. Unmerged: still centred. |
+
 ## Not yet
 
-Merge & Center, text orientation, shrink to fit, the Format Cells dialog, cell styles other than the three above,
+Text orientation, shrink to fit, the Format Cells dialog, cell styles other than the three above,
 pattern and gradient fills, and formatting whole rows or columns (a selection past the used range is cut to it: Excel
 gives the row or column itself the format).

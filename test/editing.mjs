@@ -309,6 +309,18 @@ await page.evaluate(() => window.oxe.setFeatures({ font: false }));
 await page.keyboard.press('Control+b');
 check(await page.isHidden('.oxe-group[data-feature="font"]') && !(await looksOf('G20')).b, 'features { font: false }: the Font group hidden, Ctrl+B does nothing');
 await page.evaluate(() => window.oxe.setFeatures({ font: true }));
+// Merge & Center on G22:H22, both filled in: Excel's question, OK, one value kept; Ctrl+Z puts both back.
+await page.evaluate(() => { window.oxe.enter('G22', 'left'); window.oxe.enter('H22', 'right'); window.oxe.select('G22'); });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowRight');
+await page.click('.oxe-toolbar button[title="Merge & Center"]');
+const question = await page.textContent('.oxe-dialog');
+await page.click('.oxe-dialog-button >> text=OK');
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).merges.some((m) => m.r0 === 21 && m.c0 === 6));
+check(/only keeps the upper-left value/.test(question) && await value('G22') === 'left' && await value('H22') === null, 'Merge & Center: Excel asks first, then G22:H22 merged with the value of G22', question);
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+check(await value('H22') === 'right' && !(await page.evaluate(() => window.oxe.workbook.sheet(0).merges.some((m) => m.r0 === 21))), 'Ctrl+Z: unmerged, H22 back');
 
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));

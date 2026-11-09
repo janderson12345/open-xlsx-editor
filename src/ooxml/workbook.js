@@ -6,7 +6,7 @@ import { readSharedStrings } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
-import { setCellXml, setFormulaXml, setResultXml, setStyleXml, unshareXml } from './sheetedit.js';
+import { setCellXml, setFormulaXml, setResultXml, setStyleXml, setMergesXml, unshareXml } from './sheetedit.js';
 import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
@@ -223,6 +223,16 @@ export class Workbook {
       model.maxRow = Math.max(model.maxRow, r);
       model.maxCol = Math.max(model.maxCol, c);
     }
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
+  }
+
+  /** Sheet i's merged ranges, all of them, as [{ r0, c0, r1, c1 }]. */
+  setMerges(i, merges) {
+    const part = this._part(i);
+    setMergesXml(part.doc, merges);
+    part.model.merges = merges.map((m) => ({ ...m }));
+    for (const m of merges) { part.model.maxRow = Math.max(part.model.maxRow, m.r1); part.model.maxCol = Math.max(part.model.maxCol, m.c1); }
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
   }

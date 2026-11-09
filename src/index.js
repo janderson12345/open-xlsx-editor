@@ -12,13 +12,14 @@ import { createRibbon } from './editor/ribbon.js';
 import { homeTab } from './editor/hometab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
+import { mergeLoss } from './ooxml/mergeops.js';
 import { parseRef } from './ooxml/refs.js';
 
 export { Workbook };
 
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
-const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment',
+const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
   stepDecimal: 'number', clearFormats: 'editing' };
 const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
 
@@ -109,6 +110,14 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'renameShownSheet') return sheetActs.rename(i);
     if (name === 'hideShownSheet') return editing().run('hideSheet', i);
     if (name === 'unhideSheet') return sheetActs.unhide();
+    if (name === 'merge') {
+      // (Excel asks first when values would be discarded.)
+      const sel = editing().selection;
+      if (mergeLoss(state.workbook.sheet(i), sel, args[0])) {
+        return messageBox(root, 'Merging cells only keeps the upper-left value and discards other values.', ['OK', 'Cancel'])
+          .then((b) => b === 'OK' && editing().run('merge', args[0]));
+      }
+    }
     return editing().run(name, ...args);
   };
   /** The ribbon showing what the active cell has. */

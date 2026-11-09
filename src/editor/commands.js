@@ -10,6 +10,7 @@ import { parseInput } from '../ooxml/input.js';
 import { refName } from '../ooxml/refs.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
+import { mergeChange } from '../ooxml/mergeops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -64,6 +65,13 @@ export function createCommands(ctx) {
     if (record) { state.undo.push({ sheet: idOf(ctx.sheetIndex()), styles: true, before, after: now }); state.redo = []; }
     ctx.restyled?.();
     ctx.changed?.();
+    return true;
+  }
+  /** Values, formats and merged ranges changed together (a merge, or its undo). */
+  function mergeStep({ contents: ch, styles, merges }) {
+    if (ch.length && !apply(ch, false)) return false;
+    ctx.workbook().setMerges(ctx.sheetIndex(), merges);
+    if (!restyle(styles, false)) { ctx.restyled?.(); ctx.changed?.(); }
     return true;
   }
   /** A format command: formatops.js's function over the selection on the sheet shown. */
@@ -124,6 +132,25 @@ export function createCommands(ctx) {
     borders(preset) { return formatting(fmt.setBorders, preset); },
     /** Increase (1) or Decrease (-1) Decimal. */
     stepDecimal(dir) { return formatting(fmt.stepDecimal, dir, ctx.shownText?.(state.sel.ar, state.sel.ac) ?? null); },
+    /** Merge & Center ('center'), Merge Across ('across'), Merge Cells ('cells') or Unmerge Cells ('unmerge') on the
+     *  selection (mergeops.js), as one step of the history. */
+    merge(kind) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const change = mergeChange(ctx.workbook(), ctx.sheetIndex(), state.sel, kind);
+      if (!change) return false;
+      const sh = sheet();
+      const before = {
+        contents: change.contents.map(({ r, c }) => contents(r, c)),
+        styles: change.styles.map(({ r, c }) => ({ r, c, s: sh.cells.get(r)?.get(c)?.s || 0 })),
+        merges: sh.merges.map((m) => ({ ...m })),
+      };
+      if (!mergeStep(change)) return false;
+      state.undo.push({ sheet: idOf(ctx.sheetIndex()), steps: true, before, after: change });
+      state.redo = [];
+      // (The selection becomes the merged area it is in, as the grid shows it.)
+      show(state.sel, state.focus);
+      return true;
+    },
     /** Clear Formats: the selected cells back to the Normal style's format. */
     clearFormats() { return formatting((wb, si, sel) => fmt.cellsOf(wb.sheet(si), sel).map(({ r, c }) => ({ r, c, s: 0 }))); },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },
@@ -208,9 +235,10 @@ export function createCommands(ctx) {
     // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
     const at = indexOf(entry.sheet);
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
-    if (!(entry.styles ? restyle(entry[side], false) || true : apply(entry[side], false))) { from.push(entry); return false; }
+    const done = entry.steps ? mergeStep(entry[side]) : entry.styles ? restyle(entry[side], false) || true : apply(entry[side], false);
+    if (!done) { from.push(entry); return false; }
     to.push(entry);
-    const first = entry[side][0];
+    const first = entry.steps ? { r: state.sel.ar, c: state.sel.ac } : entry[side][0];
     commands.select(first.r, first.c);
     ctx.announce(`${word}: ${refName(first.r, first.c)}`);
     return true;

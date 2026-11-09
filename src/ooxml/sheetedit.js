@@ -127,6 +127,31 @@ export function setStyleXml(doc, r, c, s) {
   return cEl;
 }
 
+/** The elements that follow mergeCells in a worksheet (CT_Worksheet's order), for placing it when it is new. */
+const AFTER_MERGES = ['phoneticPr', 'conditionalFormatting', 'dataValidations', 'hyperlinks', 'printOptions', 'pageMargins', 'pageSetup',
+  'headerFooter', 'rowBreaks', 'colBreaks', 'customProperties', 'cellWatches', 'ignoredErrors', 'smartTags', 'drawing', 'legacyDrawing',
+  'legacyDrawingHF', 'drawingHF', 'picture', 'oleObjects', 'controls', 'webPublishItems', 'tableParts', 'extLst'];
+
+/** Write the sheet's merged ranges ([{ r0, c0, r1, c1 }]): its mergeCells element made, rewritten or taken out. */
+export function setMergesXml(doc, merges) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  let el = kid(root, 'mergeCells', ns);
+  if (!merges.length) { if (el) root.removeChild(el); return; }
+  if (!el) {
+    el = make(doc, ns, 'mergeCells');
+    const next = [...root.childNodes].find((n) => n.nodeType === 1 && AFTER_MERGES.includes(n.localName));
+    root.insertBefore(el, next || null);
+  }
+  while (el.firstChild) el.removeChild(el.firstChild);
+  for (const m of merges) {
+    const mc = make(doc, ns, 'mergeCell');
+    mc.setAttribute('ref', rangeName(m));
+    el.appendChild(mc);
+  }
+  el.setAttribute('count', String(merges.length));
+}
+
 /** Give a cell a formula (its text as the file has it, without "="); its value comes with setResultXml. */
 export function setFormulaXml(doc, r, c, formula) {
   const root = doc.documentElement;

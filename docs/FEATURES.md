@@ -34,7 +34,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Virtualised grid | Done | 5,000 rows by 20 columns scroll smoothly. |
 | Fonts, fills, borders, alignment, number formats | Done | Shown as measured against Excel's PDFs (docs/LAYOUT.md); changed from the Home tab (below). |
 | Rich text in a cell (runs in several fonts) | Partly | The text is shown in the cell's own font; the runs' formatting isn't. |
-| Merged cells | Shown | Navigation steps over them. |
+| Merged cells | Done | Navigation steps over them; merged and unmerged from the Home tab. |
 | Hidden rows and columns | Shown | Hidden; no way to unhide yet. |
 | Row heights from fonts and wrapping | Done | As Excel works them out (docs/LAYOUT.md). |
 | Gridlines on or off | Shown | From the sheet's view settings. |
@@ -75,7 +75,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Wrap text | Done | |
 | | Indent | Done | |
 | | Orientation (rotated text) | Missing | |
-| | Merge & Center, Merge Across, Unmerge | Missing | Merges are shown. |
+| | Merge & Center, Merge Across, Merge Cells, Unmerge | Done | Excel's question before values are discarded. |
 | | Shrink to fit | Missing | |
 | Number (`number`) | Number format list, currency, %, comma, decimals | Done | Every format code Excel has is shown; the list offers Excel's eleven. $, % and comma apply Excel's cell styles. The Format Cells dialog missing. |
 | Styles (`styles`) | Conditional Formatting | Kept | |

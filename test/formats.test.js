@@ -161,3 +161,55 @@ test('a formatted workbook saves and reads back; one without a styles part gets 
   assert.equal(check('no-styles-part', saved), '');
   assert.equal(fontAt(Workbook.fromBytes(saved), 'A1').b, true);
 });
+
+test('merging, as Excel does it: one value kept, its format over the whole area', async () => {
+  const { mergeChange, mergeLoss } = await import('../src/ooxml/mergeops.js');
+  const { rangeName } = await import('../src/ooxml/refs.js');
+  // (Excel's sheet: a1 in A1 (filled yellow), b1 in B1, a2 in A2, B2 bold; then each command on A1:B2.)
+  const setup = () => {
+    const wb = open('formulas.xlsx');
+    const si = wb.sheets.length - 1 >= 0 ? wb.addSheet(wb.sheets.length) : 0;
+    wb.apply(si, [{ r: 0, c: 0, value: 'a1' }, { r: 0, c: 1, value: 'b1' }, { r: 1, c: 0, value: 'a2' }]);
+    wb.setStyles(si, formatEach(wb, si, range('A1'), { fill: { rgb: 'FFFFFF00' } }));
+    wb.setStyles(si, formatEach(wb, si, range('B2'), { font: { b: true } }));
+    return { wb, si };
+  };
+  const doMerge = (wb, si, sel, kind) => {
+    const ch = mergeChange(wb, si, range(sel), kind);
+    if (ch.contents.length) wb.apply(si, ch.contents);
+    wb.setStyles(si, ch.styles);
+    wb.setMerges(si, ch.merges);
+  };
+  const v = (wb, si, ref) => { const { r, c } = parseRef(ref); return wb.sheet(si).cells.get(r)?.get(c)?.v ?? null; };
+  const look = (wb, si, ref) => { const { r, c } = parseRef(ref); const xf = xfOf(wb.styles, wb.sheet(si).cells.get(r)?.get(c)?.s || 0); return `${xf.align.horizontal}${wb.styles.fills[xf.fillId].pattern === 'solid' ? ' fill' : ''}${wb.styles.fonts[xf.fontId].b ? ' bold' : ''}`; };
+  const merged = (wb, si) => wb.sheet(si).merges.map(rangeName).join();
+
+  let { wb, si } = setup();
+  assert.equal(mergeLoss(wb.sheet(si), range('A1:B2'), 'center'), 2);
+  doMerge(wb, si, 'A1:B2', 'center');
+  assert.deepEqual([v(wb, si, 'A1'), v(wb, si, 'B1'), v(wb, si, 'A2'), merged(wb, si)], ['a1', null, null, 'A1:B2']);
+  assert.deepEqual(['A1', 'B1', 'A2', 'B2'].map((r) => look(wb, si, r)), Array(4).fill('center fill'));
+  doMerge(wb, si, 'A1', 'center'); // (Merge & Center again: unmerged, alignment General)
+  assert.deepEqual([merged(wb, si), look(wb, si, 'A1')], ['', 'general fill']);
+
+  ({ wb, si } = setup());
+  doMerge(wb, si, 'A1:B2', 'across');
+  assert.deepEqual([merged(wb, si), v(wb, si, 'A2'), look(wb, si, 'B1'), look(wb, si, 'B2')], ['A1:B1,A2:B2', 'a2', 'general fill', 'general']);
+
+  ({ wb, si } = setup());
+  doMerge(wb, si, 'A1:B2', 'cells');
+  doMerge(wb, si, 'A1', 'unmerge');
+  assert.deepEqual([merged(wb, si), look(wb, si, 'A1')], ['', 'general fill']);
+
+  ({ wb, si } = setup());
+  wb.apply(si, [{ r: 0, c: 0, value: null }, { r: 0, c: 1, value: null }]);
+  doMerge(wb, si, 'A1:B2', 'center'); // (A1 and B1 empty: A2's value and plain format are kept)
+  assert.deepEqual([v(wb, si, 'A1'), v(wb, si, 'A2'), look(wb, si, 'B1')], ['a2', null, 'center']);
+
+  ({ wb, si } = setup());
+  doMerge(wb, si, 'A1:B2', 'cells');
+  doMerge(wb, si, 'B2:C3', 'cells'); // (overlapping: one area)
+  assert.equal(merged(wb, si), 'A1:C3');
+  const files = unzipSync(wb.toBytes());
+  assert.equal(check('merged', zipSync(files)), '');
+});

@@ -87,7 +87,9 @@ export function homeTab(kit, { act, color }) {
       line(b.bold, b.italic, b.underline, b.strike, bordersBtn, fillBtn, fontColorBtn))),
     grp('Alignment', col(
       line(b.top, b.middle, b.bottom, b.wrap),
-      line(b.left, b.center, b.right, btn('⇤', 'Decrease Indent', f('stepIndent', -1)), btn('⇥', 'Increase Indent', f('stepIndent', 1))))),
+      line(b.left, b.center, b.right, btn('⇤', 'Decrease Indent', f('stepIndent', -1)), btn('⇥', 'Increase Indent', f('stepIndent', 1)),
+        split('⊟', 'Merge & Center', f('merge', 'center'), () => [item('Merge & Center', f('merge', 'center')), item('Merge Across', f('merge', 'across')),
+          item('Merge Cells', f('merge', 'cells')), item('Unmerge Cells', f('merge', 'unmerge'))], { label: 'Merge & Center' })))),
     grp('Number', col(
       line(numSel),
       line(btn('$', 'Accounting Number Format', f('format', { style: 'Currency' })), btn('%', 'Percent Style (Ctrl+Shift+%)', f('format', { style: 'Percent' })),
