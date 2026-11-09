@@ -1,6 +1,7 @@
 // Keyboard and mouse on the grid, as Excel answers them: arrows (Shift extends, Ctrl jumps), Tab, Enter, Home, End,
-// Page Up and Down, F2 and double click to edit, typing to replace, Delete to empty, Ctrl+Z and Ctrl+Y; click and drag
-// to select. Everything goes through the named commands; the cell editor and formula bar enter what is typed.
+// Page Up and Down (with Ctrl, the next or previous sheet), F2 and double click to edit, typing to replace, Delete to
+// empty, Ctrl+Z and Ctrl+Y; click and drag to select. Everything goes through the named commands; the cell editor and
+// formula bar enter what is typed.
 import { createCommands } from './commands.js';
 import { createCellEditor } from './celleditor.js';
 import { createFormulaBar } from './formulabar.js';
@@ -11,7 +12,7 @@ import { editText } from '../ooxml/input.js';
 
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
-/** Make the grid in `root` editable. `ctx` = { workbook(), sheetIndex(), grid, looks(), readOnly() }. */
+/** Make the grid in `root` editable. `ctx` = { workbook(), sheetIndex(), showSheet(i), grid, looks(), readOnly() }. */
 export function attachEditing(root, ctx) {
   const { grid } = ctx;
   const view = grid.el;
@@ -34,12 +35,13 @@ export function attachEditing(root, ctx) {
   cmd = createCommands({
     ...ctx,
     announce,
-    selected: (sel) => {
+    selected: (sel, note) => {
       refreshBar();
       const cell = cellAt(sel.ar, sel.ac);
       const range = sel.r0 !== sel.r1 || sel.c0 !== sel.c1 ? `, ${refName(sel.r0, sel.c0)} to ${refName(sel.r1, sel.c1)} selected` : '';
-      announce(`${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}`);
+      announce(`${note}${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}`);
     },
+    showSheet: (i) => { editor.close(); ctx.showSheet(i); },
     changed: () => refreshBar(),
   });
   function refreshBar() {
@@ -73,6 +75,7 @@ export function attachEditing(root, ctx) {
     else if (key === 'Enter') cmd.run('move', e.shiftKey ? -1 : 1, 0);
     else if (key === 'Home') cmd.run('home', { sheetStart: ctrl });
     else if (key === 'End' && ctrl) cmd.run('end');
+    else if ((key === 'PageDown' || key === 'PageUp') && ctrl) cmd.run('nextSheet', key === 'PageDown' ? 1 : -1);
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
     else if (key === 'F2') startEdit('edit');
     else if (key === 'Delete') cmd.run('clear');

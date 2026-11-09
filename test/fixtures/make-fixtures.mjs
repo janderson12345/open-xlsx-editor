@@ -1,10 +1,11 @@
 // Generates the test workbooks in this folder from code, so the repository holds no third-party files.
 // usage: node test/fixtures/make-fixtures.mjs   (npm run fixtures)
 //
-// basic.xlsx     three sheets (one hidden), shared strings with rich text, a phonetic run and an _x000D_ escape,
-//                numbers, booleans, an error, formulas (one shared) with cached values and a calcChain, an inline
-//                string, column widths, a hidden column and row, a tall row, a merged range, long text, and parts and
-//                elements the reader doesn't model (conditional format, validation, extLst, docProps, customXml).
+// basic.xlsx     three sheets (one hidden, one with a tab colour), shared strings with rich text, a phonetic run and
+//                an _x000D_ escape, numbers, booleans, an error, formulas (one shared) with cached values and a
+//                calcChain, an inline string, column widths, a hidden column and row, a tall row, a merged range, long
+//                text, and parts and elements the reader doesn't model (conditional format, validation, extLst,
+//                docProps, customXml).
 // prefixed.xlsx  the same vocabulary under an `x:` prefix, with rows and cells that leave `r` implied, inline strings
 //                only (no shared strings part).
 // large.xlsx     5,000 rows by 20 columns, for the virtualised grid.
@@ -103,7 +104,7 @@ function basic() {
     '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="E2:E10"><formula1>"Yes,No"</formula1></dataValidation></dataValidations>' +
     '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>' +
     '<extLst><ext uri="{6F2D7B1E-0000-4000-8000-0000000000AA}" xmlns:oxe="urn:open-xlsx-editor:test"><oxe:note>kept as it came</oxe:note></ext></extLst></worksheet>';
-  const sheet2 = `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><dimension ref="A1:B2"/><sheetData>` +
+  const sheet2 = `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><sheetPr><tabColor theme="5" tint="0.3999755851924192"/></sheetPr><dimension ref="A1:B2"/><sheetData>` +
     `<row r="1">${s('A1', 'Notes')}</row><row r="2">${s('A2', '  leading spaces kept')}${n('B2', -3.5)}</row></sheetData>` +
     '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>';
   const sheet3 = `${DECL}<worksheet xmlns="${X}"><sheetData><row r="1">${s('A1', 'Hidden sheet')}</row></sheetData></worksheet>`;

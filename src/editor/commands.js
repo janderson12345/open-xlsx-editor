@@ -1,26 +1,29 @@
 // Every action is a named command, shared by the keyboard, the mouse, the formula bar and the API: moving and
-// extending the selection, entering and clearing values and formulas, undo and redo. Changes go through the workbook
-// (only the sheet's XML is touched, as everywhere; the formulas that read a changed cell are worked out again) and into
-// an undo history of cell contents; the selection is view state and never reaches the history or the file.
+// extending the selection, entering and clearing values and formulas, undo and redo, changing sheet. Changes go
+// through the workbook (only the sheet's XML is touched, as everywhere; the formulas that read a changed cell are
+// worked out again) and into an undo history of cell contents, one for the workbook, as in Excel; the selection, kept
+// for each sheet, is view state and never reaches the history or the file.
 import { cellSelection, extendSelection } from './selection.js';
 import { step, jump, lastCell } from './navigate.js';
 import { parseInput } from '../ooxml/input.js';
 import { refName } from '../ooxml/refs.js';
 
-/** The commands for one editor. `ctx` = { workbook(), sheetIndex(), grid, readOnly(), announce(msg), changed() }. */
+/** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), grid, readOnly(), announce(msg),
+ *  changed(), selected(sel, note) }. */
 export function createCommands(ctx) {
-  const state = { sel: cellSelection(0, 0), focus: { r: 0, c: 0 }, undo: [], redo: [] };
+  // (`views`: each sheet's selection and scroll position while another is shown.)
+  const state = { sel: cellSelection(0, 0), focus: { r: 0, c: 0 }, undo: [], redo: [], views: new Map() };
   const sheet = () => ctx.workbook().sheet(ctx.sheetIndex());
   const limits = () => {
     const g = ctx.grid.geometry();
     return { rows: g.rows.count - 1, cols: g.cols.count - 1 };
   };
-  const show = (sel, focus) => {
+  const show = (sel, focus, note = '') => {
     state.sel = sel;
     state.focus = focus || { r: sel.ar, c: sel.ac };
     ctx.grid.setSelection(sel);
     ctx.grid.scrollIntoView(state.focus.r, state.focus.c);
-    ctx.selected?.(sel);
+    ctx.selected?.(sel, note);
   };
   /** What a cell holds, as a change that would put it back: { r, c, formula } or { r, c, value }. */
   const contents = (r, c) => {
@@ -86,12 +89,38 @@ export function createCommands(ctx) {
     },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },
     redo() { return replay(state.redo, state.undo, 'after', 'Redone'); },
+    /** Show sheet i, with the selection and scroll position it had (A1 the first time); false if it can't be shown
+     *  (hidden, or a chart sheet). */
+    showSheet(i) {
+      const wb = ctx.workbook();
+      if (!wb.canShow(i)) {
+        if (wb.sheets[i]?.kind === 'chartsheet') ctx.announce(`${wb.sheets[i].name} is a chart sheet, which can't be shown yet`);
+        return false;
+      }
+      const from = ctx.sheetIndex();
+      if (i === from) return true;
+      const view = ctx.grid.el;
+      state.views.set(from, { sel: state.sel, focus: state.focus, top: view.scrollTop, left: view.scrollLeft });
+      ctx.showSheet(i);
+      const back = state.views.get(i);
+      if (back) { view.scrollTop = back.top; view.scrollLeft = back.left; }
+      show(back ? back.sel : cellSelection(0, 0), back?.focus, `${wb.sheets[i].name}, `);
+      return true;
+    },
+    /** Ctrl+Page Down and Ctrl+Page Up: the next or previous sheet that can be shown (hidden ones and chart sheets
+     *  passed over, no wrapping round, as in Excel). */
+    nextSheet(dir) {
+      const wb = ctx.workbook();
+      for (let i = ctx.sheetIndex() + dir; i >= 0 && i < wb.sheets.length; i += dir) if (wb.canShow(i)) return commands.showSheet(i);
+      return false;
+    },
   };
 
   function replay(from, to, side, word) {
     const entry = from.pop();
     if (!entry) return false;
-    if (entry.sheet !== ctx.sheetIndex()) { from.push(entry); return false; }
+    // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
+    if (entry.sheet !== ctx.sheetIndex() && !commands.showSheet(entry.sheet)) { from.push(entry); return false; }
     if (!apply(entry[side], false)) { from.push(entry); return false; }
     to.push(entry);
     const first = entry[side][0];
@@ -110,7 +139,7 @@ export function createCommands(ctx) {
     get selection() { return { ...state.sel }; },
     canUndo: () => state.undo.length > 0,
     canRedo: () => state.redo.length > 0,
-    /** Start again (a new workbook or sheet): A1 selected, no history. */
-    reset() { state.undo = []; state.redo = []; show(cellSelection(0, 0)); },
+    /** Start again (a new workbook): A1 selected, no history, no sheet's view kept. */
+    reset() { state.undo = []; state.redo = []; state.views.clear(); show(cellSelection(0, 0)); },
   };
 }

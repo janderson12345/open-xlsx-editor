@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { parseInput, editText } from '../src/ooxml/input.js';
 import { step, jump, lastCell } from '../src/editor/navigate.js';
 import { Workbook } from '../src/ooxml/workbook.js';
+import { textOn } from '../src/editor/tabs.js';
 
 test('typed entries read as Excel reads them', () => {
   const v = (s) => parseInput(s).value;
@@ -40,4 +41,12 @@ test('a cell edit updates the model in place and leaves the other cells as read'
   wb.setCell(0, 'Z6000', 1);
   assert.equal(wb.sheet(0).maxRow, 5999);
   assert.equal(wb.sheet(0).cells.get(11).get(3).v, 1203);
+});
+
+test('sheet tabs: the sheets that can be shown, tab colours resolved as cell colours are, readable text on them', () => {
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  assert.deepEqual(wb.sheets.map((_, i) => wb.canShow(i)), [true, true, false]); // (Hidden is state="hidden")
+  // (theme 5 is accent 2, E97132 in the default theme, lightened 40%: Excel's "Orange, Accent 2, Lighter 40%")
+  assert.deepEqual(wb.sheets.map((_, i) => wb.tabColor(i)), [null, '#F1A983', null]);
+  assert.deepEqual(['#F1A983', '#C00000', '#FFFF00', '#002060'].map(textOn), ['#000000', '#ffffff', '#000000', '#ffffff']);
 });

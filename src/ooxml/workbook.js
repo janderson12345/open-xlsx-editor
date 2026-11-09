@@ -5,7 +5,7 @@ import { kids, kid, attr, serializeXml, NS } from './xml.js';
 import { readSharedStrings } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
-import { readTheme } from './theme.js';
+import { readTheme, resolveColor } from './theme.js';
 import { setCellXml, setFormulaXml, setResultXml, unshareXml } from './sheetedit.js';
 import { parseRef } from './refs.js';
 import { Calc } from '../calc/engine.js';
@@ -73,9 +73,8 @@ export class Workbook {
   get activeSheet() {
     const view = kid(kid(this.pkg.xml(this.pkg.mainPath).documentElement, 'bookViews', this.ns), 'workbookView', this.ns);
     const active = Number(attr(view, 'activeTab') || 0);
-    const usable = (i) => this.sheets[i] && this.sheets[i].kind === 'worksheet' && this.sheets[i].state === 'visible' && this.sheets[i].path;
-    if (usable(active)) return active;
-    const i = this.sheets.findIndex((_, k) => usable(k));
+    if (this.canShow(active)) return active;
+    const i = this.sheets.findIndex((_, k) => this.canShow(k));
     return i < 0 ? 0 : i;
   }
 
@@ -93,6 +92,25 @@ export class Workbook {
   /** The model of sheet i (see readSheet). */
   sheet(i) {
     return this._part(i).model;
+  }
+
+  /** Whether sheet i can be shown: a worksheet whose tab isn't hidden. */
+  canShow(i) {
+    const info = this.sheets[i];
+    return !!info && info.kind === 'worksheet' && info.state === 'visible' && !!info.path && this.pkg.has(info.path);
+  }
+
+  /** Sheet i's tab colour as '#RRGGBB', or null. Its `sheetPr` comes first in the part, so only the part's start is
+   *  read (a tab strip shouldn't parse every sheet). */
+  tabColor(i) {
+    const bytes = this.sheets[i]?.path && this.pkg.files[this.sheets[i].path];
+    if (!bytes) return null;
+    const head = new TextDecoder().decode(bytes.subarray(0, 8192)).split(/<(?:\w+:)?sheetData\b/)[0];
+    const el = /<(?:\w+:)?tabColor\b([^>]*)>/.exec(head);
+    if (!el) return null;
+    const at = Object.fromEntries([...el[1].matchAll(/([\w:]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
+    const num = (name) => (at[name] != null ? Number(at[name]) : null);
+    return resolveColor({ rgb: at.rgb || null, theme: num('theme'), indexed: num('indexed'), auto: at.auto === '1', tint: num('tint') || 0 }, this.theme, this.styles.palette);
   }
 
   /** The index of a worksheet by name (case ignored, as in a formula), or -1. */

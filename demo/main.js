@@ -11,8 +11,8 @@ window.oxe = editor;
 async function openFile(file) {
   try {
     editor.open(new Uint8Array(await file.arrayBuffer()), file.name);
-    const wb = editor.workbook;
-    status.textContent = `${file.name}: sheet "${wb.sheets[editor.sheetIndex].name}" of ${wb.sheets.length}`;
+    const n = editor.workbook.sheets.length;
+    status.textContent = `${file.name}: ${n} sheet${n === 1 ? '' : 's'}`;
   } catch (e) {
     status.textContent = `Could not open ${file.name}: ${e.message}`;
   }

@@ -1,9 +1,11 @@
-// open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. One sheet in a virtualised grid.
+// open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. A sheet at a time in a virtualised
+// grid, the sheet tabs under it.
 import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
+import { createSheetTabs } from './editor/tabs.js';
 import { fontFamily } from './ooxml/styles.js';
 import { parseRef } from './ooxml/refs.js';
 
@@ -20,7 +22,7 @@ export function mountXlsxEditor(host, options = {}) {
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { workbook: null, grid: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null };
+  const state = { workbook: null, grid: null, tabs: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null };
   const at = (ref) => {
     const p = typeof ref === 'string' ? parseRef(ref) : ref;
     if (!p) throw new Error(`not a cell reference: ${ref}`);
@@ -30,6 +32,15 @@ export function mountXlsxEditor(host, options = {}) {
     if (!state.editing) throw new Error('no workbook open');
     return state.editing.commands;
   };
+  /** Show sheet i in the grid and mark its tab (commands.js showSheet keeps each sheet's selection around this). */
+  const showSheet = (i) => {
+    state.sheetIndex = i;
+    state.grid.setSheet(state.workbook.sheet(i), state.workbook.sheets[i].name, state.looks);
+    state.tabs.activate(i);
+  };
+  /** The tabs a workbook shows: every sheet that isn't hidden, chart sheets as tabs that can't be shown yet. */
+  const tabList = (wb) => wb.sheets.map((s, index) => ({ index, name: s.name, state: s.state, color: wb.tabColor(index), disabled: !wb.canShow(index) }))
+    .filter((t) => t.state === 'visible');
 
   const api = {
     /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). */
@@ -47,13 +58,16 @@ export function mountXlsxEditor(host, options = {}) {
         state.editing = attachEditing(root, {
           workbook: () => state.workbook,
           sheetIndex: () => state.sheetIndex,
+          showSheet,
           grid: state.grid,
           looks: () => state.looks,
           readOnly: () => state.readOnly,
           changed: () => options.onChange?.(),
         });
         state.editing.setReadOnly(state.readOnly);
+        state.tabs = createSheetTabs(root, { controls: state.grid.el.id, onSelect: (k) => state.editing.commands.run('showSheet', k) });
       }
+      state.tabs.set(tabList(wb), i);
       state.editing.reset();
       return api;
     },
@@ -70,6 +84,12 @@ export function mountXlsxEditor(host, options = {}) {
     setCell(ref, value) { const p = at(ref); return editing().run('setValue', p.r, p.c, value); },
     undo: () => editing().run('undo'),
     redo: () => editing().run('redo'),
+    /** Show a sheet (its index, or its name); false if it can't be shown (hidden, or a chart sheet). */
+    showSheet(sheet) {
+      const n = String(sheet).toLowerCase();
+      const i = typeof sheet === 'number' ? sheet : state.workbook ? state.workbook.sheets.findIndex((s) => s.name.toLowerCase() === n) : -1;
+      return editing().run('showSheet', i);
+    },
     /** Run a named command (commands.js) with its arguments. */
     command: (name, ...args) => editing().run(name, ...args),
     get selection() { return state.editing ? state.editing.commands.selection : null; },

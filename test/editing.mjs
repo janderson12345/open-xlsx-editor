@@ -1,6 +1,6 @@
 // Browser check of editing: selection by keys and mouse, typing over a cell, F2, Esc, Tab, Delete, undo and redo,
-// typed numbers and text, formulas typed and worked out again, read-only; the saved workbook read back. Standards mode
-// asserted.
+// typed numbers and text, formulas typed and worked out again, sheet tabs, read-only; the saved workbook read back.
+// Standards mode asserted.
 // Run after `npm run build`: node test/editing.mjs [outDir]
 import fs from 'node:fs';
 import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
@@ -137,6 +137,37 @@ await page.keyboard.press('ArrowRight');
 const ad = await page.evaluate(() => { const id = document.querySelector('.oxe-grid').getAttribute('aria-activedescendant'); return id && document.getElementById(id)?.getAttribute('role'); });
 check(ad === 'gridcell', 'an empty active cell is still the grid\'s active descendant');
 
+// Sheet tabs: the hidden sheet has none; clicking, the arrow keys on the tabs and Ctrl+Page Up/Down change sheet, each
+// sheet keeping its selection; undo reaches a change on another sheet by showing it.
+const tabs = () => page.evaluate(() => [...document.querySelectorAll('.oxe-tab')].map((el) => ({ name: el.textContent, on: el.getAttribute('aria-selected') === 'true', color: el.style.getPropertyValue('--oxe-tab-color') })));
+const label = () => page.evaluate(() => document.querySelector('.oxe-grid').getAttribute('aria-label'));
+const first = await tabs();
+check(first.length === 2 && first[0].name === 'Data' && first[0].on && first[1].name === 'Notes & more' && first[1].color === '#F1A983', 'two tabs (the hidden sheet has none), Data marked, the second in its tab colour', JSON.stringify(first));
+await page.evaluate(() => window.oxe.select('C5')); // (scrolled away from it: no clicking)
+await page.click('.oxe-tab >> text=Notes & more');
+await page.waitForTimeout(250);
+check(await label() === 'Notes & more' && await shown(0, 0) === 'Notes' && (await sel()).ar === 0 && (await tabs())[1].on, 'clicking the tab shows Notes & more, A1 selected', await label());
+check(/^Notes & more, A1, Notes/.test(await live()), 'and says which sheet, and the cell', await live());
+await clickCell(1, 1); // B2
+await page.keyboard.type('7');
+await page.keyboard.press('Enter');
+check(await value('B2') === 7, 'typing on the second sheet');
+await page.keyboard.press('Control+PageUp');
+check(await label() === 'Data' && (await sel()).ar === 4 && (await sel()).ac === 2 && await page.evaluate(() => document.activeElement.classList.contains('oxe-grid')), 'Ctrl+Page Up: back on Data with C5 selected, the grid still focused');
+await page.keyboard.press('Control+PageUp');
+check(await label() === 'Data', 'Ctrl+Page Up on the first sheet stays there');
+await page.keyboard.press('Control+z');
+check(await label() === 'Notes & more' && await value('B2') === -3.5, 'Ctrl+Z on Data undoes the change on Notes & more, showing it');
+await page.keyboard.press('Control+PageDown');
+check(await label() === 'Notes & more', 'Ctrl+Page Down on the last sheet shown stays there (the hidden one is passed over)');
+await page.focus('.oxe-tab[aria-selected="true"]');
+await page.keyboard.press('Home');
+check(await label() === 'Data' && await page.evaluate(() => document.activeElement.textContent) === 'Data', 'Home on the tabs: the first sheet, its tab focused');
+await page.keyboard.press('ArrowRight');
+check(await label() === 'Notes & more' && await page.evaluate(() => [...document.querySelectorAll('.oxe-tab')].map((el) => el.tabIndex).join()) === '-1,0', 'Right arrow: the next sheet, one tab in the tab order');
+await page.keyboard.press('ArrowLeft');
+await page.focus('.oxe-grid');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);
@@ -154,6 +185,7 @@ const v = (r, c) => sh.cells.get(r)?.get(c)?.v ?? null;
 check(v(1, 1) === 77 && v(1, 0) === 'Item 1 x' && v(15, 0) === 0.5 && v(15, 2) === '007' && v(15, 3) === true && v(1, 4) === 'No', 'saved: the edits are in the file');
 check(sh.cells.get(15).get(4).f === 'SUM(B2:B3)' && v(15, 4) === 87 && v(2, 2) === 20 && v(10, 1) === 129, 'saved: the formula and the results worked out');
 check(!wb.pkg.has('xl/calcChain.xml'), 'saved: calcChain.xml left out (Excel works the order out again)');
+check(wb.sheet(1).cells.get(1).get(1).v === -3.5, 'saved: the change on the second sheet undone');
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();

@@ -302,7 +302,8 @@
     --oxe-fg: #000000;
   }
   .oxe-root > .oxe-grid,
-  .oxe-root > .oxe-bar {
+  .oxe-root > .oxe-bar,
+  .oxe-root > .oxe-tabs {
     display: none;
   }
   .oxe-print {
@@ -383,6 +384,50 @@
 .oxe-namebox:focus-visible {
   outline: 2px solid var(--oxe-focus);
   outline-offset: -1px;
+}
+
+/* The sheet tabs (tabs.js) under the grid: the sheet shown on the sheet's own white with the selection's green, as
+   Excel marks it; a tab colour fills the other tabs and underlines the one shown. Too many to fit: the strip scrolls. */
+.oxe-tabs {
+  display: flex;
+  flex: none;
+  overflow-x: auto;
+  border-top: 1px solid var(--oxe-head-line);
+  background: var(--oxe-head-bg);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-tab {
+  flex: none;
+  padding: 4px 14px 3px;
+  border: 0;
+  border-right: 1px solid var(--oxe-head-line);
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--oxe-head-fg);
+  font: inherit;
+  white-space: pre;
+  cursor: pointer;
+}
+.oxe-tab-colored {
+  background: var(--oxe-tab-color);
+  color: var(--oxe-tab-text);
+}
+.oxe-tab[aria-selected="true"] {
+  background: #ffffff;
+  color: var(--oxe-sel);
+  font-weight: 600;
+  border-bottom-color: var(--oxe-sel);
+}
+.oxe-tab-colored[aria-selected="true"] {
+  border-bottom-color: var(--oxe-tab-color);
+}
+.oxe-tab[aria-disabled="true"] {
+  cursor: default;
+  font-style: italic;
+}
+.oxe-tab:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: -2px;
 }
 
 /* The selection (selection.js): view state over the cells and under the sticky headings. */

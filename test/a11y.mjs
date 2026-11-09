@@ -1,5 +1,6 @@
 // Accessibility: axe-core (WCAG 2.1 A and AA rules) on the demo with a workbook open, in light and dark, at a desktop
-// width and at 320px (reflow: no page-level horizontal scrolling, the grid scrolls inside itself).
+// width and at 320px (reflow: no page-level horizontal scrolling, the grid scrolls inside itself); the grid and the
+// sheet tabs as ARIA describes them.
 // Run after `npm run build`: node test/a11y.mjs
 import { createRequire } from 'node:module';
 import { openDemo, openFixture, checker } from './browser.mjs';
@@ -23,6 +24,12 @@ for (const colorScheme of ['light', 'dark']) {
       return { role: g.getAttribute('role'), focusable: g.tabIndex >= 0, rows: g.getAttribute('aria-rowcount'), label: g.getAttribute('aria-label') };
     });
     t.check(grid.role === 'grid' && grid.focusable && Number(grid.rows) > 0 && grid.label === 'Data', `${colorScheme}, ${width}px: the grid is a labelled, focusable ARIA grid`, JSON.stringify(grid));
+    const tabs = await page.evaluate(() => {
+      const list = document.querySelector('.oxe-tabs');
+      const id = document.querySelector('.oxe-grid').id;
+      return { role: list.getAttribute('role'), label: list.getAttribute('aria-label'), tabs: [...list.children].map((el) => `${el.getAttribute('role')}:${el.getAttribute('aria-controls') === id}:${el.getAttribute('aria-selected')}:${el.tabIndex}`) };
+    });
+    t.check(tabs.role === 'tablist' && tabs.label === 'Sheets' && tabs.tabs.join() === 'tab:true:true:0,tab:true:false:-1', `${colorScheme}, ${width}px: the sheet tabs are a labelled tablist controlling the grid, one tab in the tab order`, JSON.stringify(tabs));
     t.check(!errors.length, `${colorScheme}, ${width}px: no page errors`, errors.join('\n     '));
     await close();
   }

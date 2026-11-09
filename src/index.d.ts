@@ -41,6 +41,10 @@ export declare class Workbook {
   readonly date1904: boolean;
   readonly activeSheet: number;
   sheet(index: number): SheetModel;
+  /** Whether a sheet can be shown: a worksheet whose tab isn't hidden. */
+  canShow(index: number): boolean;
+  /** A sheet's tab colour as '#RRGGBB', or null. */
+  tabColor(index: number): string | null;
   /** Set a cell ("B2" or { r, c }, 0-based) to a number, boolean, string (written inline) or null. */
   setCell(index: number, ref: string | { r: number; c: number }, value: number | boolean | string | null): { circular: unknown[] };
   /** Give a cell a formula as the file has it ("SUM(A1:A3)", without "="); the formulas that read it are worked out again. */
@@ -72,7 +76,9 @@ export interface XlsxEditor {
   setCell(ref: CellRef, value: number | boolean | string | null): boolean;
   undo(): boolean;
   redo(): boolean;
-  /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo. */
+  /** Show a sheet by index or name, with the selection it had; false if it can't be shown (hidden, or a chart sheet). */
+  showSheet(sheet: number | string): boolean;
+  /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo, showSheet, nextSheet. */
   command(name: string, ...args: unknown[]): unknown;
   readonly selection: Selection | null;
   readonly readOnly: boolean;

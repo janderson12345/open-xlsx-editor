@@ -353,6 +353,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   view.appendChild(canvas);
   host.appendChild(view);
   const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
   const measure = (next, nextLooks) => {
