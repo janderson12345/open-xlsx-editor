@@ -213,7 +213,57 @@ function general() {
   });
 }
 
+// A theme part of our own: Calibri for body text and headings, plain colours. (A workbook without one is drawn in
+// Excel 365's default theme, Aptos Narrow, which browsers don't have.)
+const THEME = `${DECL}<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="open-xlsx-editor fixtures"><a:themeElements>` +
+  '<a:clrScheme name="fixtures">' + [['dk1', '000000'], ['lt1', 'FFFFFF'], ['dk2', '1F3864'], ['lt2', 'E7E6E6'], ['accent1', '4472C4'], ['accent2', 'ED7D31'],
+  ['accent3', 'A5A5A5'], ['accent4', 'FFC000'], ['accent5', '5B9BD5'], ['accent6', '70AD47'], ['hlink', '0563C1'], ['folHlink', '954F72']]
+    .map(([n, c]) => `<a:${n}><a:srgbClr val="${c}"/></a:${n}>`).join('') + '</a:clrScheme>' +
+  '<a:fontScheme name="fixtures"><a:majorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>' +
+  '<a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>' +
+  '<a:fmtScheme name="fixtures"><a:fillStyleLst>' + '<a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'.repeat(3) + '</a:fillStyleLst>' +
+  '<a:lnStyleLst>' + '<a:ln w="6350"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln>'.repeat(3) + '</a:lnStyleLst>' +
+  '<a:effectStyleLst>' + '<a:effectStyle><a:effectLst/></a:effectStyle>'.repeat(3) + '</a:effectStyleLst>' +
+  '<a:bgFillStyleLst>' + '<a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'.repeat(3) + '</a:bgFillStyleLst></a:fmtScheme>' +
+  '</a:themeElements></a:theme>';
+
+// A probe for fonts: one row per font and size (its own cell format), text in A and a number in B, each row tall
+// enough for its font (customHeight, so Excel doesn't resize it), with the theme above.
+export const PROBE_FONTS = [['Calibri', 11, 'minor'], ['Calibri', 11, 'minor', 'b'], ['Calibri', 11, 'minor', 'i'], ['Calibri', 8, 'minor'],
+  ['Calibri', 14, 'minor'], ['Calibri', 20, 'minor'], ['Cambria', 11], ['Cambria', 20, null, 'i'], ['Arial', 11], ['Arial', 14],
+  ['Times New Roman', 11], ['Times New Roman', 16], ['Courier New', 11], ['Courier New', 9], ['Calibri', 11]];
+function fonts() {
+  const font = ([name, sz, scheme, style]) => `<font>${style === 'b' ? '<b/>' : ''}${style === 'i' ? '<i/>' : ''}<sz val="${sz}"/><color theme="1"/><name val="${name}"/>${scheme ? `<scheme val="${scheme}"/>` : ''}</font>`;
+  const styles = `${DECL}<styleSheet xmlns="${X}"><fonts count="${PROBE_FONTS.length}">${PROBE_FONTS.map(font).join('')}</fonts>` +
+    '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+    '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    `<cellXfs count="${PROBE_FONTS.length}">${PROBE_FONTS.map((_, i) => `<xf numFmtId="0" fontId="${i}" fillId="0" borderId="0" xfId="0"${i ? ' applyFont="1"' : ''}/>`).join('')}</cellXfs>` +
+    '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>';
+  const rows = PROBE_FONTS.map((f, i) => {
+    const ht = Math.max(15, Math.ceil(f[1] * 1.6));
+    return `<row r="${i + 1}" ht="${ht}" customHeight="1"><c r="A${i + 1}" s="${i}" t="inlineStr"><is><t>${esc(`${f[0]} ${f[1]} ${f[3] || ''} Sample 0123`)}</t></is></c><c r="B${i + 1}" s="${i}"><v>${12345.678 + i}</v></c></row>`;
+  });
+  // Then, in the Normal style (Calibri 11 here), three rows of the default height and the widths probe's row heights:
+  // printed row heights depend on the Normal style's font (docs/LAYOUT.md).
+  const at = PROBE_FONTS.length + 2;
+  const txt = (r, t) => `<c r="A${r}" t="inlineStr"><is><t>${esc(t)}</t></is></c>`;
+  for (let k = 0; k < 3; k++) rows.push(`<row r="${at + k}">${txt(at + k, `d${k + 1}`)}</row>`);
+  PROBE_HEIGHTS.forEach((ht, k) => rows.push(`<row r="${at + 3 + k}" ht="${ht}" customHeight="1">${txt(at + 3 + k, `h${ht}`)}</row>`));
+  write('fonts.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Fonts" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', RT('theme'), 'theme/theme1.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="1" width="45.7109375" customWidth="1"/><col min="2" max="2" width="20.7109375" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': styles,
+    'xl/theme/theme1.xml': THEME,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+  fonts();
   general();
   basic();
   prefixed();
