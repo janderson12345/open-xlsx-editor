@@ -35,9 +35,8 @@ They come from Excel's dialog, which COM doesn't reach, so their wording isn't m
 
 ## Not yet
 
-Look in Notes and Comments, Format (finding and replacing formats), Go To and Go To Special, the Find All list of
-cells, and replacing within a date (a date's text changed would be text until dates typed are read as dates: such a
-cell is left alone and counted).
+Look in Notes and Comments, Format (finding and replacing formats), Go To and Go To Special, and the Find All list of
+cells. (Replacing within a date now works as in Excel: docs/ENTRY.md.)
 
 ## Found on the way
 

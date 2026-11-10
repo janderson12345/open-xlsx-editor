@@ -80,7 +80,10 @@ test('replace: parts or whole cells, entered as if typed; formulas as plain text
   const ch = replaceChanges(wb, all(wb, si, '1'), '1', '9');
   run(wb, ch);
   assert.deepEqual(['C2', 'A4', 'B3'].map((r) => v(wb, si, r)), [92, '=A9+A90', 'a*b']);
-  assert.equal(ch.refused, 1); // (B4's date: "9/9/2024" would be text, so it is left alone)
+  assert.equal(v(wb, si, 'B4'), 45544); // (the date 1/1/2024 made 9/9/2024, its format kept, as Excel does)
+  ({ wb, si } = setup());
+  run(wb, replaceChanges(wb, all(wb, si, '50'), '50', '60'));
+  assert.equal(v(wb, si, 'A2'), 0.6); // (50% made 60%)
   ({ wb, si } = setup());
   run(wb, replaceChanges(wb, all(wb, si, 'a*b'), 'a*b', 'Z'));
   assert.deepEqual(['B3', 'C3', 'A1', 'B1'].map((r) => v(wb, si, r)), ['Z', 'Z', 'apple', 'Apple pie']);

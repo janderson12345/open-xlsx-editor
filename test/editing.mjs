@@ -459,6 +459,28 @@ await page.click('.oxe-toolbar button[title="100%"]');
 check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":0,"cols":0}' && await page.evaluate(() => window.oxe.grid.view().zoom) === 100 && await page.isHidden('.oxe-pane-top'), 'Unfreeze Panes and 100%: as before');
 await page.click('.oxe-rtab >> text=Home');
 
+// Entries as Excel reads them: a date typed into G40 is a date, shown and in the formula bar as one; F2 and Enter keep
+// it; $1,234.50 is currency; Ctrl+Z takes the value and its format away together.
+const codeAt = (ref) => page.evaluate((ref) => { const wb = window.oxe.workbook; const cell = wb.sheet(0).cells.get(Number(ref.slice(1)) - 1)?.get(ref.charCodeAt(0) - 65); const xf = wb.styles.cellXfs[cell?.s || 0]; return wb.styles.numFmts[xf.numFmtId] ?? ({ 14: 'm/d/yyyy', 0: 'General', 8: 'currency' })[xf.numFmtId] ?? String(xf.numFmtId); }, ref);
+await page.evaluate(() => window.oxe.select('G40'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('1/2/2024');
+await page.keyboard.press('Enter');
+check(await value('G40') === 45293 && await shown(39, 6) === '1/2/2024' && await codeAt('G40') === 'm/d/yyyy', 'typed 1/2/2024: the date 45293, shown 1/2/2024', `${await value('G40')} ${await shown(39, 6)}`);
+await page.evaluate(() => window.oxe.select('G40'));
+check(await bar() === '1/2/2024', 'the formula bar shows it as a date', await bar());
+await page.focus('.oxe-grid');
+await page.keyboard.press('F2');
+await page.keyboard.press('Enter');
+check(await value('G40') === 45293, 'F2 and Enter: still the same date');
+await page.evaluate(() => window.oxe.select('G41'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('$1,234.50');
+await page.keyboard.press('Enter');
+check(await value('G41') === 1234.5 && /\$"?#,##0\.00/.test(await codeAt('G41')), 'typed $1,234.50: 1234.5 as currency (shown ######## in a column this narrow, as in Excel)', await codeAt('G41'));
+await page.keyboard.press('Control+z');
+check(await value('G41') === null && await codeAt('G41') === 'General', 'Ctrl+Z: the value and its format gone together');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

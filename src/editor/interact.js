@@ -12,6 +12,7 @@ import { announce } from './live.js';
 import { refName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
+import { formatCodeOf } from '../ooxml/styles.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -112,9 +113,11 @@ export function attachEditing(root, ctx) {
     view.focus({ preventScroll: true });
     refreshBar();
   }
+  /** A cell's text as Excel's formula bar has it (a date as a date, a percentage as one). */
+  const barText = (cell) => editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904);
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
-    bar.show(refName(s.ar, s.ac), editText(cellAt(s.ar, s.ac)));
+    bar.show(refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac)));
   }
   const reopen = (text) => {
     const s = cmd.selection;
@@ -132,7 +135,7 @@ export function attachEditing(root, ctx) {
       return;
     }
     const cls = ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '';
-    editor.open(s.ar, s.ac, seed != null ? seed : editText(cell), mode, cls);
+    editor.open(s.ar, s.ac, seed != null ? seed : barText(cell), mode, cls);
     pointing.attach(editor.el);
   };
 

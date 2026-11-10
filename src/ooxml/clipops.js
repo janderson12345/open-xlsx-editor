@@ -2,7 +2,7 @@
 // their values, formulas, formats and merged ranges. Pasting returns what changes, sheet by sheet, for the editor to
 // apply and undo as one step: [{ si, contents: [{ r, c, value } or { r, c, formula }], styles: [{ r, c, s }], merges }].
 import { shiftFormula, moveRefs } from '../calc/tokens.js';
-import { parseInput } from './input.js';
+import { entryChanges } from './entry.js';
 import { cellsOf } from './formatops.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
@@ -116,16 +116,19 @@ export function pasteCut(wb, si, sel, clip) {
 }
 
 /** Text from outside (tabs between cells, a line for each row) pasted at `sel`'s top-left cell, each cell read as if it
- *  were typed there (a number, a date, =a formula...). Formats stay as they are. */
+ *  were typed there (a number, a date, =a formula...), with the format typing would give it. */
 export function pasteText(wb, si, sel, text) {
   const lines = text.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').map((l) => l.split('\t'));
   const contents = [];
+  const styles = [];
   lines.forEach((line, dr) => line.forEach((t, dc) => {
     const r = sel.r0 + dr;
     const c = sel.c0 + dc;
-    const p = parseInput(t);
-    contents.push(p.error || p.formula == null ? { r, c, value: p.error ? t : p.value } : { r, c, formula: p.formula });
+    const ch = entryChanges(wb, si, r, c, t);
+    // (A formula Excel wouldn't take comes in as its text.)
+    contents.push(ch.error ? { r, c, value: t } : ch.content);
+    if (ch.style) styles.push(ch.style);
   }));
   const area = { r0: sel.r0, c0: sel.c0, r1: sel.r0 + lines.length - 1, c1: sel.c0 + Math.max(...lines.map((l) => l.length)) - 1 };
-  return [{ si, contents, styles: [], merges: wb.sheet(si).merges, area }];
+  return [{ si, contents, styles, merges: wb.sheet(si).merges, area }];
 }

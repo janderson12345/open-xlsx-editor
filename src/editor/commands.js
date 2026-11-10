@@ -6,7 +6,7 @@
 // the history or the file. Sheets are known by their sheetId in both, as indexes change when sheets move.
 import { cellSelection, extendSelection } from './selection.js';
 import { step, jump, lastCell } from './navigate.js';
-import { parseInput } from '../ooxml/input.js';
+import { entryChanges } from '../ooxml/entry.js';
 import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
@@ -159,9 +159,13 @@ export function createCommands(ctx) {
      *  it starts with =. */
     enter(text, at = null) {
       const { r, c } = at || { r: state.sel.ar, c: state.sel.ac };
-      const parsed = parseInput(text);
-      if (parsed.error) { ctx.announce(parsed.error); return false; }
-      return apply([parsed.formula != null ? { r, c, formula: parsed.formula } : { r, c, value: parsed.value }]);
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (inArray(r, c)) { ctx.announce("You can't change part of an array"); return false; }
+      const ch = entryChanges(ctx.workbook(), ctx.sheetIndex(), r, c, text);
+      if (ch.error) { ctx.announce(ch.error); return false; }
+      // (A date, a time, currency or a percentage typed into a General cell gives it Excel's format: one step with the value.)
+      if (!ch.style) return apply([ch.content]);
+      return runSteps([{ si: ctx.sheetIndex(), contents: [ch.content], styles: [ch.style] }]);
     },
     /** Set a cell to a value as given (a number, boolean, string or null), as the API does. */
     setValue(r, c, value) { return apply([{ r, c, value }]); },

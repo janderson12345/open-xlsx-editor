@@ -1,0 +1,762 @@
+{
+  "excel": "Excel.Application, Range.Formula = text (United States settings)",
+  "today": "2026-11-09",
+  "entries": [
+    {
+      "text": "1/2/2024",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/2/24",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/2",
+      "type": "number",
+      "value": 46024.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "2024-01-02",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "2024/1/2",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "Jan 5",
+      "type": "number",
+      "value": 46027.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "Jan 5, 2024",
+      "type": "number",
+      "value": 45296.0,
+      "format": "d-mmm-yy"
+    },
+    {
+      "text": "5 Jan 2024",
+      "type": "number",
+      "value": 45296.0,
+      "format": "d-mmm-yy"
+    },
+    {
+      "text": "5-Jan-2024",
+      "type": "number",
+      "value": 45296.0,
+      "format": "d-mmm-yy"
+    },
+    {
+      "text": "5-Jan",
+      "type": "number",
+      "value": 46027.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "Jan-24",
+      "type": "number",
+      "value": 46046.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "January 2024",
+      "type": "number",
+      "value": 45292.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "10:30",
+      "type": "number",
+      "value": 0.4375,
+      "format": "h:mm"
+    },
+    {
+      "text": "10:30:15",
+      "type": "number",
+      "value": 0.43767361111111114,
+      "format": "h:mm:ss"
+    },
+    {
+      "text": "10:30 PM",
+      "type": "number",
+      "value": 0.9375,
+      "format": "h:mm AM/PM"
+    },
+    {
+      "text": "10:30pm",
+      "type": "text",
+      "value": "10:30pm",
+      "format": "General"
+    },
+    {
+      "text": "1/2/2024 10:30",
+      "type": "number",
+      "value": 45293.4375,
+      "format": "m/d/yyyy h:mm"
+    },
+    {
+      "text": "1/2/2024 10:30 PM",
+      "type": "number",
+      "value": 45293.9375,
+      "format": "m/d/yyyy h:mm"
+    },
+    {
+      "text": "25:30",
+      "type": "number",
+      "value": 1.0625,
+      "format": "[h]:mm:ss"
+    },
+    {
+      "text": "1:2",
+      "type": "number",
+      "value": 0.043055555555555555,
+      "format": "h:mm"
+    },
+    {
+      "text": "0:90",
+      "type": "number",
+      "value": 0.0625,
+      "format": "General"
+    },
+    {
+      "text": "13/1/2024",
+      "type": "text",
+      "value": "13/1/2024",
+      "format": "General"
+    },
+    {
+      "text": "2/30/2024",
+      "type": "text",
+      "value": "2/30/2024",
+      "format": "General"
+    },
+    {
+      "text": "12/31/9999",
+      "type": "number",
+      "value": 2958465.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/1/1900",
+      "type": "number",
+      "value": 1.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "$1,234.50",
+      "type": "number",
+      "value": 1234.5,
+      "format": "$#,##0.00_);[Red]($#,##0.00)"
+    },
+    {
+      "text": "$5",
+      "type": "number",
+      "value": 5.0,
+      "format": "$#,##0_);[Red]($#,##0)"
+    },
+    {
+      "text": "1,234",
+      "type": "number",
+      "value": 1234.0,
+      "format": "#,##0"
+    },
+    {
+      "text": "1,234.5",
+      "type": "number",
+      "value": 1234.5,
+      "format": "#,##0.00"
+    },
+    {
+      "text": "1e3",
+      "type": "number",
+      "value": 1000.0,
+      "format": "0.00E+00"
+    },
+    {
+      "text": "1.5E+2",
+      "type": "number",
+      "value": 150.0,
+      "format": "0.00E+00"
+    },
+    {
+      "text": "1 1/2",
+      "type": "number",
+      "value": 1.5,
+      "format": "# ?/?"
+    },
+    {
+      "text": "3/4",
+      "type": "number",
+      "value": 46085.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "0 3/4",
+      "type": "number",
+      "value": 0.75,
+      "format": "# ?/?"
+    },
+    {
+      "text": "(5)",
+      "type": "number",
+      "value": -5.0,
+      "format": "General"
+    },
+    {
+      "text": "-$5",
+      "type": "number",
+      "value": -5.0,
+      "format": "$#,##0_);[Red]($#,##0)"
+    },
+    {
+      "text": "$-5",
+      "type": "number",
+      "value": -5.0,
+      "format": "$#,##0_);[Red]($#,##0)"
+    },
+    {
+      "text": "50%",
+      "type": "number",
+      "value": 0.5,
+      "format": "0%"
+    },
+    {
+      "text": "50.5%",
+      "type": "number",
+      "value": 0.505,
+      "format": "0.00%"
+    },
+    {
+      "text": "5%%",
+      "type": "text",
+      "value": "5%%",
+      "format": "General"
+    },
+    {
+      "text": "  42  ",
+      "type": "number",
+      "value": 42.0,
+      "format": "General"
+    },
+    {
+      "text": "TRUE",
+      "type": "boolean",
+      "value": true,
+      "format": "General"
+    },
+    {
+      "text": "abc",
+      "type": "text",
+      "value": "abc",
+      "format": "General"
+    },
+    {
+      "text": "1/2/3/4",
+      "type": "text",
+      "value": "1/2/3/4",
+      "format": "General"
+    },
+    {
+      "text": "12:00 AM",
+      "type": "number",
+      "value": 0.0,
+      "format": "h:mm AM/PM"
+    },
+    {
+      "text": "00:00",
+      "type": "number",
+      "value": 0.0,
+      "format": "h:mm"
+    },
+    {
+      "text": "2024-1-2 3:04",
+      "type": "number",
+      "value": 45293.12777777778,
+      "format": "m/d/yyyy h:mm"
+    },
+    {
+      "text": "Sat 1/6/2024",
+      "type": "text",
+      "value": "Sat 1/6/2024",
+      "format": "General"
+    },
+    {
+      "text": ".5",
+      "type": "number",
+      "value": 0.5,
+      "format": "General"
+    },
+    {
+      "text": "5.",
+      "type": "number",
+      "value": 5.0,
+      "format": "General"
+    },
+    {
+      "text": "+5",
+      "type": "number",
+      "value": 5.0,
+      "format": "General"
+    },
+    {
+      "text": "1 2",
+      "type": "text",
+      "value": "1 2",
+      "format": "General"
+    },
+    {
+      "text": "1/2/2024",
+      "before": "0.00",
+      "type": "number",
+      "value": 45293.0,
+      "format": "0.00"
+    },
+    {
+      "text": "$5",
+      "before": "0.00",
+      "type": "number",
+      "value": 5.0,
+      "format": "0.00"
+    },
+    {
+      "text": "50%",
+      "before": "0.00",
+      "type": "number",
+      "value": 0.5,
+      "format": "0.00"
+    },
+    {
+      "text": "5",
+      "before": "m/d/yyyy",
+      "type": "number",
+      "value": 5.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "10:30",
+      "before": "m/d/yyyy",
+      "type": "number",
+      "value": 0.4375,
+      "format": "h:mm"
+    },
+    {
+      "text": "1/2/2024",
+      "before": "@",
+      "type": "text",
+      "value": "1/2/2024",
+      "format": "@"
+    },
+    {
+      "text": "0.5",
+      "before": "0%",
+      "type": "number",
+      "value": 0.5,
+      "format": "0%"
+    },
+    {
+      "text": "1/2/2024",
+      "before": "0%",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/2/2024",
+      "before": "d-mmm-yy",
+      "type": "number",
+      "value": 45293.0,
+      "format": "d-mmm-yy"
+    },
+    {
+      "text": "1/2/2024",
+      "before": "h:mm",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1,234",
+      "before": "$#,##0.00",
+      "type": "number",
+      "value": 1234.0,
+      "format": "$#,##0.00"
+    },
+    {
+      "text": "1/2/2024",
+      "before": "#,##0",
+      "type": "number",
+      "value": 45293.0,
+      "format": "#,##0"
+    },
+    {
+      "text": "1/2/29",
+      "type": "number",
+      "value": 47120.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/2/30",
+      "type": "number",
+      "value": 10960.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/2/99",
+      "type": "number",
+      "value": 36162.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1/2/00",
+      "type": "number",
+      "value": 36527.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "Jan-30",
+      "type": "number",
+      "value": 46052.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "Jan-32",
+      "type": "number",
+      "value": 11689.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "Feb-29",
+      "type": "number",
+      "value": 47150.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "2/29",
+      "type": "number",
+      "value": 47150.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "2/29/2024",
+      "type": "number",
+      "value": 45351.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "2/29/2025",
+      "type": "text",
+      "value": "2/29/2025",
+      "format": "General"
+    },
+    {
+      "text": "0/1/2024",
+      "type": "text",
+      "value": "0/1/2024",
+      "format": "General"
+    },
+    {
+      "text": "Jan 2024",
+      "type": "number",
+      "value": 45292.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "5 Jan",
+      "type": "number",
+      "value": 46027.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "January 5",
+      "type": "number",
+      "value": 46027.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "Sept 5",
+      "type": "number",
+      "value": 46270.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "Sep 5",
+      "type": "number",
+      "value": 46270.0,
+      "format": "d-mmm"
+    },
+    {
+      "text": "1-2-2024",
+      "type": "number",
+      "value": 45293.0,
+      "format": "m/d/yyyy"
+    },
+    {
+      "text": "1.2.2024",
+      "type": "text",
+      "value": "1.2.2024",
+      "format": "General"
+    },
+    {
+      "text": "9:00 am",
+      "type": "number",
+      "value": 0.375,
+      "format": "h:mm AM/PM"
+    },
+    {
+      "text": "9 AM",
+      "type": "number",
+      "value": 0.375,
+      "format": "h:mm AM/PM"
+    },
+    {
+      "text": "9AM",
+      "type": "text",
+      "value": "9AM",
+      "format": "General"
+    },
+    {
+      "text": "12/2024",
+      "type": "number",
+      "value": 45627.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "13:00 PM",
+      "type": "text",
+      "value": "13:00 PM",
+      "format": "General"
+    },
+    {
+      "text": "12:60",
+      "type": "number",
+      "value": 0.5416666666666666,
+      "format": "General"
+    },
+    {
+      "text": "24:00",
+      "type": "number",
+      "value": 1.0,
+      "format": "[h]:mm:ss"
+    },
+    {
+      "text": "1/2/2024 25:00",
+      "type": "number",
+      "value": 45294.041666666664,
+      "format": "General"
+    },
+    {
+      "text": "2024-01-02T03:04",
+      "type": "text",
+      "value": "2024-01-02T03:04",
+      "format": "General"
+    },
+    {
+      "text": "Dec 31 9999",
+      "type": "text",
+      "value": "Dec 31 9999",
+      "format": "General"
+    },
+    {
+      "text": "1/1/10000",
+      "type": "text",
+      "value": "1/1/10000",
+      "format": "General"
+    },
+    {
+      "text": "1/0/2024",
+      "type": "text",
+      "value": "1/0/2024",
+      "format": "General"
+    },
+    {
+      "text": "Jan 0",
+      "type": "number",
+      "value": 36526.0,
+      "format": "mmm-yy"
+    },
+    {
+      "text": "0:00:60",
+      "type": "number",
+      "value": 0.0006944444444444445,
+      "format": "General"
+    },
+    {
+      "text": "1:2:3",
+      "type": "number",
+      "value": 0.043090277777777776,
+      "format": "h:mm:ss"
+    },
+    {
+      "text": "-1:00",
+      "type": "text",
+      "value": "-1:00",
+      "format": "General"
+    },
+    {
+      "text": "1/2/2024 10",
+      "type": "text",
+      "value": "1/2/2024 10",
+      "format": "General"
+    },
+    {
+      "text": "10:30:15.5",
+      "type": "number",
+      "value": 0.43767939814814816,
+      "format": "mm:ss.0"
+    },
+    {
+      "text": "10:30.5",
+      "type": "number",
+      "value": 0.007297453703703704,
+      "format": "mm:ss.0"
+    },
+    {
+      "text": "1/2/1899",
+      "type": "text",
+      "value": "1/2/1899",
+      "format": "General"
+    },
+    {
+      "text": "12/31/1899",
+      "type": "text",
+      "value": "12/31/1899",
+      "format": "General"
+    },
+    {
+      "text": "1/1/1900 0:00",
+      "type": "number",
+      "value": 1.0,
+      "format": "m/d/yyyy h:mm"
+    },
+    {
+      "text": "15-Mar-24",
+      "type": "number",
+      "value": 45366.0,
+      "format": "d-mmm-yy"
+    },
+    {
+      "text": "15-March-2024",
+      "type": "number",
+      "value": 45366.0,
+      "format": "d-mmm-yy"
+    },
+    {
+      "text": "Mar 15 24",
+      "type": "text",
+      "value": "Mar 15 24",
+      "format": "General"
+    },
+    {
+      "text": "March 15th",
+      "type": "text",
+      "value": "March 15th",
+      "format": "General"
+    },
+    {
+      "text": "$ 5",
+      "type": "number",
+      "value": 5.0,
+      "format": "$#,##0_);[Red]($#,##0)"
+    },
+    {
+      "text": "5$",
+      "type": "text",
+      "value": "5$",
+      "format": "General"
+    },
+    {
+      "text": "€5",
+      "type": "number",
+      "value": 5.0,
+      "format": "General"
+    },
+    {
+      "text": "$.5",
+      "type": "number",
+      "value": 0.5,
+      "format": "$#,##0.00_);[Red]($#,##0.00)"
+    },
+    {
+      "text": "$1,23",
+      "type": "text",
+      "value": "$1,23",
+      "format": "General"
+    },
+    {
+      "text": "1,23",
+      "type": "text",
+      "value": "1,23",
+      "format": "General"
+    },
+    {
+      "text": "1,2345",
+      "type": "number",
+      "value": 12345.0,
+      "format": "#,##0"
+    },
+    {
+      "text": "12,345,678.9",
+      "type": "number",
+      "value": 12345678.9,
+      "format": "#,##0.00"
+    },
+    {
+      "text": "-1,234",
+      "type": "number",
+      "value": -1234.0,
+      "format": "#,##0"
+    },
+    {
+      "text": "(1,234)",
+      "type": "number",
+      "value": -1234.0,
+      "format": "#,##0"
+    },
+    {
+      "text": "($5)",
+      "type": "number",
+      "value": -5.0,
+      "format": "$#,##0_);[Red]($#,##0)"
+    },
+    {
+      "text": "-50%",
+      "type": "number",
+      "value": -0.5,
+      "format": "0%"
+    },
+    {
+      "text": "%50",
+      "type": "number",
+      "value": 0.5,
+      "format": "0%"
+    },
+    {
+      "text": "1e",
+      "type": "text",
+      "value": "1e",
+      "format": "General"
+    },
+    {
+      "text": "e3",
+      "type": "text",
+      "value": "e3",
+      "format": "General"
+    },
+    {
+      "text": "1E+400",
+      "type": "text",
+      "value": "1E+400",
+      "format": "0.00E+00"
+    }
+  ]
+}

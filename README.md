@@ -51,6 +51,7 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
   `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut and paste.
   `docs/ROWCOL.md`: matching Excel's inserting and deleting of rows and columns. `docs/SIZES.md`: widths, heights,
   hiding. `docs/FIND.md`: Find and Replace. `docs/VIEW.md`: frozen panes and zoom.
+  `docs/ENTRY.md`: how typed entries are read.
   `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab.
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
   Word editor modules carry over.

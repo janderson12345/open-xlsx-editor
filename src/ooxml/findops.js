@@ -3,11 +3,10 @@
 // (Values). Search goes from the cell after the active one, by rows or by columns, round to the start; * and ? are
 // wildcards, ~ takes the next character as it is. A replacement is entered as if typed (a number becomes a number,
 // "=..." a formula); in a formula it is plain text, so A1 to B9 also makes A10 B90, as in Excel.
-import { formatValue, isDateFormat } from './format.js';
-import { formatGeneral, cellDisplay } from './numfmt.js';
+import { cellDisplay } from './numfmt.js';
 import { formatCodeOf } from './styles.js';
-import { displayFormula } from '../calc/tokens.js';
-import { parseInput } from './input.js';
+import { editText } from './input.js';
+import { entryChanges } from './entry.js';
 
 /** A pattern as a regular expression: Excel's wildcards, case ignored unless `matchCase`, the whole text when
  *  `whole`. Null for an empty pattern. */
@@ -24,28 +23,10 @@ export function pattern(what, { matchCase = false, whole = false } = {}, global 
   return new RegExp(whole ? `^(?:${src})$` : src, `${matchCase ? '' : 'i'}${global ? 'g' : ''}`);
 }
 
-const PERCENT = /%(?=(?:[^"]*"[^"]*")*[^"]*$)/;
-
-/** A cell's text as Excel's formula bar has it, which Look in Formulas searches. */
-export function formulaText(cell, code = 'General', date1904 = false) {
-  if (!cell) return '';
-  if (cell.f) return `=${displayFormula(cell.f)}`;
-  if (cell.v == null) return '';
-  if (cell.t === 'b') return cell.v ? 'TRUE' : 'FALSE';
-  if (cell.t !== 'n') return String(cell.v);
-  if (code && code !== 'General' && isDateFormat(code)) {
-    const frac = cell.v % 1;
-    const date = formatValue(Math.floor(cell.v), 'm/d/yyyy', { date1904 }).text;
-    return frac ? `${date} ${formatValue(cell.v, 'h:mm:ss AM/PM', { date1904 }).text}` : date;
-  }
-  if (code && PERCENT.test(code)) return `${formatGeneral(Math.round(cell.v * 100 * 1e10) / 1e10)}%`;
-  return String(cell.v);
-}
-
 /** The text of cell (r, c) of sheet si that a search looks at. */
 export function searchText(wb, si, cell, lookIn = 'formulas') {
   const code = formatCodeOf(wb.styles, cell?.s || 0);
-  return lookIn === 'values' ? cellDisplay(cell, Infinity, code, wb.date1904).text : formulaText(cell, code, wb.date1904);
+  return lookIn === 'values' ? cellDisplay(cell, Infinity, code, wb.date1904).text : editText(cell, code, wb.date1904);
 }
 
 /** The sheets a search goes through: the one shown, or every worksheet that can be shown from it on (Within:
@@ -97,8 +78,9 @@ export function replaced(text, what, withText, opts = {}) {
 
 /**
  * The changes Replace makes to cells [{ si, r, c }] (Look in is always Formulas, as in Excel's Replace): grouped by
- * sheet for the editor's undo history, [{ si, contents: [{ r, c, value } or { r, c, formula }], styles: [], merges }],
- * with `count` and `refused` (a replacement that isn't a formula Excel would take).
+ * sheet for the editor's undo history, [{ si, contents: [{ r, c, value } or { r, c, formula }], styles, merges }]
+ * (a replacement entered as if typed, with the format typing would give), with `count` and `refused` (a
+ * replacement that isn't a formula Excel would take).
  */
 export function replaceChanges(wb, cells, what, withText, opts = {}) {
   const bySheet = new Map();
@@ -108,12 +90,11 @@ export function replaceChanges(wb, cells, what, withText, opts = {}) {
     const cell = wb.sheet(si).cells.get(r)?.get(c);
     const next = replaced(searchText(wb, si, cell, 'formulas'), what, withText, opts);
     if (next == null) continue;
-    const p = parseInput(next);
-    // (A date's text changed would be text, not a date: dates typed aren't read as dates yet, so it is left alone.)
-    const date = cell.t === 'n' && !cell.f && isDateFormat(formatCodeOf(wb.styles, cell.s || 0));
-    if (p.error || (date && typeof p.value !== 'number')) { refused++; continue; }
+    const ch = entryChanges(wb, si, r, c, next);
+    if (ch.error) { refused++; continue; }
     if (!bySheet.has(si)) bySheet.set(si, { si, contents: [], styles: [], merges: wb.sheet(si).merges });
-    bySheet.get(si).contents.push(p.formula != null ? { r, c, formula: p.formula } : { r, c, value: p.value });
+    bySheet.get(si).contents.push(ch.content);
+    if (ch.style) bySheet.get(si).styles.push(ch.style);
     count++;
   }
   return Object.assign([...bySheet.values()], { count, refused });

@@ -83,4 +83,5 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
 - **Intersection and 3D references.** The space operator (intersection) and 3D references (`Sheet1:Sheet3!A1`)
   aren't read, nor are structured references to tables. Formulas using them keep Excel's values.
 - **Iterative calculation.** Circular references are left as they were and announced.
-- **Dates and times typed as entries.** Inside a formula, text such as "2024-01-02" or "1/2/2024" reads as a date.
+- **Dates and times typed as entries** are read as dates and times (docs/ENTRY.md). Inside a formula, text such as
+  "2024-01-02" or "1/2/2024" reads as a date.

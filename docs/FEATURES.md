@@ -42,7 +42,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Selecting whole rows and columns | Done | Headings, Shift+Space, Ctrl+Space, Ctrl+A, the corner. |
 | Selecting several ranges (Ctrl+click) | Missing | |
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
-| Entries read as Excel reads them | Partly | Numbers, separators, %, TRUE/FALSE, 'text. Dates and times typed as text aren't turned into dates yet. |
+| Entries read as Excel reads them | Done | Dates, times, currency, thousands, percentages, exponents, fractions, with the format Excel gives the cell (docs/ENTRY.md). United States settings only. |
 | Undo and redo | Done | Cell contents and formats across sheets; a sheet rename or delete clears the history, as Excel does. |
 | Formula bar and name box | Partly | The name box shows the active cell; typing a reference or name there to go to it is missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
