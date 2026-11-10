@@ -3,7 +3,7 @@
 // Right, Home and End move between the tabs and show the sheet (as a click does); a chart sheet's tab is there but
 // can't be shown yet. Ctrl+Page Up and Page Down in the grid change sheet from there (commands.js). A right click,
 // Shift+F10 or the Menu key on a tab opens its menu (sheetmenu.js); a double click renames it in place; dragging a tab
-// moves the sheet.
+// moves the sheet. At the right end, the status bar's figures for the selection (Average, Count, Sum).
 import { div } from './grid.js';
 
 /** Black or white, whichever reads better on `hex` ('#RRGGBB'; WCAG relative luminance). */
@@ -29,7 +29,10 @@ export function createSheetTabs(root, { controls, on }) {
   add.title = 'New sheet (Shift+F11)';
   add.setAttribute('aria-label', 'New sheet');
   add.addEventListener('click', () => on.add());
-  bar.append(strip, add);
+  // (Not a live region: Excel's status bar isn't read out as the selection changes; it is there to be read.)
+  const status = div('oxe-status');
+  status.setAttribute('aria-label', 'Selection summary');
+  bar.append(strip, add, status);
   root.append(bar);
   let tabs = []; // [{ index, el }]
   let dragged = false;
@@ -146,6 +149,11 @@ export function createSheetTabs(root, { controls, on }) {
     },
     /** Mark sheet i as the one shown. */
     activate: mark,
+    /** The status bar's text (empty: nothing shown); `hidden` hides it altogether. */
+    status(text, hidden = false) {
+      status.textContent = text;
+      status.hidden = hidden || !text;
+    },
     /** Focus sheet i's tab. */
     focus(i) { tabs.find((t) => t.index === i)?.el.focus(); },
     /** Rename sheet i in place: a text box over its tab. Enter or leaving it commits through `commit(name)`, which

@@ -16,6 +16,7 @@ import { viewTab } from './editor/viewtab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
+import { selectionStats } from './ooxml/stats.js';
 import { MAX_ROWS, MAX_COLS } from './ooxml/refs.js';
 import { parseRef } from './ooxml/refs.js';
 
@@ -45,9 +46,10 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  *   with dashes, on any tab ({ font: false, number: false }); `setFeatures()` changes them. A group turned off also
  *   turns off its keys (Ctrl+B with `font: false`).
  * - `toolbar`: false hides the ribbon but keeps editing.
+ * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs.
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
- *   features?: Record<string, boolean>, toolbar?: boolean, onChange?: () => void }} [options]
+ *   features?: Record<string, boolean>, toolbar?: boolean, statusBar?: boolean, onChange?: () => void }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
   const root = document.createElement('div');
@@ -234,6 +236,15 @@ export function mountXlsxEditor(host, options = {}) {
     const wb = state.workbook;
     const look = state.editing.commands.look();
     state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: state.grid.view() });
+    showStats();
+  };
+  /** The status bar: Excel's Average, Count and Sum of the selection (stats.js), or Count alone. */
+  const showStats = () => {
+    if (!state.tabs || !state.editing) return;
+    if (options.statusBar === false) { state.tabs.status('', true); return; }
+    const s = selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
+    const parts = !s ? [] : s.text ? [`Average: ${s.text.average}`, `Count: ${s.count}`, `Sum: ${s.text.sum}`] : [`Count: ${s.count}`];
+    state.tabs.status(parts.join('    '));
   };
   /** The workbook has new cell formats: their CSS again, and the grid drawn with them. */
   const restyled = () => {

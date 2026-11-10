@@ -484,6 +484,18 @@ await page.keyboard.press('Control+z');
 await page.keyboard.press('Control+z');
 check(await value('J16') === null, 'Ctrl+Z twice: J16 empty again');
 
+// The status bar: B2:B4 selected: Excel's Average, Count and Sum beside the sheet tabs; one cell, nothing.
+await page.evaluate(() => window.oxe.select('B2'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Shift+ArrowDown');
+const statusText = await page.textContent('.oxe-status');
+const nums = [await value('B2'), await value('B3'), await value('B4')].filter((v) => typeof v === 'number');
+const total = nums.reduce((x, y) => x + y, 0);
+check(statusText.replace(/\s+/g, ' ') === `Average: ${total / nums.length} Count: ${nums.length} Sum: ${total}`, 'B2:B4 selected: Excel’s Average, Count and Sum of its numbers in the status bar', statusText);
+await page.keyboard.press('ArrowDown');
+check(!(await page.isVisible('.oxe-status')), 'one cell selected: the status bar says nothing');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

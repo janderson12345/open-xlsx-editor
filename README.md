@@ -35,6 +35,7 @@ const editor = mountXlsxEditor(el, {
   readOnly: true,                       // show the workbook only (no ribbon, nothing editable)
   features: { number: false },          // hide a tab by name, or a group by its label on any tab
   toolbar: true,                        // false hides the ribbon but keeps editing
+  statusBar: true,                      // false hides Average, Count and Sum of the selection
 });
 editor.setReadOnly(false);              // switch at any time
 editor.setFeatures({ number: true });

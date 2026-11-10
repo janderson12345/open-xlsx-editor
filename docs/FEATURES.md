@@ -54,7 +54,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Right-click menu on cells | Done | Cut, Copy, Paste, Paste Special..., Insert..., Delete..., Clear Contents (docs/CLIPBOARD.md). |
 | Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
 | Find and Replace (Ctrl+F, Ctrl+H) | Done | Excel's options, Find All as a count, Replace All in one undo step (docs/FIND.md). |
-| Status bar (Sum, Average, Count of the selection) | Missing | |
+| Status bar (Sum, Average, Count of the selection) | Done | Beside the sheet tabs; Count alone for text or an error; hidden rows and columns left out; the first number's format (`src/ooxml/stats.js`, by Excel's documented rules: COM doesn't reach the status bar). Choosing Min, Max and Numerical Count missing; `statusBar: false` hides it. |
 | Zoom | Done | View tab, Ctrl+wheel; saved (docs/VIEW.md). |
 | Print | Done | Pages as Excel lays them out, measured against its PDFs. |
 | Accessibility | Done | ARIA grid and tablist, announcements, axe clean in light and dark at 1280 and 320px. |

@@ -399,6 +399,13 @@
   background: var(--oxe-head-bg);
   font: 13px var(--oxe-ui-font);
 }
+.oxe-status {
+  flex: none;
+  margin-left: auto;
+  padding: 0 12px;
+  align-self: center;
+  white-space: pre;
+}
 .oxe-tabs {
   display: flex;
   flex: 0 1 auto;
