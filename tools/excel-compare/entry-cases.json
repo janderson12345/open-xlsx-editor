@@ -122,5 +122,22 @@
 {"text":"%50"},
 {"text":"1e"},
 {"text":"e3"},
-{"text":"1E+400"}
+{"text":"1E+400"},
+{"text":"#N/A"},
+{"text":"#n/a"},
+{"text":"#DIV/0!"},
+{"text":"#div/0!"},
+{"text":"#VALUE!"},
+{"text":"#REF!"},
+{"text":"#NAME?"},
+{"text":"#NUM!"},
+{"text":"#NULL!"},
+{"text":"#SPILL!"},
+{"text":"#CALC!"},
+{"text":"#GETTING_DATA"},
+{"text":" #N/A"},
+{"text":"#N/A "},
+{"text":"#N/A!"},
+{"text":"#NA"},
+{"text":"#"}
 ]

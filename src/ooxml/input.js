@@ -127,9 +127,13 @@ function readNumber(s) {
   return { value, format };
 }
 
+/** The error values Excel reads when typed (test/entry-excel.json). */
+const TYPED_ERRORS = /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#N\/A|#GETTING_DATA)$/i;
+
 /**
- * A typed entry as Excel reads it: { value, format?, kind? } (a number, boolean, string, or null for an empty entry;
- * `format` the number format Excel gives a General cell, `kind` 'date', 'time', 'datetime' or 'number'), { formula }
+ * A typed entry as Excel reads it: { value, format?, kind? } (a number, boolean, string, an error as { code }, or null
+ * for an empty entry; `format` the number format Excel gives a General cell, `kind` 'date', 'time', 'datetime',
+ * 'number' or 'error'), { formula }
  * (as the file has it, without "=": normalizeFormula) or { error } when it isn't a formula Excel would take. `today`
  * gives the year of a date typed without one; `date1904`, the workbook's date system; `asText`, a cell formatted as
  * Text (@), where Excel keeps whatever is typed as it is (a formula too).
@@ -148,6 +152,9 @@ export function parseInput(text, { today = new Date(), date1904 = false, asText 
       return { error: "There's a problem with this formula" };
     }
   }
+  // (An error value typed as Excel names it, in any case, is that error; with a space around it, or #SPILL! and
+  // #CALC!, it stays text, as Excel was seen to keep it.)
+  if (TYPED_ERRORS.test(s)) return { value: { code: s.toUpperCase() }, kind: 'error' };
   const t = s.trim();
   if (/^(true|false)$/i.test(t)) return { value: t.toLowerCase() === 'true' };
   const n = readNumber(t);

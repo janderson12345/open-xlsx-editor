@@ -2,10 +2,10 @@
 
 How what is typed into a cell becomes its value and its number format (`src/ooxml/input.js` parseInput and
 formatAfterEntry, applied by `src/ooxml/entry.js` to typing, pasting text and Replace), and what Excel was seen to do.
-Measured over COM with United States settings: 124 entries put into cells as typing would (`Range.Formula = text`),
+Measured over COM with United States settings: 141 entries put into cells as typing would (`Range.Formula = text`),
 some into cells formatted first (`tools/excel-compare/excel-entries.ps1` on `entry-cases.json`, giving
 `test/entry-excel.json`). `npm test` (`test/entry.test.js`) reads every one as Excel did, value, type and the format
-the cell gets. Typed through the editor and saved, 121 of the 124 read back in Excel as Excel made them (the other
+the cell gets. Typed through the editor and saved, 121 of the first 124 read back in Excel as Excel made them (the other
 three: a boolean's spelling in the comparison, a format the test set up first, and the `1E+400` oddity below).
 
 ## In the editor
@@ -32,6 +32,7 @@ three: a boolean's spelling in the comparison, a format the test set up first, a
 | A percentage (% before or after) is 0%, with decimals 0.00%; an exponent 0.00E+00; a whole number and a fraction # ?/?. | `50%`, `%50`, `-50%`: 0%. `50.5%`: 0.00%. `1e3`: 0.00E+00. `1 1/2`, `0 3/4`: # ?/?. |
 | Brackets make a number negative; spaces round an entry are dropped; `.5`, `5.` and `+5` are numbers. | `(5)`: -5, General. |
 | A cell with a number format keeps it, except that a date typed into a percentage or a time-only format, or a time into a date-only one, takes the entry's format. A cell formatted as Text keeps what is typed as text. | `1/2/2024` into 0.00: 45293.00; into 0%: m/d/yyyy; into h:mm: m/d/yyyy; into d-mmm-yy: kept. `10:30` into m/d/yyyy: h:mm. Into @: text. |
+| An error value typed as Excel names it is that error, in any case: #NULL!, #DIV/0!, #VALUE!, #REF!, #NAME?, #NUM!, #N/A, #GETTING_DATA. With a space around it, or another name, it stays text. | `#n/a`: #N/A, an error (ISNA is TRUE). `#N/A `, ` #N/A`, `#N/A!`, `#NA`, `#SPILL!`, `#CALC!`: text. |
 | Replace enters its result the same way. | 1/1/2024 with 1 replaced by 9: 9/9/2024. 50% with 50 replaced by 60: 60%. |
 
 ## Not yet

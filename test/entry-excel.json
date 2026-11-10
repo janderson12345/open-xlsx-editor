@@ -1,6 +1,6 @@
 {
   "excel": "Excel.Application, Range.Formula = text (United States settings)",
-  "today": "2026-11-09",
+  "today": "2026-11-10",
   "entries": [
     {
       "text": "1/2/2024",
@@ -757,6 +757,108 @@
       "type": "text",
       "value": "1E+400",
       "format": "0.00E+00"
+    },
+    {
+      "text": "#N/A",
+      "type": "error",
+      "value": "#N/A",
+      "format": "General"
+    },
+    {
+      "text": "#n/a",
+      "type": "error",
+      "value": "#N/A",
+      "format": "General"
+    },
+    {
+      "text": "#DIV/0!",
+      "type": "error",
+      "value": "#DIV/0!",
+      "format": "General"
+    },
+    {
+      "text": "#div/0!",
+      "type": "error",
+      "value": "#DIV/0!",
+      "format": "General"
+    },
+    {
+      "text": "#VALUE!",
+      "type": "error",
+      "value": "#VALUE!",
+      "format": "General"
+    },
+    {
+      "text": "#REF!",
+      "type": "error",
+      "value": "#REF!",
+      "format": "General"
+    },
+    {
+      "text": "#NAME?",
+      "type": "error",
+      "value": "#NAME?",
+      "format": "General"
+    },
+    {
+      "text": "#NUM!",
+      "type": "error",
+      "value": "#NUM!",
+      "format": "General"
+    },
+    {
+      "text": "#NULL!",
+      "type": "error",
+      "value": "#NULL!",
+      "format": "General"
+    },
+    {
+      "text": "#SPILL!",
+      "type": "text",
+      "value": "#SPILL!",
+      "format": "General"
+    },
+    {
+      "text": "#CALC!",
+      "type": "text",
+      "value": "#CALC!",
+      "format": "General"
+    },
+    {
+      "text": "#GETTING_DATA",
+      "type": "error",
+      "value": "#GETTING_DATA",
+      "format": "General"
+    },
+    {
+      "text": " #N/A",
+      "type": "text",
+      "value": " #N/A",
+      "format": "General"
+    },
+    {
+      "text": "#N/A ",
+      "type": "text",
+      "value": "#N/A ",
+      "format": "General"
+    },
+    {
+      "text": "#N/A!",
+      "type": "text",
+      "value": "#N/A!",
+      "format": "General"
+    },
+    {
+      "text": "#NA",
+      "type": "text",
+      "value": "#NA",
+      "format": "General"
+    },
+    {
+      "text": "#",
+      "type": "text",
+      "value": "#",
+      "format": "General"
     }
   ]
 }
