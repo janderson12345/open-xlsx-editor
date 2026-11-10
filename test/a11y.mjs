@@ -112,6 +112,12 @@ for (const colorScheme of ['light', 'dark']) {
       await page.keyboard.press('Escape');
       await page.focus('.oxe-grid');
       await page.keyboard.press('Control+Shift+KeyL');
+      await page.keyboard.press('F5');
+      await page.waitForSelector('dialog.oxe-dialog');
+      const goTo = await axe();
+      t.check(!goTo.length && await page.evaluate(() => document.activeElement.classList.contains('oxe-dialog-field')), `${colorScheme}: the Go To box, no axe violations, its Reference field focused`, goTo.join('\n     '));
+      await page.keyboard.press('Escape');
+      await page.focus('.oxe-grid');
       const cell = await page.evaluate(() => { const r = document.querySelector('.oxe-row[aria-rowindex="3"] .oxe-cell[aria-colindex="3"]').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
       await page.mouse.click(cell.x, cell.y, { button: 'right' });
       await page.waitForSelector('.oxe-menu >> text=Paste Special...');

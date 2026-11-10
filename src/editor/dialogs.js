@@ -348,3 +348,27 @@ export function pickBox(root, { title, at, items }) {
     dlg.append(list);
   });
 }
+
+/** Excel's Go To box (F5, Ctrl+G): the names and tables to go to in a list, and a Reference field (a pick fills it);
+ *  resolves to the text to go to, or null for Cancel and Esc. */
+export function goToBox(root, names) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    const h = Object.assign(document.createElement('h2'), { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Go To' });
+    const listLabel = Object.assign(document.createElement('label'), { className: 'oxe-dialog-text', htmlFor: `${id}-list`, textContent: 'Go to:' });
+    const list = Object.assign(document.createElement('select'), { id: `${id}-list`, className: 'oxe-dialog-list' });
+    list.size = Math.max(4, Math.min(8, names.length));
+    list.append(...names.map((n) => Object.assign(document.createElement('option'), { value: n, textContent: n })));
+    const fieldLabel = Object.assign(document.createElement('label'), { className: 'oxe-dialog-text oxe-dialog-label', htmlFor: `${id}-ref`, textContent: 'Reference:' });
+    const field = Object.assign(document.createElement('input'), { id: `${id}-ref`, className: 'oxe-dialog-field', type: 'text', spellcheck: false });
+    field.dataset.first = '';
+    list.addEventListener('change', () => { field.value = list.value; });
+    list.addEventListener('dblclick', () => { if (list.value) done(list.value); });
+    const ok = () => done(field.value.trim() || null);
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
+    const row = document.createElement('div');
+    row.className = 'oxe-dialog-buttons';
+    row.append(button('OK', ok), button('Cancel', () => done(null)));
+    dlg.append(h, listLabel, list, fieldLabel, field, row);
+  });
+}

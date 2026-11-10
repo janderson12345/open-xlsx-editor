@@ -27,7 +27,7 @@ insides:
 | `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
 | `src/ooxml/charts.js` | A sheet's charts read from its drawing and chart parts, their data from the cells, and Excel's automatic value axis; drawn by `src/editor/chartview.js` (docs/CHARTS.md). |
 | `src/ooxml/tables.js` | The workbook's tables, and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
-| `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, or a defined name; Excel's words otherwise. |
+| `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |
 | `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, the proposal left to edit on one cell (docs/AUTOSUM.md). |
 | `src/ooxml/validation.js` | Data validation judged as Excel judges it: blanks, types, Excel's comparisons, text length, typed and cell lists, custom formulas; a list's choices (docs/VALIDATION.md). |
 | `src/ooxml/condformat.js` | Conditional formatting worked out as Excel draws it: rules in priority order with Stop If True, Excel's comparisons, range rules, colour scales; each cell's fill and font (docs/CONDFORMAT.md). |

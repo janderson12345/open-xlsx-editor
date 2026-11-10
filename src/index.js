@@ -7,7 +7,8 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox } from './editor/dialogs.js';
+import { goToNames } from './ooxml/goto.js';
 import { filterChoices, shownText } from './ooxml/filterops.js';
 import { readNotes } from './ooxml/notes.js';
 import { conditionalLooks } from './ooxml/condformat.js';
@@ -163,6 +164,13 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'pasteSpecialBox') return pasteSpecialBox();
     if (name === 'sortAsc' || name === 'sortDesc') return sortQuick(name === 'sortDesc');
     if (name === 'sortBox') return customSort();
+    if (name === 'goToBox') {
+      // (Excel's Go To: a name, a table or a reference; gone to as the Name Box goes.)
+      return goToBox(root, goToNames(state.workbook, i)).then((text) => {
+        if (text) editing().run('nameBox', text);
+        state.grid.el.focus({ preventScroll: true });
+      });
+    }
     if (name === 'autoSum') {
       // (Where Excel leaves the formula being edited, the cell editor opens with it, waiting for Enter.)
       const done = editing().run('autoSum', args[0]);
@@ -469,6 +477,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
           filterMenu: () => filterMenu() || listMenu(),
           askInvalid: (info) => askInvalid(info),
           selectionShown: () => showValidation(),
+          goToBox: () => act('goToBox'),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),

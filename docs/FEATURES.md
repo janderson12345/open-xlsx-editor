@@ -44,7 +44,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
 | Entries read as Excel reads them | Done | Dates, times, currency, thousands, percentages, exponents, fractions, with the format Excel gives the cell (docs/ENTRY.md). United States settings only. |
 | Undo and redo | Done | Cell contents and formats across sheets; a sheet rename or delete clears the history, as Excel does. |
-| Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, or a defined name typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). Naming a selection from it, and showing a selected name, missing. |
+| Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, a defined name, a table's name (its data rows) or a table reference ("Fruit[Qty]") typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). Naming a selection from it, and showing a selected name, missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
 | Recalculation | Done | 541 of 541 test formulas give Excel's results; 181 functions; table references (Fruit[Qty], [#Totals], [@Qty]). |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
@@ -93,7 +93,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
 | | Clear (all, formats, contents) | Partly | Clear All, Clear Formats, Clear Contents as Excel (docs/FORMATS.md). Clear Comments and Notes, Clear Hyperlinks missing. |
 | | Sort & Filter | Done | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right) as Excel sorts (docs/SORT.md); Filter (Ctrl+Shift+L), its buttons and lists, Clear and Reapply as Excel filters (docs/FILTER.md). Text, number, date and colour filters missing (kept). |
-| | Find & Select | Partly | Find and Replace; Go To and Go To Special missing. |
+| | Find & Select | Partly | Find and Replace; Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special missing. |
 
 ## Insert (`insert`)
 

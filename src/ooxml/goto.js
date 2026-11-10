@@ -1,8 +1,10 @@
 // What the Name Box goes to when a reference or a name is typed into it, as Excel's Name Box takes them (Excel's
 // documented behaviour: COM doesn't reach the Name Box): a cell or a range ("B5", "b5:d10", "$B$5"), whole columns or
 // rows ("B:D", "5:5"), any of these on another sheet ("Sheet2!A1", "'My data'!B:B"), or a defined name (the sheet's
-// own first, then the workbook's) that stands for a range.
+// own first, then the workbook's) that stands for a range, or a table: its name for its data rows, or a table
+// reference ("Fruit[Qty]", "Fruit[#All]").
 import { parseRange, MAX_ROWS, MAX_COLS, colIndex } from './refs.js';
+import { readTables, tableArea } from './tables.js';
 
 export const GOTO_MESSAGES = {
   invalid: 'You must enter a valid reference you want to go to, or type a valid name for the selection.',
@@ -43,6 +45,17 @@ export function goToTarget(wb, si, text, depth = 0) {
     if (sheet < 0 || !wb.canShow(sheet)) return { error: GOTO_MESSAGES.invalid };
     ref = m[3];
   }
+  // (A table, by its name (its data rows) or a table reference.)
+  const tm = !m && /^([A-Za-z_\\][A-Za-z0-9_.\\]*)(?:\[(.*)\])?$/.exec(t);
+  if (tm) {
+    const tables = readTables(wb);
+    if (tables.some((x) => x.name.toLowerCase() === tm[1].toLowerCase())) {
+      const a = tableArea(tables, tm[1], tm[2] ?? '#Data', { si, r: -1, c: -1 });
+      if (a.error) return { error: GOTO_MESSAGES.invalid };
+      if (!wb.canShow(a.si)) return { error: GOTO_MESSAGES.invalid };
+      return { si: a.si, sel: { r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1, ar: a.r0, ac: a.c0 } };
+    }
+  }
   // (parseRange reads a first and a second corner only: a third part is no reference here.)
   const area = ref.split(':').length <= 2 && (parseRange(ref) || wholeLines(ref));
   if (area) return { si: sheet, sel: { ...area, ar: area.r0, ac: area.c0 } };
@@ -54,4 +67,11 @@ export function goToTarget(wb, si, text, depth = 0) {
     return target.error ? { error: GOTO_MESSAGES.invalid } : target;
   }
   return { error: GOTO_MESSAGES.invalid };
+}
+
+/** What Excel's Go To box lists: the defined names that stand for ranges (not its own hidden ones, nor those of
+ *  another sheet) and the tables, in order. */
+export function goToNames(wb, si) {
+  const names = wb.definedNames.filter((d) => !d.name.startsWith('_xlnm.') && (d.sheet == null || d.sheet === si) && !goToTarget(wb, si, d.text, 1).error).map((d) => d.name);
+  return [...new Set([...names, ...readTables(wb).map((t) => t.name)])].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
 }

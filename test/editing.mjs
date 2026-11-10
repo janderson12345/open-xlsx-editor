@@ -596,6 +596,12 @@ await page.keyboard.press('Enter');
 await page.click('.oxe-namebox');
 await page.keyboard.press('Escape');
 check(await page.evaluate(() => document.querySelector('.oxe-namebox').value) === 'C3', 'Esc: the Name Box shows the active cell again');
+await page.focus('.oxe-grid');
+await page.keyboard.press('F5');
+await page.waitForSelector('dialog.oxe-dialog >> text=Go To');
+await page.fill('dialog.oxe-dialog input.oxe-dialog-field', 'd4');
+await page.keyboard.press('Enter');
+check(await page.evaluate(() => window.oxe.selection.ar === 3 && window.oxe.selection.ac === 3), 'F5: Excel’s Go To box; d4 and Enter: D4 selected');
 
 // Filter: B3, Ctrl+Shift+L: buttons on the heading row. Choice's button, "No" unticked, OK: the No rows hidden. E1,
 // Alt+Down: the same list; Clear Filter From "Choice": all shown. Ctrl+Shift+L: off, no buttons.

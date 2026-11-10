@@ -22,3 +22,14 @@ test('the Name Box goes to cells, ranges, whole lines, other sheets and defined 
   assert.deepEqual(goToTarget(wb, si, 'Later'), { error: GOTO_MESSAGES.defining, name: true }, 'a name not there yet: Excel would name the selection');
   for (const bad of ['1abc', 'Nowhere!A1', 'B5:', 'A1:B2:C3', '']) assert.equal(goToTarget(wb, si, bad).error, GOTO_MESSAGES.invalid, bad);
 });
+
+test('the Name Box and Go To reach tables: by name their data rows, or a table reference', async () => {
+  const fs = await import('node:fs');
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  const { goToNames } = await import('../src/ooxml/goto.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/formulas.xlsx')));
+  const at = (text) => { const t = goToTarget(wb, 0, text); return t.error || `${wb.sheets[t.si].name}!${rangeName(t.sel)}`; };
+  assert.deepEqual(['Fruit', 'fruit[Qty]', 'Fruit[#All]', 'Fruit[[#Headers],[Price]]'].map(at), ['Data!A2:E9', 'Data!B2:B9', 'Data!A1:E9', 'Data!C1']);
+  assert.equal(at('Fruit[Nope]'), GOTO_MESSAGES.invalid);
+  assert.deepEqual(goToNames(wb, 0), ['Fruit', 'Items', 'Rate'], 'Go To lists the names and the tables');
+});
