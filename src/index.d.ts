@@ -1,4 +1,7 @@
 // Types for the public API (hand-written; the code is plain JavaScript).
+import type { AgentWorkbook } from './agent.js';
+export type { AgentWorkbook, AgentCell, AgentRange, AgentSheet, AgentName, AgentNote } from './agent.js';
+export { openWorkbook } from './agent.js';
 
 export interface Cell {
   /** n number, s string, b boolean, e error, str formula text, d ISO date. */
@@ -102,6 +105,8 @@ export interface XlsxEditor {
    *  format(change), toggleFont('b' | 'i' | 'u' | 'strike'), stepFont(1 | -1), toggleWrap, stepIndent(1 | -1),
    *  align('horizontal' | 'vertical', value), borders(preset), stepDecimal(1 | -1), clearFormats. */
   command(name: string, ...args: unknown[]): unknown;
+  /** The workbook open here for an agent: each edit one step of the undo history, drawn as it is made. */
+  agent(): AgentWorkbook;
   readonly selection: Selection | null;
   readonly readOnly: boolean;
   setReadOnly(flag: boolean): void;

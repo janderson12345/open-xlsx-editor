@@ -603,6 +603,17 @@ await page.fill('dialog.oxe-dialog input.oxe-dialog-field', 'd4');
 await page.keyboard.press('Enter');
 check(await page.evaluate(() => window.oxe.selection.ar === 3 && window.oxe.selection.ac === 3), 'F5: Excel’s Go To box; d4 and Enter: D4 selected');
 
+// The agent on the open workbook: its entry drawn at once, one step that Ctrl+Z takes back; a sheet it adds gets a tab.
+const agentCell = async () => (await shown(8, 7)) ?? "";
+const agentWrote = await page.evaluate(() => window.oxe.agent().write({ H9: '50%' }));
+check(agentWrote.written.length === 1 && await agentCell() === '50%', 'api.agent().write: H9 entered as typed, drawn as 50%', JSON.stringify(agentWrote));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+check(await agentCell() === '', 'Ctrl+Z: the agent’s entry taken back');
+const agentSheet = await page.evaluate(() => { const name = window.oxe.agent().addSheet('From agent'); return { name, tabs: [...document.querySelectorAll('.oxe-tab')].map((t) => t.textContent) }; });
+check(agentSheet.name === 'From agent' && agentSheet.tabs.includes('From agent'), 'api.agent().addSheet: a tab for it', JSON.stringify(agentSheet));
+await page.evaluate(() => window.oxe.agent().deleteSheet('From agent'));
+
 // Filter: B3, Ctrl+Shift+L: buttons on the heading row. Choice's button, "No" unticked, OK: the No rows hidden. E1,
 // Alt+Down: the same list; Clear Filter From "Choice": all shown. Ctrl+Shift+L: off, no buttons.
 await page.evaluate(() => window.oxe.select('B3'));

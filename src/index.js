@@ -28,8 +28,10 @@ import { mergeLoss } from './ooxml/mergeops.js';
 import { selectionStats } from './ooxml/stats.js';
 import { MAX_ROWS, MAX_COLS, colName } from './ooxml/refs.js';
 import { parseRef } from './ooxml/refs.js';
+import { AgentWorkbook } from './agent.js';
 
 export { Workbook };
+export { openWorkbook } from './agent.js';
 
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
@@ -530,6 +532,17 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     setTabColor: (sheet, color) => editing().run('tabColor', sheetAt(sheet), color),
     /** Delete a sheet, without asking (the tab menu asks first); false if refused (the last sheet shown). */
     deleteSheet: (sheet) => editing().run('deleteSheet', sheetAt(sheet)),
+    /** The workbook open here for an agent (agent.js): read it, and edit it with each edit one step of the undo
+     *  history, drawn as it is made. */
+    agent() {
+      if (!state.workbook) throw new Error('no workbook open');
+      return new AgentWorkbook(() => state.workbook, {
+        cells: (si, contents, styles) => {
+          if (!editing().run('applyChanges', [{ si, contents, styles }])) throw new Error(state.readOnly ? 'The workbook is read-only' : "You can't change part of an array");
+        },
+        structure: (run, kind) => editing().run('agentChange', run, kind),
+      });
+    },
     /** Run a named command (commands.js) with its arguments. */
     command: (name, ...args) => editing().run(name, ...args),
     get selection() { return state.editing ? state.editing.commands.selection : null; },

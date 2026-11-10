@@ -345,6 +345,21 @@ export function createCommands(ctx) {
     },
     /** Changes of several sheets ([{ si, contents, styles, merges }], findops.js replaceChanges) as one step. */
     applyChanges(steps) { return runSteps(steps); },
+    /** A change by the agent (agent.js), `run(wb)`: of rows or columns ('lines': one step of the history) or of the
+     *  sheets ('sheets', as the tab menu's). A refusal throws, in Excel's words, for the agent to read. */
+    agentChange(run, kind) {
+      if (ctx.readOnly()) throw new SheetError('The workbook is read-only');
+      if (kind === 'sheets') return sheetOp(run, null, true, true);
+      const wb = ctx.workbook();
+      const before = wb.snapshot();
+      run(wb);
+      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+      state.redo = [];
+      commands.dropClip();
+      ctx.reloaded?.();
+      ctx.changed?.();
+      return true;
+    },
     /** A heading edge dragged to `px` pixels: line `index`, or every selected whole line when it is one of them (as
      *  in Excel). 0 hides. */
     resizeLines(axis, index, px) {
@@ -577,7 +592,7 @@ export function createCommands(ctx) {
   /** Run a change to the workbook's sheets. Afterwards the sheet shown is `show()` if given, else the same sheet
    *  wherever it went, else (gone or hidden) its nearest neighbour. A rename or delete clears the undo history (a
    *  change in it could name the sheet as it was). */
-  function sheetOp(run, show = null, clearsHistory = false) {
+  function sheetOp(run, show = null, clearsHistory = false, quiet = false) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
     const wb = ctx.workbook();
     const was = ctx.sheetIndex();
@@ -585,7 +600,7 @@ export function createCommands(ctx) {
     try {
       run(wb);
     } catch (e) {
-      if (!(e instanceof SheetError)) throw e;
+      if (!(e instanceof SheetError) || quiet) throw e;
       ctx.alert(e.message);
       return false;
     }
