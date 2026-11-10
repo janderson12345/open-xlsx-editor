@@ -1,0 +1,275 @@
+{
+ "data": [
+  [
+   "Region",
+   "Product",
+   "Quarter",
+   "Units",
+   "Price"
+  ],
+  [
+   "South",
+   "Plum",
+   "Q3",
+   18,
+   7.5
+  ],
+  [
+   "South",
+   "Plum",
+   "Q2",
+   31,
+   11.75
+  ],
+  [
+   "South",
+   "Apple",
+   "Q2",
+   9,
+   7
+  ],
+  [
+   "North",
+   "Pear",
+   "Q1",
+   7,
+   2
+  ],
+  [
+   "South",
+   "Pear",
+   "Q3",
+   22,
+   15.5
+  ],
+  [
+   "South",
+   "Fig",
+   "Q3",
+   4,
+   5
+  ],
+  [
+   "North",
+   "Plum",
+   "Q4",
+   38,
+   10.75
+  ],
+  [
+   "South",
+   "Apple",
+   "Q3",
+   2,
+   10
+  ],
+  [
+   "North",
+   "Pear",
+   "Q2",
+   5,
+   2
+  ],
+  [
+   "North",
+   "Pear",
+   "Q2",
+   21,
+   12.5
+  ],
+  [
+   "South",
+   "Pear",
+   "Q4",
+   26,
+   9.5
+  ],
+  [
+   "South",
+   "Fig",
+   "Q4",
+   36,
+   15.5
+  ],
+  [
+   "South",
+   "Apple",
+   "Q2",
+   20,
+   15
+  ],
+  [
+   "East",
+   "Plum",
+   "Q3",
+   27,
+   9.25
+  ],
+  [
+   "East",
+   "Fig",
+   "Q3",
+   22,
+   11
+  ],
+  [
+   "North",
+   "Plum",
+   "Q3",
+   11,
+   7
+  ],
+  [
+   "North",
+   "Plum",
+   "Q2",
+   29,
+   3.25
+  ],
+  [
+   "East",
+   "Fig",
+   "Q2",
+   24,
+   3
+  ]
+ ],
+ "change": [
+  {
+   "r": 1,
+   "c": 3,
+   "value": 100
+  },
+  {
+   "r": 1,
+   "c": 0,
+   "value": "Central"
+  }
+ ],
+ "cases": [
+  {
+   "name": "rows Region, sum of Units",
+   "rows": [
+    "Region"
+   ],
+   "cols": [],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "sum",
+     "caption": null
+    }
+   ]
+  },
+  {
+   "name": "rows Region then Product, sum of Units",
+   "rows": [
+    "Region",
+    "Product"
+   ],
+   "cols": [],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "sum",
+     "caption": null
+    }
+   ]
+  },
+  {
+   "name": "rows Product, columns Quarter, sum of Units",
+   "rows": [
+    "Product"
+   ],
+   "cols": [
+    "Quarter"
+   ],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "sum",
+     "caption": null
+    }
+   ]
+  },
+  {
+   "name": "rows Region, sum of Units and average of Price",
+   "rows": [
+    "Region"
+   ],
+   "cols": [],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "sum",
+     "caption": null
+    },
+    {
+     "field": "Price",
+     "fn": "average"
+    }
+   ]
+  },
+  {
+   "name": "rows Region, count of Product",
+   "rows": [
+    "Region"
+   ],
+   "cols": [],
+   "values": [
+    {
+     "field": "Product",
+     "fn": "count"
+    }
+   ]
+  },
+  {
+   "name": "rows Product, max of Units and min of Price",
+   "rows": [
+    "Product"
+   ],
+   "cols": [],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "max"
+    },
+    {
+     "field": "Price",
+     "fn": "min"
+    }
+   ]
+  },
+  {
+   "name": "columns Region only, sum of Units",
+   "rows": [],
+   "cols": [
+    "Region"
+   ],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "sum",
+     "caption": null
+    }
+   ]
+  },
+  {
+   "name": "rows Quarter then Region, columns Product, sum of Units",
+   "rows": [
+    "Quarter",
+    "Region"
+   ],
+   "cols": [
+    "Product"
+   ],
+   "values": [
+    {
+     "field": "Units",
+     "fn": "sum",
+     "caption": null
+    }
+   ]
+  }
+ ]
+}

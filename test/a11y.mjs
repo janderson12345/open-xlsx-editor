@@ -141,6 +141,11 @@ for (const colorScheme of ['light', 'dark']) {
       const findBar = await axe();
       t.check(!findBar.length && await page.evaluate(() => document.activeElement.getAttribute('aria-label') === 'Find what'), `${colorScheme}: the Find and Replace bar, no axe violations, its box focused`, findBar.join('\n     '));
       await page.keyboard.press('Escape');
+      await page.click('.oxe-rtab >> text=Data');
+      await page.click('.oxe-toolbar button.oxe-split-more[aria-label^="Refresh All"]');
+      const dataTab = await axe();
+      t.check(!dataTab.length, `${colorScheme}: the Data tab with its Refresh All menu, no axe violations`, dataTab.join('\n     '));
+      await page.keyboard.press('Escape');
       await page.click('.oxe-rtab >> text=View');
       await page.click('.oxe-toolbar button[title="Freeze Panes"]');
       const viewTab = await axe();

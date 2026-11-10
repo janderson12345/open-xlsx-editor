@@ -56,6 +56,10 @@ pwsh tools/excel-compare/excel-readback.ps1 <folder>/saved.json <out.json>
 The same cases done by the editor and saved, then opened in Excel and read the same way, to compare with what Excel
 made itself.
 
+PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
+change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
+`pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md).
+
 PDF export (src/pdf.js) is measured the same way: `OXE_EXPORT=1 node tools/excel-compare/print-ours.mjs <books> <out>` makes
 the PDFs through `exportPdf` instead of the browser's print (docs/PDF.md).
 

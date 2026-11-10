@@ -171,6 +171,7 @@ export function attachEditing(root, ctx) {
     else if (key === 'End' && ctrl) cmd.run('end');
     else if ((key === 'PageDown' || key === 'PageUp') && ctrl) cmd.run('nextSheet', key === 'PageDown' ? 1 : -1);
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
+    else if (key === 'F5' && e.altKey && !e.shiftKey) cmd.run('refreshPivots', ctrl);
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
     else if (key === 'F2' && e.shiftKey) { if (!ctx.toggleNote?.()) announce('This cell has no note'); }
     else if (key === 'F2') startEdit('edit');

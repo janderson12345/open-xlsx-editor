@@ -9,6 +9,7 @@ import { setXmlImpl } from '../src/ooxml/xml.js';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { encryptWorkbook } from '../src/ooxml/encryption.js';
 import { openDemo, openFixture, checker } from './browser.mjs';
+import { pivotBook } from './pivots.js';
 
 setXmlImpl({ DOMParser, XMLSerializer });
 const outDir = process.argv[2] || 'test/out';
@@ -17,6 +18,11 @@ const { page, errors, close } = await openDemo({ width: 1100, height: 760 });
 const t = checker();
 const { check } = t;
 
+/** Open a workbook from a path through the file input, waiting until it is shown. */
+const openFixtureFrom = async (pg, file, name) => {
+  await pg.setInputFiles('input[type=file]', file);
+  await pg.waitForFunction((n) => window.oxe.fileName === n, name);
+};
 const shown = (r, c) => page.evaluate(([r, c]) => document.querySelector(`.oxe-row[aria-rowindex="${r + 2}"] .oxe-cell[aria-colindex="${c + 2}"]`)?.textContent ?? null, [r, c]);
 const sel = () => page.evaluate(() => window.oxe.selection);
 const value = (ref) => page.evaluate((ref) => {
@@ -815,6 +821,23 @@ await askPassword('Test-pass 1');
 await page.waitForFunction(() => window.oxe.fileName === 'encrypted.xlsx');
 const saved = await page.evaluate(() => ({ encrypted: window.oxe.encrypted, sheets: window.oxe.workbook.sheets.length, head: [...window.oxe.save().slice(0, 4)] }));
 check(saved.encrypted && saved.sheets === 3 && saved.head.join() === '208,207,17,224', 'the right password: opened, and saved encrypted again (a compound file)', JSON.stringify(saved));
+
+// A PivotTable (Excel's, of made-up sales: test/pivot-excel.json): its source changed, Alt+F5 on it refreshes it as
+// Excel does; Ctrl+Z takes the refresh back; Data > Refresh All does it again.
+fs.writeFileSync('test/out/pivot.xlsx', pivotBook(0).wb.toBytes());
+await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+await openFixtureFrom(page, 'test/out/pivot.xlsx', 'pivot.xlsx');
+await page.evaluate(() => { window.oxe.showSheet('Src'); window.oxe.enter('D2', '100'); window.oxe.enter('A2', 'Central'); window.oxe.showSheet('Pivot'); window.oxe.select('A4'); });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Alt+F5');
+const pivotShown = async () => [await shown(5, 1), await shown(6, 0), await shown(6, 1), await shown(7, 1)].join();
+check(await pivotShown() === '150,Central,100,434', 'Alt+F5 in the PivotTable: refreshed as Excel refreshes it (South 150, Central added after, Grand Total 434)', await pivotShown());
+await page.keyboard.press('Control+z');
+check(await shown(5, 1) === '168' && await shown(6, 0) === 'Grand Total', 'Ctrl+Z: the refresh taken back', await pivotShown());
+await page.click('.oxe-rtab >> text=Data');
+await page.click('.oxe-toolbar button[title="Refresh All (Ctrl+Alt+F5)"]');
+check(await pivotShown() === '150,Central,100,434', 'Data > Refresh All: refreshed again', await pivotShown());
+await page.click('.oxe-rtab >> text=Home');
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();

@@ -23,6 +23,7 @@ import { createRibbon } from './editor/ribbon.js';
 import { createFindBar } from './editor/findbar.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
+import { dataTab } from './editor/datatab.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
@@ -415,6 +416,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     state.ribbon = createRibbon(el, {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
+        Data: (kit) => dataTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
       },
       home: () => state.grid?.el.focus({ preventScroll: true }),

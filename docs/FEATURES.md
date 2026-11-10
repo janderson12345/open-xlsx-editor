@@ -103,7 +103,7 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Tables (`tables`) | Table, PivotTable | Kept | Pivot sources follow a sheet rename. |
+| Tables (`tables`) | Table, PivotTable | Partly | Pivot sources follow a sheet rename. A PivotTable refreshed from its source as Excel refreshes it (Alt+F5, Data > Refresh All; docs/PIVOT.md): 8 of 8 cases the same cells and parts as Excel's refresh, and Excel opens the result. Creating one, and filters, grouping and calculated fields, missing. |
 | Illustrations (`illustrations`) | Pictures, shapes, icons | Kept | Not drawn on the grid. |
 | Charts (`charts`) | Charts | Partly | Column, bar, line, area, pie and doughnut drawn, with Excel's automatic axis (34 of 34) and live data; given to screen readers as figures with tables (docs/CHARTS.md). Editing and other kinds missing; kept. Series follow a sheet rename. |
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
@@ -136,7 +136,8 @@ which is dropped when formulas change (Excel rebuilds it).
 | Group | Feature | Status | Notes |
 |---|---|---|---|
 | Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
-| Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Missing | The Data tab isn't there yet; Sort and Filter are in Home > Editing (docs/SORT.md, docs/FILTER.md). Advanced Filter missing. |
+| Queries & Connections (`queries-and-connections`) | Refresh All | Partly | Refreshes the workbook's PivotTables (Ctrl+Alt+F5); Refresh, the one at the active cell (Alt+F5). Data connections aren't refreshed. |
+| Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Missing | Not on the Data tab yet; Sort and Filter are in Home > Editing (docs/SORT.md, docs/FILTER.md). Advanced Filter missing. |
 | Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Missing | |
 | | Data Validation (lists, rules) | Partly | Typed values checked as Excel checks them, its Stop, Warning and Information boxes; a list's dropdown; the input message (docs/VALIDATION.md). The box to add and change rules missing. |
 | Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |
