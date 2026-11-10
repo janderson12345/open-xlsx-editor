@@ -6,7 +6,7 @@ import { parseRef, refName } from '../src/ooxml/refs.js';
 import { formatEach } from '../src/ooxml/formatops.js';
 import { mergeChange } from '../src/ooxml/mergeops.js';
 import { readSheet } from '../src/ooxml/sheet.js';
-import { parseInput } from '../src/ooxml/input.js';
+import { entryChanges } from '../src/ooxml/entry.js';
 import { formatCodeOf } from '../src/ooxml/styles.js';
 import { colIndex } from '../src/ooxml/refs.js';
 
@@ -30,13 +30,17 @@ export function build(setup) {
   const s2 = wb.addSheet(wb.sheets.length);
   const name = wb.sheets[si].name;
   const own = (text) => text.replace(/Sheet1!/g, `${name}!`);
-  const entry = (ref, text) => {
-    const { r, c } = parseRef(ref);
-    const p = parseInput(text);
-    return p.formula != null ? { r, c, formula: p.formula } : { r, c, value: p.value };
+  // (Each cell entered as typed, Excel's format for a typed date or time with it.)
+  const enter = (k, cells) => {
+    for (const [ref, text] of Object.entries(cells)) {
+      const { r, c } = parseRef(ref);
+      const ch = entryChanges(wb, k, r, c, text);
+      wb.apply(k, [ch.content]);
+      if (ch.style) wb.setStyles(k, [ch.style]);
+    }
   };
-  wb.apply(si, Object.entries(setup.cells).map(([ref, text]) => entry(ref, text)));
-  wb.apply(s2, Object.entries(setup.sheet2 || {}).map(([ref, text]) => entry(ref, own(text))));
+  enter(si, setup.cells);
+  enter(s2, Object.fromEntries(Object.entries(setup.sheet2 || {}).map(([ref, text]) => [ref, own(text)])));
   for (const [ref, text] of Object.entries(setup.arrays || {})) {
     // (An array formula, written as Excel writes one: in its first cell, with its range.)
     const a = area(ref);

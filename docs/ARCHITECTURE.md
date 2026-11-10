@@ -22,6 +22,7 @@ insides:
 | `src/ooxml/stylesedit.js` | Cell formats changed as Excel writes them: a copy of the cell's format, font, fill or border with the change, an equal one reused, a new one at the end; Excel's Percent, Comma and Currency cell styles; a styles part made when there is none (docs/FORMATS.md). |
 | `src/ooxml/formatops.js` | What each Home button does to a selection, as Excel does it (toggles from the active cell, font sizes, indent, border presets and the neighbour's facing side, decimals): the cells' new formats, for the editor to apply and undo. |
 | `src/ooxml/mergeops.js` | Merge & Center, Merge Across, Merge Cells and Unmerge as Excel does them: the values, formats and merged ranges that change, for the editor to apply and undo as one step. |
+| `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
 | `src/ooxml/clipops.js` | Copy, cut and paste as Excel does them: a snapshot of cells, pasted with formulas moved and repeated over the selection, or moved with every formula that reads them; Paste Special (contents, formats, operations, Skip blanks, Transpose) and Paste Link; text from other programs read as typed (docs/CLIPBOARD.md). |
 | `src/ooxml/rowcol.js` | Whole rows and columns, or cells with the rest of their columns or rows shifting, inserted and deleted as Excel does it: the sheet's cells, widths, merges and ranges moved, new lines formatted from the one before, every formula of the workbook following, Excel's refusals (docs/ROWCOL.md). |
 | `src/ooxml/sizes.js` | Column widths, row heights and hidden lines written as Excel writes them: widths in whole pixels over the digit width, col elements split where a range cuts them, AutoFit Row Height as the fixed height taken away (docs/SIZES.md). |
@@ -45,7 +46,7 @@ insides:
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines; frozen panes (their own layers, sticking in place) and zoom. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
-| `src/editor/selection.js` | The selection (active cell and range) and its overlay; view state only. |
+| `src/editor/selection.js` | The selection (active cell and range) and its overlay, with the fill handle and the outline of a fill being dragged; view state only. |
 | `src/editor/navigate.js` | Moving as Excel does: a step (over merged ranges), Ctrl+arrow to the edges of blocks, Ctrl+End. |
 | `src/editor/findbar.js` | The Find and Replace bar under the ribbon (Ctrl+F, Ctrl+H), from open-docx-editor's, with Excel's options. |
 | `src/editor/ribbonkit.js` | The ribbon's building blocks: buttons, toggles, split buttons, groups, the one drop-down menu, select fields, line icons. From open-docx-editor. |

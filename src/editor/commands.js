@@ -14,6 +14,7 @@ import { mergeChange } from '../ooxml/mergeops.js';
 import * as clip from '../ooxml/clipops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
+import { fillCopy, autoFill } from '../ooxml/fillops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -408,6 +409,29 @@ export function createCommands(ctx) {
       if (!runSteps(steps)) return false;
       const area = steps[0].area;
       show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
+      return true;
+    },
+    /** Fill Down ('down', Ctrl+D), Right ('right', Ctrl+R), Up or Left over the selection (fillops.js fillCopy), as one
+     *  step of the history. */
+    fill(dir) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const steps = fillCopy(ctx.workbook(), ctx.sheetIndex(), state.sel, dir);
+      if (!runSteps(steps)) return false;
+      const a = steps[0].area;
+      show({ ...state.sel, r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 }, state.focus, `Filled ${dir}, `);
+      return true;
+    },
+    /** The fill handle dragged from the selection out to `to` (fillops.js autoFill): Excel's guess, or with Ctrl held
+     *  (`ctrl`) the other way, as Excel's Ctrl-drag: a single cell counts on, more cells are copied. The filled range
+     *  is selected. */
+    autoFill(to, { ctrl = false, type = null } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const s = state.sel;
+      const one = s.r0 === s.r1 && s.c0 === s.c1;
+      const how = type || (ctrl ? (one ? 'series' : 'copy') : 'default');
+      const steps = autoFill(ctx.workbook(), ctx.sheetIndex(), s, to, how);
+      if (!steps || !runSteps(steps)) return false;
+      show({ ...s, r0: to.r0, c0: to.c0, r1: to.r1, c1: to.c1 }, null, `Filled ${refName(to.r0, to.c0)} to ${refName(to.r1, to.c1)}, `);
       return true;
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */

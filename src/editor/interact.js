@@ -163,6 +163,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && (key === '+' || (key === '=' && e.shiftKey))) ctx.lines?.(1);
     else if (ctrl && key === '-') ctx.lines?.(-1);
     else if (ctrl && !e.shiftKey && (key === 'f' || key === 'h')) ctx.find?.(key === 'h');
+    else if (ctrl && !e.shiftKey && !e.altKey && (key.toLowerCase() === 'd' || key.toLowerCase() === 'r')) { if (ctx.allowed?.('fill') !== false) cmd.run('fill', key.toLowerCase() === 'd' ? 'down' : 'right'); }
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'v') ctx.pasteSpecial?.();
     // (Ctrl+9 hides the rows, Ctrl+0 the columns; with Shift they show again. Taken from the key's code: Shift+9 is "(".)
     else if (ctrl && (e.code === 'Digit9' || e.code === 'Digit0')) cmd.run('hideLines', e.code === 'Digit9' ? 'row' : 'col', !e.shiftKey);
@@ -239,6 +240,29 @@ export function attachEditing(root, ctx) {
 
   let dragging = false;
   let pointingDrag = false;
+  // The fill handle: dragged out of the selection down, up, right or left (the way the pointer is furthest out), the
+  // cells it will fill outlined; let go, they are filled (Ctrl held: the other way of filling).
+  let filling = null;
+  const fillTarget = (at) => {
+    const s = cmd.selection;
+    const down = at.r - s.r1;
+    const up = s.r0 - at.r;
+    const right = at.c - s.c1;
+    const left = s.c0 - at.c;
+    const most = Math.max(down, up, right, left);
+    if (most <= 0) return null;
+    if (most === down) return { ...s, r1: at.r };
+    if (most === up) return { ...s, r0: at.r };
+    if (most === right) return { ...s, c1: at.c };
+    return { ...s, c0: at.c };
+  };
+  view.addEventListener('mousedown', (e) => {
+    if (e.button !== 0 || e.target.closest('.oxe-editor') || pointing.control || !grid.fillHandleAt(e.clientX, e.clientY)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    view.focus({ preventScroll: true });
+    filling = { to: null };
+  }, true);
   view.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || e.target.closest('.oxe-editor')) return;
     const at = grid.hitTest(e.clientX, e.clientY);
@@ -307,12 +331,20 @@ export function attachEditing(root, ctx) {
     cmd.run('zoom', grid.view().zoom + (e.deltaY < 0 ? 10 : -10));
   }, { passive: false });
   view.addEventListener('mousemove', (e) => {
-    if (resizing || dragging || pointingDrag) return;
+    if (resizing || dragging || pointingDrag || filling) return;
     const edge = e.buttons ? null : grid.edgeAt(e.clientX, e.clientY);
     view.classList.toggle('oxe-resize-col', edge?.axis === 'col');
     view.classList.toggle('oxe-resize-row', edge?.axis === 'row');
+    view.classList.toggle('oxe-fill-cursor', !edge && !e.buttons && grid.fillHandleAt(e.clientX, e.clientY));
   });
   const onMove = (e) => {
+    if (filling) {
+      const at = grid.hitTest(e.clientX, e.clientY);
+      if (!at || at.r < 0 || at.c < 0) return;
+      filling.to = fillTarget(at);
+      grid.showFill(filling.to);
+      return;
+    }
     if (resizing) {
       resizing.now = Math.max(0, resizing.size + (resizing.axis === 'col' ? e.clientX : e.clientY) - resizing.from);
       grid.showGuide(resizing.axis, resizing.index, resizing.now);
@@ -324,7 +356,14 @@ export function attachEditing(root, ctx) {
     if (pointingDrag) pointing.drag(at.r, at.c);
     else cmd.run('extendTo', at.r, at.c);
   };
-  const onUp = () => {
+  const onUp = (e) => {
+    if (filling) {
+      const { to } = filling;
+      filling = null;
+      grid.showFill(null);
+      if (to) cmd.run('autoFill', to, { ctrl: e.ctrlKey || e.metaKey });
+      return;
+    }
     if (resizing) {
       const r = resizing;
       resizing = null;
@@ -357,7 +396,7 @@ export function attachEditing(root, ctx) {
     bar,
     /** Whether focus should stay where a formula is typed when a sheet tab is pressed (the formula goes on there). */
     keepsFocus: () => pointing.ready || !!carried,
-    setReadOnly(flag) { bar.setReadOnly(flag); grid.setReadOnly(flag); if (flag) editor.close(); },
+    setReadOnly(flag) { bar.setReadOnly(flag); grid.setReadOnly(flag); grid.setFillHandle(!flag && ctx.allowed?.('autoFill') !== false); if (flag) editor.close(); },
     reset() { editor.close(); cmd.reset(); },
     destroy() {
       window.removeEventListener('mousemove', onMove);

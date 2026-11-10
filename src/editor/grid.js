@@ -9,7 +9,7 @@ import { Axis } from './axis.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontDescentPx } from './fonts.js';
-import { drawSelection, drawMarks, rangeBox } from './selection.js';
+import { drawSelection, drawMarks, rangeBox, handleCorner } from './selection.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -500,6 +500,25 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** Show a selection (selection.js; null for none) and draw it. */
     setSelection(sel) {
       st.sel = sel;
+      draw(st, true);
+    },
+    /** Show the fill handle on the selection (not on a read-only workbook, or with filling turned off). */
+    setFillHandle(on) {
+      st.fillHandle = !!on;
+      draw(st, true);
+    },
+    /** Whether a point of the page is on the fill handle (within 4 pixels of the selection's bottom-right corner). */
+    fillHandleAt(clientX, clientY) {
+      const corner = handleCorner(st);
+      if (!corner) return false;
+      const rect = view.getBoundingClientRect();
+      const { x, y } = toContent(clientX - rect.left, clientY - rect.top);
+      const near = 4 / (st.zoom / 100);
+      return Math.abs(x - st.cols.start(corner.c + 1)) <= near && Math.abs(y - st.rows.start(corner.r + 1)) <= near;
+    },
+    /** While the fill handle is dragged: the cells it will fill outlined (null: none). */
+    showFill(range) {
+      st.filling = range;
       draw(st, true);
     },
     /** The cell under a point of the page: { r, c }, -1 for a heading (or null outside the grid). */

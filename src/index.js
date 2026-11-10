@@ -29,7 +29,7 @@ const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', togg
   lines: 'cells', cells: 'cells', insertCells: 'cells', deleteCells: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   pasteSpecial: 'clipboard', pasteSpecialBox: 'clipboard', pasteAs: 'clipboard',
-  stepDecimal: 'number', clearFormats: 'editing' };
+  stepDecimal: 'number', clearFormats: 'editing', fill: 'editing', autoFill: 'editing' };
 /** The Paste menu's choices, as Paste Special options. */
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */

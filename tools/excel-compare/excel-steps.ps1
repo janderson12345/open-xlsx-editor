@@ -1,8 +1,9 @@
 # Has Excel do editing steps on a small sheet and says what came of them (cases: [{ name, setup, steps, read }]):
 # inserting and deleting cells (Range.Insert and Delete, with the shift given or left to Excel), Paste Special
-# (Range.Copy, then PasteSpecial with what to paste, the operation, Skip blanks and Transpose) and Paste Link
-# (Worksheet.Paste with Link). Each case is a new workbook in an invisible instance (macros disabled for it only),
-# closed without saving; no Excel setting is changed and no keys are sent. For each case the cells of `read` on
+# (Range.Copy, then PasteSpecial with what to paste, the operation, Skip blanks and Transpose), Paste Link
+# (Worksheet.Paste with Link), Fill (Range.FillDown, FillRight, FillUp, FillLeft) and the fill handle
+# (Range.AutoFill). Each case is a new workbook in an invisible instance (macros disabled for it only), closed without
+# saving; no Excel setting is changed and no keys are sent. For each case the cells of `read` on
 # Sheet1 (and the cells given on Sheet2) are written out: formula, value, number format, bold, fill colour, bottom
 # border, with the merged ranges, column widths and defined names, or the refusal when Excel refused a step.
 #
@@ -12,7 +13,9 @@
 # steps: [{ do: "insert" | "delete", range, shift: "down" | "right" | "up" | "left" (omitted: Excel decides) },
 #   { do: "paste", from, to, paste: "all" | "formulas" | "values" | "formats" | "widths" | "formulasFormats" |
 #     "valuesFormats" | "noBorders", op: "add" | "subtract" | "multiply" | "divide", skip: bool, transpose: bool },
-#   { do: "link", from, to }]
+#   { do: "link", from, to },
+#   { do: "fill", range, dir: "down" | "right" | "up" | "left" } (Range.FillDown...),
+#   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" } (the fill handle: AutoFill)]
 # usage: pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
 param([Parameter(Mandatory)][string]$Cases, [Parameter(Mandatory)][string]$Out)
 $ErrorActionPreference = 'Stop'
@@ -20,6 +23,7 @@ $ErrorActionPreference = 'Stop'
 $list = Get-Content $Cases -Raw | ConvertFrom-Json
 $shifts = @{ down = -4121; right = -4161; up = -4162; left = -4159 }
 $pastes = @{ all = -4104; formulas = -4123; values = -4163; formats = -4122; widths = 8; formulasFormats = 11; valuesFormats = 12; noBorders = 7 }
+$fills = @{ default = 0; copy = 1; series = 2; formats = 3; values = 4 }
 $ops = @{ none = -4142; add = 2; subtract = 3; multiply = 4; divide = 5 }
 $missing = [Type]::Missing
 $x = New-Object -ComObject Excel.Application
@@ -71,6 +75,14 @@ try {
             [void]$ws.Range($st.to).PasteSpecial($what, $op, [bool]$st.skip, [bool]$st.transpose)
             $x.CutCopyMode = 0
           }
+          'fill' {
+            $r = $ws.Range($st.range)
+            switch ($st.dir) { 'down' { [void]$r.FillDown() } 'right' { [void]$r.FillRight() } 'up' { [void]$r.FillUp() } 'left' { [void]$r.FillLeft() } }
+          }
+          'autofill' {
+            $t = if ($st.type) { $fills[$st.type] } else { 0 }
+            [void]$ws.Range($st.from).AutoFill($ws.Range($st.to), $t)
+          }
           'link' {
             [void]$ws.Range($st.from).Copy()
             [void]$ws.Activate(); [void]$ws.Range($st.to).Select()
@@ -79,7 +91,7 @@ try {
           }
         }
       }
-    } catch { $a.refused = $true }
+    } catch { $a.refused = $true; $a.error = [string]$_.Exception.Message }
     $cells = [ordered]@{}
     foreach ($c in $ws.Range($case.read).Cells) {
       $one = CellOf $c

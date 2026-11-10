@@ -1,0 +1,51 @@
+// The cases of Fill (Ctrl+D, Ctrl+R, Home > Fill) and the fill handle (AutoFill) measured in Excel (excel-steps.ps1):
+// each a few cells in column A (or row 1) filled down (or across) as Excel's handle would fill them.
+// usage: node tools/excel-compare/fill-cases.mjs > tools/excel-compare/fill-cases.json
+const read = 'A1:H12';
+const col = (...texts) => Object.fromEntries(texts.map((t, i) => [`A${i + 1}`, t]));
+const down = (cells, n, type) => ({ cells, steps: [{ do: 'autofill', from: `A1:A${Object.keys(cells).length}`, to: `A1:A${n}`, ...(type ? { type } : {}) }] });
+const cases = [
+  ['one number', down(col('1'), 4)],
+  ['one number, series', down(col('1'), 4, 'series')],
+  ['two numbers', down(col('1', '2'), 6)],
+  ['two numbers, copy', down(col('1', '2'), 6, 'copy')],
+  ['step of two', down(col('1', '3'), 5)],
+  ['falling', down(col('5', '3'), 5)],
+  ['decimals', down(col('0.1', '0.2'), 6)],
+  ['three numbers, a trend', down(col('2', '4', '7'), 7)],
+  ['text', down(col('abc'), 3)],
+  ['text and a number', down(col('Item 1'), 4)],
+  ['text and two numbers', down(col('Item 1', 'Item 3'), 5)],
+  ['a number then text', down(col('1 apple'), 3)],
+  ['text, number in the middle', down(col('a1b'), 3)],
+  ['Q1', down(col('Q1'), 6)],
+  ['Qtr1', down(col('Qtr1'), 6)],
+  ['day names', down(col('Mon'), 9)],
+  ['long day names', down(col('Monday'), 3)],
+  ['month names', down(col('Jan'), 3)],
+  ['long month names, step two', down(col('January', 'March'), 5)],
+  ['month name in capitals', down(col('JAN'), 3)],
+  ['a date', down(col('1/30/2024'), 4)],
+  ['dates a week apart', down(col('1/1/2024', '1/8/2024'), 4)],
+  ['dates a month apart', down(col('1/31/2024', '2/29/2024'), 5)],
+  ['dates a year apart', down(col('1/1/2024', '1/1/2025'), 4)],
+  ['a time', down(col('9:00'), 4)],
+  ['a formula', down(col('=B1*2'), 4)],
+  ['a $ formula', down({ A1: '=$B$1+B1' }, 4)],
+  ['text and number, a block', down(col('a', '1'), 6)],
+  ['two texts', down(col('x', 'y'), 5)],
+  ['formats only', { cells: col('1', '2'), formats: [{ range: 'A1', bold: true, color: 65535 }], steps: [{ do: 'autofill', from: 'A1:A2', to: 'A1:A6', type: 'formats' }] }],
+  ['values only', { cells: col('1', '2'), formats: [{ range: 'A1', bold: true }], steps: [{ do: 'autofill', from: 'A1:A2', to: 'A1:A6', type: 'values' }] }],
+  ['formats come along', { cells: col('1'), formats: [{ range: 'A1', bold: true, numFmt: '0.00' }], steps: [{ do: 'autofill', from: 'A1', to: 'A1:A3' }] }],
+  ['upwards', { cells: { A5: '5', A6: '6' }, steps: [{ do: 'autofill', from: 'A5:A6', to: 'A1:A6' }] }],
+  ['across', { cells: { A1: 'Jan', B1: '10' }, steps: [{ do: 'autofill', from: 'A1:B1', to: 'A1:F1' }] }],
+  ['two columns', { cells: { A1: '1', B1: 'Item 7', A2: '3', B2: 'Item 8' }, steps: [{ do: 'autofill', from: 'A1:B2', to: 'A1:B5' }] }],
+  ['fill down', { cells: { A1: '=B1+1', B1: '1', B2: '2', B3: '3', C1: 'keep' }, formats: [{ range: 'A1', bold: true }], steps: [{ do: 'fill', range: 'A1:A3', dir: 'down' }] }],
+  ['fill down, two columns', { cells: { A1: '1', B1: 'x', A3: 'gone' }, steps: [{ do: 'fill', range: 'A1:B3', dir: 'down' }] }],
+  ['fill right', { cells: { A1: '=A2', A2: '5', B2: '6', C2: '7' }, steps: [{ do: 'fill', range: 'A1:C1', dir: 'right' }] }],
+  ['fill up', { cells: { A4: '=B4', B1: '1', B4: '4' }, steps: [{ do: 'fill', range: 'A1:A4', dir: 'up' }] }],
+  ['fill left', { cells: { C1: 'z' }, formats: [{ range: 'C1', color: 65535 }], steps: [{ do: 'fill', range: 'A1:C1', dir: 'left' }] }],
+  ['fill down one row', { cells: { A1: '7', B1: '=A1+1' }, steps: [{ do: 'fill', range: 'A2:B2', dir: 'down' }] }],
+  ['fill right one column', { cells: { A1: 'w', A2: '=A1' }, steps: [{ do: 'fill', range: 'B1:B2', dir: 'right' }] }],
+].map(([name, { cells, formats, steps }]) => ({ name, setup: { cells, ...(formats ? { formats } : {}) }, steps, read }));
+process.stdout.write(JSON.stringify(cases, null, 1) + '\n');

@@ -439,6 +439,51 @@ check(await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(20)?.get(
 await page.keyboard.press('Control+z');
 await page.keyboard.press('Escape');
 
+// Fill: "Item 1" typed in J16, its fill handle dragged down to J19: Item 2 to Item 4. Ctrl+Z. J16:J18 selected,
+// Ctrl+D: Item 1 copied down. Ctrl+Z; Home > Fill > Right on J16:L16.
+await page.evaluate(() => { window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+await page.evaluate(() => window.oxe.select('J16'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('Item 1');
+await page.keyboard.press('Enter');
+await page.evaluate(() => window.oxe.select('J16'));
+const corner = await page.evaluate(() => {
+  const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); const rc = g.cellRect(15, 9);
+  return { x: v.x + geo.rowHeadW + rc.x + rc.w - g.el.scrollLeft, y: v.y + geo.colHeadH + rc.y + rc.h - g.el.scrollTop };
+});
+check(await page.isVisible('.oxe-fill-handle'), 'the fill handle on the selection’s corner');
+const j19 = await pointAt(18, 9);
+await page.mouse.move(corner.x - 1, corner.y - 1);
+await page.mouse.down();
+await page.mouse.move(j19.x, j19.y, { steps: 4 });
+check(await page.isVisible('.oxe-fill-drag'), 'dragged: the cells to fill outlined');
+await page.mouse.up();
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).cells.get(18)?.get(9)?.v === 'Item 4');
+check(await value('J17') === 'Item 2' && await value('J19') === 'Item 4' && (await sel()).r1 === 18, 'let go at J19: Item 2 to Item 4, as Excel fills, J16:J19 selected');
+await page.keyboard.press('Control+z');
+check(await value('J17') === null, 'Ctrl+Z: the filled cells empty again');
+await page.evaluate(() => window.oxe.select('J16'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Control+d');
+check(await value('J18') === 'Item 1' && await value('J17') === 'Item 1', 'Ctrl+D on J16:J18: Item 1 copied down');
+await page.keyboard.press('Control+z');
+await page.evaluate(() => window.oxe.select('J16'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowRight');
+await page.keyboard.press('Shift+ArrowRight');
+// (At this width the Editing group is behind the ribbon's More button.)
+const more = await page.isVisible('.oxe-more');
+if (more) await page.click('.oxe-more');
+await page.click('.oxe-toolbar button[title="Fill"]');
+await page.click('.oxe-pop >> text=Right');
+if (more) await page.click('.oxe-more');
+check(await value('L16') === 'Item 1', 'Home > Fill > Right on J16:L16: Item 1 copied across');
+await page.keyboard.press('Control+z');
+await page.keyboard.press('Control+z');
+check(await value('J16') === null, 'Ctrl+Z twice: J16 empty again');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

@@ -1,6 +1,7 @@
 // The selection as the grid shows it: the selected range shaded, the active cell outlined, both in an overlay above
 // the cells and below the sticky headings. View state only: nothing here reaches the workbook or its undo history.
 import { setVars, div } from './grid.js';
+import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 
 /** A selection: the active cell (ar, ac) and the range (r0..r1, c0..c1) it extends over, 0-based. */
 export const cellSelection = (r, c) => ({ ar: r, ac: c, r0: r, c0: c, r1: r, c1: c });
@@ -11,7 +12,8 @@ export function extendSelection(sel, r, c) {
 }
 
 /** Draw the selection into the grid's overlay: a shaded box over a range of more than one cell, an outline round the
- *  active cell (or the merged range it is in). */
+ *  active cell (or the merged range it is in), the fill handle at the range's bottom-right corner (when it can be
+ *  used), and while the handle is dragged, the cells it will fill outlined. */
 export function drawSelection(st) {
   const sel = st.sel;
   if (!st.selLayer) return;
@@ -21,7 +23,25 @@ export function drawSelection(st) {
   if (sel.r0 !== sel.r1 || sel.c0 !== sel.c1) kids.push(box(sel.r0, sel.c0, sel.r1, sel.c1, 'oxe-sel-range'));
   const m = st.sheet.merges.find((x) => sel.ar >= x.r0 && sel.ar <= x.r1 && sel.ac >= x.c0 && sel.ac <= x.c1);
   kids.push(m ? box(m.r0, m.c0, m.r1, m.c1, 'oxe-sel-active') : box(sel.ar, sel.ac, sel.ar, sel.ac, 'oxe-sel-active'));
+  const corner = handleCorner(st);
+  if (corner) {
+    const el = div('oxe-fill-handle');
+    setVars(el, { '--oxe-x': st.cols.start(corner.c + 1), '--oxe-y': st.rows.start(corner.r + 1) });
+    kids.push(el);
+  }
+  if (st.filling) kids.push(box(st.filling.r0, st.filling.c0, st.filling.r1, st.filling.c1, 'oxe-fill-drag'));
   st.selLayer.replaceChildren(...kids);
+}
+
+/** The cell whose bottom-right corner has the fill handle: the selection's (the merged range's, when the selection is
+ *  the active cell in one), or null when it has none (turned off, or whole rows or columns, where Excel's handle sits
+ *  off the sheet's end). */
+export function handleCorner(st) {
+  const sel = st.sel;
+  if (!sel || !st.fillHandle) return null;
+  if (sel.r1 >= MAX_ROWS - 1 || sel.c1 >= MAX_COLS - 1) return null;
+  const m = st.sheet.merges.find((x) => x.r0 === sel.r0 && x.c0 === sel.c0 && x.r1 >= sel.r1 && x.c1 >= sel.c1);
+  return m ? { r: m.r1, c: m.c1 } : { r: sel.r1, c: sel.c1 };
 }
 
 /** A box over cells r0..r1, c0..c1 in the overlay's coordinates. */

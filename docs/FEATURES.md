@@ -50,7 +50,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
 | Chart sheets | Kept | Tab shown, sheet not opened. |
 | Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |
-| Fill handle, Ctrl+D, Ctrl+R | Missing | |
+| Fill handle, Ctrl+D, Ctrl+R | Done | Series, lists, dates and formulas as Excel fills them; Ctrl-drag the other way (docs/FILL.md). Auto Fill Options and double-click not yet. |
 | Right-click menu on cells | Done | Cut, Copy, Paste, Paste Special..., Insert..., Delete..., Clear Contents (docs/CLIPBOARD.md). |
 | Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
 | Find and Replace (Ctrl+F, Ctrl+H) | Done | Excel's options, Find All as a count, Replace All in one undo step (docs/FIND.md). |
@@ -90,7 +90,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Hide and unhide rows, columns | Done | |
 | | Rename, hide and unhide sheet | Done | Cells > Format; moving and tab colour on the tab menu. |
 | Editing (`editing`) | AutoSum | Missing | |
-| | Fill (down, right, series) | Missing | |
+| | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
 | | Clear (all, formats, contents) | Partly | Clear Formats and Clear Contents; Clear All missing. |
 | | Sort & Filter | Missing | Autofilters kept. |
 | | Find & Select | Partly | Find and Replace; Go To and Go To Special missing. |
