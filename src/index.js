@@ -7,10 +7,11 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox } from './editor/dialogs.js';
 import { filterChoices, shownText } from './ooxml/filterops.js';
 import { readNotes } from './ooxml/notes.js';
 import { conditionalLooks } from './ooxml/condformat.js';
+import { ruleAt, listItems } from './ooxml/validation.js';
 import { dataBeside, sortArea, guessHeader, SORT_MESSAGES } from './ooxml/sortops.js';
 import { isDateFormat } from './ooxml/format.js';
 import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
@@ -260,6 +261,41 @@ export function mountXlsxEditor(host, options = {}) {
     if (!got) { state.grid.el.focus({ preventScroll: true }); return false; }
     return editing().run('sort', { area, ...got });
   };
+  /** A typed value the cell's data validation refuses: Excel's box for the rule's style (Stop: Retry or Cancel;
+   *  Warning: Continue? Yes, No or Cancel; Information: OK or Cancel), its title first. 'retry', 'force' or 'cancel'. */
+  const askInvalid = async ({ style, title, message }) => {
+    const text = title ? `${title}
+
+${message}` : message;
+    if (style === 'warning') { const b = await messageBox(root, `${text}
+
+Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' ? 'retry' : 'cancel'; }
+    if (style === 'information') return (await messageBox(root, text, ['OK', 'Cancel'])) === 'OK' ? 'force' : 'cancel';
+    return (await messageBox(root, text, ['Retry', 'Cancel'])) === 'Retry' ? 'retry' : 'cancel';
+  };
+  /** The active cell's data validation shown: a list's dropdown button beside it, the rule's input message under it. */
+  const showValidation = () => {
+    if (!state.grid || !state.workbook || !state.editing) return '';
+    const s = editing().selection;
+    const rule = ruleAt(state.workbook.sheet(state.sheetIndex), s.ar, s.ac);
+    const prompt = rule && rule.showPrompt && (rule.promptTitle || rule.prompt) ? { title: rule.promptTitle, text: rule.prompt } : null;
+    state.grid.setValidation(rule ? { r: s.ar, c: s.ac, list: rule.type === 'list' && rule.dropDown && !state.readOnly, prompt } : null);
+    return prompt ? `, ${[prompt.title, prompt.text].filter(Boolean).join(': ')}` : '';
+  };
+  /** A list's choices for the active cell (Alt+Down, or its button): picked, it is entered as if typed. */
+  const listMenu = (rect = null) => {
+    const s = editing().selection;
+    const wb = state.workbook;
+    const rule = ruleAt(wb.sheet(state.sheetIndex), s.ar, s.ac);
+    if (!rule || rule.type !== 'list' || !rule.dropDown || state.readOnly) return false;
+    const { items } = listItems(wb, state.sheetIndex, rule, s.ar, s.ac);
+    const at = rect || (state.grid.el.querySelector('.oxe-dv-btn') || state.grid.el).getBoundingClientRect();
+    pickBox(root, { title: 'Choose a value', at: { x: at.left, y: at.bottom + 2 }, items: items.map((x) => x.text) }).then((i) => {
+      if (i != null) editing().run('enter', items[i].text);
+      state.grid.el.focus({ preventScroll: true });
+    });
+    return true;
+  };
   /** The shown sheet's conditional formats worked out again (after a change, or another sheet shown). */
   const showConditional = () => { if (state.grid && state.workbook) state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex)); };
   /** A filter button's list for column c (dialogs.js filterBox), opened under `rect`: its sort, Clear Filter From, or
@@ -397,6 +433,7 @@ export function mountXlsxEditor(host, options = {}) {
       else {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
         state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
+        state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
         state.grid.setNotes(readNotes(wb, i));
         showConditional();
         state.editing = attachEditing(root, {
@@ -418,7 +455,9 @@ export function mountXlsxEditor(host, options = {}) {
           cellMenu,
           pasteSpecial: () => act('pasteSpecialBox'),
           autoSum: (fn) => act('autoSum', fn),
-          filterMenu: () => filterMenu(),
+          filterMenu: () => filterMenu() || listMenu(),
+          askInvalid: (info) => askInvalid(info),
+          selectionShown: () => showValidation(),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),

@@ -12,6 +12,7 @@ import { fontDescentPx } from './fonts.js';
 import { drawSelection, drawMarks, rangeBox, handleCorner } from './selection.js';
 import { drawFilterButtons } from './filterbuttons.js';
 import { drawNoteMarks } from './notemarks.js';
+import { drawValidation } from './dvmarks.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -369,6 +370,7 @@ function draw(st, force = false) {
   drawMarks(st);
   drawFilterButtons(st, win);
   drawNoteMarks(st, win);
+  drawValidation(st);
   if (st.panes) drawPanes(st, win);
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
   if (active) st.view.setAttribute('aria-activedescendant', active.id);
@@ -434,12 +436,15 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   // description from the hidden texts.)
   const noteLayer = div('oxe-notes');
   noteLayer.setAttribute('aria-hidden', 'true');
+  // (A data validation list's button and input message: the same.)
+  const dvLayer = div('oxe-dv');
+  dvLayer.setAttribute('aria-hidden', 'true');
   const noteTexts = div('oxe-note-texts');
   noteTexts.hidden = true;
-  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, noteLayer, filterLayer, noteTexts);
+  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, noteLayer, filterLayer, dvLayer, noteTexts);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, filterLayer, noteLayer, noteTexts, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, filterLayer, noteLayer, noteTexts, dvLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -565,6 +570,14 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       showNote(st.noteOpen === key && st.notePinned ? null : key, true);
       return true;
     },
+    /** The active cell's data validation ({ r, c, list, prompt: { title, text } }, or null): a list's button beside
+     *  it, the input message under it. */
+    setValidation(v) {
+      st.validation = v;
+      drawValidation(st);
+    },
+    /** What a click on a list's button does: `fn(button)`. */
+    onDropdown(fn) { st.onDropdown = fn; },
     /** What a click on a filter button does: `fn(c, button)`. */
     onFilterButton(fn) { st.onFilter = fn; },
     /** Show the fill handle on the selection (not on a read-only workbook, or with filling turned off). */

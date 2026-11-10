@@ -621,6 +621,35 @@ check((await hiddenNow()).length === 0, 'E1, Alt+Down, Clear Filter From "Choice
 await page.keyboard.press('Control+Shift+KeyL');
 check(await page.evaluate(() => window.oxe.workbook.sheet(0).autoFilter) === null && await page.locator('.oxe-filters .oxe-filter-btn').count() === 0, 'Ctrl+Shift+L: the filter off, its buttons gone');
 
+// Data validation: basic.xlsx's E2:E10 is a list (Yes, No). E3 selected: its button; picked No: entered. "Maybe"
+// typed into E4: Excel's refusal, Retry or Cancel; Cancel: E4 as it was; Retry: back in the cell's editor.
+await page.evaluate(() => window.oxe.select('E3'));
+await page.focus('.oxe-grid');
+check(await page.isVisible('.oxe-dv-btn'), 'E3, in a list rule: its dropdown button');
+await page.click('.oxe-dv-btn');
+await page.waitForSelector('dialog.oxe-pick-box');
+const offered = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-pick-box option')].map((o) => o.textContent).join(','));
+await page.selectOption('dialog.oxe-pick-box select', { label: 'No' });
+await page.keyboard.press('Enter');
+check(offered === 'Yes,No' && await value('E3') === 'No', 'its list offers Yes, No; No picked: entered', `${offered} ${await value('E3')}`);
+await page.keyboard.press('Control+z');
+const e4 = await value('E4');
+await page.evaluate(() => window.oxe.select('E4'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('Maybe');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog');
+const refusal = await page.textContent('dialog.oxe-dialog');
+await page.click('dialog.oxe-dialog >> button:text-is("Cancel")');
+check(/doesn't match the data validation restrictions/.test(refusal) && /Retry/.test(refusal) && await value('E4') === e4, 'Maybe typed into E4: Excel’s refusal; Cancel: E4 as it was', refusal);
+await page.keyboard.type('Maybe');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog');
+await page.click('dialog.oxe-dialog >> button:text-is("Retry")');
+const again = await page.evaluate(() => document.querySelector('.oxe-editor')?.value);
+await page.keyboard.press('Escape');
+check(again === 'Maybe' && await value('E4') === e4, 'Retry: back in the editor with Maybe', String(again));
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

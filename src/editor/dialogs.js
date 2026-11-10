@@ -325,3 +325,26 @@ export function filterBox(root, { title, at, choices, numbers = false, filtered 
     search.dataset.first = '';
   });
 }
+
+/** A data validation list's choices under its cell, as a list to pick from (`items`: texts): resolves to the index
+ *  picked (click, double click or Enter), or null for Esc. */
+export function pickBox(root, { title, at, items }) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-label', title);
+    dlg.classList.add('oxe-pick-box');
+    dlg.style.setProperty('--oxe-fx', `${Math.round(at.x)}px`);
+    dlg.style.setProperty('--oxe-fy', `${Math.round(at.y)}px`);
+    const list = document.createElement('select');
+    list.id = `${id}-list`;
+    list.className = 'oxe-dialog-list';
+    list.setAttribute('aria-label', title);
+    list.size = Math.max(2, Math.min(8, items.length));
+    list.append(...items.map((t, i) => Object.assign(document.createElement('option'), { value: String(i), textContent: t })));
+    list.selectedIndex = 0;
+    list.dataset.first = '';
+    const ok = () => done(list.selectedIndex < 0 ? null : list.selectedIndex);
+    list.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); ok(); } });
+    list.addEventListener('click', (e) => { if (e.target.tagName === 'OPTION') ok(); });
+    dlg.append(list);
+  });
+}

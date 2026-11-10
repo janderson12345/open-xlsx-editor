@@ -1362,3 +1362,52 @@
 .oxe-root .oxe-grid .oxe-cell.oxe-cf-strike {
   text-decoration: line-through;
 }
+
+/* Data validation (dvmarks.js): a list's button beside the active cell, the input message under it. */
+.oxe-dv {
+  position: absolute;
+  top: var(--oxe-colhead-h);
+  left: 0;
+  width: var(--oxe-sheet-w);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+  z-index: 3;
+  pointer-events: none;
+}
+.oxe-dv-btn {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  width: 17px;
+  height: var(--oxe-h);
+  padding: 0;
+  border: 1px solid #a6a6a6;
+  background: #f3f3f3;
+  color: #444444;
+  font: 10px var(--oxe-ui-font);
+  pointer-events: auto;
+}
+.oxe-dv-prompt {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  max-width: 220px;
+  padding: 4px 6px;
+  border: 1px solid #767676;
+  background: #ffffe1;
+  color: #000000;
+  font: 12px/1.35 var(--oxe-ui-font);
+  white-space: pre-wrap;
+}
+.oxe-dv-prompt-text {
+  margin-top: 2px;
+}
+.oxe-dialog.oxe-pick-box {
+  position: fixed;
+  inset: var(--oxe-fy) auto auto var(--oxe-fx);
+  margin: 0;
+  padding: 2px;
+  min-width: 120px;
+}
+.oxe-pick-box .oxe-dialog-list {
+  min-width: 120px;
+}

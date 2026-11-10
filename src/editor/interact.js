@@ -28,8 +28,7 @@ export function attachEditing(root, ctx) {
   const bar = createFormulaBar(root, {
     onEnter: (text) => {
       if (carried) { finishCarried(text); return; }
-      cmd.run('enter', text);
-      view.focus();
+      commit(text, null, () => view.focus());
     },
     onCancel: () => {
       if (carried) { const o = carried; carried = null; pointing.attach(null); cmd.run('showSheet', o.si); }
@@ -56,9 +55,10 @@ export function attachEditing(root, ctx) {
     onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
     onFinish: (text, move) => {
       // (An entry refused, a formula with a mistake in it, goes back into the editor to be put right, as in Excel.)
-      if (!cmd.run('enter', text)) { reopen(text); return; }
-      if (move) cmd.run('move', move[0], move[1]);
-      view.focus({ preventScroll: true });
+      commit(text, null, () => {
+        if (move) cmd.run('move', move[0], move[1]);
+        view.focus({ preventScroll: true });
+      });
     },
     onCancel: () => view.focus({ preventScroll: true }),
   });
@@ -70,7 +70,9 @@ export function attachEditing(root, ctx) {
       ctx.lookChanged?.();
       const cell = cellAt(sel.ar, sel.ac);
       const range = sel.r0 !== sel.r1 || sel.c0 !== sel.c1 ? `, ${refName(sel.r0, sel.c0)} to ${refName(sel.r1, sel.c1)} selected` : '';
-      announce(`${note}${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}`);
+      // (A data validation input message is read with the cell, as it shows beside it.)
+      const prompt = ctx.selectionShown?.() || '';
+      announce(`${note}${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}${prompt}`);
     },
     showSheet: (i) => {
       if (pointing.ready && !carried) carry();
@@ -112,9 +114,22 @@ export function attachEditing(root, ctx) {
     pointing.attach(null);
     cmd.run('showSheet', o.si);
     cmd.run('select', o.r, o.c);
-    if (!cmd.run('enter', text, { r: o.r, c: o.c })) { reopen(text); return; }
-    view.focus({ preventScroll: true });
-    refreshBar();
+    commit(text, { r: o.r, c: o.c }, () => { view.focus({ preventScroll: true }); refreshBar(); });
+  }
+  /** Enter `text` (into `at`, or the active cell), then `after()`. Refused (a formula with a mistake), it goes back into
+   *  the editor; refused by the cell's data validation, Excel's question first (`ctx.askInvalid`): Retry (or No) back
+   *  into the editor, Yes or OK entered anyway, Cancel dropped. */
+  async function commit(text, at, after) {
+    const done = cmd.run('enter', text, at);
+    if (done && done.invalid) {
+      const how = (await ctx.askInvalid?.(done.invalid)) || 'cancel';
+      if (how === 'force') { cmd.run('enter', text, at, { force: true }); after(); }
+      else if (how === 'retry') reopen(text);
+      else { refreshBar(); view.focus({ preventScroll: true }); }
+      return;
+    }
+    if (!done) { reopen(text); return; }
+    after();
   }
   /** A cell's text as Excel's formula bar has it (a date as a date, a percentage as one). */
   const barText = (cell) => editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904);

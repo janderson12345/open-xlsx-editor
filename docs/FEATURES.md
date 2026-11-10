@@ -134,7 +134,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
 | Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Missing | The Data tab isn't there yet; Sort and Filter are in Home > Editing (docs/SORT.md, docs/FILTER.md). Advanced Filter missing. |
 | Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Missing | |
-| | Data Validation (lists, rules) | Kept | Not checked when typing; no drop-down. |
+| | Data Validation (lists, rules) | Partly | Typed values checked as Excel checks them, its Stop, Warning and Information boxes; a list's dropdown; the input message (docs/VALIDATION.md). The box to add and change rules missing. |
 | Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |
 
 ## Review (`review`)

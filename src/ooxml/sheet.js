@@ -96,6 +96,7 @@ export function readSheet(doc, sst = []) {
     page: readPageSetup(root, ns),
     autoFilter: readAutoFilter(kid(root, 'autoFilter', ns), ns),
     condFormats: readCondFormats(root, ns),
+    validations: readValidations(root, ns),
     maxRow,
     maxCol,
   };
@@ -143,6 +144,24 @@ function readCondFormats(root, ns) {
         colorScale: scale ? { cfvo: kids(scale, 'cfvo', ns).map((v) => ({ type: attr(v, 'type'), val: attr(v, 'val') })), colors: kids(scale, 'color', ns).map(readColor) } : null,
       };
     }),
+  }));
+}
+
+/**
+ * The sheet's data validation rules: [{ ranges, type ('whole', 'decimal', 'list', 'date', 'time', 'textLength',
+ * 'custom' or 'none'), operator, formulas (formula1, formula2, as the file has them, relative to the first range's
+ * top-left cell), allowBlank, dropDown (a list's in-cell dropdown shown: the file's showDropDown means hidden),
+ * errorStyle, errorTitle, error, showError, promptTitle, prompt, showPrompt }].
+ */
+function readValidations(root, ns) {
+  const flag = (el, name) => attr(el, name) === '1' || attr(el, name) === 'true';
+  return kids(kid(root, 'dataValidations', ns), 'dataValidation', ns).map((v) => ({
+    ranges: (attr(v, 'sqref') || '').split(/s+/).map(parseRange).filter(Boolean),
+    type: attr(v, 'type') || 'none', operator: attr(v, 'operator') || 'between',
+    formulas: [kid(v, 'formula1', ns), kid(v, 'formula2', ns)].filter(Boolean).map((f) => f.textContent),
+    allowBlank: flag(v, 'allowBlank'), dropDown: !flag(v, 'showDropDown'),
+    errorStyle: attr(v, 'errorStyle') || 'stop', errorTitle: attr(v, 'errorTitle') || '', error: attr(v, 'error') || '', showError: flag(v, 'showErrorMessage'),
+    promptTitle: attr(v, 'promptTitle') || '', prompt: attr(v, 'prompt') || '', showPrompt: flag(v, 'showInputMessage'),
   }));
 }
 

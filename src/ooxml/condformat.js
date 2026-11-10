@@ -29,7 +29,7 @@ function scalar(v) {
 const rank = (v) => (typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : 2);
 /** Excel's comparison of two values: below 0, 0, above 0 (a blank as 0 against a number, as "" against text); null
  *  when either is an error. */
-function compare(a, b) {
+export function compare(a, b) {
   if (isError(a) || isError(b)) return null;
   if (a == null) a = typeof b === 'string' ? '' : 0;
   if (b == null) b = typeof a === 'string' ? '' : 0;

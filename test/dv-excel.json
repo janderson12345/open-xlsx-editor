@@ -1,0 +1,212 @@
+{
+  "excel": "Excel.Application: Validation.Add, Range.Validation.Value, then the saved sheet XML",
+  "cases": [
+    {
+      "name": "whole number between 1 and 10",
+      "valid": {
+        "A1": false,
+        "A2": true,
+        "A3": true,
+        "A4": true,
+        "A5": false,
+        "A6": false,
+        "A7": false,
+        "A8": true,
+        "A9": false,
+        "A10": false,
+        "A11": false,
+        "A12": true,
+        "A13": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"whole\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A13\" xr:uid=\"{4539E3B9-71C4-4023-ABD4-AFD226484D31}\"><formula1>1</formula1><formula2>10</formula2></dataValidation></dataValidations>"
+    },
+    {
+      "name": "whole number not between 1 and 10",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": false,
+        "A4": false,
+        "A5": true,
+        "A6": false,
+        "A7": false,
+        "A8": true,
+        "A9": false,
+        "A10": true,
+        "A11": false,
+        "A12": false,
+        "A13": true
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"whole\" operator=\"notBetween\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A13\" xr:uid=\"{966E1EC0-74BC-486E-B167-37D4560101B1}\"><formula1>1</formula1><formula2>10</formula2></dataValidation></dataValidations>"
+    },
+    {
+      "name": "whole number greater than 4",
+      "valid": {
+        "A1": false,
+        "A2": false,
+        "A3": true,
+        "A4": true,
+        "A5": true,
+        "A6": false,
+        "A7": false,
+        "A8": true,
+        "A9": false,
+        "A10": true,
+        "A11": false,
+        "A12": true,
+        "A13": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"whole\" operator=\"greaterThan\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A13\" xr:uid=\"{E49ACB68-BDB9-43A5-B2A5-33DD9F4CF003}\"><formula1>4</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "whole number, blanks not ignored",
+      "valid": {
+        "A1": false,
+        "A2": true,
+        "A3": true,
+        "A4": true,
+        "A5": false,
+        "A6": false,
+        "A7": false,
+        "A8": false,
+        "A9": false,
+        "A10": false,
+        "A11": false,
+        "A12": true,
+        "A13": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"whole\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A13\" xr:uid=\"{6EF4DFF9-394E-4885-89C9-AD588C3187B5}\"><formula1>1</formula1><formula2>10</formula2></dataValidation></dataValidations>"
+    },
+    {
+      "name": "decimal between 0 and 1",
+      "valid": {
+        "A1": true,
+        "A2": true,
+        "A3": true,
+        "A4": false,
+        "A5": false,
+        "A6": false,
+        "A7": true,
+        "A8": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"decimal\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A8\" xr:uid=\"{21BDBE21-E1AD-4184-8A31-61047809E712}\"><formula1>0</formula1><formula2>1</formula2></dataValidation></dataValidations>"
+    },
+    {
+      "name": "decimal equal to a cell",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "A4": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"decimal\" operator=\"equal\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A4\" xr:uid=\"{656CBF14-3923-472B-99B2-CE1B53CD195E}\"><formula1>$B$1</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "list of words",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "A4": false,
+        "A5": true,
+        "A6": true,
+        "A7": true,
+        "A8": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A8\" xr:uid=\"{FCA829F9-E6D3-41F0-8BC2-276EA7460E47}\"><formula1>\"a,b,c\"</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "list of numbers",
+      "valid": {
+        "A1": true,
+        "A2": true,
+        "A3": true,
+        "A4": true,
+        "A5": false,
+        "A6": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A6\" xr:uid=\"{1A9B2516-8D04-4609-AC6B-9E810C691684}\"><formula1>\"1,2,3\"</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "list from cells",
+      "valid": {
+        "A1": true,
+        "A2": true,
+        "A3": false,
+        "A4": true,
+        "A5": true,
+        "A6": true
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A6\" xr:uid=\"{E6CBBD97-4070-4E87-8AA8-DC7098DE939A}\"><formula1>$B$1:$B$4</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "list, blanks not ignored",
+      "valid": {
+        "A1": true,
+        "A2": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"list\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A2\" xr:uid=\"{D58206FC-948B-41A5-9E78-ECEC89A5CB44}\"><formula1>\"a,b\"</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "date on or after 1/1/2024",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "A4": true,
+        "A5": false,
+        "A6": false,
+        "A7": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"date\" operator=\"greaterThanOrEqual\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A7\" xr:uid=\"{CE7EEBDF-3C7C-4B95-92D8-A07521172BC1}\"><formula1>45292</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "time between 9:00 and 17:00",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "A4": true,
+        "A5": false,
+        "A6": true,
+        "A7": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"time\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A7\" xr:uid=\"{C046F0DD-2A96-414B-A32C-3180DC827416}\"><formula1>0.375</formula1><formula2>0.708333333333333</formula2></dataValidation></dataValidations>"
+    },
+    {
+      "name": "text length at most 3",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "A4": false,
+        "A5": false,
+        "A6": true,
+        "A7": false,
+        "A8": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"textLength\" operator=\"lessThanOrEqual\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A8\" xr:uid=\"{134971E4-4F70-4F5C-8F1A-363FA939D768}\"><formula1>3</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "custom: a number",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": true,
+        "A4": false,
+        "A5": false
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"custom\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A5\" xr:uid=\"{C0261631-F006-42D4-AD55-A350B4265349}\"><formula1>ISNUMBER(A1)</formula1></dataValidation></dataValidations>"
+    },
+    {
+      "name": "custom: relative to the row",
+      "valid": {
+        "A1": true,
+        "A2": false,
+        "A3": false,
+        "A4": true
+      },
+      "dataValidations": "<dataValidations count=\"1\"><dataValidation type=\"custom\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"A1:A4\" xr:uid=\"{C8092FC5-5779-4E11-9ABB-7243C11205A6}\"><formula1>A1&gt;B1</formula1></dataValidation></dataValidations>"
+    }
+  ]
+}

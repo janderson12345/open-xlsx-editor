@@ -20,6 +20,7 @@ import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
 import { filterArea } from '../ooxml/filterops.js';
+import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -184,12 +185,21 @@ export function createCommands(ctx) {
     end() { const { r, c } = lastCell(sheet()); commands.select(r, c); },
     /** Enter what was typed into the active cell (or `at`): parsed as Excel reads an entry (input.js), a formula if
      *  it starts with =. */
-    enter(text, at = null) {
+    enter(text, at = null, { force = false } = {}) {
       const { r, c } = at || { r: state.sel.ar, c: state.sel.ac };
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       if (inArray(r, c)) { ctx.announce("You can't change part of an array"); return false; }
-      const ch = entryChanges(ctx.workbook(), ctx.sheetIndex(), r, c, text);
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const ch = entryChanges(wb, si, r, c, text);
       if (ch.error) { ctx.announce(ch.error); return false; }
+      // (A cell's data validation judges what is typed, a formula by its result (validation.js): refused, Excel's
+      // question comes back as { invalid } for the caller to ask; `force` enters it anyway, as Yes and OK do.)
+      const rule = !force && ruleAt(sheet(), r, c);
+      if (rule && rule.showError) {
+        const v = ch.content.formula != null ? wb.calc.formulaAt(si, r, c, ch.content.formula) : ch.content.value;
+        if (!valid(wb, si, rule, r, c, v)) return { invalid: { style: rule.errorStyle, title: rule.errorTitle, message: rule.error || VALIDATION_MESSAGE } };
+      }
       // (A date, a time, currency or a percentage typed into a General cell gives it Excel's format: one step with the value.)
       if (!ch.style) return apply([ch.content]);
       return runSteps([{ si: ctx.sheetIndex(), contents: [ch.content], styles: [ch.style] }]);

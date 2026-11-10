@@ -189,10 +189,11 @@ export class Calc {
   }
 
   /** A formula (its text as the file has it, without "=") worked out as if it were in cell (r, c) of sheet si, without
-   *  being entered there (a conditional format's): its value, or null when it can't be worked out here. */
-  formulaAt(si, r, c, text) {
+   *  being entered there (a conditional format's): its value, or null when it can't be worked out here. With `array`,
+   *  a range or array as a whole (a validation list's cells). */
+  formulaAt(si, r, c, text, array = false) {
     try {
-      return result(parseFormula(text), this.context({ si, r, c }), false);
+      return result(parseFormula(text), this.context({ si, r, c }), array);
     } catch (err) {
       if (err instanceof Unsupported || err instanceof SyntaxError || /formula/i.test(String(err?.message))) return null;
       throw err;

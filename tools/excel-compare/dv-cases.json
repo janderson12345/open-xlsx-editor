@@ -1,0 +1,328 @@
+[
+ {
+  "name": "whole number between 1 and 10",
+  "setup": {
+   "cells": {
+    "A1": "0",
+    "A2": "1",
+    "A3": "5",
+    "A4": "10",
+    "A5": "11",
+    "A6": "5.5",
+    "A7": "abc",
+    "A9": "'7",
+    "A10": "TRUE",
+    "A11": "=1/0",
+    "A12": "=2+3",
+    "A13": "-3"
+   }
+  },
+  "rule": {
+   "range": "A1:A13",
+   "type": "whole",
+   "op": "between",
+   "f1": "1",
+   "f2": "10"
+  },
+  "read": "A1:A13"
+ },
+ {
+  "name": "whole number not between 1 and 10",
+  "setup": {
+   "cells": {
+    "A1": "0",
+    "A2": "1",
+    "A3": "5",
+    "A4": "10",
+    "A5": "11",
+    "A6": "5.5",
+    "A7": "abc",
+    "A9": "'7",
+    "A10": "TRUE",
+    "A11": "=1/0",
+    "A12": "=2+3",
+    "A13": "-3"
+   }
+  },
+  "rule": {
+   "range": "A1:A13",
+   "type": "whole",
+   "op": "notBetween",
+   "f1": "1",
+   "f2": "10"
+  },
+  "read": "A1:A13"
+ },
+ {
+  "name": "whole number greater than 4",
+  "setup": {
+   "cells": {
+    "A1": "0",
+    "A2": "1",
+    "A3": "5",
+    "A4": "10",
+    "A5": "11",
+    "A6": "5.5",
+    "A7": "abc",
+    "A9": "'7",
+    "A10": "TRUE",
+    "A11": "=1/0",
+    "A12": "=2+3",
+    "A13": "-3"
+   }
+  },
+  "rule": {
+   "range": "A1:A13",
+   "type": "whole",
+   "op": "greater",
+   "f1": "4"
+  },
+  "read": "A1:A13"
+ },
+ {
+  "name": "whole number, blanks not ignored",
+  "setup": {
+   "cells": {
+    "A1": "0",
+    "A2": "1",
+    "A3": "5",
+    "A4": "10",
+    "A5": "11",
+    "A6": "5.5",
+    "A7": "abc",
+    "A9": "'7",
+    "A10": "TRUE",
+    "A11": "=1/0",
+    "A12": "=2+3",
+    "A13": "-3"
+   }
+  },
+  "rule": {
+   "range": "A1:A13",
+   "type": "whole",
+   "op": "between",
+   "f1": "1",
+   "f2": "10",
+   "ignoreBlank": false
+  },
+  "read": "A1:A13"
+ },
+ {
+  "name": "decimal between 0 and 1",
+  "setup": {
+   "cells": {
+    "A1": "0",
+    "A2": "0.5",
+    "A3": "1",
+    "A4": "1.5",
+    "A5": "-0.1",
+    "A6": "x",
+    "A8": "'0.5"
+   }
+  },
+  "rule": {
+   "range": "A1:A8",
+   "type": "decimal",
+   "op": "between",
+   "f1": "0",
+   "f2": "1"
+  },
+  "read": "A1:A8"
+ },
+ {
+  "name": "decimal equal to a cell",
+  "setup": {
+   "cells": {
+    "A1": "3",
+    "A2": "4",
+    "A3": "3.0",
+    "A4": "x",
+    "B1": "3"
+   }
+  },
+  "rule": {
+   "range": "A1:A4",
+   "type": "decimal",
+   "op": "equal",
+   "f1": "=$B$1"
+  },
+  "read": "A1:A4"
+ },
+ {
+  "name": "list of words",
+  "setup": {
+   "cells": {
+    "A1": "a",
+    "A2": "A",
+    "A3": "b",
+    "A4": "d",
+    "A5": "b ",
+    "A6": " b",
+    "A8": "c,d"
+   }
+  },
+  "rule": {
+   "range": "A1:A8",
+   "type": "list",
+   "f1": "a,b,c"
+  },
+  "read": "A1:A8"
+ },
+ {
+  "name": "list of numbers",
+  "setup": {
+   "cells": {
+    "A1": "1",
+    "A2": "'1",
+    "A3": "2",
+    "A4": "2.0",
+    "A5": "4",
+    "A6": "one"
+   }
+  },
+  "rule": {
+   "range": "A1:A6",
+   "type": "list",
+   "f1": "1,2,3"
+  },
+  "read": "A1:A6"
+ },
+ {
+  "name": "list from cells",
+  "setup": {
+   "cells": {
+    "A1": "y",
+    "A2": "Y",
+    "A3": "w",
+    "A5": "5",
+    "A6": "5.0",
+    "B1": "x",
+    "B2": "y",
+    "B3": "z",
+    "B4": "5"
+   }
+  },
+  "rule": {
+   "range": "A1:A6",
+   "type": "list",
+   "f1": "=$B$1:$B$4"
+  },
+  "read": "A1:A6"
+ },
+ {
+  "name": "list, blanks not ignored",
+  "setup": {
+   "cells": {
+    "A1": "a"
+   }
+  },
+  "rule": {
+   "range": "A1:A2",
+   "type": "list",
+   "f1": "a,b",
+   "ignoreBlank": false
+  },
+  "read": "A1:A2"
+ },
+ {
+  "name": "date on or after 1/1/2024",
+  "setup": {
+   "cells": {
+    "A1": "1/1/2024",
+    "A2": "12/31/2023",
+    "A3": "6/15/2024",
+    "A4": "45292",
+    "A5": "45291",
+    "A6": "x",
+    "A7": "'1/1/2024"
+   }
+  },
+  "rule": {
+   "range": "A1:A7",
+   "type": "date",
+   "op": "greaterEqual",
+   "f1": "1/1/2024"
+  },
+  "read": "A1:A7"
+ },
+ {
+  "name": "time between 9:00 and 17:00",
+  "setup": {
+   "cells": {
+    "A1": "9:00",
+    "A2": "8:59",
+    "A3": "12:30",
+    "A4": "17:00",
+    "A5": "17:01",
+    "A6": "0.5",
+    "A7": "1.5"
+   }
+  },
+  "rule": {
+   "range": "A1:A7",
+   "type": "time",
+   "op": "between",
+   "f1": "9:00",
+   "f2": "17:00"
+  },
+  "read": "A1:A7"
+ },
+ {
+  "name": "text length at most 3",
+  "setup": {
+   "cells": {
+    "A1": "abc",
+    "A2": "abcd",
+    "A3": "123",
+    "A4": "1234",
+    "A5": "12.5",
+    "A7": "TRUE",
+    "A8": "=1/0"
+   }
+  },
+  "rule": {
+   "range": "A1:A8",
+   "type": "length",
+   "op": "lessEqual",
+   "f1": "3"
+  },
+  "read": "A1:A8"
+ },
+ {
+  "name": "custom: a number",
+  "setup": {
+   "cells": {
+    "A1": "1",
+    "A2": "x",
+    "A4": "TRUE",
+    "A5": "=1/0"
+   }
+  },
+  "rule": {
+   "range": "A1:A5",
+   "type": "custom",
+   "f1": "=ISNUMBER(A1)"
+  },
+  "read": "A1:A5"
+ },
+ {
+  "name": "custom: relative to the row",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "1",
+    "A3": "3",
+    "B1": "4",
+    "B2": "4",
+    "B3": "3",
+    "B4": "0"
+   }
+  },
+  "rule": {
+   "range": "A1:A4",
+   "type": "custom",
+   "f1": "=A1>B1"
+  },
+  "read": "A1:A4"
+ }
+]
