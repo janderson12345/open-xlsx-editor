@@ -28,7 +28,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Feature | Status | Notes |
 |---|---|---|
 | Open .xlsx | Done | Any workbook; sheets parsed on first view. |
-| Open .xlsm, .xltx, .xlsb, .xls, .csv | Missing | .xlsm and .xltx are the same format and would mostly need their content types kept. |
+| Open .xlsm, .xltx, .xlsb, .xls, .csv | Partly | .xlsm opens, and an edit, a new sheet and a save keep its VBA project, custom ribbon (customUI) and macro-enabled content type byte for byte (test/macros.test.js); macros don't run and can't be edited. .xltx, .xlsb, .xls and .csv missing. |
 | Save .xlsx | Done | Only changed sheets rewritten; opened in Excel with no repair (`tools/check-ooxml.mjs`). |
 | Formula results on open when the file has none | Partly | Worked out by `calculate()`; the editor doesn't call it on open yet (the preview page does). |
 | Virtualised grid | Done | 5,000 rows by 20 columns scroll smoothly. |
