@@ -32,6 +32,17 @@ const pointAt = (r, c) => page.evaluate(([r, c]) => {
   return { x: v.left + rowHeadW + cols.start(c) - g.el.scrollLeft + 6, y: v.top + colHeadH + rows.start(r) - g.el.scrollTop + 6 };
 }, [r, c]);
 const clickCell = async (r, c) => { const p = await pointAt(r, c); await page.mouse.click(p.x, p.y); };
+// A ribbon button, by its title: groups that don't fit at this width (it depends on the fonts) are behind the ribbon's
+// More button, opened for the click and closed after `then` (a menu choice, a box answered).
+const ribbon = async (title, then = async () => {}) => {
+  const btn = `.oxe-toolbar button[title="${title}"]`;
+  const more = !(await page.isVisible(btn)) && await page.isVisible('.oxe-more');
+  if (more) await page.click('.oxe-more');
+  await page.click(btn);
+  await then();
+  if (more && await page.isVisible('.oxe-more')) await page.click('.oxe-more');
+};
+const menu = (title, item) => ribbon(title, () => page.click(`.oxe-pop >> text=${item}`));
 
 await openFixture(page, 'basic.xlsx');
 check((await sel()).ar === 0 && (await sel()).ac === 0, 'opens with A1 selected');
@@ -313,9 +324,8 @@ await page.evaluate(() => window.oxe.setFeatures({ font: true }));
 await page.evaluate(() => { window.oxe.enter('G22', 'left'); window.oxe.enter('H22', 'right'); window.oxe.select('G22'); });
 await page.focus('.oxe-grid');
 await page.keyboard.press('Shift+ArrowRight');
-await page.click('.oxe-toolbar button[title="Merge & Center"]');
-const question = await page.textContent('.oxe-dialog');
-await page.click('.oxe-dialog-button >> text=OK');
+let question;
+await ribbon('Merge & Center', async () => { question = await page.textContent('.oxe-dialog'); await page.click('.oxe-dialog-button >> text=OK'); });
 await page.waitForFunction(() => window.oxe.workbook.sheet(0).merges.some((m) => m.r0 === 21 && m.c0 === 6));
 check(/only keeps the upper-left value/.test(question) && await value('G22') === 'left' && await value('H22') === null, 'Merge & Center: Excel asks first, then G22:H22 merged with the value of G22', question);
 await page.focus('.oxe-grid');
@@ -367,8 +377,7 @@ const f11 = await value('F11');
 h = await headAt('col', 4);
 await page.mouse.click(h.x, h.y);
 check((await sel()).c0 === 4 && (await sel()).c1 === 4 && (await sel()).r1 === 1048575, 'the heading of column E: the whole column selected', JSON.stringify(await sel()));
-await page.click('.oxe-toolbar button[title="Delete"]');
-await page.click('.oxe-pop >> text=Delete Sheet Columns');
+await menu('Delete', 'Delete Sheet Columns');
 check(f11 != null && await value('E11') === f11, 'Delete Sheet Columns: column E gone, F moved into its place', String(await value('E11')));
 await page.keyboard.press('Control+z');
 check(await value('F11') === f11, 'Ctrl+Z: column E back');
@@ -432,8 +441,7 @@ await page.waitForFunction((b3) => window.oxe.workbook.sheet(0).cells.get(19)?.g
 check(await value('G20') === b4 && await value('F21') === c3, 'Values, Transpose: B3 in F20, B4 across in G20, C3 down in F21', `${await value('G20')} ${await value('F21')}`);
 await page.keyboard.press('Control+z');
 check(await value('F20') === null, 'Ctrl+Z: F20 empty again');
-await page.click('.oxe-toolbar button[title="Paste (Ctrl+V) options"]');
-await page.click('.oxe-pop >> text=Paste Link');
+await menu('Paste (Ctrl+V) options', 'Paste Link');
 await page.waitForFunction(() => window.oxe.workbook.sheet(0).cells.get(19)?.get(5)?.f === 'B3');
 check(await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(20)?.get(6)?.f) === 'C4' && await value('F20') === b3, 'Paste ▾ > Paste Link: =B3 in F20 to =C4 in G21, worked out', String(await value('F20')));
 await page.keyboard.press('Control+z');
@@ -473,12 +481,7 @@ await page.evaluate(() => window.oxe.select('J16'));
 await page.focus('.oxe-grid');
 await page.keyboard.press('Shift+ArrowRight');
 await page.keyboard.press('Shift+ArrowRight');
-// (At this width the Editing group is behind the ribbon's More button.)
-const more = await page.isVisible('.oxe-more');
-if (more) await page.click('.oxe-more');
-await page.click('.oxe-toolbar button[title="Fill"]');
-await page.click('.oxe-pop >> text=Right');
-if (more) await page.click('.oxe-more');
+await menu('Fill', 'Right');
 check(await value('L16') === 'Item 1', 'Home > Fill > Right on J16:L16: Item 1 copied across');
 await page.keyboard.press('Control+z');
 await page.keyboard.press('Control+z');
@@ -501,11 +504,7 @@ check(!(await page.isVisible('.oxe-status')), 'one cell selected: the status bar
 await page.evaluate(() => window.oxe.select('B11'));
 await page.focus('.oxe-grid');
 const b11 = await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(10).get(1));
-const more2 = await page.isVisible('.oxe-more');
-if (more2) await page.click('.oxe-more');
-await page.click('.oxe-toolbar button[title="Clear"]');
-await page.click('.oxe-pop >> text=Clear All');
-if (more2) await page.click('.oxe-more');
+await menu('Clear', 'Clear All');
 check(b11.s && await page.evaluate(() => { const c = window.oxe.workbook.sheet(0).cells.get(10)?.get(1); return !c || (c.v == null && !c.s); }), 'Clear All on B11: its value and format gone');
 await page.keyboard.press('Control+z');
 check(await page.evaluate((s) => window.oxe.workbook.sheet(0).cells.get(10).get(1).s === s, b11.s), 'Ctrl+Z: B11 back with its format');
@@ -542,10 +541,7 @@ check(colA && colA.width > 0 && await colPx(0) > 30, 'column A’s edge double-c
 await page.keyboard.press('Control+z');
 await page.evaluate(() => window.oxe.select('A3'));
 await page.focus('.oxe-grid');
-await page.click('.oxe-toolbar button[title="Format"]');
-await page.click('.oxe-pop >> text=Row Height...');
-await page.fill('.oxe-dialog-field', '30');
-await page.keyboard.press('Enter');
+await ribbon('Format', async () => { await page.click('.oxe-pop >> text=Row Height...'); await page.fill('.oxe-dialog-field', '30'); await page.keyboard.press('Enter'); });
 await page.waitForFunction(() => window.oxe.workbook.sheet(0).rows.get(2)?.ht === 30);
 check(await page.evaluate(() => window.oxe.grid.geometry().rows.size(2)) === 40, 'Format, Row Height... 30: row 3 is 30pt (40 pixels)');
 await page.focus('.oxe-grid');
@@ -583,8 +579,7 @@ check(/^Item/.test(String(await value('A3'))), 'Ctrl+Z: every replacement undone
 // Ctrl+wheel zooms by 10%. Unfreeze Panes, and zoom back to 100%.
 await page.evaluate(() => { window.oxe.select('C3'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
 await page.click('.oxe-rtab >> text=View');
-await page.click('.oxe-toolbar button[title="Freeze Panes"]');
-await page.click('.oxe-pop >> text=Freeze Panes');
+await menu('Freeze Panes', 'Freeze Panes');
 check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":2,"cols":2}' && await page.isVisible('.oxe-pane-top') && await page.isVisible('.oxe-pane-corner'), 'View, Freeze Panes at C3: rows 1-2 and columns A-B frozen');
 await page.evaluate(() => { window.oxe.grid.el.scrollTop = 2000; window.oxe.grid.el.scrollLeft = 600; });
 await page.waitForTimeout(100);
@@ -597,9 +592,8 @@ await page.mouse.wheel(0, -100);
 await page.keyboard.up('Control');
 await page.waitForFunction(() => window.oxe.grid.view().zoom === 110);
 check(await page.evaluate(() => window.oxe.workbook.sheet(0).zoom) === 110, 'Ctrl+wheel: zoom 110%, kept for the file');
-await page.click('.oxe-toolbar button[title="Freeze Panes"]');
-await page.click('.oxe-pop >> text=Unfreeze Panes');
-await page.click('.oxe-toolbar button[title="100%"]');
+await menu('Freeze Panes', 'Unfreeze Panes');
+await ribbon('100%');
 check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":0,"cols":0}' && await page.evaluate(() => window.oxe.grid.view().zoom) === 100 && await page.isHidden('.oxe-pane-top'), 'Unfreeze Panes and 100%: as before');
 await page.click('.oxe-rtab >> text=Home');
 
