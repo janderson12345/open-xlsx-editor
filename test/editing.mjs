@@ -408,6 +408,37 @@ check(await value('B3') === b6 && await value('D3') === d3, 'Shift cells up: B6 
 await page.keyboard.press('Control+z');
 check(await value('B3') === b3, 'Ctrl+Z: back');
 
+// Paste Special: B3:C4 copied, F20 right-clicked: the cell's menu, Paste Special...; Values and Transpose chosen, OK:
+// the values across instead of down. Ctrl+Z; then the ribbon's Paste ▾ > Paste Link at F20.
+const c3 = await value('C3');
+const b4 = await value('B4');
+await page.evaluate(() => window.oxe.select('B3'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowRight');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Control+c');
+await page.evaluate(() => window.oxe.select('F20'));
+const f20 = await pointAt(19, 5);
+await page.mouse.click(f20.x, f20.y, { button: 'right' });
+await page.waitForSelector('.oxe-menu >> text=Paste Special...');
+check(await page.isVisible('.oxe-menu >> text=Insert...') && await page.isVisible('.oxe-menu >> text=Clear Contents'), 'F20 right-clicked: the cell’s menu (Cut, Copy, Paste, Paste Special..., Insert..., Delete..., Clear Contents)');
+await page.click('.oxe-menu >> text=Paste Special...');
+await page.waitForSelector('dialog.oxe-dialog');
+check(await page.isChecked('dialog.oxe-dialog >> label:text-is("All") >> xpath=preceding-sibling::input') && await page.isChecked('dialog.oxe-dialog >> label:text-is("None") >> xpath=preceding-sibling::input'), 'Paste Special...: Excel’s box, All and None chosen first');
+await page.click('dialog.oxe-dialog >> label:text-is("Values")');
+await page.click('dialog.oxe-dialog >> label:text-is("Transpose")');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.waitForFunction((b3) => window.oxe.workbook.sheet(0).cells.get(19)?.get(5)?.v === b3, b3);
+check(await value('G20') === b4 && await value('F21') === c3, 'Values, Transpose: B3 in F20, B4 across in G20, C3 down in F21', `${await value('G20')} ${await value('F21')}`);
+await page.keyboard.press('Control+z');
+check(await value('F20') === null, 'Ctrl+Z: F20 empty again');
+await page.click('.oxe-toolbar button[title="Paste (Ctrl+V) options"]');
+await page.click('.oxe-pop >> text=Paste Link');
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).cells.get(19)?.get(5)?.f === 'B3');
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(20)?.get(6)?.f) === 'C4' && await value('F20') === b3, 'Paste ▾ > Paste Link: =B3 in F20 to =C4 in G21, worked out', String(await value('F20')));
+await page.keyboard.press('Control+z');
+await page.keyboard.press('Escape');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

@@ -48,7 +48,7 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
 - `npm run dev`: the demo at http://localhost:8080 (drag an .xlsx onto it).
 - `CONTRIBUTING.md`: setup and tests. `docs/ARCHITECTURE.md`: the module map. `docs/LAYOUT.md`: matching Excel's
   layout. `docs/CALC.md`: matching Excel's calculation. `docs/SHEETS.md`: matching Excel's sheet operations.
-  `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut and paste.
+  `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut, paste and Paste Special.
   `docs/ROWCOL.md`: matching Excel's inserting and deleting of rows, columns and cells. `docs/SIZES.md`: widths, heights,
   hiding. `docs/FIND.md`: Find and Replace. `docs/VIEW.md`: frozen panes and zoom.
   `docs/ENTRY.md`: how typed entries are read.

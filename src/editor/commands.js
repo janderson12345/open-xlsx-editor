@@ -389,6 +389,27 @@ export function createCommands(ctx) {
       if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');
       return true;
     },
+    /** Paste Special (Ctrl+Alt+V) of the cells copied here at the selection (clipops.js pasteSpecial: `paste`, `op`,
+     *  `skip`, `transpose`; Column widths, `paste` 'widths'), or Paste Link (`link`), as one step of the history. The
+     *  copy stays to be pasted again, as in Excel. Not for cells cut, nor for text from another program. */
+    pasteSpecial({ paste = 'all', op = null, skip = false, transpose = false, link = false } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const copy = state.clip;
+      if (!copy) { ctx.announce('Copy cells first: Paste Special pastes cells copied in this workbook or another one open here'); return false; }
+      if (copy.cut) { ctx.announce("Paste Special isn't available for cells that were cut: paste them, or copy them instead"); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      if (paste === 'widths' && !link) {
+        const widths = clip.pasteWidths(state.sel, copy);
+        return sizeStep((book, k) => { for (const { c, width } of widths) book.setLines(k, 'col', c, c, { width }); }, 'Pasted column widths');
+      }
+      if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
+      const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste, op, skip, transpose });
+      if (!runSteps(steps)) return false;
+      const area = steps[0].area;
+      show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
+      return true;
+    },
     /** Clear Formats: the selected cells back to the Normal style's format. */
     clearFormats() { return formatting((wb, si, sel) => fmt.cellsOf(wb.sheet(si), sel).map(({ r, c }) => ({ r, c, s: 0 }))); },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },

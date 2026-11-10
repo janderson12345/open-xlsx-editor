@@ -1,5 +1,5 @@
 # Has Excel open workbooks saved by the editor and say what is in them, as excel-steps.ps1 says what came of its own
-# steps (a list: [{ name, file, sheet, sheet2, read, cells2 }], as test/shift.test.js writes it with SHIFT_SAVE): the
+# steps (a list: [{ name, file, sheet, sheet2, read, cells2 }], as test/steps.js writes it with STEPS_SAVE): the
 # cells of `read` on `sheet` (formula, value, number format, bold, fill colour, bottom border), the formulas of cells2
 # on `sheet2`, and the merged ranges. An invisible instance, macros disabled for it only, each file closed without
 # saving; no Excel setting is changed and no keys are sent.

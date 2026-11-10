@@ -1102,7 +1102,9 @@
 /* The radio groups and check boxes of optionsBox (dialogs.js): Excel's Insert, Delete and Paste Special boxes. */
 .oxe-dialog-group {
   display: grid;
-  grid-template-columns: repeat(var(--oxe-cols, 1), minmax(0, max-content));
+  grid-auto-flow: column;
+  grid-template-rows: repeat(var(--oxe-rows), auto);
+  justify-content: start;
   column-gap: 24px;
   row-gap: 4px;
   margin: 0 0 10px;

@@ -1,4 +1,4 @@
-# Copy, cut and paste
+# Copy, cut, paste and Paste Special
 
 How cells are copied, cut and pasted (`src/ooxml/clipops.js`, references moved by `moveRefs` in
 `src/calc/tokens.js`), and what Excel was seen to do. Each rule was measured by doing the same thing in Excel over COM
@@ -29,8 +29,42 @@ with the same formulas and values.
 | After a cut, every formula in the workbook that reads the moved cells follows them, on any sheet, when the whole reference was inside what was cut; a range that only partly was stays as it was. | A1:A2 cut to C1: `=A1+A2` is `=C1+C2`, `=SUM(A1:A2)` is `=SUM(C1:C2)`, `=SUM(A1:A3)` stays; another sheet's `=Sheet1!A1` is `=Sheet1!C1`. |
 | A reference to a single cell that a cut was pasted over becomes `#REF!`. | A1 cut to A3: `=$A$1+A3` is `=$A$3+#REF!`. |
 
+## Paste Special and Paste Link
+
+Measured over COM: 30 cases of `Range.Copy` then `PasteSpecial` (what to paste, the operation, Skip blanks,
+Transpose) or `Worksheet.Paste` with Link, on two small sheets: numbers, text, a blank, relative, $ and outside
+formulas, a percentage, a filled, bold, bordered cell and a wide column copied onto cells with their own values,
+formulas, text, blanks and formats (`tools/excel-compare/excel-steps.ps1` on `paste-cases.json`, from
+`paste-cases.mjs`, giving `test/paste-excel.json`). `test/paste.test.js` does each and expects Excel's cells
+(formula, value, number format, bold, fill, border), merged ranges and widths: 30 of 30. Saved by the editor and
+opened in Excel (`excel-readback.ps1`), 30 of 30 read back as Excel made them.
+
+- Ctrl+Alt+V, Home > Paste ▾ > Paste Special..., or a cell's right-click menu: Excel's box (Paste, Operation, Skip
+  blanks, Transpose, Paste Link). Paste ▾ also has Formulas, Values, Formatting, Transpose and Paste Link at once.
+- For cells copied in the editor (from this workbook or another open here; formats only within one workbook). Not
+  after a cut, as in Excel; not for text from another program.
+- One step of the undo history; the copy stays to be pasted again.
+
+| Rule | Seen |
+|---|---|
+| Formulas: formulas (moved as a paste moves them) and values, the destination's formats kept. Values: what each cell shows, formulas worked out. Formats: the formats alone. All except borders: everything, the destination's borders kept. | A2 `=A1*2` to E2: `=E1*2` (Formulas); 2 (Values). F1 filled stays filled under Formulas and Values. |
+| Formulas and number formats, Values and number formats: the number format alone joins the destination's other formats. | E3 bold, A3 0% pasted: bold and 0%. |
+| Column widths: the widths alone. | Column A 20 wide: E 20 wide, nothing else changed. |
+| An empty cell of the copy empties its destination, and its format goes with All; Skip blanks leaves the destination as it was, format too. | C2 blank onto G2 50 (0.0): G2 empty; with Skip blanks, 50 in 0.0. |
+| Add, Subtract, Multiply, Divide: the destination's number and the copy's worked out; a blank counts as 0; text on either side is left as it was; dividing by 0 gives `#DIV/0!`. | 10 + 1: 11. 50 × blank: 0. 50 ÷ blank: `#DIV/0!`. `x` + `t`: `x`. `y` + 3: `y`. |
+| With a formula on either side, the result is a formula: the destination's in brackets, the copy's in brackets, a number as it is. | `=E1+1` + 3: `=(E1+1)+3`. 40 − `=E1*2`: `=40-(E1*2)`. Blank + `=H9*2`: `=0+(H9*2)`. `=TRUE` + `=F1+H9`: `=(TRUE)+(F1+H9)`. |
+| An operation with Formats changes nothing but formats. | Formats, Add: the formats only. |
+| Transpose: rows become columns. A reference to a cell of the copy, $ or not, follows that cell to where it went; one outside keeps its $ parts and its relative parts turn with the copy. | A1:C3 to E1: B2 `=$A$1+B1` is F2 `=$E$1+E2`; B3 `=SUM(A1:B1)` is G2 `=SUM(E1:E2)`; B2 `=B1+D9` is F2 `=E2+M4`; `=$D$9+1` stays. |
+| A selection that is a whole number of copies takes the copy that many times, as Paste does. | A1:C3 values onto E10:G15: twice. |
+| Paste Link: a formula for each cell reading the copied cell as far from the copy's top-left, relative; for one cell, absolute. Over a whole number of copies, the links carry on across the selection rather than repeating. Cells in the General format take the number format of the copy's first cell. | A1:C3 to E1: `=A1` ... `=C3`, each 0.00 as A1. A1 to E5: `=$A$1`. B1:C1 onto E5:H6: `=B1` to `=E2`. |
+
+Not measured: an operation with a TRUE or FALSE constant (left as it is here, as text is), Transpose of a reference
+whose $ is on one part only (each part turned as above), column widths onto columns that had their own width (they
+keep it here), and merged ranges with Transpose (not pasted).
+
 ## Not yet
 
-Paste Special (values only, formats only, transpose...), the Format Painter, pasting the formats of another
+Paste Special's Comments and Notes, Validation, All using Source theme and All merging conditional formats; Paste
+Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
 program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was
 pasted onto (Excel shrinks it: `=SUM(A1:A3)` became `=SUM(A2:A3)` when A1 was moved onto A3).

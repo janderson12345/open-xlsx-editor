@@ -1,9 +1,11 @@
 // Copy, cut and paste, as Excel does them (measured over COM, docs/CLIPBOARD.md). A copy is a snapshot of cells:
 // their values, formulas, formats and merged ranges. Pasting returns what changes, sheet by sheet, for the editor to
 // apply and undo as one step: [{ si, contents: [{ r, c, value } or { r, c, formula }], styles: [{ r, c, s }], merges }].
-import { shiftFormula, moveRefs } from '../calc/tokens.js';
+import { shiftFormula, moveRefs, transposeFormula, sheetPrefix } from '../calc/tokens.js';
 import { entryChanges } from './entry.js';
 import { cellsOf } from './formatops.js';
+import { formatCodeOf } from './styles.js';
+import { refName, colName } from './refs.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
 const inside = (a, b) => a.r0 >= b.r0 && a.r1 <= b.r1 && a.c0 >= b.c0 && a.c1 <= b.c1;
@@ -18,8 +20,11 @@ export function snapshot(wb, si, sel, cut = false) {
     sheetName: wb.sheets[si].name,
     cells: cells.map(({ r, c }) => {
       const cell = sheet.cells.get(r)?.get(c);
-      return { dr: r - rect.r0, dc: c - rect.c0, f: cell?.f || null, v: cell?.f ? null : cell?.v ?? null, t: cell?.t, s: cell?.s || 0 };
+      // (`result`: what a formula worked out to, for Paste Special's Values.)
+      return { dr: r - rect.r0, dc: c - rect.c0, f: cell?.f || null, v: cell?.f ? null : cell?.v ?? null, t: cell?.t, s: cell?.s || 0, result: cell?.v ?? null };
     }),
+    // (Each column's width when it isn't the standard one, for Paste Special's Column widths.)
+    widths: Array.from({ length: rect.c1 - rect.c0 + 1 }, (_, dc) => sheet.cols.find((x) => x.min <= rect.c0 + dc && x.max >= rect.c0 + dc && x.width != null)?.width ?? null),
     merges: sheet.merges.filter((m) => inside(m, rect)).map((m) => ({ r0: m.r0 - rect.r0, c0: m.c0 - rect.c0, r1: m.r1 - rect.r0, c1: m.c1 - rect.c0 })),
   };
 }
@@ -33,7 +38,7 @@ export function pasteArea(sel, rows, cols) {
   return { r0: sel.r0, c0: sel.c0, r1: sel.r0 + (tile ? h : rows) - 1, c1: sel.c0 + (tile ? w : cols) - 1 };
 }
 
-const valueOf = (cell) => (cell.t === 'e' ? String(cell.v) : cell.v);
+const valueOf = (cell) => (cell.t === 'e' ? { code: String(cell.v) } : cell.v);
 
 /** Paste a copy (not a cut) into sheet si at `sel`: values, formulas moved as their cells are (relative references
  *  follow, $ ones stay, one off the sheet is #REF!), formats and merged ranges. A copy from another workbook brings
@@ -131,4 +136,124 @@ export function pasteText(wb, si, sel, text) {
   }));
   const area = { r0: sel.r0, c0: sel.c0, r1: sel.r0 + lines.length - 1, c1: sel.c0 + Math.max(...lines.map((l) => l.length)) - 1 };
   return [{ si, contents, styles, merges: wb.sheet(si).merges, area }];
+}
+
+/** What Paste Special pastes (its Paste choices): contents (formulas, or `values` their results), the whole format,
+ *  or only the number format. */
+const PASTES = {
+  all: { contents: 'formulas', format: 'all' },
+  formulas: { contents: 'formulas' },
+  values: { contents: 'values' },
+  formats: { format: 'all' },
+  noBorders: { contents: 'formulas', format: 'noBorders' },
+  formulasFormats: { contents: 'formulas', format: 'number' },
+  valuesFormats: { contents: 'values', format: 'number' },
+};
+/** A number as a formula writes it (15 digits, as Excel keeps them). */
+const numText = (n) => String(Number(n.toPrecision(15)));
+const OPS = { add: '+', subtract: '-', multiply: '*', divide: '/' };
+const operate = (op, a, b) => (op === 'add' ? a + b : op === 'subtract' ? a - b : op === 'multiply' ? a * b : b === 0 ? null : a / b);
+
+/** A cell's content after Paste Special's operation: `dest` the cell there (or undefined), `src` { formula } or
+ *  { value } from the copy. Text, on either side, is left as it was (null: no change); a blank is 0; a formula is
+ *  combined as a formula, =(destination)+(copy), else the numbers worked out (dividing by 0, #DIV/0!). */
+function operated(op, dest, src, r, c) {
+  const destFormula = dest?.f != null && dest.f !== '' ? `(${dest.f})` : null;
+  const destText = !destFormula && dest && dest.v != null && typeof dest.v !== 'number';
+  const srcText = src.value != null && typeof src.value !== 'number';
+  if (destText || srcText) return null;
+  const dn = destFormula ? null : dest?.v ?? 0;
+  if (src.formula != null) return { r, c, formula: `${destFormula ?? numText(dn)}${OPS[op]}(${src.formula})` };
+  const sn = src.value ?? 0;
+  if (destFormula) return { r, c, formula: `${destFormula}${OPS[op]}${numText(sn)}` };
+  const out = operate(op, dn, sn);
+  return { r, c, value: out == null ? { code: '#DIV/0!' } : out };
+}
+
+/**
+ * Paste Special of a copy (not a cut) at `sel` on sheet si, as Excel's: `paste` one of all, formulas, values, formats,
+ * noBorders (all except borders), formulasFormats and valuesFormats (with the number format only); `op` add,
+ * subtract, multiply or divide (Excel's Operation; with formats alone, none); `skip` (Skip blanks: an empty cell of the
+ * copy changes nothing); `transpose` (rows become columns, formulas as transposeFormula rewrites them). Steps as
+ * pasteCopy's; merged ranges come with the whole format, and aren't transposed. Formats only within one workbook.
+ */
+export function pasteSpecial(wb, si, sel, clip, { paste = 'all', op = null, skip = false, transpose = false } = {}) {
+  const what = PASTES[paste];
+  const h = clip.rect.r1 - clip.rect.r0 + 1;
+  const w = clip.rect.c1 - clip.rect.c0 + 1;
+  const [rows, cols] = transpose ? [w, h] : [h, w];
+  const area = pasteArea(sel, rows, cols);
+  const sameBook = clip.wb === wb;
+  const sheet = wb.sheet(si);
+  const out = { si, contents: [], styles: [], merges: sheet.merges, area };
+  const operation = op && what.contents ? op : null;
+  for (let tr = area.r0; tr <= area.r1; tr += rows) {
+    for (let tc = area.c0; tc <= area.c1; tc += cols) {
+      for (const cell of clip.cells) {
+        const [dr, dc] = transpose ? [cell.dc, cell.dr] : [cell.dr, cell.dc];
+        const r = tr + dr;
+        const c = tc + dc;
+        if (skip && cell.f == null && cell.v == null) continue;
+        const dest = sheet.cells.get(r)?.get(c);
+        if (what.contents) {
+          const from = { r: clip.rect.r0 + cell.dr, c: clip.rect.c0 + cell.dc };
+          let src;
+          if (!cell.f) src = { value: valueOf(cell) };
+          else if (what.contents === 'values') src = { value: cell.t === 'e' ? { code: String(cell.result) } : cell.result };
+          else if (transpose) src = { formula: transposeFormula(cell.f, { here: clip.sheetName, from: { sheet: clip.sheetName, ...clip.rect }, src: from, dst: { r, c }, to: { r: tr, c: tc } }) };
+          else src = { formula: shiftFormula(cell.f, r - from.r, c - from.c) };
+          const next = operation ? operated(operation, dest, src, r, c) : { r, c, ...src };
+          if (next) out.contents.push(next);
+        }
+        if (!sameBook || !what.format) continue;
+        const was = dest?.s || 0;
+        if (what.format === 'all') out.styles.push({ r, c, s: cell.s });
+        else if (what.format === 'number') out.styles.push({ r, c, s: wb.styleWith(was, { numFmt: formatCodeOf(wb.styles, cell.s) }) });
+        else {
+          // (All except borders: the copy's format with the destination's borders.)
+          const sides = wb.styles.borders[wb.styles.cellXfs[was]?.borderId ?? 0];
+          const border = Object.fromEntries(['left', 'right', 'top', 'bottom'].map((k) => [k, sides[k]?.style ? sides[k] : null]));
+          out.styles.push({ r, c, s: wb.styleWith(cell.s, { border }) });
+        }
+      }
+      if (what.format && what.format !== 'number' && sameBook && !transpose) {
+        const here = { r0: tr, c0: tc, r1: tr + rows - 1, c1: tc + cols - 1 };
+        out.merges = [...out.merges.filter((m) => !overlaps(m, here)), ...clip.merges.map((m) => ({ r0: tr + m.r0, c0: tc + m.c0, r1: tr + m.r1, c1: tc + m.c1 }))];
+      }
+    }
+  }
+  return [out];
+}
+
+/** Paste Special's Column widths: each column from `sel`'s first takes the width of the copy's column above it ([{ c,
+ *  width }] for wb.setLines; a column of the copy with the standard width leaves its column as it is). */
+export function pasteWidths(sel, clip) {
+  return clip.widths.map((width, dc) => ({ c: sel.c0 + dc, width })).filter((x) => x.width != null);
+}
+
+/**
+ * Paste Link at `sel` on sheet si, as Excel's: each cell of the paste area (the copy's size, or the selection when it is
+ * a whole number of copies) a formula reading the cell of the copy as far from its top-left, relative (=A1, =B1...),
+ * or for a single cell one absolute reference (=$A$1); with its sheet's name when the copy is on another. Cells in the
+ * General format take the number format of the copy's first cell, as Excel gives them.
+ */
+export function pasteLink(wb, si, sel, clip) {
+  const h = clip.rect.r1 - clip.rect.r0 + 1;
+  const w = clip.rect.c1 - clip.rect.c0 + 1;
+  const area = pasteArea(sel, h, w);
+  const sheet = wb.sheet(si);
+  const prefix = clip.si === si ? '' : sheetPrefix(clip.sheetName);
+  const one = h === 1 && w === 1;
+  const first = clip.cells.find((x) => x.dr === 0 && x.dc === 0);
+  const code = formatCodeOf(wb.styles, first?.s || 0);
+  const out = { si, contents: [], styles: [], merges: sheet.merges, area };
+  for (let r = area.r0; r <= area.r1; r++) {
+    for (let c = area.c0; c <= area.c1; c++) {
+      const ref = one ? `$${colName(clip.rect.c0)}$${clip.rect.r0 + 1}` : refName(clip.rect.r0 + r - area.r0, clip.rect.c0 + c - area.c0);
+      out.contents.push({ r, c, formula: prefix + ref });
+      const s = sheet.cells.get(r)?.get(c)?.s || 0;
+      if (code !== 'General' && formatCodeOf(wb.styles, s) === 'General') out.styles.push({ r, c, s: wb.styleWith(s, { numFmt: code }) });
+    }
+  }
+  return [out];
 }

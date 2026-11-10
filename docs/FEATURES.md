@@ -65,7 +65,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Group | Feature | Status | Notes |
 |---|---|---|---|
 | Clipboard (`clipboard`) | Cut, Copy, Paste | Done | As Excel moves formulas, and the formulas that read cut cells. |
-| | Paste Special | Missing | |
+| | Paste Special | Partly | Excel's box (all, formulas, values, formats, all except borders, column widths, the number-format pairs; the four operations, Skip blanks, Transpose, Paste Link) and the Paste menu; for cells copied here (docs/CLIPBOARD.md). Not yet: comments, validation, source theme, merging conditional formats. |
 | | Format Painter | Missing | |
 | Undo (`undo`) | Undo, Redo | Done | |
 | Font (`font`) | Font, size, grow and shrink | Done | Grow and Shrink step through Excel's sizes. The font list is a fixed one with the theme's fonts first. |

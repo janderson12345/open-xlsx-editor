@@ -82,7 +82,9 @@ export function homeTab(kit, { act, color }) {
   const sheetMenu = (icon, label, title, items) => menu(icon, title, items, { label, big: false });
   const groups = [
     grp('Undo', col(b.undo, b.redo)),
-    grp('Clipboard', btn('📋', 'Paste (Ctrl+V)', f('clipPaste'), { label: 'Paste', big: true }),
+    grp('Clipboard', split('📋', 'Paste (Ctrl+V)', f('clipPaste'), () => [item('Paste', f('clipPaste'), { hint: 'Ctrl+V' }), item('Formulas', f('pasteAs', 'formulas')),
+      item('Values', f('pasteAs', 'values')), item('Formatting', f('pasteAs', 'formats')), item('Transpose', f('pasteAs', 'transpose')), item('Paste Link', f('pasteAs', 'link')),
+      el('hr'), item('Paste Special...', f('pasteSpecialBox'), { hint: 'Ctrl+Alt+V' })], { label: 'Paste', big: true }),
       col(btn('✂', 'Cut (Ctrl+X)', f('clipCut'), { label: 'Cut' }), btn('⧉', 'Copy (Ctrl+C)', f('clipCopy'), { label: 'Copy' }))),
     grp('Font', col(
       line(fontSel, sizeSel, btn('A⁺', 'Increase Font Size', f('stepFont', 1)), btn('A⁻', 'Decrease Font Size', f('stepFont', -1))),

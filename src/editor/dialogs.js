@@ -136,7 +136,8 @@ export function optionsBox(root, { title, groups = [], checks = [], buttons = []
     groups.forEach((g, gi) => {
       const set = document.createElement('fieldset');
       set.className = 'oxe-dialog-group';
-      if (g.columns > 1) set.style.setProperty('--oxe-cols', String(g.columns));
+      // (Down each column, then across, as Excel's boxes list them.)
+      set.style.setProperty('--oxe-rows', String(Math.ceil(g.options.length / (g.columns || 1))));
       if (g.legend) set.append(Object.assign(document.createElement('legend'), { textContent: g.legend }));
       const name = `${id}-g${gi}`;
       radios.set(g.key, g.options.map((label, oi) => {

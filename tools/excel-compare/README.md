@@ -49,7 +49,7 @@ written out: each cell's formula, value, number format, bold, fill and bottom bo
 widths and the names, or the refusal. An invisible instance, closed without saving.
 
 ```sh
-SHIFT_SAVE=<folder> node --test test/shift.test.js
+STEPS_SAVE=<folder> node --test test/shift.test.js   # or test/paste.test.js
 pwsh tools/excel-compare/excel-readback.ps1 <folder>/saved.json <out.json>
 ```
 

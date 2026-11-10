@@ -202,6 +202,35 @@ export function shiftFormula(text, dr, dc) {
   });
 }
 
+/**
+ * A formula copied with Paste Special's Transpose, as Excel rewrites it: `from` the cells copied ({ sheet, r0, c0, r1,
+ * c1 }), `src` the formula's cell there and `dst` where it goes ({ r, c }), `to` where `from`'s top-left cell goes. A
+ * cell of the copy that a reference names, $ or not, becomes the cell it went to (=$A$1+B1 in B2, A1:C3 to E1, is
+ * =$E$1+E2 in F2); a reference outside the copy keeps its $ parts, and its relative parts are the same distance away
+ * across instead of down (=D9 in B2 is =M4 in F2). Off the sheet, #REF!.
+ */
+export function transposeFormula(text, { here, from, src, dst, to }) {
+  const same = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
+  const corner = (r, c, absR, absC, own) => {
+    if (own && r >= from.r0 && r <= from.r1 && c >= from.c0 && c <= from.c1) return [to.r + (c - from.c0), to.c + (r - from.r0)];
+    return [absR ? r : dst.r + (c - src.c), absC ? c : dst.c + (r - src.r)];
+  };
+  try {
+    return mapRefs(text, (t) => {
+      if (t.type !== 'ref' || t.book != null || !t.area || t.area.kind === 'rows' || t.area.kind === 'cols') return null;
+      const a = t.area;
+      const own = same(t.sheet ?? here, from.sheet);
+      const [r0, c0] = corner(a.r0, a.c0, a.ar0, a.ac0, own);
+      const [r1, c1] = corner(a.r1, a.c1, a.ar1, a.ac1, own);
+      const next = { ...a, r0: Math.min(r0, r1), r1: Math.max(r0, r1), c0: Math.min(c0, c1), c1: Math.max(c0, c1) };
+      if (!(okRow(next.r0) && okRow(next.r1) && okCol(next.c0) && okCol(next.c1))) return `${t.prefix}#REF!`;
+      return t.prefix + areaText(next);
+    });
+  } catch {
+    return text;
+  }
+}
+
 /** A row or column index after `n` lines were inserted at `at` (n > 0) or deleted from `at` (n < 0: at to at - n - 1);
  *  null when deleted. */
 export function shiftLine(i, at, n) {

@@ -28,7 +28,14 @@ const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', togg
   freeze: 'window', zoom: 'zoom', zoomBox: 'zoom', zoomSelection: 'zoom', zoomToSelection: 'zoom',
   lines: 'cells', cells: 'cells', insertCells: 'cells', deleteCells: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
+  pasteSpecial: 'clipboard', pasteSpecialBox: 'clipboard', pasteAs: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing' };
+/** The Paste menu's choices, as Paste Special options. */
+const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
+/** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
+const PASTE_CHOICES = { All: 'all', Formulas: 'formulas', Values: 'values', Formats: 'formats', 'All except borders': 'noBorders',
+  'Column widths': 'widths', 'Formulas and number formats': 'formulasFormats', 'Values and number formats': 'valuesFormats' };
+const OPERATIONS = { None: null, Add: 'add', Subtract: 'subtract', Multiply: 'multiply', Divide: 'divide' };
 const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
 
 /**
@@ -139,6 +146,8 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'rowHeightBox' || name === 'columnWidthBox') return sizeBox(name === 'rowHeightBox' ? 'row' : 'col');
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
+    if (name === 'pasteSpecialBox') return pasteSpecialBox();
+    if (name === 'pasteAs') return editing().run('pasteSpecial', PASTE_AS[args[0]]);
     if (name === 'merge') {
       // (Excel asks first when values would be discarded.)
       const sel = editing().selection;
@@ -172,6 +181,28 @@ export function mountXlsxEditor(host, options = {}) {
     }
     state.grid.el.focus({ preventScroll: true });
     return false;
+  };
+  /** Excel's Paste Special box (Ctrl+Alt+V, Paste > Paste Special...): Paste, Operation, Skip blanks, Transpose, and its
+   *  Paste Link button. */
+  const pasteSpecialBox = async () => {
+    if (state.readOnly || !allowed('pasteSpecial')) return false;
+    const got = await optionsBox(root, { title: 'Paste Special',
+      groups: [{ key: 'paste', legend: 'Paste', options: Object.keys(PASTE_CHOICES), value: 'All', columns: 2 },
+        { key: 'op', legend: 'Operation', options: Object.keys(OPERATIONS), value: 'None', columns: 2 }],
+      checks: [{ key: 'skip', label: 'Skip blanks' }, { key: 'transpose', label: 'Transpose' }], buttons: ['Paste Link'] });
+    if (!got) { state.grid.el.focus({ preventScroll: true }); return false; }
+    if (got.button === 'Paste Link') return editing().run('pasteSpecial', { link: true });
+    return editing().run('pasteSpecial', { paste: PASTE_CHOICES[got.choices.paste], op: OPERATIONS[got.choices.op], ...got.checks });
+  };
+  /** The menu of a cell (right-click): Excel's, as far as the editor goes. */
+  const cellMenu = (point) => {
+    const ro = state.readOnly;
+    const run = (name, ...a) => () => act(name, ...a);
+    menu.open([{ label: 'Cut', run: run('clipCut'), disabled: ro || !allowed('clipCut') }, { label: 'Copy', run: run('clipCopy'), disabled: !allowed('clipCopy') },
+      { label: 'Paste', run: run('clipPaste'), disabled: ro || !allowed('clipPaste') }, { label: 'Paste Special...', run: run('pasteSpecialBox'), disabled: ro || !allowed('pasteSpecialBox') },
+      'separator', { label: 'Insert...', run: () => lines(1), disabled: ro || !allowed('lines') }, { label: 'Delete...', run: () => lines(-1), disabled: ro || !allowed('lines') },
+      { label: 'Clear Contents', run: () => editing().run('clear'), disabled: ro }],
+    point, { label: 'Cell' });
   };
   /** The menu of a row or column heading. */
   const headerMenu = (axis, point) => {
@@ -276,6 +307,8 @@ export function mountXlsxEditor(host, options = {}) {
           reloaded: () => { state.grid.setModel(state.workbook.sheet(state.sheetIndex)); lookChanged(); },
           lines,
           headerMenu,
+          cellMenu,
+          pasteSpecial: () => act('pasteSpecialBox'),
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),

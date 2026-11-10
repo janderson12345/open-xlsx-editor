@@ -93,9 +93,9 @@ const adder = (doc, ns) => (parent, name, text) => {
   return el;
 };
 
-/** Set a cell to a number, a boolean, a string (written inline, so the shared string table isn't rewritten) or
- *  null (emptied; its style stays). A formula the cell held goes (the caller takes it out of a shared formula's group
- *  first, and out of calcChain.xml). Returns the cell's element. */
+/** Set a cell to a number, a boolean, a string (written inline, so the shared string table isn't rewritten), an error
+ *  ({ code }) or null (emptied; its style stays). A formula the cell held goes (the caller takes it out of a shared
+ *  formula's group first, and out of calcChain.xml). Returns the cell's element. */
 export function setCellXml(doc, r, c, value) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
@@ -109,6 +109,10 @@ export function setCellXml(doc, r, c, value) {
   } else if (typeof value === 'boolean') {
     cEl.setAttribute('t', 'b');
     add(cEl, 'v', value ? '1' : '0');
+  } else if (value != null && typeof value === 'object') {
+    // (An error value, { code: '#DIV/0!' }, as Excel writes a constant one.)
+    cEl.setAttribute('t', 'e');
+    add(cEl, 'v', value.code);
   } else if (value != null) {
     cEl.setAttribute('t', 'inlineStr');
     const t = add(add(cEl, 'is'), 't', String(value));
