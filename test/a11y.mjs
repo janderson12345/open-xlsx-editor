@@ -58,6 +58,11 @@ for (const colorScheme of ['light', 'dark']) {
       const sizeBox = await axe();
       t.check(!sizeBox.length && await page.evaluate(() => document.activeElement.classList.contains('oxe-dialog-field')), `${colorScheme}: the Row Height box, no axe violations, its field focused`, sizeBox.join('\n     '));
       await page.keyboard.press('Escape');
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('Control+h');
+      const findBar = await axe();
+      t.check(!findBar.length && await page.evaluate(() => document.activeElement.getAttribute('aria-label') === 'Find what'), `${colorScheme}: the Find and Replace bar, no axe violations, its box focused`, findBar.join('\n     '));
+      await page.keyboard.press('Escape');
       const ribbon = await page.evaluate(() => {
         const list = document.querySelector('.oxe-rtablist');
         const tab = list.querySelector('[role=tab]');

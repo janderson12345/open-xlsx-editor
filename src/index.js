@@ -9,6 +9,7 @@ import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, numberBox } from './editor/dialogs.js';
 import { createRibbon } from './editor/ribbon.js';
+import { createFindBar } from './editor/findbar.js';
 import { homeTab } from './editor/hometab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
@@ -124,6 +125,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'unhideSheet') return sheetActs.unhide();
     if (name === 'insertRows' || name === 'deleteRows') return editing().run('lines', 'row', name === 'insertRows' ? 1 : -1);
     if (name === 'insertColumns' || name === 'deleteColumns') return editing().run('lines', 'col', name === 'insertColumns' ? 1 : -1);
+    if (name === 'find' || name === 'replace') return state.find?.open(name === 'replace');
     if (name === 'rowHeightBox' || name === 'columnWidthBox') return sizeBox(name === 'rowHeightBox' ? 'row' : 'col');
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
@@ -198,6 +200,16 @@ export function mountXlsxEditor(host, options = {}) {
       home: () => state.grid?.el.focus({ preventScroll: true }),
     });
     placeRibbon();
+    // (Find and Replace: a bar under the ribbon, there with the ribbon hidden too.)
+    state.find = createFindBar({
+      workbook: () => state.workbook,
+      from: () => { const s = editing().selection; return { si: state.sheetIndex, r: s.ar, c: s.ac }; },
+      go: (hit) => editing().run('goTo', hit),
+      apply: (steps) => editing().run('applyChanges', steps),
+      home: () => state.grid?.el.focus({ preventScroll: true }),
+      readOnly: () => state.readOnly,
+    });
+    el.after(state.find.el);
   };
 
   const openMenu = (i, point, byKeyboard) => {
@@ -240,6 +252,7 @@ export function mountXlsxEditor(host, options = {}) {
           lines,
           headerMenu,
           fitWidth: (c) => state.grid.fitWidth(c),
+          find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),
           allowed,
         });
@@ -318,6 +331,8 @@ export function mountXlsxEditor(host, options = {}) {
       if (theme) root.dataset.theme = theme;
       else delete root.dataset.theme;
     },
+    /** Open the Find bar (Ctrl+F), or Find and Replace (Ctrl+H). */
+    find: (replace = false) => state.find?.open(replace),
     destroy() {
       window.removeEventListener('beforeprint', beforePrint);
       menu.close();

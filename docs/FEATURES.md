@@ -53,7 +53,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Fill handle, Ctrl+D, Ctrl+R | Missing | |
 | Right-click menu on cells | Missing | |
 | Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
-| Find and Replace (Ctrl+F, Ctrl+H) | Missing | |
+| Find and Replace (Ctrl+F, Ctrl+H) | Done | Excel's options, Find All as a count, Replace All in one undo step (docs/FIND.md). |
 | Status bar (Sum, Average, Count of the selection) | Missing | |
 | Zoom | Missing | |
 | Print | Done | Pages as Excel lays them out, measured against its PDFs. |
@@ -93,7 +93,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Fill (down, right, series) | Missing | |
 | | Clear (all, formats, contents) | Partly | Clear Formats and Clear Contents; Clear All missing. |
 | | Sort & Filter | Missing | Autofilters kept. |
-| | Find & Select | Missing | |
+| | Find & Select | Partly | Find and Replace; Go To and Go To Special missing. |
 
 ## Insert (`insert`)
 

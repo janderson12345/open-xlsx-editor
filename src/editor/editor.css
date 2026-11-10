@@ -949,6 +949,69 @@
 .oxe-pop .oxe-swatches { padding: 2px 6px 4px; grid-template-columns: repeat(10, 24px); gap: 2px; }
 .oxe-pop .oxe-swatches-theme { row-gap: 0; }
 .oxe-pop .oxe-swatch { width: 24px; height: 24px; }
+/* Find and Replace (findbar.js): under the ribbon, in the headings' colours. */
+.oxe-findbar {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--oxe-head-line);
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-findbar[hidden],
+.oxe-findbar [hidden] { display: none; }
+.oxe-findrow,
+.oxe-replrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+}
+.oxe-findbox {
+  width: min(260px, 100%);
+  height: 26px;
+  box-sizing: border-box;
+  padding: 0 6px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+  background: var(--oxe-head-bg);
+  color: inherit;
+  font: inherit;
+}
+.oxe-findbar button,
+.oxe-findbar select {
+  min-width: 28px;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+  background: var(--oxe-head-bg);
+  color: inherit;
+  font: inherit;
+}
+.oxe-findbar button { cursor: pointer; }
+.oxe-findbar button:hover { background: var(--oxe-sel-fill); }
+.oxe-findbar button:focus-visible,
+.oxe-findbar select:focus-visible,
+.oxe-findbar input:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-find-opt {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+}
+.oxe-findinfo { min-height: 1em; font-size: 12px; }
+.oxe-findinfo:empty { display: none; }
+@media print {
+  .oxe-findbar { display: none; }
+}
+
 /* Simplified (one-line) ribbon. */
 .oxe-simple .oxe-ribbon { padding: 3px 8px; }
 .oxe-simple .oxe-panel { gap: 2px; align-items: center; }

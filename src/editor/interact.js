@@ -159,6 +159,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && (key === 'a' || key === 'A') && !e.shiftKey) cmd.run('selectAll');
     else if (ctrl && (key === '+' || (key === '=' && e.shiftKey))) ctx.lines?.(1);
     else if (ctrl && key === '-') ctx.lines?.(-1);
+    else if (ctrl && !e.shiftKey && (key === 'f' || key === 'h')) ctx.find?.(key === 'h');
     // (Ctrl+9 hides the rows, Ctrl+0 the columns; with Shift they show again. Taken from the key's code: Shift+9 is "(".)
     else if (ctrl && (e.code === 'Digit9' || e.code === 'Digit0')) cmd.run('hideLines', e.code === 'Digit9' ? 'row' : 'col', !e.shiftKey);
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');

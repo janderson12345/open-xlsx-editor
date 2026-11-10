@@ -410,6 +410,31 @@ check(await page.evaluate(() => window.oxe.workbook.sheet(0).rows.get(2)?.hidden
 await page.keyboard.press('Control+Shift+9');
 check(await page.evaluate(() => window.oxe.grid.geometry().rows.size(2)) === 40, 'Ctrl+Shift+9: shown again, still 30pt');
 
+// Find and Replace: Ctrl+F, "Item", Enter goes from A1 to the next match, then the next; Find All counts them. Ctrl+H,
+// "Item" with "Thing", Replace All; Esc back to the sheet, Ctrl+Z puts them back.
+await page.evaluate(() => window.oxe.select('A1'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+f');
+await page.waitForSelector('.oxe-findbar:not([hidden])');
+await page.keyboard.type('Item');
+await page.keyboard.press('Enter');
+const firstHit = await sel();
+await page.keyboard.press('Enter');
+const secondHit = await sel();
+check(firstHit.ar === 1 && firstHit.ac === 0 && secondHit.ar === 2 && await page.evaluate(() => document.activeElement.classList.contains('oxe-findbox')), 'Ctrl+F, Item, Enter twice: A2 then A3, the box keeping focus', JSON.stringify([firstHit, secondHit]));
+await page.click('.oxe-findbar button[title="Find All"]');
+const found = await page.textContent('.oxe-findinfo');
+check(/^\d+ cell\(s\) found$/.test(found), 'Find All: the cells found counted', found);
+await page.keyboard.press('Control+h');
+await page.fill('.oxe-replrow .oxe-findbox', 'Thing');
+await page.click('.oxe-findbar button[title="Replace All"]');
+const done = await page.textContent('.oxe-findinfo');
+check(/^All done\. We made \d+ replacements?\./.test(done) && /^Thing/.test(String(await value('A3'))), 'Ctrl+H, Replace All: Item made Thing, said as Excel says it', done);
+await page.keyboard.press('Escape');
+check(await page.isHidden('.oxe-findbar') && await page.evaluate(() => document.activeElement.classList.contains('oxe-grid')), 'Esc: the bar closed, back in the sheet');
+await page.keyboard.press('Control+z');
+check(/^Item/.test(String(await value('A3'))), 'Ctrl+Z: every replacement undone at once');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

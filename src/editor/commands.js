@@ -243,6 +243,14 @@ export function createCommands(ctx) {
       show(state.sel, state.focus);
       return true;
     },
+    /** Go to a found cell ({ si, r, c }): its sheet shown, the cell selected. */
+    goTo(hit) {
+      if (hit.si !== ctx.sheetIndex() && !commands.showSheet(hit.si)) return false;
+      commands.select(hit.r, hit.c);
+      return true;
+    },
+    /** Changes of several sheets ([{ si, contents, styles, merges }], findops.js replaceChanges) as one step. */
+    applyChanges(steps) { return runSteps(steps); },
     /** A heading edge dragged to `px` pixels: line `index`, or every selected whole line when it is one of them (as
      *  in Excel). 0 hides. */
     resizeLines(axis, index, px) {
