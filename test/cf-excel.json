@@ -1,0 +1,609 @@
+{
+  "excel": "Excel.Application: FormatConditions, Range.DisplayFormat, then the saved sheet and styles XML",
+  "cases": [
+    {
+      "name": "greater than",
+      "cells": {
+        "A2": {
+          "fill": 255
+        },
+        "A4": {
+          "fill": 255
+        },
+        "A7": {
+          "fill": 255
+        },
+        "A10": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>10</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "between",
+      "cells": {
+        "A1": {
+          "fill": 65280
+        },
+        "A2": {
+          "fill": 65280
+        },
+        "A3": {
+          "fill": 65280
+        },
+        "A5": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"between\"><formula>5</formula><formula>12</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "not between",
+      "cells": {
+        "A4": {
+          "fill": 65280
+        },
+        "A6": {
+          "fill": 65280
+        },
+        "A7": {
+          "fill": 65280
+        },
+        "A8": {
+          "fill": 65280
+        },
+        "A10": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"notBetween\"><formula>5</formula><formula>12</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "equal, with text and blanks around",
+      "cells": {
+        "A3": {
+          "fill": 65535,
+          "bold": true
+        },
+        "A5": {
+          "fill": 65535,
+          "bold": true
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"equal\"><formula>7</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><font><b/><i val=\"0\"/></font><fill><patternFill><bgColor rgb=\"FFFFFF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "not equal",
+      "cells": {
+        "A1": {
+          "fill": 65535
+        },
+        "A2": {
+          "fill": 65535
+        },
+        "A4": {
+          "fill": 65535
+        },
+        "A6": {
+          "fill": 65535
+        },
+        "A7": {
+          "fill": 65535
+        },
+        "A8": {
+          "fill": 65535
+        },
+        "A10": {
+          "fill": 65535
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"notEqual\"><formula>7</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFFFF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "less or equal, to a cell",
+      "cells": {
+        "A1": {
+          "color": 16711680
+        },
+        "A3": {
+          "color": 16711680
+        },
+        "A5": {
+          "color": 16711680
+        },
+        "A6": {
+          "color": 16711680
+        },
+        "A8": {
+          "color": 16711680
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"lessThanOrEqual\"><formula>$B$1</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><font><color rgb=\"FF0000FF\"/></font></dxf></dxfs>"
+    },
+    {
+      "name": "equal to text",
+      "cells": {
+        "A1": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A8\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"equal\"><formula>\"apple\"</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "a formula, relative",
+      "cells": {
+        "A1": {
+          "fill": 65280
+        },
+        "A4": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A7\"><cfRule type=\"expression\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\"><formula>A1&gt;B1</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "a formula over the row",
+      "cells": {
+        "A1": {
+          "fill": 65535
+        },
+        "B1": {
+          "fill": 65535
+        },
+        "A3": {
+          "fill": 65535
+        },
+        "B3": {
+          "fill": 65535
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:B3\"><cfRule type=\"expression\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\"><formula>$B1=\"y\"</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFFFF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "text contains",
+      "cells": {
+        "A1": {
+          "fill": 255
+        },
+        "A2": {
+          "fill": 255
+        },
+        "A5": {
+          "fill": 255
+        },
+        "A8": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A8\"><cfRule type=\"containsText\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"containsText\" text=\"apple\"><formula>NOT(ISERROR(SEARCH(\"apple\",A1)))</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "text does not contain",
+      "cells": {
+        "A3": {
+          "fill": 255
+        },
+        "A4": {
+          "fill": 255
+        },
+        "A6": {
+          "fill": 255
+        },
+        "A7": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A8\"><cfRule type=\"notContainsText\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"notContains\" text=\"apple\"><formula>ISERROR(SEARCH(\"apple\",A1))</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "text begins with",
+      "cells": {
+        "A1": {
+          "fill": 255
+        },
+        "A5": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A8\"><cfRule type=\"beginsWith\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"beginsWith\" text=\"ap\"><formula>LEFT(A1,LEN(\"ap\"))=\"ap\"</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "text ends with",
+      "cells": {
+        "A1": {
+          "fill": 255
+        },
+        "A2": {
+          "fill": 255
+        },
+        "A8": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A8\"><cfRule type=\"endsWith\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"endsWith\" text=\"apple\"><formula>RIGHT(A1,LEN(\"apple\"))=\"apple\"</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "top 3",
+      "cells": {
+        "A2": {
+          "fill": 65280
+        },
+        "A4": {
+          "fill": 65280
+        },
+        "A7": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"top10\" dxfId=\"0\" priority=\"1\" rank=\"3\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "bottom 2",
+      "cells": {
+        "A1": {
+          "fill": 255
+        },
+        "A6": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"top10\" dxfId=\"0\" priority=\"1\" bottom=\"1\" rank=\"2\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "top 25 percent",
+      "cells": {
+        "A4": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"top10\" dxfId=\"0\" priority=\"1\" percent=\"1\" rank=\"25\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "above average",
+      "cells": {
+        "A2": {
+          "fill": 65280
+        },
+        "A4": {
+          "fill": 65280
+        },
+        "A7": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"aboveAverage\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "below average",
+      "cells": {
+        "A1": {
+          "fill": 255
+        },
+        "A3": {
+          "fill": 255
+        },
+        "A5": {
+          "fill": 255
+        },
+        "A6": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"aboveAverage\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" aboveAverage=\"0\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "equal or above average",
+      "cells": {
+        "A2": {
+          "fill": 65280
+        },
+        "A3": {
+          "fill": 65280
+        },
+        "A4": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A4\"><cfRule type=\"aboveAverage\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" equalAverage=\"1\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "duplicates",
+      "cells": {
+        "A1": {
+          "fill": 255
+        },
+        "A2": {
+          "fill": 255
+        },
+        "A3": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A8\"><cfRule type=\"duplicateValues\" dxfId=\"0\" priority=\"1\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "unique values",
+      "cells": {
+        "A1": {
+          "fill": 65280
+        },
+        "A2": {
+          "fill": 65280
+        },
+        "A4": {
+          "fill": 65280
+        },
+        "A6": {
+          "fill": 65280
+        },
+        "A7": {
+          "fill": 65280
+        },
+        "A9": {
+          "fill": 65280
+        },
+        "A10": {
+          "fill": 65280
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"uniqueValues\" dxfId=\"0\" priority=\"1\"/></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "blanks",
+      "cells": {
+        "A8": {
+          "fill": 65535
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"containsBlanks\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\"><formula>LEN(TRIM(A1))=0</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFFFF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "no blanks",
+      "cells": {
+        "A1": {
+          "fill": 65535
+        },
+        "A2": {
+          "fill": 65535
+        },
+        "A3": {
+          "fill": 65535
+        },
+        "A4": {
+          "fill": 65535
+        },
+        "A5": {
+          "fill": 65535
+        },
+        "A6": {
+          "fill": 65535
+        },
+        "A7": {
+          "fill": 65535
+        },
+        "A9": {
+          "fill": 65535
+        },
+        "A10": {
+          "fill": 65535
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"notContainsBlanks\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\"><formula>LEN(TRIM(A1))&gt;0</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFFFF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "errors",
+      "cells": {
+        "A9": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"containsErrors\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\"><formula>ISERROR(A1)</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "two rules, both apply",
+      "cells": {
+        "A2": {
+          "fill": 255
+        },
+        "A3": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A4": {
+          "fill": 255
+        },
+        "A5": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A7": {
+          "fill": 255
+        },
+        "A10": {
+          "fill": 255
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>10</formula></cfRule><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"2\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>6</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"2\"><dxf><font><b/><i val=\"0\"/></font><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "two rules, stop if true",
+      "cells": {
+        "A2": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A3": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A4": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A5": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A7": {
+          "fill": 65280,
+          "bold": true
+        },
+        "A10": {
+          "fill": 65280,
+          "bold": true
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>6</formula></cfRule><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"2\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>10</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"2\"><dxf><fill><patternFill><bgColor rgb=\"FFFF0000\"/></patternFill></fill></dxf><dxf><font><b/><i val=\"0\"/></font><fill><patternFill><bgColor rgb=\"FF00FF00\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "a rule over formatted cells",
+      "cells": {
+        "A2": {
+          "color": 16711680
+        },
+        "A4": {
+          "color": 16711680
+        },
+        "A7": {
+          "color": 16711680
+        },
+        "A10": {
+          "color": 16711680
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>10</formula></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><font><color rgb=\"FF0000FF\"/></font></dxf></dxfs>"
+    },
+    {
+      "name": "two-colour scale",
+      "cells": {
+        "A1": {
+          "fill": 16777215
+        },
+        "A2": {
+          "fill": 14214622
+        },
+        "A3": {
+          "fill": 11652028
+        },
+        "A4": {
+          "fill": 9089435
+        },
+        "A5": {
+          "fill": 6526841
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A6\"><cfRule type=\"colorScale\" priority=\"1\"><colorScale><cfvo type=\"min\"/><cfvo type=\"max\"/><color rgb=\"FFFFFFFF\"/><color rgb=\"FF799763\"/></colorScale></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "three-colour scale",
+      "cells": {
+        "A1": {
+          "fill": 7039480
+        },
+        "A2": {
+          "fill": 7708154
+        },
+        "A3": {
+          "fill": 8376829
+        },
+        "A4": {
+          "fill": 8710129
+        },
+        "A5": {
+          "fill": 8576981
+        },
+        "A6": {
+          "fill": 8109667
+        }
+      },
+      "conditionalFormatting": [
+        "<conditionalFormatting sqref=\"A1:A6\"><cfRule type=\"colorScale\" priority=\"1\"><colorScale><cfvo type=\"min\"/><cfvo type=\"percentile\" val=\"50\"/><cfvo type=\"max\"/><color rgb=\"FFF8696B\"/><color rgb=\"FFFFEB84\"/><color rgb=\"FF63BE7B\"/></colorScale></cfRule></conditionalFormatting>"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    }
+  ]
+}

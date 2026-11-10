@@ -188,6 +188,17 @@ export class Calc {
     return { circular: [...circular] };
   }
 
+  /** A formula (its text as the file has it, without "=") worked out as if it were in cell (r, c) of sheet si, without
+   *  being entered there (a conditional format's): its value, or null when it can't be worked out here. */
+  formulaAt(si, r, c, text) {
+    try {
+      return result(parseFormula(text), this.context({ si, r, c }), false);
+    } catch (err) {
+      if (err instanceof Unsupported || err instanceof SyntaxError || /formula/i.test(String(err?.message))) return null;
+      throw err;
+    }
+  }
+
   /** The context a formula is worked out in (evaluate.js). */
   context(e) {
     const book = this.book;

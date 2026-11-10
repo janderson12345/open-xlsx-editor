@@ -1338,3 +1338,27 @@
 .oxe-thread-text {
   white-space: pre-wrap;
 }
+
+/* Conditional formats (ooxml/condformat.js): a rule's fill and font over the cell's own (four parts, to outrank the
+   cell format classes cellstyles.js scopes to the editor). */
+.oxe-fill.oxe-cf-fill {
+  background: var(--oxe-cf);
+}
+.oxe-root .oxe-grid .oxe-cell.oxe-cf-color {
+  color: var(--oxe-cf-color);
+}
+.oxe-root .oxe-grid .oxe-cell.oxe-cf-bold {
+  font-weight: 700;
+}
+.oxe-root .oxe-grid .oxe-cell.oxe-cf-normal {
+  font-weight: 400;
+}
+.oxe-root .oxe-grid .oxe-cell.oxe-cf-italic {
+  font-style: italic;
+}
+.oxe-root .oxe-grid .oxe-cell.oxe-cf-upright {
+  font-style: normal;
+}
+.oxe-root .oxe-grid .oxe-cell.oxe-cf-strike {
+  text-decoration: line-through;
+}

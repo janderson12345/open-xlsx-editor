@@ -27,6 +27,7 @@ insides:
 | `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, or a defined name; Excel's words otherwise. |
 | `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, the proposal left to edit on one cell (docs/AUTOSUM.md). |
+| `src/ooxml/condformat.js` | Conditional formatting worked out as Excel draws it: rules in priority order with Stop If True, Excel's comparisons, range rules, colour scales; each cell's fill and font (docs/CONDFORMAT.md). |
 | `src/ooxml/notes.js` | A sheet's notes and threaded comments read as Excel 365 writes them (the placeholder note of a thread left out); shown by `src/editor/notemarks.js` (docs/NOTES.md). |
 | `src/ooxml/filterops.js` | AutoFilter as Excel does it: its range, the rows a filter hides by shown values, a column's list, the autoFilter element and the _xlnm._FilterDatabase name as Excel writes them (docs/FILTER.md). |
 | `src/ooxml/sortops.js` | Sort as Excel does it: its order of values and of text, the range around a cell, the header guess, formulas moved as a copy moves them, borders left, Excel's refusals (docs/SORT.md). |

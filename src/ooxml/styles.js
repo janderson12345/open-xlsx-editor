@@ -55,6 +55,19 @@ export function readFill(el, ns) {
   return { pattern: attr(p, 'patternType') || 'none', fg: readColor(kid(p, 'fgColor', ns)), bg: readColor(kid(p, 'bgColor', ns)) };
 }
 
+/** One `dxf` (the format a conditional format applies): only what it sets. A dxf's solid fill colour is its pattern's
+ *  background colour, as Excel writes it (`<patternFill><bgColor rgb="FFFF0000"/>`); a property set to off is false. */
+export function readDxf(el, ns) {
+  const font = kid(el, 'font', ns);
+  const p = kid(kid(el, 'fill', ns), 'patternFill', ns);
+  const on = (name) => { const x = kid(font, name, ns); return x ? !!onOff(x) : undefined; };
+  const u = kid(font, 'u', ns);
+  return {
+    font: font ? { b: on('b'), i: on('i'), strike: on('strike'), u: u ? attr(u, 'val') || 'single' : undefined, color: readColor(kid(font, 'color', ns)) } : null,
+    fill: p ? readColor(kid(p, 'bgColor', ns)) || readColor(kid(p, 'fgColor', ns)) : null,
+  };
+}
+
 /** One `border`: each side's style (thin, medium, thick, hair, dotted, dashed, double, ...) and colour. */
 export function readBorder(el, ns) {
   const side = (name) => {
@@ -84,7 +97,7 @@ export function fontFamily(font, theme) {
  *  Excel's defaults). `normal` is the Normal style's font (cellStyleXfs 0), the one column widths are measured in;
  *  `palette` the indexed colours (the workbook's own `indexedColors`, else the legacy palette). */
 export function readStyles(doc) {
-  if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN }], normal: FALLBACK_FONT, palette: INDEXED, numFmts: {} };
+  if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN }], normal: FALLBACK_FONT, palette: INDEXED, numFmts: {}, dxfs: [] };
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const fonts = kids(kid(root, 'fonts', ns), 'font', ns).map((el) => readFont(el, ns));
@@ -101,7 +114,8 @@ export function readStyles(doc) {
   const palette = custom.length ? [...custom, ...INDEXED.slice(custom.length)] : INDEXED;
   const numFmts = {};
   for (const el of kids(kid(root, 'numFmts', ns), 'numFmt', ns)) numFmts[Number(attr(el, 'numFmtId'))] = attr(el, 'formatCode') || 'General';
-  return { fonts, fills, borders, cellXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette, numFmts };
+  const dxfs = kids(kid(root, 'dxfs', ns), 'dxf', ns).map((el) => readDxf(el, ns));
+  return { fonts, fills, borders, cellXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette, numFmts, dxfs };
 }
 
 /** The cell format `s` (out-of-range indexes take format 0, as Excel does). */

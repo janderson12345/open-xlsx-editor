@@ -51,10 +51,16 @@ export function decorations(st, win) {
         const d = deco(sheet.cells.get(merge.r0)?.get(merge.c0)?.s || 0);
         if (d.fill || !print) fills.push(rect(st, merge.r0, merge.c0, merge.r1, merge.c1, d.fill ? d.fillClass : 'oxe-blank', ox, oy));
       }
+      // (A conditional format's fill, over the cell's own: ooxml/condformat.js.)
+      const cf = st.cond?.get(`${r},${c}`);
+      if (cf?.fill) {
+        const m = merge || { r0: r, c0: c, r1: r, c1: c };
+        if (m.r0 === r && m.c0 === c) { const el = rect(st, m.r0, m.c0, m.r1, m.c1, 'oxe-cf-fill', ox, oy); el.style.setProperty('--oxe-cf', cf.fill); fills.push(el); }
+      }
       const cell = line?.get(c);
       if (!cell || !cell.s) continue;
       const d = deco(cell.s);
-      if (d.fill && !merge) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
+      if (d.fill && !merge && !cf?.fill) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
       for (const side of d.sides) edges.push(...edge(st, r, c, side, ox, oy));
     }
   }

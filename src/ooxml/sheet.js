@@ -6,6 +6,7 @@ import { kids, kid, attr } from './xml.js';
 import { parseRef, parseRange } from './refs.js';
 import { stringItemText } from './strings.js';
 import { shiftFormula } from '../calc/tokens.js';
+import { readColor } from './styles.js';
 
 /** A cell as stored: `t` its type (n number, s string, b boolean, e error, str formula text, d ISO date), `v` its
  *  value (null for a cell that only carries a style), `s` its style (an index into cellXfs), `f` its formula text.
@@ -94,6 +95,7 @@ export function readSheet(doc, sst = []) {
     ...readView(view, ns),
     page: readPageSetup(root, ns),
     autoFilter: readAutoFilter(kid(root, 'autoFilter', ns), ns),
+    condFormats: readCondFormats(root, ns),
     maxRow,
     maxCol,
   };
@@ -120,6 +122,28 @@ function readAutoFilter(el, ns) {
     });
   }
   return { ...area, columns };
+}
+
+/**
+ * The sheet's conditional formats: [{ ranges: [{ r0, c0, r1, c1 }], rules: [{ type, priority, dxfId, stopIfTrue,
+ * operator, formulas, text, rank, percent, bottom, aboveAverage, equalAverage, dupe, colorScale: { cfvo: [{ type, val }],
+ * colors } }] }], as the file has them (formulas without "=", relative to the first range's top-left cell).
+ */
+function readCondFormats(root, ns) {
+  const flag = (el, name, dflt = false) => { const v = attr(el, name); return v == null ? dflt : v === '1' || v === 'true'; };
+  return kids(root, 'conditionalFormatting', ns).map((cf) => ({
+    ranges: (attr(cf, 'sqref') || '').split(/s+/).map(parseRange).filter(Boolean),
+    rules: kids(cf, 'cfRule', ns).map((r) => {
+      const scale = kid(r, 'colorScale', ns);
+      return {
+        type: attr(r, 'type'), priority: Number(attr(r, 'priority') || 0), dxfId: attr(r, 'dxfId') == null ? null : Number(attr(r, 'dxfId')),
+        stopIfTrue: flag(r, 'stopIfTrue'), operator: attr(r, 'operator'), formulas: kids(r, 'formula', ns).map((f) => f.textContent),
+        text: attr(r, 'text'), rank: Number(attr(r, 'rank') || 10), percent: flag(r, 'percent'), bottom: flag(r, 'bottom'),
+        aboveAverage: flag(r, 'aboveAverage', true), equalAverage: flag(r, 'equalAverage'),
+        colorScale: scale ? { cfvo: kids(scale, 'cfvo', ns).map((v) => ({ type: attr(v, 'type'), val: attr(v, 'val') })), colors: kids(scale, 'color', ns).map(readColor) } : null,
+      };
+    }),
+  }));
 }
 
 function readView(view, ns) {

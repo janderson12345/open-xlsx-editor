@@ -111,6 +111,15 @@ const note = await page.evaluate(() => { const b = document.querySelector('.oxe-
 await page.keyboard.press('Shift+F2');
 check(note?.bold === 'Avery Chen:' && /Check this total/.test(note.text) && !(await page.isVisible('.oxe-note-box')), 'Shift+F2 on B2: its note, the author in bold; again: hidden', JSON.stringify(note));
 
+// Conditional formats: basic.xlsx's B2:B10 bold when over 5: B7 (6) bold, B5 (4) not; 50 typed into B2: bold at once.
+await openFixture(page, 'basic.xlsx');
+await page.evaluate(() => window.oxe.setReadOnly(false));
+const boldIn = (ref) => page.evaluate((ref) => { const [, col, row] = /([A-Z]+)(\d+)/.exec(ref); const cell = [...document.querySelectorAll(`.oxe-grid .oxe-row[aria-rowindex="${Number(row) + 1}"] .oxe-cell`)].find((x) => x.getAttribute('aria-colindex') === String(col.charCodeAt(0) - 63)); return cell ? getComputedStyle(cell).fontWeight : null; }, ref);
+const [b7, b5] = [await boldIn('B7'), await boldIn('B5')];
+await page.evaluate(() => window.oxe.enter('B2', '50'));
+const b2Bold = await boldIn('B2');
+check(b7 === '700' && b5 === '400' && b2Bold === '700', 'conditional format: B7 (6) bold, B5 (4) not; B2 typed 50: bold', `${b7} ${b5} ${b2Bold}`);
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

@@ -10,6 +10,7 @@ import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox } from './editor/dialogs.js';
 import { filterChoices, shownText } from './ooxml/filterops.js';
 import { readNotes } from './ooxml/notes.js';
+import { conditionalLooks } from './ooxml/condformat.js';
 import { dataBeside, sortArea, guessHeader, SORT_MESSAGES } from './ooxml/sortops.js';
 import { isDateFormat } from './ooxml/format.js';
 import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
@@ -78,6 +79,7 @@ export function mountXlsxEditor(host, options = {}) {
     state.sheetIndex = i;
     state.grid.setSheet(state.workbook.sheet(i), state.workbook.sheets[i].name, state.looks);
     state.grid.setNotes(readNotes(state.workbook, i));
+    showConditional();
     state.tabs.activate(i);
     showClip();
   };
@@ -258,6 +260,8 @@ export function mountXlsxEditor(host, options = {}) {
     if (!got) { state.grid.el.focus({ preventScroll: true }); return false; }
     return editing().run('sort', { area, ...got });
   };
+  /** The shown sheet's conditional formats worked out again (after a change, or another sheet shown). */
+  const showConditional = () => { if (state.grid && state.workbook) state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex)); };
   /** A filter button's list for column c (dialogs.js filterBox), opened under `rect`: its sort, Clear Filter From, or
    *  the values ticked. */
   const openFilter = async (c, rect) => {
@@ -389,11 +393,12 @@ export function mountXlsxEditor(host, options = {}) {
       state.sheetIndex = i;
       state.fileName = fileName;
       state.looks = applyCellStyles(root, wb);
-      if (state.grid) { state.grid.setSheet(sheet, wb.sheets[i].name, state.looks); state.grid.setNotes(readNotes(wb, i)); }
+      if (state.grid) { state.grid.setSheet(sheet, wb.sheets[i].name, state.looks); state.grid.setNotes(readNotes(wb, i)); showConditional(); }
       else {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
         state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
         state.grid.setNotes(readNotes(wb, i));
+        showConditional();
         state.editing = attachEditing(root, {
           workbook: () => state.workbook,
           sheetIndex: () => state.sheetIndex,
@@ -403,7 +408,7 @@ export function mountXlsxEditor(host, options = {}) {
           grid: state.grid,
           looks: () => state.looks,
           readOnly: () => state.readOnly,
-          changed: () => options.onChange?.(),
+          changed: () => { showConditional(); options.onChange?.(); },
           lookChanged,
           restyled,
           clipShown: (c) => { state.clip = c; showClip(); },

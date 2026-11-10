@@ -195,6 +195,14 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
   el.setAttribute('aria-colindex', String(c + 2));
   if (st.idBase) el.id = `${st.idBase}-${r}-${c}`;
+  // (A conditional format's font: its colour and weight over the cell's own, ooxml/condformat.js.)
+  const cf = st.cond?.get(`${r},${c}`);
+  if (cf) {
+    if (cf.color) { el.classList.add('oxe-cf-color'); el.style.setProperty('--oxe-cf-color', cf.color); }
+    if (cf.bold !== undefined) el.classList.add(cf.bold ? 'oxe-cf-bold' : 'oxe-cf-normal');
+    if (cf.italic !== undefined) el.classList.add(cf.italic ? 'oxe-cf-italic' : 'oxe-cf-upright');
+    if (cf.strike) el.classList.add('oxe-cf-strike');
+  }
   // (A note or comment thread: heard as the cell's description, from notemarks.js's texts.)
   if (st.idBase && st.notes?.has(`${r},${c}`)) el.setAttribute('aria-describedby', `${st.idBase}-note-${r}-${c}`);
   if (st.sel && r >= st.sel.r0 && r <= st.sel.r1 && c >= st.sel.c0 && c <= st.sel.c1) el.setAttribute('aria-selected', 'true');
@@ -537,6 +545,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** Show a selection (selection.js; null for none) and draw it. */
     setSelection(sel) {
       st.sel = sel;
+      draw(st, true);
+    },
+    /** What the sheet's conditional formats give its cells (ooxml/condformat.js conditionalLooks), drawn. */
+    setConditional(looks) {
+      st.cond = looks;
       draw(st, true);
     },
     /** The sheet's notes and comment threads (ooxml/notes.js readNotes), marked and described. */

@@ -1,0 +1,785 @@
+[
+ {
+  "name": "greater than",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "greater",
+    "f1": "10",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "between",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "between",
+    "f1": "5",
+    "f2": "12",
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "not between",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "notBetween",
+    "f1": "5",
+    "f2": "12",
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "equal, with text and blanks around",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "equal",
+    "f1": "7",
+    "fill": 65535,
+    "bold": true
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "not equal",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "notEqual",
+    "f1": "7",
+    "fill": 65535
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "less or equal, to a cell",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x",
+    "B1": "7"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "lessEqual",
+    "f1": "=$B$1",
+    "color": 16711680
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "equal to text",
+  "setup": {
+   "cells": {
+    "A1": "apple",
+    "A2": "Pineapple",
+    "A3": "pear",
+    "A4": "grape",
+    "A5": "APPLE pie",
+    "A6": "",
+    "A7": "42",
+    "A8": "crab apple"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A8",
+    "kind": "cell",
+    "op": "equal",
+    "f1": "=\"apple\"",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "a formula, relative",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x",
+    "B1": "4",
+    "B2": "20",
+    "B3": "7",
+    "B4": "1",
+    "B5": "9",
+    "B6": "1",
+    "B7": "15"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A7",
+    "kind": "expr",
+    "f1": "=A1>B1",
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "a formula over the row",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x",
+    "B1": "y",
+    "B2": "n",
+    "B3": "y"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:B3",
+    "kind": "expr",
+    "f1": "=$B1=\"y\"",
+    "fill": 65535
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "text contains",
+  "setup": {
+   "cells": {
+    "A1": "apple",
+    "A2": "Pineapple",
+    "A3": "pear",
+    "A4": "grape",
+    "A5": "APPLE pie",
+    "A6": "",
+    "A7": "42",
+    "A8": "crab apple"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A8",
+    "kind": "text",
+    "op": "contains",
+    "text": "apple",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "text does not contain",
+  "setup": {
+   "cells": {
+    "A1": "apple",
+    "A2": "Pineapple",
+    "A3": "pear",
+    "A4": "grape",
+    "A5": "APPLE pie",
+    "A6": "",
+    "A7": "42",
+    "A8": "crab apple"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A8",
+    "kind": "text",
+    "op": "notContains",
+    "text": "apple",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "text begins with",
+  "setup": {
+   "cells": {
+    "A1": "apple",
+    "A2": "Pineapple",
+    "A3": "pear",
+    "A4": "grape",
+    "A5": "APPLE pie",
+    "A6": "",
+    "A7": "42",
+    "A8": "crab apple"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A8",
+    "kind": "text",
+    "op": "begins",
+    "text": "ap",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "text ends with",
+  "setup": {
+   "cells": {
+    "A1": "apple",
+    "A2": "Pineapple",
+    "A3": "pear",
+    "A4": "grape",
+    "A5": "APPLE pie",
+    "A6": "",
+    "A7": "42",
+    "A8": "crab apple"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A8",
+    "kind": "text",
+    "op": "ends",
+    "text": "apple",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "top 3",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "top",
+    "rank": 3,
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "bottom 2",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "top",
+    "rank": 2,
+    "bottom": true,
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "top 25 percent",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "top",
+    "rank": 25,
+    "percent": true,
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "above average",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "average",
+    "how": 0,
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "below average",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "average",
+    "how": 1,
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "equal or above average",
+  "setup": {
+   "cells": {
+    "A1": "1",
+    "A2": "2",
+    "A3": "3",
+    "A4": "2"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A4",
+    "kind": "average",
+    "how": 2,
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "duplicates",
+  "setup": {
+   "cells": {
+    "A1": "apple",
+    "A2": "apple",
+    "A3": "APPLE",
+    "A4": "grape",
+    "A5": "APPLE pie",
+    "A6": "",
+    "A7": "42",
+    "A8": "crab apple"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A8",
+    "kind": "unique",
+    "dup": true,
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "unique values",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "unique",
+    "dup": false,
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "blanks",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "blanks",
+    "fill": 65535
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "no blanks",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "noBlanks",
+    "fill": 65535
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "errors",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "errors",
+    "fill": 255
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "two rules, both apply",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "greater",
+    "f1": "10",
+    "fill": 255
+   },
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "greater",
+    "f1": "6",
+    "bold": true,
+    "fill": 65280
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "two rules, stop if true",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "greater",
+    "f1": "6",
+    "bold": true,
+    "fill": 65280
+   },
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "greater",
+    "f1": "10",
+    "fill": 255,
+    "stop": true
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "a rule over formatted cells",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "A2": "12",
+    "A3": "7",
+    "A4": "20",
+    "A5": "7",
+    "A6": "1",
+    "A7": "15",
+    "A8": "",
+    "A9": "=1/0",
+    "A10": "x"
+   },
+   "formats": [
+    {
+     "range": "A1:A3",
+     "numFmt": "0.00"
+    }
+   ]
+  },
+  "rules": [
+   {
+    "range": "A1:A10",
+    "kind": "cell",
+    "op": "greater",
+    "f1": "10",
+    "color": 16711680
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "two-colour scale",
+  "setup": {
+   "cells": {
+    "A1": "0",
+    "A2": "25",
+    "A3": "50",
+    "A4": "75",
+    "A5": "100",
+    "A6": ""
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A6",
+    "kind": "scale",
+    "colors": [
+     16777215,
+     6526841
+    ]
+   }
+  ],
+  "read": "A1:B10"
+ },
+ {
+  "name": "three-colour scale",
+  "setup": {
+   "cells": {
+    "A1": "1",
+    "A2": "2",
+    "A3": "3",
+    "A4": "4",
+    "A5": "5",
+    "A6": "9"
+   }
+  },
+  "rules": [
+   {
+    "range": "A1:A6",
+    "kind": "scale",
+    "colors": [
+     7039480,
+     8711167,
+     8109667
+    ]
+   }
+  ],
+  "read": "A1:B10"
+ }
+]

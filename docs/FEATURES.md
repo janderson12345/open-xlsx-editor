@@ -80,7 +80,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Merge & Center, Merge Across, Merge Cells, Unmerge | Done | Excel's question before values are discarded. |
 | | Shrink to fit | Missing | |
 | Number (`number`) | Number format list, currency, %, comma, decimals | Done | Every format code Excel has is shown; the list offers Excel's eleven. $, % and comma apply Excel's cell styles. The Format Cells dialog missing. |
-| Styles (`styles`) | Conditional Formatting | Kept | |
+| Styles (`styles`) | Conditional Formatting | Partly | Drawn as Excel draws it: cell values, formulas, text, top and bottom, average, duplicates, blanks, errors, colour scales (docs/CONDFORMAT.md). Data bars, icon sets and the menu missing; kept. |
 | | Format as Table | Kept | |
 | | Cell Styles | Kept | Cells show their style's formatting. |
 | Cells (`cells`) | Insert and delete rows and columns | Partly | Formulas on every sheet, names, chart series, merges, widths and the sheet's ranges follow (docs/ROWCOL.md). Refused for now on a sheet with pictures, charts, comments, tables or pivot tables. |
