@@ -51,7 +51,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Chart sheets | Kept | Tab shown, sheet not opened. |
 | Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |
 | Fill handle, Ctrl+D, Ctrl+R | Missing | |
-| Right-click menu on cells | Missing | |
+| Right-click menu on cells | Done | Cut, Copy, Paste, Paste Special..., Insert..., Delete..., Clear Contents (docs/CLIPBOARD.md). |
 | Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
 | Find and Replace (Ctrl+F, Ctrl+H) | Done | Excel's options, Find All as a count, Replace All in one undo step (docs/FIND.md). |
 | Status bar (Sum, Average, Count of the selection) | Missing | |
