@@ -93,10 +93,15 @@ function checkSheetNames(wb, problems) {
 }
 
 let bad = 0;
+let skipped = 0;
 for (const file of files) {
   const problems = [];
+  const bytes = new Uint8Array(fs.readFileSync(file));
+  // (A workbook saved with a password is a compound file holding the encrypted package: nothing to check without the
+  // password. test/encryption.test.js checks those the editor writes.)
+  if (bytes.length >= 8 && [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1].every((b, i) => bytes[i] === b)) { skipped++; console.log(`skip ${file} (saved with a password)`); continue; }
   let zip;
-  try { zip = unzipSync(new Uint8Array(fs.readFileSync(file))); } catch (e) { zip = null; problems.push(`not a zip: ${e.message}`); }
+  try { zip = unzipSync(bytes); } catch (e) { zip = null; problems.push(`not a zip: ${e.message}`); }
   const names = zip ? Object.keys(zip) : [];
   const xml = new Map();
   for (const n of names) if (/\.(xml|rels|vml)$/i.test(n)) { const d = parse(strFromU8(zip[n]), n, problems); if (d) xml.set(n, d); }
@@ -163,5 +168,6 @@ for (const file of files) {
   if (problems.length) { bad++; console.log(`FAIL ${file}`); for (const p of problems.slice(0, 20)) console.log(`  ${p}`); if (problems.length > 20) console.log(`  ...and ${problems.length - 20} more`); }
   else console.log(`ok   ${file}`);
 }
-console.log(bad ? `${bad} of ${files.length} files with problems` : `all ${files.length} files ok`);
+const passed = skipped ? ` (${skipped} saved with a password skipped)` : '';
+console.log(bad ? `${bad} of ${files.length - skipped} files with problems${passed}` : `all ${files.length - skipped} files ok${passed}`);
 process.exit(bad ? 1 : 0);
