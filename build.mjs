@@ -10,6 +10,7 @@ await esbuild.build({ ...common, entryPoints: ['src/index.js'], outfile: 'dist/o
 fs.copyFileSync('src/editor/editor.css', 'dist/open-xlsx-editor.css');
 // (The co-editing module with Yjs, for the browser tests to load beside the demo.)
 await esbuild.build({ ...common, entryPoints: ['demo/collab.js'], outfile: 'demo/dist/collab.js' });
+await esbuild.build({ ...common, entryPoints: ['demo/pdf.js'], outfile: 'demo/dist/pdf.js' });
 const ctx = await esbuild.context({ ...common, entryPoints: ['demo/main.js'], outfile: 'demo/dist/demo.js' });
 if (serve) {
   await ctx.watch();

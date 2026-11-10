@@ -56,6 +56,9 @@ pwsh tools/excel-compare/excel-readback.ps1 <folder>/saved.json <out.json>
 The same cases done by the editor and saved, then opened in Excel and read the same way, to compare with what Excel
 made itself.
 
+PDF export (src/pdf.js) is measured the same way: `OXE_EXPORT=1 node tools/excel-compare/print-ours.mjs <books> <out>` makes
+the PDFs through `exportPdf` instead of the browser's print (docs/PDF.md).
+
 ## Each change: a run
 
 ```powershell

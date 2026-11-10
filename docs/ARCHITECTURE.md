@@ -29,6 +29,7 @@ insides:
 | `src/ooxml/tables.js` | The workbook's tables, and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
 | `src/ooxml/cfb.js` | Compound files (MS-CFB): every stream read by its path; written as version 3, small streams in the mini stream. |
 | `src/ooxml/encryption.js` | Workbooks saved with a password (MS-OFFCRYPTO agile): decrypted and encrypted with @noble/hashes and @noble/ciphers; PasswordError; docs/ENCRYPTION.md. |
+| `src/pdf.js` | PDF export from the print layout (pdf-lib, fontkit): fills, borders and cell text at the layout's places, clipped to their cells; docs/PDF.md. |
 | `src/collab.js` | Co-editing over Yjs: `connectWorkbook(api, ydoc)`; cell contents shared cell by cell from `api.onEdit`, made with the `remoteContents` command; any other change shared as the workbook's bytes; docs/COLLAB.md. |
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |

@@ -1,0 +1,252 @@
+// PDF export drawn from the editor's own print layout (pdf-lib, MIT): each printed page becomes a PDF page of the same
+// paper size, and on it, at the places the layout put them, the fills, the borders and the cells' text, as real text
+// (selectable and searchable), each piece clipped to its cell as the page clips it. Separate from the main bundle:
+// import { exportPdf } from 'open-xlsx-editor/pdf'. Adapted from open-docx-editor's pdf.js.
+//
+// Fonts, the first that has the face: the fonts installed on the computer, read with the browser's Local Font Access
+// (Chromium browsers: it asks the user once), embedded as subsets (fontkit); else the PDF standard fonts (Helvetica,
+// Times, Courier and their bold and italic faces), each piece of text drawn at the width the layout measured, so the
+// columns and pages are the layout's in any font. A standard font draws characters it lacks as "?" (it covers
+// Windows-1252's only).
+import { PDFDocument, StandardFonts, rgb, PDFOperator, PDFOperatorNames, PDFNumber, pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize, setTextMatrix, showText, setFillingRgbColor, rectangle, clip, endPath } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+
+const PT = 0.75; // CSS px to PDF points
+
+/**
+ * The workbook open in `editor` (mountXlsxEditor's API) printed to a PDF: the sheet shown, or (`sheets: 'all'`) every
+ * worksheet that can be shown, in tab order, as Excel's "Print Entire Workbook". Returns the PDF's bytes. Options:
+ * `title` and `author` (document information); `localFonts` false not to ask for the installed fonts.
+ */
+export async function exportPdf(editor, { sheets = 'shown', title, author, localFonts = true } = {}) {
+  const wb = editor.workbook;
+  if (!wb) throw new Error('no workbook open');
+  const root = editor.grid.el.closest('.oxe-root');
+  const shown = editor.sheetIndex;
+  const list = sheets === 'all' ? [...wb.sheets.keys()].filter((i) => wb.canShow(i) && wb.sheets[i].kind === 'worksheet') : [shown];
+  const pdf = await PDFDocument.create();
+  pdf.registerFontkit(fontkit);
+  if (title) pdf.setTitle(title);
+  if (author) pdf.setAuthor(author);
+  pdf.setProducer('open-xlsx-editor');
+  const sources = await fontSources(localFonts);
+  const fonts = {};
+  // (The print pages shown off-screen while they're measured, in print's colours: editor.css, .oxe-exporting.)
+  root.classList.add('oxe-exporting');
+  try {
+    for (const i of list) {
+      if (i !== editor.sheetIndex) editor.showSheet(i);
+      editor.preparePrint();
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      for (const pageEl of root.querySelectorAll(':scope > .oxe-print > .oxe-page')) await drawPage(pdf, pageEl, { sources, fonts });
+    }
+  } finally {
+    root.classList.remove('oxe-exporting');
+    if (editor.sheetIndex !== shown) editor.showSheet(shown);
+  }
+  if (!pdf.getPageCount()) pdf.addPage([8.5 * 72, 11 * 72]); // (an empty sheet prints one blank page, as Excel says "nothing to print")
+  return pdf.save();
+}
+
+/** The installed fonts by "family|bold|italic" in lower case, when the browser has Local Font Access and it's allowed. */
+async function fontSources(local) {
+  const key = (family, bold, italic) => `${family.toLowerCase()}|${bold ? 1 : 0}|${italic ? 1 : 0}`;
+  const installed = new Map();
+  if (local && typeof window !== 'undefined' && typeof window.queryLocalFonts === 'function') {
+    try {
+      for (const f of await window.queryLocalFonts()) {
+        const s = (f.style || '').toLowerCase();
+        const b = /bold|black|heavy|semibold|demibold/.test(s), i = /italic|oblique/.test(s);
+        const k = key(f.family, b, i);
+        if (!installed.has(k) || /^(regular|bold|italic|bold italic)$/.test(s)) installed.set(k, f);
+        const named = key((f.fullName || '').replace(/\s+(bold|italic|oblique|regular)\b/gi, '').trim(), b, i);
+        if (f.fullName && !installed.has(named)) installed.set(named, f);
+      }
+    } catch { /* not allowed: the standard fonts */ }
+  }
+  return { key, installed };
+}
+
+/** The font for a computed style: an installed one embedded as a subset, else a standard font of its kind. */
+async function fontFor(pdf, cs, { sources, fonts }) {
+  const bold = (parseInt(cs.fontWeight, 10) || 400) >= 600;
+  const italic = /italic|oblique/.test(cs.fontStyle);
+  for (const fam of cs.fontFamily.split(',').map((f) => f.trim().replace(/^["']|["']$/g, ''))) {
+    const k = sources.key(fam, bold, italic);
+    if (fonts[k] !== undefined) { if (fonts[k]) return fonts[k]; continue; }
+    fonts[k] = null;
+    const f = sources.installed.get(k);
+    if (!f) continue;
+    try {
+      const font = await pdf.embedFont(fromCollection(new Uint8Array(await (await f.blob()).arrayBuffer()), f.postscriptName), { subset: true });
+      fonts[k] = { font, chars: new Set(font.getCharacterSet()) };
+      return fonts[k];
+    } catch { /* a font fontkit can't read: the next family */ }
+  }
+  const first = cs.fontFamily.toLowerCase().split(',')[0];
+  const mono = /courier|consol|mono/.test(first);
+  const serif = !mono && /times|cambria|georgia|garamond|book|serif|palatino|constantia/.test(first) && !/sans/.test(first);
+  const name = (mono ? 'Courier' : serif ? 'TimesRoman' : 'Helvetica') + (bold && italic ? (serif ? 'BoldItalic' : 'BoldOblique') : bold ? 'Bold' : italic ? (serif ? 'Italic' : 'Oblique') : '');
+  if (!fonts[name]) {
+    const font = await pdf.embedFont(StandardFonts[name]);
+    fonts[name] = { font, chars: new Set(font.getCharacterSet()) };
+  }
+  return fonts[name];
+}
+
+/** One printed page: its fills and borders, then its cells' text. */
+async function drawPage(pdf, pageEl, ctx) {
+  const pr = pageEl.getBoundingClientRect();
+  const page = pdf.addPage([pr.width * PT, pr.height * PT]);
+  const X = (x) => (x - pr.left) * PT;
+  const Y = (y) => (pr.bottom - y) * PT;
+  const areaEl = pageEl.querySelector('.oxe-page-area');
+  const area = areaEl.getBoundingClientRect();
+  const clipTo = (r) => [pushGraphicsState(), rectangle(X(r.left), Y(r.bottom), r.width * PT, r.height * PT), clip(), endPath()];
+  // 1. Fills and border edges (decor.js) and cells' own backgrounds, inside the printable area, in the order the page
+  //    paints them (the DOM's: fills, cells, edges).
+  page.pushOperators(...clipTo(area));
+  for (const el of areaEl.querySelectorAll('*')) {
+    const cs = getComputedStyle(el);
+    if (cs.visibility !== 'visible' || cs.display === 'none') continue;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height || r.right <= area.left || r.left >= area.right || r.bottom <= area.top || r.top >= area.bottom) continue;
+    const bg = color(cs.backgroundColor);
+    if (bg) page.drawRectangle({ x: X(r.left), y: Y(r.bottom), width: r.width * PT, height: r.height * PT, color: bg.rgb, opacity: bg.a });
+    for (const s of ['Top', 'Right', 'Bottom', 'Left']) {
+      const w = parseFloat(cs[`border${s}Width`]) || 0;
+      const c = color(cs[`border${s}Color`]);
+      const style = cs[`border${s}Style`];
+      if (!w || !c || style === 'none' || style === 'hidden') continue;
+      const t = w * PT;
+      const dash = style === 'dashed' ? [3 * t, 2 * t] : style === 'dotted' ? [t, t] : undefined;
+      const line = (x1, y1, x2, y2) => page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: t, color: c.rgb, opacity: c.a, dashArray: dash });
+      if (s === 'Top') line(X(r.left), Y(r.top + w / 2), X(r.right), Y(r.top + w / 2));
+      if (s === 'Bottom') line(X(r.left), Y(r.bottom - w / 2), X(r.right), Y(r.bottom - w / 2));
+      if (s === 'Left') line(X(r.left + w / 2), Y(r.top), X(r.left + w / 2), Y(r.bottom));
+      if (s === 'Right') line(X(r.right - w / 2), Y(r.top), X(r.right - w / 2), Y(r.bottom));
+    }
+  }
+  page.pushOperators(popGraphicsState());
+  // 2. Text: each cell's text node, line by line, clipped to the cell (and the cell to the printable area).
+  const range = document.createRange();
+  const canvas = document.createElement('canvas').getContext('2d');
+  // (Measured once per font: a sheet has thousands of cells in a few.)
+  ctx.ascents ||= new Map();
+  const ascent = (cs) => {
+    const f = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    if (!ctx.ascents.has(f)) {
+      canvas.font = f;
+      ctx.ascents.set(f, canvas.measureText('Hg').fontBoundingBoxAscent ?? parseFloat(cs.fontSize) * 0.8);
+    }
+    return ctx.ascents.get(f);
+  };
+  const walker = document.createTreeWalker(areaEl, NodeFilter.SHOW_TEXT, { acceptNode: (t) => (t.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
+  for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+    const el = t.parentElement;
+    const cs = getComputedStyle(el);
+    if (cs.visibility !== 'visible') continue;
+    const cell = el.closest('.oxe-cell');
+    const cr = cell ? cell.getBoundingClientRect() : area;
+    const box = { left: Math.max(cr.left, area.left), top: Math.max(cr.top, area.top), right: Math.min(cr.right, area.right), bottom: Math.min(cr.bottom, area.bottom) };
+    if (box.right <= box.left || box.bottom <= box.top) continue;
+    const { font, chars } = await fontFor(pdf, cs, ctx);
+    const size = (parseFloat(cs.fontSize) || 16) * PT;
+    const c = color(cs.color) || { rgb: rgb(0, 0, 0) };
+    const key = page.node.newFontDictionary(font.name, font.ref);
+    for (const piece of pieces(t, range)) {
+      const safe = [...piece.text.replace(/[\u00a0\u2000-\u200a\u202f\u205f]/g, ' ').replace(/[\u200b-\u200d\u2060\ufeff\u00ad]/g, '').replace(/[\u2010\u2011\u2012\u2212]/g, '-')]
+        .map((ch) => (chars.has(ch.codePointAt(0)) ? ch : ch.trim() ? '?' : ' ')).join('');
+      if (!safe.trim()) continue;
+      const natural = font.widthOfTextAtSize(safe, size);
+      const want = piece.r.width * PT;
+      const ops = [...clipTo({ left: box.left, bottom: box.bottom, width: box.right - box.left, height: box.bottom - box.top }), beginText(), setFontAndSize(key, size), setFillingRgbColor(c.rgb.red, c.rgb.green, c.rgb.blue)];
+      // (Scaled to the width the layout measured in the page's font: another font's letters fill the same room.)
+      if (natural > 0 && Math.abs(want - natural) > 0.1) ops.push(PDFOperator.of(PDFOperatorNames.SetTextHorizontalScaling, [PDFNumber.of(+(100 * want / natural).toFixed(2))]));
+      ops.push(setTextMatrix(1, 0, 0, 1, X(piece.r.left), Y(piece.r.top + ascent(cs))), showText(font.encodeText(safe)), endText(), popGraphicsState());
+      page.pushOperators(...ops);
+      // Underline and strikethrough, from the cell text's own decoration.
+      const lines = cs.textDecorationLine || '';
+      const y = Y(piece.r.top + ascent(cs));
+      const thick = Math.max(0.5, size / 18);
+      if (lines.includes('underline')) page.drawLine({ start: { x: X(piece.r.left), y: y - size * 0.12 }, end: { x: X(piece.r.left) + want, y: y - size * 0.12 }, thickness: thick, color: c.rgb });
+      if (lines.includes('line-through')) page.drawLine({ start: { x: X(piece.r.left), y: y + size * 0.3 }, end: { x: X(piece.r.left) + want, y: y + size * 0.3 }, thickness: thick, color: c.rgb });
+    }
+  }
+}
+
+/** A text node's pieces, one per line it's on (wrapped cell text): [{ text, r }]. */
+function pieces(t, rg) {
+  const out = [];
+  const n = t.data.length;
+  let from = 0;
+  while (from < n) {
+    rg.setStart(t, from); rg.setEnd(t, from + 1);
+    const first = rg.getClientRects()[0];
+    if (!first) { from++; continue; }
+    let lo = from, hi = n - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      rg.setStart(t, mid); rg.setEnd(t, mid + 1);
+      const q = rg.getClientRects()[0];
+      if (q && Math.abs(q.top - first.top) < 2) lo = mid; else hi = mid - 1;
+    }
+    let end = lo + 1;
+    while (end > from + 1 && t.data[end - 1] === ' ' && end < n) end--;
+    rg.setStart(t, from); rg.setEnd(t, end);
+    const r = rg.getBoundingClientRect();
+    if (r.width > 0) out.push({ text: t.data.slice(from, end), r: { left: r.left, top: r.top, width: r.width, height: r.height } });
+    from = lo + 1;
+  }
+  return out;
+}
+
+/** A font file of its own from a collection (.ttc): the font whose PostScript name is `ps` (else the first). */
+function fromCollection(bytes, ps) {
+  const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  if (bytes.length < 12 || dv.getUint32(0) !== 0x74746366) return bytes; // 'ttcf'
+  const offsets = Array.from({ length: dv.getUint32(8) }, (_, k) => dv.getUint32(12 + 4 * k));
+  const tables = (at) => Array.from({ length: dv.getUint16(at + 4) }, (_, k) => {
+    const r = at + 12 + 16 * k;
+    return { tag: dv.getUint32(r), sum: dv.getUint32(r + 4), off: dv.getUint32(r + 8), len: dv.getUint32(r + 12) };
+  });
+  const psName = (at) => {
+    const name = tables(at).find((t) => t.tag === 0x6e616d65); // 'name'
+    if (!name) return null;
+    const count = dv.getUint16(name.off + 2), strings = name.off + dv.getUint16(name.off + 4);
+    for (let k = 0; k < count; k++) {
+      const r = name.off + 6 + 12 * k;
+      if (dv.getUint16(r + 6) !== 6) continue;
+      const platform = dv.getUint16(r), len = dv.getUint16(r + 8), off = strings + dv.getUint16(r + 10);
+      let s = '';
+      if (platform === 3 || platform === 0) for (let j = 0; j < len; j += 2) s += String.fromCharCode(dv.getUint16(off + j));
+      else for (let j = 0; j < len; j++) s += String.fromCharCode(bytes[off + j]);
+      return s;
+    }
+    return null;
+  };
+  const at = offsets.find((o) => psName(o) === ps) ?? offsets[0];
+  const list = tables(at);
+  const head = 12 + 16 * list.length;
+  const out = new Uint8Array(head + list.reduce((t, x) => t + ((x.len + 3) & ~3), 0));
+  const ov = new DataView(out.buffer);
+  ov.setUint32(0, dv.getUint32(at));
+  for (let k = 4; k < 12; k += 2) ov.setUint16(k, dv.getUint16(at + k));
+  let pos = head;
+  list.forEach((t, k) => {
+    const r = 12 + 16 * k;
+    ov.setUint32(r, t.tag); ov.setUint32(r + 4, t.sum); ov.setUint32(r + 8, pos); ov.setUint32(r + 12, t.len);
+    out.set(bytes.subarray(t.off, t.off + t.len), pos);
+    pos += (t.len + 3) & ~3;
+  });
+  return out;
+}
+
+/** CSS color to pdf-lib's, with its alpha; null when transparent. */
+function color(css) {
+  const m = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/.exec(css || '');
+  if (!m) return null;
+  const a = m[4] == null ? 1 : +m[4];
+  if (a < 0.02) return null;
+  return { rgb: rgb(+m[1] / 255, +m[2] / 255, +m[3] / 255), a };
+}

@@ -4,6 +4,7 @@
 // standards mode (LESSONS.md section 4), or the run stops.
 // usage: node tools/excel-compare/print-ours.mjs <xlsxDir> <outDir>   (from the repository, after `node build.mjs`)
 //   BROWSER_CHANNEL=msedge (default) | chrome; CHROMIUM_PATH=<executable> instead; OXE_JOBS=4
+//   OXE_EXPORT=1: the PDF made by src/pdf.js exportPdf (the installed fonts allowed) instead of the browser's print
 // Use the browser your users print from: its fonts and font rendering are part of what's measured (Edge on Windows).
 import { chromium } from 'playwright';
 import http from 'node:http';
@@ -27,7 +28,9 @@ const todo = fs.readdirSync(dir).filter((f) => /\.xls[xm]$/i.test(f) && !fs.exis
 let done = 0;
 let quirks = false;
 const one = async (f) => {
-  const page = await browser.newPage({ viewport: { width: 1300, height: 1000 } });
+  const context = await browser.newContext({ viewport: { width: 1300, height: 1000 } });
+  if (process.env.OXE_EXPORT) await context.grantPermissions(['local-fonts']).catch(() => {});
+  const page = await context.newPage();
   try {
     await Promise.race([(async () => {
       await page.goto(url);
@@ -36,13 +39,24 @@ const one = async (f) => {
       await page.waitForFunction((n) => window.oxe.fileName === n || /Could not open/.test(document.getElementById('status').textContent), f);
       const pages = await page.evaluate(() => window.oxe.preparePrint());
       if (!pages) throw new Error(await page.evaluate(() => document.getElementById('status').textContent));
-      await page.emulateMedia({ media: 'print' });
       await page.evaluate(() => document.fonts.ready);
-      await page.pdf({ path: pdfName(f), preferCSSPageSize: true, printBackground: true });
+      if (process.env.OXE_EXPORT) {
+        const b64 = await page.evaluate(async () => {
+          const { exportPdf } = await import('/dist/pdf.js');
+          const bytes = await exportPdf(window.oxe);
+          let s = '';
+          for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+          return btoa(s);
+        });
+        fs.writeFileSync(pdfName(f), Buffer.from(b64, 'base64'));
+      } else {
+        await page.emulateMedia({ media: 'print' });
+        await page.pdf({ path: pdfName(f), preferCSSPageSize: true, printBackground: true });
+      }
     })(), new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 150000))]);
     done++;
   } catch (e) { console.log('FAILED', f, e.message); }
-  await page.close();
+  await context.close();
 };
 const jobs = Number(process.env.OXE_JOBS || 4);
 await Promise.all(Array.from({ length: jobs }, async () => { while (todo.length && !quirks) await one(todo.shift()); }));

@@ -313,6 +313,17 @@
     --oxe-rowhead-w: 0px;
   }
 }
+/* PDF export (pdf.js): the printed pages shown off-screen while they are measured, in print's colours. */
+.oxe-exporting > .oxe-print {
+  display: block;
+  position: fixed;
+  left: -100000px;
+  top: 0;
+  background: #ffffff;
+  --oxe-bg: #ffffff;
+  --oxe-fg: #000000;
+  --oxe-rowhead-w: 0px;
+}
 .oxe-page {
   position: relative;
   width: var(--oxe-page-w);
