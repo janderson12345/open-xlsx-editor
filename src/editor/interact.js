@@ -156,6 +156,7 @@ export function attachEditing(root, ctx) {
     else if (key === 'End' && ctrl) cmd.run('end');
     else if ((key === 'PageDown' || key === 'PageUp') && ctrl) cmd.run('nextSheet', key === 'PageDown' ? 1 : -1);
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
+    else if (key === 'F2' && e.shiftKey) { if (!ctx.toggleNote?.()) announce('This cell has no note'); }
     else if (key === 'F2') startEdit('edit');
     else if (key === 'F11' && e.shiftKey) cmd.run('insertSheet');
     else if (key === 'Delete') cmd.run('clear');

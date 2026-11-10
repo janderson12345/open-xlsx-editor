@@ -1284,3 +1284,57 @@
 .oxe-filter-list .oxe-dialog-option[hidden] {
   display: none;
 }
+
+/* Notes and comment threads (notemarks.js): Excel's red corner mark, purple for a thread, and the box beside the cell. */
+.oxe-notes {
+  position: absolute;
+  top: var(--oxe-colhead-h);
+  left: 0;
+  width: var(--oxe-sheet-w);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+  z-index: 2;
+  pointer-events: none;
+}
+.oxe-note-mark {
+  position: absolute;
+  left: calc(var(--oxe-x) - 6px);
+  top: var(--oxe-y);
+  width: 0;
+  height: 0;
+  border-top: 6px solid #e00000;
+  border-left: 6px solid transparent;
+}
+.oxe-note-mark.oxe-thread-mark {
+  border-top-color: #9c27b0;
+}
+.oxe-note-box {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  width: 200px;
+  padding: 4px 6px;
+  border: 1px solid #767676;
+  background: #ffffe1;
+  color: #000000;
+  font: 12px/1.35 var(--oxe-ui-font);
+  white-space: pre-wrap;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25);
+}
+.oxe-thread-box {
+  width: 240px;
+  background: #ffffff;
+  border-color: #9c27b0;
+  white-space: normal;
+}
+.oxe-thread-item + .oxe-thread-item {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #dddddd;
+}
+.oxe-thread-date {
+  color: #595959;
+  font-size: 11px;
+}
+.oxe-thread-text {
+  white-space: pre-wrap;
+}

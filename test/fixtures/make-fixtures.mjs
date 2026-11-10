@@ -9,6 +9,8 @@
 // prefixed.xlsx  the same vocabulary under an `x:` prefix, with rows and cells that leave `r` implied, inline strings
 //                only (no shared strings part).
 // large.xlsx     5,000 rows by 20 columns, for the virtualised grid.
+// notes.xlsx     notes and a threaded comment with a reply, written as Excel writes them (comments, the VML that
+//                shows notes, threadedComments, persons), made-up people.
 //
 // The zips are written with a fixed date, so the files only change when this script does.
 import fs from 'node:fs';
@@ -576,6 +578,51 @@ function formulas() {
   });
 }
 
+// Notes and a threaded comment as Excel 365 writes them (its parts and XML read from a workbook Excel saved): a note's
+// text in comments1.xml with its box in a VML drawing; a threaded comment in threadedComments with its people in
+// persons, and a placeholder note for older versions. The people are made up.
+function notes() {
+  const VML_NS = 'xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"';
+  const shape = (n, r, c) => `<v:shape id="_x0000_s${1024 + n}" type="#_x0000_t202" style='position:absolute;margin-left:${60 + c * 48}pt;margin-top:${r * 15}pt;width:108pt;height:59.25pt;z-index:${n};visibility:hidden' fillcolor="infoBackground [80]" strokecolor="none [81]" o:insetmode="auto">` +
+    `<v:fill color2="infoBackground [80]"/><v:shadow color="none [81]" obscured="t"/><v:path o:connecttype="none"/><v:textbox style='mso-direction-alt:auto'><div style='text-align:left'></div></v:textbox>` +
+    `<x:ClientData ObjectType="Note"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>${c + 1}, 15, ${r}, 10, ${c + 3}, 31, ${r + 4}, 9</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>${r}</x:Row><x:Column>${c}</x:Column></x:ClientData></v:shape>`;
+  const vml = `<xml ${VML_NS}><o:shapelayout v:ext="edit"><o:idmap v:ext="edit" data="1"/></o:shapelayout><v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe"><v:stroke joinstyle="miter"/><v:path gradientshapeok="t" o:connecttype="rect"/></v:shapetype>` +
+    shape(1, 1, 1) + shape(2, 2, 2) + shape(3, 3, 3) + '</xml>';
+  const run = (t, bold) => `<r><rPr>${bold ? '<b/>' : ''}<sz val="9"/><color indexed="81"/><rFont val="Tahoma"/><family val="2"/></rPr><t xml:space="preserve">${esc(t)}</t></r>`;
+  const TC = '{6F1D3C2A-0B4E-4D7A-9C1E-2A3B4C5D6E7F}';
+  const placeholder = ['[Threaded comment]', '', 'Your version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924',
+    '', 'Comment:', '    Is this the right total?', 'Reply:', '    Yes, checked against the invoice.'].join('\n');
+  const comments = `${DECL}<comments xmlns="${X}"><authors><author>Avery Chen</author><author>tc=${TC}</author></authors><commentList>` +
+    `<comment ref="B2" authorId="0" shapeId="0"><text>${run('Avery Chen:', true)}${run('\nCheck this total', false)}</text></comment>` +
+    `<comment ref="C3" authorId="1" shapeId="0"><text><t>${esc(placeholder)}</t></text></comment>` +
+    `<comment ref="D4" authorId="0" shapeId="0"><text>${run('Avery Chen:', true)}${run('\nFirst line\nSecond line', false)}</text></comment></commentList></comments>`;
+  const TN = 'http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments';
+  const AVERY = '{1A2B3C4D-5E6F-4A1B-8C2D-3E4F5A6B7C8D}';
+  const SAM = '{9F8E7D6C-5B4A-4C3D-8E2F-1A0B9C8D7E6F}';
+  const threaded = `${DECL}<ThreadedComments xmlns="${TN}" xmlns:x="${X}"><threadedComment ref="C3" dT="2026-01-01T09:30:00.00" personId="${AVERY}" id="${TC}"><text>Is this the right total?</text></threadedComment>` +
+    `<threadedComment ref="C3" dT="2026-01-02T14:05:00.00" personId="${SAM}" id="{2B3C4D5E-6F7A-4B8C-9D0E-1F2A3B4C5D6E}" parentId="${TC}"><text>Yes, checked against the invoice.</text></threadedComment></ThreadedComments>`;
+  const persons = `${DECL}<personList xmlns="${TN}" xmlns:x="${X}"><person displayName="Avery Chen" id="${AVERY}" userId="avery@example.com" providerId="None"/><person displayName="Sam Rivera" id="${SAM}" userId="sam@example.com" providerId="None"/></personList>`;
+  const v = (ref, n) => `<c r="${ref}"><v>${n}</v></c>`;
+  const t = (ref, text) => `<c r="${ref}" t="inlineStr"><is><t>${esc(text)}</t></is></c>`;
+  const data = `<row r="1">${t('A1', 'Item')}${t('B1', 'Total')}</row><row r="2">${t('A2', 'apples')}${v('B2', 12)}</row><row r="3">${t('A3', 'pears')}${v('C3', 30)}</row><row r="4">${t('A4', 'figs')}${v('D4', 7)}</row><row r="5">${t('A5', 'plain')}${v('B5', 1)}</row>`;
+  write('notes.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')],
+      ['xl/comments1.xml', CT('comments')], ['xl/threadedComments/threadedComment1.xml', 'application/vnd.ms-excel.threadedcomments+xml'], ['xl/persons/person.xml', 'application/vnd.ms-excel.person+xml'], ...PROPS_CT])
+      .replace('<Default Extension="xml"', '<Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/><Default Extension="xml"'),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Notes" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', 'http://schemas.microsoft.com/office/2017/10/relationships/person', 'persons/person.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><sheetData>${data}</sheetData><legacyDrawing r:id="rId1"/></worksheet>`,
+    'xl/worksheets/_rels/sheet1.xml.rels': rels([['rId1', RT('vmlDrawing'), '../drawings/vmlDrawing1.vml'], ['rId2', RT('comments'), '../comments1.xml'], ['rId3', 'http://schemas.microsoft.com/office/2017/10/relationships/threadedComment', '../threadedComments/threadedComment1.xml']]),
+    'xl/drawings/vmlDrawing1.vml': vml,
+    'xl/comments1.xml': comments,
+    'xl/threadedComments/threadedComment1.xml': threaded,
+    'xl/persons/person.xml': persons,
+    'xl/styles.xml': STYLES,
+  });
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   formulas();
   rowHeights();
@@ -588,4 +635,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   prefixed();
   large();
   widths();
+  notes();
 }

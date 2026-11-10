@@ -92,6 +92,25 @@ const printView = await page.evaluate(() => ({
 check(printView.grid === 'none' && printView.pages === 342 && printView.first === 'Column A' && /size: 8.5in 11in/.test(printView.size), 'large: print media shows the pages, not the grid', JSON.stringify(printView));
 await page.emulateMedia({ media: 'screen' });
 
+// Notes: notes.xlsx's two notes marked red, its thread purple; B2 described by its note; the pointer resting on C3
+// shows the thread with both people; Shift+F2 on B2 shows its note with the author in bold, and hides it again.
+await openFixture(page, 'notes.xlsx');
+const marks = await page.evaluate(() => ({ red: document.querySelectorAll('.oxe-grid > * .oxe-note-mark:not(.oxe-thread-mark)').length, purple: document.querySelectorAll('.oxe-grid > * .oxe-thread-mark').length }));
+const b2 = await page.evaluate(() => { const cell = [...document.querySelectorAll('.oxe-row[aria-rowindex="3"] .oxe-cell')].find((x) => x.getAttribute('aria-colindex') === '3'); const id = cell?.getAttribute('aria-describedby'); return id && document.getElementById(id)?.textContent; });
+check(marks.red === 2 && marks.purple === 1 && b2 === 'Note. Avery Chen: Check this total', 'notes: two red marks, one purple; B2 described by its note', `${JSON.stringify(marks)} ${b2}`);
+const c3 = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const { rows, cols, rowHeadW, colHeadH } = g.geometry(); return { x: v.left + rowHeadW + cols.start(2) + 10, y: v.top + colHeadH + rows.start(2) + 6 }; });
+await page.mouse.move(c3.x, c3.y);
+await page.waitForSelector('.oxe-thread-box', { timeout: 2000 }).catch(() => {});
+const thread = await page.evaluate(() => document.querySelector('.oxe-thread-box')?.textContent || '');
+check(/Avery Chen/.test(thread) && /Sam Rivera/.test(thread) && /checked against the invoice/.test(thread), 'the pointer on C3: the thread, with its reply', thread);
+await page.mouse.move(5, 5);
+await page.evaluate(() => window.oxe.select('B2'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+F2');
+const note = await page.evaluate(() => { const b = document.querySelector('.oxe-note-box:not(.oxe-thread-box)'); return b ? { text: b.textContent, bold: b.querySelector('strong')?.textContent } : null; });
+await page.keyboard.press('Shift+F2');
+check(note?.bold === 'Avery Chen:' && /Check this total/.test(note.text) && !(await page.isVisible('.oxe-note-box')), 'Shift+F2 on B2: its note, the author in bold; again: hidden', JSON.stringify(note));
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

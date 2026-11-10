@@ -9,6 +9,7 @@ import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox } from './editor/dialogs.js';
 import { filterChoices, shownText } from './ooxml/filterops.js';
+import { readNotes } from './ooxml/notes.js';
 import { dataBeside, sortArea, guessHeader, SORT_MESSAGES } from './ooxml/sortops.js';
 import { isDateFormat } from './ooxml/format.js';
 import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
@@ -76,6 +77,7 @@ export function mountXlsxEditor(host, options = {}) {
   const showSheet = (i) => {
     state.sheetIndex = i;
     state.grid.setSheet(state.workbook.sheet(i), state.workbook.sheets[i].name, state.looks);
+    state.grid.setNotes(readNotes(state.workbook, i));
     state.tabs.activate(i);
     showClip();
   };
@@ -387,10 +389,11 @@ export function mountXlsxEditor(host, options = {}) {
       state.sheetIndex = i;
       state.fileName = fileName;
       state.looks = applyCellStyles(root, wb);
-      if (state.grid) state.grid.setSheet(sheet, wb.sheets[i].name, state.looks);
+      if (state.grid) { state.grid.setSheet(sheet, wb.sheets[i].name, state.looks); state.grid.setNotes(readNotes(wb, i)); }
       else {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
         state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
+        state.grid.setNotes(readNotes(wb, i));
         state.editing = attachEditing(root, {
           workbook: () => state.workbook,
           sheetIndex: () => state.sheetIndex,
@@ -411,6 +414,7 @@ export function mountXlsxEditor(host, options = {}) {
           pasteSpecial: () => act('pasteSpecialBox'),
           autoSum: (fn) => act('autoSum', fn),
           filterMenu: () => filterMenu(),
+          toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),

@@ -11,6 +11,7 @@ import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontDescentPx } from './fonts.js';
 import { drawSelection, drawMarks, rangeBox, handleCorner } from './selection.js';
 import { drawFilterButtons } from './filterbuttons.js';
+import { drawNoteMarks } from './notemarks.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -106,9 +107,9 @@ function drawPanes(st, win) {
   const fr = st.freeze?.rows || 0;
   const fc = st.freeze?.cols || 0;
   const paint = (pane, w) => {
-    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer', 'filterLayer']) pane[k].replaceChildren(); return; }
+    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer', 'filterLayer', 'noteLayer']) pane[k].replaceChildren(); return; }
     // (The pane's own layers; no cell ids, which belong to the sheet's own cells.)
-    const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, filterLayer: pane.filterLayer, idBase: null });
+    const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, filterLayer: pane.filterLayer, noteLayer: pane.noteLayer, noteTexts: null, idBase: null });
     drawGridlines(sub, w);
     const { fills, edges } = decorations(sub, w);
     pane.fills.replaceChildren(...fills);
@@ -116,6 +117,7 @@ function drawPanes(st, win) {
     pane.edges.replaceChildren(...edges);
     drawSelection(sub);
     drawFilterButtons(sub, w);
+    drawNoteMarks(sub, w);
   };
   paint(st.panes.top, fr ? { r0: 0, r1: fr - 1, c0: win.c0, c1: win.c1 } : null);
   paint(st.panes.left, fc ? { r0: win.r0, r1: win.r1, c0: 0, c1: fc - 1 } : null);
@@ -193,6 +195,8 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
   el.setAttribute('aria-colindex', String(c + 2));
   if (st.idBase) el.id = `${st.idBase}-${r}-${c}`;
+  // (A note or comment thread: heard as the cell's description, from notemarks.js's texts.)
+  if (st.idBase && st.notes?.has(`${r},${c}`)) el.setAttribute('aria-describedby', `${st.idBase}-note-${r}-${c}`);
   if (st.sel && r >= st.sel.r0 && r <= st.sel.r1 && c >= st.sel.c0 && c <= st.sel.c1) el.setAttribute('aria-selected', 'true');
   let x = st.cols.start(c);
   let w = st.cols.size(c);
@@ -356,6 +360,7 @@ function draw(st, force = false) {
   drawSelection(st);
   drawMarks(st);
   drawFilterButtons(st, win);
+  drawNoteMarks(st, win);
   if (st.panes) drawPanes(st, win);
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
   if (active) st.view.setAttribute('aria-activedescendant', active.id);
@@ -403,10 +408,10 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     const wrap = div(`oxe-pane ${cls}`);
     wrap.setAttribute('aria-hidden', 'true');
     const inner = div('oxe-pane-inner');
-    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer'), filterLayer: div('oxe-filters') };
+    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer'), filterLayer: div('oxe-filters'), noteLayer: div('oxe-notes') };
     const over = div('oxe-overlay');
     over.append(layers.selLayer);
-    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over, layers.filterLayer);
+    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over, layers.noteLayer, layers.filterLayer);
     wrap.append(inner);
     return { wrap, inner, ...layers };
   };
@@ -417,10 +422,16 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   // (The AutoFilter's buttons: over the cells, clickable, out of the tab order and hidden from assistive technology.)
   const filterLayer = div('oxe-filters');
   filterLayer.setAttribute('aria-hidden', 'true');
-  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, filterLayer);
+  // (Notes: their marks and boxes in a layer hidden from assistive technology, which hears each note as its cell's
+  // description from the hidden texts.)
+  const noteLayer = div('oxe-notes');
+  noteLayer.setAttribute('aria-hidden', 'true');
+  const noteTexts = div('oxe-note-texts');
+  noteTexts.hidden = true;
+  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, noteLayer, filterLayer, noteTexts);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, filterLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, filterLayer, noteLayer, noteTexts, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -470,6 +481,26 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   resize?.observe(view);
   setSheet(sheet, label, looks);
 
+  // (A note's box opens while the pointer rests on its cell, as Excel's does; Shift+F2 keeps it open.)
+  let rest = 0;
+  const showNote = (key, pinned = false) => {
+    if (st.noteOpen === key && st.notePinned === pinned) return;
+    st.noteOpen = key;
+    st.notePinned = pinned;
+    drawNoteMarks(st, st.win);
+  };
+  view.addEventListener('mousemove', (e) => {
+    const rect = view.getBoundingClientRect();
+    const { x, y } = toContent(e.clientX - rect.left, e.clientY - rect.top);
+    const key = x < 0 || y < 0 ? null : `${st.rows.indexAt(y)},${st.cols.indexAt(x)}`;
+    if (key === st.noteHover) return;
+    st.noteHover = key;
+    clearTimeout(rest);
+    if (key && st.notes?.has(key)) rest = setTimeout(() => showNote(key), 250);
+    else if (st.noteOpen && !st.notePinned) showNote(null);
+  });
+  view.addEventListener('mouseleave', () => { clearTimeout(rest); st.noteHover = null; if (st.noteOpen && !st.notePinned) showNote(null); });
+
   return {
     el: view,
     setSheet,
@@ -507,6 +538,19 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     setSelection(sel) {
       st.sel = sel;
       draw(st, true);
+    },
+    /** The sheet's notes and comment threads (ooxml/notes.js readNotes), marked and described. */
+    setNotes(notes) {
+      st.notes = notes;
+      st.noteOpen = null;
+      draw(st, true);
+    },
+    /** Shift+F2: cell (r, c)'s note shown beside it, or hidden again; false when it has none. */
+    toggleNote(r, c) {
+      const key = `${r},${c}`;
+      if (!st.notes?.has(key)) { if (st.noteOpen) showNote(null); return false; }
+      showNote(st.noteOpen === key && st.notePinned ? null : key, true);
+      return true;
     },
     /** What a click on a filter button does: `fn(c, button)`. */
     onFilterButton(fn) { st.onFilter = fn; },

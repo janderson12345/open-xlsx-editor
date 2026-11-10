@@ -104,7 +104,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Charts (`charts`) | Charts | Kept | Series follow a sheet rename. |
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
 | Links (`links`) | Hyperlinks | Kept | Not clickable yet; follow a sheet rename. |
-| Comments (`comments`) | Comments and notes | Kept | Not shown. |
+| Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover and Shift+F2, read to screen readers (docs/NOTES.md). Adding and editing missing; kept. |
 | Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers not printed yet. |
 
 ## Page Layout (`layout`)
@@ -143,7 +143,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Proofing (`proofing`) | Spelling | Missing | |
 | Accessibility (`accessibility`) | Check Accessibility | Missing | |
-| Comments (`comments`) | New, show, delete comments; notes | Kept | |
+| Comments (`comments`) | New, show, delete comments; notes | Partly | Shown (docs/NOTES.md); new, edit and delete missing. |
 | Protect (`protect`) | Protect sheet, protect workbook | Kept | Not enforced: a protected sheet can be edited. |
 
 ## View (`view`)
