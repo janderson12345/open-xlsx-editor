@@ -86,6 +86,18 @@ python tools/excel-compare/diff.py <work folder>/report-1.txt <work folder>/repo
 A layout change is kept when the total doesn't get worse and nothing that got worse is left unexplained. Run twice
 with no change first to learn the noise floor.
 
+## Save fidelity
+
+```sh
+pwsh tools/excel-compare/excel-make-books.ps1 <folder>
+node tools/excel-compare/fidelity.mjs <folder> <out>
+pwsh tools/excel-compare/excel-fidelity.ps1 <folder> <out>
+```
+
+Workbooks made by Excel (or any folder of them) opened, edited and saved by the editor; the parts kept byte for byte
+counted, then Excel compares every cell and the count of each feature in the original and the saved copy
+(docs/FIDELITY.md).
+
 ## The workbooks
 
 Real workbooks are kept out of the repository (`..\samples`), and referred to by label (`sample X014`), never by
