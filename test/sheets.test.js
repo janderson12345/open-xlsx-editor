@@ -94,7 +94,7 @@ test('a delete turns references to the sheet into #REF!, takes its own names awa
   // (Excel's file: <definedName name="Here" localSheetId="0">Data!$B$3</definedName> ... name="LocalOnMy">#REF!<...)
   assert.match(xml, /<definedName name="Here" localSheetId="0">Data!\$B\$3<\/definedName><definedName name="LocalOnMy">#REF!<\/definedName><definedName name="Items">/);
   assert.doesNotMatch(xml, /Mine/);
-  assert.equal(Object.keys(files).filter((p) => p.startsWith('xl/worksheets/')).length, 2);
+  assert.equal(Object.keys(files).filter((p) => /^xl\/worksheets\/[^/]+\.xml$/.test(p)).length, 2, 'two sheet parts left');
   assert.doesNotMatch(strFromU8(files['[Content_Types].xml']), /sheet3\.xml/);
   assert.doesNotMatch(strFromU8(files['xl/_rels/workbook.xml.rels']), /sheet3\.xml/);
 });

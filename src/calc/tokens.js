@@ -34,6 +34,16 @@ const RE_IDENT = /[A-Za-z_\\][A-Za-z0-9_.?\\]*/y;
 const RE_AFTER_REF = /[A-Za-z0-9_.?\\(!]/;
 
 const at = (re, text, i) => { re.lastIndex = i; return re.exec(text); };
+/** Where the brackets opened at i close (a table reference's), nested ones and ' escapes passed over; -1 if never. */
+function bracketsEnd(text, i) {
+  let depth = 0;
+  for (let j = i; j < text.length; j++) {
+    if (text[j] === "'") { j++; continue; }
+    if (text[j] === '[') depth++;
+    else if (text[j] === ']' && --depth === 0) return j + 1;
+  }
+  return -1;
+}
 const okRow = (r) => r >= 0 && r < MAX_ROWS;
 const okCol = (c) => c >= 0 && c < MAX_COLS;
 
@@ -104,7 +114,8 @@ function literal(s) {
 }
 
 /** A formula (without its "=") as tokens { type, text, start, end, ... }: num, str, bool, err (with `value`), ref (with
- *  `sheet`, `book`, `prefix` and `area`, or area null for Sheet1!#REF!), func (a name followed by "("), name, op, punct.
+ *  `sheet`, `book`, `prefix` and `area`, or area null for Sheet1!#REF!), func (a name followed by "("), name, struct (a
+ *  table reference, Fruit[Qty] or [@Qty]: `table` (null when unnamed) and `spec`, the brackets' text), op, punct.
  *  Spaces are skipped (Excel's intersection operator, a space between references, isn't read). */
 export function tokenize(text) {
   const out = [];
@@ -134,6 +145,12 @@ export function tokenize(text) {
       push('err', i + code.length, { value: code });
       continue;
     }
+    if (ch === '[') {
+      const end = bracketsEnd(text, i);
+      if (end < 0) throw new FormulaError('A table reference is missing its closing bracket', i);
+      push('struct', end, { table: null, spec: text.slice(i + 1, end - 1) });
+      continue;
+    }
     const ref = refAt(text, i);
     if (ref) { push('ref', ref.end, ref); continue; }
     let m = at(RE_NUMBER, text, i);
@@ -142,7 +159,11 @@ export function tokenize(text) {
       let j = i + m[0].length;
       while (text[j] === ' ') j++;
       const upper = m[0].toUpperCase();
-      if (text[j] === '(') push('func', i + m[0].length);
+      if (text[i + m[0].length] === '[') {
+        const end = bracketsEnd(text, i + m[0].length);
+        if (end < 0) throw new FormulaError('A table reference is missing its closing bracket', i);
+        push('struct', end, { table: m[0], spec: text.slice(i + m[0].length + 1, end - 1) });
+      } else if (text[j] === '(') push('func', i + m[0].length);
       else if (upper === 'TRUE' || upper === 'FALSE') push('bool', i + m[0].length, { value: upper === 'TRUE' });
       else push('name', i + m[0].length);
       continue;

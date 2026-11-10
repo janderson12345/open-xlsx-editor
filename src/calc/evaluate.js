@@ -135,6 +135,11 @@ export function evaluate(node, ctx, mode = 'scalar') {
     }
     case 'arr': return new Arr(node.rows.map((row) => row.map((v) => (v && v.err ? errorOf(v.err) : v))));
     case 'name': return ctx.name(node.name, mode);
+    case 'struct': {
+      // (A table reference, as the range it stands for from this cell: ooxml/tables.js.)
+      const a = ctx.tableArea ? ctx.tableArea(node.table, node.spec) : { error: '#REF!' };
+      return a.error ? errorOf(a.error) : new Area(a.si, a.r0, a.c0, a.r1, a.c1);
+    }
     case 'neg': case 'pos': case 'pct': {
       const a = operand(evaluate(node.a, ctx, mode), ctx, mode);
       if (a instanceof Arr) return elementwise([a], ctx, ([x]) => unary(node.k, x, ctx));

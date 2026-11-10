@@ -55,6 +55,7 @@ export function parseFormula(text) {
       case 'err': return { k: 'err', v: t.value };
       case 'ref': return t.area ? { k: 'ref', sheet: t.sheet, book: t.book, area: t.area } : { k: 'err', v: '#REF!' };
       case 'name': return { k: 'name', name: t.text };
+      case 'struct': return { k: 'struct', table: t.table, spec: t.spec };
       case 'func': {
         i++; // (its "(")
         const node = { k: 'fn', name: functionName(t.text), args: [] };

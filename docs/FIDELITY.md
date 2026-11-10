@@ -26,12 +26,11 @@ chart taken out of its drawing (Excel wouldn't open it: found).
 
 | Workbooks | Parts kept byte for byte | Cells Excel reads as before | Features Excel counts as before |
 |---|---|---|---|
-| 4 made by Excel (charts, pivot, formats, review) | 62 of 67 | 458 of 458 | all |
+| 4 made by Excel (charts, pivot, formats, review) | 63 of 67 | 458 of 458 | all |
 | 11 test fixtures (all but large.xlsx) | 94 of 105 | 5,789 of 5,789 | all |
 
-Every part that changed is a sheet that was edited, except one: in the pivot workbook `xl/workbook.xml` gains
-`fullCalcOnLoad="1"`, because its table's total row (`SUBTOTAL(109,SalesTable[Units])`) uses a table reference the
-calculation engine doesn't work out yet, and the editor then asks Excel to calculate on opening rather than leave a
-value it couldn't check.
+Every part that changed is a sheet that was edited. (Before table references were worked out, the pivot workbook's
+`xl/workbook.xml` also changed: its table's total row, `SUBTOTAL(109,SalesTable[Units])`, couldn't be checked, and the
+editor asked Excel to calculate on opening. That made 62 of 67.)
 
 The same folders can be pointed at any workbooks; the real ones stay outside the repository and are named by label.

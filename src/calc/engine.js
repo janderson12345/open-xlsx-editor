@@ -4,6 +4,7 @@ import { parseFormula } from './parse.js';
 import { evaluate, result, pick } from './evaluate.js';
 import { Unsupported, E, cellValue } from './values.js';
 import { FUNCTIONS } from './functions.js';
+import { readTables, tableArea } from '../ooxml/tables.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
 /** References wider than this many columns are checked against every change instead of being indexed by column. */
@@ -21,6 +22,13 @@ export class Calc {
      *  the workbook when it opens it. */
     this.incomplete = false;
     this._names = new Map();
+    /** The workbook's tables, for table references (read at the first that needs them). */
+    this._tables = null;
+  }
+
+  get tables() {
+    if (!this._tables) this._tables = readTables(this.book);
+    return this._tables;
   }
 
   /** Read every worksheet's formulas (done once, at the first change). */
@@ -57,6 +65,11 @@ export class Calc {
           if (n.book != null) { e.unsupported = true; return; }
           const s = n.sheet == null ? si : this.book.sheetIndexOf(n.sheet);
           if (s >= 0) e.deps.push({ si: s, r0: Math.min(n.area.r0, n.area.r1), c0: Math.min(n.area.c0, n.area.c1), r1: Math.max(n.area.r0, n.area.r1), c1: Math.max(n.area.c0, n.area.c1) });
+          return;
+        }
+        case 'struct': {
+          const a = tableArea(this.tables, n.table, n.spec, { si, r: e.r, c: e.c });
+          if (!a.error) e.deps.push({ si: a.si, r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 });
           return;
         }
         case 'name': {
@@ -211,6 +224,7 @@ export class Calc {
       rowsOf: (si) => book.sheet(si).cells,
       extent: (si) => { const m = book.sheet(si); return { maxRow: m.maxRow, maxCol: m.maxCol }; },
       sheetIndex: (name) => book.sheetIndexOf(name),
+      tableArea: (table, spec) => tableArea(this.tables, table, spec, ctx.here),
       // (For SUBTOTAL: a cell's own formula, and whether its row is hidden.)
       formulaOf: (si, r, c) => book.sheet(si).cells.get(r)?.get(c)?.f || null,
       rowHidden: (si, r) => !!book.sheet(si).rows.get(r)?.hidden,

@@ -46,7 +46,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Undo and redo | Done | Cell contents and formats across sheets; a sheet rename or delete clears the history, as Excel does. |
 | Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, or a defined name typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). Naming a selection from it, and showing a selected name, missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
-| Recalculation | Done | 519 of 519 test formulas give Excel's results; 181 functions. |
+| Recalculation | Done | 541 of 541 test formulas give Excel's results; 181 functions; table references (Fruit[Qty], [#Totals], [@Qty]). |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
 | Chart sheets | Kept | Tab shown, sheet not opened. |
 | Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |

@@ -564,6 +564,11 @@ export const PROBE_FORMULAS = [
   'SIN(PI()/6)', 'COS(0)', 'TAN(1)', 'ASIN(2)', 'ATAN2(1,1)', 'DEGREES(PI())', 'RADIANS(180)', 'GCD(24,36)', 'GCD(7,0)', 'LCM(4,6)', 'LCM(4,0)',
   'CEILING.MATH(4.3)', 'CEILING.MATH(-4.3)', 'CEILING.MATH(-4.3,1,1)', 'FLOOR.MATH(4.7,2)', 'FLOOR.MATH(-4.7)', 'CEILING.MATH(6.7,0.5)', 'COMBIN(8,3)',
   'COMBIN(3,5)', 'TYPE(1)', 'TYPE("a")', 'TYPE(TRUE)', 'TYPE(#N/A)', 'TYPE({1,2})', 'ERROR.TYPE(#DIV/0!)', 'ERROR.TYPE(1)',
+  // Table references (the table Fruit on Data!A1:E9: ooxml/tables.js)
+  'SUM(Fruit[Qty])', 'SUM(Fruit[Price])', 'COUNTA(Fruit[Name])', 'ROWS(Fruit[#Data])', 'ROWS(Fruit[#All])', 'INDEX(Fruit[#Headers],1,3)',
+  'SUM(Fruit[[Qty]:[Price]])', 'SUMIFS(Fruit[Price],Fruit[Name],"Apple")', 'XLOOKUP("Fig",Fruit[Name],Fruit[Price])', 'SUM(fruit[qty])',
+  'Fruit[[#Headers],[Price]]', 'COLUMNS(Fruit[#All])', 'SUBTOTAL(109,Fruit[Price])', 'Fruit[[#This Row],[Name]]',
+  'AVERAGE(Fruit[[#Data],[Price]])', 'COUNTA(Fruit[[#Headers],[#Data],[Name]])', 'MATCH("Cherry",Fruit[Name],0)', 'SUM(Fruit[[#All],[Qty]:[Price]])',
 ];
 function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
@@ -588,13 +593,18 @@ function formulas() {
     const chain = r === 2 ? num('D2', 1) : r <= 10 ? `<c r="D${r}">${r === 3 ? '<f t="shared" ref="D3:D10" si="0">D2+1</f>' : '<f t="shared" si="0"/>'}</c>` :
       r === 11 ? '<c r="D11"><f>SUM(D2:D10)</f></c>' : '';
     const fwd = r === 2 ? '<c r="E2"><f>E3*2</f></c>' : r === 3 ? num('E3', 5) : '';
+    // (F2:F4 and F12: a table's This Row from another sheet, by the row's number; row 12 is past the table's rows.)
+    const thisRow = r <= 4 || r === 12 ? `<c r="F${r}"><f>Fruit[[#This Row],[Price]]*2</f></c>` : '';
     // (As the file has them: newer functions with their _xlfn. prefix.)
-    return `<row r="${r}">${str(`A${r}`, f)}<c r="B${r}"><f>${esc(normalizeFormula(f))}</f></c>${chain}${fwd}</row>`;
+    return `<row r="${r}">${str(`A${r}`, f)}<c r="B${r}"><f>${esc(normalizeFormula(f))}</f></c>${chain}${fwd}${thisRow}</row>`;
   });
-  const sheet = (rows, cols) => `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/>${cols}<sheetData>${rows.join('')}</sheetData></worksheet>`;
+  const sheet = (rows, cols, tail = '') => `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><sheetFormatPr defaultRowHeight="15"/>${cols}<sheetData>${rows.join('')}</sheetData>${tail}</worksheet>`;
+  const table = `${DECL}<table xmlns="${X}" id="1" name="Fruit" displayName="Fruit" ref="A1:E9" totalsRowShown="0"><autoFilter ref="A1:E9"/>` +
+    '<tableColumns count="5"><tableColumn id="1" name="Name"/><tableColumn id="2" name="Qty"/><tableColumn id="3" name="Price"/><tableColumn id="4" name="Date"/><tableColumn id="5" name="Flag"/></tableColumns>' +
+    '<tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/></table>';
   write('formulas.xlsx', {
     '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/worksheets/sheet2.xml', CT('worksheet')],
-      ['xl/worksheets/sheet3.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ...PROPS_CT]),
+      ['xl/worksheets/sheet3.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/tables/table1.xml', CT('table')], ...PROPS_CT]),
     '_rels/.rels': ROOT_RELS,
     ...docProps(),
     'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Calc" sheetId="1" r:id="rId1"/><sheet name="Data" sheetId="2" r:id="rId2"/>` +
@@ -603,7 +613,9 @@ function formulas() {
     'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('worksheet'), 'worksheets/sheet2.xml'],
       ['rId3', RT('worksheet'), 'worksheets/sheet3.xml'], ['rId4', RT('styles'), 'styles.xml']]),
     'xl/worksheets/sheet1.xml': sheet(calcRows, '<cols><col min="1" max="1" width="50.7109375" customWidth="1"/><col min="2" max="2" width="30.7109375" customWidth="1"/></cols>'),
-    'xl/worksheets/sheet2.xml': sheet(dataRows, ''),
+    'xl/worksheets/sheet2.xml': sheet(dataRows, '', '<tableParts count="1"><tablePart r:id="rId1"/></tableParts>'),
+    'xl/worksheets/_rels/sheet2.xml.rels': rels([['rId1', RT('table'), '../tables/table1.xml']]),
+    'xl/tables/table1.xml': table,
     'xl/worksheets/sheet3.xml': sheet([`<row r="1">${num('A1', 100)}</row>`, `<row r="2">${str('A2', 'text')}</row>`], ''),
     'xl/styles.xml': STYLES,
   });

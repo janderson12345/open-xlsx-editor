@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 519 formula cells with no saved values. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 541 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **519 of 519 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9).
+`test/formulas-excel.json`. `npm test` checks every one: **541 of 541 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9).
 
 ## How it works
 
@@ -21,6 +21,10 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
     GCD, LCM, CEILING.MATH and FLOOR.MATH; TYPE and ERROR.TYPE. Excel raises 1 + rate to a whole number of periods by
     repeated squaring in PV and FV but through logarithms in PMT, and each is computed so, to Excel's last digit. RATE
     and IRR are found by Newton's method (IRR on the discount factor, so IRR({-100,10}) is -0.9).
+  - Table references (`ooxml/tables.js`): Fruit[Qty] is the column's data rows; [#All], [#Data], [#Headers], [#Totals]
+    and two of them together; [[Qty]:[Price]] the columns between; [#This Row] (shown [@Qty]) the formula's own row,
+    from any sheet by the row's number, #VALUE! past the table's rows (Excel's answers in test/formulas-excel.json).
+    Names compare case aside. Typing a table reference into a cell isn't read yet.
   - `values.js` defines the values and how each is coerced into another.
 - **Recalculating** (`engine.js`):
   - **What a change reaches.** On the first change every worksheet's formulas are read, with what each one reads,
