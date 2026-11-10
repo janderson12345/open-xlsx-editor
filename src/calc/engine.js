@@ -211,6 +211,9 @@ export class Calc {
       rowsOf: (si) => book.sheet(si).cells,
       extent: (si) => { const m = book.sheet(si); return { maxRow: m.maxRow, maxCol: m.maxCol }; },
       sheetIndex: (name) => book.sheetIndexOf(name),
+      // (For SUBTOTAL: a cell's own formula, and whether its row is hidden.)
+      formulaOf: (si, r, c) => book.sheet(si).cells.get(r)?.get(c)?.f || null,
+      rowHidden: (si, r) => !!book.sheet(si).rows.get(r)?.hidden,
       name: (name, mode) => {
         const t = this.nameTree(name, e.si);
         return t ? evaluate(t, ctx, mode) : E.name;

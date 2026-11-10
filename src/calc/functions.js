@@ -10,20 +10,20 @@ export const FUNCTIONS = Object.create(null);
 /** `names`, space separated. `lift`: a function of single values, worked element by element when an array formula
  *  gives it arrays; `array`: its arguments are worked out as arrays (SUMPRODUCT); `volatile`: worked out again at every
  *  change (NOW, OFFSET). */
-const def = (names, fn, opts = {}) => { for (const n of names.split(' ')) FUNCTIONS[n] = { fn, ...opts }; };
-const lifted = (names, fn) => def(names, fn, { lift: true });
+export const def = (names, fn, opts = {}) => { for (const n of names.split(' ')) FUNCTIONS[n] = { fn, ...opts }; };
+export const lifted = (names, fn) => def(names, fn, { lift: true });
 
-const given = (v) => v !== undefined && v !== MISSING;
+export const given = (v) => v !== undefined && v !== MISSING;
 /** One value of an argument (implicit intersection for a range); an error is thrown. */
-const one = (v, ctx) => {
+export const one = (v, ctx) => {
   const x = scalar(v, ctx);
   if (x instanceof XlError) throw x;
   return x;
 };
-const num = (v, ctx) => toNum(one(v, ctx), ctx.date1904);
-const text = (v, ctx) => toText(one(v, ctx));
+export const num = (v, ctx) => toNum(one(v, ctx), ctx.date1904);
+export const text = (v, ctx) => toText(one(v, ctx));
 const bool = (v, ctx) => toBool(one(v, ctx));
-const opt = (args, i, ctx, dflt, as = num) => (given(args[i]) ? as(args[i], ctx) : args[i] === MISSING ? as(0, ctx) : dflt);
+export const opt = (args, i, ctx, dflt, as = num) => (given(args[i]) ? as(args[i], ctx) : args[i] === MISSING ? as(0, ctx) : dflt);
 
 // ---- Reading ranges
 
@@ -54,7 +54,7 @@ export function* cellsIn(a, ctx) {
 
 /** Every value the arguments hold, { v, direct }: `direct` for one given as an argument itself, not read from a
  *  reference or an array (SUM counts "2" and TRUE typed as arguments, not in cells). */
-function* values(args, ctx) {
+export function* values(args, ctx) {
   for (const a of args) {
     if (a instanceof Area) { for (const [, , v] of cellsIn(a, ctx)) yield { v, direct: false }; }
     else if (a instanceof Union) { for (const x of a.areas) for (const [, , v] of cellsIn(x, ctx)) yield { v, direct: false }; }
@@ -64,7 +64,7 @@ function* values(args, ctx) {
 }
 
 /** The numbers of the arguments, as SUM, AVERAGE, MIN and MAX see them. */
-function numbers(args, ctx) {
+export function numbers(args, ctx) {
   const out = [];
   for (const { v, direct } of values(args, ctx)) {
     if (v instanceof XlError) throw v;
@@ -75,7 +75,7 @@ function numbers(args, ctx) {
 }
 
 /** A range or array as rows and columns with element access. */
-function grid(v, ctx) {
+export function grid(v, ctx) {
   if (v instanceof Area) {
     const ext = ctx.extent(v.si);
     // (Rows beyond the last one used are empty: searches stop there.)
@@ -89,7 +89,7 @@ function grid(v, ctx) {
 }
 
 /** A row or column of a range or array as a list: { length, at(i) }; null if it is two-dimensional. */
-function vector(v, ctx) {
+export function vector(v, ctx) {
   const g = grid(v, ctx);
   if (g.rows === 1) return { length: g.cols, at: (i) => g.at(0, i), vertical: false, g };
   if (g.cols === 1) return { length: Math.min(g.rows, Math.max(g.used, 1)), at: (i) => g.at(i, 0), vertical: true, g };
@@ -98,7 +98,7 @@ function vector(v, ctx) {
 
 // ---- Rounding, as Excel rounds: on the value's 15 significant decimal digits, so ROUND(2.675, 2) is 2.68.
 
-function roundDec(x, n, how) {
+export function roundDec(x, n, how) {
   if (!Number.isFinite(x) || x === 0) return x;
   n = Math.trunc(n);
   const [mant, e = '0'] = Math.abs(x).toPrecision(15).split('e');
@@ -483,7 +483,7 @@ function exactly(x, wild) {
  * equal values that follow it. -1 (sorted down: MATCH -1): a scan from the start, blanks and other types passed over,
  * that takes the first exact match and stops at the first value below x.
  */
-function position(list, x, how, wild = true) {
+export function position(list, x, how, wild = true) {
   if (how === 0) {
     const eq = exactly(x, wild);
     for (let i = 0; i < list.length; i++) if (eq(list.at(i))) return i;
@@ -745,8 +745,8 @@ def('MINIFS', (a, ctx) => { const n = gather(a[0], pairsFrom(a, 1, ctx), ctx); r
 
 // ---- Dates and times (serial numbers: days since 1900-01-00, or 1904-01-01 in the 1904 system)
 
-const serialOf = (v, ctx) => { const n = num(v, ctx); if (n < 0) throw E.num; return n; };
-const parts = (v, ctx) => dateParts(serialOf(v, ctx), ctx.date1904);
+export const serialOf = (v, ctx) => { const n = num(v, ctx); if (n < 0) throw E.num; return n; };
+export const parts = (v, ctx) => dateParts(serialOf(v, ctx), ctx.date1904);
 const daysIn = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
 function nowSerial(ctx) {
   const d = new Date();

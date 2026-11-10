@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 399 formula cells with no saved values. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 519 formula cells with no saved values. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **399 of 399 as Excel**.
+`test/formulas-excel.json`. `npm test` checks every one: **519 of 519 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9).
 
 ## How it works
 
@@ -15,6 +15,12 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
   - `evaluate.js` handles the operators, references and names.
   - `functions.js` holds about 130 functions: maths, statistics, logic, information, text, lookup (VLOOKUP, INDEX,
     MATCH, XLOOKUP, OFFSET, INDIRECT), the IF/IFS family and dates.
+  - `functions-more.js` holds 54 more: SUBTOTAL (hidden rows left out by 101 to 111, other subtotals always), RANK,
+    PERCENTILE, QUARTILE and MODE; NETWORKDAYS, WORKDAY, DATEDIF, WEEKNUM, ISOWEEKNUM and YEARFRAC; PMT, PV, FV, NPER,
+    RATE, NPV and IRR; LOOKUP, XMATCH and ADDRESS; TEXTBEFORE, TEXTAFTER, NUMBERVALUE, FIXED and DOLLAR; trigonometry,
+    GCD, LCM, CEILING.MATH and FLOOR.MATH; TYPE and ERROR.TYPE. Excel raises 1 + rate to a whole number of periods by
+    repeated squaring in PV and FV but through logarithms in PMT, and each is computed so, to Excel's last digit. RATE
+    and IRR are found by Newton's method (IRR on the discount factor, so IRR({-100,10}) is -0.9).
   - `values.js` defines the values and how each is coerced into another.
 - **Recalculating** (`engine.js`):
   - **What a change reaches.** On the first change every worksheet's formulas are read, with what each one reads,

@@ -9,7 +9,8 @@ export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '
 /** Functions newer than Excel 2007, which the file names with a prefix (`_xlfn.CONCAT`) so that older versions show
  *  #NAME? instead of misreading them. Only the ones the engine knows: others typed are kept as typed. */
 export const PREFIXED = new Set(['CONCAT', 'TEXTJOIN', 'IFS', 'SWITCH', 'MAXIFS', 'MINIFS', 'XLOOKUP', 'XMATCH', 'IFNA',
-  'DAYS', 'XOR', 'STDEV.S', 'STDEV.P', 'VAR.S', 'VAR.P', 'CEILING.MATH', 'FLOOR.MATH', 'ISOWEEKNUM']);
+  'DAYS', 'XOR', 'STDEV.S', 'STDEV.P', 'VAR.S', 'VAR.P', 'CEILING.MATH', 'FLOOR.MATH', 'ISOWEEKNUM', 'PERCENTILE.INC', 'PERCENTILE.EXC',
+  'QUARTILE.INC', 'QUARTILE.EXC', 'RANK.EQ', 'RANK.AVG', 'MODE.SNGL', 'TEXTBEFORE', 'TEXTAFTER', 'NUMBERVALUE', 'UNICODE', 'UNICHAR']);
 
 export class FormulaError extends Error {
   constructor(message, pos) {

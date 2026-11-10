@@ -533,6 +533,37 @@ export const PROBE_FORMULAS = [
   '1E-16&""', '1E-17&""', '1E-18&""', '1.2345E-14&""', '1.23456E-14&""', '1.5E-18&""', '1.23456789012345E-5&""', '99999999999999999999&""',
   '1.5E+19&""', '-1E-15&""', '0.5-0.4-0.1', '0.1+0.2-0.3+0', '1+1E-15-1', '1-1E-15-1', '2.3-2.2-0.1', 'Data!C2-1.5', '-(0.1+0.2-0.3)',
   '0.1+0.2-0.3>0', '10*(0.1+0.2)-3', '(0.1+0.2)*10-3', '100-99.99', '1E-14+1-1', 'SUM(0.1,0.2,-0.3)', '{1,2,3}*2', 'ROUND({1.2,2.7},0)',
+  // SUBTOTAL, ranks, percentiles, quartiles, the mode (functions-more.js)
+  'SUBTOTAL(9,Data!C2:C9)', 'SUBTOTAL(1,Data!C2:C9)', 'SUBTOTAL(2,Data!B2:B9)', 'SUBTOTAL(3,Data!A2:A9)', 'SUBTOTAL(4,Data!C2:C9)',
+  'SUBTOTAL(109,Data!C2:C9)', 'SUBTOTAL(12,Data!C2:C9)', 'RANK(4,Data!C2:C9)', 'RANK(4,Data!C2:C9,1)', 'RANK.EQ(2,Data!B2:B9)',
+  'RANK.AVG(2,Data!B2:B9)', 'RANK(9,Data!C2:C9)', 'PERCENTILE(Data!C2:C9,0.3)', 'PERCENTILE.INC(Data!C2:C9,1)', 'PERCENTILE.EXC(Data!C2:C9,0.25)',
+  'PERCENTILE.EXC(Data!C2:C9,0.05)', 'QUARTILE(Data!C2:C9,1)', 'QUARTILE.INC(Data!C2:C9,3)', 'QUARTILE.EXC(Data!C2:C9,2)', 'QUARTILE(Data!C2:C9,5)',
+  'MODE(1,2,2,3,3)', 'MODE.SNGL(Data!B2:B9)', 'MODE(1,2,3)', 'AVERAGEA(Data!E2:E9)', 'MAXA(Data!E2:E9)', 'MINA(Data!A2:A3,-1)',
+  // Working days, DATEDIF, weeks, YEARFRAC
+  'NETWORKDAYS(DATE(2024,1,1),DATE(2024,1,31))', 'NETWORKDAYS(DATE(2024,1,31),DATE(2024,1,1))', 'NETWORKDAYS(DATE(2024,1,1),DATE(2024,1,31),{45293,45296})',
+  'WORKDAY(DATE(2024,1,5),1)', 'WORKDAY(DATE(2024,1,8),-3)', 'WORKDAY(DATE(2024,1,1),10,DATE(2024,1,2))',
+  'DATEDIF(DATE(2020,5,15),DATE(2024,3,10),"Y")', 'DATEDIF(DATE(2020,5,15),DATE(2024,3,10),"M")', 'DATEDIF(DATE(2020,5,15),DATE(2024,3,10),"D")',
+  'DATEDIF(DATE(2020,5,15),DATE(2024,3,10),"YM")', 'DATEDIF(DATE(2020,5,15),DATE(2024,3,10),"MD")', 'DATEDIF(DATE(2020,5,15),DATE(2024,3,10),"YD")',
+  'DATEDIF(DATE(2024,3,1),DATE(2024,1,1),"D")', 'WEEKNUM(DATE(2024,1,1))', 'WEEKNUM(DATE(2024,1,7))', 'WEEKNUM(DATE(2024,1,7),2)',
+  'WEEKNUM(DATE(2024,12,31),21)', 'ISOWEEKNUM(DATE(2021,1,1))', 'ISOWEEKNUM(DATE(2024,12,30))', 'YEARFRAC(DATE(2024,1,1),DATE(2024,7,1))',
+  'YEARFRAC(DATE(2024,1,1),DATE(2024,7,1),1)', 'YEARFRAC(DATE(2023,1,31),DATE(2024,2,29),0)', 'YEARFRAC(DATE(2020,3,15),DATE(2024,9,1),1)',
+  'YEARFRAC(DATE(2024,1,1),DATE(2024,7,1),2)', 'YEARFRAC(DATE(2024,1,1),DATE(2024,7,1),3)', 'YEARFRAC(DATE(2024,1,31),DATE(2024,3,31),4)',
+  // Loans and investments
+  'PMT(0.05/12,360,200000)', 'PMT(0,12,1200)', 'PMT(0.06/12,60,-20000,0,1)', 'PV(0.08/12,240,-500)', 'FV(0.06/12,120,-100)', 'FV(0.05,10,-100,-1000,1)',
+  'NPER(0.01,-100,1000)', 'NPER(0,-100,1000)', 'RATE(48,-200,8000)', 'RATE(10,-100,1000)', 'NPV(0.1,-10000,3000,4200,6800)',
+  'IRR({-70000,12000,15000,18000,21000,26000})', 'IRR({-100,10})',
+  // LOOKUP, XMATCH, ADDRESS
+  'LOOKUP(4.5,{1,2,3,4,5},{"a","b","c","d","e"})', 'LOOKUP("Cherry",Data!A2:A9)', 'LOOKUP(0,{1,2})', 'XMATCH(4,Data!C2:C9)', 'XMATCH(5,{1,3,5,7},1)',
+  'XMATCH(4,{1,3,5,7},-1)', 'XMATCH(4,{1,3,5,7},1)', 'XMATCH("App*",Data!A2:A9,2)', 'XMATCH(2,{1,2,2,3},0,-1)', 'ADDRESS(2,3)', 'ADDRESS(2,3,4)',
+  'ADDRESS(2,3,2,FALSE)', 'ADDRESS(1,28,1,TRUE,"My Data")',
+  // Text
+  'TEXTBEFORE("a-b-c","-")', 'TEXTBEFORE("a-b-c","-",2)', 'TEXTAFTER("a-b-c","-",-1)', 'TEXTAFTER("a-b-c","x")', 'TEXTAFTER("a-b-c","x",1,0,0,"none")',
+  'TEXTBEFORE("A-B","b",1,1)', 'NUMBERVALUE("1.234,5",",",".")', 'NUMBERVALUE("12%")', 'NUMBERVALUE(" 3 000 ")', 'FIXED(1234.567)', 'FIXED(1234.567,1,TRUE)',
+  'FIXED(-1234.5,-2)', 'DOLLAR(-1234.567)', 'DOLLAR(0.5,0)', 'UNICODE("A")', 'UNICHAR(9731)',
+  // Trigonometry, GCD, LCM, rounding to a multiple, COMBIN, TYPE, ERROR.TYPE
+  'SIN(PI()/6)', 'COS(0)', 'TAN(1)', 'ASIN(2)', 'ATAN2(1,1)', 'DEGREES(PI())', 'RADIANS(180)', 'GCD(24,36)', 'GCD(7,0)', 'LCM(4,6)', 'LCM(4,0)',
+  'CEILING.MATH(4.3)', 'CEILING.MATH(-4.3)', 'CEILING.MATH(-4.3,1,1)', 'FLOOR.MATH(4.7,2)', 'FLOOR.MATH(-4.7)', 'CEILING.MATH(6.7,0.5)', 'COMBIN(8,3)',
+  'COMBIN(3,5)', 'TYPE(1)', 'TYPE("a")', 'TYPE(TRUE)', 'TYPE(#N/A)', 'TYPE({1,2})', 'ERROR.TYPE(#DIV/0!)', 'ERROR.TYPE(1)',
 ];
 function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
