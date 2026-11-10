@@ -33,7 +33,7 @@ const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', togg
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   pasteSpecial: 'clipboard', pasteSpecialBox: 'clipboard', pasteAs: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing', clearAs: 'editing', fill: 'editing', autoFill: 'editing',
-  sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing' };
+  sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing', autoSum: 'editing' };
 /** The Paste menu's choices, as Paste Special options. */
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
@@ -154,6 +154,12 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'pasteSpecialBox') return pasteSpecialBox();
     if (name === 'sortAsc' || name === 'sortDesc') return sortQuick(name === 'sortDesc');
     if (name === 'sortBox') return customSort();
+    if (name === 'autoSum') {
+      // (Where Excel leaves the formula being edited, the cell editor opens with it, waiting for Enter.)
+      const done = editing().run('autoSum', args[0]);
+      if (done?.edit) { state.editing.editWith(done.edit); return true; }
+      return done;
+    }
     if (name === 'pasteAs') return editing().run('pasteSpecial', PASTE_AS[args[0]]);
     if (name === 'merge') {
       // (Excel asks first when values would be discarded.)
@@ -372,6 +378,7 @@ export function mountXlsxEditor(host, options = {}) {
           headerMenu,
           cellMenu,
           pasteSpecial: () => act('pasteSpecialBox'),
+          autoSum: (fn) => act('autoSum', fn),
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),

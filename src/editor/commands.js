@@ -17,6 +17,7 @@ import { shiftCells } from '../ooxml/rowcol.js';
 import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { clearChanges } from '../ooxml/clearops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
+import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -452,6 +453,17 @@ export function createCommands(ctx) {
       if (step.contents.length && !runSteps([step])) return false;
       const order = typeof how === 'string' ? (how === 'desc' ? ', Z to A' : ', A to Z') : '';
       ctx.announce(`Sorted ${refName(plan.area.r0, plan.area.c0)} to ${refName(plan.area.r1, plan.area.c1)}${order}`);
+      return true;
+    },
+    /** AutoSum (Alt+=) and its Average, Count Numbers, Max and Min (`fn`), as one step of the history, the totals
+     *  selected with what they sum (autosumops.js). Where Excel leaves a formula being edited (one cell, or nothing
+     *  found to sum) that cell is selected and { edit: text } returned, for the cell editor to open with it. */
+    autoSum(fn = 'sum') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const step = autoSumOf(ctx.workbook(), ctx.sheetIndex(), state.sel, fn);
+      if (step.edit) { commands.select(step.edit.r, step.edit.c); return { edit: step.edit.text }; }
+      if (!runSteps([step])) return false;
+      show({ ...state.sel, ...step.area }, state.focus, 'AutoSum, ');
       return true;
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */

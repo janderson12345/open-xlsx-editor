@@ -110,6 +110,8 @@ export function homeTab(kit, { act, color }) {
         item('Hide Sheet', f('hideShownSheet')), item('Unhide Sheet...', f('unhideSheet')), el('hr'),
         el('div', { class: 'oxe-cap' }, 'Organize Sheets'), item('Rename Sheet', f('renameShownSheet'))]))),
     grp('Editing', col(
+      split('∑', 'AutoSum (Alt+=)', f('autoSum', 'sum'), () => [item('Sum', f('autoSum', 'sum'), { hint: 'Alt+=' }), item('Average', f('autoSum', 'average')),
+        item('Count Numbers', f('autoSum', 'count')), item('Max', f('autoSum', 'max')), item('Min', f('autoSum', 'min'))], { label: 'AutoSum' }),
       sheetMenu('⬇', 'Fill', 'Fill', () => [item('Down', f('fill', 'down'), { hint: 'Ctrl+D' }), item('Right', f('fill', 'right'), { hint: 'Ctrl+R' }),
         item('Up', f('fill', 'up')), item('Left', f('fill', 'left'))]),
       sheetMenu('⌫', 'Clear', 'Clear', () => [item('Clear All', f('clearAs', 'all')), item('Clear Formats', f('clearFormats')), item('Clear Contents', f('clear'), { hint: 'Delete' })]),

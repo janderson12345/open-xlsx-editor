@@ -1,0 +1,447 @@
+[
+ {
+  "name": "numbers in a column selected",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B2:B5",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "numbers in two columns selected",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B2:C5",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "a column with the blank under it",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B2:B6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "two columns with the blank row under them",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B2:C6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "with a blank row and a blank column",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B2:D6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "the blank row under the table",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "the blank column beside the table",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "D2:D5",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "numbers in a row selected",
+  "setup": {
+   "cells": {
+    "B8": "1",
+    "C8": "2",
+    "D8": "3",
+    "E8": "4"
+   }
+  },
+  "select": "B8:E8",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "a row with the blank beside it",
+  "setup": {
+   "cells": {
+    "B8": "1",
+    "C8": "2",
+    "D8": "3",
+    "E8": "4"
+   }
+  },
+  "select": "B8:F8",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "a blank in the column",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "text in the column",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "x",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "y",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "a number over the numbers",
+  "setup": {
+   "cells": {
+    "B1": "2024",
+    "C1": "2025",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "subtotals in the column",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "B2": "1",
+    "B3": "2",
+    "B4": "=SUM(B2:B3)",
+    "B5": "5",
+    "B6": "6",
+    "B7": "=SUM(B5:B6)",
+    "C1": "Amt",
+    "C2": "10",
+    "C3": "20",
+    "C4": "=SUM(C2:C3)",
+    "C5": "50",
+    "C6": "60",
+    "C7": "=SUM(C5:C6)"
+   }
+  },
+  "select": "B8:C8",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "a gap of two rows",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "B6": "",
+    "D1": "x"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "the cell under is filled",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "B6": "99"
+   }
+  },
+  "select": "B2:B5",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "currency numbers",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   },
+   "formats": [
+    {
+     "range": "B2:B5",
+     "numFmt": "$#,##0.00"
+    },
+    {
+     "range": "C2:C5",
+     "numFmt": "0%"
+    }
+   ]
+  },
+  "select": "B6:C6",
+  "fn": "sum",
+  "read": "A1:F10"
+ },
+ {
+  "name": "average under the table",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "average",
+  "read": "A1:F10"
+ },
+ {
+  "name": "count under the table",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "count",
+  "read": "A1:F10"
+ },
+ {
+  "name": "max under the table",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "max",
+  "read": "A1:F10"
+ },
+ {
+  "name": "min under the table",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "min",
+  "read": "A1:F10"
+ },
+ {
+  "name": "count over text and numbers",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "x",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B6:C6",
+  "fn": "count",
+  "read": "A1:F10"
+ },
+ {
+  "name": "a whole block with totals both ways",
+  "setup": {
+   "cells": {
+    "B1": "Qty",
+    "C1": "Amt",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40"
+   }
+  },
+  "select": "B2:D6",
+  "fn": "average",
+  "read": "A1:F10"
+ }
+]

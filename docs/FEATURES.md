@@ -89,7 +89,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Row height, column width (and AutoFit) | Done | Dragging a heading's edge, double-click and Format's AutoFit, the Row Height and Column Width boxes; stored as Excel stores them. AutoFit's width is within a few pixels of Excel's (docs/SIZES.md). |
 | | Hide and unhide rows, columns | Done | |
 | | Rename, hide and unhide sheet | Done | Cells > Format; moving and tab colour on the tab menu. |
-| Editing (`editing`) | AutoSum | Missing | |
+| Editing (`editing`) | AutoSum | Done | Sum, Average, Count Numbers, Max, Min and Alt+= as Excel places and fills them (docs/AUTOSUM.md). More Functions... missing. |
 | | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
 | | Clear (all, formats, contents) | Partly | Clear All, Clear Formats, Clear Contents as Excel (docs/FORMATS.md). Clear Comments and Notes, Clear Hyperlinks missing. |
 | | Sort & Filter | Partly | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right) as Excel sorts (docs/SORT.md). Filter missing; autofilters kept. |

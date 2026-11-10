@@ -560,6 +560,27 @@ check(headed && byBoth && await value('A1') === 'Item', 'Custom Sort... on A1:F1
 await page.keyboard.press('Control+z');
 check((await rowsOf()).join() === rowsWere.join(), 'Ctrl+Z: as before');
 
+// AutoSum: 5 and 7 typed in Q40:Q41; on Q42 Alt+= opens the cell with Excel's =SUM(Q40:Q41), Enter enters it.
+// Q40:Q42 selected, AutoSum > Average: =AVERAGE(Q40:Q41) in the blank Q42. Ctrl+Z each.
+await page.evaluate(() => window.oxe.select('Q40'));
+await page.focus('.oxe-grid');
+for (const n of ['5', '7']) { await page.keyboard.type(n); await page.keyboard.press('Enter'); }
+await page.keyboard.press('Alt+Equal');
+await page.waitForSelector('.oxe-editor:visible');
+const proposed = await page.evaluate(() => document.querySelector('.oxe-editor').value);
+await page.keyboard.press('Enter');
+const q42 = () => page.evaluate(() => { const c = window.oxe.workbook.sheet(0).cells.get(41)?.get(16); return c && (c.f != null || c.v != null) ? `${c.f}=${c.v}` : ''; });
+check(proposed === '=SUM(Q40:Q41)' && await q42() === 'SUM(Q40:Q41)=12', 'Alt+= under 5 and 7: Excel’s =SUM(Q40:Q41) proposed, Enter: 12', `${proposed} ${await q42()}`);
+await page.keyboard.press('Control+z');
+await page.evaluate(() => window.oxe.select('Q40'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Shift+ArrowDown');
+await menu('AutoSum (Alt+=) options', 'Average');
+check(await q42() === 'AVERAGE(Q40:Q41)=6', 'Q40:Q42, AutoSum > Average: =AVERAGE(Q40:Q41) in the blank Q42', await q42());
+for (let k = 0; k < 3; k++) await page.keyboard.press('Control+z');
+check(await q42() === '' && await value('Q40') === null, 'Ctrl+Z: Q40:Q42 empty again', `${await q42()} ${await value('Q40')} ${await value('Q41')}`);
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);
