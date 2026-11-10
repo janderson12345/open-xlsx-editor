@@ -34,3 +34,21 @@ Every part that changed is a sheet that was edited. (Before table references wer
 editor asked Excel to calculate on opening. That made 62 of 67.)
 
 The same folders can be pointed at any workbooks; the real ones stay outside the repository and are named by label.
+
+## Cached results other readers see (10 November 2026)
+
+A program that reads a workbook without calculating it (openpyxl with `data_only=True`, pandas, most viewers) sees
+each formula's cached result, the `<v>` the last program to save it wrote. The editor writes a result whenever it
+works one out, so after an edit those readers see the new values, not the ones from before it.
+
+Measured on `test/fixtures/formulas.xlsx` (541 formula cells, none with a cached result, as the fixture script writes
+them), Data!B2 set to 7, saved, and read back with openpyxl 3.1.5:
+
+| Saved after | Results written | openpyxl reads as the editor worked them out |
+|---|---|---|
+| The edit alone | the 64 that depend on Data!B2 | 64 of 64 |
+| The edit, then Ctrl+Alt+F9 (`calculate()`) | all 541 | 539 of 541 |
+
+The two that differ are results that are empty text (`T(1)`, `MID` past the end of its text): the editor writes
+`<v></v>` with `t="str"`, and openpyxl reads that as None. The results nothing changed keep the cached
+values the file came with.
