@@ -1,0 +1,40 @@
+// The cases of Excel's automatic value axis (excel-axes.ps1): sets of numbers of many sizes and spreads, all positive,
+// mixed in sign, all negative, small and large, near one another, for column, bar and line charts.
+// usage: node tools/excel-compare/axes-cases.mjs > tools/excel-compare/axes-cases.json
+const cases = [];
+const add = (name, values, type = 'column') => cases.push({ name, values, type });
+add('100 to 322', [100, 137, 174, 211, 248, 285, 322, 109]);
+add('1 to 5', [1, 2, 3, 4, 5]);
+add('0 to 9', [0, 3, 9, 4]);
+add('1 to 10', [1, 10]);
+add('1 to 11', [1, 11]);
+add('1 to 12', [1, 12]);
+add('1 to 19', [1, 19]);
+add('1 to 21', [1, 21]);
+add('1 to 99', [1, 99]);
+add('1 to 101', [1, 101]);
+add('1 to 120', [1, 120]);
+add('3 to 47', [3, 47, 12, 30]);
+add('0.1 to 0.9', [0.1, 0.5, 0.9]);
+add('0.01 to 0.07', [0.01, 0.03, 0.07]);
+add('1234 to 98765', [1234, 50000, 98765]);
+add('2.5 million', [1200000, 2500000, 1800000]);
+add('-5 to 5', [-5, 0, 5]);
+add('-3 to 17', [-3, 17, 8]);
+add('-40 to -2', [-40, -2, -20]);
+add('all equal 7', [7, 7, 7]);
+add('one value 42', [42]);
+add('all zero', [0, 0]);
+add('near: 98 to 102', [98, 100, 102]);
+add('near: 1000 to 1010', [1000, 1004, 1010]);
+add('near: 500 to 600', [500, 550, 600]);
+add('near: 0.9 to 1.1', [0.9, 1, 1.1]);
+add('negative near: -102 to -98', [-102, -100, -98]);
+add('1 to 1000', [1, 1000]);
+add('1 to 1500', [1, 1500]);
+add('17 to 83', [17, 83, 45, 60]);
+add('100 to 322, line', [100, 137, 174, 211, 248, 285, 322, 109], 'line');
+add('near: 98 to 102, line', [98, 100, 102], 'line');
+add('100 to 322, bar', [100, 137, 174, 211, 248, 285, 322, 109], 'bar');
+add('-3 to 17, line', [-3, 17, 8], 'line');
+process.stdout.write(JSON.stringify(cases, null, 1) + '\n');

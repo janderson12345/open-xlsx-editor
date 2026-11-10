@@ -1,0 +1,315 @@
+[
+ {
+  "name": "100 to 322",
+  "values": [
+   100,
+   137,
+   174,
+   211,
+   248,
+   285,
+   322,
+   109
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 5",
+  "values": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "type": "column"
+ },
+ {
+  "name": "0 to 9",
+  "values": [
+   0,
+   3,
+   9,
+   4
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 10",
+  "values": [
+   1,
+   10
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 11",
+  "values": [
+   1,
+   11
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 12",
+  "values": [
+   1,
+   12
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 19",
+  "values": [
+   1,
+   19
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 21",
+  "values": [
+   1,
+   21
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 99",
+  "values": [
+   1,
+   99
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 101",
+  "values": [
+   1,
+   101
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 120",
+  "values": [
+   1,
+   120
+  ],
+  "type": "column"
+ },
+ {
+  "name": "3 to 47",
+  "values": [
+   3,
+   47,
+   12,
+   30
+  ],
+  "type": "column"
+ },
+ {
+  "name": "0.1 to 0.9",
+  "values": [
+   0.1,
+   0.5,
+   0.9
+  ],
+  "type": "column"
+ },
+ {
+  "name": "0.01 to 0.07",
+  "values": [
+   0.01,
+   0.03,
+   0.07
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1234 to 98765",
+  "values": [
+   1234,
+   50000,
+   98765
+  ],
+  "type": "column"
+ },
+ {
+  "name": "2.5 million",
+  "values": [
+   1200000,
+   2500000,
+   1800000
+  ],
+  "type": "column"
+ },
+ {
+  "name": "-5 to 5",
+  "values": [
+   -5,
+   0,
+   5
+  ],
+  "type": "column"
+ },
+ {
+  "name": "-3 to 17",
+  "values": [
+   -3,
+   17,
+   8
+  ],
+  "type": "column"
+ },
+ {
+  "name": "-40 to -2",
+  "values": [
+   -40,
+   -2,
+   -20
+  ],
+  "type": "column"
+ },
+ {
+  "name": "all equal 7",
+  "values": [
+   7,
+   7,
+   7
+  ],
+  "type": "column"
+ },
+ {
+  "name": "one value 42",
+  "values": [
+   42
+  ],
+  "type": "column"
+ },
+ {
+  "name": "all zero",
+  "values": [
+   0,
+   0
+  ],
+  "type": "column"
+ },
+ {
+  "name": "near: 98 to 102",
+  "values": [
+   98,
+   100,
+   102
+  ],
+  "type": "column"
+ },
+ {
+  "name": "near: 1000 to 1010",
+  "values": [
+   1000,
+   1004,
+   1010
+  ],
+  "type": "column"
+ },
+ {
+  "name": "near: 500 to 600",
+  "values": [
+   500,
+   550,
+   600
+  ],
+  "type": "column"
+ },
+ {
+  "name": "near: 0.9 to 1.1",
+  "values": [
+   0.9,
+   1,
+   1.1
+  ],
+  "type": "column"
+ },
+ {
+  "name": "negative near: -102 to -98",
+  "values": [
+   -102,
+   -100,
+   -98
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 1000",
+  "values": [
+   1,
+   1000
+  ],
+  "type": "column"
+ },
+ {
+  "name": "1 to 1500",
+  "values": [
+   1,
+   1500
+  ],
+  "type": "column"
+ },
+ {
+  "name": "17 to 83",
+  "values": [
+   17,
+   83,
+   45,
+   60
+  ],
+  "type": "column"
+ },
+ {
+  "name": "100 to 322, line",
+  "values": [
+   100,
+   137,
+   174,
+   211,
+   248,
+   285,
+   322,
+   109
+  ],
+  "type": "line"
+ },
+ {
+  "name": "near: 98 to 102, line",
+  "values": [
+   98,
+   100,
+   102
+  ],
+  "type": "line"
+ },
+ {
+  "name": "100 to 322, bar",
+  "values": [
+   100,
+   137,
+   174,
+   211,
+   248,
+   285,
+   322,
+   109
+  ],
+  "type": "bar"
+ },
+ {
+  "name": "-3 to 17, line",
+  "values": [
+   -3,
+   17,
+   8
+  ],
+  "type": "line"
+ }
+]

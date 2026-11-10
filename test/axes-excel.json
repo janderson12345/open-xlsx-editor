@@ -1,0 +1,209 @@
+{
+  "excel": "Excel.Application: a chart over the numbers, Axes(xlValue) MinimumScale, MaximumScale, MajorUnit",
+  "cases": [
+    {
+      "name": "100 to 322",
+      "min": 0.0,
+      "max": 350.0,
+      "major": 50.0
+    },
+    {
+      "name": "1 to 5",
+      "min": 0.0,
+      "max": 6.0,
+      "major": 1.0
+    },
+    {
+      "name": "0 to 9",
+      "min": 0.0,
+      "max": 10.0,
+      "major": 1.0
+    },
+    {
+      "name": "1 to 10",
+      "min": 0.0,
+      "max": 12.0,
+      "major": 2.0
+    },
+    {
+      "name": "1 to 11",
+      "min": 0.0,
+      "max": 12.0,
+      "major": 2.0
+    },
+    {
+      "name": "1 to 12",
+      "min": 0.0,
+      "max": 14.0,
+      "major": 2.0
+    },
+    {
+      "name": "1 to 19",
+      "min": 0.0,
+      "max": 20.0,
+      "major": 2.0
+    },
+    {
+      "name": "1 to 21",
+      "min": 0.0,
+      "max": 25.0,
+      "major": 5.0
+    },
+    {
+      "name": "1 to 99",
+      "min": 0.0,
+      "max": 120.0,
+      "major": 20.0
+    },
+    {
+      "name": "1 to 101",
+      "min": 0.0,
+      "max": 120.0,
+      "major": 20.0
+    },
+    {
+      "name": "1 to 120",
+      "min": 0.0,
+      "max": 140.0,
+      "major": 20.0
+    },
+    {
+      "name": "3 to 47",
+      "min": 0.0,
+      "max": 50.0,
+      "major": 5.0
+    },
+    {
+      "name": "0.1 to 0.9",
+      "min": 0.0,
+      "max": 1.0,
+      "major": 0.1
+    },
+    {
+      "name": "0.01 to 0.07",
+      "min": 0.0,
+      "max": 0.08,
+      "major": 0.01
+    },
+    {
+      "name": "1234 to 98765",
+      "min": 0.0,
+      "max": 120000.0,
+      "major": 20000.0
+    },
+    {
+      "name": "2.5 million",
+      "min": 0.0,
+      "max": 3000000.0,
+      "major": 500000.0
+    },
+    {
+      "name": "-5 to 5",
+      "min": -6.0,
+      "max": 6.0,
+      "major": 2.0
+    },
+    {
+      "name": "-3 to 17",
+      "min": -5.0,
+      "max": 20.0,
+      "major": 5.0
+    },
+    {
+      "name": "-40 to -2",
+      "min": -45.0,
+      "max": 0.0,
+      "major": 5.0
+    },
+    {
+      "name": "all equal 7",
+      "min": 0.0,
+      "max": 8.0,
+      "major": 1.0
+    },
+    {
+      "name": "one value 42",
+      "min": 0.0,
+      "max": 45.0,
+      "major": 5.0
+    },
+    {
+      "name": "all zero",
+      "min": 0.0,
+      "max": 1.0,
+      "major": 0.1
+    },
+    {
+      "name": "near: 98 to 102",
+      "min": 96.0,
+      "max": 103.0,
+      "major": 1.0
+    },
+    {
+      "name": "near: 1000 to 1010",
+      "min": 994.0,
+      "max": 1012.0,
+      "major": 2.0
+    },
+    {
+      "name": "near: 500 to 600",
+      "min": 440.0,
+      "max": 620.0,
+      "major": 20.0
+    },
+    {
+      "name": "near: 0.9 to 1.1",
+      "min": 0.0,
+      "max": 1.2000000000000002,
+      "major": 0.2
+    },
+    {
+      "name": "negative near: -102 to -98",
+      "min": -103.0,
+      "max": -96.0,
+      "major": 1.0
+    },
+    {
+      "name": "1 to 1000",
+      "min": 0.0,
+      "max": 1200.0,
+      "major": 200.0
+    },
+    {
+      "name": "1 to 1500",
+      "min": 0.0,
+      "max": 1600.0,
+      "major": 200.0
+    },
+    {
+      "name": "17 to 83",
+      "min": 0.0,
+      "max": 90.0,
+      "major": 10.0
+    },
+    {
+      "name": "100 to 322, line",
+      "min": 0.0,
+      "max": 350.0,
+      "major": 50.0
+    },
+    {
+      "name": "near: 98 to 102, line",
+      "min": 96.0,
+      "max": 103.0,
+      "major": 1.0
+    },
+    {
+      "name": "100 to 322, bar",
+      "min": 0.0,
+      "max": 350.0,
+      "major": 50.0
+    },
+    {
+      "name": "-3 to 17, line",
+      "min": -5.0,
+      "max": 20.0,
+      "major": 5.0
+    }
+  ]
+}

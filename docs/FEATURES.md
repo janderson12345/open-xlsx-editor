@@ -101,7 +101,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Tables (`tables`) | Table, PivotTable | Kept | Pivot sources follow a sheet rename. |
 | Illustrations (`illustrations`) | Pictures, shapes, icons | Kept | Not drawn on the grid. |
-| Charts (`charts`) | Charts | Kept | Series follow a sheet rename. |
+| Charts (`charts`) | Charts | Partly | Column, bar, line, area, pie and doughnut drawn, with Excel's automatic axis (34 of 34) and live data; given to screen readers as figures with tables (docs/CHARTS.md). Editing and other kinds missing; kept. Series follow a sheet rename. |
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
 | Links (`links`) | Hyperlinks | Kept | Not clickable yet; follow a sheet rename. |
 | Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover and Shift+F2, read to screen readers (docs/NOTES.md). Adding and editing missing; kept. |

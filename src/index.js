@@ -12,6 +12,8 @@ import { filterChoices, shownText } from './ooxml/filterops.js';
 import { readNotes } from './ooxml/notes.js';
 import { conditionalLooks } from './ooxml/condformat.js';
 import { ruleAt, listItems } from './ooxml/validation.js';
+import { readCharts } from './ooxml/charts.js';
+import { chartFigure } from './editor/chartview.js';
 import { dataBeside, sortArea, guessHeader, SORT_MESSAGES } from './ooxml/sortops.js';
 import { isDateFormat } from './ooxml/format.js';
 import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
@@ -297,7 +299,16 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     return true;
   };
   /** The shown sheet's conditional formats worked out again (after a change, or another sheet shown). */
-  const showConditional = () => { if (state.grid && state.workbook) state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex)); };
+  const showConditional = () => {
+    if (!state.grid || !state.workbook) return;
+    state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex));
+    // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)
+    const charts = readCharts(state.workbook, state.sheetIndex).filter((c) => c.kind);
+    state.grid.setCharts(charts, state.workbook.theme);
+    let figures = root.querySelector(':scope > .oxe-chart-figures');
+    if (!figures && charts.length) { figures = document.createElement('section'); figures.className = 'oxe-chart-figures'; figures.setAttribute('aria-label', 'Charts on this sheet'); root.append(figures); }
+    figures?.replaceChildren(...charts.map(chartFigure));
+  };
   /** A filter button's list for column c (dialogs.js filterBox), opened under `rect`: its sort, Clear Filter From, or
    *  the values ticked. */
   const openFilter = async (c, rect) => {

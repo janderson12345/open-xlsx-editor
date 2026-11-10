@@ -120,6 +120,17 @@ await page.evaluate(() => window.oxe.enter('B2', '50'));
 const b2Bold = await boldIn('B2');
 check(b7 === '700' && b5 === '400' && b2Bold === '700', 'conditional format: B7 (6) bold, B5 (4) not; B2 typed 50: bold', `${b7} ${b5} ${b2Bold}`);
 
+// Charts: charts.xlsx's four drawn over the cells, each also a figure with its data for a screen reader; 500 typed into
+// B7 (June, North): the first chart's axis goes to 600, as Excel's would.
+await openFixture(page, 'charts.xlsx');
+await page.evaluate(() => window.oxe.setReadOnly(false));
+await page.waitForSelector('.oxe-chart svg');
+const figs = await page.evaluate(() => [...document.querySelectorAll('.oxe-chart-figures figcaption')].map((x) => x.textContent));
+await page.evaluate(() => window.oxe.enter('B7', '500'));
+const topLabel = await page.evaluate(() => Math.max(...[...document.querySelector('.oxe-chart svg').querySelectorAll('text')].map((t) => Number(t.textContent)).filter(Number.isFinite)));
+check(await page.locator('.oxe-chart').count() === 4 && figs.join('|') === 'Column chart: Sales by month|Line chart: Chart 2|Pie chart: North|Bar chart: Sales, stacked' && topLabel === 600,
+  'charts: four drawn, each a figure for a screen reader; B7 typed 500: the first one\'s axis to 600', `${figs.join('|')} ${topLabel}`);
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

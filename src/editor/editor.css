@@ -1411,3 +1411,28 @@
 .oxe-pick-box .oxe-dialog-list {
   min-width: 120px;
 }
+
+/* Charts (chartview.js): each a picture over the cells, where its anchor puts it. */
+.oxe-charts {
+  position: absolute;
+  top: var(--oxe-colhead-h);
+  left: 0;
+  width: var(--oxe-sheet-w);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+  z-index: 2;
+  pointer-events: none;
+}
+.oxe-chart {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  line-height: 0;
+}
+.oxe-chart-figures {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

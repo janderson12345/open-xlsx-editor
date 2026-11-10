@@ -9,6 +9,8 @@
 // prefixed.xlsx  the same vocabulary under an `x:` prefix, with rows and cells that leave `r` implied, inline strings
 //                only (no shared strings part).
 // large.xlsx     5,000 rows by 20 columns, for the virtualised grid.
+// charts.xlsx    four charts (clustered columns, lines, a pie, stacked bars) over a sheet of monthly sales, written as
+//                Excel writes chart parts.
 // notes.xlsx     notes and a threaded comment with a reply, written as Excel writes them (comments, the VML that
 //                shows notes, threadedComments, persons), made-up people.
 //
@@ -666,6 +668,60 @@ function notes() {
   });
 }
 
+// Charts as Excel writes them (a drawing of two-cell anchors, each a graphic frame pointing to a chart part): monthly
+// sales for three regions, drawn four ways.
+function charts() {
+  const C = 'http://schemas.openxmlformats.org/drawingml/2006/chart';
+  const A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
+  const XDR = 'http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing';
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  const regions = { North: [120, 135, 150, 145, 170, 190], South: [80, 95, 90, 110, 105, 125], West: [60, 72, 85, 80, 98, 104] };
+  const names = Object.keys(regions);
+  const cols = ['B', 'C', 'D'];
+  const text = (ref, t) => `<c r="${ref}" t="inlineStr"><is><t>${t}</t></is></c>`;
+  const head = `<row r="1">${text('A1', 'Month')}${names.map((n, i) => text(`${cols[i]}1`, n)).join('')}</row>`;
+  const body = months.map((m, k) => `<row r="${k + 2}">${text(`A${k + 2}`, m)}${names.map((n, i) => `<c r="${cols[i]}${k + 2}"><v>${regions[n][k]}</v></c>`).join('')}</row>`).join('');
+  const strCache = (list) => `<c:strCache><c:ptCount val="${list.length}"/>${list.map((t, i) => `<c:pt idx="${i}"><c:v>${t}</c:v></c:pt>`).join('')}</c:strCache>`;
+  const numCache = (list) => `<c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="${list.length}"/>${list.map((v, i) => `<c:pt idx="${i}"><c:v>${v}</c:v></c:pt>`).join('')}</c:numCache>`;
+  const ser = (name, i, extra = '') => {
+    const col = cols[names.indexOf(name)];
+    return `<c:ser><c:idx val="${i}"/><c:order val="${i}"/><c:tx><c:strRef><c:f>Sales!$${col}$1</c:f>${strCache([name])}</c:strRef></c:tx>${extra}` +
+      `<c:cat><c:strRef><c:f>Sales!$A$2:$A$7</c:f>${strCache(months)}</c:strRef></c:cat><c:val><c:numRef><c:f>Sales!$${col}$2:$${col}$7</c:f>${numCache(regions[name])}</c:numRef></c:val></c:ser>`;
+  };
+  const axes = (dir) => `<c:catAx><c:axId val="10"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="${dir === 'bar' ? 'l' : 'b'}"/><c:numFmt formatCode="General" sourceLinked="1"/>` +
+    '<c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/><c:crossAx val="20"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/><c:noMultiLvlLbl val="0"/></c:catAx>' +
+    `<c:valAx><c:axId val="20"/><c:scaling><c:orientation val="minMax"/></c:scaling><c:delete val="0"/><c:axPos val="${dir === 'bar' ? 'b' : 'l'}"/><c:majorGridlines/><c:numFmt formatCode="General" sourceLinked="1"/>` +
+    '<c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/><c:crossAx val="10"/><c:crosses val="autoZero"/><c:crossBetween val="between"/></c:valAx>';
+  const title = (t) => (t ? `<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:r><a:t>${t}</a:t></a:r></a:p></c:rich></c:tx><c:overlay val="0"/></c:title><c:autoTitleDeleted val="0"/>` : '<c:autoTitleDeleted val="1"/>');
+  const space = (inner, legend) => `${DECL}<c:chartSpace xmlns:c="${C}" xmlns:a="${A}" xmlns:r="${R}"><c:roundedCorners val="0"/><c:chart>${inner}` +
+    `${legend ? `<c:legend><c:legendPos val="${legend}"/><c:overlay val="0"/></c:legend>` : ''}<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart></c:chartSpace>`;
+  const parts = [
+    space(`${title('Sales by month')}<c:plotArea><c:layout/><c:barChart><c:barDir val="col"/><c:grouping val="clustered"/><c:varyColors val="0"/>${ser('North', 0)}${ser('South', 1)}<c:gapWidth val="219"/><c:overlap val="-27"/><c:axId val="10"/><c:axId val="20"/></c:barChart>${axes('col')}</c:plotArea>`, 'b'),
+    space(`${title(null)}<c:plotArea><c:layout/><c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/>${names.map((n, i) => ser(n, i, '<c:marker><c:symbol val="none"/></c:marker>')).join('')}<c:marker val="1"/><c:axId val="10"/><c:axId val="20"/></c:lineChart>${axes('col')}</c:plotArea>`, 'r'),
+    space(`<c:title><c:overlay val="0"/></c:title><c:autoTitleDeleted val="0"/><c:plotArea><c:layout/><c:pieChart><c:varyColors val="1"/>${ser('North', 0)}<c:firstSliceAng val="0"/></c:pieChart></c:plotArea>`, 'r'),
+    space(`${title('Sales, stacked')}<c:plotArea><c:layout/><c:barChart><c:barDir val="bar"/><c:grouping val="stacked"/><c:varyColors val="0"/>${names.map((n, i) => ser(n, i)).join('')}<c:gapWidth val="150"/><c:overlap val="100"/><c:axId val="10"/><c:axId val="20"/></c:barChart>${axes('bar')}</c:plotArea>`, 'b'),
+  ];
+  const at = [[5, 1, 13, 16], [14, 1, 22, 16], [5, 17, 13, 32], [14, 17, 22, 32]];
+  const anchor = ([c0, r0, c1, r1], i) => `<xdr:twoCellAnchor><xdr:from><xdr:col>${c0}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${r0}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>` +
+    `<xdr:to><xdr:col>${c1}</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${r1}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="${i + 2}" name="Chart ${i + 1}"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr>` +
+    `<xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm><a:graphic><a:graphicData uri="${C}"><c:chart xmlns:c="${C}" r:id="rId${i + 1}"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor>`;
+  const files = {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')],
+      ['xl/drawings/drawing1.xml', 'application/vnd.openxmlformats-officedocument.drawing+xml'], ...parts.map((x, i) => [`xl/charts/chart${i + 1}.xml`, 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml']), ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Sales" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><sheetData>${head}${body}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><drawing r:id="rId1"/></worksheet>`,
+    'xl/worksheets/_rels/sheet1.xml.rels': rels([['rId1', RT('drawing'), '../drawings/drawing1.xml']]),
+    'xl/drawings/drawing1.xml': `${DECL}<xdr:wsDr xmlns:xdr="${XDR}" xmlns:a="${A}" xmlns:r="${R}">${at.map(anchor).join('')}</xdr:wsDr>`,
+    'xl/drawings/_rels/drawing1.xml.rels': rels(parts.map((x, i) => [`rId${i + 1}`, RT('chart'), `../charts/chart${i + 1}.xml`])),
+    'xl/styles.xml': STYLES,
+  };
+  parts.forEach((x, i) => { files[`xl/charts/chart${i + 1}.xml`] = x; });
+  write('charts.xlsx', files);
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   formulas();
   rowHeights();
@@ -679,4 +735,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   large();
   widths();
   notes();
+  charts();
 }
