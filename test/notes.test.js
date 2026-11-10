@@ -23,7 +23,7 @@ test('notes and threaded comments read as Excel shows them', () => {
   assert.deepEqual(c3.items.map((x) => [x.author, x.text]), [['Avery Chen', 'Is this the right total?'], ['Sam Rivera', 'Yes, checked against the invoice.']]);
   assert.equal(c3.items[1].date, '2026-01-02T14:05:00.00');
   // (Read only: saved unchanged, every part byte for byte.)
-  wb.setCell(0, 4, 0, 'edited');
+  wb.apply(0, [{ r: 4, c: 0, value: 'edited' }]);
   const again = Workbook.fromBytes(wb.toBytes());
   assert.deepEqual([...readNotes(again, 0).keys()].sort(), ['1,1', '2,2', '3,3'], 'kept on save');
 });
