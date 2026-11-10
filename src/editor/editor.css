@@ -367,11 +367,13 @@
   font: 13px var(--oxe-ui-font);
 }
 .oxe-namebox {
+  width: 96px;
   min-width: 64px;
   padding: 3px 6px;
   border: 1px solid var(--oxe-head-line);
   background: var(--oxe-bg);
   color: #1b1b1b;
+  font: inherit;
 }
 .oxe-formula {
   flex: 1;

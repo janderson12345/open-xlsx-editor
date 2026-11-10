@@ -581,6 +581,22 @@ check(await q42() === 'AVERAGE(Q40:Q41)=6', 'Q40:Q42, AutoSum > Average: =AVERAG
 for (let k = 0; k < 3; k++) await page.keyboard.press('Control+z');
 check(await q42() === '' && await value('Q40') === null, 'Ctrl+Z: Q40:Q42 empty again', `${await q42()} ${await value('Q40')} ${await value('Q41')}`);
 
+// The Name Box: C3:D4 typed and Enter: that range selected, C3 active, back on the sheet; "1abc": Excel's words.
+await page.click('.oxe-namebox');
+await page.keyboard.type('c3:d4');
+await page.keyboard.press('Enter');
+const went = await page.evaluate(() => ({ sel: window.oxe.selection, box: document.querySelector('.oxe-namebox').value, grid: document.activeElement === window.oxe.grid.el }));
+check(went.sel.r0 === 2 && went.sel.c0 === 2 && went.sel.r1 === 3 && went.sel.c1 === 3 && went.sel.ar === 2 && went.box === 'C3' && went.grid, 'Name Box, c3:d4 and Enter: C3:D4 selected, C3 active, back on the sheet', JSON.stringify(went));
+await page.click('.oxe-namebox');
+await page.keyboard.type('1abc');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog');
+check(/^You must enter a valid reference/.test(await page.textContent('dialog.oxe-dialog')), 'Name Box, 1abc: Excel’s words', await page.textContent('dialog.oxe-dialog'));
+await page.keyboard.press('Enter');
+await page.click('.oxe-namebox');
+await page.keyboard.press('Escape');
+check(await page.evaluate(() => document.querySelector('.oxe-namebox').value) === 'C3', 'Esc: the Name Box shows the active cell again');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

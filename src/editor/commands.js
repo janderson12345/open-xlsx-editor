@@ -18,6 +18,7 @@ import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { clearChanges } from '../ooxml/clearops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
+import { goToTarget } from '../ooxml/goto.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -464,6 +465,14 @@ export function createCommands(ctx) {
       if (step.edit) { commands.select(step.edit.r, step.edit.c); return { edit: step.edit.text }; }
       if (!runSteps([step])) return false;
       show({ ...state.sel, ...step.area }, state.focus, 'AutoSum, ');
+      return true;
+    },
+    /** The Name Box: go to the reference or name typed (goto.js), on its sheet; Excel's words when it can't. */
+    nameBox(text) {
+      const to = goToTarget(ctx.workbook(), ctx.sheetIndex(), text);
+      if (to.error) { if (to.name) ctx.announce(to.error); else ctx.alert(to.error); return false; }
+      if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
+      show(to.sel, null, 'Went to ');
       return true;
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */

@@ -44,7 +44,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
 | Entries read as Excel reads them | Done | Dates, times, currency, thousands, percentages, exponents, fractions, with the format Excel gives the cell (docs/ENTRY.md). United States settings only. |
 | Undo and redo | Done | Cell contents and formats across sheets; a sheet rename or delete clears the history, as Excel does. |
-| Formula bar and name box | Partly | The name box shows the active cell; typing a reference or name there to go to it is missing. |
+| Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, or a defined name typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). Naming a selection from it, and showing a selected name, missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
 | Recalculation | Done | 399 of 399 test formulas give Excel's results; about 130 functions. |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |

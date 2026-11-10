@@ -36,6 +36,9 @@ export function attachEditing(root, ctx) {
       refreshBar();
       view.focus();
     },
+    onGo: (text) => {
+      if (cmd.run('nameBox', text) !== false) view.focus();
+    },
     onKey: (e) => pointing.key(e),
     onFocus: () => pointing.attach(bar.input),
     onBlur: () => {
