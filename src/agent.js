@@ -18,9 +18,9 @@ import { ruleAt, valid, VALIDATION_MESSAGE } from './ooxml/validation.js';
 import { refName, rangeName, colIndex, MAX_ROWS, MAX_COLS } from './ooxml/refs.js';
 import { sheetPrefix } from './calc/tokens.js';
 
-/** Opens an .xlsx or .xlsm (bytes) for reading and editing. */
-export function openWorkbook(bytes) {
-  return new AgentWorkbook(Workbook.fromBytes(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)));
+/** Opens an .xlsx or .xlsm (bytes) for reading and editing; one saved with a password needs `password`. */
+export function openWorkbook(bytes, { password = null } = {}) {
+  return new AgentWorkbook(Workbook.fromBytes(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), { password }));
 }
 
 /** A cell's value as JavaScript has it: a number, string or boolean, an error as its text ("#DIV/0!"), or null. */

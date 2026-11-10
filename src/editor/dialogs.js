@@ -372,3 +372,23 @@ export function goToBox(root, names) {
     dlg.append(h, listLabel, list, fieldLabel, field, row);
   });
 }
+
+/** Excel's Password box for opening a workbook saved with a password: "'name' is protected.", a Password field (its
+ *  text hidden), OK and Cancel. Resolves to the password, or null. */
+export function passwordBox(root, fileName) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.setAttribute('aria-describedby', `${id}-text`);
+    const h = Object.assign(document.createElement('h2'), { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Password' });
+    const text = Object.assign(document.createElement('p'), { id: `${id}-text`, className: 'oxe-dialog-text', textContent: `'${fileName || 'This workbook'}' is protected.` });
+    const label = Object.assign(document.createElement('label'), { className: 'oxe-dialog-text oxe-dialog-label', htmlFor: `${id}-pw`, textContent: 'Password:' });
+    const field = Object.assign(document.createElement('input'), { id: `${id}-pw`, className: 'oxe-dialog-field', type: 'password', autocomplete: 'off', spellcheck: false });
+    field.dataset.first = '';
+    const ok = () => done(field.value);
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
+    const row = document.createElement('div');
+    row.className = 'oxe-dialog-buttons';
+    row.append(button('OK', ok), button('Cancel', () => done(null)));
+    dlg.append(h, text, label, field, row);
+  });
+}

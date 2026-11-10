@@ -10,7 +10,8 @@ window.oxe = editor;
 
 async function openFile(file) {
   try {
-    editor.open(new Uint8Array(await file.arrayBuffer()), file.name);
+    // (A workbook saved with a password: the editor asks for it, and opens it once given.)
+    if (!(await editor.open(new Uint8Array(await file.arrayBuffer()), file.name))) { status.textContent = `${file.name} was not opened`; return; }
     const n = editor.workbook.sheets.length;
     status.textContent = `${file.name}: ${n} sheet${n === 1 ? '' : 's'}`;
   } catch (e) {

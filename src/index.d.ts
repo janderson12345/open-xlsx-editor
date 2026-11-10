@@ -2,6 +2,8 @@
 import type { AgentWorkbook } from './agent.js';
 export type { AgentWorkbook, AgentCell, AgentRange, AgentSheet, AgentName, AgentNote } from './agent.js';
 export { openWorkbook } from './agent.js';
+/** Why an encrypted workbook didn't open: 'needed' (no password), 'wrong', 'unsupported' (an older encryption), 'damaged'. */
+export declare class PasswordError extends Error { reason: 'needed' | 'wrong' | 'unsupported' | 'damaged'; }
 
 export interface Cell {
   /** n number, s string, b boolean, e error, str formula text, d ISO date. */
@@ -38,7 +40,10 @@ export interface SheetInfo {
 }
 
 export declare class Workbook {
-  static fromBytes(bytes: Uint8Array | ArrayBuffer): Workbook;
+  /** One saved with a password needs `password` (a PasswordError otherwise). */
+  static fromBytes(bytes: Uint8Array | ArrayBuffer, options?: { password?: string }): Workbook;
+  setPassword(password: string | null): void;
+  readonly encrypted: boolean;
   readonly sheets: SheetInfo[];
   readonly sharedStrings: string[];
   readonly date1904: boolean;
@@ -76,7 +81,13 @@ export interface Selection { ar: number; ac: number; r0: number; c0: number; r1:
 export type CellRef = string | { r: number; c: number };
 
 export interface XlsxEditor {
-  open(bytes: Uint8Array | ArrayBuffer, fileName?: string | null): XlsxEditor;
+  /** A workbook saved with a password opens with `password`; without it the editor asks, and a promise is returned
+   *  (the editor once open, or null if cancelled or the password was wrong). */
+  open(bytes: Uint8Array | ArrayBuffer, fileName?: string | null, options?: { password?: string }): XlsxEditor | Promise<XlsxEditor | null>;
+  /** Save with this password from now on (Encrypt with Password), or without one (null). */
+  setPassword(password: string | null): void;
+  /** Whether the workbook is saved with a password. */
+  readonly encrypted: boolean;
   save(): Uint8Array;
   /** Select a cell. */
   select(ref: CellRef): void;

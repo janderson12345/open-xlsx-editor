@@ -3,10 +3,15 @@
 // sheet tabs as ARIA describes them.
 // Run after `npm run build`: node test/a11y.mjs
 import { createRequire } from 'node:module';
+import fs from 'node:fs';
 import { openDemo, openFixture, checker } from './browser.mjs';
+import { encryptWorkbook } from '../src/ooxml/encryption.js';
 
 const axePath = createRequire(import.meta.url).resolve('axe-core/axe.min.js');
 const t = checker();
+// (A workbook with a test password, for the Password box.)
+fs.mkdirSync('test/out', { recursive: true });
+fs.writeFileSync('test/out/a11y-encrypted.xlsx', encryptWorkbook(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')), 'Test-pass 1', null, { spins: 1000 }));
 
 for (const colorScheme of ['light', 'dark']) {
   for (const [width, height] of [[1280, 900], [320, 640]]) {
@@ -112,6 +117,12 @@ for (const colorScheme of ['light', 'dark']) {
       await page.keyboard.press('Escape');
       await page.focus('.oxe-grid');
       await page.keyboard.press('Control+Shift+KeyL');
+      await page.setInputFiles('input[type=file]', 'test/out/a11y-encrypted.xlsx');
+      await page.waitForSelector('dialog.oxe-dialog input[type=password]');
+      const passwordDialog = await axe();
+      t.check(!passwordDialog.length && await page.evaluate(() => document.activeElement.type === 'password'), `${colorScheme}: the Password box, no axe violations, its field focused`, passwordDialog.join('\n     '));
+      await page.keyboard.press('Escape');
+      await page.focus('.oxe-grid');
       await page.keyboard.press('F5');
       await page.waitForSelector('dialog.oxe-dialog');
       const goTo = await axe();

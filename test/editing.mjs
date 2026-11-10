@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
 import { setXmlImpl } from '../src/ooxml/xml.js';
 import { Workbook } from '../src/ooxml/workbook.js';
+import { encryptWorkbook } from '../src/ooxml/encryption.js';
 import { openDemo, openFixture, checker } from './browser.mjs';
 
 setXmlImpl({ DOMParser, XMLSerializer });
@@ -791,6 +792,29 @@ check(wb.styles.fills[wb.styles.cellXfs[sh.cells.get(19).get(7).s].fillId].fg.rg
 check(!wb.pkg.has('xl/calcChain.xml'), 'saved: calcChain.xml left out (Excel works the order out again)');
 check(wb.sheet(1).cells.get(1).get(1).v === -3.5, 'saved: the change on the second sheet undone');
 check(wb.sheets.map((s) => `${s.name}:${s.state}`).join() === 'Data:visible,Notes:visible,Hidden:hidden' && !Object.keys(wb.pkg.files).some((p) => /sheet[45]\.xml/.test(p)), 'saved: the sheets as left (Summary and Sheet2 gone with their parts)', wb.sheets.map((s) => s.name).join());
+
+// A workbook saved with a password (made here with a test password): Excel's Password box; a wrong one gets Excel's
+// words and nothing opens; the right one opens it, and it saves encrypted again.
+fs.mkdirSync('test/out', { recursive: true });
+fs.writeFileSync('test/out/encrypted.xlsx', encryptWorkbook(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')), 'Test-pass 1', null, { spins: 1000 }));
+const askPassword = async (pw) => {
+  await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+  await page.setInputFiles('input[type=file]', 'test/out/encrypted.xlsx');
+  await page.waitForSelector('dialog.oxe-dialog input[type=password]');
+  const text = await page.textContent('dialog.oxe-dialog');
+  await page.fill('dialog.oxe-dialog input[type=password]', pw);
+  await page.keyboard.press('Enter');
+  return text;
+};
+const asked = await askPassword('not it');
+await page.waitForSelector('dialog.oxe-dialog >> text=The password you supplied is not correct');
+await page.keyboard.press('Enter');
+await page.waitForFunction(() => /was not opened/.test(document.getElementById('status').textContent));
+check(/'encrypted\.xlsx' is protected\./.test(asked) && await page.evaluate(() => window.oxe.fileName) !== 'encrypted.xlsx', 'a password-protected workbook: Excel’s Password box; a wrong password: Excel’s words, not opened', asked);
+await askPassword('Test-pass 1');
+await page.waitForFunction(() => window.oxe.fileName === 'encrypted.xlsx');
+const saved = await page.evaluate(() => ({ encrypted: window.oxe.encrypted, sheets: window.oxe.workbook.sheets.length, head: [...window.oxe.save().slice(0, 4)] }));
+check(saved.encrypted && saved.sheets === 3 && saved.head.join() === '208,207,17,224', 'the right password: opened, and saved encrypted again (a compound file)', JSON.stringify(saved));
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();

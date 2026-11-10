@@ -50,4 +50,4 @@ export interface AgentWorkbook {
 }
 
 /** Opens an .xlsx or .xlsm for an agent. In Node, set up a DOMParser and XMLSerializer first. */
-export function openWorkbook(bytes: Uint8Array | ArrayBuffer): AgentWorkbook;
+export function openWorkbook(bytes: Uint8Array | ArrayBuffer, options?: { password?: string }): AgentWorkbook;

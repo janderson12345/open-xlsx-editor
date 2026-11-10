@@ -7,7 +7,8 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox } from './editor/dialogs.js';
+import { PasswordError } from './ooxml/encryption.js';
 import { goToNames } from './ooxml/goto.js';
 import { filterChoices, shownText } from './ooxml/filterops.js';
 import { readNotes } from './ooxml/notes.js';
@@ -32,6 +33,7 @@ import { AgentWorkbook } from './agent.js';
 
 export { Workbook };
 export { openWorkbook } from './agent.js';
+export { PasswordError };
 
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
@@ -441,9 +443,23 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     .filter((t) => t.state === 'visible');
 
   const api = {
-    /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). */
-    open(bytes, fileName = null) {
-      const wb = Workbook.fromBytes(bytes);
+    /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). One saved
+     *  with a password opens with `password`; without one, Excel's Password box asks for it and a promise is
+     *  returned (the editor once open, or null: cancelled, or the password wrong, said in Excel's words). */
+    open(bytes, fileName = null, { password = null } = {}) {
+      let wb;
+      try {
+        wb = Workbook.fromBytes(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), { password });
+      } catch (e) {
+        if (!(e instanceof PasswordError) || e.reason !== 'needed') throw e;
+        return passwordBox(root, fileName).then((pw) => {
+          if (pw == null) return null;
+          try { return api.open(bytes, fileName, { password: pw }); } catch (err) {
+            if (!(err instanceof PasswordError)) throw err;
+            return messageBox(root, err.message).then(() => null);
+          }
+        });
+      }
       const i = wb.activeSheet;
       const sheet = wb.sheet(i);
       state.workbook = wb;
@@ -544,6 +560,15 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
         structure: (run, kind) => editing().run('agentChange', run, kind),
       });
     },
+    /** The password the workbook is saved with (a new one, as Excel's Encrypt with Password), or null to save it
+     *  without one. */
+    setPassword(password) {
+      if (!state.workbook) throw new Error('no workbook open');
+      state.workbook.setPassword(password || null);
+      options.onChange?.();
+    },
+    /** Whether the workbook open is saved with a password. */
+    get encrypted() { return !!state.workbook?.encrypted; },
     /** Call `fn` after each edit made here (not one from another editor of a shared workbook): { cells: [{ si,
      *  contents }] } for cell contents alone, { book: true } for anything else. Returns a function that stops it. */
     onEdit(fn) { state.onEdit.add(fn); return () => state.onEdit.delete(fn); },

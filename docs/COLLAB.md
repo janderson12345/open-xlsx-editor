@@ -40,6 +40,8 @@ room's. Opening another file afterwards makes that file the room's.
   cell keeps its address. It isn't moved with the rows, because cells are keyed by position.
 - Other people's cursors aren't drawn yet. `awareness` carries the user's name and colour for a host page to show.
 - Notes and threaded comments are read-only in the editor, so they are not co-edited.
+- A workbook saved with a password is shared encrypted, so each editor joining asks for the password. Whether co-editing
+  an encrypted workbook works end to end hasn't been tested.
 
 ## Tested
 

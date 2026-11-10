@@ -18,6 +18,7 @@ import { sheetPrefix } from '../calc/tokens.js';
 import { colName } from './refs.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
+import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
  *  `standalone="yes"`). */
@@ -79,11 +80,30 @@ export class Workbook {
     this.dirty = new Set();
   }
 
-  static fromBytes(bytes) {
+  /** Open a workbook's bytes. One saved with a password (encryption.js) needs `password`; without it, or with a
+   *  wrong one, a PasswordError says so. It is saved again with the same password (`setPassword` changes it). */
+  static fromBytes(bytes, { password = null } = {}) {
+    let encryption = null;
+    if (isCompoundFile(bytes)) {
+      const { bytes: plain, streams } = decryptWorkbook(bytes, password);
+      encryption = { password, streams };
+      bytes = plain;
+    }
     const pkg = OpcPackage.fromBytes(bytes);
     if (!/\.xml$/.test(pkg.mainPath) || !pkg.has(pkg.mainPath)) throw new Error('Not a workbook: main part missing');
-    return new Workbook(pkg);
+    const wb = new Workbook(pkg);
+    wb.encryption = encryption;
+    return wb;
   }
+
+  /** The password the workbook is saved with: a new one (Encrypt with Password), or null to save it unencrypted. */
+  setPassword(password) {
+    this.encryption = password ? { password, streams: this.encryption?.streams ?? null } : null;
+    this.edited = true;
+  }
+
+  /** Whether the workbook is saved with a password. */
+  get encrypted() { return !!this.encryption; }
 
   /** The index of the sheet a workbook opens on: the active tab if it is a visible worksheet, else the first one. */
   get activeSheet() {
@@ -421,7 +441,8 @@ export class Workbook {
     if (this.stylesPath && this.dirty.has(this.stylesPath)) this.pkg.setText(this.stylesPath, partText(this.stylesDoc, this.pkg.text(this.stylesPath)));
     if (this.bookDirty) this.pkg.setText(this.pkg.mainPath, partText(this.doc, this.pkg.text(this.pkg.mainPath)));
     this.bookDirty = false;
-    return this.pkg.toBytes();
+    const bytes = this.pkg.toBytes();
+    return this.encryption ? encryptWorkbook(bytes, this.encryption.password, this.encryption.streams) : bytes;
   }
 
   _fullCalcOnLoad() {
