@@ -57,6 +57,7 @@ export function createCommands(ctx) {
     if (changes.some((ch) => inArray(ch.r, ch.c))) { ctx.announce("You can't change part of an array"); return false; }
     const before = changes.map((ch) => contents(ch.r, ch.c));
     const { circular } = ctx.workbook().apply(ctx.sheetIndex(), changes);
+    ctx.edited?.({ cells: [{ si: ctx.sheetIndex(), contents: changes }] });
     if (record) { state.undo.push({ sheet: idOf(ctx.sheetIndex()), before, after: changes }); state.redo = []; }
     ctx.grid.refresh();
     ctx.changed?.();
@@ -72,6 +73,7 @@ export function createCommands(ctx) {
     if (!now.length) return false;
     const before = now.map(({ r, c }) => ({ r, c, s: sh.cells.get(r)?.get(c)?.s || 0 }));
     ctx.workbook().setStyles(ctx.sheetIndex(), now);
+    ctx.edited?.({ book: true });
     if (record) { state.undo.push({ sheet: idOf(ctx.sheetIndex()), styles: true, before, after: now }); state.redo = []; }
     ctx.restyled?.();
     ctx.changed?.();
@@ -92,12 +94,17 @@ export function createCommands(ctx) {
       if (st.contents.some(({ r, c }) => sh.arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1))) { ctx.announce("You can't change part of an array"); return false; }
     }
     const circular = [];
+    const mergesOf = (st) => JSON.stringify(wb.sheet(indexOf(st.sheet)).merges);
+    const mergedBefore = list.map(mergesOf);
     for (const st of list) {
       const k = indexOf(st.sheet);
       if (st.contents.length) circular.push(...wb.apply(k, st.contents).circular);
       if (st.merges) wb.setMerges(k, st.merges);
       if (st.styles.length) wb.setStyles(k, st.styles);
     }
+    // (For a shared workbook, collab.js: contents alone go cell by cell, formats and merges with the whole workbook.)
+    const formats = list.some((st, k) => st.styles.length || mergesOf(st) !== mergedBefore[k]);
+    ctx.edited?.(formats ? { book: true } : { cells: list.map((st) => ({ si: indexOf(st.sheet), contents: st.contents })) });
     ctx.restyled?.();
     ctx.changed?.();
     if (circular.length) ctx.announce(`Circular reference: ${circular.map((e) => refName(e.r, e.c)).join(', ')} read themselves and weren't worked out`);
@@ -136,6 +143,7 @@ export function createCommands(ctx) {
     const before = wb.snapshot();
     apply(wb, ctx.sheetIndex());
     state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+    ctx.edited?.({ book: true });
     state.redo = [];
     ctx.reloaded?.();
     ctx.changed?.();
@@ -156,6 +164,7 @@ export function createCommands(ctx) {
       return false;
     }
     state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+    ctx.edited?.({ book: true });
     state.redo = [];
     commands.dropClip();
     ctx.reloaded?.();
@@ -345,6 +354,14 @@ export function createCommands(ctx) {
     },
     /** Changes of several sheets ([{ si, contents, styles, merges }], findops.js replaceChanges) as one step. */
     applyChanges(steps) { return runSteps(steps); },
+    /** Cell contents [{ r, c, value } or { r, c, formula }] of sheet si that another editor of a shared workbook
+     *  changed (collab.js): made here outside the history, and drawn. */
+    remoteContents(si, contents) {
+      ctx.workbook().apply(si, contents);
+      if (si === ctx.sheetIndex()) ctx.grid.refresh();
+      ctx.changed?.();
+      return true;
+    },
     /** A change by the agent (agent.js), `run(wb)`: of rows or columns ('lines': one step of the history) or of the
      *  sheets ('sheets', as the tab menu's). A refusal throws, in Excel's words, for the agent to read. */
     agentChange(run, kind) {
@@ -354,6 +371,7 @@ export function createCommands(ctx) {
       const before = wb.snapshot();
       run(wb);
       state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+    ctx.edited?.({ book: true });
       state.redo = [];
       commands.dropClip();
       ctx.reloaded?.();
@@ -605,6 +623,7 @@ export function createCommands(ctx) {
       return false;
     }
     if (clearsHistory) { state.undo = []; state.redo = []; }
+    ctx.edited?.({ book: true });
     for (const id of state.views.keys()) if (indexOf(id) < 0) state.views.delete(id);
     const now = indexOf(shownId);
     ctx.sheetsChanged(now); // (the tabs again, and the sheet shown at its new index, or -1 if it went)
@@ -623,6 +642,7 @@ export function createCommands(ctx) {
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
     if (entry.snap) {
       ctx.workbook().restore(entry[side]);
+      ctx.edited?.({ book: true });
       ctx.reloaded?.();
       ctx.changed?.();
       to.push(entry);

@@ -29,6 +29,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|
 | Open .xlsx | Done | Any workbook; sheets parsed on first view. |
 | Open .xlsm, .xltx, .xlsb, .xls, .csv | Partly | .xlsm opens, and an edit, a new sheet and a save keep its VBA project, custom ribbon (customUI) and macro-enabled content type byte for byte (test/macros.test.js); macros don't run and can't be edited. .xltx, .xlsb, .xls and .csv missing. |
+| Co-editing | Partly | Over Yjs, with any provider (src/collab.js, docs/COLLAB.md): cell contents live, cell by cell; formats, rows, columns and sheets as the whole workbook, which the others reopen. Others' cursors not drawn; undo is each editor's own and starts again when another's whole-workbook change arrives. |
 | Agent interface | Done | Read sheets, names, tables, ranges (values, shown text, formulas, Markdown), find and notes; enter text as typed, write blocks, insert and delete rows and columns, add, rename and delete sheets; without a browser or on the open editor, each edit one undo step (docs/AGENT.md). 12 of 12 typed entries read the same in Excel. |
 | Save .xlsx | Done | Only changed sheets rewritten; opened in Excel with no repair (`tools/check-ooxml.mjs`). |
 | Formula results on open when the file has none | Partly | Worked out by `calculate()`; the editor doesn't call it on open yet (the preview page does). |

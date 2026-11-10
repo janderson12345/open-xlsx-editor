@@ -9,7 +9,7 @@
     "build": "node build.mjs",
     "dev": "node build.mjs --serve",
     "fixtures": "node test/fixtures/make-fixtures.mjs",
-    "test:e2e": "npm run build && node test/e2e.mjs && node test/editing.mjs && node test/a11y.mjs",
+    "test:e2e": "npm run build && node test/e2e.mjs && node test/editing.mjs && node test/a11y.mjs && node test/collab.mjs",
     "check": "node tools/check-ooxml.mjs test/fixtures test/out",
     "lint": "eslint src test tools && node tools/scan-bytes.mjs"
   },
@@ -33,14 +33,24 @@
     "eslint": "9.39.1",
     "globals": "15.15.0",
     "pdfjs-dist": "^2.16.105",
-    "playwright": "^1.64.1"
+    "playwright": "^1.64.1",
+    "yjs": "^13.6.33"
   },
   "exports": {
     ".": "./src/index.js",
-    "./style.css": "./src/editor/editor.css"
+    "./style.css": "./src/editor/editor.css",
+    "./collab": "./src/collab.js"
   },
   "files": [
     "src",
     "dist"
-  ]
+  ],
+  "peerDependencies": {
+    "yjs": "^13.6.0"
+  },
+  "peerDependenciesMeta": {
+    "yjs": {
+      "optional": true
+    }
+  }
 }

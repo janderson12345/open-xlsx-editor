@@ -69,7 +69,7 @@ export function mountXlsxEditor(host, options = {}) {
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
+  const state = { onEdit: new Set(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
     features: { ...(options.features || {}) }, toolbar: options.toolbar !== false };
   const at = (ref) => {
     const p = typeof ref === 'string' ? parseRef(ref) : ref;
@@ -467,6 +467,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
           looks: () => state.looks,
           readOnly: () => state.readOnly,
           changed: () => { showConditional(); options.onChange?.(); },
+          edited: (e) => { for (const f of [...state.onEdit]) f(e); },
           lookChanged,
           restyled,
           clipShown: (c) => { state.clip = c; showClip(); },
@@ -543,6 +544,9 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
         structure: (run, kind) => editing().run('agentChange', run, kind),
       });
     },
+    /** Call `fn` after each edit made here (not one from another editor of a shared workbook): { cells: [{ si,
+     *  contents }] } for cell contents alone, { book: true } for anything else. Returns a function that stops it. */
+    onEdit(fn) { state.onEdit.add(fn); return () => state.onEdit.delete(fn); },
     /** Run a named command (commands.js) with its arguments. */
     command: (name, ...args) => editing().run(name, ...args),
     get selection() { return state.editing ? state.editing.commands.selection : null; },
