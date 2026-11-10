@@ -12,8 +12,8 @@ import { colIndex } from '../src/ooxml/refs.js';
 
 /** A case list and Excel's answers for it, by name. */
 export function readCases(cases, answers) {
-  const list = JSON.parse(fs.readFileSync(cases, 'utf8').replace(/^﻿/, ''));
-  const excel = JSON.parse(fs.readFileSync(answers, 'utf8').replace(/^﻿/, '')).cases;
+  const list = JSON.parse(fs.readFileSync(cases, 'utf8').replace(/^\uFEFF/, ''));
+  const excel = JSON.parse(fs.readFileSync(answers, 'utf8').replace(/^\uFEFF/, '')).cases;
   return list.map((c) => ({ ...c, excel: excel.find((x) => x.name === c.name) }));
 }
 export const area = (text) => { const [a, b = a] = text.split(':').map(parseRef); return { r0: a.r, c0: a.c, r1: b.r, c1: b.c, ar: a.r, ac: a.c }; };
