@@ -91,7 +91,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Rename, hide and unhide sheet | Done | Cells > Format; moving and tab colour on the tab menu. |
 | Editing (`editing`) | AutoSum | Missing | |
 | | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
-| | Clear (all, formats, contents) | Partly | Clear Formats and Clear Contents; Clear All missing. |
+| | Clear (all, formats, contents) | Partly | Clear All, Clear Formats, Clear Contents as Excel (docs/FORMATS.md). Clear Comments and Notes, Clear Hyperlinks missing. |
 | | Sort & Filter | Missing | Autofilters kept. |
 | | Find & Select | Partly | Find and Replace; Go To and Go To Special missing. |
 

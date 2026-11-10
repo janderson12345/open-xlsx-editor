@@ -44,6 +44,23 @@ which reads back every font, fill, alignment, border, number format and cell sty
 | A selection that overlaps a merged range is merged with it into one. | A1:B2 merged, then B2:C3: A1:C3. |
 | Merge & Center on a selection with a merged range in it unmerges, and sets the alignment back to General. Unmerge Cells leaves the alignment. | A1 after Merge & Center, pressed again: not merged, General. Unmerged: still centred. |
 
+## Clear (`src/ooxml/clearops.js`)
+
+Measured over COM: `Range.Clear`, `ClearContents` and `ClearFormats` on a small table with a formula, formats, a
+border and two merged ranges, six cases (`tools/excel-compare/excel-steps.ps1` on `clear-cases.json`, from
+`clear-cases.mjs`, giving `test/clear-excel.json`). `test/clear.test.js` expects Excel's cells and merged ranges
+in each; cleared here and opened in Excel, the three that clear read back as Excel made them.
+
+| Rule | Seen |
+|---|---|
+| Clear All empties the cells and gives them the Normal format; merged ranges inside are unmerged. | B2:E8: values, bold, fill and border gone, D8:E8 unmerged. |
+| Clear Contents (and Delete) empties them; formats and merged ranges stay. | B2 keeps bold and 0.00. |
+| Clear Formats gives them the Normal format and unmerges; the values stay. | B3 `=B2*2` kept, plain. |
+| A selection over part of a merged range is refused, whichever Clear: "We can't do that to a merged cell." | B9:C10 with A9:B9 merged. |
+
+A click on a merged cell selects the whole merged range in Excel; here a selection of one of its cells clears the
+whole range in the same way.
+
 ## Not yet
 
 Text orientation, shrink to fit, the Format Cells dialog, cell styles other than the three above,

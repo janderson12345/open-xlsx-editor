@@ -15,6 +15,7 @@ import * as clip from '../ooxml/clipops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
 import { fillCopy, autoFill } from '../ooxml/fillops.js';
+import { clearChanges } from '../ooxml/clearops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -191,16 +192,19 @@ export function createCommands(ctx) {
     },
     /** Set a cell to a value as given (a number, boolean, string or null), as the API does. */
     setValue(r, c, value) { return apply([{ r, c, value }]); },
-    /** Delete: empty the selected cells that have something in them (their formats stay). Only the cells there are
-     *  are looked at, so a whole column is quick. */
-    clear() {
-      const s = state.sel;
-      const changes = [];
-      for (const [r, line] of sheet().cells) {
-        if (r < s.r0 || r > s.r1) continue;
-        for (const [c, cell] of line) if (c >= s.c0 && c <= s.c1 && (cell.v != null || cell.f != null)) changes.push({ r, c, value: null });
-      }
-      return changes.length ? apply(changes) : false;
+    /** Delete and Clear Contents: empty the selected cells that have something in them (their formats stay). Only
+     *  the cells there are are looked at, so a whole column is quick. Refused, as Excel refuses, over part of a merged
+     *  range. */
+    clear() { return commands.clearAs('contents'); },
+    /** Home > Clear: Clear All ('all'), Clear Contents ('contents') or Clear Formats ('formats') of the selection
+     *  (clearops.js), as one step of the history. */
+    clearAs(what) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const step = clearChanges(ctx.workbook(), ctx.sheetIndex(), state.sel, what);
+      if (step.error) { ctx.alert(step.error); return false; }
+      if (what === 'contents' && !step.contents.length) return false;
+      if (what === 'contents') return apply(step.contents);
+      return runSteps([step]);
     },
     /** Whole rows ('row') or columns ('col') selected: line i, or from the anchor's line to i (`extend`). The active
      *  cell is the first one of the line, as in Excel. */
@@ -435,7 +439,7 @@ export function createCommands(ctx) {
       return true;
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */
-    clearFormats() { return formatting((wb, si, sel) => fmt.cellsOf(wb.sheet(si), sel).map(({ r, c }) => ({ r, c, s: 0 }))); },
+    clearFormats() { return commands.clearAs('formats'); },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },
     redo() { return replay(state.redo, state.undo, 'after', 'Redone'); },
     /** Show sheet i, with the selection and scroll position it had (A1 the first time); false if it can't be shown

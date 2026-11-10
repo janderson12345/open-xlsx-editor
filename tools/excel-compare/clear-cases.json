@@ -1,0 +1,260 @@
+[
+ {
+  "name": "clear all",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Q1",
+    "A2": "a",
+    "B2": "1",
+    "C2": "10",
+    "B3": "=B2*2",
+    "D8": "merged",
+    "A9": "kept"
+   },
+   "formats": [
+    {
+     "range": "B2:B3",
+     "bold": true,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C2",
+     "color": 65535,
+     "border": true
+    },
+    {
+     "range": "A9",
+     "bold": true
+    }
+   ],
+   "merges": [
+    "D8:E8",
+    "A9:B9"
+   ]
+  },
+  "steps": [
+   {
+    "do": "clear",
+    "range": "B2:E8",
+    "what": "all"
+   }
+  ],
+  "read": "A1:F10"
+ },
+ {
+  "name": "clear contents",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Q1",
+    "A2": "a",
+    "B2": "1",
+    "C2": "10",
+    "B3": "=B2*2",
+    "D8": "merged",
+    "A9": "kept"
+   },
+   "formats": [
+    {
+     "range": "B2:B3",
+     "bold": true,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C2",
+     "color": 65535,
+     "border": true
+    },
+    {
+     "range": "A9",
+     "bold": true
+    }
+   ],
+   "merges": [
+    "D8:E8",
+    "A9:B9"
+   ]
+  },
+  "steps": [
+   {
+    "do": "clear",
+    "range": "B2:E8",
+    "what": "contents"
+   }
+  ],
+  "read": "A1:F10"
+ },
+ {
+  "name": "clear formats",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Q1",
+    "A2": "a",
+    "B2": "1",
+    "C2": "10",
+    "B3": "=B2*2",
+    "D8": "merged",
+    "A9": "kept"
+   },
+   "formats": [
+    {
+     "range": "B2:B3",
+     "bold": true,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C2",
+     "color": 65535,
+     "border": true
+    },
+    {
+     "range": "A9",
+     "bold": true
+    }
+   ],
+   "merges": [
+    "D8:E8",
+    "A9:B9"
+   ]
+  },
+  "steps": [
+   {
+    "do": "clear",
+    "range": "B2:E8",
+    "what": "formats"
+   }
+  ],
+  "read": "A1:F10"
+ },
+ {
+  "name": "clear all, part of a merge",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Q1",
+    "A2": "a",
+    "B2": "1",
+    "C2": "10",
+    "B3": "=B2*2",
+    "D8": "merged",
+    "A9": "kept"
+   },
+   "formats": [
+    {
+     "range": "B2:B3",
+     "bold": true,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C2",
+     "color": 65535,
+     "border": true
+    },
+    {
+     "range": "A9",
+     "bold": true
+    }
+   ],
+   "merges": [
+    "D8:E8",
+    "A9:B9"
+   ]
+  },
+  "steps": [
+   {
+    "do": "clear",
+    "range": "B9:C10",
+    "what": "all"
+   }
+  ],
+  "read": "A1:F10"
+ },
+ {
+  "name": "clear formats, part of a merge",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Q1",
+    "A2": "a",
+    "B2": "1",
+    "C2": "10",
+    "B3": "=B2*2",
+    "D8": "merged",
+    "A9": "kept"
+   },
+   "formats": [
+    {
+     "range": "B2:B3",
+     "bold": true,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C2",
+     "color": 65535,
+     "border": true
+    },
+    {
+     "range": "A9",
+     "bold": true
+    }
+   ],
+   "merges": [
+    "D8:E8",
+    "A9:B9"
+   ]
+  },
+  "steps": [
+   {
+    "do": "clear",
+    "range": "B9:C10",
+    "what": "formats"
+   }
+  ],
+  "read": "A1:F10"
+ },
+ {
+  "name": "clear contents, part of a merge",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Q1",
+    "A2": "a",
+    "B2": "1",
+    "C2": "10",
+    "B3": "=B2*2",
+    "D8": "merged",
+    "A9": "kept"
+   },
+   "formats": [
+    {
+     "range": "B2:B3",
+     "bold": true,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C2",
+     "color": 65535,
+     "border": true
+    },
+    {
+     "range": "A9",
+     "bold": true
+    }
+   ],
+   "merges": [
+    "D8:E8",
+    "A9:B9"
+   ]
+  },
+  "steps": [
+   {
+    "do": "clear",
+    "range": "B9:C10",
+    "what": "contents"
+   }
+  ],
+  "read": "A1:F10"
+ }
+]

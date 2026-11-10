@@ -496,6 +496,27 @@ check(statusText.replace(/\s+/g, ' ') === `Average: ${total / nums.length} Count
 await page.keyboard.press('ArrowDown');
 check(!(await page.isVisible('.oxe-status')), 'one cell selected: the status bar says nothing');
 
+// Clear: B11 (bold, a total) cleared with Home > Clear > Clear All: empty and plain; Ctrl+Z. B12:B13 (part of the merged
+// A12:C13) and Delete: Excel's refusal.
+await page.evaluate(() => window.oxe.select('B11'));
+await page.focus('.oxe-grid');
+const b11 = await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(10).get(1));
+const more2 = await page.isVisible('.oxe-more');
+if (more2) await page.click('.oxe-more');
+await page.click('.oxe-toolbar button[title="Clear"]');
+await page.click('.oxe-pop >> text=Clear All');
+if (more2) await page.click('.oxe-more');
+check(b11.s && await page.evaluate(() => { const c = window.oxe.workbook.sheet(0).cells.get(10)?.get(1); return !c || (c.v == null && !c.s); }), 'Clear All on B11: its value and format gone');
+await page.keyboard.press('Control+z');
+check(await page.evaluate((s) => window.oxe.workbook.sheet(0).cells.get(10).get(1).s === s, b11.s), 'Ctrl+Z: B11 back with its format');
+await page.evaluate(() => window.oxe.select('B12'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Delete');
+await page.waitForSelector('dialog.oxe-dialog');
+check(await page.textContent('dialog.oxe-dialog') === "We can't do that to a merged cell.OK", 'Delete on B12:B13, part of the merged A12:C13: Excel’s refusal', await page.textContent('dialog.oxe-dialog'));
+await page.keyboard.press('Enter');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

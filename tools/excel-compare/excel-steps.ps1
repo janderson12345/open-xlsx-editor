@@ -15,7 +15,8 @@
 #     "valuesFormats" | "noBorders", op: "add" | "subtract" | "multiply" | "divide", skip: bool, transpose: bool },
 #   { do: "link", from, to },
 #   { do: "fill", range, dir: "down" | "right" | "up" | "left" } (Range.FillDown...),
-#   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" } (the fill handle: AutoFill)]
+#   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" } (the fill handle: AutoFill),
+#   { do: "clear", range, what: "all" | "contents" | "formats" } (Range.Clear, ClearContents, ClearFormats)]
 # usage: pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
 param([Parameter(Mandatory)][string]$Cases, [Parameter(Mandatory)][string]$Out)
 $ErrorActionPreference = 'Stop'
@@ -82,6 +83,10 @@ try {
           'autofill' {
             $t = if ($st.type) { $fills[$st.type] } else { 0 }
             [void]$ws.Range($st.from).AutoFill($ws.Range($st.to), $t)
+          }
+          'clear' {
+            $r = $ws.Range($st.range)
+            switch ($st.what) { 'all' { [void]$r.Clear() } 'contents' { [void]$r.ClearContents() } 'formats' { [void]$r.ClearFormats() } }
           }
           'link' {
             [void]$ws.Range($st.from).Copy()

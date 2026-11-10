@@ -1,0 +1,241 @@
+{
+  "excel": "Excel.Application: Range.Insert, Range.Delete, Range.Copy and PasteSpecial, Worksheet.Paste with Link",
+  "cases": [
+    {
+      "name": "clear all",
+      "cells": {
+        "A1": {
+          "v": "Name"
+        },
+        "B1": {
+          "v": "Q1"
+        },
+        "A2": {
+          "v": "a"
+        },
+        "A9": {
+          "v": "kept",
+          "bold": true
+        },
+        "B9": {
+          "bold": true
+        }
+      },
+      "merges": [
+        "A9:B9"
+      ]
+    },
+    {
+      "name": "clear contents",
+      "cells": {
+        "A1": {
+          "v": "Name"
+        },
+        "B1": {
+          "v": "Q1"
+        },
+        "A2": {
+          "v": "a"
+        },
+        "B2": {
+          "fmt": "0.00",
+          "bold": true
+        },
+        "C2": {
+          "color": 65535,
+          "border": true
+        },
+        "B3": {
+          "fmt": "0.00",
+          "bold": true
+        },
+        "A9": {
+          "v": "kept",
+          "bold": true
+        },
+        "B9": {
+          "bold": true
+        }
+      },
+      "merges": [
+        "D8:E8",
+        "A9:B9"
+      ]
+    },
+    {
+      "name": "clear formats",
+      "cells": {
+        "A1": {
+          "v": "Name"
+        },
+        "B1": {
+          "v": "Q1"
+        },
+        "A2": {
+          "v": "a"
+        },
+        "B2": {
+          "v": 1.0
+        },
+        "C2": {
+          "v": 10.0
+        },
+        "B3": {
+          "f": "=B2*2",
+          "v": 2.0
+        },
+        "D8": {
+          "v": "merged"
+        },
+        "A9": {
+          "v": "kept",
+          "bold": true
+        },
+        "B9": {
+          "bold": true
+        }
+      },
+      "merges": [
+        "A9:B9"
+      ]
+    },
+    {
+      "name": "clear all, part of a merge",
+      "refused": true,
+      "error": "We can't do that to a merged cell.",
+      "cells": {
+        "A1": {
+          "v": "Name"
+        },
+        "B1": {
+          "v": "Q1"
+        },
+        "A2": {
+          "v": "a"
+        },
+        "B2": {
+          "v": 1.0,
+          "fmt": "0.00",
+          "bold": true
+        },
+        "C2": {
+          "v": 10.0,
+          "color": 65535,
+          "border": true
+        },
+        "B3": {
+          "f": "=B2*2",
+          "v": 2.0,
+          "fmt": "0.00",
+          "bold": true
+        },
+        "D8": {
+          "v": "merged"
+        },
+        "A9": {
+          "v": "kept",
+          "bold": true
+        },
+        "B9": {
+          "bold": true
+        }
+      },
+      "merges": [
+        "D8:E8",
+        "A9:B9"
+      ]
+    },
+    {
+      "name": "clear formats, part of a merge",
+      "refused": true,
+      "error": "We can't do that to a merged cell.",
+      "cells": {
+        "A1": {
+          "v": "Name"
+        },
+        "B1": {
+          "v": "Q1"
+        },
+        "A2": {
+          "v": "a"
+        },
+        "B2": {
+          "v": 1.0,
+          "fmt": "0.00",
+          "bold": true
+        },
+        "C2": {
+          "v": 10.0,
+          "color": 65535,
+          "border": true
+        },
+        "B3": {
+          "f": "=B2*2",
+          "v": 2.0,
+          "fmt": "0.00",
+          "bold": true
+        },
+        "D8": {
+          "v": "merged"
+        },
+        "A9": {
+          "v": "kept",
+          "bold": true
+        },
+        "B9": {
+          "bold": true
+        }
+      },
+      "merges": [
+        "D8:E8",
+        "A9:B9"
+      ]
+    },
+    {
+      "name": "clear contents, part of a merge",
+      "refused": true,
+      "error": "We can't do that to a merged cell.",
+      "cells": {
+        "A1": {
+          "v": "Name"
+        },
+        "B1": {
+          "v": "Q1"
+        },
+        "A2": {
+          "v": "a"
+        },
+        "B2": {
+          "v": 1.0,
+          "fmt": "0.00",
+          "bold": true
+        },
+        "C2": {
+          "v": 10.0,
+          "color": 65535,
+          "border": true
+        },
+        "B3": {
+          "f": "=B2*2",
+          "v": 2.0,
+          "fmt": "0.00",
+          "bold": true
+        },
+        "D8": {
+          "v": "merged"
+        },
+        "A9": {
+          "v": "kept",
+          "bold": true
+        },
+        "B9": {
+          "bold": true
+        }
+      },
+      "merges": [
+        "D8:E8",
+        "A9:B9"
+      ]
+    }
+  ]
+}
