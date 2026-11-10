@@ -92,7 +92,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Editing (`editing`) | AutoSum | Missing | |
 | | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
 | | Clear (all, formats, contents) | Partly | Clear All, Clear Formats, Clear Contents as Excel (docs/FORMATS.md). Clear Comments and Notes, Clear Hyperlinks missing. |
-| | Sort & Filter | Missing | Autofilters kept. |
+| | Sort & Filter | Partly | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right) as Excel sorts (docs/SORT.md). Filter missing; autofilters kept. |
 | | Find & Select | Partly | Find and Replace; Go To and Go To Special missing. |
 
 ## Insert (`insert`)
@@ -132,7 +132,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Group | Feature | Status | Notes |
 |---|---|---|---|
 | Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
-| Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Missing | Autofilters kept. |
+| Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Missing | The Data tab isn't there yet; Sort is in Home > Editing (docs/SORT.md). Autofilters kept. |
 | Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Missing | |
 | | Data Validation (lists, rules) | Kept | Not checked when typing; no drop-down. |
 | Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |

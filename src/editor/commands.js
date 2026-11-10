@@ -16,6 +16,7 @@ import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
 import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { clearChanges } from '../ooxml/clearops.js';
+import { quickSort, sortChanges } from '../ooxml/sortops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -436,6 +437,21 @@ export function createCommands(ctx) {
       const steps = autoFill(ctx.workbook(), ctx.sheetIndex(), s, to, how);
       if (!steps || !runSteps(steps)) return false;
       show({ ...s, r0: to.r0, c0: to.c0, r1: to.r1, c1: to.c1 }, null, `Filled ${refName(to.r0, to.c0)} to ${refName(to.r1, to.c1)}, `);
+      return true;
+    },
+    /** Sort (sortops.js), as one step of the history; the selection stays. With `how` ({ area, keys, header,
+     *  matchCase, leftToRight }, as the Sort box gives it) that sort; else A to Z ('asc') or Z to A ('desc') as
+     *  Excel's buttons sort, the data beside a selection taken in too when `expand`. Excel's refusals in its words. */
+    sort(how = 'asc', { expand = false } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const plan = typeof how === 'string' ? quickSort(wb, si, state.sel, how === 'desc', { expand }) : how;
+      const step = plan.error ? plan : sortChanges(wb, si, plan.area, plan);
+      if (step.error) { ctx.alert(step.error); return false; }
+      if (step.contents.length && !runSteps([step])) return false;
+      const order = typeof how === 'string' ? (how === 'desc' ? ', Z to A' : ', A to Z') : '';
+      ctx.announce(`Sorted ${refName(plan.area.r0, plan.area.c0)} to ${refName(plan.area.r1, plan.area.c1)}${order}`);
       return true;
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */

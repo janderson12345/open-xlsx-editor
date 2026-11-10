@@ -1161,3 +1161,53 @@
   flex-wrap: wrap;
   gap: 4px 24px;
 }
+
+/* Excel's Sort box (dialogs.js sortBox): its tools and headers check box over the levels, one level marked. */
+.oxe-dialog.oxe-sort-box {
+  max-width: min(600px, calc(100vw - 32px));
+}
+.oxe-sort-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.oxe-sort-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.oxe-sort-tools .oxe-dialog-button {
+  min-width: 0;
+  padding: 3px 8px;
+}
+.oxe-sort-levels {
+  min-height: 120px;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+}
+.oxe-sort-level {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+}
+.oxe-sort-level.oxe-on {
+  background: var(--oxe-sel-fill);
+}
+.oxe-sort-select {
+  min-width: 0;
+  font: inherit;
+}
+.oxe-sort-select:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-sort-tools .oxe-dialog-button:disabled {
+  opacity: 0.45;
+}

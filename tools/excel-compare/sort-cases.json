@@ -1,0 +1,2290 @@
+[
+ {
+  "name": "mixed types ascending",
+  "setup": {
+   "cells": {
+    "A1": "Item",
+    "B1": "Row",
+    "A2": "3",
+    "A3": "b",
+    "A4": "TRUE",
+    "A5": "=NA()",
+    "A7": "a",
+    "A8": "-1",
+    "A9": "FALSE",
+    "A10": "B",
+    "A11": "'10",
+    "A12": "=1/0",
+    "A13": "2.5",
+    "A14": "=\"\"",
+    "A15": "' ",
+    "A16": "=\"\"",
+    "A17": "0",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11",
+    "B12": "r12",
+    "B13": "r13",
+    "B14": "r14",
+    "B15": "r15",
+    "B16": "r16",
+    "B17": "r17"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B17",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B18"
+ },
+ {
+  "name": "mixed types descending",
+  "setup": {
+   "cells": {
+    "A1": "Item",
+    "B1": "Row",
+    "A2": "3",
+    "A3": "b",
+    "A4": "TRUE",
+    "A5": "=NA()",
+    "A7": "a",
+    "A8": "-1",
+    "A9": "FALSE",
+    "A10": "B",
+    "A11": "'10",
+    "A12": "=1/0",
+    "A13": "2.5",
+    "A14": "=\"\"",
+    "A15": "' ",
+    "A16": "=\"\"",
+    "A17": "0",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11",
+    "B12": "r12",
+    "B13": "r13",
+    "B14": "r14",
+    "B15": "r15",
+    "B16": "r16",
+    "B17": "r17"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B17",
+    "keys": [
+     {
+      "key": "A1",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B18"
+ },
+ {
+  "name": "text ascending",
+  "setup": {
+   "cells": {
+    "A1": "Word",
+    "B1": "Row",
+    "A2": "a",
+    "A3": "B",
+    "A4": "ab",
+    "A5": "a-b",
+    "A6": "a b",
+    "A7": "a'b",
+    "A8": "a_b",
+    "A9": "Ab",
+    "A10": "z",
+    "A11": "1a",
+    "A12": "'10",
+    "A13": "'2",
+    "A14": "_x",
+    "A15": "-x",
+    "A16": "#x",
+    "A17": "!x",
+    "A18": "x1",
+    "A19": "x10",
+    "A20": "x2",
+    "A21": " a",
+    "A22": "A",
+    "A23": "aa",
+    "A24": "é",
+    "A25": "e",
+    "A26": "f",
+    "A27": "co-op",
+    "A28": "coop",
+    "A29": "cop",
+    "A30": "(x)",
+    "A31": "[x]",
+    "A32": "~x",
+    "A33": "x.y",
+    "A34": "xy",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11",
+    "B12": "r12",
+    "B13": "r13",
+    "B14": "r14",
+    "B15": "r15",
+    "B16": "r16",
+    "B17": "r17",
+    "B18": "r18",
+    "B19": "r19",
+    "B20": "r20",
+    "B21": "r21",
+    "B22": "r22",
+    "B23": "r23",
+    "B24": "r24",
+    "B25": "r25",
+    "B26": "r26",
+    "B27": "r27",
+    "B28": "r28",
+    "B29": "r29",
+    "B30": "r30",
+    "B31": "r31",
+    "B32": "r32",
+    "B33": "r33",
+    "B34": "r34"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B34",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B35"
+ },
+ {
+  "name": "text descending",
+  "setup": {
+   "cells": {
+    "A1": "Word",
+    "B1": "Row",
+    "A2": "a",
+    "A3": "B",
+    "A4": "ab",
+    "A5": "a-b",
+    "A6": "a b",
+    "A7": "a'b",
+    "A8": "a_b",
+    "A9": "Ab",
+    "A10": "z",
+    "A11": "1a",
+    "A12": "'10",
+    "A13": "'2",
+    "A14": "_x",
+    "A15": "-x",
+    "A16": "#x",
+    "A17": "!x",
+    "A18": "x1",
+    "A19": "x10",
+    "A20": "x2",
+    "A21": " a",
+    "A22": "A",
+    "A23": "aa",
+    "A24": "é",
+    "A25": "e",
+    "A26": "f",
+    "A27": "co-op",
+    "A28": "coop",
+    "A29": "cop",
+    "A30": "(x)",
+    "A31": "[x]",
+    "A32": "~x",
+    "A33": "x.y",
+    "A34": "xy",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11",
+    "B12": "r12",
+    "B13": "r13",
+    "B14": "r14",
+    "B15": "r15",
+    "B16": "r16",
+    "B17": "r17",
+    "B18": "r18",
+    "B19": "r19",
+    "B20": "r20",
+    "B21": "r21",
+    "B22": "r22",
+    "B23": "r23",
+    "B24": "r24",
+    "B25": "r25",
+    "B26": "r26",
+    "B27": "r27",
+    "B28": "r28",
+    "B29": "r29",
+    "B30": "r30",
+    "B31": "r31",
+    "B32": "r32",
+    "B33": "r33",
+    "B34": "r34"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B34",
+    "keys": [
+     {
+      "key": "A1",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B35"
+ },
+ {
+  "name": "text, match case",
+  "setup": {
+   "cells": {
+    "A1": "Word",
+    "B1": "Row",
+    "A2": "b",
+    "A3": "A",
+    "A4": "a",
+    "A5": "B",
+    "A6": "ab",
+    "A7": "Ab",
+    "A8": "aB",
+    "A9": "AB",
+    "A10": "a",
+    "A11": "A",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B11",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes",
+    "matchCase": true
+   }
+  ],
+  "read": "A1:B12"
+ },
+ {
+  "name": "text, ignoring case: ties kept in order",
+  "setup": {
+   "cells": {
+    "A1": "Word",
+    "B1": "Row",
+    "A2": "b",
+    "A3": "A",
+    "A4": "a",
+    "A5": "B",
+    "A6": "ab",
+    "A7": "Ab",
+    "A8": "aB",
+    "A9": "AB",
+    "A10": "a",
+    "A11": "A",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B11",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B12"
+ },
+ {
+  "name": "numbers stored as text, as numbers",
+  "setup": {
+   "cells": {
+    "A1": "N",
+    "B1": "Row",
+    "A2": "'10",
+    "A3": "9",
+    "A4": "'2",
+    "A5": "1",
+    "A6": "'1.5",
+    "A7": "x",
+    "A8": "'-3",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B8",
+    "keys": [
+     {
+      "key": "A1",
+      "textAsNumbers": true
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B9"
+ },
+ {
+  "name": "dates and times",
+  "setup": {
+   "cells": {
+    "A1": "When",
+    "B1": "Row",
+    "A2": "3/1/2024",
+    "A3": "1/15/2024",
+    "A4": "9:30",
+    "A5": "12/31/2023",
+    "A6": "45000",
+    "A7": "1/15/2024 8:00",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B7",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B8"
+ },
+ {
+  "name": "signs ascending",
+  "setup": {
+   "cells": {
+    "A1": "Sign",
+    "B1": "Row",
+    "A2": " x",
+    "A3": "!x",
+    "A4": "\"x",
+    "A5": "#x",
+    "A6": "$x",
+    "A7": "%x",
+    "A8": "&x",
+    "A9": "''x",
+    "A10": "(x",
+    "A11": ")x",
+    "A12": "*x",
+    "A13": "'+x",
+    "A14": ",x",
+    "A15": "'-x",
+    "A16": ".x",
+    "A17": "/x",
+    "A18": ":x",
+    "A19": ";x",
+    "A20": "<x",
+    "A21": "'=x",
+    "A22": ">x",
+    "A23": "?x",
+    "A24": "'@x",
+    "A25": "[x",
+    "A26": "\\x",
+    "A27": "]x",
+    "A28": "^x",
+    "A29": "_x",
+    "A30": "`x",
+    "A31": "{x",
+    "A32": "|x",
+    "A33": "}x",
+    "A34": "~x",
+    "A35": "’x",
+    "A36": "–x",
+    "A37": " x",
+    "A38": "§x",
+    "A39": "°x",
+    "A40": "0x",
+    "A41": "x",
+    "A42": "Ax",
+    "A43": "ñ",
+    "A44": "n",
+    "A45": "o",
+    "A46": "ß",
+    "A47": "ss",
+    "A48": "st",
+    "A49": "æ",
+    "A50": "ae",
+    "A51": "af",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11",
+    "B12": "r12",
+    "B13": "r13",
+    "B14": "r14",
+    "B15": "r15",
+    "B16": "r16",
+    "B17": "r17",
+    "B18": "r18",
+    "B19": "r19",
+    "B20": "r20",
+    "B21": "r21",
+    "B22": "r22",
+    "B23": "r23",
+    "B24": "r24",
+    "B25": "r25",
+    "B26": "r26",
+    "B27": "r27",
+    "B28": "r28",
+    "B29": "r29",
+    "B30": "r30",
+    "B31": "r31",
+    "B32": "r32",
+    "B33": "r33",
+    "B34": "r34",
+    "B35": "r35",
+    "B36": "r36",
+    "B37": "r37",
+    "B38": "r38",
+    "B39": "r39",
+    "B40": "r40",
+    "B41": "r41",
+    "B42": "r42",
+    "B43": "r43",
+    "B44": "r44",
+    "B45": "r45",
+    "B46": "r46",
+    "B47": "r47",
+    "B48": "r48",
+    "B49": "r49",
+    "B50": "r50",
+    "B51": "r51"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B51",
+    "keys": [
+     {
+      "key": "A1",
+      "order": "asc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B52"
+ },
+ {
+  "name": "signs descending",
+  "setup": {
+   "cells": {
+    "A1": "Sign",
+    "B1": "Row",
+    "A2": " x",
+    "A3": "!x",
+    "A4": "\"x",
+    "A5": "#x",
+    "A6": "$x",
+    "A7": "%x",
+    "A8": "&x",
+    "A9": "''x",
+    "A10": "(x",
+    "A11": ")x",
+    "A12": "*x",
+    "A13": "'+x",
+    "A14": ",x",
+    "A15": "'-x",
+    "A16": ".x",
+    "A17": "/x",
+    "A18": ":x",
+    "A19": ";x",
+    "A20": "<x",
+    "A21": "'=x",
+    "A22": ">x",
+    "A23": "?x",
+    "A24": "'@x",
+    "A25": "[x",
+    "A26": "\\x",
+    "A27": "]x",
+    "A28": "^x",
+    "A29": "_x",
+    "A30": "`x",
+    "A31": "{x",
+    "A32": "|x",
+    "A33": "}x",
+    "A34": "~x",
+    "A35": "’x",
+    "A36": "–x",
+    "A37": " x",
+    "A38": "§x",
+    "A39": "°x",
+    "A40": "0x",
+    "A41": "x",
+    "A42": "Ax",
+    "A43": "ñ",
+    "A44": "n",
+    "A45": "o",
+    "A46": "ß",
+    "A47": "ss",
+    "A48": "st",
+    "A49": "æ",
+    "A50": "ae",
+    "A51": "af",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8",
+    "B9": "r9",
+    "B10": "r10",
+    "B11": "r11",
+    "B12": "r12",
+    "B13": "r13",
+    "B14": "r14",
+    "B15": "r15",
+    "B16": "r16",
+    "B17": "r17",
+    "B18": "r18",
+    "B19": "r19",
+    "B20": "r20",
+    "B21": "r21",
+    "B22": "r22",
+    "B23": "r23",
+    "B24": "r24",
+    "B25": "r25",
+    "B26": "r26",
+    "B27": "r27",
+    "B28": "r28",
+    "B29": "r29",
+    "B30": "r30",
+    "B31": "r31",
+    "B32": "r32",
+    "B33": "r33",
+    "B34": "r34",
+    "B35": "r35",
+    "B36": "r36",
+    "B37": "r37",
+    "B38": "r38",
+    "B39": "r39",
+    "B40": "r40",
+    "B41": "r41",
+    "B42": "r42",
+    "B43": "r43",
+    "B44": "r44",
+    "B45": "r45",
+    "B46": "r46",
+    "B47": "r47",
+    "B48": "r48",
+    "B49": "r49",
+    "B50": "r50",
+    "B51": "r51"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B51",
+    "keys": [
+     {
+      "key": "A1",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B52"
+ },
+ {
+  "name": "header guessed: text over text and numbers",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "3",
+    "B3": "1",
+    "B4": "2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: text over dates",
+  "setup": {
+   "cells": {
+    "A1": "When",
+    "A2": "3/1/2024",
+    "A3": "1/1/2024",
+    "A4": "2/1/2024"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:A4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: text over text and a number",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "A2": "c",
+    "A3": "5",
+    "A4": "b"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:A4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: a number over text",
+  "setup": {
+   "cells": {
+    "A1": "7",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:A4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: one column of four differs",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Cat",
+    "D1": "Note",
+    "A2": "c",
+    "B2": "3",
+    "C2": "x",
+    "D2": "y",
+    "A3": "a",
+    "B3": "1",
+    "C3": "w",
+    "D3": "v"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two columns of four differ",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Amt",
+    "D1": "Note",
+    "A2": "c",
+    "B2": "3",
+    "C2": "30",
+    "D2": "y",
+    "A3": "a",
+    "B3": "1",
+    "C3": "10",
+    "D3": "v"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: one column of three differs",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Cat",
+    "A2": "c",
+    "B2": "3",
+    "C2": "x",
+    "A3": "a",
+    "B3": "1",
+    "C3": "w"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two columns of three differ",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "c",
+    "B2": "3",
+    "C2": "30",
+    "A3": "a",
+    "B3": "1",
+    "C3": "10"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: a column blank in both rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "B3": "1",
+    "C3": "z"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: text over a blank",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "A3": "a",
+    "B3": "1",
+    "A4": "b",
+    "B4": "2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: the diagonal cells taken away",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "B3": "1",
+    "A4": "q"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: a border under the first row",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4"
+   },
+   "formats": [
+    {
+     "range": "A1:B1",
+     "border": true
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: one bold cell of two",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4"
+   },
+   "formats": [
+    {
+     "range": "A1",
+     "bold": true
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: one bold cell of four",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "C1": "y",
+    "D1": "z",
+    "A2": "c",
+    "A3": "a",
+    "B2": "r2",
+    "B3": "r3",
+    "C2": "p",
+    "C3": "q",
+    "D2": "s",
+    "D3": "t"
+   },
+   "formats": [
+    {
+     "range": "A1",
+     "bold": true
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: the second row bold, not the first",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4"
+   },
+   "formats": [
+    {
+     "range": "A2:B2",
+     "bold": true
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two columns blank in both rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "B3": "1",
+    "C3": "z",
+    "D3": "w"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two columns differ, two blank in both rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "c",
+    "B2": "3",
+    "C2": "30",
+    "A3": "a",
+    "B3": "1",
+    "C3": "10",
+    "D3": "z",
+    "E3": "w"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: three columns blank in both rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "B3": "1",
+    "C3": "z",
+    "D3": "w",
+    "E3": "v"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: bold, two columns blank in both rows",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "A2": "c",
+    "B2": "r2",
+    "A3": "a",
+    "B3": "r3",
+    "C3": "z",
+    "D3": "w"
+   },
+   "formats": [
+    {
+     "range": "A1:B1",
+     "bold": true
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two blanks in the first row only",
+  "setup": {
+   "cells": {
+    "C1": "Amt",
+    "A2": "3",
+    "B2": "30",
+    "C2": "300",
+    "A3": "1",
+    "B3": "10",
+    "C3": "100"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two blanks in the second row only",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Amt",
+    "D1": "Cat",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "B3": "1",
+    "C3": "5",
+    "D3": "x"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: two blanks in the first row of six",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Amt",
+    "D1": "Cat",
+    "A2": "c",
+    "B2": "3",
+    "C2": "30",
+    "D2": "p",
+    "E2": "7",
+    "F2": "8",
+    "A3": "a",
+    "B3": "1",
+    "C3": "10",
+    "D3": "q",
+    "E3": "9",
+    "F3": "6"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: one blank in each of the two rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "C2": "30",
+    "A3": "a",
+    "B3": "1",
+    "C3": "10"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: text over numbers, the third row text",
+  "setup": {
+   "cells": {
+    "A1": "Qty",
+    "A2": "3",
+    "A3": "x",
+    "A4": "1"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E7"
+ },
+ {
+  "name": "header guessed: Sort object",
+  "setup": {
+   "cells": {
+    "A1": "Qty",
+    "B1": "Amt",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ]
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: text over numbers",
+  "setup": {
+   "cells": {
+    "A1": "Qty",
+    "B1": "Amt",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: numbers over numbers",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "B1": "50",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: text over text",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: bold text over text",
+  "setup": {
+   "cells": {
+    "A1": "m",
+    "B1": "x",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4"
+   },
+   "formats": [
+    {
+     "range": "A1:B1",
+     "bold": true
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: text over numbers in one column only",
+  "setup": {
+   "cells": {
+    "A1": "Qty",
+    "B1": "50",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: text over numbers in the other column",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "B1": "Amt",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: a blank over numbers",
+  "setup": {
+   "cells": {
+    "B1": "Amt",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: number format differs",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "B1": "50",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   },
+   "formats": [
+    {
+     "range": "A1:B1",
+     "numFmt": "0.00"
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: fill differs",
+  "setup": {
+   "cells": {
+    "A1": "5",
+    "B1": "50",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   },
+   "formats": [
+    {
+     "range": "A1:B1",
+     "color": 65535
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "header guessed: one row",
+  "setup": {
+   "cells": {
+    "A1": "b",
+    "B1": "a"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B1",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:B2"
+ },
+ {
+  "name": "no header",
+  "setup": {
+   "cells": {
+    "A1": "Qty",
+    "B1": "Amt",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2",
+    "B2": "30",
+    "B3": "10",
+    "B4": "20"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "no"
+   }
+  ],
+  "read": "A1:B5"
+ },
+ {
+  "name": "formulas and formats move with their rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Twice",
+    "D1": "Fixed",
+    "E1": "Next",
+    "F1": "Label",
+    "A2": "c",
+    "B2": "3",
+    "C2": "=B2*2",
+    "D2": "=$B$2",
+    "E2": "=B3",
+    "F2": "=A2&\"!\"",
+    "A3": "a",
+    "B3": "1",
+    "C3": "=B3*2",
+    "D3": "=$B$2+1",
+    "E3": "=B4",
+    "F3": "=A3&\"!\"",
+    "A4": "b",
+    "B4": "2",
+    "C4": "=B4*2",
+    "D4": "=B$2",
+    "E4": "=B5",
+    "F4": "=A4&\"!\"",
+    "B6": "=SUM(B2:B4)",
+    "H2": "=B2",
+    "H3": "=C3",
+    "H4": "=SUM(B2:B3)"
+   },
+   "formats": [
+    {
+     "range": "A2:B2",
+     "bold": true
+    },
+    {
+     "range": "B3",
+     "color": 65535,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C4",
+     "border": true
+    }
+   ],
+   "sheet2": {
+    "A1": "=Sheet1!B2"
+   },
+   "names": {
+    "First": "=Sheet1!$B$2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:F4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H7"
+ },
+ {
+  "name": "sorted by a formula column",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Twice",
+    "D1": "Fixed",
+    "E1": "Next",
+    "F1": "Label",
+    "A2": "c",
+    "B2": "3",
+    "C2": "=B2*2",
+    "D2": "=$B$2",
+    "E2": "=B3",
+    "F2": "=A2&\"!\"",
+    "A3": "a",
+    "B3": "1",
+    "C3": "=B3*2",
+    "D3": "=$B$2+1",
+    "E3": "=B4",
+    "F3": "=A3&\"!\"",
+    "A4": "b",
+    "B4": "2",
+    "C4": "=B4*2",
+    "D4": "=B$2",
+    "E4": "=B5",
+    "F4": "=A4&\"!\"",
+    "B6": "=SUM(B2:B4)",
+    "H2": "=B2",
+    "H3": "=C3",
+    "H4": "=SUM(B2:B3)"
+   },
+   "formats": [
+    {
+     "range": "A2:B2",
+     "bold": true
+    },
+    {
+     "range": "B3",
+     "color": 65535,
+     "numFmt": "0.00"
+    },
+    {
+     "range": "C4",
+     "border": true
+    }
+   ],
+   "sheet2": {
+    "A1": "=Sheet1!B2"
+   },
+   "names": {
+    "First": "=Sheet1!$B$2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:F4",
+    "keys": [
+     {
+      "key": "F1",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H7"
+ },
+ {
+  "name": "two keys: team A to Z, score largest first",
+  "setup": {
+   "cells": {
+    "A1": "Team",
+    "B1": "Score",
+    "C1": "Row",
+    "A2": "red",
+    "B2": "5",
+    "C2": "r2",
+    "A3": "blue",
+    "B3": "7",
+    "C3": "r3",
+    "A4": "red",
+    "B4": "9",
+    "C4": "r4",
+    "A5": "blue",
+    "B5": "7",
+    "C5": "r5",
+    "A6": "red",
+    "B6": "5",
+    "C6": "r6",
+    "A7": "green",
+    "B7": "1",
+    "C7": "r7"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:C7",
+    "keys": [
+     {
+      "key": "A1"
+     },
+     {
+      "key": "B1",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:C8"
+ },
+ {
+  "name": "three keys",
+  "setup": {
+   "cells": {
+    "A1": "Team",
+    "B1": "Score",
+    "C1": "Row",
+    "A2": "red",
+    "B2": "5",
+    "C2": "r2",
+    "A3": "blue",
+    "B3": "7",
+    "C3": "r3",
+    "A4": "red",
+    "B4": "9",
+    "C4": "r4",
+    "A5": "blue",
+    "B5": "7",
+    "C5": "r5",
+    "A6": "red",
+    "B6": "5",
+    "C6": "r6",
+    "A7": "green",
+    "B7": "1",
+    "C7": "r7"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:C7",
+    "keys": [
+     {
+      "key": "B1"
+     },
+     {
+      "key": "A1",
+      "order": "desc"
+     },
+     {
+      "key": "C1",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:C8"
+ },
+ {
+  "name": "left to right",
+  "setup": {
+   "cells": {
+    "A1": "Key",
+    "B1": "3",
+    "C1": "b",
+    "D1": "1",
+    "E1": "a",
+    "A2": "Row",
+    "B2": "c2",
+    "C2": "c3",
+    "D2": "c4",
+    "E2": "c5"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "B1:E2",
+    "keys": [
+     {
+      "key": "B1"
+     }
+    ],
+    "header": "no",
+    "leftToRight": true
+   }
+  ],
+  "read": "A1:F3"
+ },
+ {
+  "name": "region around one cell",
+  "setup": {
+   "cells": {
+    "B3": "Name",
+    "C3": "Qty",
+    "B4": "c",
+    "C4": "3",
+    "B5": "a",
+    "C5": "1",
+    "B6": "b",
+    "C6": "2",
+    "B8": "z",
+    "C8": "0",
+    "E4": "apart",
+    "E5": "kept",
+    "A1": "title"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "C5",
+    "region": true,
+    "keys": [
+     {
+      "key": "B5"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:F9"
+ },
+ {
+  "name": "region with a blank cell inside",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "A4": "b",
+    "B4": "2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1",
+    "region": true,
+    "keys": [
+     {
+      "key": "B1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:C5"
+ },
+ {
+  "name": "region touching diagonally",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A3": "a",
+    "B3": "1",
+    "C4": "d",
+    "D4": "x",
+    "A5": "q"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A2",
+    "region": true,
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "legacy": true
+   }
+  ],
+  "read": "A1:E6"
+ },
+ {
+  "name": "blank rows in the range go last",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "A2": "c",
+    "B2": "3",
+    "A4": "a",
+    "B4": "1",
+    "A6": "b",
+    "B6": "2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B7",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B8"
+ },
+ {
+  "name": "merged cells of different sizes",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "x"
+   },
+   "merges": [
+    "B2:C2"
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:C4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:C5"
+ },
+ {
+  "name": "merged cells all the same size",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "B2": "x2",
+    "B3": "x3",
+    "B4": "x4"
+   },
+   "merges": [
+    "B2:C2",
+    "B3:C3",
+    "B4:C4"
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A2:C4",
+    "keys": [
+     {
+      "key": "A2"
+     }
+    ],
+    "header": "no"
+   }
+  ],
+  "read": "A1:C5"
+ },
+ {
+  "name": "every cell in a merged range of one size",
+  "setup": {
+   "cells": {
+    "A2": "c",
+    "A3": "a",
+    "A4": "b"
+   },
+   "merges": [
+    "A2:B2",
+    "A3:B3",
+    "A4:B4"
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A2:B4",
+    "keys": [
+     {
+      "key": "A2"
+     }
+    ],
+    "header": "no"
+   }
+  ],
+  "read": "A1:C5"
+ },
+ {
+  "name": "a merged range outside the sorted rows",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "A2": "c",
+    "A3": "a",
+    "A4": "b",
+    "A6": "m"
+   },
+   "merges": [
+    "A6:B6"
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:C7"
+ },
+ {
+  "name": "part of an array",
+  "setup": {
+   "cells": {
+    "A1": "N",
+    "A2": "3",
+    "A3": "1",
+    "A4": "2"
+   },
+   "arrays": {
+    "B2:B3": "=A2:A3*2"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B4",
+    "keys": [
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:B5"
+ }
+]

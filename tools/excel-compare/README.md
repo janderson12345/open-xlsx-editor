@@ -43,7 +43,7 @@ node tools/excel-compare/shift-cases.mjs > tools/excel-compare/shift-cases.json
 pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
 ```
 
-The same for `paste-cases.mjs` (Paste Special, Paste Link) and `fill-cases.mjs` (Fill, AutoFill). Each case is a small sheet built in a new workbook (cells, array formulas, formats, merged ranges, widths, names), one
+The same for `paste-cases.mjs` (Paste Special, Paste Link), `fill-cases.mjs` (Fill, AutoFill), `clear-cases.mjs` (Clear) and `sort-cases.mjs` (Sort: Worksheet.Sort, and Range.Sort where headers are guessed). Each case is a small sheet built in a new workbook (cells, array formulas, formats, merged ranges, widths, names), one
 or more steps done there by Excel (inserting and deleting cells, Paste Special, Paste Link, Fill, the fill handle), and what came of it
 written out: each cell's formula, value, number format, bold, fill and bottom border, the merged ranges, the column
 widths and the names, or the refusal. An invisible instance, closed without saving.

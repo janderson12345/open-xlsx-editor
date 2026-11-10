@@ -7,17 +7,19 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox } from './editor/dialogs.js';
+import { dataBeside, sortArea, guessHeader, SORT_MESSAGES } from './ooxml/sortops.js';
+import { isDateFormat } from './ooxml/format.js';
 import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
 import { createRibbon } from './editor/ribbon.js';
 import { createFindBar } from './editor/findbar.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
-import { fontFamily } from './ooxml/styles.js';
+import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
 import { selectionStats } from './ooxml/stats.js';
-import { MAX_ROWS, MAX_COLS } from './ooxml/refs.js';
+import { MAX_ROWS, MAX_COLS, colName } from './ooxml/refs.js';
 import { parseRef } from './ooxml/refs.js';
 
 export { Workbook };
@@ -30,7 +32,8 @@ const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', togg
   lines: 'cells', cells: 'cells', insertCells: 'cells', deleteCells: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   pasteSpecial: 'clipboard', pasteSpecialBox: 'clipboard', pasteAs: 'clipboard',
-  stepDecimal: 'number', clearFormats: 'editing', clearAs: 'editing', fill: 'editing', autoFill: 'editing' };
+  stepDecimal: 'number', clearFormats: 'editing', clearAs: 'editing', fill: 'editing', autoFill: 'editing',
+  sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing' };
 /** The Paste menu's choices, as Paste Special options. */
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
@@ -149,6 +152,8 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
     if (name === 'pasteSpecialBox') return pasteSpecialBox();
+    if (name === 'sortAsc' || name === 'sortDesc') return sortQuick(name === 'sortDesc');
+    if (name === 'sortBox') return customSort();
     if (name === 'pasteAs') return editing().run('pasteSpecial', PASTE_AS[args[0]]);
     if (name === 'merge') {
       // (Excel asks first when values would be discarded.)
@@ -195,6 +200,53 @@ export function mountXlsxEditor(host, options = {}) {
     if (!got) { state.grid.el.focus({ preventScroll: true }); return false; }
     if (got.button === 'Paste Link') return editing().run('pasteSpecial', { link: true });
     return editing().run('pasteSpecial', { paste: PASTE_CHOICES[got.choices.paste], op: OPERATIONS[got.choices.op], ...got.checks });
+  };
+  /** Before a sort of a selection with data beside it, Excel's Sort Warning: true to take that data in too, false to
+   *  sort the selection alone, null when cancelled (COM doesn't reach the box; its words and its choice of Expand). */
+  const sortWarning = async () => {
+    if (!dataBeside(state.workbook.sheet(state.sheetIndex), editing().selection)) return false;
+    const got = await optionsBox(root, { title: 'Sort Warning', ok: 'Sort',
+      text: 'There is data next to your selection. Since you have not selected this data, it will not be sorted.',
+      groups: [{ key: 'what', legend: 'What do you want to do?', options: ['Expand the selection', 'Continue with the current selection'], value: 'Expand the selection' }] });
+    if (!got) { state.grid.el.focus({ preventScroll: true }); return null; }
+    return got.choices.what === 'Expand the selection';
+  };
+  /** Sort A to Z and Sort Z to A (`desc`), by the active cell's column (sortops.js quickSort). */
+  const sortQuick = async (desc) => {
+    if (state.readOnly || !allowed('sort')) return false;
+    const expand = await sortWarning();
+    return expand != null && editing().run('sort', desc ? 'desc' : 'asc', { expand });
+  };
+  /** Custom Sort...: Excel's Sort box over what A to Z would sort, the headers guessed as Excel guesses them; its
+   *  columns named from the header row (Column B where there is none), each one's orders by what it holds. */
+  const customSort = async () => {
+    if (state.readOnly || !allowed('sort')) return false;
+    const expand = await sortWarning();
+    if (expand == null) return false;
+    const wb = state.workbook;
+    const si = state.sheetIndex;
+    const sheet = wb.sheet(si);
+    const sel = editing().selection;
+    const area = (expand && dataBeside(sheet, sel)) || sortArea(sheet, sel);
+    if (!area) return messageBox(root, SORT_MESSAGES.empty).then(() => false);
+    const at = (r, c) => sheet.cells.get(r)?.get(c);
+    const kindOf = (cells) => {
+      const cell = cells.find((x) => x && x.v != null && x.v !== '');
+      if (typeof cell?.v !== 'number') return 'text';
+      return isDateFormat(formatCodeOf(wb.styles, cell.s || 0)) ? 'date' : 'number';
+    };
+    const span = (a, b) => Array.from({ length: Math.min(b - a + 1, 500) }, (_, k) => a + k);
+    const lines = (leftToRight, header) => (leftToRight
+      ? span(area.r0, area.r1).map((r) => ({ at: r, label: `Row ${r + 1}`, kind: kindOf(span(area.c0, area.c1).map((c) => at(r, c))) }))
+      : span(area.c0, area.c1).map((c) => {
+        const top = at(area.r0, c)?.v;
+        const label = header && top != null && top !== '' ? String(top) : `Column ${colName(c)}`;
+        return { at: c, label, kind: kindOf(span(area.r0 + (header ? 1 : 0), area.r1).map((r) => at(r, c))) };
+      }));
+    const start = { keys: [{ at: Math.min(Math.max(sel.ac, area.c0), area.c1), desc: false }], header: guessHeader(wb, si, area), matchCase: false, leftToRight: false };
+    const got = await sortBox(root, { lines, start });
+    if (!got) { state.grid.el.focus({ preventScroll: true }); return false; }
+    return editing().run('sort', { area, ...got });
   };
   /** The menu of a cell (right-click): Excel's, as far as the editor goes. */
   const cellMenu = (point) => {

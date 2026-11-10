@@ -25,6 +25,7 @@ insides:
 | `src/ooxml/clearops.js` | Home > Clear (All, Contents, Formats) as Excel does it, merged ranges unmerged, part of one refused. |
 | `src/ooxml/stats.js` | The status bar's Average, Count and Sum of the selection, by Excel's rules. |
 | `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
+| `src/ooxml/sortops.js` | Sort as Excel does it: its order of values and of text, the range around a cell, the header guess, formulas moved as a copy moves them, borders left, Excel's refusals (docs/SORT.md). |
 | `src/ooxml/clipops.js` | Copy, cut and paste as Excel does them: a snapshot of cells, pasted with formulas moved and repeated over the selection, or moved with every formula that reads them; Paste Special (contents, formats, operations, Skip blanks, Transpose) and Paste Link; text from other programs read as typed (docs/CLIPBOARD.md). |
 | `src/ooxml/rowcol.js` | Whole rows and columns, or cells with the rest of their columns or rows shifting, inserted and deleted as Excel does it: the sheet's cells, widths, merges and ranges moved, new lines formatted from the one before, every formula of the workbook following, Excel's refusals (docs/ROWCOL.md). |
 | `src/ooxml/sizes.js` | Column widths, row heights and hidden lines written as Excel writes them: widths in whole pixels over the digit width, col elements split where a range cuts them, AutoFit Row Height as the fixed height taken away (docs/SIZES.md). |

@@ -75,6 +75,30 @@ for (const colorScheme of ['light', 'dark']) {
       const specialBox = await axe();
       t.check(!specialBox.length && await page.evaluate(() => document.activeElement.type === 'radio' && document.activeElement.checked), `${colorScheme}: the Paste Special box, no axe violations, All focused`, specialBox.join('\n     '));
       await page.keyboard.press('Escape');
+      // Sort & Filter: on E2:E3 Sort A to Z asks with Excel's Sort Warning; on one cell Custom Sort... opens the Sort box.
+      const sortMenu = async (item) => {
+        const hidden = !(await page.isVisible('.oxe-toolbar button[title="Sort & Filter"]')) && await page.isVisible('.oxe-more');
+        if (hidden) await page.click('.oxe-more');
+        await page.click('.oxe-toolbar button[title="Sort & Filter"]');
+        await page.click(`.oxe-pop >> text=${item}`);
+        return hidden;
+      };
+      await page.evaluate(() => window.oxe.select('E2'));
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('Shift+ArrowDown');
+      let opened = await sortMenu('Sort A to Z');
+      await page.waitForSelector('dialog.oxe-dialog');
+      const warningBox = await axe();
+      t.check(!warningBox.length && await page.evaluate(() => document.activeElement.type === 'radio' && document.activeElement.checked), `${colorScheme}: the Sort Warning, no axe violations, Expand the selection focused`, warningBox.join('\n     '));
+      await page.keyboard.press('Escape');
+      if (opened) await page.click('.oxe-more');
+      await page.evaluate(() => window.oxe.select('B3'));
+      opened = await sortMenu('Custom Sort...');
+      await page.waitForSelector('dialog.oxe-sort-box');
+      const sortDialog = await axe();
+      t.check(!sortDialog.length && await page.evaluate(() => document.activeElement.classList.contains('oxe-sort-select')), `${colorScheme}: the Sort box, no axe violations, its first column list focused`, sortDialog.join('\n     '));
+      await page.keyboard.press('Escape');
+      if (opened) await page.click('.oxe-more');
       const cell = await page.evaluate(() => { const r = document.querySelector('.oxe-row[aria-rowindex="3"] .oxe-cell[aria-colindex="3"]').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
       await page.mouse.click(cell.x, cell.y, { button: 'right' });
       await page.waitForSelector('.oxe-menu >> text=Paste Special...');

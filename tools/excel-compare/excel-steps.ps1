@@ -2,8 +2,9 @@
 # inserting and deleting cells (Range.Insert and Delete, with the shift given or left to Excel), Paste Special
 # (Range.Copy, then PasteSpecial with what to paste, the operation, Skip blanks and Transpose), Paste Link
 # (Worksheet.Paste with Link), Fill (Range.FillDown, FillRight, FillUp, FillLeft) and the fill handle
-# (Range.AutoFill). Each case is a new workbook in an invisible instance (macros disabled for it only), closed without
-# saving; no Excel setting is changed and no keys are sent. For each case the cells of `read` on
+# (Range.AutoFill), Clear (Range.Clear, ClearContents, ClearFormats) and Sort (Worksheet.Sort, Range.Sort). Each
+# case is a new workbook in an invisible instance (macros disabled for it only), closed without saving; no Excel
+# setting is changed and no keys are sent. For each case the cells of `read` on
 # Sheet1 (and the cells given on Sheet2) are written out: formula, value, number format, bold, fill colour, bottom
 # border, with the merged ranges, column widths and defined names, or the refusal when Excel refused a step.
 #
@@ -16,7 +17,11 @@
 #   { do: "link", from, to },
 #   { do: "fill", range, dir: "down" | "right" | "up" | "left" } (Range.FillDown...),
 #   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" } (the fill handle: AutoFill),
-#   { do: "clear", range, what: "all" | "contents" | "formats" } (Range.Clear, ClearContents, ClearFormats)]
+#   { do: "clear", range, what: "all" | "contents" | "formats" } (Range.Clear, ClearContents, ClearFormats),
+#   { do: "sort", range, region: bool (range's CurrentRegion, as Sort on one cell takes it), keys: [{ key (a cell of
+#     the column, or row, to sort by), order: "asc" | "desc", textAsNumbers: bool }], header: "guess" | "yes" | "no",
+#     matchCase: bool, leftToRight: bool } (Worksheet.Sort, as Excel's Sort box applies it; the range sorted is
+#     written out as `region`)]
 # usage: pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
 param([Parameter(Mandatory)][string]$Cases, [Parameter(Mandatory)][string]$Out)
 $ErrorActionPreference = 'Stop'
@@ -88,6 +93,37 @@ try {
             $r = $ws.Range($st.range)
             switch ($st.what) { 'all' { [void]$r.Clear() } 'contents' { [void]$r.ClearContents() } 'formats' { [void]$r.ClearFormats() } }
           }
+          'sort' {
+            # (Assigned in each branch: a range coming out of an if expression is unrolled into its cells.)
+            if ($st.region) { $r = $ws.Range($st.range).CurrentRegion } else { $r = $ws.Range($st.range) }
+            $a.region = $r.Address($false, $false)
+            $hdr = @{ guess = 0; yes = 1; no = 2 }[$(if ($st.header) { [string]$st.header } else { 'guess' })]
+            $way = if ($st.leftToRight) { 2 } else { 1 }
+            $keys = @($st.keys)
+            if ($st.legacy) {
+              # (Range.Sort, whose xlGuess looks at the first row as the A to Z button does; the Sort object's
+              # xlGuess was seen never to take a header.) Up to three keys.
+              $k1 = $ws.Range($keys[0].key)
+              $o1 = if ($keys[0].order -eq 'desc') { 2 } else { 1 }
+              $k2 = $missing; $o2 = 1; $k3 = $missing; $o3 = 1
+              if ($keys.Count -gt 1) { $k2 = $ws.Range($keys[1].key); if ($keys[1].order -eq 'desc') { $o2 = 2 } }
+              if ($keys.Count -gt 2) { $k3 = $ws.Range($keys[2].key); if ($keys[2].order -eq 'desc') { $o3 = 2 } }
+              [void]$r.Sort($k1, $o1, $k2, $missing, $o2, $k3, $o3, $hdr, 1, [bool]$st.matchCase, $way)
+            } else {
+              $so = $ws.Sort
+              $so.SortFields.Clear()
+              foreach ($k in $keys) {
+                $order = if ($k.order -eq 'desc') { 2 } else { 1 }
+                $data = if ($k.textAsNumbers) { 1 } else { 0 }
+                [void]$so.SortFields.Add($ws.Range($k.key), 0, $order, $missing, $data)
+              }
+              $so.SetRange($r)
+              $so.Header = $hdr
+              $so.MatchCase = [bool]$st.matchCase
+              $so.Orientation = $way
+              $so.Apply()
+            }
+          }
           'link' {
             [void]$ws.Range($st.from).Copy()
             [void]$ws.Activate(); [void]$ws.Range($st.to).Select()
@@ -124,5 +160,5 @@ try {
   [void][Runtime.InteropServices.Marshal]::ReleaseComObject($x)
   [GC]::Collect(); [GC]::WaitForPendingFinalizers()
 }
-[ordered]@{ excel = 'Excel.Application: Range.Insert, Range.Delete, Range.Copy and PasteSpecial, Worksheet.Paste with Link'; cases = $answers } | ConvertTo-Json -Depth 6 | Set-Content -Encoding utf8 $Out
+[ordered]@{ excel = 'Excel.Application: Range.Insert, Range.Delete, Range.Copy and PasteSpecial, Worksheet.Paste with Link, Range.Fill and AutoFill, Range.Clear, Worksheet.Sort and Range.Sort'; cases = $answers } | ConvertTo-Json -Depth 6 | Set-Content -Encoding utf8 $Out
 "$($answers.Count) cases"

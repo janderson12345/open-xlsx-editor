@@ -516,6 +516,50 @@ await page.waitForSelector('dialog.oxe-dialog');
 check(await page.textContent('dialog.oxe-dialog') === "We can't do that to a merged cell.OK", 'Delete on B12:B13, part of the merged A12:C13: Excel’s refusal', await page.textContent('dialog.oxe-dialog'));
 await page.keyboard.press('Enter');
 
+// Sort: E2:E10 (Yes and No) selected, Sort & Filter > Sort Z to A: Excel's Sort Warning (data beside), Sort with the
+// selection expanded: the Yes rows first, each row kept whole, the total under them left; Ctrl+Z. A1:F10, Custom
+// Sort...: the headers guessed, Choice Z to A then Amount largest first; OK; Ctrl+Z.
+const rowsOf = () => page.evaluate(() => Array.from({ length: 9 }, (_, k) => { const l = window.oxe.workbook.sheet(0).cells.get(k + 1); return `${l?.get(0)?.v}|${l?.get(1)?.v}|${l?.get(4)?.v}`; }));
+const rowsWere = await rowsOf();
+const totalLabel = await value('A11');
+await page.evaluate(() => window.oxe.select('E2'));
+await page.focus('.oxe-grid');
+for (let k = 0; k < 8; k++) await page.keyboard.press('Shift+ArrowDown');
+let warning = '';
+await ribbon('Sort & Filter', async () => {
+  await page.click('.oxe-pop >> text=Sort Z to A');
+  await page.waitForSelector('dialog.oxe-dialog');
+  warning = await page.textContent('dialog.oxe-dialog .oxe-dialog-text');
+  await page.click('dialog.oxe-dialog >> button:text-is("Sort")');
+});
+let rowsNow = await rowsOf();
+const yesFirst = rowsNow.findIndex((x) => x.endsWith('|No')) > rowsNow.findLastIndex((x) => x.endsWith('|Yes'));
+check(/^There is data next to your selection/.test(warning) && yesFirst && [...rowsNow].sort().join() === [...rowsWere].sort().join() && await value('A11') === totalLabel,
+  'Sort Z to A on E2:E10: Excel’s Sort Warning, the selection expanded, Yes rows first, rows whole, the total left', rowsNow.join(' '));
+await page.keyboard.press('Control+z');
+check((await rowsOf()).join() === rowsWere.join(), 'Ctrl+Z: the rows back in their order');
+await page.evaluate(() => window.oxe.select('A1'));
+await page.focus('.oxe-grid');
+for (let k = 0; k < 5; k++) await page.keyboard.press('Shift+ArrowRight');
+for (let k = 0; k < 9; k++) await page.keyboard.press('Shift+ArrowDown');
+let headed = false;
+await ribbon('Sort & Filter', async () => {
+  await page.click('.oxe-pop >> text=Custom Sort...');
+  await page.waitForSelector('dialog.oxe-sort-box');
+  headed = await page.isChecked('dialog.oxe-sort-box >> input[type=checkbox]');
+  await page.selectOption('.oxe-sort-level >> nth=0 >> select >> nth=0', { label: 'Choice' });
+  await page.selectOption('.oxe-sort-level >> nth=0 >> select >> nth=1', { label: 'Z to A' });
+  await page.click('dialog.oxe-sort-box >> button:text-is("Add Level")');
+  await page.selectOption('.oxe-sort-level >> nth=1 >> select >> nth=0', { label: 'Amount' });
+  await page.selectOption('.oxe-sort-level >> nth=1 >> select >> nth=1', { label: 'Largest to Smallest' });
+  await page.click('dialog.oxe-sort-box >> button:text-is("OK")');
+});
+rowsNow = await rowsOf();
+const byBoth = rowsNow.every((x, k) => k === 0 || (() => { const [, a, e] = rowsNow[k - 1].split('|'); const [, b, f] = x.split('|'); return e > f || (e === f && Number(a) >= Number(b)); })());
+check(headed && byBoth && await value('A1') === 'Item', 'Custom Sort... on A1:F10: headers guessed, Choice Z to A then Amount largest first, the header row left', rowsNow.join(' '));
+await page.keyboard.press('Control+z');
+check((await rowsOf()).join() === rowsWere.join(), 'Ctrl+Z: as before');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);
