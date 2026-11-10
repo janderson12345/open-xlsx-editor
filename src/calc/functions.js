@@ -475,21 +475,52 @@ function exactly(x, wild) {
   }
   return (v) => v !== null && sameType(v, x) && compare(v, x) === 0;
 }
-/** Position of x in a list: `how` 0 the first exact match, 1 the last value <= x (a list sorted up), -1 the last
- *  value >= x (sorted down); -1 if none. */
+/**
+ * Position of x in a list, as Excel finds it (fitted on Excel's answers for 400 unsorted lists, with blanks and text
+ * among the numbers: docs/CALC.md); -1 if none. `how` 0: the first exact match. 1 (a list sorted up: MATCH 1, VLOOKUP
+ * and HLOOKUP TRUE): Excel's binary search, which on a list that isn't sorted gives its own answer: from the middle,
+ * a blank or a value of another type passed over to the right; an exact match taken at once, then the last of the
+ * equal values that follow it. -1 (sorted down: MATCH -1): a scan from the start, blanks and other types passed over,
+ * that takes the first exact match and stops at the first value below x.
+ */
 function position(list, x, how, wild = true) {
   if (how === 0) {
     const eq = exactly(x, wild);
     for (let i = 0; i < list.length; i++) if (eq(list.at(i))) return i;
     return -1;
   }
+  const fits = (v) => v !== null && sameType(v, x);
+  if (how < 0) {
+    let found = -1;
+    for (let i = 0; i < list.length; i++) {
+      const v = list.at(i);
+      if (!fits(v)) continue;
+      const k = compare(v, x);
+      if (k === 0) return i;
+      if (k < 0) break;
+      found = i;
+    }
+    return found;
+  }
+  let lo = 0;
+  let hi = list.length - 1;
   let found = -1;
-  for (let i = 0; i < list.length; i++) {
-    const v = list.at(i);
-    if (v === null || !sameType(v, x)) continue;
-    const k = compare(v, x);
-    if (how > 0 ? k <= 0 : k >= 0) found = i;
-    else break;
+  while (lo <= hi) {
+    let m = (lo + hi) >> 1;
+    while (m <= hi && !fits(list.at(m))) m++;
+    if (m > hi) { hi = ((lo + hi) >> 1) - 1; continue; }
+    const k = compare(list.at(m), x);
+    if (k === 0) {
+      // (The last of the equal values after it, blanks and other types passed over.)
+      let last = m;
+      for (let j = m + 1; j < list.length; j++) {
+        const v = list.at(j);
+        if (!fits(v)) continue;
+        if (compare(v, x) === 0) last = j; else break;
+      }
+      return last;
+    }
+    if (k < 0) { found = m; lo = m + 1; } else hi = m - 1;
   }
   return found;
 }

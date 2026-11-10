@@ -27,6 +27,15 @@ Excel opens the workbook read-only and invisibly (links not updated, macros off 
 formula (`CalculateFull`) and the script writes each formula cell's sheet, address, formula and value to JSON; closed
 without saving. `test/formulas-excel.json` came from `test/fixtures/formulas.xlsx` this way (docs/CALC.md).
 
+```sh
+node tools/excel-compare/lookup-cases.mjs <cases.json>
+pwsh tools/excel-compare/excel-lookups.ps1 <cases.json> test/lookup-excel.json
+```
+
+Approximate lookups over 400 unsorted lists (the same lists each time, from a fixed seed): Excel answers MATCH 1,
+MATCH -1 and VLOOKUP TRUE for each in a new workbook in an invisible instance, closed without saving. On a list that
+isn't sorted, Excel's binary search gives its own answer, which `test/lookups.test.js` expects of the engine.
+
 ## Each change: a run
 
 ```powershell

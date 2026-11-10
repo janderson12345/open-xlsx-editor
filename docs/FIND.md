@@ -3,8 +3,7 @@
 How cells are searched and replaced (`src/ooxml/findops.js`, the bar in `src/editor/findbar.js`), and what Excel was
 seen to do. Each rule was measured over COM (`Range.Find` and `FindNext`, `Cells.Replace`, on a new workbook in a
 hidden instance). `npm test` (`test/find.test.js`) repeats each search and replacement and expects Excel's result.
-After replacements across formulas.xlsx, Excel works the workbook out as the editor does, except for three
-approximate lookups over a column left unsorted by the replacement (a calculation gap, not a search one: see below).
+After replacements across formulas.xlsx, Excel works out all 399 formulas as the editor does.
 
 ## In the editor
 
@@ -42,6 +41,6 @@ cell is left alone and counted).
 
 ## Found on the way
 
-Replacing 5 with 7 in formulas.xlsx left a column unsorted (0, 70, 60, 70, 80). Excel's approximate `VLOOKUP` and
-`MATCH` over it give 3, the editor's 1: Excel uses a binary search, which gives its own answer on unsorted data. The
-calculation engine should do the same.
+Replacing 5 with 7 in formulas.xlsx left a column unsorted (0, 70, 60, 70, 80), where Excel's approximate `VLOOKUP` and
+`MATCH` gave answers the engine didn't: Excel searches such lists its own way. The engine now does the same
+(docs/CALC.md), and after those replacements Excel works out all 399 formulas as the editor does.
