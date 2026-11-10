@@ -240,9 +240,9 @@ export class Workbook {
     this.edited = true;
   }
 
-  /** Insert `n` rows ('row') or columns ('col') of sheet i before index `at`, or delete -n from `at` (rowcol.js; a
-   *  refusal throws a SheetError with Excel's words). */
-  changeLines(i, axis, at, n) { changeLines(this, i, axis, at, n); }
+  /** Insert `n` rows ('row') or columns ('col') of sheet i before index `at`, or delete -n from `at`, or only the cells of
+   *  `band` (rowcol.js; a refusal throws a SheetError with Excel's words). */
+  changeLines(i, axis, at, n, band = null, opts = {}) { changeLines(this, i, axis, at, n, band, opts); }
 
   /** Rows ('row') or columns ('col') a to b of sheet i resized, hidden or shown (sizes.js setRows and setColumns: { width },
    *  { height }, { hidden }, { bestFit }); the sheet read again. */

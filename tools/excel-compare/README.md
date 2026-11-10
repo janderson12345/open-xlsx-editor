@@ -36,6 +36,26 @@ Approximate lookups over 400 unsorted lists (the same lists each time, from a fi
 MATCH -1 and VLOOKUP TRUE for each in a new workbook in an invisible instance, closed without saving. On a list that
 isn't sorted, Excel's binary search gives its own answer, which `test/lookups.test.js` expects of the engine.
 
+## Editing steps
+
+```sh
+node tools/excel-compare/shift-cases.mjs > tools/excel-compare/shift-cases.json
+pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
+```
+
+Each case is a small sheet built in a new workbook (cells, array formulas, formats, merged ranges, widths, names), one
+or more steps done there by Excel (inserting and deleting cells, Paste Special, Paste Link), and what came of it
+written out: each cell's formula, value, number format, bold, fill and bottom border, the merged ranges, the column
+widths and the names, or the refusal. An invisible instance, closed without saving.
+
+```sh
+SHIFT_SAVE=<folder> node --test test/shift.test.js
+pwsh tools/excel-compare/excel-readback.ps1 <folder>/saved.json <out.json>
+```
+
+The same cases done by the editor and saved, then opened in Excel and read the same way, to compare with what Excel
+made itself.
+
 ## Each change: a run
 
 ```powershell

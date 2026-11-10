@@ -97,9 +97,9 @@ export function homeTab(kit, { act, color }) {
       line(btn('$', 'Accounting Number Format', f('format', { style: 'Currency' })), btn('%', 'Percent Style (Ctrl+Shift+%)', f('format', { style: 'Percent' })),
         btn(',', 'Comma Style', f('format', { style: 'Comma' })), btn('.0←', 'Increase Decimal', f('stepDecimal', 1)), btn('.0→', 'Decrease Decimal', f('stepDecimal', -1))))),
     grp('Cells', col(
-      sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),
+      sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Cells...', f('insertCells'), { hint: 'Ctrl++' }), item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),
         item('Insert Sheet', f('insertSheet'), { hint: 'Shift+F11' })]),
-      sheetMenu('🗑', 'Delete', 'Delete', () => [item('Delete Sheet Rows', f('deleteRows')), item('Delete Sheet Columns', f('deleteColumns')),
+      sheetMenu('🗑', 'Delete', 'Delete', () => [item('Delete Cells...', f('deleteCells'), { hint: 'Ctrl+-' }), item('Delete Sheet Rows', f('deleteRows')), item('Delete Sheet Columns', f('deleteColumns')),
         item('Delete Sheet', f('deleteShownSheet'))]),
       sheetMenu('✎', 'Format', 'Format', () => [el('div', { class: 'oxe-cap' }, 'Cell Size'), item('Row Height...', f('rowHeightBox')), item('AutoFit Row Height', f('fitLines', 'row')),
         item('Column Width...', f('columnWidthBox')), item('AutoFit Column Width', f('fitLines', 'col')), el('hr'),

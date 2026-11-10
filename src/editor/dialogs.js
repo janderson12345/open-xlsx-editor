@@ -1,5 +1,6 @@
-// Excel's message boxes and its Unhide list, as modal <dialog> elements: focus held inside, Esc cancels, focus back
-// where it was on closing. Each resolves a promise with what was chosen.
+// Excel's message boxes, its Unhide list and its boxes of choices (Insert, Delete, Paste Special), as modal <dialog>
+// elements: focus held inside, Esc cancels, focus back where it was on closing. Each resolves a promise with what was
+// chosen.
 
 let dialogCount = 0;
 
@@ -116,5 +117,67 @@ export function numberBox(root, { title, label, value, min = 0, max, refusal }) 
     row.append(button('OK', ok), button('Cancel', () => done(null)));
     dlg.append(h, lab, field, note, row);
     setTimeout(() => field.select());
+  });
+}
+
+/** A box of choices, as Excel's Insert, Delete and Paste Special boxes are: a title, groups of radio buttons
+ *  ({ key, legend, options: labels, value: the one chosen first, columns }), check boxes ({ key, label, value }) and
+ *  OK, Cancel and any other `buttons` (before OK, as Excel's Paste Link). Resolves to { button, choices: { key: label },
+ *  checks: { key: true or false } }, or null for Cancel and Esc. Enter is OK. */
+export function optionsBox(root, { title, groups = [], checks = [], buttons = [] }) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    const h = document.createElement('h2');
+    h.id = `${id}-title`;
+    h.className = 'oxe-dialog-title';
+    h.textContent = title;
+    dlg.append(h);
+    const radios = new Map();
+    groups.forEach((g, gi) => {
+      const set = document.createElement('fieldset');
+      set.className = 'oxe-dialog-group';
+      if (g.columns > 1) set.style.setProperty('--oxe-cols', String(g.columns));
+      if (g.legend) set.append(Object.assign(document.createElement('legend'), { textContent: g.legend }));
+      const name = `${id}-g${gi}`;
+      radios.set(g.key, g.options.map((label, oi) => {
+        const input = Object.assign(document.createElement('input'), { type: 'radio', name, id: `${name}-${oi}`, value: label, checked: label === g.value });
+        if (label === g.value && gi === 0) input.dataset.first = '';
+        const lab = Object.assign(document.createElement('label'), { htmlFor: input.id, textContent: label });
+        const line = document.createElement('div');
+        line.className = 'oxe-dialog-option';
+        line.append(input, lab);
+        set.append(line);
+        return input;
+      }));
+      dlg.append(set);
+    });
+    const boxes = new Map();
+    if (checks.length) {
+      const line = document.createElement('div');
+      line.className = 'oxe-dialog-checks';
+      checks.forEach((ch, ci) => {
+        const input = Object.assign(document.createElement('input'), { type: 'checkbox', id: `${id}-c${ci}`, checked: !!ch.value });
+        const lab = Object.assign(document.createElement('label'), { htmlFor: input.id, textContent: ch.label });
+        const one = document.createElement('div');
+        one.className = 'oxe-dialog-option';
+        one.append(input, lab);
+        line.append(one);
+        boxes.set(ch.key, input);
+      });
+      dlg.append(line);
+    }
+    const answer = (button) => done({
+      button,
+      choices: Object.fromEntries([...radios].map(([k, list]) => [k, list.find((x) => x.checked)?.value ?? null])),
+      checks: Object.fromEntries([...boxes].map(([k, input]) => [k, input.checked])),
+    });
+    dlg.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); answer('OK'); }
+    });
+    const row = document.createElement('div');
+    row.className = 'oxe-dialog-buttons';
+    row.append(...buttons.map((label) => button(label, () => answer(label))), button('OK', () => answer('OK')), button('Cancel', () => done(null)));
+    dlg.append(row);
+    if (!dlg.querySelector('[data-first]')) (dlg.querySelector('input') || row.firstChild).dataset.first = '';
   });
 }

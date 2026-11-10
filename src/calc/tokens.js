@@ -220,13 +220,43 @@ export function shiftSpan(a, b, at, n) {
   return [a < at ? a : a > last ? a + n : at, b > last ? b + n : b < at ? b : at - 1];
 }
 
+/** An area ({ r0, c0, r1, c1 }) after cells of band `band` were shifted (see shiftRefs): undefined when it stays as
+ *  it was, null when all of it was deleted, the moved, grown or shrunk area otherwise. Whole rows and columns stay. */
+export function bandArea(a, axis, at, n, [b0, b1]) {
+  if (a.kind === 'rows' || a.kind === 'cols') return undefined;
+  const rows = axis === 'row';
+  const [p0, p1] = rows ? [a.c0, a.c1] : [a.r0, a.r1];
+  const [s0, s1] = rows ? [a.r0, a.r1] : [a.c0, a.c1];
+  let next;
+  if (p0 >= b0 && p1 <= b1) {
+    const span = shiftSpan(s0, s1, at, n);
+    if (!span) return null;
+    if (!(rows ? okRow(span[1]) : okCol(span[1]))) return null;
+    next = rows ? { ...a, r0: span[0], r1: span[1] } : { ...a, c0: span[0], c1: span[1] };
+  } else if (n < 0 && s0 >= at && s1 <= at - n - 1 && b0 <= p1 && b1 >= p0) {
+    // (The deleted cells take one end off a range they cross; in its middle they leave it as it was.)
+    let q0 = p0;
+    let q1 = p1;
+    if (b0 <= p0) q0 = b1 + 1; else if (b1 >= p1) q1 = b0 - 1; else return undefined;
+    next = rows ? { ...a, c0: q0, c1: q1 } : { ...a, r0: q0, r1: q1 };
+  } else return undefined;
+  if (next.r0 === a.r0 && next.r1 === a.r1 && next.c0 === a.c0 && next.c1 === a.c1) return undefined;
+  return next;
+}
+
 /**
  * A formula after rows or columns of sheet `sheet` were inserted or deleted (`axis` 'row' or 'col'; `at`, `n` as in
  * shiftLine), as Excel rewrites it: references move, $ or not; a range grows or shrinks; a reference whose cells were
  * all deleted becomes #REF! (its sheet kept: Sheet1!#REF!). `here`: the formula's own sheet (null for a defined name,
  * whose references name their sheet). Text that doesn't read as a formula comes back as it was.
+ *
+ * With `band` ([first, last] columns for axis 'row', rows for 'col'), only the cells of those columns (or rows) were
+ * shifted (Excel's Insert and Delete with Shift cells down, right, up or left): a reference moves as above when its
+ * columns (rows) are within the band and stays otherwise, whole rows and columns included; but a range all of whose
+ * shifted-axis lines were deleted, with the band covering one end of it, loses that end (B3:D4 is D3:D4 once B3:C4 is
+ * deleted upwards).
  */
-export function shiftRefs(text, { here, sheet, axis, at, n }) {
+export function shiftRefs(text, { here, sheet, axis, at, n, band = null }) {
   const same = (a, b) => a != null && b != null && String(a).toLowerCase() === String(b).toLowerCase();
   const rows = axis === 'row';
   try {
@@ -234,6 +264,12 @@ export function shiftRefs(text, { here, sheet, axis, at, n }) {
       if (t.type !== 'ref' || t.book != null || !t.area || !same(t.sheet ?? here, sheet)) return null;
       const a = t.area;
       if (rows ? a.kind === 'cols' : a.kind === 'rows') return null;
+      if (band) {
+        const next = bandArea(a, axis, at, n, band);
+        if (next === undefined) return null;
+        if (next === null) return `${t.prefix}#REF!`;
+        return t.prefix + areaText(next);
+      }
       const span = rows ? shiftSpan(a.r0, a.r1, at, n) : shiftSpan(a.c0, a.c1, at, n);
       if (!span) return `${t.prefix}#REF!`;
       const next = rows ? { ...a, r0: span[0], r1: span[1] } : { ...a, c0: span[0], c1: span[1] };

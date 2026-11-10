@@ -13,6 +13,7 @@ import * as fmt from '../ooxml/formatops.js';
 import { mergeChange } from '../ooxml/mergeops.js';
 import * as clip from '../ooxml/clipops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
+import { shiftCells } from '../ooxml/rowcol.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -134,6 +135,26 @@ export function createCommands(ctx) {
     ctx.announce(note);
     return true;
   }
+  /** Rows, columns or cells moved by `change(wb, si)`, as one step of the history (a snapshot before and after).
+   *  Excel's refusals said in its words (false); 'unmerge' for its question about merged cells. */
+  function moved(change) {
+    const wb = ctx.workbook();
+    const before = wb.snapshot();
+    try {
+      change(wb, ctx.sheetIndex());
+    } catch (e) {
+      if (!(e instanceof SheetError)) throw e;
+      if (e.ask) return 'unmerge';
+      ctx.alert(e.message);
+      return false;
+    }
+    state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+    state.redo = [];
+    commands.dropClip();
+    ctx.reloaded?.();
+    ctx.changed?.();
+    return true;
+  }
   /** A format command: formatops.js's function over the selection on the sheet shown. */
   const formatting = (fn, ...args) => (ctx.readOnly() ? (ctx.announce('The workbook is read-only'), false) : restyle(fn(ctx.workbook(), ctx.sheetIndex(), state.sel, ...args)));
 
@@ -205,21 +226,21 @@ export function createCommands(ctx) {
       const rows = axis === 'row';
       const count = rows ? s.r1 - s.r0 + 1 : s.c1 - s.c0 + 1;
       if (count >= (rows ? MAX_ROWS : MAX_COLS)) return false;
-      const wb = ctx.workbook();
-      const before = wb.snapshot();
-      try {
-        wb.changeLines(ctx.sheetIndex(), axis, rows ? s.r0 : s.c0, dir * count);
-      } catch (e) {
-        if (!(e instanceof SheetError)) throw e;
-        ctx.alert(e.message);
-        return false;
-      }
-      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
-      state.redo = [];
-      commands.dropClip();
-      ctx.reloaded?.();
-      ctx.changed?.();
-      show(state.sel, state.focus, `${dir > 0 ? 'Inserted' : 'Deleted'} ${count} ${rows ? 'row' : 'column'}${count > 1 ? 's' : ''}, `);
+      const done = moved((wb, si) => wb.changeLines(si, axis, rows ? s.r0 : s.c0, dir * count));
+      if (done === true) show(state.sel, state.focus, `${dir > 0 ? 'Inserted' : 'Deleted'} ${count} ${rows ? 'row' : 'column'}${count > 1 ? 's' : ''}, `);
+      return done;
+    },
+    /** Insert (dir 1) or delete (-1) the selected cells, the rest of their columns shifting down or up (axis 'row') or
+     *  of their rows right or left ('col'), as one step of the history (rowcol.js shiftCells). Returns 'unmerge' when
+     *  merged cells would be split: asked first, as Excel asks, and done again with `unmerge`. */
+    cells(dir, axis, { unmerge = false } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const s = state.sel;
+      const done = moved((wb, si) => shiftCells(wb, si, s, dir, axis, { unmerge }));
+      if (done !== true) return done;
+      // (Excel keeps the inserted cells selected; after a delete, the cells that took their place.)
+      const way = dir > 0 ? (axis === 'row' ? 'shifted down' : 'shifted right') : (axis === 'row' ? 'shifted up' : 'shifted left');
+      show(state.sel, state.focus, `${dir > 0 ? 'Inserted' : 'Deleted'} cells, the rest ${way}, `);
       return true;
     },
     /** Every selected cell with the same format change (stylesedit.js: font, fill, border, align, numFmt, style). */

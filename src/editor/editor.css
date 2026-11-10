@@ -1098,3 +1098,32 @@
 @media print {
   .oxe-toolbar { display: none; }
 }
+
+/* The radio groups and check boxes of optionsBox (dialogs.js): Excel's Insert, Delete and Paste Special boxes. */
+.oxe-dialog-group {
+  display: grid;
+  grid-template-columns: repeat(var(--oxe-cols, 1), minmax(0, max-content));
+  column-gap: 24px;
+  row-gap: 4px;
+  margin: 0 0 10px;
+  padding: 6px 10px 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+}
+.oxe-dialog-group legend {
+  padding: 0 4px;
+}
+.oxe-dialog-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.oxe-dialog-option input:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-dialog-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+}

@@ -84,7 +84,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Format as Table | Kept | |
 | | Cell Styles | Kept | Cells show their style's formatting. |
 | Cells (`cells`) | Insert and delete rows and columns | Partly | Formulas on every sheet, names, chart series, merges, widths and the sheet's ranges follow (docs/ROWCOL.md). Refused for now on a sheet with pictures, charts, comments, tables or pivot tables. |
-| | Insert and delete cells (shifting the rest) | Missing | |
+| | Insert and delete cells (shifting the rest) | Done | Excel's Insert and Delete boxes, Insert Cells... and Delete Cells...; formulas, names, formats and merges as Excel changes them (docs/ROWCOL.md). |
 | | Insert and delete sheets | Done | Cells > Insert, Delete; also on the tab menu. |
 | | Row height, column width (and AutoFit) | Done | Dragging a heading's edge, double-click and Format's AutoFit, the Row Height and Column Width boxes; stored as Excel stores them. AutoFit's width is within a few pixels of Excel's (docs/SIZES.md). |
 | | Hide and unhide rows, columns | Done | |

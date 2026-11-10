@@ -49,7 +49,7 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
 - `CONTRIBUTING.md`: setup and tests. `docs/ARCHITECTURE.md`: the module map. `docs/LAYOUT.md`: matching Excel's
   layout. `docs/CALC.md`: matching Excel's calculation. `docs/SHEETS.md`: matching Excel's sheet operations.
   `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut and paste.
-  `docs/ROWCOL.md`: matching Excel's inserting and deleting of rows and columns. `docs/SIZES.md`: widths, heights,
+  `docs/ROWCOL.md`: matching Excel's inserting and deleting of rows, columns and cells. `docs/SIZES.md`: widths, heights,
   hiding. `docs/FIND.md`: Find and Replace. `docs/VIEW.md`: frozen panes and zoom.
   `docs/ENTRY.md`: how typed entries are read.
   `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab.

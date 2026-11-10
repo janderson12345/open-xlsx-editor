@@ -7,7 +7,8 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox } from './editor/dialogs.js';
+import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
 import { createRibbon } from './editor/ribbon.js';
 import { createFindBar } from './editor/findbar.js';
 import { homeTab } from './editor/hometab.js';
@@ -25,7 +26,7 @@ export { Workbook };
 const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
   resizeLines: 'cells', columnWidth: 'cells', rowHeight: 'cells', fitLines: 'cells', hideLines: 'cells', rowHeightBox: 'cells', columnWidthBox: 'cells',
   freeze: 'window', zoom: 'zoom', zoomBox: 'zoom', zoomSelection: 'zoom', zoomToSelection: 'zoom',
-  lines: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
+  lines: 'cells', cells: 'cells', insertCells: 'cells', deleteCells: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing' };
 const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
@@ -128,6 +129,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'unhideSheet') return sheetActs.unhide();
     if (name === 'insertRows' || name === 'deleteRows') return editing().run('lines', 'row', name === 'insertRows' ? 1 : -1);
     if (name === 'insertColumns' || name === 'deleteColumns') return editing().run('lines', 'col', name === 'insertColumns' ? 1 : -1);
+    if (name === 'insertCells' || name === 'deleteCells') return lines(name === 'insertCells' ? 1 : -1);
     if (name === 'zoomBox') {
       return numberBox(root, { title: 'Zoom', label: 'Custom (%):', value: String(state.grid.view().zoom), min: 10, max: 400, refusal: 'Enter a number between 10 and 400.' })
         .then((n) => n != null && editing().run('zoom', n));
@@ -147,15 +149,27 @@ export function mountXlsxEditor(host, options = {}) {
     }
     return editing().run(name, ...args);
   };
-  /** Ctrl++ (dir 1) and Ctrl+- (-1): whole rows or columns selected are inserted or deleted; otherwise Excel's question
-   *  (its Insert and Delete boxes, without shifting cells, which isn't there yet). */
+  /** Ctrl++ (dir 1) and Ctrl+- (-1), Insert Cells... and Delete Cells...: whole rows or columns selected are inserted
+   *  or deleted; otherwise Excel's Insert or Delete box (shift cells right or down, left or up, entire row or column),
+   *  the shift Excel would make chosen first. */
   const lines = async (dir) => {
     if (state.readOnly || !allowed('lines')) return false;
     const s = editing().selection;
     if (s.c0 === 0 && s.c1 >= MAX_COLS - 1) return editing().run('lines', 'row', dir);
     if (s.r0 === 0 && s.r1 >= MAX_ROWS - 1) return editing().run('lines', 'col', dir);
-    const b = await messageBox(root, dir > 0 ? 'Insert' : 'Delete', ['Entire row', 'Entire column', 'Cancel']);
-    if (b === 'Entire row' || b === 'Entire column') return editing().run('lines', b === 'Entire row' ? 'row' : 'col', dir);
+    const across = dir > 0 ? 'Shift cells right' : 'Shift cells left';
+    const down = dir > 0 ? 'Shift cells down' : 'Shift cells up';
+    const got = await optionsBox(root, { title: dir > 0 ? 'Insert' : 'Delete',
+      groups: [{ key: 'how', legend: dir > 0 ? 'Insert' : 'Delete', options: [across, down, 'Entire row', 'Entire column'], value: shapeShift(s) === 'col' ? across : down }] });
+    const how = got?.choices.how;
+    if (how === 'Entire row' || how === 'Entire column') return editing().run('lines', how === 'Entire row' ? 'row' : 'col', dir);
+    if (how) {
+      const axis = how === down ? 'row' : 'col';
+      const done = editing().run('cells', dir, axis);
+      if (done !== 'unmerge') return done;
+      // (Excel asks before unmerging the merged cells the shift would split.)
+      if (await messageBox(root, ROWCOL_MESSAGES.unmerge, ['OK', 'Cancel']) === 'OK') return editing().run('cells', dir, axis, { unmerge: true });
+    }
     state.grid.el.focus({ preventScroll: true });
     return false;
   };

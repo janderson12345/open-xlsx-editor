@@ -373,6 +373,41 @@ check(f11 != null && await value('E11') === f11, 'Delete Sheet Columns: column E
 await page.keyboard.press('Control+z');
 check(await value('F11') === f11, 'Ctrl+Z: column E back');
 
+// Cells: B3:C4 selected, Ctrl++ asks with Excel's Insert box, Shift cells down chosen as Excel would; Enter shifts the
+// cells below down. Ctrl+Z; B3:B5, Ctrl+-, Shift cells left chosen first, Shift cells up picked and OK.
+await page.evaluate(() => { window.oxe.select('B3'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowRight');
+await page.keyboard.press('Shift+ArrowDown');
+const [b3, b6, d3] = [await value('B3'), await value('B6'), await value('D3')];
+await page.keyboard.press('Control+Shift+Equal');
+await page.waitForSelector('dialog.oxe-dialog');
+check(await page.isChecked('dialog.oxe-dialog >> label:text-is("Shift cells down") >> xpath=preceding-sibling::input'), 'Ctrl++ on B3:C4: Excel’s Insert box, Shift cells down chosen');
+await page.keyboard.press('Enter');
+// (A12:C13 is merged across the columns shifted: Excel's question first, OK to unmerge.)
+await page.waitForSelector('dialog.oxe-dialog >> text=merged cells to unmerge');
+check(await page.isVisible('dialog.oxe-dialog >> text=merged cells to unmerge'), 'Enter: Excel’s question, as A12:C13 is merged across the cells shifted');
+await page.keyboard.press('Enter');
+await page.waitForFunction((b3) => window.oxe.workbook.sheet(0).cells.get(4)?.get(1)?.v === b3, b3);
+check(await value('B3') === null && await value('D3') === d3 && await value('B8') === b6 && await page.evaluate(() => window.oxe.workbook.sheet(0).merges.length) === 0, 'OK: B3:C4 inserted, the cells below moved down two, column D left as it was, A12:C13 unmerged', JSON.stringify(await page.evaluate(() => window.oxe.workbook.sheet(0).merges)));
+await page.keyboard.press('Control+z');
+check(await value('B3') === b3 && await value('B6') === b6 && await page.evaluate(() => window.oxe.workbook.sheet(0).merges.length) === 1, 'Ctrl+Z: the cells back where they were, merged again');
+await page.evaluate(() => window.oxe.select('B3'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Control+Minus');
+await page.waitForSelector('dialog.oxe-dialog');
+check(await page.isChecked('dialog.oxe-dialog >> label:text-is("Shift cells left") >> xpath=preceding-sibling::input'), 'Ctrl+- on B3:B5 (taller than wide): Excel’s Delete box, Shift cells left chosen');
+await page.click('dialog.oxe-dialog >> label:text-is("Shift cells up")');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.waitForSelector('dialog.oxe-dialog >> text=merged cells to unmerge');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.waitForFunction((b6) => window.oxe.workbook.sheet(0).cells.get(2)?.get(1)?.v === b6, b6);
+check(await value('B3') === b6 && await value('D3') === d3, 'Shift cells up: B6 moved up into B3, column D left as it was');
+await page.keyboard.press('Control+z');
+check(await value('B3') === b3, 'Ctrl+Z: back');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

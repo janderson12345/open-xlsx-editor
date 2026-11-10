@@ -59,6 +59,12 @@ for (const colorScheme of ['light', 'dark']) {
       t.check(!sizeBox.length && await page.evaluate(() => document.activeElement.classList.contains('oxe-dialog-field')), `${colorScheme}: the Row Height box, no axe violations, its field focused`, sizeBox.join('\n     '));
       await page.keyboard.press('Escape');
       await page.focus('.oxe-grid');
+      await page.keyboard.press('Control+Shift+Equal');
+      await page.waitForSelector('dialog.oxe-dialog');
+      const insertBox = await axe();
+      t.check(!insertBox.length && await page.evaluate(() => document.activeElement.type === 'radio' && document.activeElement.checked), `${colorScheme}: the Insert box, no axe violations, its chosen option focused`, insertBox.join('\n     '));
+      await page.keyboard.press('Escape');
+      await page.focus('.oxe-grid');
       await page.keyboard.press('Control+h');
       const findBar = await axe();
       t.check(!findBar.length && await page.evaluate(() => document.activeElement.getAttribute('aria-label') === 'Find what'), `${colorScheme}: the Find and Replace bar, no axe violations, its box focused`, findBar.join('\n     '));
