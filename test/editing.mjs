@@ -435,6 +435,30 @@ check(await page.isHidden('.oxe-findbar') && await page.evaluate(() => document.
 await page.keyboard.press('Control+z');
 check(/^Item/.test(String(await value('A3'))), 'Ctrl+Z: every replacement undone at once');
 
+// View: Freeze Panes at C3 from the View tab; scrolled far down and right, a click where A1 shows still selects A1.
+// Ctrl+wheel zooms by 10%. Unfreeze Panes, and zoom back to 100%.
+await page.evaluate(() => { window.oxe.select('C3'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+await page.click('.oxe-rtab >> text=View');
+await page.click('.oxe-toolbar button[title="Freeze Panes"]');
+await page.click('.oxe-pop >> text=Freeze Panes');
+check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":2,"cols":2}' && await page.isVisible('.oxe-pane-top') && await page.isVisible('.oxe-pane-corner'), 'View, Freeze Panes at C3: rows 1-2 and columns A-B frozen');
+await page.evaluate(() => { window.oxe.grid.el.scrollTop = 2000; window.oxe.grid.el.scrollLeft = 600; });
+await page.waitForTimeout(100);
+const a1 = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); return { x: v.left + geo.rowHeadW + 10, y: v.top + geo.colHeadH + 6 }; });
+await page.mouse.click(a1.x, a1.y);
+check((await sel()).ar === 0 && (await sel()).ac === 0, 'scrolled away, a click on the frozen corner selects A1', JSON.stringify(await sel()));
+await page.mouse.move(a1.x + 200, a1.y + 200);
+await page.keyboard.down('Control');
+await page.mouse.wheel(0, -100);
+await page.keyboard.up('Control');
+await page.waitForFunction(() => window.oxe.grid.view().zoom === 110);
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).zoom) === 110, 'Ctrl+wheel: zoom 110%, kept for the file');
+await page.click('.oxe-toolbar button[title="Freeze Panes"]');
+await page.click('.oxe-pop >> text=Unfreeze Panes');
+await page.click('.oxe-toolbar button[title="100%"]');
+check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":0,"cols":0}' && await page.evaluate(() => window.oxe.grid.view().zoom) === 100 && await page.isHidden('.oxe-pane-top'), 'Unfreeze Panes and 100%: as before');
+await page.click('.oxe-rtab >> text=Home');
+
 // Read-only: nothing changes.
 await page.evaluate(() => window.oxe.setReadOnly(true));
 await clickCell(1, 0);

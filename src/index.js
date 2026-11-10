@@ -11,6 +11,7 @@ import { messageBox, unhideBox, numberBox } from './editor/dialogs.js';
 import { createRibbon } from './editor/ribbon.js';
 import { createFindBar } from './editor/findbar.js';
 import { homeTab } from './editor/hometab.js';
+import { viewTab } from './editor/viewtab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
@@ -23,6 +24,7 @@ export { Workbook };
  *  ribbon or the keyboard. */
 const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
   resizeLines: 'cells', columnWidth: 'cells', rowHeight: 'cells', fitLines: 'cells', hideLines: 'cells', rowHeightBox: 'cells', columnWidthBox: 'cells',
+  freeze: 'window', zoom: 'zoom', zoomBox: 'zoom', zoomSelection: 'zoom', zoomToSelection: 'zoom',
   lines: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing' };
@@ -112,7 +114,8 @@ export function mountXlsxEditor(host, options = {}) {
   /** Whether a formatting command's ribbon group is on (`features`); every other command always is. */
   const allowed = (name, change) => {
     const group = groupOf(name, change || {});
-    return !group || (state.features[group] !== false && state.features.home !== false);
+    const tab = group === 'zoom' || group === 'window' ? 'view' : 'home';
+    return !group || (state.features[group] !== false && state.features[tab] !== false);
   };
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
@@ -125,6 +128,11 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'unhideSheet') return sheetActs.unhide();
     if (name === 'insertRows' || name === 'deleteRows') return editing().run('lines', 'row', name === 'insertRows' ? 1 : -1);
     if (name === 'insertColumns' || name === 'deleteColumns') return editing().run('lines', 'col', name === 'insertColumns' ? 1 : -1);
+    if (name === 'zoomBox') {
+      return numberBox(root, { title: 'Zoom', label: 'Custom (%):', value: String(state.grid.view().zoom), min: 10, max: 400, refusal: 'Enter a number between 10 and 400.' })
+        .then((n) => n != null && editing().run('zoom', n));
+    }
+    if (name === 'zoomSelection') return editing().run('zoomToSelection');
     if (name === 'find' || name === 'replace') return state.find?.open(name === 'replace');
     if (name === 'rowHeightBox' || name === 'columnWidthBox') return sizeBox(name === 'rowHeightBox' ? 'row' : 'col');
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
@@ -180,7 +188,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (!state.ribbon || !state.workbook || !state.editing) return;
     const wb = state.workbook;
     const look = state.editing.commands.look();
-    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo() });
+    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: state.grid.view() });
   };
   /** The workbook has new cell formats: their CSS again, and the grid drawn with them. */
   const restyled = () => {
@@ -196,7 +204,10 @@ export function mountXlsxEditor(host, options = {}) {
     const el = document.createElement('div');
     root.prepend(el);
     state.ribbon = createRibbon(el, {
-      tabs: { Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }) },
+      tabs: {
+        Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
+        View: (kit) => viewTab(kit, { act }),
+      },
       home: () => state.grid?.el.focus({ preventScroll: true }),
     });
     placeRibbon();

@@ -12,6 +12,7 @@ import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { changeLines } from './rowcol.js';
 import { setColumns, setRows } from './sizes.js';
+import { setFreeze, setZoom } from './view.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 
@@ -253,6 +254,17 @@ export class Workbook {
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
     this.resetCalc();
+  }
+
+  /** Sheet i's view changed (view.js): { freeze: { rows, cols }, active: { r, c }, topLeft } or { zoom } (percent). */
+  setView(i, { freeze, active, topLeft, zoom }) {
+    const part = this._part(i);
+    if (freeze) setFreeze(part.doc, freeze, active, topLeft);
+    if (zoom != null) setZoom(part.doc, zoom);
+    part.model.freeze = freeze ? { rows: freeze.rows, cols: freeze.cols } : part.model.freeze;
+    if (zoom != null) part.model.zoom = Math.round(Math.min(400, Math.max(10, zoom)));
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
   }
 
   /** The workbook as it is now, to go back to (restore): the parts, the sheets read so far and the workbook part. */

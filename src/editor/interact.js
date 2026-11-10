@@ -287,6 +287,13 @@ export function attachEditing(root, ctx) {
     resizing = { ...edge, from: edge.axis === 'col' ? e.clientX : e.clientY, now: edge.size };
     grid.showGuide(edge.axis, edge.index, edge.size);
   }, true);
+  // Ctrl+wheel zooms the sheet by 10% a notch.
+  view.addEventListener('wheel', (e) => {
+    if (!(e.ctrlKey || e.metaKey) || !e.deltaY) return;
+    e.preventDefault();
+    if (ctx.allowed?.('zoom') === false) return;
+    cmd.run('zoom', grid.view().zoom + (e.deltaY < 0 ? 10 : -10));
+  }, { passive: false });
   view.addEventListener('mousemove', (e) => {
     if (resizing || dragging || pointingDrag) return;
     const edge = e.buttons ? null : grid.edgeAt(e.clientX, e.clientY);

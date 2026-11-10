@@ -78,9 +78,9 @@ export function unhideBox(root, names) {
 }
 
 /** Excel's Row Height and Column Width boxes: a title, a labelled number field holding `value`, OK and Cancel. Resolves
- *  to the number typed (checked against 0 to `max`: `refusal` said under the field otherwise, and the box kept),
+ *  to the number typed (checked against `min` (0) to `max`: `refusal` said under the field otherwise, and the box kept),
  *  or null for Cancel and Esc. */
-export function numberBox(root, { title, label, value, max, refusal }) {
+export function numberBox(root, { title, label, value, min = 0, max, refusal }) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     const h = document.createElement('h2');
@@ -102,7 +102,7 @@ export function numberBox(root, { title, label, value, max, refusal }) {
     note.setAttribute('role', 'alert');
     const ok = () => {
       const n = Number(field.value.trim());
-      if (field.value.trim() === '' || !Number.isFinite(n) || n < 0 || n > max) {
+      if (field.value.trim() === '' || !Number.isFinite(n) || n < min || n > max) {
         note.textContent = refusal;
         field.focus();
         field.select();

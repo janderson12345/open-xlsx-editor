@@ -63,6 +63,12 @@ for (const colorScheme of ['light', 'dark']) {
       const findBar = await axe();
       t.check(!findBar.length && await page.evaluate(() => document.activeElement.getAttribute('aria-label') === 'Find what'), `${colorScheme}: the Find and Replace bar, no axe violations, its box focused`, findBar.join('\n     '));
       await page.keyboard.press('Escape');
+      await page.click('.oxe-rtab >> text=View');
+      await page.click('.oxe-toolbar button[title="Freeze Panes"]');
+      const viewTab = await axe();
+      t.check(!viewTab.length, `${colorScheme}: the View tab with its Freeze Panes menu, no axe violations`, viewTab.join('\n     '));
+      await page.keyboard.press('Escape');
+      await page.click('.oxe-rtab >> text=Home');
       const ribbon = await page.evaluate(() => {
         const list = document.querySelector('.oxe-rtablist');
         const tab = list.querySelector('[role=tab]');

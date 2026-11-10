@@ -66,28 +66,58 @@ export function sheetGeometry(sheet, { print = false, normalFamily, auto = null 
 /** The range of rows and columns in view (with overscan), from the scroll position. */
 function visibleWindow(st) {
   const { view, rows, cols, rowHeadW } = st;
-  const w = Math.max(0, view.clientWidth - rowHeadW);
-  const h = Math.max(0, view.clientHeight - COLHEAD_H);
+  const z = (st.zoom || 100) / 100;
+  const top = view.scrollTop / z;
+  const left = view.scrollLeft / z;
+  const w = Math.max(0, view.clientWidth / z - rowHeadW);
+  const h = Math.max(0, view.clientHeight / z - COLHEAD_H);
   return {
-    r0: Math.max(0, rows.indexAt(view.scrollTop) - OVERSCAN),
-    r1: Math.min(rows.count - 1, rows.indexAt(view.scrollTop + h) + OVERSCAN),
-    c0: Math.max(0, cols.indexAt(view.scrollLeft) - OVERSCAN),
-    c1: Math.min(cols.count - 1, cols.indexAt(view.scrollLeft + w) + OVERSCAN),
+    r0: Math.max(0, rows.indexAt(top) - OVERSCAN),
+    r1: Math.min(rows.count - 1, rows.indexAt(top + h) + OVERSCAN),
+    c0: Math.max(0, cols.indexAt(left) - OVERSCAN),
+    c1: Math.min(cols.count - 1, cols.indexAt(left + w) + OVERSCAN),
   };
 }
 
 function drawColumnHeadings(st, win) {
-  const kids = [st.corner];
-  for (let c = win.c0; c <= win.c1; c++) {
-    const w = st.cols.size(c);
-    if (!w) continue;
-    const el = div('oxe-colhead', 'columnheader');
-    el.setAttribute('aria-colindex', String(c + 2));
+  const heading = (c, role) => {
+    const el = div('oxe-colhead', role);
+    if (role) el.setAttribute('aria-colindex', String(c + 2));
     el.textContent = colName(c);
-    setVars(el, { '--oxe-x': st.cols.start(c), '--oxe-w': w });
-    kids.push(el);
+    setVars(el, { '--oxe-x': st.cols.start(c), '--oxe-w': st.cols.size(c) });
+    return el;
+  };
+  const kids = [st.corner];
+  // (Frozen columns' headings stay where they are, in a pinned strip of their own.)
+  const fc = st.freeze?.cols || 0;
+  if (fc && st.pinHeads) {
+    const inner = st.pinHeads.firstChild;
+    inner.replaceChildren(...Array.from({ length: fc }, (_, c) => c).filter((c) => st.cols.size(c)).map((c) => heading(c, null)));
+    kids.push(st.pinHeads);
   }
+  for (let c = win.c0; c <= win.c1; c++) if (st.cols.size(c)) kids.push(heading(c, 'columnheader'));
   st.colheads.replaceChildren(...kids);
+}
+
+/** The frozen panes (rows above and columns left of the freeze, and the corner where they meet), each drawn with the
+ *  layers the sheet has (gridlines, fills, cells, borders, selection) over the part of the sheet they keep in place. */
+function drawPanes(st, win) {
+  const fr = st.freeze?.rows || 0;
+  const fc = st.freeze?.cols || 0;
+  const paint = (pane, w) => {
+    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer']) pane[k].replaceChildren(); return; }
+    // (The pane's own layers; no cell ids, which belong to the sheet's own cells.)
+    const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, idBase: null });
+    drawGridlines(sub, w);
+    const { fills, edges } = decorations(sub, w);
+    pane.fills.replaceChildren(...fills);
+    drawRows(sub, w);
+    pane.edges.replaceChildren(...edges);
+    drawSelection(sub);
+  };
+  paint(st.panes.top, fr ? { r0: 0, r1: fr - 1, c0: win.c0, c1: win.c1 } : null);
+  paint(st.panes.left, fc ? { r0: win.r0, r1: win.r1, c0: 0, c1: fc - 1 } : null);
+  paint(st.panes.corner, fr && fc ? { r0: 0, r1: fr - 1, c0: 0, c1: fc - 1 } : null);
 }
 
 function drawGridlines(st, win) {
@@ -323,6 +353,7 @@ function draw(st, force = false) {
   st.edges.replaceChildren(...edges);
   drawSelection(st);
   drawMarks(st);
+  if (st.panes) drawPanes(st, win);
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
   if (active) st.view.setAttribute('aria-activedescendant', active.id);
   else st.view.removeAttribute('aria-activedescendant');
@@ -362,10 +393,28 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   const markLayer = div('oxe-layer');
   const clipLayer = div('oxe-layer');
   overlay.append(selLayer, markLayer, clipLayer);
-  canvas.append(colheads, lines, fills, body, edges, overlay);
+  // (Frozen panes: the rows above the freeze stuck under the column headings, the columns left of it beside the row
+  // headings, the corner where they meet; each its own set of layers, hidden from assistive technology: the sheet's
+  // own cells are under them.)
+  const pane = (cls) => {
+    const wrap = div(`oxe-pane ${cls}`);
+    wrap.setAttribute('aria-hidden', 'true');
+    const inner = div('oxe-pane-inner');
+    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer') };
+    const over = div('oxe-overlay');
+    over.append(layers.selLayer);
+    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over);
+    wrap.append(inner);
+    return { wrap, inner, ...layers };
+  };
+  const panes = { top: pane('oxe-pane-top'), left: pane('oxe-pane-left'), corner: pane('oxe-pane-corner') };
+  panes.top.inner.prepend(panes.corner.wrap);
+  const pinHeads = div('oxe-colheads-pin');
+  pinHeads.append(div('oxe-colheads-pin-inner'));
+  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -376,6 +425,28 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     view.setAttribute('aria-colcount', String(st.cols.count + 1));
     setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': COLHEAD_H });
     setVars(canvas, { '--oxe-sheet-w': st.rowHeadW + st.cols.end, '--oxe-sheet-h': COLHEAD_H + st.rows.end });
+    applyView(next.freeze, next.zoom);
+  };
+  /** Frozen rows and columns and the zoom (percent) applied: the panes sized, the sheet scaled. */
+  const applyView = (freeze = { rows: 0, cols: 0 }, zoom = 100) => {
+    st.freeze = { rows: freeze.rows || 0, cols: freeze.cols || 0 };
+    st.zoom = zoom || 100;
+    st.paneH = st.freeze.rows ? st.rows.start(st.freeze.rows) : 0;
+    st.paneW = st.freeze.cols ? st.cols.start(st.freeze.cols) : 0;
+    view.classList.toggle('oxe-frozen-rows', !!st.freeze.rows);
+    view.classList.toggle('oxe-frozen-cols', !!st.freeze.cols);
+    setVars(view, { '--oxe-pane-h': st.paneH, '--oxe-pane-w': st.paneW });
+    canvas.style.zoom = st.zoom === 100 ? '' : String(st.zoom / 100);
+  };
+  /** A point of the view in the sheet's own coordinates: x past the row headings and y past the column headings
+   *  (negative over them), at the zoom, frozen panes not scrolled. */
+  const toContent = (lx, ly) => {
+    const z = st.zoom / 100;
+    let x = lx / z - st.rowHeadW;
+    let y = ly / z - COLHEAD_H;
+    if (x >= st.paneW) x += view.scrollLeft / z;
+    if (y >= st.paneH) y += view.scrollTop / z;
+    return { x, y };
   };
   const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color }) => {
     measure(next, nextLooks);
@@ -400,9 +471,21 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     window: () => ({ ...st.win }),
     /** Scroll so that cell (r, c) is at the top left, and draw at once. */
     scrollToCell(r, c) {
-      view.scrollTop = st.rows.start(r);
-      view.scrollLeft = st.cols.start(c);
+      const z = st.zoom / 100;
+      view.scrollTop = Math.max(0, st.rows.start(r) - st.paneH) * z;
+      view.scrollLeft = Math.max(0, st.cols.start(c) - st.paneW) * z;
       draw(st);
+    },
+    /** Frozen rows and columns ({ rows, cols }) and the zoom (percent), as the sheet's view has them. */
+    setView({ freeze, zoom } = {}) {
+      applyView(freeze ?? st.freeze, zoom ?? st.zoom);
+      draw(st, true);
+      drawClip(st);
+    },
+    /** The view as shown: { freeze, zoom, topLeft } (topLeft: the first cell of the scrolled part). */
+    view: () => {
+      const z = st.zoom / 100;
+      return { freeze: { ...st.freeze }, zoom: st.zoom, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
     },
     /** Outline the cells copied or cut, dashed, until they are pasted or let go ({ r0, c0, r1, c1 }; null for none). */
     setClip(rect) {
@@ -425,27 +508,34 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       const lx = clientX - rect.left;
       const ly = clientY - rect.top;
       if (lx < 0 || ly < 0 || lx > view.clientWidth || ly > view.clientHeight) return null;
-      return {
-        r: ly < COLHEAD_H ? -1 : st.rows.indexAt(ly - COLHEAD_H + view.scrollTop),
-        c: lx < st.rowHeadW ? -1 : st.cols.indexAt(lx - st.rowHeadW + view.scrollLeft),
-      };
+      const { x, y } = toContent(lx, ly);
+      return { r: y < 0 ? -1 : st.rows.indexAt(y), c: x < 0 ? -1 : st.cols.indexAt(x) };
     },
     /** A cell's box in the sheet's coordinates (the overlay's): { x, y, w, h }. */
     cellRect: (r, c) => ({ x: st.cols.start(c), y: st.rows.start(r), w: st.cols.size(c), h: st.rows.size(r) }),
     /** Scroll as little as needed for cell (r, c) to be in full view, past the headings. */
     scrollIntoView(r, c) {
+      // (In the sheet's coordinates at the zoom; a cell in a frozen pane is always in view that way, the others are
+      // brought out from under the panes.)
+      const z = st.zoom / 100;
       const x = st.cols.start(c);
       const y = st.rows.start(r);
-      const w = view.clientWidth - st.rowHeadW;
-      const h = view.clientHeight - COLHEAD_H;
-      if (x < view.scrollLeft) view.scrollLeft = x;
-      else if (x + st.cols.size(c) > view.scrollLeft + w) view.scrollLeft = x + st.cols.size(c) - w;
-      if (y < view.scrollTop) view.scrollTop = y;
-      else if (y + st.rows.size(r) > view.scrollTop + h) view.scrollTop = y + st.rows.size(r) - h;
+      const w = view.clientWidth / z - st.rowHeadW;
+      const h = view.clientHeight / z - COLHEAD_H;
+      const left = view.scrollLeft / z;
+      const top = view.scrollTop / z;
+      if (c >= st.freeze.cols) {
+        if (x - st.paneW < left) view.scrollLeft = (x - st.paneW) * z;
+        else if (x + st.cols.size(c) > left + w) view.scrollLeft = (x + st.cols.size(c) - w) * z;
+      }
+      if (r >= st.freeze.rows) {
+        if (y - st.paneH < top) view.scrollTop = (y - st.paneH) * z;
+        else if (y + st.rows.size(r) > top + h) view.scrollTop = (y + st.rows.size(r) - h) * z;
+      }
       draw(st, true);
     },
     /** Rows in view, for paging. */
-    rowsInView: () => Math.max(1, st.rows.indexAt(view.scrollTop + view.clientHeight - COLHEAD_H) - st.rows.indexAt(view.scrollTop)),
+    rowsInView: () => { const z = st.zoom / 100; return Math.max(1, st.rows.indexAt(view.scrollTop / z + view.clientHeight / z - COLHEAD_H) - st.rows.indexAt(view.scrollTop / z + st.paneH)); },
     /** After cells changed: sizes worked out again (row heights follow their fonts), drawn where the view is. */
     refresh() {
       measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
@@ -458,19 +548,20 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       const rect = view.getBoundingClientRect();
       const lx = clientX - rect.left;
       const ly = clientY - rect.top;
-      const near = 4;
+      const near = 4 / (st.zoom / 100);
+      const at = toContent(lx, ly);
       const find = (axis, pos) => {
         let i = axis.indexAt(pos);
         if (pos - axis.start(i) <= near && i > 0) i -= 1;
         else if (axis.start(i + 1) - pos > near) return null;
         return i;
       };
-      if (ly >= 0 && ly < COLHEAD_H && lx >= st.rowHeadW && lx <= view.clientWidth) {
-        const c = find(st.cols, lx - st.rowHeadW + view.scrollLeft);
+      if (ly >= 0 && at.y < 0 && at.x >= 0 && lx <= view.clientWidth) {
+        const c = find(st.cols, at.x);
         return c == null ? null : { axis: 'col', index: c, size: st.cols.size(c) };
       }
-      if (lx >= 0 && lx < st.rowHeadW && ly >= COLHEAD_H && ly <= view.clientHeight) {
-        const r = find(st.rows, ly - COLHEAD_H + view.scrollTop);
+      if (lx >= 0 && at.x < 0 && at.y >= 0 && ly <= view.clientHeight) {
+        const r = find(st.rows, at.y);
         return r == null ? null : { axis: 'row', index: r, size: st.rows.size(r) };
       }
       return null;
@@ -482,15 +573,19 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       if (axis == null) return;
       const line = div('oxe-guide');
       const tip = div('oxe-guide-tip');
+      const z = st.zoom / 100;
+      const top = view.scrollTop / z;
+      const left = view.scrollLeft / z;
       if (axis === 'col') {
-        const x = st.rowHeadW + st.cols.start(index) + size;
-        setVars(line, { '--oxe-x': x, '--oxe-y': view.scrollTop, '--oxe-w': 1, '--oxe-h': view.clientHeight });
-        setVars(tip, { '--oxe-x': x + 4, '--oxe-y': view.scrollTop + 2 });
+        // (A frozen column's edge doesn't scroll.)
+        const x = st.rowHeadW + st.cols.start(index) + size + (index < st.freeze.cols ? left : 0);
+        setVars(line, { '--oxe-x': x, '--oxe-y': top, '--oxe-w': 1, '--oxe-h': view.clientHeight / z });
+        setVars(tip, { '--oxe-x': x + 4, '--oxe-y': top + 2 });
         tip.textContent = `Width: ${(Math.max(0, size - 5) / MDW).toFixed(2)} (${Math.round(size)} pixels)`;
       } else {
-        const y = COLHEAD_H + st.rows.start(index) + size;
-        setVars(line, { '--oxe-x': view.scrollLeft, '--oxe-y': y, '--oxe-w': view.clientWidth, '--oxe-h': 1 });
-        setVars(tip, { '--oxe-x': view.scrollLeft + st.rowHeadW + 4, '--oxe-y': y + 4 });
+        const y = COLHEAD_H + st.rows.start(index) + size + (index < st.freeze.rows ? top : 0);
+        setVars(line, { '--oxe-x': left, '--oxe-y': y, '--oxe-w': view.clientWidth / z, '--oxe-h': 1 });
+        setVars(tip, { '--oxe-x': left + st.rowHeadW + 4, '--oxe-y': y + 4 });
         tip.textContent = `Height: ${(Math.round(size) * 0.75).toFixed(2)} (${Math.round(size)} pixels)`;
       }
       st.canvas.append(line, tip);

@@ -676,6 +676,79 @@
   .oxe-clip { animation: none; }
 }
 
+/* Frozen panes (grid.js drawPanes): the rows above the freeze stick under the column headings, the columns left of it
+   beside the row headings, the corner where they meet stays put; each is in the sheet's flow so that it can stick,
+   with a negative margin so that it takes no room. Inside a pane its layers start at 0 (the headings' sizes made 0
+   there), and only the top pane keeps row headings. A thin line marks the freeze, as Excel draws it. */
+.oxe-pane { display: none; }
+.oxe-frozen-rows .oxe-pane-top,
+.oxe-frozen-cols .oxe-pane-left,
+.oxe-frozen-rows.oxe-frozen-cols .oxe-pane-corner {
+  display: block;
+}
+.oxe-pane {
+  position: sticky;
+  /* (clip, not hidden: hidden would make the pane a scroll container, and the row headings and the corner inside it
+     would stick to the pane instead of the sheet) */
+  overflow: clip;
+  background: var(--oxe-bg);
+}
+.oxe-pane-top {
+  top: var(--oxe-colhead-h);
+  z-index: 3;
+  width: var(--oxe-sheet-w);
+  height: var(--oxe-pane-h);
+  margin-bottom: calc(-1 * var(--oxe-pane-h));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--oxe-fg) 45%, transparent);
+}
+.oxe-pane-left {
+  left: var(--oxe-rowhead-w);
+  z-index: 2;
+  width: var(--oxe-pane-w);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+  margin-left: var(--oxe-rowhead-w);
+  margin-bottom: calc(var(--oxe-colhead-h) - var(--oxe-sheet-h));
+  box-shadow: 1px 0 0 color-mix(in srgb, var(--oxe-fg) 45%, transparent);
+}
+.oxe-pane-corner {
+  left: var(--oxe-rowhead-w);
+  z-index: 3;
+  width: var(--oxe-pane-w);
+  height: var(--oxe-pane-h);
+  margin-left: var(--oxe-rowhead-w);
+  margin-bottom: calc(-1 * var(--oxe-pane-h));
+  box-shadow: 1px 0 0 color-mix(in srgb, var(--oxe-fg) 45%, transparent);
+}
+.oxe-pane-inner {
+  position: absolute;
+  inset: 0;
+  --oxe-colhead-h: 0px;
+}
+.oxe-pane-left > .oxe-pane-inner,
+.oxe-pane-corner > .oxe-pane-inner {
+  --oxe-rowhead-w: 0px;
+}
+.oxe-pane-left .oxe-rowhead,
+.oxe-pane-corner .oxe-rowhead {
+  display: none;
+}
+.oxe-colheads { z-index: 4; }
+.oxe-colheads-pin {
+  position: sticky;
+  left: var(--oxe-rowhead-w);
+  z-index: 4;
+  width: var(--oxe-pane-w);
+  height: var(--oxe-colhead-h);
+  margin-top: calc(-1 * var(--oxe-colhead-h));
+  margin-left: var(--oxe-rowhead-w);
+  background: var(--oxe-head-bg);
+}
+.oxe-colheads-pin-inner {
+  position: absolute;
+  inset: 0;
+  --oxe-rowhead-w: 0px;
+}
+
 /* Resizing a row or column from its heading's edge: the cursor, the guide where the edge will be, Excel's tip. */
 .oxe-grid.oxe-resize-col { cursor: col-resize; }
 .oxe-grid.oxe-resize-row { cursor: row-resize; }
@@ -1011,6 +1084,8 @@
 @media print {
   .oxe-findbar { display: none; }
 }
+
+.oxe-zoomlabel { align-self: center; padding: 0 6px; font-size: 12px; }
 
 /* Simplified (one-line) ribbon. */
 .oxe-simple .oxe-ribbon { padding: 3px 8px; }

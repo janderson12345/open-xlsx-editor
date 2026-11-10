@@ -26,6 +26,7 @@ insides:
 | `src/ooxml/rowcol.js` | Whole rows and columns inserted and deleted as Excel does it: the sheet's cells, widths, merges and ranges moved, new lines formatted from the one before, every formula of the workbook following, Excel's refusals (docs/ROWCOL.md). |
 | `src/ooxml/sizes.js` | Column widths, row heights and hidden lines written as Excel writes them: widths in whole pixels over the digit width, col elements split where a range cuts them, AutoFit Row Height as the fixed height taken away (docs/SIZES.md). |
 | `src/ooxml/findops.js` | Find and Replace as Excel does them: the formula bar's text or the shown text searched, Excel's wildcards, the order from the cell after the active one, replacements entered as typed (docs/FIND.md). |
+| `src/ooxml/view.js` | The sheet view as Excel writes it: frozen panes (a pane element with a selection for each pane) and the zoom (docs/VIEW.md). |
 | `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults, array formula ranges. Implied `r` positions followed; a shared formula's later cells get their own formula text. |
 | `src/ooxml/input.js` | A typed entry as a value (numbers, separators, %, TRUE/FALSE, 'text) or a formula (=..., in the file's form). |
 | `src/ooxml/sheetedit.js` | Changing cells in the worksheet's XML in place: values, formulas, formula results (the formula kept), shared formulas written out cell by cell. Implied positions pinned first, rows indexed, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. |
@@ -40,7 +41,7 @@ insides:
 | `src/ooxml/theme.js` | The theme's fonts and colours (Excel 365's default theme without a theme part); `resolveColor`, the one colour resolver (theme swap, integer-HLS tints, indexed palette). |
 | `src/ooxml/numfmt.js` | What a cell shows (`cellDisplay`): the General format, and format codes through format.js. |
 | `src/ooxml/format.js` | Excel's number format codes: sections, digits, scaling, scientific, fractions, dates and times, text; built-in formats; serial dates (1900 and 1904). |
-| `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines. An ARIA grid (rows, row and column headers, gridcells with indexes). |
+| `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines; frozen panes (their own layers, sticking in place) and zoom. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
 | `src/editor/selection.js` | The selection (active cell and range) and its overlay; view state only. |
@@ -49,6 +50,7 @@ insides:
 | `src/editor/ribbonkit.js` | The ribbon's building blocks: buttons, toggles, split buttons, groups, the one drop-down menu, select fields, line icons. From open-docx-editor. |
 | `src/editor/ribbon.js` | The ribbon: tabs and panels, groups that don't fit behind More, the one-line simplified ribbon, F6 and Esc, `features`. From open-docx-editor's toolbar.js, with each tab in a file of its own. |
 | `src/editor/hometab.js` | The Home tab: Undo, Font, Alignment, Number, Cells, Editing; its controls set from the active cell. |
+| `src/editor/viewtab.js` | The View tab: Zoom (Zoom..., 100%, Zoom to Selection) and Window (Freeze Panes, Top Row, First Column, Unfreeze). |
 | `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo, showSheet, nextSheet, insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet, and the formatting ones: format, toggleFont, stepFont, toggleWrap, stepIndent, align, borders, stepDecimal, clearFormats), with the workbook's undo history of cell contents and formats (values and formulas; undoing a change on another sheet shows it; cleared by a rename or delete) and each sheet's selection and scroll position, both by sheetId. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
 | `src/editor/formulabar.js` | The active cell's name and contents; Enter there enters into the cell. |

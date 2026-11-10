@@ -91,9 +91,22 @@ export function readSheet(doc, sst = []) {
     arrays,
     format: { defaultRowHeight: num('defaultRowHeight') ?? 15, defaultColWidth: num('defaultColWidth'), baseColWidth: num('baseColWidth') },
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
+    ...readView(view, ns),
     page: readPageSetup(root, ns),
     maxRow,
     maxCol,
+  };
+}
+
+/** The sheet view's frozen rows and columns (a frozen pane's ySplit and xSplit; a split that isn't frozen is
+ *  ignored) and its zoom in percent. */
+function readView(view, ns) {
+  const pane = view && kid(view, 'pane', ns);
+  const frozen = pane && /^frozen/.test(attr(pane, 'state') || '');
+  const zoom = Number(view && attr(view, 'zoomScale')) || 100;
+  return {
+    freeze: { rows: frozen ? Math.trunc(Number(attr(pane, 'ySplit') || 0)) : 0, cols: frozen ? Math.trunc(Number(attr(pane, 'xSplit') || 0)) : 0 },
+    zoom: Math.min(400, Math.max(10, zoom)),
   };
 }
 

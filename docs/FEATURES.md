@@ -55,7 +55,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Formatting whole rows and columns | Partly | A selection past the used range is cut to it; Excel gives the row or column itself the format. |
 | Find and Replace (Ctrl+F, Ctrl+H) | Done | Excel's options, Find All as a count, Replace All in one undo step (docs/FIND.md). |
 | Status bar (Sum, Average, Count of the selection) | Missing | |
-| Zoom | Missing | |
+| Zoom | Done | View tab, Ctrl+wheel; saved (docs/VIEW.md). |
 | Print | Done | Pages as Excel lays them out, measured against its PDFs. |
 | Accessibility | Done | ARIA grid and tablist, announcements, axe clean in light and dark at 1280 and 320px. |
 | Light and dark | Done | The chrome follows the theme; the sheet stays white, as in Excel. |
@@ -152,8 +152,8 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Workbook Views (`workbook-views`) | Normal, Page Break Preview, Page Layout | Partly | Normal only. |
 | Show (`show`) | Gridlines, formula bar, headings | Partly | Gridlines follow the file; none can be switched. |
-| Zoom (`zoom`) | Zoom, 100%, zoom to selection | Missing | |
-| Window (`window`) | Freeze Panes | Missing | Frozen panes in a file aren't frozen yet. |
+| Zoom (`zoom`) | Zoom, 100%, zoom to selection | Done | 10% to 400%, as Excel allows; saved with the sheet. |
+| Window (`window`) | Freeze Panes | Done | Freeze Panes, Top Row, First Column, Unfreeze, written as Excel writes them; frozen panes in a file shown frozen (docs/VIEW.md). |
 | | Split, new window | Missing | |
 
 ## File (`file`)
