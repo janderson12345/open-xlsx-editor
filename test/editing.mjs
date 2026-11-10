@@ -597,6 +597,30 @@ await page.click('.oxe-namebox');
 await page.keyboard.press('Escape');
 check(await page.evaluate(() => document.querySelector('.oxe-namebox').value) === 'C3', 'Esc: the Name Box shows the active cell again');
 
+// Filter: B3, Ctrl+Shift+L: buttons on the heading row. Choice's button, "No" unticked, OK: the No rows hidden. E1,
+// Alt+Down: the same list; Clear Filter From "Choice": all shown. Ctrl+Shift+L: off, no buttons.
+await page.evaluate(() => window.oxe.select('B3'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+Shift+KeyL');
+const head = await page.evaluate(() => window.oxe.workbook.sheet(0).autoFilter?.r0);
+check(head === 0 && await page.locator('.oxe-filters .oxe-filter-btn').count() > 0, 'Ctrl+Shift+L on B3: the filter on, buttons on the heading row');
+const noRows = await page.evaluate(() => [...window.oxe.workbook.sheet(0).cells].filter(([r, l]) => r > 0 && r < 10 && l.get(4)?.v === 'No').map(([r]) => r));
+await page.click('.oxe-grid .oxe-filters .oxe-filter-btn[data-col="4"]');
+await page.waitForSelector('dialog.oxe-filter-box');
+const listed = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-filter-box .oxe-filter-list label')].map((l) => l.textContent));
+await page.click('dialog.oxe-filter-box >> label:text-is("No")');
+await page.click('dialog.oxe-filter-box >> button:text-is("OK")');
+const hiddenNow = () => page.evaluate(() => [...window.oxe.workbook.sheet(0).rows].filter(([, x]) => x.hidden).map(([r]) => r).sort((a, b) => a - b));
+check(listed.includes('(Select All)') && listed.includes('No') && listed.includes('Yes') && (await hiddenNow()).join() === noRows.join(), 'Choice’s button, No unticked, OK: the No rows hidden', `${listed.join('|')} / ${await hiddenNow()} vs ${noRows}`);
+await page.evaluate(() => window.oxe.select('E1'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Alt+ArrowDown');
+await page.waitForSelector('dialog.oxe-filter-box');
+await page.click('dialog.oxe-filter-box >> button:text-is("Clear Filter From \\"Choice\\"")');
+check((await hiddenNow()).length === 0, 'E1, Alt+Down, Clear Filter From "Choice": every row shown');
+await page.keyboard.press('Control+Shift+KeyL');
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).autoFilter) === null && await page.locator('.oxe-filters .oxe-filter-btn').count() === 0, 'Ctrl+Shift+L: the filter off, its buttons gone');
+
 // Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
 // Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
 const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);

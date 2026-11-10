@@ -262,3 +262,66 @@ export function sortBox(root, { lines, start }) {
     levels.querySelector('select').dataset.first = '';
   });
 }
+
+/**
+ * A filter button's list, as Excel's: Sort A to Z and Z to A (Smallest to Largest for numbers), Clear Filter From the
+ * column, a search box, and the column's values to tick, with (Select All) and (Blanks); OK keeps the rows ticked.
+ * `at`: { x, y } where it opens (the button's bottom left, in the window). `choices`: filterops.js filterChoices.
+ * Resolves to { do: 'asc' | 'desc' | 'clear' } or { do: 'apply', values, blank, all }, or null for Cancel and Esc.
+ */
+export function filterBox(root, { title, at, choices, numbers = false, filtered = false }) {
+  return modal(root, (dlg, done, id) => {
+    const make = (tag, props = {}, ...kids) => {
+      const x = document.createElement(tag);
+      for (const [k, v] of Object.entries(props)) { if (k === 'role' || k.startsWith('aria-')) x.setAttribute(k, v); else x[k] = v; }
+      x.append(...kids);
+      return x;
+    };
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.classList.add('oxe-filter-box');
+    dlg.style.setProperty('--oxe-fx', `${Math.round(at.x)}px`);
+    dlg.style.setProperty('--oxe-fy', `${Math.round(at.y)}px`);
+    const item = (label, run, disabled = false) => { const b = button(label, run); b.classList.add('oxe-filter-item'); b.disabled = disabled; return b; };
+    const head = make('div', { className: 'oxe-filter-actions' },
+      item(numbers ? 'Sort Smallest to Largest' : 'Sort A to Z', () => done({ do: 'asc' })),
+      item(numbers ? 'Sort Largest to Smallest' : 'Sort Z to A', () => done({ do: 'desc' })),
+      item(`Clear Filter From "${title}"`, () => done({ do: 'clear' }), !filtered));
+    const search = make('input', { type: 'search', className: 'oxe-dialog-field', id: `${id}-search`, placeholder: 'Search', 'aria-label': 'Search' });
+    const list = make('div', { className: 'oxe-filter-list', role: 'group', 'aria-label': 'Values' });
+    const entries = choices.values.map((v) => ({ label: v.text === '' ? ' ' : v.text, value: v.text, checked: v.checked }));
+    if (choices.blanks != null) entries.push({ label: '(Blanks)', blank: true, checked: choices.blanks });
+    const all = make('input', { type: 'checkbox', id: `${id}-all` });
+    const boxes = entries.map((e, i) => {
+      const input = make('input', { type: 'checkbox', id: `${id}-v${i}`, checked: e.checked });
+      input.addEventListener('change', () => { sync(); });
+      return { e, input, line: make('div', { className: 'oxe-dialog-option' }, input, make('label', { htmlFor: `${id}-v${i}`, textContent: e.label })) };
+    });
+    const okBtn = button('OK', () => apply());
+    const sync = () => {
+      const shown = boxes.filter((b) => !b.line.hidden);
+      const on = shown.filter((b) => b.input.checked).length;
+      all.checked = on === shown.length && on > 0;
+      all.indeterminate = on > 0 && on < shown.length;
+      okBtn.disabled = !boxes.some((b) => b.input.checked);
+    };
+    all.addEventListener('change', () => { for (const b of boxes) if (!b.line.hidden) b.input.checked = all.checked; sync(); });
+    search.addEventListener('input', () => {
+      const q = search.value.trim().toLowerCase();
+      for (const b of boxes) b.line.hidden = !!q && !b.e.label.toLowerCase().includes(q);
+      sync();
+    });
+    list.append(make('div', { className: 'oxe-dialog-option' }, all, make('label', { htmlFor: all.id, textContent: '(Select All)' })), ...boxes.map((b) => b.line));
+    const apply = () => {
+      if (okBtn.disabled) return;
+      // (With a search typed, only the values it found count, as in Excel.)
+      const picked = boxes.filter((b) => !b.line.hidden && b.input.checked);
+      const every = picked.length === boxes.length;
+      done({ do: 'apply', all: every, values: picked.filter((b) => !b.e.blank).map((b) => b.e.value), blank: picked.some((b) => b.e.blank) });
+    };
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); apply(); } });
+    const row = make('div', { className: 'oxe-dialog-buttons' }, okBtn, button('Cancel', () => done(null)));
+    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title oxe-filter-title', textContent: `Filter: ${title}` }), head, search, list, row);
+    sync();
+    search.dataset.first = '';
+  });
+}

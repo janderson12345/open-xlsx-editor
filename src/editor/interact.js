@@ -147,7 +147,9 @@ export function attachEditing(root, ctx) {
     const ctrl = e.ctrlKey || e.metaKey;
     const key = e.key;
     let handled = true;
-    if (ARROWS[key]) cmd.run('move', ARROWS[key][0], ARROWS[key][1], { extend: e.shiftKey, jump: ctrl });
+    // (Alt+Down on a heading cell of a filter opens its list, as in Excel.)
+    if (e.altKey && !ctrl && key === 'ArrowDown' && ctx.filterMenu?.()) { /* opened */ }
+    else if (ARROWS[key]) cmd.run('move', ARROWS[key][0], ARROWS[key][1], { extend: e.shiftKey, jump: ctrl });
     else if (key === 'Tab') cmd.run('move', 0, e.shiftKey ? -1 : 1);
     else if (key === 'Enter') cmd.run('move', e.shiftKey ? -1 : 1, 0);
     else if (key === 'Home') cmd.run('home', { sheetStart: ctrl });
@@ -169,6 +171,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && !e.shiftKey && !e.altKey && (key.toLowerCase() === 'd' || key.toLowerCase() === 'r')) { if (ctx.allowed?.('fill') !== false) cmd.run('fill', key.toLowerCase() === 'd' ? 'down' : 'right'); }
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'v') ctx.pasteSpecial?.();
     else if (e.altKey && !ctrl && key === '=') ctx.autoSum?.('sum');
+    else if (ctrl && e.shiftKey && !e.altKey && key.toLowerCase() === 'l') { if (ctx.allowed?.('filterToggle') !== false) cmd.run('filterToggle'); }
     // (Ctrl+9 hides the rows, Ctrl+0 the columns; with Shift they show again. Taken from the key's code: Shift+9 is "(".)
     else if (ctrl && (e.code === 'Digit9' || e.code === 'Digit0')) cmd.run('hideLines', e.code === 'Digit9' ? 'row' : 'col', !e.shiftKey);
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');

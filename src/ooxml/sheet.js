@@ -93,6 +93,7 @@ export function readSheet(doc, sst = []) {
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
     ...readView(view, ns),
     page: readPageSetup(root, ns),
+    autoFilter: readAutoFilter(kid(root, 'autoFilter', ns), ns),
     maxRow,
     maxCol,
   };
@@ -100,6 +101,27 @@ export function readSheet(doc, sst = []) {
 
 /** The sheet view's frozen rows and columns (a frozen pane's ySplit and xSplit; a split that isn't frozen is
  *  ignored) and its zoom in percent. */
+/**
+ * The sheet's AutoFilter: { r0, c0, r1, c1 (its range, the header row first), columns: Map(column index => { values:
+ * [shown texts], blank (blanks shown too), other (a kind of filter not read here: custom, top 10, colour, dates) }) },
+ * or null.
+ */
+function readAutoFilter(el, ns) {
+  const area = el && parseRange(attr(el, 'ref'));
+  if (!area) return null;
+  const columns = new Map();
+  for (const fc of kids(el, 'filterColumn', ns)) {
+    const filters = kid(fc, 'filters', ns);
+    const plain = filters && [...filters.childNodes].every((n) => n.nodeType !== 1 || n.localName === 'filter');
+    columns.set(area.c0 + Number(attr(fc, 'colId')), {
+      values: filters ? kids(filters, 'filter', ns).map((f) => attr(f, 'val') ?? '') : [],
+      blank: !!filters && (attr(filters, 'blank') === '1' || attr(filters, 'blank') === 'true'),
+      other: !plain,
+    });
+  }
+  return { ...area, columns };
+}
+
 function readView(view, ns) {
   const pane = view && kid(view, 'pane', ns);
   const frozen = pane && /^frozen/.test(attr(pane, 'state') || '');

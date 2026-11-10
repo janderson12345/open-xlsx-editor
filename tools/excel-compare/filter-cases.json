@@ -1,0 +1,596 @@
+[
+ {
+  "name": "turned on from one cell",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "turned on, then off",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "on",
+    "cell": "B3"
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "one text value",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "two text values",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red",
+     "green"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "text in another case",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 1,
+    "values": [
+     "apple"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "numbers by their text",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 2,
+    "values": [
+     "1",
+     "10"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "blanks",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "="
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "blanks and a value",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "=",
+     "blue"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "two columns",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red",
+     "blue"
+    ]
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 2,
+    "values": [
+     "1"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "a filter cleared",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red"
+    ]
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red",
+     "blue",
+     "green",
+     "="
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "numbers shown with decimals",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   },
+   "formats": [
+    {
+     "range": "B2:B7",
+     "numFmt": "0.00"
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 2,
+    "values": [
+     "1.00",
+     "2.50"
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "one column cleared",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red"
+    ]
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 2,
+    "values": [
+     "1"
+    ]
+   },
+   {
+    "do": "clear",
+    "range": "A1",
+    "field": 3
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "on, then off with a filter set",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "apple",
+    "B2": "1",
+    "C2": "red",
+    "A3": "pear",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "Apple",
+    "B4": "3",
+    "C4": "red",
+    "A5": "fig",
+    "B5": "1",
+    "C5": "",
+    "A6": "plum",
+    "B6": "2.5",
+    "C6": "green",
+    "A7": "kiwi",
+    "B7": "10",
+    "C7": "blue"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "B3"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red"
+    ]
+   },
+   {
+    "do": "on",
+    "cell": "B3"
+   }
+  ],
+  "read": "A1:C10"
+ }
+]

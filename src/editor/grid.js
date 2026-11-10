@@ -10,6 +10,7 @@ import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontDescentPx } from './fonts.js';
 import { drawSelection, drawMarks, rangeBox, handleCorner } from './selection.js';
+import { drawFilterButtons } from './filterbuttons.js';
 import { colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx, colChars } from '../ooxml/units.js';
@@ -105,15 +106,16 @@ function drawPanes(st, win) {
   const fr = st.freeze?.rows || 0;
   const fc = st.freeze?.cols || 0;
   const paint = (pane, w) => {
-    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer']) pane[k].replaceChildren(); return; }
+    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer', 'filterLayer']) pane[k].replaceChildren(); return; }
     // (The pane's own layers; no cell ids, which belong to the sheet's own cells.)
-    const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, idBase: null });
+    const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, filterLayer: pane.filterLayer, idBase: null });
     drawGridlines(sub, w);
     const { fills, edges } = decorations(sub, w);
     pane.fills.replaceChildren(...fills);
     drawRows(sub, w);
     pane.edges.replaceChildren(...edges);
     drawSelection(sub);
+    drawFilterButtons(sub, w);
   };
   paint(st.panes.top, fr ? { r0: 0, r1: fr - 1, c0: win.c0, c1: win.c1 } : null);
   paint(st.panes.left, fc ? { r0: win.r0, r1: win.r1, c0: 0, c1: fc - 1 } : null);
@@ -353,6 +355,7 @@ function draw(st, force = false) {
   st.edges.replaceChildren(...edges);
   drawSelection(st);
   drawMarks(st);
+  drawFilterButtons(st, win);
   if (st.panes) drawPanes(st, win);
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
   if (active) st.view.setAttribute('aria-activedescendant', active.id);
@@ -400,10 +403,10 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     const wrap = div(`oxe-pane ${cls}`);
     wrap.setAttribute('aria-hidden', 'true');
     const inner = div('oxe-pane-inner');
-    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer') };
+    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer'), filterLayer: div('oxe-filters') };
     const over = div('oxe-overlay');
     over.append(layers.selLayer);
-    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over);
+    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over, layers.filterLayer);
     wrap.append(inner);
     return { wrap, inner, ...layers };
   };
@@ -411,10 +414,13 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   panes.top.inner.prepend(panes.corner.wrap);
   const pinHeads = div('oxe-colheads-pin');
   pinHeads.append(div('oxe-colheads-pin-inner'));
-  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay);
+  // (The AutoFilter's buttons: over the cells, clickable, out of the tab order and hidden from assistive technology.)
+  const filterLayer = div('oxe-filters');
+  filterLayer.setAttribute('aria-hidden', 'true');
+  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, filterLayer);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, selLayer, markLayer, clipLayer, filterLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -502,6 +508,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       st.sel = sel;
       draw(st, true);
     },
+    /** What a click on a filter button does: `fn(c, button)`. */
+    onFilterButton(fn) { st.onFilter = fn; },
     /** Show the fill handle on the selection (not on a read-only workbook, or with filling turned off). */
     setFillHandle(on) {
       st.fillHandle = !!on;

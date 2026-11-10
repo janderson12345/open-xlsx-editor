@@ -7,7 +7,8 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox } from './editor/dialogs.js';
+import { filterChoices, shownText } from './ooxml/filterops.js';
 import { dataBeside, sortArea, guessHeader, SORT_MESSAGES } from './ooxml/sortops.js';
 import { isDateFormat } from './ooxml/format.js';
 import { shapeShift, ROWCOL_MESSAGES } from './ooxml/rowcol.js';
@@ -33,7 +34,8 @@ const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', togg
   clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
   pasteSpecial: 'clipboard', pasteSpecialBox: 'clipboard', pasteAs: 'clipboard',
   stepDecimal: 'number', clearFormats: 'editing', clearAs: 'editing', fill: 'editing', autoFill: 'editing',
-  sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing', autoSum: 'editing' };
+  sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing', autoSum: 'editing',
+  filterToggle: 'editing', filterBy: 'editing', filterClear: 'editing', filterReapply: 'editing', filterAll: 'editing', filterSort: 'editing' };
 /** The Paste menu's choices, as Paste Special options. */
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
@@ -254,6 +256,34 @@ export function mountXlsxEditor(host, options = {}) {
     if (!got) { state.grid.el.focus({ preventScroll: true }); return false; }
     return editing().run('sort', { area, ...got });
   };
+  /** A filter button's list for column c (dialogs.js filterBox), opened under `rect`: its sort, Clear Filter From, or
+   *  the values ticked. */
+  const openFilter = async (c, rect) => {
+    const wb = state.workbook;
+    const si = state.sheetIndex;
+    const f = wb.sheet(si).autoFilter;
+    if (!f || !allowed('filterBy')) return false;
+    const title = shownText(wb, wb.sheet(si).cells.get(f.r0)?.get(c)) || `Column ${colName(c)}`;
+    const choices = filterChoices(wb, si, f, c);
+    const numbers = choices.values.length > 0 && choices.values.every((v) => v.text !== '' && Number.isFinite(Number(v.text.replace(/,/g, ''))));
+    const got = await filterBox(root, { title, at: { x: rect.left, y: rect.bottom + 2 }, choices, numbers, filtered: f.columns.has(c) });
+    if (got && !state.readOnly) {
+      if (got.do === 'asc' || got.do === 'desc') editing().run('filterSort', c, got.do === 'desc');
+      else if (got.do === 'clear') editing().run('filterBy', c, null);
+      else editing().run('filterBy', c, got.all ? null : { values: got.values, blank: got.blank });
+    }
+    state.grid.el.focus({ preventScroll: true });
+    return true;
+  };
+  /** Alt+Down on a heading cell of the filter: its list, as in Excel (false elsewhere, for the key to move on). */
+  const filterMenu = () => {
+    const f = state.workbook.sheet(state.sheetIndex).autoFilter;
+    const s = editing().selection;
+    if (!f || s.ar !== f.r0 || s.ac < f.c0 || s.ac > f.c1) return false;
+    const btn = state.grid.el.querySelector(`.oxe-filters .oxe-filter-btn[data-col="${s.ac}"]`);
+    openFilter(s.ac, (btn || state.grid.el).getBoundingClientRect());
+    return true;
+  };
   /** The menu of a cell (right-click): Excel's, as far as the editor goes. */
   const cellMenu = (point) => {
     const ro = state.readOnly;
@@ -360,6 +390,7 @@ export function mountXlsxEditor(host, options = {}) {
       if (state.grid) state.grid.setSheet(sheet, wb.sheets[i].name, state.looks);
       else {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
+        state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
         state.editing = attachEditing(root, {
           workbook: () => state.workbook,
           sheetIndex: () => state.sheetIndex,
@@ -379,6 +410,7 @@ export function mountXlsxEditor(host, options = {}) {
           cellMenu,
           pasteSpecial: () => act('pasteSpecialBox'),
           autoSum: (fn) => act('autoSum', fn),
+          filterMenu: () => filterMenu(),
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),

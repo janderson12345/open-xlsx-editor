@@ -99,6 +99,19 @@ for (const colorScheme of ['light', 'dark']) {
       t.check(!sortDialog.length && await page.evaluate(() => document.activeElement.classList.contains('oxe-sort-select')), `${colorScheme}: the Sort box, no axe violations, its first column list focused`, sortDialog.join('\n     '));
       await page.keyboard.press('Escape');
       if (opened) await page.click('.oxe-more');
+      // The filter: Ctrl+Shift+L on B3, Alt+Down on B1: the column's list; axe on it; then the filter off again.
+      await page.evaluate(() => window.oxe.select('B3'));
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('Control+Shift+KeyL');
+      await page.evaluate(() => window.oxe.select('B1'));
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('Alt+ArrowDown');
+      await page.waitForSelector('dialog.oxe-filter-box');
+      const filterList = await axe();
+      t.check(!filterList.length && await page.evaluate(() => document.activeElement.type === 'search'), `${colorScheme}: a filter's list, no axe violations, its search box focused`, filterList.join('\n     '));
+      await page.keyboard.press('Escape');
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('Control+Shift+KeyL');
       const cell = await page.evaluate(() => { const r = document.querySelector('.oxe-row[aria-rowindex="3"] .oxe-cell[aria-colindex="3"]').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
       await page.mouse.click(cell.x, cell.y, { button: 'right' });
       await page.waitForSelector('.oxe-menu >> text=Paste Special...');

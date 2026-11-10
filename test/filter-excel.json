@@ -1,0 +1,206 @@
+{
+  "excel": "Excel.Application: Range.AutoFilter, then the saved sheet and workbook XML",
+  "cases": [
+    {
+      "name": "turned on from one cell",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{52A2B44A-D933-4CF2-8DEE-98FCC2BE7865}\"/>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": []
+    },
+    {
+      "name": "turned on, then off",
+      "filtering": false,
+      "hidden": [],
+      "autoFilter": null,
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": []
+    },
+    {
+      "name": "one text value",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        5,
+        6,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{6C1973F7-335F-4B1C-8573-03AEF2345D43}\"><filterColumn colId=\"2\"><filters><filter val=\"red\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "two text values",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        5,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{A366654F-EF20-4E2C-920B-9DB9F90AC5B9}\"><filterColumn colId=\"2\"><filters><filter val=\"green\"/><filter val=\"red\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "text in another case",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        5,
+        6,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{90233919-D411-4953-8FB4-053431D2BD7B}\"><filterColumn colId=\"0\"><filters><filter val=\"apple\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "numbers by their text",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        4,
+        6
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{5FE6A491-AE85-413F-908F-5E61B20B3AE3}\"><filterColumn colId=\"1\"><filters><filter val=\"1\"/><filter val=\"10\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "blanks",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        2,
+        3,
+        4,
+        6,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{5F2A3DBE-13E9-4F82-A319-6D3E384871F2}\"><filterColumn colId=\"2\"><filters blank=\"1\"/></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"2\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "blanks and a value",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        2,
+        4,
+        6
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{CFC9DF9D-86A4-4C61-B591-67CF48F5B12A}\"><filterColumn colId=\"2\"><filters blank=\"1\"><filter val=\"blue\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"2\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "two columns",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{F71CE1A4-2822-40DF-B783-1872FEF67BBD}\"><filterColumn colId=\"1\"><filters><filter val=\"1\"/></filters></filterColumn><filterColumn colId=\"2\"><filters><filter val=\"blue\"/><filter val=\"red\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "a filter cleared",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{BB96B181-8718-48E4-BE56-EDA751DFB979}\"><filterColumn colId=\"2\"><filters blank=\"1\"><filter val=\"blue\"/><filter val=\"green\"/><filter val=\"red\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": []
+    },
+    {
+      "name": "numbers shown with decimals",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        4,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{2C582E83-9A23-427B-B79E-EA56086ED02E}\"><filterColumn colId=\"1\"><filters><filter val=\"1.00\"/><filter val=\"2.50\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "one column cleared",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        4,
+        6,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{8F357EB2-0429-42DB-BD0E-81869994CC04}\"><filterColumn colId=\"1\"><filters><filter val=\"1\"/></filters></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "on, then off with a filter set",
+      "filtering": false,
+      "hidden": [],
+      "autoFilter": null,
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": []
+    }
+  ]
+}

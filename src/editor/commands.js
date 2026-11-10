@@ -19,6 +19,7 @@ import { clearChanges } from '../ooxml/clearops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
+import { filterArea } from '../ooxml/filterops.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -474,6 +475,42 @@ export function createCommands(ctx) {
       if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
       show(to.sel, null, 'Went to ');
       return true;
+    },
+    /** Filter (Ctrl+Shift+L): the sheet's AutoFilter turned on over what Sort would take, or off (filterops.js). */
+    filterToggle() {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const sh = sheet();
+      if (sh.autoFilter) return moved((wb, si) => wb.setAutoFilter(si, null)) === true && (ctx.announce('Filter off'), true);
+      const { area, error } = filterArea(sh, state.sel);
+      if (error) { ctx.alert(error); return false; }
+      return moved((wb, si) => wb.setAutoFilter(si, { ...area, columns: new Map() })) === true && (ctx.announce(`Filter on ${refName(area.r0, area.c0)} to ${refName(area.r1, area.c1)}`), true);
+    },
+    /** Column c of the filter shows rows with `show` ({ values: shown texts, blank }), or all of them (null). */
+    filterBy(c, show) {
+      const f = sheet().autoFilter;
+      if (!f || ctx.readOnly()) return false;
+      const columns = new Map(f.columns);
+      if (show) columns.set(c, { values: show.values, blank: !!show.blank, other: false });
+      else columns.delete(c);
+      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns })) === true;
+    },
+    /** Home > Sort & Filter > Clear (every column's filter taken off, the buttons kept), and Reapply (the rows
+     *  filtered again, after edits). */
+    filterClear() { const f = sheet().autoFilter; return !!f && f.columns.size > 0 && commands.filterAll(new Map()); },
+    filterReapply() { const f = sheet().autoFilter; return !!f && commands.filterAll(f.columns); },
+    filterAll(columns) {
+      const f = sheet().autoFilter;
+      if (!f || ctx.readOnly()) return false;
+      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns: new Map(columns) })) === true;
+    },
+    /** A filter button's Sort A to Z (or Z to A, `desc`): the filter's range by column c, its heading row kept. Not
+     *  yet while rows are filtered out (Excel then sorts only the rows shown). */
+    filterSort(c, desc) {
+      const sh = sheet();
+      const f = sh.autoFilter;
+      if (!f) return false;
+      for (let r = f.r0 + 1; r <= f.r1; r++) if (sh.rows.get(r)?.hidden) { ctx.announce("Sorting while rows are filtered out isn't available yet"); return false; }
+      return commands.sort({ area: { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1 }, keys: [{ at: c, desc }], header: true });
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */
     clearFormats() { return commands.clearAs('formats'); },

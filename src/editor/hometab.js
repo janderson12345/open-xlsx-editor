@@ -115,7 +115,8 @@ export function homeTab(kit, { act, color }) {
       sheetMenu('⬇', 'Fill', 'Fill', () => [item('Down', f('fill', 'down'), { hint: 'Ctrl+D' }), item('Right', f('fill', 'right'), { hint: 'Ctrl+R' }),
         item('Up', f('fill', 'up')), item('Left', f('fill', 'left'))]),
       sheetMenu('⌫', 'Clear', 'Clear', () => [item('Clear All', f('clearAs', 'all')), item('Clear Formats', f('clearFormats')), item('Clear Contents', f('clear'), { hint: 'Delete' })]),
-      sheetMenu('⇅', 'Sort & Filter', 'Sort & Filter', () => [item('Sort A to Z', f('sortAsc')), item('Sort Z to A', f('sortDesc')), item('Custom Sort...', f('sortBox'))]),
+      sheetMenu('⇅', 'Sort & Filter', 'Sort & Filter', () => [item('Sort A to Z', f('sortAsc')), item('Sort Z to A', f('sortDesc')), item('Custom Sort...', f('sortBox')), el('hr'),
+        item('Filter', f('filterToggle'), { hint: 'Ctrl+Shift+L' }), item('Clear', f('filterClear')), item('Reapply', f('filterReapply'))]),
       sheetMenu('🔍', 'Find & Select', 'Find & Select', () => [item('Find...', f('find'), { hint: 'Ctrl+F' }), item('Replace...', f('replace'), { hint: 'Ctrl+H' })]))),
   ];
   paintBars();
