@@ -147,7 +147,8 @@ export function parseInput(text, { today = new Date(), date1904 = false, asText 
     try {
       const formula = normalizeFormula(s.slice(1));
       parseFormula(formula);
-      return { formula };
+      // (=@A1:A3, all @, is kept as the old kind of formula, which doesn't spill: as Excel saves it.)
+      return /^\s*@/.test(s.slice(1)) && !/^_xlfn\.SINGLE\(/i.test(formula) ? { formula, legacy: true } : { formula };
     } catch {
       return { error: "There's a problem with this formula" };
     }
@@ -212,7 +213,11 @@ export function formatAfterEntry(current, parsed) {
  */
 export function editText(cell, code = 'General', date1904 = false) {
   if (!cell) return '';
-  if (cell.f) return `=${displayFormula(cell.f)}`;
+  if (cell.f) {
+    // (A formula of the old kind that is a whole range, A1:A3, works by implicit intersection: Excel 365 shows its @.)
+    const legacy = !cell.dynamic && !cell.array && /^('[^']+'|[^!(]+!)?\$?[A-Z]{1,3}\$?\d+:\$?[A-Z]{1,3}\$?\d+$/i.test(cell.f);
+    return `=${legacy ? '@' : ''}${displayFormula(cell.f)}`;
+  }
   if (cell.v == null) return '';
   if (cell.t === 'b') return cell.v ? 'TRUE' : 'FALSE';
   if (cell.t !== 'n') return String(cell.v);

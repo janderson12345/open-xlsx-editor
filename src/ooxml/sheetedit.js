@@ -80,7 +80,7 @@ function growDimension(root, ns, r, c) {
 }
 
 /** The `c` element of a cell, made (with its row) if there isn't one. */
-function cellEl(doc, r, c) {
+export function cellEl(doc, r, c) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const sheetData = kid(root, 'sheetData', ns);

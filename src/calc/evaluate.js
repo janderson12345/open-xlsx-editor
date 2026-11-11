@@ -2,12 +2,13 @@
 // works on single values: a range given to an operator is cut down to the formula's own row or column (implicit
 // intersection). The arguments of SUMPRODUCT and its kind, and array formulas, work on whole arrays, element by element.
 import { Area, Arr, Union, MISSING, XlError, E, errorOf, Unsupported, isError, scalar, matrix, toNum, toText, compare, finite,
-  closeToZero } from './values.js';
+  closeToZero, Lambda } from './values.js';
 import { FUNCTIONS } from './functions.js';
 // (More functions, registered into FUNCTIONS once it is made.)
 import './functions-text.js';
 import './functions-lookup.js';
 import './functions-more.js';
+import './functions-dynamic.js';
 
 /** x^y as Excel has it: 0^0 is #NUM!, 0 to a negative power #DIV/0!, a negative number to a fractional power #NUM!
  *  unless it is an odd root (=(-8)^(1/3) is -2). */
@@ -95,7 +96,54 @@ export function elementwise(values, ctx, fn) {
   return new Arr(out);
 }
 
+/** A LET or LAMBDA name as the scope keeps it: lower case, without the file's _xlpm. */
+const scoped = (name) => name.replace(/^_xlpm\./i, '').toLowerCase();
+/** What a name stands for in the LETs and LAMBDAs around it, or undefined. */
+function bound(ctx, name) {
+  const key = scoped(name);
+  for (let k = (ctx.scope || []).length - 1; k >= 0; k--) if (ctx.scope[k].has(key)) return ctx.scope[k].get(key);
+  return undefined;
+}
+/** Work out `node` with names bound (`binds`, a Map) on top of `scope`. */
+function within(scope, binds, node, ctx, mode) {
+  const was = ctx.scope;
+  ctx.scope = [...(scope || []), binds];
+  try { return evaluate(node, ctx, mode); } finally { ctx.scope = was; }
+}
+/** LET(name1, value1, ..., calculation): each name bound in turn, the last argument worked out with them. */
+function letOf(node, ctx, mode) {
+  const args = node.args;
+  if (args.length < 3 || args.length % 2 === 0) return E.value;
+  const binds = new Map();
+  const was = ctx.scope;
+  ctx.scope = [...(was || []), binds];
+  try {
+    for (let k = 0; k < args.length - 1; k += 2) {
+      if (args[k].k !== 'name') return E.name;
+      binds.set(scoped(args[k].name), evaluate(args[k + 1], ctx, mode));
+    }
+    return evaluate(args[args.length - 1], ctx, mode);
+  } finally { ctx.scope = was; }
+}
+/** A LAMBDA called with arguments (worked out where it is called). */
+function apply(fn, argNodes, ctx, mode) {
+  if (isError(fn)) return fn;
+  if (!(fn instanceof Lambda)) return E.value;
+  if (argNodes.length !== fn.params.length) return E.value;
+  const binds = new Map(fn.params.map((p, k) => [p, evaluate(argNodes[k], ctx, mode)]));
+  return within(fn.scope, binds, fn.body, ctx, mode);
+}
+
 function call(node, ctx, mode) {
+  if (node.name === 'LET') return letOf(node, ctx, mode);
+  if (node.name === 'LAMBDA') {
+    const params = node.args.slice(0, -1);
+    if (!node.args.length || params.some((p) => p.k !== 'name')) return E.value;
+    return new Lambda(params.map((p) => scoped(p.name)), node.args[node.args.length - 1], [...(ctx.scope || [])]);
+  }
+  // (A name LET bound to a LAMBDA, called: =LET(f, LAMBDA(x, x*2), f(3)).)
+  const local = bound(ctx, node.name);
+  if (local !== undefined) return apply(local, node.args, ctx, mode);
   const def = FUNCTIONS[node.name];
   if (!def) throw new Unsupported(`the function ${node.name}`);
   if (def.volatile) ctx.volatile = true;
@@ -136,7 +184,11 @@ export function evaluate(node, ctx, mode = 'scalar') {
       return items.every((x) => x instanceof Area) ? new Union(items) : E.value;
     }
     case 'arr': return new Arr(node.rows.map((row) => row.map((v) => (v && v.err ? errorOf(v.err) : v))));
-    case 'name': return ctx.name(node.name, mode);
+    case 'name': {
+      const local = bound(ctx, node.name);
+      return local !== undefined ? local : ctx.name(node.name, mode);
+    }
+    case 'call': return apply(evaluate(node.f, ctx, mode), node.args, ctx, mode);
     case 'struct': {
       // (A table reference, as the range it stands for from this cell: ooxml/tables.js.)
       const a = ctx.tableArea ? ctx.tableArea(node.table, node.spec) : { error: '#REF!' };
@@ -165,8 +217,28 @@ export function evaluate(node, ctx, mode = 'scalar') {
  *  formula its rows. */
 export function result(tree, ctx, array = false) {
   ctx.root = tree;
-  const v = evaluate(tree, ctx, array ? 'array' : 'scalar');
+  let v = evaluate(tree, ctx, array ? 'array' : 'scalar');
+  if (v instanceof Lambda) v = E.calc; // (a LAMBDA not called: Excel's #CALC!)
   const one = (x) => (x == null || x === MISSING ? 0 : x);
   if (array) return matrix(v instanceof Union ? E.value : v, ctx).map((row) => row.map(one));
   return one(v instanceof Union ? E.value : scalar(v, ctx));
+}
+
+/** A dynamic array formula's result (Excel 365's, entered or saved with its metadata): { rows } when it gives an array
+ *  (even of one value, as SEQUENCE(1) does), to spill from its cell; else { value }. */
+/** The functions whose answer is an array to Excel, whatever its size (a formula of them is saved as an array). */
+const ARRAY_FUNCTIONS = new Set(['SEQUENCE', 'SORT', 'SORTBY', 'UNIQUE', 'FILTER', 'TRANSPOSE']);
+
+export function dynamicResult(tree, ctx) {
+  ctx.root = tree;
+  let v = evaluate(tree, ctx, 'array');
+  if (v instanceof Lambda) v = E.calc;
+  const one = (x) => (x == null || x === MISSING ? 0 : x);
+  if (v instanceof Union) return { value: E.value };
+  if (v instanceof Arr || (v instanceof Area && v.size > 1)) return { rows: matrix(v, ctx).map((row) => row.map(one)) };
+  // (A function that gives arrays, or a LAMBDA called, is an array formula to Excel even when its answer is one value,
+  // FILTER's if_empty or its #CALC!: kept as one of one, as Excel saves it.)
+  const value = one(scalar(v, ctx));
+  if (tree.k === 'call' || (tree.k === 'fn' && ARRAY_FUNCTIONS.has(tree.name))) return { rows: [[value]] };
+  return { value };
 }

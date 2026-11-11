@@ -57,7 +57,7 @@ export function readSheet(doc, sst = []) {
       c = at ? at.c : c + 1;
       if (!line) cells.set(r, (line = new Map()));
       const cell = readCell(cEl, ns, sst);
-      if (cell.f != null) formulaKind(cell, kid(cEl, 'f', ns), r, c, shared, arrays);
+      if (cell.f != null) formulaKind(cell, kid(cEl, 'f', ns), r, c, shared, arrays, attr(cEl, 'cm') != null);
       line.set(c, cell);
       if (c > maxCol) maxCol = c;
     }
@@ -177,7 +177,7 @@ function readView(view, ns) {
 
 /** What kind of formula a cell holds. A shared formula is written out on its group's first cell only (the one with
  *  `ref`); the others read it as moved to where they are. */
-function formulaKind(cell, fEl, r, c, shared, arrays) {
+function formulaKind(cell, fEl, r, c, shared, arrays, dynamic = false) {
   const t = attr(fEl, 't');
   if (t === 'shared') {
     const si = attr(fEl, 'si');
@@ -187,6 +187,10 @@ function formulaKind(cell, fEl, r, c, shared, arrays) {
       const first = shared.get(si);
       try { cell.f = shiftFormula(first.text, r - first.r, c - first.c); } catch { /* (left '': not worked out) */ }
     }
+  } else if (t === 'array' && dynamic) {
+    // (Excel 365's dynamic array formula, its cell metadata marking it: the range it spilled into, not a fixed array.)
+    cell.dynamic = true;
+    cell.spill = parseRange(attr(fEl, 'ref')) || { r0: r, c0: c, r1: r, c1: c };
   } else if (t === 'array') {
     cell.array = parseRange(attr(fEl, 'ref')) || { r0: r, c0: c, r1: r, c1: c };
     arrays.push(cell.array);

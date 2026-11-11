@@ -14,7 +14,7 @@ export function entryChanges(wb, si, r, c, text, today = new Date()) {
   const code = formatCodeOf(wb.styles, s);
   const parsed = parseInput(text, { today, date1904: wb.date1904, asText: code === '@' });
   if (parsed.error) return { error: parsed.error };
-  const content = parsed.formula != null ? { r, c, formula: parsed.formula } : { r, c, value: parsed.value };
+  const content = parsed.formula != null ? { r, c, formula: parsed.formula, ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
   const format = formatAfterEntry(code, parsed);
   return { content, style: format ? { r, c, s: wb.styleWith(s, { numFmt: format }) } : null, parsed };
 }

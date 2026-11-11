@@ -75,6 +75,9 @@ insides:
 | `src/calc/functions.js` | The worksheet functions, as Excel defines them: maths, statistics, logic, information, and the helpers the others share. |
 | `src/calc/functions-text.js` | Text, and dates and times. |
 | `src/calc/functions-lookup.js` | Lookup and reference, and the conditional sums and counts. |
+| `src/calc/functions-dynamic.js` | Excel 365's dynamic array functions: SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, @ and D1#; docs/DYNAMIC.md. |
+| `src/calc/spill.js` | Spilling: a dynamic formula's array placed from its cell, #SPILL! when blocked, cells left emptied, readers worked out again. |
+| `src/ooxml/spillxml.js`, `src/ooxml/dynamicmeta.js` | Dynamic array formulas in the file as Excel 365 writes them: the anchor's `t="array"`, `ref` and `cm`, and `xl/metadata.xml`'s XLDAPR entry. |
 | `src/calc/engine.js` | `Calc`: what each formula reads, what a change reaches, the order to work them out in, results written back. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |

@@ -163,5 +163,19 @@ const back = await page.evaluate(() => ({ name: window.oxe.workbook.sheets[windo
 check(renameUndone.includes(sourceSheet) && !renameUndone.includes('Regions') && !deleted.includes(sourceSheet) && back.name === sourceSheet && back.a2 === 'South' && (await tabNames()).includes(sourceSheet),
   'Ctrl+Z after Rename and after Delete: the sheet as it was, its cells and tab back', JSON.stringify({ renameUndone, deleted, back }));
 
+// A dynamic array formula typed in the grid: =SORT(B2:B6) in H2 spills down, drawn; a value typed in its way makes it
+// #SPILL!, and Ctrl+Z lets it spill again.
+await page.evaluate(() => window.oxe.select('H2'));
+await page.keyboard.type('=SORT(B2:B6)');
+await page.keyboard.press('Enter');
+const spilled = async () => { const out = []; for (let r = 1; r <= 5; r++) out.push(await shown(r, 7)); return out.join(','); };
+const sorted = await spilled();
+check(sorted === '1,3,4,5,7', 'a dynamic array formula typed in H2: =SORT(B2:B6) spills down H2:H6, drawn', sorted);
+await page.evaluate(() => window.oxe.select('H4'));
+await page.keyboard.type('x');
+await page.keyboard.press('Enter');
+const blocked = await shown(1, 7);
+await page.keyboard.press('Control+z');
+check(blocked === '#SPILL!' && await spilled() === sorted, 'a value typed in its way: #SPILL!; Ctrl+Z: it spills again', `${blocked} / ${await spilled()}`);
 
 await finish();

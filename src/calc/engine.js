@@ -1,7 +1,8 @@
 // Recalculation: which formulas a change reaches, the order to work them out in (each after the formulas it reads),
 // and their results written back into the cells. Formulas Excel saved are trusted until something they read changes.
 import { parseFormula } from './parse.js';
-import { evaluate, result, pick } from './evaluate.js';
+import { evaluate, result, pick, dynamicResult } from './evaluate.js';
+import { place, release, spillOf, touched } from './spill.js';
 import { Unsupported, E, cellValue } from './values.js';
 import { FUNCTIONS } from './functions.js';
 import { readTables, tableArea } from '../ooxml/tables.js';
@@ -10,6 +11,8 @@ const key = (si, r, c) => `${si}:${r}:${c}`;
 /** References wider than this many columns are checked against every change instead of being indexed by column. */
 const WIDE = 64;
 const overlaps = (a, b) => a.si === b.si && a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
+/** The cells a formula fills: an array formula's range, a dynamic formula's spill, or its own cell. */
+const spanOf = (e) => e.array || e.spill || { r0: e.r, c0: e.c, r1: e.r, c1: e.c };
 
 /** The calculation state of a workbook. `book` is the Workbook (workbook.js): its sheets' models, sheetIndexOf(name),
  *  definedName(name, si), date1904 and writeResult(si, r, c, value). */
@@ -37,7 +40,10 @@ export class Calc {
     this.entries = new Map();
     this.byCol = new Map(); // si -> col -> Set of entries
     this.wide = new Map(); // si -> Set of entries
-    this.at = new Map(); // key of every cell a formula fills (an array formula's whole range) -> entry
+    this.at = new Map(); // key of every cell a formula fills (an array formula's whole range, a spill) -> entry
+    this.spilledBy = new Map(); // key of a cell a dynamic formula spilled into (not its own) -> its entry (spill.js)
+    this.blocked = new Set(); // dynamic formulas showing #SPILL!, waiting for room
+    this.moved = []; // spill ranges that grew, shrank or went since the last pass: what reads them works out again
     this.book.sheets.forEach((info, si) => {
       if (info.kind !== 'worksheet' || !info.path) return;
       for (const [r, line] of this.book.sheet(si).cells) for (const [c, cell] of line) if (cell.f != null) this.add(si, r, c, cell);
@@ -94,7 +100,7 @@ export class Calc {
   add(si, r, c, cell) {
     if (!this.entries) return;
     this.remove(si, r, c);
-    const e = { si, r, c, text: cell.f, tree: null, deps: [], volatile: false, unsupported: false, array: cell.array || null };
+    const e = { si, r, c, text: cell.f, tree: null, deps: [], volatile: false, unsupported: false, array: cell.array || null, dynamic: !!cell.dynamic, spill: null };
     if (cell.dataTable || cell.f === '') e.unsupported = true;
     else {
       try { e.tree = parseFormula(cell.f); } catch { e.unsupported = true; }
@@ -102,7 +108,12 @@ export class Calc {
     }
     if (e.unsupported) this.incomplete = true;
     this.entries.set(key(si, r, c), e);
-    const span = e.array || { r0: r, c0: c, r1: r, c1: c };
+    // (A dynamic formula from the file: the cells its saved spill fills are its, until it is worked out again.)
+    if (e.dynamic && cell.spill && (cell.spill.r1 > r || cell.spill.c1 > c)) {
+      e.spill = cell.spill;
+      for (let rr = e.spill.r0; rr <= e.spill.r1; rr++) for (let cc = e.spill.c0; cc <= e.spill.c1; cc++) if (rr !== r || cc !== c) this.spilledBy.set(key(si, rr, cc), e);
+    }
+    const span = spanOf(e);
     for (let rr = span.r0; rr <= span.r1; rr++) for (let cc = span.c0; cc <= span.c1; cc++) this.at.set(key(si, rr, cc), e);
     for (const d of e.deps) {
       if (d.c1 - d.c0 >= WIDE) { if (!this.wide.has(d.si)) this.wide.set(d.si, new Set()); this.wide.get(d.si).add(e); continue; }
@@ -118,8 +129,9 @@ export class Calc {
     const e = this.entries.get(key(si, r, c));
     if (!e) return;
     this.entries.delete(key(si, r, c));
-    const span = e.array || { r0: r, c0: c, r1: r, c1: c };
+    const span = spanOf(e);
     for (let rr = span.r0; rr <= span.r1; rr++) for (let cc = span.c0; cc <= span.c1; cc++) if (this.at.get(key(si, rr, cc)) === e) this.at.delete(key(si, rr, cc));
+    if (e.dynamic) release(this, e);
     for (const d of e.deps) {
       this.wide.get(d.si)?.delete(e);
       const cols = this.byCol.get(d.si);
@@ -147,7 +159,7 @@ export class Calc {
       if (size <= 4096) {
         for (let r = d.r0; r <= d.r1; r++) for (let c = d.c0; c <= d.c1; c++) { const p = this.at.get(key(d.si, r, c)); if (p && p !== e && dirty.has(p)) out.add(p); }
       } else {
-        for (const p of dirty) if (p !== e && p.si === d.si && overlaps(d, p.array ? { si: p.si, ...p.array } : { si: p.si, r0: p.r, c0: p.c, r1: p.r, c1: p.c })) out.add(p);
+        for (const p of dirty) if (p !== e && p.si === d.si && overlaps(d, { si: p.si, ...spanOf(p) })) out.add(p);
       }
     }
     return out;
@@ -162,18 +174,34 @@ export class Calc {
     const take = (e) => {
       if (dirty.has(e)) return;
       dirty.add(e);
-      queue.push(e.array ? { si: e.si, ...e.array } : { si: e.si, r0: e.r, c0: e.c, r1: e.r, c1: e.c });
+      queue.push({ si: e.si, ...spanOf(e) });
     };
     for (const a of also) { const e = this.entries.get(key(a.si, a.r, a.c)); if (e) take(e); }
+    for (const e of touched(this, changed)) take(e);
     for (const e of this.entries.values()) if (e.volatile) take(e);
     while (queue.length) for (const e of this.readers(queue.pop())) take(e);
-    return this._run(dirty);
+    return this._settle(this._run(dirty));
   }
 
   /** Work out every formula in the workbook. */
   calculateAll() {
     this.build();
-    return this._run(new Set(this.entries.values()));
+    return this._settle(this._run(new Set(this.entries.values())));
+  }
+
+  /** After a pass: while spills grew, shrank or went, what reads the cells they took or left is worked out again
+   *  (a few rounds at most: a spill that reads what it spills over stops there). */
+  _settle(out) {
+    for (let round = 0; round < 8 && this.moved.length; round++) {
+      const rects = this.moved.splice(0);
+      const dirty = new Set();
+      for (const a of rects) for (const e of this.readers(a)) dirty.add(e);
+      if (!dirty.size) break;
+      const more = this._run(dirty);
+      out.circular.push(...more.circular);
+    }
+    this.moved.length = 0;
+    return out;
   }
 
   _run(dirty) {
@@ -221,6 +249,7 @@ export class Calc {
       date1904: book.date1904,
       volatile: false,
       cellValue: (si, r, c) => cellValue(book.sheet(si).cells.get(r)?.get(c)),
+      spillOf: (si, r, c) => spillOf(this, si, r, c),
       rowsOf: (si) => book.sheet(si).cells,
       extent: (si) => { const m = book.sheet(si); return { maxRow: m.maxRow, maxCol: m.maxCol }; },
       sheetIndex: (name) => book.sheetIndexOf(name),
@@ -241,6 +270,8 @@ export class Calc {
     const ctx = this.context(e);
     let v;
     try {
+      // (A dynamic array formula: its result spilled from its cell, or one value; spill.js.)
+      if (e.dynamic && !e.array) { place(this, e, dynamicResult(e.tree, ctx)); return; }
       v = result(e.tree, ctx, !!e.array);
     } catch (err) {
       if (!(err instanceof Unsupported)) throw err;

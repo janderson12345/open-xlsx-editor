@@ -50,7 +50,10 @@ export function build(setup) {
     const f = el.getElementsByTagNameNS('*', 'f')[0];
     f.setAttribute('t', 'array');
     f.setAttribute('ref', ref);
+    // (A legacy array formula, Ctrl+Shift+Enter's: no dynamic array metadata, so it doesn't spill.)
+    el.removeAttribute('cm');
     wb._parsed.set(wb.sheets[si], { doc, model: readSheet(doc, wb.sharedStrings) });
+    wb.resetCalc();
   }
   for (const fmt of setup.formats || []) {
     const change = {};

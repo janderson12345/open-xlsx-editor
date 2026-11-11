@@ -39,11 +39,7 @@ export function createCommands(ctx) {
     ctx.selected?.(sel, note);
   };
   /** What a cell holds, as a change that would put it back: { r, c, formula } or { r, c, value }. */
-  const contents = (r, c) => {
-    const cell = sheet().cells.get(r)?.get(c);
-    if (cell && cell.f != null && cell.f !== '') return { r, c, formula: cell.f };
-    return { r, c, value: cell && cell.f == null ? cell.v ?? null : null };
-  };
+  const contents = (r, c) => contentsOn(sheet(), r, c, ctx.sheetIndex());
   const inArray = (r, c) => sheet().arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1);
   const idOf = (i) => ctx.workbook().sheets[i]?.sheetId;
   const indexOf = (id) => ctx.workbook().sheets.findIndex((s) => s.sheetId === id);
@@ -78,11 +74,14 @@ export function createCommands(ctx) {
     return true;
   }
   /** What a cell of any sheet holds, as a change that would put it back. */
-  const contentsOn = (sh, r, c) => {
+  /** What a cell holds, as a change that would put it back: a formula (of the old kind, `legacy`, when it doesn't
+   *  spill), or a value; a cell a formula spilled into holds nothing of its own. */
+  function contentsOn(sh, r, c, si = ctx.workbook().sheets.findIndex((s, i) => s.kind === 'worksheet' && s.path && ctx.workbook().sheet(i) === sh)) {
     const cell = sh.cells.get(r)?.get(c);
-    if (cell && cell.f != null && cell.f !== '') return { r, c, formula: cell.f };
+    if (cell && cell.f != null && cell.f !== '') return { r, c, formula: cell.f, ...(cell.dynamic || cell.array ? {} : { legacy: true }) };
+    if (ctx.workbook().isSpilled(si, r, c)) return { r, c, value: null };
     return { r, c, value: cell && cell.f == null ? cell.v ?? null : null };
-  };
+  }
   /** Values, formats and merged ranges changed together, sheet by sheet ([{ sheet (its sheetId), contents, styles,
    *  merges }]: a merge, a paste, or their undo). Refused, whole, if a cell is part of an array formula. */
   function applySteps(list) {

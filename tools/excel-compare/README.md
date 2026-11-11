@@ -70,6 +70,10 @@ change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `tes
 `pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md);
 `pivotnew-ours.mjs <folder>` with the same check, the editor's new PivotTables.
 
+Dynamic arrays: `dynamic-cases.mjs` makes the cases, `excel-dynamic.ps1 <cases.json> <out.json> <books folder>` has Excel
+365 enter each with Formula2 and save it, and `dynamic-ours.mjs <folder>` with `excel-dynamic-check.ps1 <folder>
+<out.json>` has Excel read the editor's files the same way (docs/DYNAMIC.md).
+
 Go To Special: `special-cases.mjs` makes the cases, `excel-special.ps1 <cases.json> test/fixtures/special.xlsx
 test/special-excel.json` has Excel find each (the selection made, the choice asked as the box asks it, the result
 selected and read; nothing saved) (docs/GOTOSPECIAL.md).

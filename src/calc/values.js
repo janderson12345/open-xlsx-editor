@@ -12,7 +12,7 @@ const BY_CODE = Object.fromEntries(ERROR_CODES.map((c) => [c, new XlError(c)]));
 export const errorOf = (code) => BY_CODE[code] || new XlError(code);
 export const E = {
   null: BY_CODE['#NULL!'], div0: BY_CODE['#DIV/0!'], value: BY_CODE['#VALUE!'], ref: BY_CODE['#REF!'],
-  name: BY_CODE['#NAME?'], num: BY_CODE['#NUM!'], na: BY_CODE['#N/A'],
+  name: BY_CODE['#NAME?'], num: BY_CODE['#NUM!'], na: BY_CODE['#N/A'], spill: BY_CODE['#SPILL!'], calc: BY_CODE['#CALC!'],
 };
 export const isError = (v) => v instanceof XlError;
 
@@ -38,6 +38,11 @@ export class Arr {
   constructor(rows) { this.rows = rows; }
   get height() { return this.rows.length; }
   get width() { return this.rows[0]?.length || 0; }
+}
+
+/** A LAMBDA as a value: its parameters' names (lower case, without _xlpm.), its body, and the names it saw. */
+export class Lambda {
+  constructor(params, body, scope) { this.params = params; this.body = body; this.scope = scope; }
 }
 
 /** An argument left out (=IF(A1,,2)). */

@@ -10,7 +10,12 @@ export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '
  *  #NAME? instead of misreading them. Only the ones the engine knows: others typed are kept as typed. */
 export const PREFIXED = new Set(['CONCAT', 'TEXTJOIN', 'IFS', 'SWITCH', 'MAXIFS', 'MINIFS', 'XLOOKUP', 'XMATCH', 'IFNA',
   'DAYS', 'XOR', 'STDEV.S', 'STDEV.P', 'VAR.S', 'VAR.P', 'CEILING.MATH', 'FLOOR.MATH', 'ISOWEEKNUM', 'PERCENTILE.INC', 'PERCENTILE.EXC',
-  'QUARTILE.INC', 'QUARTILE.EXC', 'RANK.EQ', 'RANK.AVG', 'MODE.SNGL', 'TEXTBEFORE', 'TEXTAFTER', 'NUMBERVALUE', 'UNICODE', 'UNICHAR']);
+  'QUARTILE.INC', 'QUARTILE.EXC', 'RANK.EQ', 'RANK.AVG', 'MODE.SNGL', 'TEXTBEFORE', 'TEXTAFTER', 'NUMBERVALUE', 'UNICODE', 'UNICHAR',
+  'SEQUENCE', 'SORTBY', 'UNIQUE', 'LET', 'LAMBDA', 'ANCHORARRAY', 'SINGLE', 'SORT', 'FILTER']);
+/** Of those, the ones the file names with a second prefix (`_xlfn._xlws.SORT`), as Excel 365 writes them. */
+const WORKSHEET_PREFIXED = new Set(['SORT', 'FILTER']);
+/** A newer function's name as the file has it. */
+export const fileName = (name) => (WORKSHEET_PREFIXED.has(name) ? `_xlfn._xlws.${name}` : PREFIXED.has(name) ? `_xlfn.${name}` : name);
 
 export class FormulaError extends Error {
   constructor(message, pos) {
@@ -152,6 +157,11 @@ export function tokenize(text) {
       continue;
     }
     const ref = refAt(text, i);
+    // (A cell followed by # is the range its formula spills into: D1#.)
+    if (ref && text[ref.end] === '#' && ref.area?.kind === 'cell' && !ERROR_CODES.some((e) => text.slice(ref.end, ref.end + e.length).toUpperCase() === e)) {
+      push('ref', ref.end + 1, { ...ref, end: ref.end + 1, spill: true });
+      continue;
+    }
     if (ref) { push('ref', ref.end, ref); continue; }
     let m = at(RE_NUMBER, text, i);
     if (m) { push('num', i + m[0].length, { value: literal(m[0]) }); continue; }
@@ -170,7 +180,7 @@ export function tokenize(text) {
     }
     const two = text.slice(i, i + 2);
     if (two === '<>' || two === '<=' || two === '>=') { push('op', i + 2); continue; }
-    if ('+-*/^&=<>%:'.includes(ch)) { push('op', i + 1); continue; }
+    if ('+-*/^&=<>%:@'.includes(ch)) { push('op', i + 1); continue; }
     if ('(),;{}'.includes(ch)) { push('punct', i + 1); continue; }
     throw new FormulaError(`Unexpected "${ch}"`, i);
   }
@@ -388,10 +398,88 @@ export function renameSheetRefs(text, from, to) {
   }
 }
 
-/** A formula from the file as Excel shows it: without the _xlfn. and _xlws. prefixes of newer functions. */
+/** Where the bracket opened at token k (a "(" punct, or the one after a func) closes: the index of its ")". */
+function closing(toks, k) {
+  let depth = 0;
+  for (let j = k; j < toks.length; j++) {
+    if (toks[j].type === 'punct' && toks[j].text === '(') depth++;
+    else if (toks[j].type === 'punct' && toks[j].text === ')' && --depth === 0) return j;
+  }
+  return toks.length - 1;
+}
+/** The text with some tokens' spans replaced ([{ from, to (token indexes, inclusive), text }]). */
+function splice(text, toks, edits) {
+  let out = '';
+  let at = 0;
+  for (const e of edits.sort((a, b) => toks[a.from].start - toks[b.from].start)) {
+    out += text.slice(at, toks[e.from].start) + e.text;
+    at = toks[e.to].end;
+  }
+  return out + text.slice(at);
+}
+
+/** A typed formula's dynamic-array parts in the file's form, as Excel 365 writes them: D1# as _xlfn.ANCHORARRAY(D1),
+ *  @x as _xlfn.SINGLE(x), and LET's and LAMBDA's names as _xlpm.name. */
+function dynamicFileForm(typed) {
+  const toks = tokenize(typed);
+  const edits = [];
+  const params = new Map(); // token index of a name -> its file form
+  toks.forEach((t, k) => {
+    const name = t.type === 'func' ? t.text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, '') : null;
+    if (name !== 'LET' && name !== 'LAMBDA') return;
+    // (Its arguments, split at its own commas: LET's names are every other one but the last, LAMBDA's all but the last.)
+    const end = closing(toks, k + 1);
+    const args = [[]];
+    let depth = 0;
+    for (let j = k + 2; j < end; j++) {
+      const x = toks[j];
+      if (x.type === 'punct' && (x.text === '(' || x.text === '{')) depth++;
+      if (x.type === 'punct' && (x.text === ')' || x.text === '}')) depth--;
+      if (depth === 0 && x.type === 'punct' && x.text === ',') args.push([]);
+      else args[args.length - 1].push(j);
+    }
+    const names = args.slice(0, -1).filter((_, a) => name === 'LAMBDA' || a % 2 === 0)
+      .map((a) => (a.length === 1 && toks[a[0]].type === 'name' ? toks[a[0]].text.replace(/^_xlpm\./i, '').toLowerCase() : null)).filter(Boolean);
+    for (let j = k + 2; j < end; j++) if (toks[j].type === 'name' && names.includes(toks[j].text.replace(/^_xlpm\./i, '').toLowerCase())) params.set(j, `_xlpm.${toks[j].text.replace(/^_xlpm\./i, '')}`);
+  });
+  for (const [k, text] of params) edits.push({ from: k, to: k, text });
+  toks.forEach((t, k) => {
+    if (t.type === 'ref' && t.spill) edits.push({ from: k, to: k, text: `_xlfn.ANCHORARRAY(${t.text.slice(0, -1)})` });
+    if (t.type === 'op' && t.text === '@' && toks[k + 1]) {
+      const next = toks[k + 1];
+      const end = next.type === 'func' ? closing(toks, k + 2) : next.type === 'punct' && next.text === '(' ? closing(toks, k + 1) : k + 1;
+      // (The operand as typed, inner names and # converted too.)
+      const inner = dynamicFileForm(typed.slice(next.start, toks[end].end));
+      edits.push({ from: k, to: end, text: `_xlfn.SINGLE(${inner})` });
+    }
+  });
+  // (An @ that covers tokens another edit also covers: the @'s operand was converted whole.)
+  const kept = edits.filter((e) => !edits.some((o) => o !== e && o.from < e.from && o.to >= e.to));
+  return kept.length ? splice(typed, toks, kept) : typed;
+}
+
+/** The file's dynamic-array parts as Excel shows them: D1#, @x, and LET's and LAMBDA's names without _xlpm. */
+function dynamicShownForm(text) {
+  const toks = tokenize(text);
+  const edits = [];
+  toks.forEach((t, k) => {
+    const name = t.type === 'func' ? t.text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, '') : null;
+    if (name === 'ANCHORARRAY' && toks[k + 2]?.type === 'ref' && toks[k + 3]?.text === ')') edits.push({ from: k, to: k + 3, text: `${toks[k + 2].text}#` });
+    else if (name === 'SINGLE') {
+      const end = closing(toks, k + 1);
+      edits.push({ from: k, to: end, text: `@${dynamicShownForm(text.slice(toks[k + 2].start, toks[end - 1].end))}` });
+    } else if (t.type === 'name' && /^_xlpm\./i.test(t.text)) edits.push({ from: k, to: k, text: t.text.replace(/^_xlpm\./i, '') });
+  });
+  const kept = edits.filter((e) => !edits.some((o) => o !== e && o.from <= e.from && o.to >= e.to && (o.from !== e.from || o.to !== e.to)));
+  return kept.length ? splice(text, toks, kept) : text;
+}
+
+/** A formula from the file as Excel shows it: without the _xlfn. and _xlws. prefixes of newer functions, and with
+ *  Excel 365's D1#, @ and LET's names as typed. */
 export function displayFormula(text) {
   try {
-    return mapRefs(text, (t) => (t.type === 'func' && /^_xl(fn|ws)\./i.test(t.text) ? t.text.replace(/^_xl(fn|ws)\./i, '') : null));
+    const shown = /_xlfn\.(ANCHORARRAY|SINGLE)|_xlpm\./i.test(text) ? dynamicShownForm(text) : text;
+    return mapRefs(shown, (t) => (t.type === 'func' && /^_xl(fn|ws)\./i.test(t.text) ? t.text.replace(/^(_xl(fn|ws)\.)+/i, '') : null));
   } catch {
     return text;
   }
@@ -400,7 +488,8 @@ export function displayFormula(text) {
 /** A typed formula (without "=") in the file's form, as Excel takes an entry: function names, references and TRUE and
  *  FALSE in capitals, newer functions prefixed, missing closing brackets added. Throws a FormulaError when it doesn't
  *  read as a formula. */
-export function normalizeFormula(typed) {
+export function normalizeFormula(entry) {
+  const typed = /[#@]|\b(LET|LAMBDA)\s*\(/i.test(entry) ? dynamicFileForm(entry) : entry;
   const toks = tokenize(typed);
   let depth = 0;
   for (const t of toks) {
@@ -411,15 +500,17 @@ export function normalizeFormula(typed) {
   // (A function token doesn't include its "(", which comes as its own token: count it once.)
   depth -= toks.filter((t) => t.type === 'func').length;
   let text = mapRefs(typed, (t) => {
-    if (t.type === 'func') {
-      const name = t.text.toUpperCase().replace(/^_XL(FN|WS)\./, '');
-      return PREFIXED.has(name) ? `_xlfn.${name}` : name;
-    }
+    if (t.type === 'func') return fileName(t.text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, ''));
     if (t.type === 'bool') return t.text.toUpperCase();
     if (t.type === 'ref' && t.area) return t.prefix + areaText(t.area);
     if (t.type === 'err') return t.value;
     return null;
   });
   if (depth > 0) text += ')'.repeat(depth);
+  // (A formula that is all @, =@A1:A3, is saved as Excel 2019 wrote it, A1:A3: its implicit intersection is the old one.)
+  if (/^_xlfn\.SINGLE\(/i.test(text)) {
+    const t = tokenize(text);
+    if (closing(t, 1) === t.length - 1) text = text.slice(t[2].start, t[t.length - 1].start);
+  }
   return text;
 }

@@ -93,8 +93,7 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
 
 ## Not yet
 
-- **Spilling.** Dynamic arrays (FILTER, SORT, UNIQUE, SEQUENCE) aren't supported, and neither is the `@` operator.
-  A formula's array result shows its first value.
+- **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
 - **Intersection and 3D references.** The space operator (intersection) and 3D references (`Sheet1:Sheet3!A1`)
   aren't read, nor are structured references to tables. Formulas using them keep Excel's values.
 - **Iterative calculation.** Circular references are left as they were and announced.

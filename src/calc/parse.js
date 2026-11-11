@@ -5,7 +5,7 @@ import { tokenize, FormulaError } from './tokens.js';
 const BINARY = { '=': 1, '<>': 1, '<': 1, '>': 1, '<=': 1, '>=': 1, '&': 2, '+': 3, '-': 3, '*': 4, '/': 4, '^': 5 };
 
 /** A function's name as the engine knows it: capitals, without the file's _xlfn. or _xlws. prefix. */
-export const functionName = (text) => text.toUpperCase().replace(/^_XL(FN|WS)\./, '');
+export const functionName = (text) => text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, '');
 
 /** A formula (without "=") as a tree of { k, ... }: num, str, bool, err (`v`); ref (`sheet`, `book`, `area`); name;
  *  fn (`name`, `args`); missing (an argument left out); neg, pos, pct, paren (`a`); bin (`op`, `a`, `b`); union
@@ -33,9 +33,25 @@ export function parseFormula(text) {
       const a = unary();
       return { k: t.text === '-' ? 'neg' : 'pos', a };
     }
+    // (@: implicit intersection, as the file's SINGLE function has it.)
+    if (is(t, 'op', '@')) { i++; return { k: 'fn', name: 'SINGLE', args: [unary()] }; }
     let node = primary();
+    // (A LAMBDA called where it is written: =LAMBDA(x,x*2)(3).)
+    while (is(peek(), 'punct', '(') && (node.k === 'call' || (node.k === 'fn' && node.name === 'LAMBDA'))) node = { k: 'call', f: node, args: argList() };
     while (is(peek(), 'op', '%')) { i++; node = { k: 'pct', a: node }; }
     return node;
+  }
+  /** A bracketed list of arguments, from its "(": each an expression, or missing (left out). */
+  function argList() {
+    i++; // (the "(")
+    const args = [];
+    if (is(peek(), 'punct', ')')) { i++; return args; }
+    for (;;) {
+      args.push(is(peek(), 'punct', ',') || is(peek(), 'punct', ')') ? { k: 'missing' } : expr(1));
+      const sep = toks[i++];
+      if (is(sep, 'punct', ')')) return args;
+      if (!is(sep, 'punct', ',')) { i--; return fail('Expected , or ) after an argument'); }
+    }
   }
   function constant() {
     let t = toks[i++];
@@ -53,20 +69,14 @@ export function parseFormula(text) {
     switch (t.type) {
       case 'num': case 'str': case 'bool': return { k: t.type, v: t.value };
       case 'err': return { k: 'err', v: t.value };
-      case 'ref': return t.area ? { k: 'ref', sheet: t.sheet, book: t.book, area: t.area } : { k: 'err', v: '#REF!' };
+      case 'ref': {
+        if (!t.area) return { k: 'err', v: '#REF!' };
+        const ref = { k: 'ref', sheet: t.sheet, book: t.book, area: t.area };
+        return t.spill ? { k: 'fn', name: 'ANCHORARRAY', args: [ref] } : ref;
+      }
       case 'name': return { k: 'name', name: t.text };
       case 'struct': return { k: 'struct', table: t.table, spec: t.spec };
-      case 'func': {
-        i++; // (its "(")
-        const node = { k: 'fn', name: functionName(t.text), args: [] };
-        if (is(peek(), 'punct', ')')) { i++; return node; }
-        for (;;) {
-          node.args.push(is(peek(), 'punct', ',') || is(peek(), 'punct', ')') ? { k: 'missing' } : expr(1));
-          const sep = toks[i++];
-          if (is(sep, 'punct', ')')) return node;
-          if (!is(sep, 'punct', ',')) { i--; return fail('Expected , or ) after an argument'); }
-        }
-      }
+      case 'func': return { k: 'fn', name: functionName(t.text), args: argList() };
       case 'punct':
         if (t.text === '(') {
           const items = [expr(1)];

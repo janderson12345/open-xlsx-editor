@@ -7,6 +7,7 @@ import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
 import { setCellXml, setFormulaXml, setResultXml, setStyleXml, setMergesXml, unshareXml } from './sheetedit.js';
+import { setDynamicXml, clearSpilledXml, RICH_ERRORS } from './spillxml.js';
 import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
@@ -209,7 +210,9 @@ export class Workbook {
       if (ch.formula != null) parseFormula(ch.formula); // (throws a FormulaError before anything changes)
     }
     let formulas = false;
-    for (const { r, c, value, formula } of changes) {
+    // (The formulas known before any is changed: one replaced here may have spilled into cells the file filled.)
+    this.calc.build();
+    for (const { r, c, value, formula, legacy } of changes) {
       const old = model.cells.get(r)?.get(c);
       if (old && old.shared != null) this._unshare(i, old.shared);
       if (old && old.f != null) { this.calc.remove(i, r, c); formulas = true; }
@@ -220,7 +223,8 @@ export class Workbook {
       model.cells.get(r).set(c, cell);
       model.maxRow = Math.max(model.maxRow, r);
       model.maxCol = Math.max(model.maxCol, c);
-      if (formula != null) { this.calc.add(i, r, c, cell); formulas = true; }
+      // (A formula entered here is Excel 365's: an array result spills from it; spill.js.)
+      if (formula != null) { cell.dynamic = !legacy; this.calc.add(i, r, c, cell); formulas = true; }
     }
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
@@ -397,10 +401,17 @@ export class Workbook {
       text: el.textContent,
     }, el));
     this.dirty = new Set(snap.dirty);
+    this._dynamicCm = null;
     this.bookDirty = true;
     this.edited = true;
     this.resetCalc();
   }
+
+  /** A dynamic array formula's cell in the file's form (spillxml.js), and a cell its spill no longer reaches emptied. */
+  setDynamic(i, r, c, rect) { setDynamicXml(this, i, r, c, rect); }
+  clearSpilled(i, r, c) { clearSpilledXml(this, i, r, c); }
+  /** Whether a dynamic formula spilled into (r, c) of sheet i (the value there isn't the cell's own). */
+  isSpilled(i, r, c) { return !!this._calc?.spilledBy?.get(`${i}:${r}:${c}`); }
 
   /** Sheets added, renamed, moved, hidden or shown, coloured and deleted as Excel does it (sheetops.js; a refusal
    *  throws a SheetError with Excel's words). `addSheet` returns the new sheet's index. */
@@ -448,7 +459,9 @@ export class Workbook {
     const t = typeof value === 'number' ? 'n' : typeof value === 'boolean' ? 'b' : typeof value === 'string' ? 'str' : 'e';
     const v = t === 'e' ? value.code : value;
     if (cell && cell.t === t && cell.v === v) return;
-    setResultXml(part.doc, r, c, t === 'e' ? value : v);
+    // (#SPILL! and #CALC! are rich values in Excel's file: #VALUE! there, worked out again when Excel opens it.)
+    if (t === 'e' && RICH_ERRORS.has(v)) this._incomplete = true;
+    setResultXml(part.doc, r, c, t === 'e' ? (RICH_ERRORS.has(v) ? { code: '#VALUE!' } : value) : v);
     if (cell) { cell.t = t; cell.v = v; }
     else {
       if (!model.cells.has(r)) model.cells.set(r, new Map());
