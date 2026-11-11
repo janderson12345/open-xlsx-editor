@@ -32,8 +32,7 @@ PivotTable report."), and the layouts the refresh doesn't make (no row or column
 several values with a column field). Over cells with something in them, Excel's question comes first; its wording is
 from Excel's dialog, which COM doesn't reach.
 
-**Undo:** a pivot at a cell of a sheet there is is one step that Ctrl+Z takes back. A pivot on a new sheet clears the
-undo history, as inserting and deleting sheets here do.
+**Undo:** a new PivotTable is one step that Ctrl+Z takes back, the new sheet it went on with it.
 
 ## Refresh
 

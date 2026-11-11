@@ -395,6 +395,20 @@ export function createCommands(ctx) {
     if (!entry) return false;
     // (The history is the workbook's: undoing a change on another sheet shows that sheet first, as Excel does.)
     const at = indexOf(entry.sheet);
+    if (entry.sheets) {
+      // (Sheets added, renamed, moved, hidden or deleted: the workbook back with its sheets, the tabs again, and the
+      // sheet that was shown then.)
+      const shownId = idOf(ctx.sheetIndex());
+      const was = ctx.sheetIndex();
+      ctx.workbook().restore(entry[side]);
+      ctx.edited?.({ book: true });
+      env.sheetsMoved(ctx.workbook(), shownId, was, () => indexOf(entry.shown[side]));
+      ctx.reloaded?.();
+      ctx.changed?.();
+      to.push(entry);
+      ctx.announce(`${word}: the sheets as they were`);
+      return true;
+    }
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
     if (entry.snap) {
       ctx.workbook().restore(entry[side]);

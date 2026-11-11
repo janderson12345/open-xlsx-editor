@@ -944,6 +944,25 @@ const madePivot = await page.evaluate(() => {
 });
 check(madePivot.sheet !== sourceSheet && madePivot.cells === 'Row Labels=Sum of Units East=4 North=8 South=8 Grand Total=20', 'PivotTable made on a new sheet: Row Labels, East, North, South, Grand Total 20', JSON.stringify(madePivot));
 await page.click('.oxe-rtab >> text=Home');
+// Ctrl+Z takes the PivotTable's new sheet back; Ctrl+Y makes it again.
+const tabNames = () => page.evaluate(() => [...document.querySelectorAll('.oxe-tab')].map((x) => x.textContent).join(','));
+const withPivot = await tabNames();
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const pivotUndone = await tabNames();
+await page.keyboard.press('Control+y');
+check(!pivotUndone.includes(madePivot.sheet) && await tabNames() === withPivot, 'Ctrl+Z: the PivotTable\'s sheet taken back; Ctrl+Y: made again', `${pivotUndone} / ${await tabNames()}`);
+// Sheets renamed and deleted: one undo step each, the sheet back with its cells and its tab.
+await page.evaluate((name) => window.oxe.showSheet(name), sourceSheet);
+await page.evaluate((name) => window.oxe.renameSheet(name, 'Regions'), sourceSheet);
+await page.keyboard.press('Control+z');
+const renameUndone = await tabNames();
+await page.evaluate(() => window.oxe.command('deleteSheet', window.oxe.sheetIndex));
+const deleted = await tabNames();
+await page.keyboard.press('Control+z');
+const back = await page.evaluate(() => ({ name: window.oxe.workbook.sheets[window.oxe.sheetIndex].name, a2: window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(1)?.get(0)?.v }));
+check(renameUndone.includes(sourceSheet) && !renameUndone.includes('Regions') && !deleted.includes(sourceSheet) && back.name === sourceSheet && back.a2 === 'South' && (await tabNames()).includes(sourceSheet),
+  'Ctrl+Z after Rename and after Delete: the sheet as it was, its cells and tab back', JSON.stringify({ renameUndone, deleted, back }));
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();

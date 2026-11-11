@@ -130,3 +130,29 @@ test('every workbook these tests wrote passes the package check', () => {
   const r = spawnSync(process.execPath, ['tools/check-ooxml.mjs', dir], { encoding: 'utf8' });
   assert.equal(r.status, 0, r.stdout);
 });
+
+test('a snapshot brings back the sheets as they were: added, renamed, moved and deleted ones (undo)', () => {
+  const wb = book('basic.xlsx');
+  wb.sheet(0); wb.sheet(1); // (parsed, as a shown sheet is)
+  const names = () => wb.sheets.map((s) => s.name).join(',');
+  const was = names();
+  const bytes = unzipSync(wb.toBytes());
+  const snap = wb.snapshot();
+  const k = wb.addSheet(0, 'Added');
+  wb.apply(k, [{ r: 0, c: 0, value: 5 }]);
+  wb.renameSheet(1, 'Renamed');
+  wb.moveSheet(2, 3);
+  wb.deleteSheet(wb.sheetIndexOf('Renamed'));
+  assert.notEqual(names(), was);
+  const after = wb.snapshot();
+  wb.restore(snap);
+  assert.equal(names(), was);
+  assert.equal(cell(wb, 'Data', 'A1').v, 'Item');
+  const again = unzipSync(wb.toBytes());
+  for (const name of Object.keys(bytes)) if (name !== 'xl/workbook.xml') assert.deepEqual(again[name], bytes[name], name);
+  assert.equal(Object.keys(again).length, Object.keys(bytes).length);
+  // (And forward again: redo.)
+  wb.restore(after);
+  assert.ok(names().startsWith('Added,') && !names().includes('Renamed'));
+  assert.equal(wb.sheet(0).cells.get(0).get(0).v, 5);
+});

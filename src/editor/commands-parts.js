@@ -70,7 +70,7 @@ export function partCommands(env) {
      *  sheets ('sheets', as the tab menu's). A refusal throws, in Excel's words, for the agent to read. */
     agentChange(run, kind) {
       if (ctx.readOnly()) throw new SheetError('The workbook is read-only');
-      if (kind === 'sheets') return sheetOp(run, null, true, true);
+      if (kind === 'sheets') return sheetOp(run, null, true);
       const wb = ctx.workbook();
       const before = wb.snapshot();
       run(wb);

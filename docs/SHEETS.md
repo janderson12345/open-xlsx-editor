@@ -58,9 +58,15 @@ Left, Move Right, Tab Color, Hide, Unhide.
   - a hidden sheet loses `tabSelected`
 - **docProps/app.xml isn't updated.** It still lists the sheet names as they were. Excel rewrites it when it saves and doesn't use it when it opens a file.
 
+## Undo
+
+Each sheet operation (insert, rename, move, hide or show, tab colour, delete) is one step of the undo history: Ctrl+Z
+puts the workbook back with its sheets as they were (`Workbook.snapshot` keeps the sheet list), shows the sheet that
+was shown, and Ctrl+Y does it again. Excel can't undo deleting a sheet, and warns before it deletes one; here the
+deletion can be undone, a difference kept on purpose.
+
 ## Not yet
 
 - Copying a sheet (Move or Copy... with "Create a copy").
 - Grouping sheets (selecting several tabs).
 - References across several sheets (`Sheet1:Sheet3!A1`). The formula engine doesn't read them yet.
-- Undo. Sheet operations aren't undone, and a rename or delete clears the undo history: an earlier change could name the sheet as it was.

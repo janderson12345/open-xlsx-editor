@@ -371,23 +371,26 @@ export class Workbook {
   snapshot() {
     return {
       files: { ...this.pkg.files }, rels: this.pkg.rels, book: serializeXml(this.doc), dirty: new Set(this.dirty), bookDirty: this.bookDirty,
-      parsed: [...this._parsed].map(([info, part]) => [info, serializeXml(part.doc)]),
+      // (The sheets as they were, names, order and all, and the parsed ones by their ids: sheets added, renamed, moved
+      // or deleted since are put back too.)
+      sheets: this.sheets.map((info) => ({ ...info })),
+      parsed: [...this._parsed].map(([info, part]) => [info.sheetId, serializeXml(part.doc)]),
     };
   }
 
-  /** Back to a snapshot: its parts, its sheets (read again) and its defined names. Cell formats added since stay (no
-   *  cell of the snapshot uses them). */
+  /** Back to a snapshot: its parts, its sheets (their list read again) and its defined names. Cell formats added
+   *  since stay (no cell of the snapshot uses them). */
   restore(snap) {
     this.pkg.files = { ...snap.files };
     this.pkg.rels = snap.rels;
-    this._parsed = new Map(snap.parsed.map(([info, text]) => {
-      const doc = parseXml(text);
-      return [info, { doc, model: readSheet(doc, this.sharedStrings) }];
-    }));
     this.doc = parseXml(snap.book);
     const root = this.doc.documentElement;
     const els = kids(kid(root, 'sheets', this.ns), 'sheet', this.ns);
-    for (const info of this.sheets) info.el = els.find((el) => Number(attr(el, 'sheetId')) === info.sheetId) || info.el;
+    this.sheets = snap.sheets.map((info) => withEl({ ...info }, els.find((el) => Number(attr(el, 'sheetId')) === info.sheetId) || null));
+    this._parsed = new Map(snap.parsed.map(([id, text]) => {
+      const doc = parseXml(text);
+      return [this.sheets.find((s) => s.sheetId === id), { doc, model: readSheet(doc, this.sharedStrings) }];
+    }).filter(([info]) => info));
     this.definedNames = kids(kid(root, 'definedNames', this.ns), 'definedName', this.ns).map((el) => withEl({
       name: attr(el, 'name'),
       sheet: attr(el, 'localSheetId') == null ? null : Number(attr(el, 'localSheetId')),

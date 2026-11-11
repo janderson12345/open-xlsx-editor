@@ -2,6 +2,7 @@
 // cell of one there is, its row labels aligned left and its columns fitted, as Excel leaves a new one.
 import { createPivot, pivotSourceFields, layoutRefusal, applyPivot } from '../ooxml/pivotnew.js';
 import { readPivots } from '../ooxml/pivot.js';
+import { SheetError } from '../ooxml/sheetops.js';
 import { pxWidth } from '../ooxml/sizes.js';
 import { parseRange } from '../ooxml/refs.js';
 import { areasSelection } from './selection.js';
@@ -78,11 +79,13 @@ export function pivotCommands(env) {
           si = book.addSheet(ctx.sheetIndex());
           // (The sheets from the new one on moved up one: the source's with them.)
           out = createPivot(book, { ...src, si: src.si >= si ? src.si + 1 : src.si }, { si, r: 2, c: 0 }, layout);
-          if (out.error) { book.deleteSheet(si); si = -1; return; }
+          if (out.error) throw new SheetError(out.error);
           finish(book, out);
-        }, () => si, true);
-        if (!done || out.error) { if (out?.error) ctx.alert(out.error); return false; }
+        }, () => si);
+        if (!done) return false;
         fit(wb, si, out.changes[0].area);
+        // (The widths fitted on the new sheet, once shown, belong to the same step.)
+        state.undo[state.undo.length - 1].after = wb.snapshot();
       }
       const area = out.changes[0].area;
       env.show(areasSelection([{ r0: area.r0, c0: area.c0, r1: area.r0, c1: area.c0 }]), null, `${out.name} made, `);
