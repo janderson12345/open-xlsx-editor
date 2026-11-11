@@ -327,6 +327,10 @@ export const PROBE_FORMULAS = [
   'REGEXREPLACE("abc","(b)","$1$")', 'REGEXREPLACE("abc","(b)","${1")', 'REGEXREPLACE("abc","(b)","$10")', 'REGEXREPLACE("abc","b","x","x")',
   'TEXTJOIN("|",FALSE,REGEXREPLACE({"ab","cd"},"[ac]","X"))', 'TEXTJOIN("|",FALSE,REGEXTEST({"ab","cd"},"a"))',
   'TEXTJOIN("|",FALSE,REGEXTEST("Ab","a",{0,1}))',
+  'YEARFRAC(DATE(2021,2,28),DATE(2021,3,31),0)', 'YEARFRAC(DATE(2020,2,29),DATE(2020,3,31),0)', 'YEARFRAC(DATE(2021,1,31),DATE(2021,3,31),0)',
+  'YEARFRAC(DATE(2021,2,28),DATE(2022,2,28),0)', 'YEARFRAC(DATE(2020,2,29),DATE(2021,2,28),0)', 'YEARFRAC(DATE(2021,3,30),DATE(2021,3,31),0)',
+  'YEARFRAC(DATE(2021,2,28),DATE(2021,5,30),0)', 'YEARFRAC(DATE(2020,2,29),DATE(2020,12,31),0)', 'YEARFRAC(DATE(2021,2,27),DATE(2021,3,31),0)',
+  'YEARFRAC(DATE(2021,2,28),DATE(2024,2,29),0)', 'YEARFRAC(DATE(2021,12,31),DATE(2021,2,28),0)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

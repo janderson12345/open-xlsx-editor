@@ -188,7 +188,9 @@ def('YEARFRAC', (a, ctx) => {
       let d2 = q.d;
       if (lastOfFeb(p) && lastOfFeb(q)) d2 = 30;
       if (lastOfFeb(p)) d1 = 30;
-      if (d2 === 31 && d1 >= 30) d2 = 30;
+      // (The 31st as the end becomes the 30th only after a start on the 30th or 31st itself, not after the end of February
+      // made the 30th: February 28, 2021 to March 31 is 31 days, February 29, 2020 to December 31 301.)
+      if (d2 === 31 && p.d >= 30) d2 = 30;
       if (d1 === 31) d1 = 30;
       return ((q.y - p.y) * 360 + (q.m - p.m) * 30 + (d2 - d1)) / 360;
     }
