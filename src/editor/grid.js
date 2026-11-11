@@ -41,11 +41,14 @@ export const div = (cls, role) => {
 
 /** The grid's rows and columns for a sheet: sizes from its rows, cols and defaults, hidden ones of no size. With
  *  `print`, columns and rows at their printed sizes (units.js printColPx, printRowPx, which needs the Normal style's
- *  typeface) instead of their sizes on screen. With `auto` (rowheights.js), rows without customHeight take Excel's
- *  own heights instead of their stored `ht`. */
-export function sheetGeometry(sheet, { print = false, normalFamily, auto = null } = {}) {
-  const colPx = print ? printColPx : (px) => px;
-  const rowPx = print ? (pt) => printRowPx(pt, normalFamily) : rowHeightToPx;
+ *  typeface) instead of their sizes on screen, and with `scale` (a fraction) rows as they print at that scale. With
+ *  `auto` (rowheights.js), rows without customHeight take Excel's own heights instead of their stored `ht`. */
+export function sheetGeometry(sheet, { print = false, normalFamily, auto = null, scale = 1 } = {}) {
+  // (Columns scaled are whole printer dots too: 430 at 100% is 323 at 75%, measured at 40% to 90%.)
+  const colPx = !print ? (px) => px : scale === 1 ? printColPx : (px) => Math.round(printColPx(px) * 6.25 * scale) / 6.25 / scale;
+  // (Printed at a scale, a row's height is the printer's whole dots of its height at that scale, docs/PRINT.md; here
+  // before the scale, which the page's zoom applies.)
+  const rowPx = !print ? rowHeightToPx : scale === 1 ? (pt) => printRowPx(pt, normalFamily) : (pt) => Math.round(printRowPx(pt, normalFamily) * 6.25 * scale) / 6.25 / scale;
   const rowCount = Math.min(MAX_ROWS, Math.max(sheet.maxRow + 1 + PAD_ROWS, 200));
   const colCount = Math.min(MAX_COLS, Math.max(sheet.maxCol + 1 + PAD_COLS, 26));
   const rowSizes = new Map();

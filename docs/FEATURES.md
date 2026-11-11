@@ -59,7 +59,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Find and Replace (Ctrl+F, Ctrl+H) | Done | Excel's options, Find All as a count, Replace All in one undo step (docs/FIND.md). |
 | Status bar (Sum, Average, Count of the selection) | Done | Beside the sheet tabs; Count alone for text or an error; hidden rows and columns left out; the first number's format (`src/ooxml/stats.js`, by Excel's documented rules: COM doesn't reach the status bar). Choosing Min, Max and Numerical Count missing; `statusBar: false` hides it. |
 | Zoom | Done | View tab, Ctrl+wheel; saved (docs/VIEW.md). |
-| Print | Done | Pages as Excel lays them out, measured against its PDFs. |
+| Print | Done | Pages as Excel lays them out, measured against its PDFs; print area, titles, breaks, scale, fit to page, headers and footers as Excel applies them (docs/PRINT.md). |
 | PDF export | Done | `exportPdf` (src/pdf.js, docs/PDF.md): the sheet shown or the whole workbook, from the print layout, as real text in the installed fonts; 102,079 of 102,097 cells within 1px of Excel's PDFs. Headers, footers, charts and pictures not drawn, as in print. |
 | Accessibility | Done | ARIA grid and tablist, announcements, axe clean in light and dark at 1280 and 320px. |
 | Light and dark | Done | The chrome follows the theme; the sheet stays white, as in Excel. |
@@ -109,7 +109,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
 | Links (`links`) | Hyperlinks | Kept | Not clickable yet; follow a sheet rename. |
 | Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover and Shift+F2, read to screen readers (docs/NOTES.md). Adding and editing missing; kept. |
-| Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers not printed yet. |
+| Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers printed and exported as Excel prints them (docs/PRINT.md); not editable yet. |
 
 ## Page Layout (`layout`)
 
@@ -117,8 +117,8 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Themes (`themes`) | Theme colours and fonts | Shown | Excel 365's default theme when the file has none. |
 | Page Setup (`page-setup`) | Margins, orientation, paper size, page order | Shown | Used when printing. |
-| | Print area, print titles, page breaks | Missing | |
-| Scale to Fit (`scale-to-fit`) | Width, height, scale | Missing | |
+| | Print area, print titles, page breaks | Shown | Used when printing and exporting, as Excel does (docs/PRINT.md); can't be set here yet. |
+| Scale to Fit (`scale-to-fit`) | Width, height, scale | Shown | Used when printing and exporting, rows and columns in whole printer dots as Excel prints them (docs/PRINT.md); can't be set here yet. |
 | Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Partly | Gridlines on screen follow the file; nothing can be changed. |
 
 ## Formulas (`formulas`)

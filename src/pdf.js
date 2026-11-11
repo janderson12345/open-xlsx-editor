@@ -128,30 +128,36 @@ async function drawPage(pdf, pageEl, ctx) {
     }
   }
   page.pushOperators(popGraphicsState());
-  // 2. Text: each cell's text node, line by line, clipped to the cell (and the cell to the printable area).
+  // 2. Text: each cell's text node, line by line, clipped to the cell (and the cell to the printable area); headers
+  //    and footers.
   const range = document.createRange();
   const canvas = document.createElement('canvas').getContext('2d');
   // (Measured once per font: a sheet has thousands of cells in a few.)
   ctx.ascents ||= new Map();
-  const ascent = (cs) => {
-    const f = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  // (In a zoomed box, the print scale, the computed font size is the unzoomed one: `z` is the element's own zoom.)
+  const ascent = (cs, z = 1) => {
+    const f = `${cs.fontStyle} ${cs.fontWeight} ${(parseFloat(cs.fontSize) || 16) * z}px ${cs.fontFamily}`;
     if (!ctx.ascents.has(f)) {
       canvas.font = f;
       ctx.ascents.set(f, canvas.measureText('Hg').fontBoundingBoxAscent ?? parseFloat(cs.fontSize) * 0.8);
     }
     return ctx.ascents.get(f);
   };
-  const walker = document.createTreeWalker(areaEl, NodeFilter.SHOW_TEXT, { acceptNode: (t) => (t.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
+  // (The page's text: its cells', and its header's and footer's outside the printable area.)
+  const walker = document.createTreeWalker(pageEl, NodeFilter.SHOW_TEXT, { acceptNode: (t) => (t.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
   for (let t = walker.nextNode(); t; t = walker.nextNode()) {
     const el = t.parentElement;
     const cs = getComputedStyle(el);
     if (cs.visibility !== 'visible') continue;
     const cell = el.closest('.oxe-cell');
-    const cr = cell ? cell.getBoundingClientRect() : area;
-    const box = { left: Math.max(cr.left, area.left), top: Math.max(cr.top, area.top), right: Math.min(cr.right, area.right), bottom: Math.min(cr.bottom, area.bottom) };
+    // (A cell's text clipped to its cell and the printable area; a header's or footer's to the page.)
+    const bound = cell ? area : pr;
+    const cr = cell ? cell.getBoundingClientRect() : pr;
+    const box = { left: Math.max(cr.left, bound.left), top: Math.max(cr.top, bound.top), right: Math.min(cr.right, bound.right), bottom: Math.min(cr.bottom, bound.bottom) };
     if (box.right <= box.left || box.bottom <= box.top) continue;
     const { font, chars } = await fontFor(pdf, cs, ctx);
-    const size = (parseFloat(cs.fontSize) || 16) * PT;
+    const z = el.currentCSSZoom || 1;
+    const size = (parseFloat(cs.fontSize) || 16) * z * PT;
     const c = color(cs.color) || { rgb: rgb(0, 0, 0) };
     const key = page.node.newFontDictionary(font.name, font.ref);
     for (const piece of pieces(t, range)) {
@@ -163,11 +169,11 @@ async function drawPage(pdf, pageEl, ctx) {
       const ops = [...clipTo({ left: box.left, bottom: box.bottom, width: box.right - box.left, height: box.bottom - box.top }), beginText(), setFontAndSize(key, size), setFillingRgbColor(c.rgb.red, c.rgb.green, c.rgb.blue)];
       // (Scaled to the width the layout measured in the page's font: another font's letters fill the same room.)
       if (natural > 0 && Math.abs(want - natural) > 0.1) ops.push(PDFOperator.of(PDFOperatorNames.SetTextHorizontalScaling, [PDFNumber.of(+(100 * want / natural).toFixed(2))]));
-      ops.push(setTextMatrix(1, 0, 0, 1, X(piece.r.left), Y(piece.r.top + ascent(cs))), showText(font.encodeText(safe)), endText(), popGraphicsState());
+      ops.push(setTextMatrix(1, 0, 0, 1, X(piece.r.left), Y(piece.r.top + ascent(cs, z))), showText(font.encodeText(safe)), endText(), popGraphicsState());
       page.pushOperators(...ops);
       // Underline and strikethrough, from the cell text's own decoration.
       const lines = cs.textDecorationLine || '';
-      const y = Y(piece.r.top + ascent(cs));
+      const y = Y(piece.r.top + ascent(cs, z));
       const thick = Math.max(0.5, size / 18);
       if (lines.includes('underline')) page.drawLine({ start: { x: X(piece.r.left), y: y - size * 0.12 }, end: { x: X(piece.r.left) + want, y: y - size * 0.12 }, thickness: thick, color: c.rgb });
       if (lines.includes('line-through')) page.drawLine({ start: { x: X(piece.r.left), y: y + size * 0.3 }, end: { x: X(piece.r.left) + want, y: y + size * 0.3 }, thickness: thick, color: c.rgb });

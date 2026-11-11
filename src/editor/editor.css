@@ -360,6 +360,49 @@
 .oxe-page-cells .oxe-wrap.oxe-v-center > .oxe-tx {
   top: var(--oxe-pwrap-mid);
 }
+/* The page's cells at the print scale (print.js): a box zoomed by it, holding the title and body blocks, each clipped
+   to its cells. */
+.oxe-page-zoom {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--oxe-zw);
+  height: var(--oxe-zh);
+  zoom: var(--oxe-zoom);
+}
+/* Headers and footers on the page (print.js drawHeaderFooter): a line placed by its top and height, its left section
+   from the left, its right one to the right, its centre centred. */
+.oxe-hf {
+  position: absolute;
+  top: var(--oxe-hf-top);
+  line-height: var(--oxe-hf-lh);
+  white-space: pre;
+  font-family: var(--oxe-hf-font);
+  font-size: var(--oxe-hf-size);
+  color: #000000;
+}
+.oxe-hf-left { left: var(--oxe-hf-left); }
+.oxe-hf-right { right: calc(var(--oxe-page-w) - var(--oxe-hf-left)); }
+.oxe-hf-center { left: var(--oxe-hf-left); translate: -50% 0; }
+.oxe-hf span { font-size: var(--oxe-hf-run-size, inherit); font-family: var(--oxe-hf-run-font, inherit); color: var(--oxe-hf-run-color, inherit); }
+.oxe-hf .oxe-hf-b { font-weight: bold; }
+.oxe-hf .oxe-hf-i { font-style: italic; }
+.oxe-hf .oxe-hf-u { text-decoration: underline; }
+.oxe-hf .oxe-hf-s { text-decoration: line-through; }
+.oxe-page-zoom .oxe-tx {
+  translate: 0 var(--oxe-pshift, 0px);
+}
+.oxe-page-zoom .oxe-cell:not(.oxe-h-right) > .oxe-tx {
+  translate: var(--oxe-pshift-x, 0px) var(--oxe-pshift, 0px);
+}
+.oxe-page-block {
+  position: absolute;
+  left: var(--oxe-bx);
+  top: var(--oxe-by);
+  width: var(--oxe-bw);
+  height: var(--oxe-bh);
+  overflow: hidden;
+}
 .oxe-page-cells {
   position: absolute;
   left: calc(-1 * var(--oxe-ox));

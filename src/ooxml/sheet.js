@@ -196,9 +196,10 @@ function formulaKind(cell, fEl, r, c, shared, arrays) {
 /** Paper sizes by `paperSize` code, in inches (ECMA-376 Part 1, 18.3.1.63): only the common ones so far. */
 const PAPER = { 1: [8.5, 11], 5: [8.5, 14], 8: [11.69, 16.54], 9: [8.27, 11.69], 11: [5.83, 8.27] };
 
-/** What the sheet says about printing: paper, orientation, margins (inches), gridlines and headings. Without
- *  `pageMargins` Excel uses its Normal margins, 0.7in at the sides and 0.75in top and bottom. Scaling and fit-to-page
- *  are read but not applied yet. */
+/** What the sheet says about printing: paper, orientation, margins (inches), gridlines and headings, its scale or
+ *  fit to pages (fitToWidth, fitToHeight: 0 as many as it takes), its manual page breaks (before rows and columns,
+ *  0-based) and headers and footers. Without `pageMargins` Excel uses its Normal margins, 0.7in at the sides and
+ *  0.75in top and bottom. */
 function readPageSetup(root, ns) {
   const m = kid(root, 'pageMargins', ns);
   const ps = kid(root, 'pageSetup', ns);
@@ -218,6 +219,22 @@ function readPageSetup(root, ns) {
     gridLines: on(po, 'gridLines'),
     headings: on(po, 'headings'),
     pageOrder: attr(ps, 'pageOrder') || 'downThenOver',
+    fitToWidth: Number(attr(ps, 'fitToWidth') ?? 1),
+    fitToHeight: Number(attr(ps, 'fitToHeight') ?? 1),
+    headerFooter: (() => {
+      const hf = kid(root, 'headerFooter', ns);
+      const text = (name) => kid(hf, name, ns)?.textContent || '';
+      return {
+        differentFirst: on(hf, 'differentFirst'), differentOddEven: on(hf, 'differentOddEven'),
+        scaleWithDoc: !hf || attr(hf, 'scaleWithDoc') !== '0', alignWithMargins: !hf || attr(hf, 'alignWithMargins') !== '0',
+        odd: { header: text('oddHeader'), footer: text('oddFooter') }, even: { header: text('evenHeader'), footer: text('evenFooter') },
+        first: { header: text('firstHeader'), footer: text('firstFooter') },
+      };
+    })(),
+    breaks: {
+      rows: kids(kid(root, 'rowBreaks', ns), 'brk', ns).filter((b) => attr(b, 'man') === '1' || attr(b, 'man') === 'true').map((b) => Number(attr(b, 'id'))),
+      cols: kids(kid(root, 'colBreaks', ns), 'brk', ns).filter((b) => attr(b, 'man') === '1' || attr(b, 'man') === 'true').map((b) => Number(attr(b, 'id'))),
+    },
   };
 }
 

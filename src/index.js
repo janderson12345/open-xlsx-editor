@@ -3,6 +3,7 @@
 import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
+import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
@@ -581,7 +582,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     preparePrint() {
       if (!state.workbook) return 0;
       const wb = state.workbook;
-      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme));
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11 });
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },

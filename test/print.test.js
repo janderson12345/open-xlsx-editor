@@ -33,3 +33,45 @@ test('pages down then over: large.xlsx splits its 5,000 rows down and its 20 col
   assert.equal(pages.length, 342);
   assert.equal(pages[pages.length / 3].c0, 9);
 });
+
+test('print area, titles and manual breaks (print-area.xlsx): pages as Excel prints them', async () => {
+  const { printSetup } = await import('../src/ooxml/printarea.js');
+  const { sheetGeometry } = await import('../src/editor/grid.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/print-area.xlsx')));
+  const setup = printSetup(wb, 0);
+  assert.deepEqual(setup, { area: { r0: 2, c0: 1, r1: 69, c1: 7 }, titles: { rows: [0, 1], cols: null } });
+  const sheet = wb.sheet(0);
+  assert.deepEqual(sheet.page.breaks, { rows: [29], cols: [5] });
+  const { pages } = paginate(sheet, sheetGeometry(sheet, { print: true, normalFamily: 'Calibri' }), setup);
+  // (Excel's PDF: B:E then F:H across, rows 3:29 then 30:70 down, rows 1:2 above each.)
+  assert.deepEqual(pages, [{ r0: 2, r1: 28, c0: 1, c1: 4 }, { r0: 29, r1: 69, c0: 1, c1: 4 }, { r0: 2, r1: 28, c0: 5, c1: 7 }, { r0: 29, r1: 69, c0: 5, c1: 7 }]);
+});
+
+test('scale and fit to page: Excel picks the whole percentage that fits, rows of whole printer dots', async () => {
+  const { printScale } = await import('../src/editor/print.js');
+  const { sheetGeometry } = await import('../src/editor/grid.js');
+  const fit = sheetOf('print-fit.xlsx');
+  const range = { r0: 0, c0: 0, r1: fit.maxRow, c1: fit.maxCol };
+  assert.equal(printScale(fit, sheetGeometry(fit, { print: true, normalFamily: 'Calibri' }), range), 0.41, '24 columns on one page wide: 41%, as Excel');
+  const scaled = sheetOf('print-scale.xlsx');
+  assert.equal(printScale(scaled, sheetGeometry(scaled, { print: true, normalFamily: 'Calibri' }), range), 0.6);
+  // (A 15pt Calibri row prints as 121 dots at 600 dpi; at 60% as 73, at 75% 91: here before the 60% zoom.)
+  const g = sheetGeometry(scaled, { print: true, normalFamily: 'Calibri', scale: 0.6 });
+  assert.ok(Math.abs(g.rows.size(0) * 0.6 * 6.25 - 73) < 1e-9);
+  const { pages } = paginate(scaled, g, { scale: 0.6 });
+  assert.equal(pages[0].r1 - pages[0].r0 + 1, 77, '77 rows on the first page, as Excel (78 would fill 5,694 of 5,700 dots)');
+});
+
+test("headers and footers: Excel's codes read into sections, fields filled in per page", async () => {
+  const { parseHeaderFooter, fillFields } = await import('../src/ooxml/headerfooter.js');
+  const s = parseHeaderFooter('&LQuarterly stock&CPage &P of &N&R&A');
+  assert.deepEqual(s.left.map((r) => r.text), ['Quarterly stock']);
+  assert.deepEqual(fillFields(s.center, { page: 2, pages: 5 }).map((r) => r.text).join(''), 'Page 2 of 5');
+  assert.equal(fillFields(s.right, { page: 1, pages: 1, sheet: 'Probe' })[0].text, 'Probe');
+  const f = parseHeaderFooter('Plain && simple &B&14Bold big&B &"Times New Roman,Italic"italic &P+1');
+  assert.equal(f.center[0].text, 'Plain & simple ');
+  assert.deepEqual([f.center[1].bold, f.center[1].size], [true, 14]);
+  assert.deepEqual([f.center[3].font, f.center[3].italic], ['Times New Roman', true]);
+  assert.equal(fillFields(f.center, { page: 3, pages: 9 }).at(-1).text, '4', '&P+1');
+  assert.deepEqual(sheetOf('print-headers.xlsx').page.headerFooter.odd, { header: '&LQuarterly stock&CPage &P of &N&R&A', footer: '&C&F' });
+});
