@@ -32,6 +32,7 @@ insides:
 | `src/pdf.js` | PDF export from the print layout (pdf-lib, fontkit): fills, borders and cell text at the layout's places, clipped to their cells; docs/PDF.md. |
 | `src/collab.js` | Co-editing over Yjs: `connectWorkbook(api, ydoc)`; cell contents shared cell by cell from `api.onEdit`, made with the `remoteContents` command; any other change shared as the workbook's bytes; docs/COLLAB.md. |
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
+| `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, and the anchors of pictures, charts and shapes (docs/ROWCOL.md). |
 | `src/ooxml/pivot.js` | PivotTables: read from their parts, refreshed from their source as Excel's Refresh does (cache, records, items, compact layout); docs/PIVOT.md. |
 | `src/editor/datatab.js` | The Data tab: Refresh All and Refresh. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |

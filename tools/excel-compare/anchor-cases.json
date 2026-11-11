@@ -1,0 +1,221 @@
+{
+ "sheet": {
+  "data": [
+   [
+    "Item",
+    "Qty",
+    "Price"
+   ],
+   [
+    "Bolt",
+    2,
+    0.5
+   ],
+   [
+    "Nut",
+    9,
+    5.5
+   ],
+   [
+    "Screw",
+    3,
+    1.5
+   ],
+   [
+    "Washer",
+    10,
+    6.5
+   ],
+   [
+    "Rivet",
+    4,
+    2.5
+   ],
+   [
+    "Pin",
+    11,
+    7.5
+   ],
+   [
+    "Clip",
+    5,
+    3.5
+   ],
+   [
+    "Hook",
+    12,
+    8.5
+   ],
+   [
+    "Ring",
+    6,
+    4.5
+   ],
+   [
+    "Peg",
+    13,
+    0.5
+   ]
+  ],
+  "at": "B2",
+  "chart": {
+   "range": "F3:K14",
+   "series": "C3:C12"
+  },
+  "shape": "M5:O8",
+  "notes": [
+   "B6",
+   "F20",
+   "A1",
+   "D12"
+  ],
+  "table": true
+ },
+ "cases": [
+  {
+   "name": "insert row 1",
+   "step": {
+    "do": "insert",
+    "range": "1:1"
+   }
+  },
+  {
+   "name": "insert rows 5:6 (inside the table and chart)",
+   "step": {
+    "do": "insert",
+    "range": "5:6"
+   }
+  },
+  {
+   "name": "insert rows 15:17 (below the table and chart)",
+   "step": {
+    "do": "insert",
+    "range": "15:17"
+   }
+  },
+  {
+   "name": "delete row 1",
+   "step": {
+    "do": "delete",
+    "range": "1:1"
+   }
+  },
+  {
+   "name": "delete rows 5:6 (table rows, a note)",
+   "step": {
+    "do": "delete",
+    "range": "5:6"
+   }
+  },
+  {
+   "name": "delete row 12 (the table's last row)",
+   "step": {
+    "do": "delete",
+    "range": "12:12"
+   }
+  },
+  {
+   "name": "delete rows 3:14 (the table's data, all of the chart)",
+   "step": {
+    "do": "delete",
+    "range": "3:14"
+   }
+  },
+  {
+   "name": "delete rows 2:12 (all of the table)",
+   "step": {
+    "do": "delete",
+    "range": "2:12"
+   }
+  },
+  {
+   "name": "delete rows 6:7 (inside the shape)",
+   "step": {
+    "do": "delete",
+    "range": "6:7"
+   }
+  },
+  {
+   "name": "insert column A",
+   "step": {
+    "do": "insert",
+    "range": "A:A"
+   }
+  },
+  {
+   "name": "insert columns C:D (inside the table)",
+   "step": {
+    "do": "insert",
+    "range": "C:D"
+   }
+  },
+  {
+   "name": "delete column C (the table's Qty)",
+   "step": {
+    "do": "delete",
+    "range": "C:C"
+   }
+  },
+  {
+   "name": "delete columns F:K (all of the chart)",
+   "step": {
+    "do": "delete",
+    "range": "F:K"
+   }
+  },
+  {
+   "name": "delete columns B:D (all of the table)",
+   "step": {
+    "do": "delete",
+    "range": "B:D"
+   }
+  },
+  {
+   "name": "delete column N (inside the shape)",
+   "step": {
+    "do": "delete",
+    "range": "N:N"
+   }
+  },
+  {
+   "name": "insert B5:D5 shifting down (the table's width)",
+   "step": {
+    "do": "insert",
+    "range": "B5:D5",
+    "shift": "down"
+   }
+  },
+  {
+   "name": "insert C5 shifting down (part of the table)",
+   "step": {
+    "do": "insert",
+    "range": "C5",
+    "shift": "down"
+   }
+  },
+  {
+   "name": "delete B5:D6 shifting up (the table's width)",
+   "step": {
+    "do": "delete",
+    "range": "B5:D6",
+    "shift": "up"
+   }
+  },
+  {
+   "name": "insert F5 shifting down (under the chart)",
+   "step": {
+    "do": "insert",
+    "range": "F5",
+    "shift": "down"
+   }
+  },
+  {
+   "name": "insert A6 shifting right (the note at B6)",
+   "step": {
+    "do": "insert",
+    "range": "A6",
+    "shift": "right"
+   }
+  }
+ ]
+}

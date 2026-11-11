@@ -56,6 +56,11 @@ pwsh tools/excel-compare/excel-readback.ps1 <folder>/saved.json <out.json>
 The same cases done by the editor and saved, then opened in Excel and read the same way, to compare with what Excel
 made itself.
 
+Notes, pictures, charts and shapes when rows and columns move: `anchor-cases.mjs [--no-table]` makes the cases,
+`excel-anchors.ps1 <cases> <out.json>` has Excel do each one and read where everything went (nothing saved), and
+`anchors-ours.mjs <folder>` with `excel-anchors-check.ps1 <folder> <out.json>` has Excel read back the editor's
+results (docs/ROWCOL.md).
+
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
 `pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md).

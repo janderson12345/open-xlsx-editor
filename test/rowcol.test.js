@@ -124,8 +124,8 @@ test('refused as Excel refuses; a sheet with parts whose positions aren\'t moved
   const { wb, si } = setup();
   wb.apply(si, [{ r: 1048575, c: 0, value: 1 }]);
   assert.throws(() => wb.changeLines(si, 'row', 2, 1), { message: ROWCOL_MESSAGES.offSheet });
-  // (A sheet with comments: their positions aren't moved yet.)
-  wb.pkg.addRel('http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments', '../comments1.xml', false, wb.sheets[si].path);
+  // (A sheet with a slicer: its position isn't moved yet.)
+  wb.pkg.addRel('http://schemas.microsoft.com/office/2007/relationships/slicer', '../slicers/slicer1.xml', false, wb.sheets[si].path);
   assert.throws(() => wb.changeLines(si, 'row', 0, 1), { message: ROWCOL_MESSAGES.parts });
 });
 

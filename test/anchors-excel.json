@@ -1,0 +1,942 @@
+[
+    {
+        "name":  "insert row 1",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  45,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L16",
+                           "from":  "F4",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  75,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P10",
+                           "from":  "M6",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A2",
+                      "B7",
+                      "D13",
+                      "F21"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert rows 5:6 (inside the table and chart)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L17",
+                           "from":  "F3",
+                           "height":  210
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  90,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P11",
+                           "from":  "M7",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B8",
+                      "D14",
+                      "F22"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert rows 15:17 (below the table and chart)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "D12",
+                      "F23"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete row 1",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  15,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L14",
+                           "from":  "F2",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  45,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P8",
+                           "from":  "M4",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "B5",
+                      "D11",
+                      "F19"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete rows 5:6 (table rows, a note)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L13",
+                           "from":  "F3",
+                           "height":  150
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P7",
+                           "from":  "M5",
+                           "height":  30
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "D10",
+                      "F18"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete row 12 (the table\u0027s last row)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L14",
+                           "from":  "F3",
+                           "height":  165
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "F19"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete rows 3:14 (the table\u0027s data, all of the chart)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+
+                   ],
+        "shapes":  [
+
+                   ],
+        "notes":  [
+                      "A1",
+                      "F8"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete rows 2:12 (all of the table)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  15,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L4",
+                           "from":  "F2",
+                           "height":  30
+                       }
+                   ],
+        "shapes":  [
+
+                   ],
+        "notes":  [
+                      "A1",
+                      "F9"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete rows 6:7 (inside the shape)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L13",
+                           "from":  "F3",
+                           "height":  150
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P7",
+                           "from":  "M5",
+                           "height":  30
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "D10",
+                      "F18"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert column A",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  288,
+                           "width":  288,
+                           "to":  "M15",
+                           "from":  "G3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  624,
+                           "width":  144,
+                           "to":  "Q9",
+                           "from":  "N5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "B1",
+                      "C6",
+                      "E12",
+                      "G20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert columns C:D (inside the table)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  336,
+                           "width":  288,
+                           "to":  "N15",
+                           "from":  "H3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  672,
+                           "width":  144,
+                           "to":  "R9",
+                           "from":  "O5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "F12",
+                      "H20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete column C (the table\u0027s Qty)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  192,
+                           "width":  288,
+                           "to":  "K15",
+                           "from":  "E3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  528,
+                           "width":  144,
+                           "to":  "O9",
+                           "from":  "L5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "C12",
+                      "E20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete columns F:K (all of the chart)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  288,
+                           "width":  144,
+                           "to":  "J9",
+                           "from":  "G5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "D12"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete columns B:D (all of the table)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  96,
+                           "width":  288,
+                           "to":  "I15",
+                           "from":  "C3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  432,
+                           "width":  144,
+                           "to":  "M9",
+                           "from":  "J5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "C20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete column N (inside the shape)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  96,
+                           "to":  "O9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "D12",
+                      "F20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert B5:D5 shifting down (the table\u0027s width)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B7",
+                      "D13",
+                      "F20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert C5 shifting down (part of the table)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "D12",
+                      "F20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "delete B5:D6 shifting up (the table\u0027s width)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "D10",
+                      "F20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert F5 shifting down (under the chart)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "B6",
+                      "D12",
+                      "F21"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    },
+    {
+        "name":  "insert A6 shifting right (the note at B6)",
+        "refused":  null,
+        "table":  null,
+        "charts":  [
+                       {
+                           "top":  30,
+                           "left":  240,
+                           "width":  288,
+                           "to":  "L15",
+                           "from":  "F3",
+                           "height":  180
+                       }
+                   ],
+        "shapes":  [
+                       {
+                           "top":  60,
+                           "left":  576,
+                           "width":  144,
+                           "to":  "P9",
+                           "from":  "M5",
+                           "height":  60
+                       }
+                   ],
+        "notes":  [
+                      "A1",
+                      "C6",
+                      "D12",
+                      "F20"
+                  ],
+        "before":  {
+                       "shape":  {
+                                     "top":  60,
+                                     "left":  576,
+                                     "width":  144,
+                                     "to":  "P9",
+                                     "from":  "M5",
+                                     "height":  60
+                                 },
+                       "chart":  {
+                                     "top":  30,
+                                     "left":  240,
+                                     "width":  288,
+                                     "to":  "L15",
+                                     "from":  "F3",
+                                     "height":  180
+                                 }
+                   }
+    }
+]

@@ -3,7 +3,8 @@
 // conditional formats, data validations, filter and view hold; every formula of the workbook that reads the sheet
 // follows (tokens.js shiftRefs), defined names and chart series too. New rows take the format of the row above, new
 // columns the format and width of the column to their left. Afterwards the sheet is read again and the workbook worked
-// out again. A sheet with pictures, charts, comments, tables or pivot tables is refused for now: their positions
+// out again. Notes and threaded comments go with their cells, pictures, charts and shapes with whole rows and
+// columns (anchors.js). A sheet with tables, pivot tables, slicers or timelines is refused for now: their positions
 // aren't moved yet.
 //
 // Inserting and deleting cells (the rest of their columns shifting down or up, or of their rows right or left) is the
@@ -14,16 +15,17 @@ import { readSheet } from './sheet.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
 import { shiftLine, shiftSpan, shiftRefs, bandArea } from '../calc/tokens.js';
 import { SheetError, mapFormulas } from './sheetops.js';
+import { moveNotes, moveDrawings } from './anchors.js';
 
 export const ROWCOL_MESSAGES = {
   offSheet: 'To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet. Select another location in which to insert new cells, or delete data from the end of your worksheet.',
   array: "You can't change part of an array.",
-  parts: "Rows and columns can't be inserted or deleted yet on a sheet with pictures, charts, comments, tables or pivot tables.",
-  cellParts: "Cells can't be inserted or deleted yet on a sheet with pictures, charts, comments, tables or pivot tables.",
+  parts: "Rows and columns can't be inserted or deleted yet on a sheet with tables, pivot tables, slicers or timelines.",
+  cellParts: "Cells can't be inserted or deleted yet on a sheet with tables, pivot tables, slicers or timelines.",
   unmerge: 'This operation will cause some merged cells to unmerge. Do you wish to continue?',
 };
 /** Relationships of a sheet whose parts hold positions this doesn't move yet. */
-const ANCHORED = /\/(drawing|vmlDrawing|comments|table|pivotTable|threadedComment|slicer|timeline)$/;
+const ANCHORED = /\/(table|pivotTable|slicer|timeline)$/;
 
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
@@ -317,6 +319,12 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   if (band) moveBandCells(doc, axis, at, n, band); else moveCells(doc, axis, at, n);
   if (axis === 'col' && !band) moveCols(doc, at, n);
   moveRanges(doc, axis, at, n, band, split);
+  // Notes with their cells; pictures, charts and shapes with whole lines (not when cells shift, as in Excel).
+  moveNotes(wb, si, (r, c) => {
+    const next = shiftRange({ r0: r, c0: c, r1: r, c1: c }, axis, at, n, band);
+    return next && { r: next.r0, c: next.c0 };
+  });
+  if (!band) moveDrawings(wb, si, axis, at, n);
   // The sheet read again from its moved XML, and everything worked out again.
   wb._parsed.set(info, { doc, model: readSheet(doc, wb.sharedStrings) });
   wb.dirty.add(info.path);

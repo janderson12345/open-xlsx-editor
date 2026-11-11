@@ -56,10 +56,32 @@ The sheet's other ranges (hyperlinks, conditional formats, data validations, the
 when they are within the band and stay otherwise; that isn't measured. The question's wording comes from Excel's
 dialog, which COM doesn't reach.
 
+## Notes, pictures, charts and shapes
+
+Measured by `tools/excel-compare/excel-anchors.ps1` on `anchor-cases.mjs --no-table`. The sheet holds a stock list on
+B2:D12, a column chart anchored F3 to the start of L15, a rectangle M5 to P9, and notes at A1, B6, D12 and F20. That
+sheet is `test/fixtures/anchors.xlsx`, written by `make-fixtures.mjs`. Twenty steps were measured: whole rows and
+columns inserted and deleted around, inside and across each object, and cells shifted down, up and right
+(`src/ooxml/anchors.js`).
+
+| What | As Excel does it |
+|---|---|
+| A note or threaded comment | Moves with its cell, also when cells shift, and is deleted with it. |
+| A picture, chart or shape (a two-cell anchor) | Each corner after the change moves with it. An end corner on the boundary where lines are inserted stays, so the object doesn't grow. Lines deleted inside it shrink it. One whose whole extent is deleted is deleted, a chart with its part. |
+| The same when cells shift | Not moved. |
+| One that moves but doesn't size (`editAs="oneCell"`), or doesn't move (`absolute`) | Moved by its start, or left where it is. Not measured. |
+
+Results: all 20 steps put the chart, the rectangle and the notes where Excel did (`test/anchors.test.js` against
+`test/anchors-excel.json`). The editor's 20 results were saved (`anchors-ours.mjs`) and opened in Excel
+(`excel-anchors-check.ps1`), and Excel read every one back the same.
+
+On the same sheet with a table, deleting rows 3:14 (the table's data and all of the chart's rows) left Excel's chart
+one row tall instead of deleting it. That is the only case where the table changed what happened to a drawing.
+
 ## Not yet
 
-A sheet with pictures, charts, comments, tables or pivot tables is refused ("Rows and columns can't be inserted or
-deleted yet on a sheet with...", or "Cells can't..."): their anchors and ranges aren't moved yet. Also missing: page
+A sheet with tables, pivot tables, slicers or timelines is refused ("Rows and columns can't be inserted or
+deleted yet on a sheet with...", or "Cells can't..."): their ranges aren't moved yet. Also missing: page
 breaks, pivot caches' source ranges on other sheets, and the Insert Options button (format from below, clear
 formatting). One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is
 `=SUM(A3:A3)` in Excel after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to
