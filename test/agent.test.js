@@ -8,7 +8,7 @@ const book = () => openWorkbook(fs.readFileSync('test/fixtures/formulas.xlsx'));
 
 test('an agent reads the sheets, names and tables, and a range by reference, name or table', () => {
   const a = book();
-  assert.deepEqual(a.sheets().map((s) => [s.name, s.used, s.tables.join()]), [['Calc', 'A2:F1339', ''], ['Data', 'A1:Q9', 'Fruit'], ['My Data', 'A1:A2', '']]);
+  assert.deepEqual(a.sheets().map((s) => [s.name, s.used, s.tables.join()]), [['Calc', 'A2:F1387', ''], ['Data', 'A1:Q9', 'Fruit'], ['My Data', 'A1:A2', '']]);
   assert.deepEqual(a.names().map((n) => [n.name, n.refersTo, n.table]), [['Fruit', 'Data!A1:E9', true], ['Items', 'Data!$A$2:$A$9', false], ['Rate', 'Data!$C$2', false]]);
   const qty = a.read('Fruit[Qty]');
   assert.equal(qty.range, 'Data!B2:B9');

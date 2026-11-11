@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1352 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1400 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1352 of 1352 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1400 of 1400 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -97,6 +97,17 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       is #N/A). "da" and "e" are both deka. The binary prefixes (ki, Mi, ... Yi) are for bit and byte only.
     - Names are exact: "M", "FT" and " m" are #N/A, as are units of different kinds. TRUE is #VALUE!, and "2" is 2.
     - Temperatures go through kelvin, with "K" and "kel" taking a prefix ("mK"), and C, F, Rank and Reau not.
+  - `functions-amort.js`: AMORLINC and AMORDEGRC, the French depreciation. Microsoft's page gives other rules than
+    Excel's; these are Excel's, from about 600 cases with cell values in a hidden Excel, then the probe's 48:
+    - AMORDEGRC's coefficient by the life (1 / rate): up to 2 years #NUM!, to 4 years 1.5, to 6 years 2, past that 2.5.
+    - The life has ceil(1 / rate) periods, the first (prorated) one with them. The last two take half of what is left
+      each, and the ones after it nothing. A period starting below salvage takes nothing.
+    - Each period's depreciation is rounded as returned, but the value it leaves isn't, except the first period's
+      (5000 bought January 1 at 0.3: 1119, then 1746, not 1747).
+    - The first period's part of a year: bases 0 and 4 as YEARFRAC; bases 1 and 3 actual days, February 29 counted as
+      the 28th, over 365, or for basis 1 over the purchase year's days. None (bought on the first period's last day):
+      a whole year, and for AMORDEGRC one period fewer.
+    - basis 2 is #NUM!, as are a purchase after the first period, salvage above cost, a negative period, a rate of 0.
   - `functions-regex.js`, `regex.js`: REGEXTEST, REGEXEXTRACT and REGEXREPLACE. Excel's patterns are PCRE2's with
     Unicode properties; `regex.js` turns them into JavaScript's (the v flag). Measured on about 190 cases with a hidden
     Excel, then the probe's 125:
@@ -213,8 +224,9 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
   (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
   rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
-- **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD), AMORDEGRC and AMORLINC,
-  the BESSEL functions.
+- **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD) and the BESSEL functions.
+- **AMORDEGRC bought on the first period's last day with a life of 3 years or less**: the rule here (declining, no
+  halves, up to the life's periods) fits the two such assets measured, not more.
 - **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.

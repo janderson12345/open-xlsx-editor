@@ -6,7 +6,8 @@
 
 const LIST = {
   Financial: `ACCRINT(issue,first_interest,settlement,rate,par,frequency,[basis],[calc_method])
-    ACCRINTM(issue,settlement,rate,par,[basis]) COUPDAYBS(settlement,maturity,frequency,[basis])
+    ACCRINTM(issue,settlement,rate,par,[basis]) AMORDEGRC(cost,date_purchased,first_period,salvage,period,rate,[basis])
+    AMORLINC(cost,date_purchased,first_period,salvage,period,rate,[basis]) COUPDAYBS(settlement,maturity,frequency,[basis])
     COUPDAYS(settlement,maturity,frequency,[basis]) COUPDAYSNC(settlement,maturity,frequency,[basis])
     COUPNCD(settlement,maturity,frequency,[basis]) COUPNUM(settlement,maturity,frequency,[basis])
     COUPPCD(settlement,maturity,frequency,[basis]) DISC(settlement,maturity,pr,redemption,[basis])

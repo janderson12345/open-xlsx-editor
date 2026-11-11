@@ -20,6 +20,7 @@ import './functions-bonds.js';
 import './functions-complex.js';
 import './functions-convert.js';
 import './functions-regex.js';
+import './functions-amort.js';
 
 /** x^y as Excel has it: 0^0 is #NUM!, 0 to a negative power #DIV/0!, a negative number to a fractional power #NUM!
  *  unless it is an odd root (=(-8)^(1/3) is -2). */
