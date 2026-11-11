@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1216 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1341 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1216 of 1216 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1341 of 1341 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -97,6 +97,22 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       is #N/A). "da" and "e" are both deka. The binary prefixes (ki, Mi, ... Yi) are for bit and byte only.
     - Names are exact: "M", "FT" and " m" are #N/A, as are units of different kinds. TRUE is #VALUE!, and "2" is 2.
     - Temperatures go through kelvin, with "K" and "kel" taking a prefix ("mK"), and C, F, Rank and Reau not.
+  - `functions-regex.js`, `regex.js`: REGEXTEST, REGEXEXTRACT and REGEXREPLACE. Excel's patterns are PCRE2's with
+    Unicode properties; `regex.js` turns them into JavaScript's (the v flag). Measured on about 190 cases with a hidden
+    Excel, then the probe's 125:
+    - \w, \d, \s and \b are Unicode's (é is a letter, a no-break space a space, ٣ a digit). $ matches before a final
+      newline too, . anything but a newline. (?i), (?s), (?m) and (?x) at the start apply to the whole pattern.
+    - Read too: [[:alpha:]] and the other POSIX classes, \Q...\E, (?P<name>...) and (?P=name), \g1 and \g{-1},
+      \x{..}, \o{..}, octal, \cJ, \h, \R, \N, a{,2}, comments (?#...). Atomic groups and possessive quantifiers are
+      made from a lookahead and a reference to it (^a++a matches nothing in "aaa", as in Excel).
+    - An unknown escape (\i), an unclosed group or a bad repeat is #VALUE!. case_sensitivity is 0 or 1, else #VALUE!.
+    - REGEXEXTRACT: mode 0 the first match (#N/A if none); 1 every match, in a row; 2 the first match's groups, in a
+      row, a group that took no part #N/A, and #VALUE! where there is no match or no group. An array given it is cut
+      to its first value. REGEXTEST and REGEXREPLACE work out each value of an array.
+    - REGEXREPLACE: occurrence 0 every match, n the nth, -n the nth from the end. The replacement is PCRE2's extended
+      one: $1, ${1}, ${name}, $name, $0 and $&, $$; \1; \n, \t, \x41; \u, \l, \U...\E, \L...\E; ${2:-default}
+      (where group 2 took no part) and ${2:+set:unset}. A group the pattern doesn't have, "$" or "\" alone, and an
+      unknown escape (\q) are #VALUE!.
   - `trig.js`: sine and cosine as Excel works them out. The angle is brought near 0 with the x87's 64-bit π, not the
     true one, so =SIN(PI()) is 1.22514845490862E-16 and =COS(PI()/2) 6.1257422745431E-17 (the true values are
     1.22464679914735E-16 and 6.12323399573677E-17). From 2^27 on, #NUM! (=SIN(134217728)). TAN is SIN over COS
@@ -197,7 +213,10 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
   (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
   rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
 - **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD), AMORDEGRC and AMORLINC,
-  the BESSEL functions and the REGEX functions.
+  the BESSEL functions.
+- **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
+  through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
+  pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
