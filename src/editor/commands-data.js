@@ -1,0 +1,161 @@
+// Commands that move data (commands.js shares its state with them): copy, cut and paste (Paste Special too), fill
+// and AutoFill, sort, AutoSum, the Name Box and the filter.
+import { refName } from '../ooxml/refs.js';
+import * as clip from '../ooxml/clipops.js';
+import { fillCopy, autoFill } from '../ooxml/fillops.js';
+import { quickSort, sortChanges } from '../ooxml/sortops.js';
+import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
+import { goToTarget } from '../ooxml/goto.js';
+import { filterArea } from '../ooxml/filterops.js';
+
+/** These commands: `env` is createCommands's shared state and helpers (commands.js). */
+export function dataCommands(env) {
+  const { commands, ctx, state, sheet, show, runSteps, sizeStep, moved } = env;
+  return {
+    /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
+     *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
+    copy(cut = false) {
+      if (cut && ctx.readOnly()) { ctx.announce('The workbook is read-only'); return null; }
+      state.clip = clip.snapshot(ctx.workbook(), ctx.sheetIndex(), state.sel, cut);
+      ctx.clipShown?.(state.clip);
+      return state.clip;
+    },
+    cut() { return commands.copy(true); },
+    /** Let the copy or cut go (Esc): its outline goes. */
+    dropClip() {
+      if (!state.clip) return false;
+      state.clip = null;
+      ctx.clipShown?.(null);
+      return true;
+    },
+    /** Paste (Ctrl+V) at the selection: the cells copied or cut here, or, when `text` from the system clipboard isn't
+     *  what was copied here, that text read cell by cell as if typed. A paste of a cut moves the cells and lets the cut
+     *  go. The pasted cells are selected. */
+    paste(text = null) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const mine = state.clip && (text == null || text === state.clip.text || !text) && (!state.clip.cut || state.clip.wb === wb);
+      const steps = mine ? (state.clip.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, state.clip) : text ? clip.pasteText(wb, si, state.sel, text) : null;
+      if (!steps || !runSteps(steps)) return false;
+      if (mine && state.clip.cut) commands.dropClip();
+      const area = steps.find((x) => x.si === si)?.area;
+      if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');
+      return true;
+    },
+    /** Paste Special (Ctrl+Alt+V) of the cells copied here at the selection (clipops.js pasteSpecial: `paste`, `op`,
+     *  `skip`, `transpose`; Column widths, `paste` 'widths'), or Paste Link (`link`), as one step of the history. The
+     *  copy stays to be pasted again, as in Excel. Not for cells cut, nor for text from another program. */
+    pasteSpecial({ paste = 'all', op = null, skip = false, transpose = false, link = false } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const copy = state.clip;
+      if (!copy) { ctx.announce('Copy cells first: Paste Special pastes cells copied in this workbook or another one open here'); return false; }
+      if (copy.cut) { ctx.announce("Paste Special isn't available for cells that were cut: paste them, or copy them instead"); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      if (paste === 'widths' && !link) {
+        const widths = clip.pasteWidths(state.sel, copy);
+        return sizeStep((book, k) => { for (const { c, width } of widths) book.setLines(k, 'col', c, c, { width }); }, 'Pasted column widths');
+      }
+      if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
+      const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste, op, skip, transpose });
+      if (!runSteps(steps)) return false;
+      const area = steps[0].area;
+      show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
+      return true;
+    },
+    /** Fill Down ('down', Ctrl+D), Right ('right', Ctrl+R), Up or Left over the selection (fillops.js fillCopy), as one
+     *  step of the history. */
+    fill(dir) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const steps = fillCopy(ctx.workbook(), ctx.sheetIndex(), state.sel, dir);
+      if (!runSteps(steps)) return false;
+      const a = steps[0].area;
+      show({ ...state.sel, r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 }, state.focus, `Filled ${dir}, `);
+      return true;
+    },
+    /** The fill handle dragged from the selection out to `to` (fillops.js autoFill): Excel's guess, or with Ctrl held
+     *  (`ctrl`) the other way, as Excel's Ctrl-drag: a single cell counts on, more cells are copied. The filled range
+     *  is selected. */
+    autoFill(to, { ctrl = false, type = null } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const s = state.sel;
+      const one = s.r0 === s.r1 && s.c0 === s.c1;
+      const how = type || (ctrl ? (one ? 'series' : 'copy') : 'default');
+      const steps = autoFill(ctx.workbook(), ctx.sheetIndex(), s, to, how);
+      if (!steps || !runSteps(steps)) return false;
+      show({ ...s, r0: to.r0, c0: to.c0, r1: to.r1, c1: to.c1 }, null, `Filled ${refName(to.r0, to.c0)} to ${refName(to.r1, to.c1)}, `);
+      return true;
+    },
+    /** Sort (sortops.js), as one step of the history; the selection stays. With `how` ({ area, keys, header,
+     *  matchCase, leftToRight }, as the Sort box gives it) that sort; else A to Z ('asc') or Z to A ('desc') as
+     *  Excel's buttons sort, the data beside a selection taken in too when `expand`. Excel's refusals in its words. */
+    sort(how = 'asc', { expand = false } = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const plan = typeof how === 'string' ? quickSort(wb, si, state.sel, how === 'desc', { expand }) : how;
+      const step = plan.error ? plan : sortChanges(wb, si, plan.area, plan);
+      if (step.error) { ctx.alert(step.error); return false; }
+      if (step.contents.length && !runSteps([step])) return false;
+      const order = typeof how === 'string' ? (how === 'desc' ? ', Z to A' : ', A to Z') : '';
+      ctx.announce(`Sorted ${refName(plan.area.r0, plan.area.c0)} to ${refName(plan.area.r1, plan.area.c1)}${order}`);
+      return true;
+    },
+    /** AutoSum (Alt+=) and its Average, Count Numbers, Max and Min (`fn`), as one step of the history, the totals
+     *  selected with what they sum (autosumops.js). Where Excel leaves a formula being edited (one cell, or nothing
+     *  found to sum) that cell is selected and { edit: text } returned, for the cell editor to open with it. */
+    autoSum(fn = 'sum') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const step = autoSumOf(ctx.workbook(), ctx.sheetIndex(), state.sel, fn);
+      if (step.edit) { commands.select(step.edit.r, step.edit.c); return { edit: step.edit.text }; }
+      if (!runSteps([step])) return false;
+      show({ ...state.sel, ...step.area }, state.focus, 'AutoSum, ');
+      return true;
+    },
+    /** The Name Box: go to the reference or name typed (goto.js), on its sheet; Excel's words when it can't. */
+    nameBox(text) {
+      const to = goToTarget(ctx.workbook(), ctx.sheetIndex(), text);
+      if (to.error) { if (to.name) ctx.announce(to.error); else ctx.alert(to.error); return false; }
+      if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
+      show(to.sel, null, 'Went to ');
+      return true;
+    },
+    /** Filter (Ctrl+Shift+L): the sheet's AutoFilter turned on over what Sort would take, or off (filterops.js). */
+    filterToggle() {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const sh = sheet();
+      if (sh.autoFilter) return moved((wb, si) => wb.setAutoFilter(si, null)) === true && (ctx.announce('Filter off'), true);
+      const { area, error } = filterArea(sh, state.sel);
+      if (error) { ctx.alert(error); return false; }
+      return moved((wb, si) => wb.setAutoFilter(si, { ...area, columns: new Map() })) === true && (ctx.announce(`Filter on ${refName(area.r0, area.c0)} to ${refName(area.r1, area.c1)}`), true);
+    },
+    /** Column c of the filter shows rows with `show` ({ values: shown texts, blank }), or all of them (null). */
+    filterBy(c, show) {
+      const f = sheet().autoFilter;
+      if (!f || ctx.readOnly()) return false;
+      const columns = new Map(f.columns);
+      if (show) columns.set(c, { values: show.values, blank: !!show.blank, other: false });
+      else columns.delete(c);
+      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns })) === true;
+    },
+    /** Home > Sort & Filter > Clear (every column's filter taken off, the buttons kept), and Reapply (the rows
+     *  filtered again, after edits). */
+    filterClear() { const f = sheet().autoFilter; return !!f && f.columns.size > 0 && commands.filterAll(new Map()); },
+    filterReapply() { const f = sheet().autoFilter; return !!f && commands.filterAll(f.columns); },
+    filterAll(columns) {
+      const f = sheet().autoFilter;
+      if (!f || ctx.readOnly()) return false;
+      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns: new Map(columns) })) === true;
+    },
+    /** A filter button's Sort A to Z (or Z to A, `desc`): the filter's range by column c, its heading row kept. Not
+     *  yet while rows are filtered out (Excel then sorts only the rows shown). */
+    filterSort(c, desc) {
+      const sh = sheet();
+      const f = sh.autoFilter;
+      if (!f) return false;
+      for (let r = f.r0 + 1; r <= f.r1; r++) if (sh.rows.get(r)?.hidden) { ctx.announce("Sorting while rows are filtered out isn't available yet"); return false; }
+      return commands.sort({ area: { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1 }, keys: [{ at: c, desc }], header: true });
+    },
+  };
+}

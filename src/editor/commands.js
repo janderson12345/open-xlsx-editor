@@ -5,22 +5,18 @@
 // cell contents, one for the workbook, as in Excel; the selection, kept for each sheet, is view state and never reaches
 // the history or the file. Sheets are known by their sheetId in both, as indexes change when sheets move.
 import { cellSelection, extendSelection } from './selection.js';
-import { readPivots, refreshPivot, pivotAt } from '../ooxml/pivot.js';
+import { sheetCommands } from './commands-sheets.js';
+import { dataCommands } from './commands-data.js';
+import { partCommands } from './commands-parts.js';
 import { step, jump, lastCell } from './navigate.js';
 import { entryChanges } from '../ooxml/entry.js';
 import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
-import { SheetError, nearest } from '../ooxml/sheetops.js';
+import { SheetError } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
 import { mergeChange } from '../ooxml/mergeops.js';
-import * as clip from '../ooxml/clipops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
-import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { clearChanges } from '../ooxml/clearops.js';
-import { quickSort, sortChanges } from '../ooxml/sortops.js';
-import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
-import { goToTarget } from '../ooxml/goto.js';
-import { filterArea } from '../ooxml/filterops.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
@@ -347,80 +343,6 @@ export function createCommands(ctx) {
       ctx.grid.scrollToCell(s.r0, s.c0);
       return true;
     },
-    /** Go to a found cell ({ si, r, c }): its sheet shown, the cell selected. */
-    goTo(hit) {
-      if (hit.si !== ctx.sheetIndex() && !commands.showSheet(hit.si)) return false;
-      commands.select(hit.r, hit.c);
-      return true;
-    },
-    /** Changes of several sheets ([{ si, contents, styles, merges }], findops.js replaceChanges) as one step. */
-    applyChanges(steps) { return runSteps(steps); },
-    /** Refresh (Alt+F5: the PivotTable at the active cell) or Refresh All (Ctrl+Alt+F5: every one), from their
-     *  sources as Excel's Refresh does (pivot.js), as one step of the history; a pivot that can't be refreshed here
-     *  leaves everything as it was, and says so. */
-    refreshPivots(all = false) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const wb = ctx.workbook();
-      const here = pivotAt(wb, ctx.sheetIndex(), state.sel.ar, state.sel.ac);
-      const list = all ? readPivots(wb).filter((p, k, a) => a.findIndex((q) => q.cachePath === p.cachePath) === k) : here ? [here] : [];
-      if (!list.length) { ctx.announce(all ? 'There are no PivotTables to refresh' : 'The active cell is not in a PivotTable'); return false; }
-      const before = wb.snapshot();
-      for (const p of list) {
-        const out = refreshPivot(wb, p);
-        if (out.error) {
-          wb.restore(before);
-          ctx.reloaded?.();
-          ctx.alert(out.why ? `${out.error}: ${out.why}.` : out.error);
-          return false;
-        }
-        for (const ch of out.changes) if (ch.contents.length) wb.apply(ch.si, ch.contents);
-      }
-      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
-      state.redo = [];
-      ctx.edited?.({ book: true });
-      ctx.reloaded?.();
-      ctx.changed?.();
-      ctx.announce(list.length === 1 ? 'PivotTable refreshed' : `${list.length} PivotTables refreshed`);
-      return true;
-    },
-    /** A change to the sheet's notes or rules, `run(wb, si)` (noteedit.js setNote, deleteNote; Workbook
-     *  setValidation), as one step of the history. */
-    sheetChange(run) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const wb = ctx.workbook();
-      const before = wb.snapshot();
-      if (run(wb, ctx.sheetIndex()) === false) return false;
-      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
-      state.redo = [];
-      ctx.edited?.({ book: true });
-      ctx.reloaded?.();
-      ctx.changed?.();
-      return true;
-    },
-    /** Cell contents [{ r, c, value } or { r, c, formula }] of sheet si that another editor of a shared workbook
-     *  changed (collab.js): made here outside the history, and drawn. */
-    remoteContents(si, contents) {
-      ctx.workbook().apply(si, contents);
-      if (si === ctx.sheetIndex()) ctx.grid.refresh();
-      ctx.changed?.();
-      return true;
-    },
-    /** A change by the agent (agent.js), `run(wb)`: of rows or columns ('lines': one step of the history) or of the
-     *  sheets ('sheets', as the tab menu's). A refusal throws, in Excel's words, for the agent to read. */
-    agentChange(run, kind) {
-      if (ctx.readOnly()) throw new SheetError('The workbook is read-only');
-      if (kind === 'sheets') return sheetOp(run, null, true, true);
-      const wb = ctx.workbook();
-      const before = wb.snapshot();
-      run(wb);
-      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
-    ctx.edited?.({ book: true });
-      state.redo = [];
-      commands.dropClip();
-      ctx.reloaded?.();
-      ctx.changed?.();
-      return true;
-    },
     /** A heading edge dragged to `px` pixels: line `index`, or every selected whole line when it is one of them (as
      *  in Excel). 0 hides. */
     resizeLines(axis, index, px) {
@@ -453,229 +375,12 @@ export function createCommands(ctx) {
       const [a, b] = linesOf(axis);
       return sizeStep((wb, si) => wb.setLines(si, axis, a, b, { hidden }), `${axis === 'col' ? 'Columns' : 'Rows'} ${hidden ? 'hidden' : 'shown'}`);
     },
-    /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
-     *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
-    copy(cut = false) {
-      if (cut && ctx.readOnly()) { ctx.announce('The workbook is read-only'); return null; }
-      state.clip = clip.snapshot(ctx.workbook(), ctx.sheetIndex(), state.sel, cut);
-      ctx.clipShown?.(state.clip);
-      return state.clip;
-    },
-    cut() { return commands.copy(true); },
-    /** Let the copy or cut go (Esc): its outline goes. */
-    dropClip() {
-      if (!state.clip) return false;
-      state.clip = null;
-      ctx.clipShown?.(null);
-      return true;
-    },
-    /** Paste (Ctrl+V) at the selection: the cells copied or cut here, or, when `text` from the system clipboard isn't
-     *  what was copied here, that text read cell by cell as if typed. A paste of a cut moves the cells and lets the cut
-     *  go. The pasted cells are selected. */
-    paste(text = null) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const wb = ctx.workbook();
-      const si = ctx.sheetIndex();
-      const mine = state.clip && (text == null || text === state.clip.text || !text) && (!state.clip.cut || state.clip.wb === wb);
-      const steps = mine ? (state.clip.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, state.clip) : text ? clip.pasteText(wb, si, state.sel, text) : null;
-      if (!steps || !runSteps(steps)) return false;
-      if (mine && state.clip.cut) commands.dropClip();
-      const area = steps.find((x) => x.si === si)?.area;
-      if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');
-      return true;
-    },
-    /** Paste Special (Ctrl+Alt+V) of the cells copied here at the selection (clipops.js pasteSpecial: `paste`, `op`,
-     *  `skip`, `transpose`; Column widths, `paste` 'widths'), or Paste Link (`link`), as one step of the history. The
-     *  copy stays to be pasted again, as in Excel. Not for cells cut, nor for text from another program. */
-    pasteSpecial({ paste = 'all', op = null, skip = false, transpose = false, link = false } = {}) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const copy = state.clip;
-      if (!copy) { ctx.announce('Copy cells first: Paste Special pastes cells copied in this workbook or another one open here'); return false; }
-      if (copy.cut) { ctx.announce("Paste Special isn't available for cells that were cut: paste them, or copy them instead"); return false; }
-      const wb = ctx.workbook();
-      const si = ctx.sheetIndex();
-      if (paste === 'widths' && !link) {
-        const widths = clip.pasteWidths(state.sel, copy);
-        return sizeStep((book, k) => { for (const { c, width } of widths) book.setLines(k, 'col', c, c, { width }); }, 'Pasted column widths');
-      }
-      if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
-      const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste, op, skip, transpose });
-      if (!runSteps(steps)) return false;
-      const area = steps[0].area;
-      show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
-      return true;
-    },
-    /** Fill Down ('down', Ctrl+D), Right ('right', Ctrl+R), Up or Left over the selection (fillops.js fillCopy), as one
-     *  step of the history. */
-    fill(dir) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const steps = fillCopy(ctx.workbook(), ctx.sheetIndex(), state.sel, dir);
-      if (!runSteps(steps)) return false;
-      const a = steps[0].area;
-      show({ ...state.sel, r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 }, state.focus, `Filled ${dir}, `);
-      return true;
-    },
-    /** The fill handle dragged from the selection out to `to` (fillops.js autoFill): Excel's guess, or with Ctrl held
-     *  (`ctrl`) the other way, as Excel's Ctrl-drag: a single cell counts on, more cells are copied. The filled range
-     *  is selected. */
-    autoFill(to, { ctrl = false, type = null } = {}) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const s = state.sel;
-      const one = s.r0 === s.r1 && s.c0 === s.c1;
-      const how = type || (ctrl ? (one ? 'series' : 'copy') : 'default');
-      const steps = autoFill(ctx.workbook(), ctx.sheetIndex(), s, to, how);
-      if (!steps || !runSteps(steps)) return false;
-      show({ ...s, r0: to.r0, c0: to.c0, r1: to.r1, c1: to.c1 }, null, `Filled ${refName(to.r0, to.c0)} to ${refName(to.r1, to.c1)}, `);
-      return true;
-    },
-    /** Sort (sortops.js), as one step of the history; the selection stays. With `how` ({ area, keys, header,
-     *  matchCase, leftToRight }, as the Sort box gives it) that sort; else A to Z ('asc') or Z to A ('desc') as
-     *  Excel's buttons sort, the data beside a selection taken in too when `expand`. Excel's refusals in its words. */
-    sort(how = 'asc', { expand = false } = {}) {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const wb = ctx.workbook();
-      const si = ctx.sheetIndex();
-      const plan = typeof how === 'string' ? quickSort(wb, si, state.sel, how === 'desc', { expand }) : how;
-      const step = plan.error ? plan : sortChanges(wb, si, plan.area, plan);
-      if (step.error) { ctx.alert(step.error); return false; }
-      if (step.contents.length && !runSteps([step])) return false;
-      const order = typeof how === 'string' ? (how === 'desc' ? ', Z to A' : ', A to Z') : '';
-      ctx.announce(`Sorted ${refName(plan.area.r0, plan.area.c0)} to ${refName(plan.area.r1, plan.area.c1)}${order}`);
-      return true;
-    },
-    /** AutoSum (Alt+=) and its Average, Count Numbers, Max and Min (`fn`), as one step of the history, the totals
-     *  selected with what they sum (autosumops.js). Where Excel leaves a formula being edited (one cell, or nothing
-     *  found to sum) that cell is selected and { edit: text } returned, for the cell editor to open with it. */
-    autoSum(fn = 'sum') {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const step = autoSumOf(ctx.workbook(), ctx.sheetIndex(), state.sel, fn);
-      if (step.edit) { commands.select(step.edit.r, step.edit.c); return { edit: step.edit.text }; }
-      if (!runSteps([step])) return false;
-      show({ ...state.sel, ...step.area }, state.focus, 'AutoSum, ');
-      return true;
-    },
-    /** The Name Box: go to the reference or name typed (goto.js), on its sheet; Excel's words when it can't. */
-    nameBox(text) {
-      const to = goToTarget(ctx.workbook(), ctx.sheetIndex(), text);
-      if (to.error) { if (to.name) ctx.announce(to.error); else ctx.alert(to.error); return false; }
-      if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
-      show(to.sel, null, 'Went to ');
-      return true;
-    },
-    /** Filter (Ctrl+Shift+L): the sheet's AutoFilter turned on over what Sort would take, or off (filterops.js). */
-    filterToggle() {
-      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const sh = sheet();
-      if (sh.autoFilter) return moved((wb, si) => wb.setAutoFilter(si, null)) === true && (ctx.announce('Filter off'), true);
-      const { area, error } = filterArea(sh, state.sel);
-      if (error) { ctx.alert(error); return false; }
-      return moved((wb, si) => wb.setAutoFilter(si, { ...area, columns: new Map() })) === true && (ctx.announce(`Filter on ${refName(area.r0, area.c0)} to ${refName(area.r1, area.c1)}`), true);
-    },
-    /** Column c of the filter shows rows with `show` ({ values: shown texts, blank }), or all of them (null). */
-    filterBy(c, show) {
-      const f = sheet().autoFilter;
-      if (!f || ctx.readOnly()) return false;
-      const columns = new Map(f.columns);
-      if (show) columns.set(c, { values: show.values, blank: !!show.blank, other: false });
-      else columns.delete(c);
-      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns })) === true;
-    },
-    /** Home > Sort & Filter > Clear (every column's filter taken off, the buttons kept), and Reapply (the rows
-     *  filtered again, after edits). */
-    filterClear() { const f = sheet().autoFilter; return !!f && f.columns.size > 0 && commands.filterAll(new Map()); },
-    filterReapply() { const f = sheet().autoFilter; return !!f && commands.filterAll(f.columns); },
-    filterAll(columns) {
-      const f = sheet().autoFilter;
-      if (!f || ctx.readOnly()) return false;
-      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns: new Map(columns) })) === true;
-    },
-    /** A filter button's Sort A to Z (or Z to A, `desc`): the filter's range by column c, its heading row kept. Not
-     *  yet while rows are filtered out (Excel then sorts only the rows shown). */
-    filterSort(c, desc) {
-      const sh = sheet();
-      const f = sh.autoFilter;
-      if (!f) return false;
-      for (let r = f.r0 + 1; r <= f.r1; r++) if (sh.rows.get(r)?.hidden) { ctx.announce("Sorting while rows are filtered out isn't available yet"); return false; }
-      return commands.sort({ area: { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1 }, keys: [{ at: c, desc }], header: true });
-    },
     /** Clear Formats: the selected cells back to the Normal style's format. */
     clearFormats() { return commands.clearAs('formats'); },
     undo() { return replay(state.undo, state.redo, 'before', 'Undone'); },
     redo() { return replay(state.redo, state.undo, 'after', 'Redone'); },
-    /** Show sheet i, with the selection and scroll position it had (A1 the first time); false if it can't be shown
-     *  (hidden, or a chart sheet). */
-    showSheet(i) {
-      const wb = ctx.workbook();
-      if (!wb.canShow(i)) {
-        if (wb.sheets[i]?.kind === 'chartsheet') ctx.announce(`${wb.sheets[i].name} is a chart sheet, which can't be shown yet`);
-        return false;
-      }
-      const from = ctx.sheetIndex();
-      if (i === from) return true;
-      const view = ctx.grid.el;
-      if (from >= 0) state.views.set(idOf(from), { sel: state.sel, focus: state.focus, top: view.scrollTop, left: view.scrollLeft });
-      ctx.showSheet(i);
-      const back = state.views.get(idOf(i));
-      if (back) { view.scrollTop = back.top; view.scrollLeft = back.left; }
-      show(back ? back.sel : cellSelection(0, 0), back?.focus, `${wb.sheets[i].name}, `);
-      return true;
-    },
-    /** Ctrl+Page Down and Ctrl+Page Up: the next or previous sheet that can be shown (hidden ones and chart sheets
-     *  passed over, no wrapping round, as in Excel). */
-    nextSheet(dir) {
-      const wb = ctx.workbook();
-      for (let i = ctx.sheetIndex() + dir; i >= 0 && i < wb.sheets.length; i += dir) if (wb.canShow(i)) return commands.showSheet(i);
-      return false;
-    },
-    /** A new sheet before the one shown (Insert, Shift+F11), or after it (`after`: the + button), shown. */
-    insertSheet({ after = false } = {}) {
-      let at = -1;
-      return sheetOp((wb) => { at = wb.addSheet(ctx.sheetIndex() + (after ? 1 : 0)); }, () => at);
-    },
-    /** Rename sheet i (Excel's refusals said in its words). */
-    renameSheet(i, name) { return sheetOp((wb) => wb.renameSheet(i, name), null, true); },
-    /** Move sheet i to index `to`. */
-    moveSheet(i, to) {
-      if (to < 0 || to >= ctx.workbook().sheets.length) return false;
-      return sheetOp((wb) => wb.moveSheet(i, to));
-    },
-    /** Hide sheet i's tab (showing the next sheet if it was the one shown), or show it again (`hidden` false). */
-    hideSheet(i, hidden = true) {
-      const id = idOf(i);
-      return sheetOp((wb) => wb.setSheetHidden(i, hidden), hidden ? null : () => indexOf(id));
-    },
-    /** Sheet i's tab colour ({ rgb } or { theme, tint }; null for none). */
-    tabColor(i, color) { return sheetOp((wb) => wb.setTabColor(i, color)); },
-    /** Delete sheet i (no question asked here: the tab menu asks first, as Excel does). */
-    deleteSheet(i) { return sheetOp((wb) => wb.deleteSheet(i), null, true); },
   };
 
-  /** Run a change to the workbook's sheets. Afterwards the sheet shown is `show()` if given, else the same sheet
-   *  wherever it went, else (gone or hidden) its nearest neighbour. A rename or delete clears the undo history (a
-   *  change in it could name the sheet as it was). */
-  function sheetOp(run, show = null, clearsHistory = false, quiet = false) {
-    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-    const wb = ctx.workbook();
-    const was = ctx.sheetIndex();
-    const shownId = idOf(was);
-    try {
-      run(wb);
-    } catch (e) {
-      if (!(e instanceof SheetError) || quiet) throw e;
-      ctx.alert(e.message);
-      return false;
-    }
-    if (clearsHistory) { state.undo = []; state.redo = []; }
-    ctx.edited?.({ book: true });
-    for (const id of state.views.keys()) if (indexOf(id) < 0) state.views.delete(id);
-    const now = indexOf(shownId);
-    ctx.sheetsChanged(now); // (the tabs again, and the sheet shown at its new index, or -1 if it went)
-    let target = show ? show() : now;
-    if (target < 0 || !wb.canShow(target)) target = nearest(wb, target < 0 ? Math.min(was, wb.sheets.length - 1) : target);
-    if (target !== now || now < 0) commands.showSheet(target);
-    ctx.changed?.();
-    return true;
-  }
 
   function replay(from, to, side, word) {
     const entry = from.pop();
@@ -700,6 +405,12 @@ export function createCommands(ctx) {
     ctx.announce(`${word}: ${refName(first.r, first.c)}`);
     return true;
   }
+
+  // (The other commands, from modules sharing this state and these helpers: sheets first, whose sheetOp the parts
+  // use.)
+  const env = { commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
+  Object.assign(commands, sheetCommands(env));
+  Object.assign(commands, dataCommands(env), partCommands(env));
 
   return {
     commands,
