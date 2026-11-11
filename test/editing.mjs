@@ -851,6 +851,19 @@ await page.click('dialog.oxe-dv-box >> text=OK');
 const dv = await page.evaluate(() => { const v = window.oxe.workbook.sheet(window.oxe.sheetIndex).validations; return v.map((x) => `${x.type}:${x.ranges.map((r) => `${r.r0},${r.c0},${r.r1},${r.c1}`).join(' ')}:${x.formulas[0]}`).join(';'); });
 const maybe = await page.evaluate(() => window.oxe.enter('G3', 'Maybe'));
 check(dv === 'list:1,6,3,6:"Yes,No"' && maybe?.invalid?.style === 'stop', 'Data Validation box: a list rule on G2:G4; Maybe refused (Stop)', `${dv} ${JSON.stringify(maybe)}`);
+// Home > Conditional Formatting > Greater Than...: 20 on the Units (D2:D19), light red: the cells over 20 drawn red.
+await page.click('.oxe-rtab >> text=Home');
+await page.evaluate(() => { window.oxe.select('D2'); window.oxe.command('extendTo', 18, 3); });
+// (The box answered inside the ribbon helper: the More panel closes after it.)
+await ribbon('Conditional Formatting', async () => {
+  await page.click('.oxe-pop >> text=Greater Than...');
+  await page.waitForSelector('dialog.oxe-cf-box');
+  await page.fill('dialog.oxe-cf-box input', '20');
+  await page.click('dialog.oxe-cf-box >> text=OK');
+});
+const cfLooks = await page.evaluate(() => { const looks = []; const sh = window.oxe.workbook.sheet(window.oxe.sheetIndex); for (let r = 1; r <= 18; r++) { const v = sh.cells.get(r)?.get(3)?.v; const el = document.querySelector(`.oxe-row[aria-rowindex="${r + 2}"] .oxe-cell[aria-colindex="5"]`); looks.push(`${v}:${el?.classList.contains('oxe-cf-color') ? getComputedStyle(el).color : '-'}`); } return looks; });
+check(cfLooks.length === 18 && cfLooks.every((x) => { const [v, color] = x.split(':'); return Number(v) > 20 ? color === 'rgb(156, 0, 6)' : color === '-'; }), 'Conditional Formatting > Greater Than 20: the cells over 20 in dark red, the rest as they were', cfLooks.join(' '));
+await page.click('.oxe-rtab >> text=Data');
 await page.click('.oxe-rtab >> text=Home');
 
 check(!errors.length, 'no page errors', errors.join('\n     '));

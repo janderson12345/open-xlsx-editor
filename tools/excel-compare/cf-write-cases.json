@@ -1,0 +1,169 @@
+{
+ "cases": [
+  {
+   "name": "greater than 5, light red fill with dark red text",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "cellIs",
+     "operator": "greaterThan",
+     "f1": "5",
+     "preset": "lightRed"
+    }
+   ]
+  },
+  {
+   "name": "less than 3, yellow fill with dark yellow text",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "cellIs",
+     "operator": "lessThan",
+     "f1": "3",
+     "preset": "yellow"
+    }
+   ]
+  },
+  {
+   "name": "between 3 and 7, green fill with dark green text",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "cellIs",
+     "operator": "between",
+     "f1": "3",
+     "f2": "7",
+     "preset": "green"
+    }
+   ]
+  },
+  {
+   "name": "equal to \"apple\", light red fill",
+   "rules": [
+    {
+     "range": "B1:B10",
+     "kind": "cellIs",
+     "operator": "equal",
+     "f1": "=\"apple\"",
+     "preset": "redFill"
+    }
+   ]
+  },
+  {
+   "name": "text that contains \"an\", red text",
+   "rules": [
+    {
+     "range": "B1:B10",
+     "kind": "containsText",
+     "text": "an",
+     "preset": "redText"
+    }
+   ]
+  },
+  {
+   "name": "duplicate values, light red fill with dark red text",
+   "rules": [
+    {
+     "range": "B1:B10",
+     "kind": "duplicate",
+     "preset": "lightRed"
+    }
+   ]
+  },
+  {
+   "name": "top 3 items",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "top10",
+     "rank": 3,
+     "preset": "lightRed"
+    }
+   ]
+  },
+  {
+   "name": "top 20%",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "top10",
+     "rank": 20,
+     "percent": true,
+     "preset": "lightRed"
+    }
+   ]
+  },
+  {
+   "name": "bottom 2 items",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "top10",
+     "rank": 2,
+     "bottom": true,
+     "preset": "lightRed"
+    }
+   ]
+  },
+  {
+   "name": "above average",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "average",
+     "preset": "lightRed"
+    }
+   ]
+  },
+  {
+   "name": "below average",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "average",
+     "below": true,
+     "preset": "yellow"
+    }
+   ]
+  },
+  {
+   "name": "3-color scale",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "colorScale",
+     "points": 3
+    }
+   ]
+  },
+  {
+   "name": "2-color scale",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "colorScale",
+     "points": 2
+    }
+   ]
+  },
+  {
+   "name": "greater than 5, then less than 3 on the same cells",
+   "rules": [
+    {
+     "range": "A1:A10",
+     "kind": "cellIs",
+     "operator": "greaterThan",
+     "f1": "5",
+     "preset": "lightRed"
+    },
+    {
+     "range": "A1:A10",
+     "kind": "cellIs",
+     "operator": "lessThan",
+     "f1": "3",
+     "preset": "green"
+    }
+   ]
+  }
+ ]
+}

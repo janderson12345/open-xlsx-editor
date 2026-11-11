@@ -154,6 +154,18 @@ for (const colorScheme of ['light', 'dark']) {
       const dataTab = await axe();
       t.check(!dataTab.length, `${colorScheme}: the Data tab with its Refresh All menu, no axe violations`, dataTab.join('\n     '));
       await page.keyboard.press('Escape');
+      await page.click('.oxe-rtab >> text=Home');
+      const cfHidden = !(await page.isVisible('.oxe-toolbar button[title="Conditional Formatting"]')) && await page.isVisible('.oxe-more');
+      if (cfHidden) await page.click('.oxe-more');
+      await page.click('.oxe-toolbar button[title="Conditional Formatting"]');
+      const cfMenu = await axe();
+      await page.click('.oxe-pop >> text=Between...');
+      await page.waitForSelector('dialog.oxe-cf-box');
+      const cfBox = await axe();
+      t.check(!cfMenu.length && !cfBox.length && await page.evaluate(() => document.activeElement.tagName === 'INPUT'), `${colorScheme}: the Conditional Formatting menu and its Between box, no axe violations, From focused`, [...cfMenu, ...cfBox].join(String.fromCharCode(10) + '     '));
+      await page.keyboard.press('Escape');
+      if (cfHidden && await page.isVisible('.oxe-more')) await page.click('.oxe-more');
+      await page.click('.oxe-rtab >> text=Data');
       await page.click('.oxe-toolbar button[title="Data Validation..."]');
       await page.waitForSelector('dialog.oxe-dv-box');
       const dvBox = await axe();

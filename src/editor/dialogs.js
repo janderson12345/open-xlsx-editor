@@ -518,3 +518,36 @@ export function validationBox(root, rule = null) {
     dlg.append(h, list, settings, message, alertPanel, row);
   });
 }
+
+/** One of Excel's Conditional Formatting menu boxes: `text` ("Format cells that are GREATER THAN:"), its `inputs`
+ *  ([{ label, value }]), a `choice` ([{ value, label }], Duplicate or Unique) and the format to apply from `presets`
+ *  ([{ value, label }]). Resolves to { values, choice, preset }, or null. */
+export function cfRuleBox(root, { title, text, inputs = [], choice = null, presets, preset }) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.classList.add('oxe-cf-box');
+    const h = Object.assign(document.createElement('h2'), { id: `${id}-title`, className: 'oxe-dialog-title', textContent: title });
+    const p = Object.assign(document.createElement('p'), { className: 'oxe-dialog-text', textContent: text });
+    const fields = inputs.map((x, k) => {
+      const input = Object.assign(document.createElement('input'), { type: 'text', className: 'oxe-dialog-field', value: x.value ?? '', spellcheck: false, id: `${id}-in${k}` });
+      if (k === 0) input.dataset.first = '';
+      const label = Object.assign(document.createElement('label'), { htmlFor: input.id, className: 'oxe-dialog-text', textContent: x.label });
+      return [label, input];
+    });
+    const select = (opts, value, label, first) => {
+      const s = Object.assign(document.createElement('select'), { className: 'oxe-dialog-list', id: `${id}-${label.replace(/\W/g, '')}` });
+      s.append(...opts.map((o) => Object.assign(document.createElement('option'), { value: o.value, textContent: o.label })));
+      s.value = value;
+      if (first) s.dataset.first = '';
+      return [Object.assign(document.createElement('label'), { htmlFor: s.id, className: 'oxe-dialog-text', textContent: label }), s];
+    };
+    const pick = choice ? select(choice, choice[0].value, 'Format cells that contain:', !inputs.length) : null;
+    const fmt = select(presets, preset, 'with', !inputs.length && !choice);
+    const ok = () => done({ values: fields.map(([, i]) => i.value), choice: pick?.[1].value ?? null, preset: fmt[1].value });
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); ok(); } });
+    const row = document.createElement('div');
+    row.className = 'oxe-dialog-buttons';
+    row.append(button('OK', ok), button('Cancel', () => done(null)));
+    dlg.append(h, p, ...fields.flat(), ...(pick || []), ...fmt, row);
+  });
+}

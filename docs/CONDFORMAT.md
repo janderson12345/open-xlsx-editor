@@ -27,8 +27,39 @@ rules and their formats are saved as they were.
 | Duplicates and unique values compare case aside, leave blanks out, and count an error as a value. | apple, apple, APPLE: duplicates. Unique: the error too. |
 | Colour scales place each number between their points (lowest, a percentile, highest) and move each channel from the lower point's colour by whole steps, the fraction cut off. | 1 to 9 on red, yellow, green: 2 is #FA9D75 (248 + 2.8 is 250). |
 
+## Adding rules
+
+Home > Styles > Conditional Formatting has the menu's rules, each added for the selection:
+
+- **Highlight Cells Rules:** Greater Than, Less Than, Between, Equal To, Text that Contains, Duplicate Values (or
+  Unique).
+- **Top/Bottom Rules:** Top 10 Items, Top 10%, Bottom 10 Items, Bottom 10%, Above Average, Below Average.
+- **Color Scales:** Excel's default three-colour and two-colour scales.
+- **Clear Rules** from Selected Cells (their cells taken out of every rule's range) or from Entire Sheet.
+
+Each opens Excel's small box: "Format cells that are GREATER THAN:", the values, and "with" one of the menu's preset
+formats (Light Red Fill with Dark Red Text, Yellow Fill with Dark Yellow Text, Green Fill with Dark Green Text, Light
+Red Fill, Red Text). Each rule added is one step of the undo history (`src/ooxml/cfedit.js`).
+
+A rule is written as Excel writes it:
+
+- **Its attributes** in Excel's order.
+- **Values:** a number as it is, text quoted, "=" a formula.
+- **Text that Contains** as `NOT(ISERROR(SEARCH("an",B1)))` from the range's first cell.
+- **Its format** as a dxf: the preset's font colour, and its fill as the pattern's background.
+- **Placement:** in the conditionalFormatting of the same range, or a new one in its place among the sheet's elements.
+
+Measured: `excel-cf-write.ps1` had Excel add each of 14 rules (`cf-write-cases.mjs`) with the menu's presets, and kept
+the XML it saved (`test/cf-write-excel.json`). The same rules written here give the same rules, ranges and formats
+(`test/cfedit.test.js`). Opened in Excel beside Excel's own (`cf-write-ours.mjs`, `excel-cf-look.ps1`), all 14 are
+drawn the same: every cell's displayed fill and font colour.
+
+Two things the measurement could not settle, because Excel's COM is not its menu. COM's rules Stop If True, and COM
+gives a later rule the lower priority. The editor follows the menu: a new rule doesn't stop, and it comes first
+(priority 1, as the Rules Manager lists the newest first). The tests compare everything else and set those two aside.
+
 ## Not yet
 
 Data bars and icon sets (stored in the sheet's extLst by Excel 2010 and later), date rules ("a date occurring")
-checked against today's date, a rule's number format and borders, and the Conditional Formatting menu to add, edit and
-manage rules.
+checked against today's date, a rule's number format and borders, editing a rule (the Rules Manager), New Rule, and
+the other presets of Color Scales.

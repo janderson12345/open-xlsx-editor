@@ -98,6 +98,16 @@ export function homeTab(kit, { act, color }) {
       line(numSel),
       line(btn('$', 'Accounting Number Format', f('format', { style: 'Currency' })), btn('%', 'Percent Style (Ctrl+Shift+%)', f('format', { style: 'Percent' })),
         btn(',', 'Comma Style', f('format', { style: 'Comma' })), btn('.0←', 'Increase Decimal', f('stepDecimal', 1)), btn('.0→', 'Decrease Decimal', f('stepDecimal', -1))))),
+    grp('Styles', menu('▦', 'Conditional Formatting', () => [
+      el('div', { class: 'oxe-cap' }, 'Highlight Cells Rules'), item('Greater Than...', f('cfAdd', 'greaterThan')), item('Less Than...', f('cfAdd', 'lessThan')),
+      item('Between...', f('cfAdd', 'between')), item('Equal To...', f('cfAdd', 'equal')), item('Text that Contains...', f('cfAdd', 'containsText')),
+      item('Duplicate Values...', f('cfAdd', 'duplicate')), el('hr'),
+      el('div', { class: 'oxe-cap' }, 'Top/Bottom Rules'), item('Top 10 Items...', f('cfAdd', 'top')), item('Top 10%...', f('cfAdd', 'topPercent')),
+      item('Bottom 10 Items...', f('cfAdd', 'bottom')), item('Bottom 10%...', f('cfAdd', 'bottomPercent')), item('Above Average...', f('cfAdd', 'above')),
+      item('Below Average...', f('cfAdd', 'below')), el('hr'),
+      el('div', { class: 'oxe-cap' }, 'Color Scales'), item('Red - Yellow - Green Color Scale', f('cfAdd', 'scale3')), item('Orange - Yellow Color Scale', f('cfAdd', 'scale2')), el('hr'),
+      item('Clear Rules from Selected Cells', f('cfClear', 'selection')), item('Clear Rules from Entire Sheet', f('cfClear', 'sheet'))],
+      { label: 'Conditional Formatting', big: true })),
     grp('Cells', col(
       sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Cells...', f('insertCells'), { hint: 'Ctrl++' }), item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),
         item('Insert Sheet', f('insertSheet'), { hint: 'Shift+F11' })]),

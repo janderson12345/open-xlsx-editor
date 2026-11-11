@@ -8,7 +8,8 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox, noteBox, validationBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox, noteBox, validationBox, cfRuleBox } from './editor/dialogs.js';
+import { CF_PRESETS } from './ooxml/cfedit.js';
 import { setNote, deleteNote } from './ooxml/noteedit.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { goToNames } from './ooxml/goto.js';
@@ -192,6 +193,34 @@ export function mountXlsxEditor(host, options = {}) {
       return editing().run('sheetChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
     }
     if (name === 'showNote') { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); }
+    if (name === 'cfAdd') {
+      // (Excel's Conditional Formatting menu: the rule's box, then the rule for the selection.)
+      const s = editing().selection;
+      const sel = [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }];
+      const add = (rule) => editing().run('sheetChange', (wb, si) => wb.setConditional(si, sel, rule));
+      const presets = Object.entries(CF_PRESETS).map(([value, p]) => ({ value, label: p.label }));
+      const kind = args[0];
+      if (kind === 'scale3' || kind === 'scale2') return add({ kind: 'colorScale', points: kind === 'scale2' ? 2 : 3 });
+      const WORDS = { greaterThan: 'GREATER THAN', lessThan: 'LESS THAN', between: 'BETWEEN', equal: 'EQUAL TO', containsText: 'CONTAIN THE TEXT' };
+      const TITLES = { greaterThan: 'Greater Than', lessThan: 'Less Than', between: 'Between', equal: 'Equal To', containsText: 'Text That Contains', duplicate: 'Duplicate Values', top: 'Top 10 Items', topPercent: 'Top 10%', bottom: 'Bottom 10 Items', bottomPercent: 'Bottom 10%', above: 'Above Average', below: 'Below Average' };
+      const ranked = ['top', 'topPercent', 'bottom', 'bottomPercent'].includes(kind);
+      const text = WORDS[kind] ? `Format cells that are ${WORDS[kind]}:` : ranked ? `Format cells that rank in the ${kind.startsWith('top') ? 'TOP' : 'BOTTOM'}:` : kind === 'duplicate' ? '' : `Format cells that are ${kind === 'above' ? 'ABOVE' : 'BELOW'} AVERAGE for the selected range`;
+      const inputs = kind === 'between' ? [{ label: 'From', value: '' }, { label: 'and', value: '' }] : WORDS[kind] ? [{ label: 'Value', value: '' }] : ranked ? [{ label: kind.endsWith('Percent') ? 'Percent' : 'Items', value: '10' }] : [];
+      return cfRuleBox(root, { title: TITLES[kind], text, inputs, choice: kind === 'duplicate' ? [{ value: 'duplicate', label: 'Duplicate' }, { value: 'unique', label: 'Unique' }] : null, presets, preset: kind === 'below' ? 'yellow' : 'lightRed' }).then((a) => {
+        if (a) {
+          if (WORDS[kind] && kind !== 'containsText') add({ kind: 'cellIs', operator: kind, f1: a.values[0], f2: a.values[1], preset: a.preset });
+          else if (kind === 'containsText') add({ kind: 'containsText', text: a.values[0], preset: a.preset });
+          else if (kind === 'duplicate') add({ kind: 'duplicate', unique: a.choice === 'unique', preset: a.preset });
+          else if (ranked) add({ kind: 'top10', rank: Math.max(1, Math.round(Number(a.values[0]) || 10)), percent: kind.endsWith('Percent'), bottom: kind.startsWith('bottom'), preset: a.preset });
+          else add({ kind: 'average', below: kind === 'below', preset: a.preset });
+        }
+        state.grid.el.focus({ preventScroll: true });
+      });
+    }
+    if (name === 'cfClear') {
+      const s = editing().selection;
+      return editing().run('sheetChange', (wb, si) => wb.setConditional(si, args[0] === 'sheet' ? null : [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], null));
+    }
     if (name === 'validationBox') {
       // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
       const s = editing().selection;
