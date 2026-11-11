@@ -36,7 +36,7 @@ test('pages down then over: large.xlsx splits its 5,000 rows down and its 20 col
 
 test('print area, titles and manual breaks (print-area.xlsx): pages as Excel prints them', async () => {
   const { printSetup } = await import('../src/ooxml/printarea.js');
-  const { sheetGeometry } = await import('../src/editor/grid.js');
+  const { sheetGeometry } = await import('../src/editor/geometry.js');
   const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/print-area.xlsx')));
   const setup = printSetup(wb, 0);
   assert.deepEqual(setup, { area: { r0: 2, c0: 1, r1: 69, c1: 7 }, titles: { rows: [0, 1], cols: null } });
@@ -49,7 +49,7 @@ test('print area, titles and manual breaks (print-area.xlsx): pages as Excel pri
 
 test('scale and fit to page: Excel picks the whole percentage that fits, rows of whole printer dots', async () => {
   const { printScale } = await import('../src/editor/print.js');
-  const { sheetGeometry } = await import('../src/editor/grid.js');
+  const { sheetGeometry } = await import('../src/editor/geometry.js');
   const fit = sheetOf('print-fit.xlsx');
   const range = { r0: 0, c0: 0, r1: fit.maxRow, c1: fit.maxCol };
   assert.equal(printScale(fit, sheetGeometry(fit, { print: true, normalFamily: 'Calibri' }), range), 0.41, '24 columns on one page wide: 41%, as Excel');

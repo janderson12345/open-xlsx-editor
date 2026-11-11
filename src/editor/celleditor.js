@@ -3,7 +3,7 @@
 // click (edit mode, where they move the caret); F2 switches between them, as in Excel. Enter, Tab and their Shift forms
 // finish and move; Esc gives up; Alt+Enter is a line break. `onKey` sees each key first (pointing.js takes the arrows
 // while a formula is pointing).
-import { setVars } from './grid.js';
+import { setVars } from './dom.js';
 
 const MOVES = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 

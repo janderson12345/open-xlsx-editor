@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Axis } from '../src/editor/axis.js';
-import { sheetGeometry } from '../src/editor/grid.js';
+import { sheetGeometry } from '../src/editor/geometry.js';
 import { Workbook } from '../src/ooxml/workbook.js';
 
 test('an axis finds the index under a position, passing over hidden ones', () => {

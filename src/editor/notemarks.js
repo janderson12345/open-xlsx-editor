@@ -2,7 +2,7 @@
 // corner of a cell with a note, a purple one for a comment thread; the note (its author in bold) or the thread (each
 // author, date and text) in a box beside the cell while the pointer rests on it, or after Shift+F2. Assistive
 // technology hears the note as the cell's description.
-import { div, setVars } from './grid.js';
+import { div, setVars } from './dom.js';
 
 /** What a screen reader hears for a note or a thread. */
 export function describeNote(n) {

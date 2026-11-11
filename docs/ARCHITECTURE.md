@@ -41,6 +41,10 @@ insides:
 | `src/ooxml/noteedit.js` | Notes written and deleted as Excel's New Note writes them: the comments part, the VML box, the parts and relationships made when the sheet has none (docs/NOTES.md). |
 | `src/editor/reviewtab.js` | The Review tab: Notes. |
 | `src/editor/datadialogs.js` | Excel's boxes for data: Sort, a filter's list, a list's choices, Data Validation, the Conditional Formatting menu's rule boxes (with `dialogs.js`'s modal and buttons). |
+| `src/editor/geometry.js` | A sheet's rows and columns in pixels, on screen or printed (`sheetGeometry`), and the grid's layout constants. |
+| `src/editor/cells.js` | A cell's element as the grid and print draw it (text as shown, aligned, wrapped, running on, indented), merged ranges, numbers too wide shown as #s, AutoFit's width. |
+| `src/editor/gridlayers.js` | The grid's layers for the part in view: column headings, frozen panes, gridlines, rows of cells. |
+| `src/editor/dom.js` | Small DOM helpers: CSS custom properties in pixels, a div with a class. |
 | `src/editor/acts.js` | The ribbon's actions (the act dispatcher) and the boxes and menus they open: Insert and Delete, Paste Special, Sort, the validation question, a list's choices, a filter's list, the cell's and headings' menus, Row Height and Column Width; given `index.js`'s state and helpers as one object. |
 | `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |

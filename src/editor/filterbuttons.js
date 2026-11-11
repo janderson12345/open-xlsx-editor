@@ -2,7 +2,7 @@
 // them; a column with a filter set shows it. A layer of their own over the cells: clicked with the mouse, and reached
 // from the keyboard with Alt+Down on a heading cell (as in Excel), so they stay out of the tab order and away from
 // assistive technology, which hears the cell instead.
-import { setVars } from './grid.js';
+import { setVars } from './dom.js';
 
 const SIZE = 16;
 

@@ -1,0 +1,179 @@
+// The cells as the grid and print draw them: a cell's element (its text as shown, aligned, wrapped, running on into
+// empty neighbours, indented, in its format's classes), merged ranges, and numbers too wide for their column as #s.
+import { fontDescentPx } from './fonts.js';
+import { cellDisplay } from '../ooxml/numfmt.js';
+import { colChars } from '../ooxml/units.js';
+import { MDW } from './geometry.js';
+import { setVars, div } from './dom.js';
+
+/** The merged range a cell is inside, if any. */
+export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
+
+const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0 };
+/** An indent level in px: 10.08 in print (Excel's PDF of test/fixtures/align.xlsx: one, two and three levels from
+ *  either side), 9 on screen (not yet measured). */
+const INDENT_PX = { screen: 9, print: 10.08 };
+
+/** Where a cell's text sits across: general alignment puts numbers right, booleans and errors in the middle and text
+ *  left; fill, justify and distributed are drawn left for now, centre-across-selection as centre. */
+function horizontalOf(align, cell) {
+  const h = align.horizontal;
+  if (h === 'general') return cell.t === 'n' ? 'right' : cell.t === 'b' || cell.t === 'e' ? 'center' : 'left';
+  if (h === 'center' || h === 'centerContinuous') return 'center';
+  return h === 'right' ? 'right' : 'left';
+}
+
+/** The columns either side of c that text may run on into: up to the nearest cell with something in it, a merged
+ *  range or the edge of what is drawn. Returns [first, last + 1). */
+function runOn(st, r, c, line, win) {
+  let end = c + 1;
+  while (end <= win.c1 + 1 && end < st.cols.count && !(line.get(end)?.v != null) && !mergeAt(st, r, end)) end++;
+  let begin = c;
+  while (begin - 1 >= Math.max(0, win.c0 - 1) && !(line.get(begin - 1)?.v != null) && !mergeAt(st, r, begin - 1)) begin--;
+  return [begin, end];
+}
+
+/** One cell's element: its text in an inner span (which carries the line height and the baseline shifts), placed by
+ *  the cell format's alignment and indent; text runs on over empty neighbours (left text to the right, right text to
+ *  the left, centred text both ways, as far as the nearer side allows), wrapped text and numbers never do. */
+export function cellElement(st, r, c, cell, line, win, rowTop) {
+  const merge = mergeAt(st, r, c);
+  const look = st.deco ? st.deco(cell.s || 0) : null;
+  const align = (look && look.align) || NO_ALIGN;
+  const isText = cell.t === 's' || cell.t === 'str';
+  const wrap = align.wrap && isText;
+  // (A General number gets the characters that fit its cell on screen, in print too: st.screenCols when printing.)
+  const screen = st.screenCols || st.cols;
+  const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
+  const shown = cellDisplay(cell, colChars(screenW, MDW), look ? look.code : 'General', st.date1904);
+  // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
+  const h = shown.hashes ? 'center' : shown.textFormat && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
+  // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)
+  const clean = (t) => (wrap ? t.replace(/\r/g, '') : t.replace(/[\r\n]/g, ''));
+  const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}`, 'gridcell');
+  if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
+  el.setAttribute('aria-colindex', String(c + 2));
+  if (st.idBase) el.id = `${st.idBase}-${r}-${c}`;
+  // (A conditional format's font: its colour and weight over the cell's own, ooxml/condformat.js.)
+  const cf = st.cond?.get(`${r},${c}`);
+  if (cf) {
+    if (cf.color) { el.classList.add('oxe-cf-color'); el.style.setProperty('--oxe-cf-color', cf.color); }
+    if (cf.bold !== undefined) el.classList.add(cf.bold ? 'oxe-cf-bold' : 'oxe-cf-normal');
+    if (cf.italic !== undefined) el.classList.add(cf.italic ? 'oxe-cf-italic' : 'oxe-cf-upright');
+    if (cf.strike) el.classList.add('oxe-cf-strike');
+  }
+  // (A note or comment thread: heard as the cell's description, from notemarks.js's texts.)
+  if (st.idBase && st.notes?.has(`${r},${c}`)) el.setAttribute('aria-describedby', `${st.idBase}-note-${r}-${c}`);
+  if (st.sel && r >= st.sel.r0 && r <= st.sel.r1 && c >= st.sel.c0 && c <= st.sel.c1) el.setAttribute('aria-selected', 'true');
+  let x = st.cols.start(c);
+  let w = st.cols.size(c);
+  let hgt = st.rows.size(r);
+  if (merge) {
+    el.classList.add('oxe-merged');
+    el.setAttribute('aria-colspan', String(merge.c1 - merge.c0 + 1));
+    el.setAttribute('aria-rowspan', String(merge.r1 - merge.r0 + 1));
+    w = st.cols.start(merge.c1 + 1) - x;
+    hgt = st.rows.start(merge.r1 + 1) - st.rows.start(r);
+  } else if (isText && !wrap) {
+    const [begin, end] = runOn(st, r, c, line, win);
+    const left = st.cols.start(begin);
+    const right = st.cols.start(end);
+    if (h === 'left') w = right - x;
+    else if (h === 'right') { w = x + w - left; x = left; }
+    else {
+      const centre = x + w / 2;
+      const half = Math.min(centre - left, right - centre);
+      x = centre - half;
+      w = 2 * half;
+    }
+  }
+  const vars = { '--oxe-x': x, '--oxe-y': st.rows.start(r) - rowTop, '--oxe-w': w, '--oxe-h': hgt };
+  // Bottom-aligned text sits on its row's baseline, which the row's tallest font sets (rowheights.js rowDescents).
+  if (!wrap && align.vertical !== 'top' && align.vertical !== 'center' && look && st.rowDesc) {
+    const lift = (st.rowDesc.get(r) ?? 0) - fontDescentPx(look.font.family, look.font.sizePx);
+    if (lift > 0.01) vars['--oxe-row-shift'] = -lift;
+  }
+  if (align.indent && h !== 'center') {
+    el.classList.add(h === 'right' ? 'oxe-indent-r' : 'oxe-indent-l');
+    vars['--oxe-indent'] = align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen);
+  }
+  el.appendChild(textSpan(shown, clean));
+  const color = shown.color && st.color ? st.color(shown.color) : null;
+  if (color) {
+    el.classList.add('oxe-nf-color');
+    el.style.setProperty('--oxe-nf-color', color);
+  }
+  // (A formatted number wider than its cell shows #s instead; fitNumbers checks once the cell is in the page.)
+  if (shown.fit) el.dataset.oxeFit = '1';
+  setVars(el, vars);
+  return el;
+}
+
+/** The text span: plain text, or for formats with padding (_x: a space as wide as x, drawn as a hidden x) and fill
+ *  (*x: x repeated across the room left in the cell) the pieces in a row. */
+function textSpan(shown, clean) {
+  const span = document.createElement('span');
+  span.className = 'oxe-tx';
+  if (shown.parts.every((p) => typeof p === 'string')) {
+    span.textContent = clean(shown.text);
+    return span;
+  }
+  span.classList.add('oxe-parts');
+  if (shown.parts.some((p) => p && p.fill)) span.classList.add('oxe-parts-fill');
+  for (const p of shown.parts) {
+    if (typeof p === 'string') span.append(clean(p));
+    else {
+      const piece = document.createElement('span');
+      piece.className = p.pad ? 'oxe-pad' : 'oxe-repeat';
+      piece.textContent = p.pad || p.fill.repeat(200);
+      span.appendChild(piece);
+    }
+  }
+  return span;
+}
+
+let measure = null;
+/** The canvas AutoFit measures text with. */
+let fitCtx = null;
+/** Replace formatted numbers wider than their cells with #s, as Excel does (as many as fit). Run once the cells are in
+ *  the page, so one layout serves them all; the width is measured in the cell's own font. */
+export function fitNumbers(container) {
+  const cells = container.querySelectorAll('.oxe-cell[data-oxe-fit]');
+  if (!cells.length) return;
+  measure = measure || document.createElement('canvas').getContext('2d');
+  const jobs = [];
+  for (const el of cells) {
+    const span = el.firstElementChild;
+    const cs = getComputedStyle(span);
+    const box = getComputedStyle(el);
+    const room = parseFloat(el.style.getPropertyValue('--oxe-w')) - parseFloat(box.paddingLeft) - parseFloat(box.paddingRight);
+    measure.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    // (Padding pieces count; a fill shrinks to nothing.)
+    const text = [...span.childNodes].map((n) => (n.classList && n.classList.contains('oxe-repeat') ? '' : n.textContent)).join('');
+    if (measure.measureText(text).width > room + 0.5) jobs.push([span, Math.max(1, Math.floor(room / measure.measureText('#').width))]);
+  }
+  for (const [span, n] of jobs) {
+    span.classList.remove('oxe-parts', 'oxe-parts-fill');
+    span.textContent = '#'.repeat(n);
+    span.parentElement.classList.remove('oxe-h-left', 'oxe-h-right');
+    span.parentElement.classList.add('oxe-h-center');
+  }
+}
+
+/** The pixels AutoFit gives column c of the grid's sheet (`st`): its widest text as shown (a General number in full,
+ *  the longest line of wrapped text), measured in each cell's font, plus 9 of padding (docs/SIZES.md); null when the
+ *  column is empty. */
+export function columnFitWidth(st, c) {
+    if (!fitCtx) fitCtx = document.createElement('canvas').getContext('2d');
+    let widest = 0;
+    for (const [r, line] of st.sheet.cells) {
+      const cell = line.get(c);
+      if (!cell || cell.v == null || mergeAt(st, r, c)) continue;
+      const look = st.deco ? st.deco(cell.s || 0) : null;
+      const text = cellDisplay(cell, Infinity, look ? look.code : 'General', st.date1904).text;
+      if (!text) continue;
+      fitCtx.font = look ? look.font.css : '14.6667px sans-serif';
+      for (const part of String(text).split('\n')) widest = Math.max(widest, fitCtx.measureText(part.replace(/\r/g, '')).width);
+    }
+    return widest ? Math.ceil(widest) + 9 : null;
+}

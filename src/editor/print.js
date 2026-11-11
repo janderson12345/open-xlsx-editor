@@ -3,7 +3,9 @@
 // manual breaks, pages in the sheet's page order), the print title rows and columns repeated on every page, all at
 // the sheet's scale or the scale that fits it on the pages asked for, each page at its paper size with the sheet's
 // margins. Built only for printing (and for PDF export and tools/excel-compare); hidden on screen.
-import { sheetGeometry, cellElement, mergeAt, setVars, div, fitNumbers } from './grid.js';
+import { sheetGeometry } from './geometry.js';
+import { cellElement, mergeAt, fitNumbers } from './cells.js';
+import { setVars, div } from './dom.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontStack } from './fonts.js';

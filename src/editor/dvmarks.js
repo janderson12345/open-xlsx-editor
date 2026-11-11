@@ -1,7 +1,7 @@
 // A data validation list's dropdown button, beside the active cell's right edge as Excel draws it, and the rule's
 // input message in a box under the cell. Clicked with the mouse; Alt+Down opens the list from the keyboard, and the
 // message is read with the cell, so both stay out of the tab order and away from assistive technology.
-import { div, setVars } from './grid.js';
+import { div, setVars } from './dom.js';
 
 /** Draw `st.validation` ({ r, c, list, prompt }) into `st.dvLayer`; the button calls `st.onDropdown(button)`. */
 export function drawValidation(st) {

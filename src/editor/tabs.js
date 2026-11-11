@@ -4,7 +4,7 @@
 // can't be shown yet. Ctrl+Page Up and Page Down in the grid change sheet from there (commands.js). A right click,
 // Shift+F10 or the Menu key on a tab opens its menu (sheetmenu.js); a double click renames it in place; dragging a tab
 // moves the sheet. At the right end, the status bar's figures for the selection (Average, Count, Sum).
-import { div } from './grid.js';
+import { div } from './dom.js';
 
 /** Black or white, whichever reads better on `hex` ('#RRGGBB'; WCAG relative luminance). */
 export function textOn(hex) {

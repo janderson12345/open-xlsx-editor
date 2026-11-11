@@ -1,6 +1,6 @@
 // The selection as the grid shows it: the selected range shaded, the active cell outlined, both in an overlay above
 // the cells and below the sticky headings. View state only: nothing here reaches the workbook or its undo history.
-import { setVars, div } from './grid.js';
+import { setVars, div } from './dom.js';
 import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 
 /** A selection: the active cell (ar, ac) and the range (r0..r1, c0..c1) it extends over, 0-based. */

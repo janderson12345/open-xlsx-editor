@@ -1,7 +1,8 @@
 // Cell fills and borders: a rectangle under the text for each filled cell in view, an edge over it for each side with a
 // border, for empty cells as much as for cells with values. Their colours and line styles come from cellstyles.js's
 // classes; their geometry from here, on screen in whole pixels on the gridlines, in print as Excel's PDF has them.
-import { mergeAt, setVars, div } from './grid.js';
+import { mergeAt } from './cells.js';
+import { setVars, div } from './dom.js';
 
 /** Border line widths in units of a thin line: thin and its dash patterns 1, medium and its patterns 2, thick and
  *  double 3; hair is thinner than a unit. */
