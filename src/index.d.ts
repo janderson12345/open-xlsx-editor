@@ -119,6 +119,8 @@ export interface XlsxEditor {
   /** The workbook open here for an agent: each edit one step of the undo history, drawn as it is made. */
   agent(): AgentWorkbook;
   readonly selection: Selection | null;
+  /** Call `fn` each time the selection is shown anew (moved, extended, another sheet shown); returns a stop function. */
+  onSelect(fn: () => void): () => void;
   readonly readOnly: boolean;
   setReadOnly(flag: boolean): void;
   /** Turn ribbon features on or off: a tab by name ({ home: false }) or a group by its label ({ font: false }). */
