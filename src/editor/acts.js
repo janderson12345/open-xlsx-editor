@@ -1,7 +1,8 @@
 // The ribbon's actions and the boxes and menus they open (index.js shares the editor's state and helpers with them as
 // one object): the act dispatcher, Insert and Delete, Paste Special, Sort and its warning, the validation question and
 // message, a list's choices, a filter's list, the cell's and the headings' menus, Row Height and Column Width.
-import { messageBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, noteBox, validationBox, cfRuleBox } from './dialogs.js';
+import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
+import { sortBox, filterBox, pickBox, validationBox, cfRuleBox } from './datadialogs.js';
 import { CF_PRESETS } from '../ooxml/cfedit.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
