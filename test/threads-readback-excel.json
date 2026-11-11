@@ -1,0 +1,27 @@
+{
+ "source": "tools/excel-compare/excel-threads-check.ps1 on test/out/threads/threads.xlsx (threads.test.js)",
+ "threads": [
+  {
+   "cell": "B2",
+   "author": "Avery Chen",
+   "text": "Check these totals",
+   "replies": [
+    {
+     "author": "Avery Chen",
+     "text": "Done & checked <twice>"
+    },
+    {
+     "author": "Avery Chen",
+     "text": "Thanks\nlooks right"
+    }
+   ]
+  },
+  {
+   "cell": "F6",
+   "author": "Avery Chen",
+   "text": "A second thread",
+   "replies": []
+  }
+ ],
+ "legacyComments": 0
+}

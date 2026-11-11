@@ -1845,3 +1845,28 @@
 .oxe-root.oxe-painting .oxe-grid {
   cursor: copy;
 }
+
+/* A comment thread (threadbox.js): its comments listed, each with its author, time and buttons, the reply box under. */
+.oxe-dialog.oxe-thread-box {
+  width: 340px;
+}
+.oxe-thread-list {
+  max-height: 280px;
+  overflow: auto;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+.oxe-thread-item {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--oxe-head-line);
+}
+.oxe-thread-head,
+.oxe-thread-text {
+  margin: 0 0 4px;
+  white-space: pre-wrap;
+}
+.oxe-thread-acts {
+  display: flex;
+  gap: 6px;
+}

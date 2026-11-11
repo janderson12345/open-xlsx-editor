@@ -63,7 +63,7 @@ cursors to measure, so this follows Excel's documented look rather than a measur
   columns is hidden under the pane.
 - The flag is in the grid's overlay, which assistive technology doesn't read, as with this editor's own selection
   outline; a screen reader doesn't hear where the others are.
-- Notes and threaded comments are read-only in the editor, so they are not co-edited.
+- Notes and threaded comments are not co-edited yet: one editor's changes to them don't reach the others.
 - A workbook saved with a password is shared encrypted, so each editor joining asks for the password. Whether co-editing
   an encrypted workbook works end to end hasn't been tested.
 

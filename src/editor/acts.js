@@ -11,6 +11,8 @@ import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor } from './namesbox.js';
 import { formatCellsBox } from './formatbox.js';
+import { threadBox } from './threadbox.js';
+import { addThread, replyThread, editThread } from '../ooxml/threadedit.js';
 import { insertChart } from '../ooxml/chartnew.js';
 import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
 import { chartBox } from './chartbox.js';
@@ -105,7 +107,7 @@ export function createActs(env) {
       // (Excel's New Note and Edit Note: the active cell's note in a box to type in, beside the cell.)
       const s = editing().selection;
       const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
-      if (n?.kind === 'thread') return messageBox(root, "Threaded comments can't be edited here yet.");
+      if (n?.kind === 'thread') return act('commentBox');
       const body = n ? n.runs.filter((x, k) => !(k === 0 && x.bold)).map((x) => x.text).join('').replace(/^\n/, '') : '';
       const author = n ? n.author || (n.runs[0]?.bold ? n.runs[0].text.replace(/:$/, '') : '') : options.author || 'Author';
       const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
@@ -113,6 +115,32 @@ export function createActs(env) {
       return noteBox(root, { title: n ? `Edit Note for ${ref}` : `New Note for ${ref}`, author, text: body, at: { x: box.right + 8, y: box.top } }).then((text) => {
         if (text != null && (n || text !== '')) editing().run('sheetChange', (wb, si) => setNote(wb, si, s.ar, s.ac, text, options.author || 'Author'));
         state.grid.el.focus({ preventScroll: true });
+      });
+    }
+    if (name === 'commentBox') {
+      // (Excel's comment thread on the active cell: started, replied to, a comment edited or a reply deleted, the whole
+      // thread deleted; each one step of Undo, the box opened again on the thread after each.)
+      const s = editing().selection;
+      const ref = `${colName(s.ac)}${s.ar + 1}`;
+      const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
+      if (n?.kind === 'note') return messageBox(root, `${ref} has a note: a cell has a note or a comment, not both.`);
+      const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
+      return threadBox(root, { ref, items: n?.items || [], at: { x: box.right + 8, y: box.top }, readOnly: state.readOnly }).then((answer) => {
+        state.grid.el.focus({ preventScroll: true });
+        if (!answer) return false;
+        const who = options.author || 'Author';
+        let refused = null;
+        editing().run('sheetChange', (wb, si) => {
+          try {
+            if (answer.removeAll) return deleteNote(wb, si, s.ar, s.ac);
+            if (answer.post != null) { if (n) replyThread(wb, si, s.ar, s.ac, answer.post, who); else addThread(wb, si, s.ar, s.ac, answer.post, who); }
+            else if (answer.remove != null) editThread(wb, si, s.ar, s.ac, answer.remove, null);
+            else if (answer.edit != null) editThread(wb, si, s.ar, s.ac, answer.edit, answer.text);
+          } catch (e) { refused = e.message; return false; }
+          return true;
+        });
+        if (refused) return messageBox(root, refused).then(() => false);
+        return answer.removeAll ? true : act('commentBox');
       });
     }
     if (name === 'deleteNote') {
@@ -428,12 +456,14 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
         const s = editing().selection;
         return pivotAt(state.workbook, state.sheetIndex, s.ar, s.ac) ? [{ label: 'Refresh', run: () => editing().run('refreshPivots', false), disabled: ro }, { label: 'Show Field List', run: run('pivotFieldList'), disabled: ro }, 'separator'] : [];
       })(),
-      // (Excel's: New Note on a cell without one; Edit, Delete and Show/Hide Note on one with.)
+      // (Excel's: New Comment and New Note on a cell with neither; a thread's Reply to Comment and Delete Comment; a
+      // note's Edit, Delete and Show/Hide Note.)
       ...(() => {
         const s = editing().selection;
-        const has = readNotes(state.workbook, state.sheetIndex).has(`${s.ar},${s.ac}`);
-        return has ? [{ label: 'Edit Note', run: run('editNote'), disabled: ro }, { label: 'Delete Note', run: run('deleteNote'), disabled: ro }, { label: 'Show/Hide Note', run: run('showNote') }]
-          : [{ label: 'New Note', run: run('editNote'), disabled: ro }];
+        const n = readNotes(state.workbook, state.sheetIndex).get(`${s.ar},${s.ac}`);
+        if (n?.kind === 'thread') return [{ label: 'Reply to Comment', run: run('commentBox'), disabled: ro }, { label: 'Delete Comment', run: run('deleteNote'), disabled: ro }, { label: 'Show/Hide Comment', run: run('showNote') }];
+        return n ? [{ label: 'Edit Note', run: run('editNote'), disabled: ro }, { label: 'Delete Note', run: run('deleteNote'), disabled: ro }, { label: 'Show/Hide Note', run: run('showNote') }]
+          : [{ label: 'New Comment', run: run('commentBox'), disabled: ro }, { label: 'New Note', run: run('editNote'), disabled: ro }];
       })()],
     point, { label: 'Cell' });
   };

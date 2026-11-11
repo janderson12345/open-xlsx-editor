@@ -280,6 +280,7 @@ export function mountXlsxEditor(host, options = {}) {
           goToBox: () => act('goToBox'),
           nameManager: () => act('nameManager'),
           painting: () => act('painting'),
+          commentBox: () => act('commentBox'),
           chartKey: (e) => state.picker?.onKey(e),
           formatCells: () => act('formatCellsBox'),
           painted: () => act('paintFormats'),

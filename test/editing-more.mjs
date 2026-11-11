@@ -267,4 +267,37 @@ await page.keyboard.press('Control+z');
 await page.waitForSelector('.oxe-chart');
 check(chartGone === '' && await chartsNow() === '0', 'Delete deletes the picked chart; Ctrl+Z brings it back', `${chartGone} / ${await chartsNow()}`);
 
+// A comment thread (Ctrl+Alt+M) on B2 of a new sheet: posted, replied to, the reply edited, then deleted; the thread
+// read back from the workbook at each step, and Ctrl+Z undoing the deletion.
+await page.evaluate(() => { window.oxe.command('insertSheet'); window.oxe.select('B2'); });
+await page.focus('.oxe-grid');
+const threadNow = () => page.evaluate(() => {
+  const wb = window.oxe.workbook;
+  const path = wb.sheets[window.oxe.sheetIndex].path;
+  const rel = wb.pkg.readRels(path).find((r) => /threadedComment$/.test(r.type));
+  const xml = rel ? wb.pkg.text(rel.target) : '';
+  return [...xml.matchAll(/<text>([\s\S]*?)<\/text>/g)].map((m) => m[1]).join(' | ');
+});
+const box = 'dialog.oxe-thread-box';
+await page.keyboard.press('Control+Alt+m');
+await page.waitForSelector(box);
+await page.fill(`${box} textarea`, 'Check these totals');
+await page.click(`${box} >> button:text-is("Post")`);
+await page.waitForSelector(`${box} .oxe-thread-item`);
+await page.fill(`${box} > textarea`, 'Done');
+await page.click(`${box} >> button:text-is("Reply")`);
+await page.waitForFunction((b) => document.querySelectorAll(`${b} .oxe-thread-item`).length === 2, box);
+check(await threadNow() === 'Check these totals | Done', 'New Comment, then a reply: the thread written', await threadNow());
+await page.click(`${box} button[aria-label^="Edit reply 1"]`);
+await page.fill(`${box} .oxe-thread-item textarea`, 'Done, checked');
+await page.click(`${box} >> button:text-is("Save")`);
+await page.waitForFunction((b) => [...document.querySelectorAll(`${b} .oxe-thread-text`)].some((x) => x.textContent === 'Done, checked'), box);
+check(await threadNow() === 'Check these totals | Done, checked', 'the reply edited', await threadNow());
+await page.click(`${box} button[aria-label^="Delete reply 1"]`);
+await page.waitForFunction((b) => document.querySelectorAll(`${b} .oxe-thread-item`).length === 1, box);
+const oneLeft = await threadNow();
+await page.click(`${box} >> button:text-is("Close")`);
+await page.keyboard.press('Control+z');
+check(oneLeft === 'Check these totals' && await threadNow() === 'Check these totals | Done, checked', 'the reply deleted; Ctrl+Z brings it back', `${oneLeft} / ${await threadNow()}`);
+
 await finish();

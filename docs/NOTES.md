@@ -55,3 +55,26 @@ thread left. `test/noteedit.test.js` covers the same in the unit tests.
 Editing threads (new comments, replies, resolving), Show All Notes, a note's own size and position (from its VML
 shape), notes following their cells when rows are sorted, and marks in frozen panes' cells drawn twice. Notes do
 follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
+
+## Writing threaded comments (`src/ooxml/threadedit.js`, `src/editor/threadbox.js`)
+
+Review > New Comment (Ctrl+Alt+M, or New Comment on a cell's menu) opens the active cell's thread: post the first
+comment, reply, edit any comment, delete a reply or the whole thread. Each is one step of Undo. A cell has a note or a
+thread, not both. The author is the editor's `author` option.
+
+Measured over COM (`tools/excel-compare/excel-threads.ps1`: `AddCommentThreaded`, `AddReply`, `CommentThreaded.Delete`
+on a new workbook, saved; the signed-in person Excel signs them with replaced by a made-up one before anything is
+written out; `test/threads-excel.json`). The same steps here write each part as Excel does, its made-up ids and times
+aside:
+
+| Part | As Excel writes it |
+|---|---|
+| `xl/threadedComments/threadedCommentN.xml` | A `threadedComment` per comment: `ref`, `dT` (local time to hundredths), `personId`, `id`, and for a reply `parentId`, the thread's first. Line breaks CR LF. |
+| `xl/persons/person.xml` | The workbook's people: `displayName`, `id`; for someone not signed in here, `userId` the name and `providerId` None (Excel's signed-in person has their account's). |
+| The comments part | A placeholder note for older versions of Excel: "[Threaded comment]", Excel's sentence about it, then each comment as "Comment:" or "Reply:" and its text indented four spaces; its author `tc={id}`; `xr:uid` the thread's id. A deleted thread's author leaves the list and the others are numbered again. |
+| The VML drawing | A hidden box as a note has, at Excel's place for it (B2's at 107.25pt, 7.5pt; 48pt a column, 15pt a row). |
+
+Replies made within the same hundredth of a second are ordered by id in Excel, so each reply after the first takes the
+one before's id with its third group one more, as Excel's own do. Excel opened the workbook written here
+(`excel-threads-check.ps1`, `test/threads-readback-excel.json`) and read both threads, their authors, texts and replies
+in order, and no placeholder notes.

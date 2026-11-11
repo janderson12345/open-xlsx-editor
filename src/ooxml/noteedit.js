@@ -111,7 +111,11 @@ export function deleteNote(wb, si, r, c) {
     const next = text.replace(re, () => { found = true; return ''; });
     if (next !== text) pkg.setText(target, next);
   };
-  drop(relOf(wb, path, `${REL}/comments`)?.target, new RegExp(`<comment\\b[^>]*\\sref="${ref}"[^>]*>[\\s\\S]*?</comment>`, 'g'));
+  const comments = relOf(wb, path, `${REL}/comments`)?.target;
+  drop(comments, new RegExp(`<comment\\b[^>]*\\sref="${ref}"[^>]*>[\\s\\S]*?</comment>`, 'g'));
+  // (A deleted thread's placeholder author, tc={id}, goes from the list too and the rest are numbered again, as
+  // Excel's saved comments part has it: excel-threads.ps1.)
+  if (comments && found) pkg.setText(comments, pruneThreadAuthors(pkg.text(comments)));
   drop(relOf(wb, path, THREADED)?.target, new RegExp(`<threadedComment\\b[^>]*\\sref="${ref}"[^>]*?(?:/>|>[\\s\\S]*?</threadedComment>)`, 'g'));
   const vml = relOf(wb, path, `${REL}/vmlDrawing`)?.target;
   if (vml) {
@@ -123,3 +127,21 @@ export function deleteNote(wb, si, r, c) {
   return found;
 }
 
+
+/** The comments part and VML drawing of sheet si, made when it has none (threadedit.js's placeholders go there too). */
+export { notesParts as notesPartsFor };
+
+/** A comments part without the thread placeholders' authors (tc={id}) no comment uses any more, the comments'
+ *  authorIds numbered again to match. */
+function pruneThreadAuthors(xml) {
+  const authors = [...xml.matchAll(/<author>([\s\S]*?)<\/author>/g)].map((m) => m[1]);
+  const used = new Set([...xml.matchAll(/<comment\b[^>]*\sauthorId="(\d+)"/g)].map((m) => Number(m[1])));
+  const keep = authors.map((a, i) => used.has(i) || !a.startsWith('tc='));
+  if (keep.every(Boolean)) return xml;
+  const renumber = new Map();
+  let n = 0;
+  keep.forEach((k, i) => { if (k) renumber.set(i, n++); });
+  const list = authors.filter((_, i) => keep[i]).map((a) => `<author>${a}</author>`).join('');
+  return xml.replace(/<authors>[\s\S]*?<\/authors>/, `<authors>${list}</authors>`)
+    .replace(/(<comment\b[^>]*\sauthorId=")(\d+)"/g, (m, a, id) => `${a}${renumber.get(Number(id)) ?? id}"`);
+}

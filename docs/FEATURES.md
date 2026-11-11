@@ -108,7 +108,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Charts (`charts`) | Charts | Partly | Insert > Charts: 14 kinds written as Excel writes them (14 of 14, and read back by Excel), the series taken as Excel takes them (10 of 10). Picked, moved, sized, deleted; Edit Chart: kind, title, legend, data labels (15 of 15 edits as Excel writes them). Column, bar, line, area, pie, doughnut and scatter drawn with Excel's automatic axis (34 of 34) and live data; figures with tables for screen readers (docs/CHARTS.md). Not yet: the data range, axis titles, secondary axes, combo and the 2016 kinds. |
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
 | Links (`links`) | Hyperlinks | Kept | Not clickable yet; follow a sheet rename. |
-| Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover, read to screen readers; notes written, edited and deleted as Excel writes them (Shift+F2, the cell's menu, Review > Notes; docs/NOTES.md). Threads shown and deleted, not edited. |
+| Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover, read to screen readers; notes written, edited and deleted as Excel writes them (Shift+F2, the cell's menu, Review > Notes; docs/NOTES.md). Threads written as Excel writes them: New Comment (Ctrl+Alt+M), reply, edit, delete a reply or the thread (docs/NOTES.md). |
 | Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers printed and exported as Excel prints them (docs/PRINT.md); not editable yet. |
 
 ## Page Layout (`layout`)
@@ -148,7 +148,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Proofing (`proofing`) | Spelling | Missing | |
 | Accessibility (`accessibility`) | Check Accessibility | Missing | |
-| Comments (`comments`) | New, show, delete comments; notes | Partly | Notes: New, Edit, Delete, Show/Hide (docs/NOTES.md); threaded comments shown and deleted, not written. |
+| Comments (`comments`) | New, show, delete comments; notes | Done | Notes: New, Edit, Delete, Show/Hide; threaded comments: New, Reply, Edit, Delete (docs/NOTES.md). Not yet: @mentions, resolving a thread. |
 | Protect (`protect`) | Protect sheet, protect workbook | Kept | Not enforced: a protected sheet can be edited. |
 
 ## View (`view`)
