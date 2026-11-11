@@ -1,0 +1,332 @@
+{
+ "cases": [
+  {
+   "name": "constants, all, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "constants",
+   "types": 23
+  },
+  {
+   "name": "formulas, all, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "formulas",
+   "types": 23
+  },
+  {
+   "name": "constants, numbers, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "constants",
+   "types": 1
+  },
+  {
+   "name": "formulas, numbers, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "formulas",
+   "types": 1
+  },
+  {
+   "name": "constants, text, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "constants",
+   "types": 2
+  },
+  {
+   "name": "formulas, text, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "formulas",
+   "types": 2
+  },
+  {
+   "name": "constants, logicals, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "constants",
+   "types": 4
+  },
+  {
+   "name": "formulas, logicals, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "formulas",
+   "types": 4
+  },
+  {
+   "name": "constants, errors, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "constants",
+   "types": 16
+  },
+  {
+   "name": "formulas, errors, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "formulas",
+   "types": 16
+  },
+  {
+   "name": "constants, numbers and text, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "constants",
+   "types": 3
+  },
+  {
+   "name": "formulas, numbers and text, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "formulas",
+   "types": 3
+  },
+  {
+   "name": "constants, numbers, in A1:D6",
+   "select": "A1:D6",
+   "active": "A1",
+   "kind": "constants",
+   "types": 1
+  },
+  {
+   "name": "constants, all, in two ranges",
+   "select": "A1:B3,D2:D6",
+   "active": "D2",
+   "kind": "constants",
+   "types": 23
+  },
+  {
+   "name": "formulas, all, in C1:E4",
+   "select": "C1:E4",
+   "active": "C1",
+   "kind": "formulas",
+   "types": 23
+  },
+  {
+   "name": "blanks, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "blanks"
+  },
+  {
+   "name": "blanks, in A1:E8",
+   "select": "A1:E8",
+   "active": "A1",
+   "kind": "blanks"
+  },
+  {
+   "name": "blanks, in A8:C10 (a merged range)",
+   "select": "A8:C10",
+   "active": "A8",
+   "kind": "blanks"
+  },
+  {
+   "name": "notes, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "notes"
+  },
+  {
+   "name": "notes, in B1:E6",
+   "select": "B1:E6",
+   "active": "B1",
+   "kind": "notes"
+  },
+  {
+   "name": "current region, B3",
+   "select": "B3",
+   "active": "B3",
+   "kind": "region"
+  },
+  {
+   "name": "current region, J12",
+   "select": "J12",
+   "active": "J12",
+   "kind": "region"
+  },
+  {
+   "name": "current region, an empty cell next to data (F7)",
+   "select": "F7",
+   "active": "F7",
+   "kind": "region"
+  },
+  {
+   "name": "current region, an empty cell apart (M20)",
+   "select": "M20",
+   "active": "M20",
+   "kind": "region"
+  },
+  {
+   "name": "current array, G3",
+   "select": "G3",
+   "active": "G3",
+   "kind": "array"
+  },
+  {
+   "name": "current array, not in one (A1)",
+   "select": "A1",
+   "active": "A1",
+   "kind": "array"
+  },
+  {
+   "name": "row differences, A12:C16 by column A",
+   "select": "A12:C16",
+   "active": "A12",
+   "kind": "rowDiff"
+  },
+  {
+   "name": "row differences, A12:C16 by column B",
+   "select": "A12:C16",
+   "active": "B13",
+   "kind": "rowDiff"
+  },
+  {
+   "name": "column differences, A12:C16 by row 12",
+   "select": "A12:C16",
+   "active": "A12",
+   "kind": "colDiff"
+  },
+  {
+   "name": "column differences, A12:C16 by row 14",
+   "select": "A12:C16",
+   "active": "B14",
+   "kind": "colDiff"
+  },
+  {
+   "name": "row differences, A17:C17 (case)",
+   "select": "A17:C17",
+   "active": "A17",
+   "kind": "rowDiff"
+  },
+  {
+   "name": "row differences, A21:C21 (relative formulas)",
+   "select": "A21:C21",
+   "active": "A21",
+   "kind": "rowDiff"
+  },
+  {
+   "name": "column differences, A20:C21 by row 20",
+   "select": "A20:C21",
+   "active": "A20",
+   "kind": "colDiff"
+  },
+  {
+   "name": "precedents, direct, E3",
+   "select": "E3",
+   "active": "E3",
+   "kind": "precedents",
+   "levels": "direct"
+  },
+  {
+   "name": "precedents, all levels, E3",
+   "select": "E3",
+   "active": "E3",
+   "kind": "precedents",
+   "levels": "all"
+  },
+  {
+   "name": "precedents, direct, C2:C3",
+   "select": "C2:C3",
+   "active": "C2",
+   "kind": "precedents",
+   "levels": "direct"
+  },
+  {
+   "name": "dependents, direct, B2",
+   "select": "B2",
+   "active": "B2",
+   "kind": "dependents",
+   "levels": "direct"
+  },
+  {
+   "name": "dependents, all levels, B2",
+   "select": "B2",
+   "active": "B2",
+   "kind": "dependents",
+   "levels": "all"
+  },
+  {
+   "name": "dependents, all levels, B4",
+   "select": "B4",
+   "active": "B4",
+   "kind": "dependents",
+   "levels": "all"
+  },
+  {
+   "name": "precedents, none (A1)",
+   "select": "A1",
+   "active": "A1",
+   "kind": "precedents",
+   "levels": "direct"
+  },
+  {
+   "name": "last cell, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "lastCell"
+  },
+  {
+   "name": "visible cells only, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "visible"
+  },
+  {
+   "name": "visible cells only, in A1:H8",
+   "select": "A1:H8",
+   "active": "A1",
+   "kind": "visible"
+  },
+  {
+   "name": "visible cells only, in A1:B3 (nothing hidden)",
+   "select": "A1:B3",
+   "active": "A1",
+   "kind": "visible"
+  },
+  {
+   "name": "conditional formats, all, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "cfAll"
+  },
+  {
+   "name": "conditional formats, same as C3",
+   "select": "C3",
+   "active": "C3",
+   "kind": "cfSame"
+  },
+  {
+   "name": "conditional formats, all, in A1:B6",
+   "select": "A1:B6",
+   "active": "A1",
+   "kind": "cfAll"
+  },
+  {
+   "name": "data validation, all, from A1",
+   "select": "A1",
+   "active": "A1",
+   "kind": "dvAll"
+  },
+  {
+   "name": "data validation, same as B3",
+   "select": "B3",
+   "active": "B3",
+   "kind": "dvSame"
+  },
+  {
+   "name": "data validation, same as D2",
+   "select": "D2",
+   "active": "D2",
+   "kind": "dvSame"
+  },
+  {
+   "name": "data validation, same as A1 (none)",
+   "select": "A1",
+   "active": "A1",
+   "kind": "dvSame"
+  }
+ ]
+}

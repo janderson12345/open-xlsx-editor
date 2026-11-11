@@ -3,8 +3,29 @@
 import { setVars, div } from './dom.js';
 import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 
-/** A selection: the active cell (ar, ac) and the range (r0..r1, c0..c1) it extends over, 0-based. */
+/** A selection: the active cell (ar, ac) and the range (r0..r1, c0..c1) it extends over, 0-based. With Ctrl, more
+ *  than one range (Excel's areas): `more`, the others in the order they were added, the active range last. */
 export const cellSelection = (r, c) => ({ ar: r, ac: c, r0: r, c0: c, r1: r, c1: c });
+
+/** Ctrl+click: cell (r, c) the active cell and a new range, the ranges selected before kept. */
+export function addArea(sel, r, c) {
+  return { ...cellSelection(r, c), more: [...(sel.more || []), { r0: sel.r0, c0: sel.c0, r1: sel.r1, c1: sel.c1 }] };
+}
+
+/** Every range of a selection, as Excel's Areas: the others first, the active range last. */
+export const areasOf = (sel) => [...(sel.more || []), { r0: sel.r0, c0: sel.c0, r1: sel.r1, c1: sel.c1 }];
+
+/** A selection of ranges (as Go To Special gives them), the first range's top-left cell active. */
+export function areasSelection(areas, active = null) {
+  const last = areas[areas.length - 1];
+  const at = active || { r: areas[0].r0, c: areas[0].c0 };
+  const sel = { ar: at.r, ac: at.c, r0: last.r0, c0: last.c0, r1: last.r1, c1: last.c1 };
+  if (areas.length > 1) sel.more = areas.slice(0, -1).map((a) => ({ r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 }));
+  return sel;
+}
+
+/** Whether cell (r, c) is in any range of the selection. */
+export const inSelection = (sel, r, c) => areasOf(sel).some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1);
 
 /** The range between an anchor cell and another, with the anchor kept active. */
 export function extendSelection(sel, r, c) {
@@ -20,7 +41,8 @@ export function drawSelection(st) {
   if (!sel) return st.selLayer.replaceChildren();
   const box = (r0, c0, r1, c1, cls) => rangeBox(st, r0, c0, r1, c1, cls);
   const kids = [];
-  if (sel.r0 !== sel.r1 || sel.c0 !== sel.c1) kids.push(box(sel.r0, sel.c0, sel.r1, sel.c1, 'oxe-sel-range'));
+  for (const a of sel.more || []) kids.push(box(a.r0, a.c0, a.r1, a.c1, 'oxe-sel-range'));
+  if (sel.more?.length || sel.r0 !== sel.r1 || sel.c0 !== sel.c1) kids.push(box(sel.r0, sel.c0, sel.r1, sel.c1, 'oxe-sel-range'));
   const m = st.sheet.merges.find((x) => sel.ar >= x.r0 && sel.ar <= x.r1 && sel.ac >= x.c0 && sel.ac <= x.c1);
   kids.push(m ? box(m.r0, m.c0, m.r1, m.c1, 'oxe-sel-active') : box(sel.ar, sel.ac, sel.ar, sel.ac, 'oxe-sel-active'));
   const corner = handleCorner(st);
@@ -38,7 +60,7 @@ export function drawSelection(st) {
  *  off the sheet's end). */
 export function handleCorner(st) {
   const sel = st.sel;
-  if (!sel || !st.fillHandle) return null;
+  if (!sel || !st.fillHandle || sel.more?.length) return null; // (none on more than one range, as in Excel)
   if (sel.r1 >= MAX_ROWS - 1 || sel.c1 >= MAX_COLS - 1) return null;
   const m = st.sheet.merges.find((x) => x.r0 === sel.r0 && x.c0 === sel.c0 && x.r1 >= sel.r1 && x.c1 >= sel.c1);
   return m ? { r: m.r1, c: m.c1 } : { r: sel.r1, c: sel.c1 };

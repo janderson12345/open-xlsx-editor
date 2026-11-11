@@ -6,9 +6,15 @@ import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
+import { specialCells, firstShown } from '../ooxml/special.js';
+import { areasOf, areasSelection } from './selection.js';
 import { filterArea } from '../ooxml/filterops.js';
 
 /** These commands: `env` is createCommands's shared state and helpers (commands.js). */
+/** Excel's refusal of Copy and Cut over more than one range. (Excel copies ranges that line up, the same rows or the
+ *  same columns; here, only one.) */
+export const MULTIPLE_MESSAGE = "This action won't work on multiple selections.";
+
 export function dataCommands(env) {
   const { commands, ctx, state, sheet, show, runSteps, sizeStep, moved } = env;
   return {
@@ -16,6 +22,7 @@ export function dataCommands(env) {
      *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
     copy(cut = false) {
       if (cut && ctx.readOnly()) { ctx.announce('The workbook is read-only'); return null; }
+      if (state.sel.more?.length) { ctx.alert(MULTIPLE_MESSAGE); return null; }
       state.clip = clip.snapshot(ctx.workbook(), ctx.sheetIndex(), state.sel, cut);
       ctx.clipShown?.(state.clip);
       return state.clip;
@@ -119,6 +126,16 @@ export function dataCommands(env) {
       if (to.error) { if (to.name) ctx.announce(to.error); else ctx.alert(to.error); return false; }
       if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
       show(to.sel, null, 'Went to ');
+      return true;
+    },
+    /** Go To Special: the cells of a kind (special.js; `choice` as it takes it) selected, the first of them in sight
+     *  active (special.js firstShown); Excel's "No cells were found." when there are none. */
+    goToSpecial(choice) {
+      const s = state.sel;
+      const got = specialCells(ctx.workbook(), ctx.sheetIndex(), areasOf(s), { r: s.ar, c: s.ac }, choice);
+      if (got.error) { ctx.alert(got.error); return false; }
+      const n = got.areas.length;
+      show(areasSelection(got.areas, firstShown(sheet(), got.areas)), null, n > 1 ? `${n} ranges selected, ` : 'Selected ');
       return true;
     },
     /** Filter (Ctrl+Shift+L): the sheet's AutoFilter turned on over what Sort would take, or off (filterops.js). */

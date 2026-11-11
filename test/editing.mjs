@@ -866,6 +866,46 @@ check(cfLooks.length === 18 && cfLooks.every((x) => { const [v, color] = x.split
 await page.click('.oxe-rtab >> text=Data');
 await page.click('.oxe-rtab >> text=Home');
 
+// Ctrl+click: a second range, both shaded; Bold goes to both, Copy refuses them, as Excel does.
+await clickCell(1, 0); // A2
+await page.keyboard.down('Control');
+await clickCell(3, 2); // C4
+await page.keyboard.up('Control');
+const two = await sel();
+const shaded = await page.evaluate(() => document.querySelectorAll('.oxe-sel-range').length);
+check(two.more?.length === 1 && two.ar === 3 && two.ac === 2 && shaded === 2, 'Ctrl+click: A2 and C4 selected, both shaded, C4 active', `${JSON.stringify(two)} ${shaded}`);
+const boldOf = (r, c) => page.evaluate(([r, c]) => { const wb = window.oxe.workbook; const s = wb.sheet(window.oxe.sheetIndex).cells.get(r)?.get(c)?.s || 0; return !!wb.styles.fonts[wb.styles.cellXfs[s].fontId]?.b; }, [r, c]);
+await page.keyboard.press('Control+b');
+check(await boldOf(1, 0) && await boldOf(3, 2), 'Bold (Ctrl+B) on two ranges: both cells bold');
+await page.keyboard.press('Control+c');
+const manyRefusal = await page.textContent('dialog.oxe-dialog');
+check(/won't work on multiple selections/.test(manyRefusal || ''), "Copy over two ranges: Excel's refusal", manyRefusal);
+await page.click('dialog.oxe-dialog >> text=OK');
+await page.keyboard.press('Control+z');
+// Home > Find & Select > Go To Special...: Constants, Numbers only, from A1: every number typed in, and only those.
+await clickCell(0, 0);
+await ribbon('Find & Select', async () => {
+  await page.click('.oxe-pop >> text=Go To Special...');
+  await page.waitForSelector('dialog.oxe-special-box');
+  await page.check('dialog.oxe-special-box >> text=Constants');
+  for (const t of ['Text', 'Logicals', 'Errors']) await page.uncheck(`dialog.oxe-special-box label:text-is("${t}")`);
+  await page.click('dialog.oxe-special-box >> text=OK');
+});
+const special = await page.evaluate(() => {
+  const s = window.oxe.selection;
+  const sh = window.oxe.workbook.sheet(window.oxe.sheetIndex);
+  const areas = [...(s.more || []), s];
+  const inSel = (r, c) => areas.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1);
+  let wrong = 0; let numbers = 0;
+  for (const [r, line] of sh.cells) for (const [c, cell] of line) {
+    const want = cell.f == null && cell.t === 'n' && cell.v != null;
+    if (want) numbers++;
+    if (want !== inSel(r, c) && !sh.merges.some((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1)) wrong++;
+  }
+  return { numbers, wrong, ranges: areas.length };
+});
+check(special.numbers > 0 && special.wrong === 0, 'Go To Special > Constants, Numbers: the number constants selected, nothing else', JSON.stringify(special));
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

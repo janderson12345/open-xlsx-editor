@@ -129,7 +129,11 @@ export function homeTab(kit, { act, color }) {
     // whole ribbon, five rows tall.)
     menu('⇅', 'Sort & Filter', () => [item('Sort A to Z', f('sortAsc')), item('Sort Z to A', f('sortDesc')), item('Custom Sort...', f('sortBox')), el('hr'),
       item('Filter', f('filterToggle'), { hint: 'Ctrl+Shift+L' }), item('Clear', f('filterClear')), item('Reapply', f('filterReapply'))], { label: 'Sort & Filter', big: true }),
-    menu('🔍', 'Find & Select', () => [item('Find...', f('find'), { hint: 'Ctrl+F' }), item('Replace...', f('replace'), { hint: 'Ctrl+H' }), item('Go To...', f('goToBox'), { hint: 'Ctrl+G' })], { label: 'Find & Select', big: true })),
+    menu('🔍', 'Find & Select', () => [item('Find...', f('find'), { hint: 'Ctrl+F' }), item('Replace...', f('replace'), { hint: 'Ctrl+H' }), item('Go To...', f('goToBox'), { hint: 'Ctrl+G' }), item('Go To Special...', f('specialBox')), el('hr'),
+      // (Excel's shortcuts to Go To Special's choices, the whole sheet looked in when one cell is selected.)
+      item('Formulas', f('goToSpecial', { kind: 'formulas', types: 23 })), item('Notes', f('goToSpecial', { kind: 'notes' })),
+      item('Conditional Formatting', f('goToSpecial', { kind: 'cfAll' })), item('Constants', f('goToSpecial', { kind: 'constants', types: 23 })),
+      item('Data Validation', f('goToSpecial', { kind: 'dvAll' }))], { label: 'Find & Select', big: true })),
   ];
   paintBars();
 

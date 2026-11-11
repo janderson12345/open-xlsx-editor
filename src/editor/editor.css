@@ -1218,6 +1218,36 @@
   gap: 4px 24px;
 }
 
+/* Excel's Go To Special box (specialbox.js): its choices in two columns, each one's options indented under it. */
+.oxe-special-choices {
+  margin: 0 0 10px;
+  padding: 6px 10px 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+}
+.oxe-special-choices legend {
+  padding: 0 4px;
+}
+.oxe-special-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 32px;
+}
+.oxe-special-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.oxe-special-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 22px;
+}
+.oxe-special-sub input:disabled + label {
+  opacity: 0.55;
+}
+
 /* Excel's Sort box (dialogs.js sortBox): its tools and headers check box over the levels, one level marked. */
 .oxe-dialog.oxe-sort-box {
   max-width: min(600px, calc(100vw - 32px));

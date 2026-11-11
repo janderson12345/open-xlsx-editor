@@ -43,7 +43,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Gridlines on or off | Shown | From the sheet's view settings. |
 | Selecting: keys, mouse, Shift, Ctrl+arrow, Ctrl+End | Done | |
 | Selecting whole rows and columns | Done | Headings, Shift+Space, Ctrl+Space, Ctrl+A, the corner. |
-| Selecting several ranges (Ctrl+click) | Missing | |
+| Selecting several ranges (Ctrl+click) | Partly | Ctrl+click or drag adds a range; formatting, Clear and Data Validation go to each; Copy and Cut refuse, as Excel does when they don't line up (docs/GOTOSPECIAL.md). Other commands act on the last range. |
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
 | Entries read as Excel reads them | Done | Dates, times, currency, thousands, percentages, exponents, fractions, with the format Excel gives the cell (docs/ENTRY.md). United States settings only. |
 | Undo and redo | Done | Cell contents and formats across sheets; a sheet rename or delete clears the history, as Excel does. |
@@ -97,7 +97,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
 | | Clear (all, formats, contents) | Partly | Clear All, Clear Formats, Clear Contents as Excel (docs/FORMATS.md). Clear Comments and Notes, Clear Hyperlinks missing. |
 | | Sort & Filter | Done | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right) as Excel sorts (docs/SORT.md); Filter (Ctrl+Shift+L), its buttons and lists, Clear and Reapply as Excel filters (docs/FILTER.md). Text, number, date and colour filters missing (kept). |
-| | Find & Select | Partly | Find and Replace; Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special missing. |
+| | Find & Select | Partly | Find and Replace; Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special (Excel's box and Find & Select's shortcuts; every choice but Objects; docs/GOTOSPECIAL.md). |
 
 ## Insert (`insert`)
 

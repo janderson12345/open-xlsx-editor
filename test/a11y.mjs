@@ -171,6 +171,14 @@ for (const colorScheme of ['light', 'dark']) {
       const dvBox = await axe();
       t.check(!dvBox.length && await page.evaluate(() => document.activeElement.tagName === 'SELECT'), `${colorScheme}: the Data Validation box, no axe violations, Allow focused`, dvBox.join(String.fromCharCode(10) + '     '));
       await page.keyboard.press('Escape');
+      // (Go To Special from the Go To box's Special... button, as F5 then Special... reaches it.)
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('F5');
+      await page.click('dialog.oxe-dialog >> button:text-is("Special...")');
+      await page.waitForSelector('dialog.oxe-special-box');
+      const gotoSpecialAxe = await axe();
+      t.check(!gotoSpecialAxe.length && await page.evaluate(() => document.activeElement.type === 'radio'), `${colorScheme}: the Go To Special box, no axe violations, a choice focused`, gotoSpecialAxe.join(String.fromCharCode(10) + '     '));
+      await page.keyboard.press('Escape');
       await page.click('.oxe-rtab >> text="View"');
       await page.click('.oxe-toolbar button[title="Freeze Panes"]');
       const viewTab = await axe();

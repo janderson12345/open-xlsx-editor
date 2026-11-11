@@ -6,6 +6,8 @@ import { sortBox, filterBox, pickBox, validationBox, cfRuleBox } from './datadia
 import { CF_PRESETS } from '../ooxml/cfedit.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
+import { specialBox } from './specialbox.js';
+import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
 import { ruleAt, listItems } from '../ooxml/validation.js';
@@ -102,14 +104,22 @@ export function createActs(env) {
       // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
       const s = editing().selection;
       return validationBox(root, boxRule(ruleAt(state.workbook.sheet(i), s.ar, s.ac), state.workbook.date1904)).then((rule) => {
-        if (rule) editing().run('sheetChange', (wb, si) => wb.setValidation(si, [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], rule === 'clear' ? null : rule));
+        if (rule) editing().run('sheetChange', (wb, si) => wb.setValidation(si, areasOf(s), rule === 'clear' ? null : rule));
         state.grid.el.focus({ preventScroll: true });
       });
     }
     if (name === 'goToBox') {
       // (Excel's Go To: a name, a table or a reference; gone to as the Name Box goes.)
       return goToBox(root, goToNames(state.workbook, i)).then((text) => {
+        if (text === goToBox.SPECIAL) return act('specialBox');
         if (text) editing().run('nameBox', text);
+        state.grid.el.focus({ preventScroll: true });
+      });
+    }
+    if (name === 'specialBox') {
+      // (Excel's Go To Special box; its choice found and selected.)
+      return specialBox(root).then((choice) => {
+        if (choice) editing().run('goToSpecial', choice);
         state.grid.el.focus({ preventScroll: true });
       });
     }

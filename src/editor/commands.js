@@ -4,7 +4,7 @@
 // is touched, as everywhere; the formulas that read a changed cell are worked out again) and into an undo history of
 // cell contents, one for the workbook, as in Excel; the selection, kept for each sheet, is view state and never reaches
 // the history or the file. Sheets are known by their sheetId in both, as indexes change when sheets move.
-import { cellSelection, extendSelection } from './selection.js';
+import { cellSelection, extendSelection, addArea, areasOf } from './selection.js';
 import { sheetCommands } from './commands-sheets.js';
 import { dataCommands } from './commands-data.js';
 import { partCommands } from './commands-parts.js';
@@ -168,12 +168,17 @@ export function createCommands(ctx) {
     ctx.changed?.();
     return true;
   }
-  /** A format command: formatops.js's function over the selection on the sheet shown. */
-  const formatting = (fn, ...args) => (ctx.readOnly() ? (ctx.announce('The workbook is read-only'), false) : restyle(fn(ctx.workbook(), ctx.sheetIndex(), state.sel, ...args)));
+  /** The selection's ranges, each as a selection with the active cell (formatting and Clear go over each, as Excel's
+   *  do: borders outline each range, a font toggled goes by the active cell). */
+  const eachArea = () => areasOf(state.sel).map((a) => ({ ...a, ar: state.sel.ar, ac: state.sel.ac }));
+  /** A format command: formatops.js's function over each range of the selection on the sheet shown. */
+  const formatting = (fn, ...args) => (ctx.readOnly() ? (ctx.announce('The workbook is read-only'), false) : restyle(eachArea().flatMap((a) => fn(ctx.workbook(), ctx.sheetIndex(), a, ...args))));
 
   const commands = {
     /** Select one cell. */
     select(r, c) { show(cellSelection(r, c)); },
+    /** Ctrl+click: cell (r, c) a new range, the ranges selected before kept. */
+    addArea(r, c) { show(addArea(state.sel, r, c), { r, c }, 'Added '); },
     /** Extend the selection from the active cell to (r, c). */
     extendTo(r, c) { show(extendSelection(state.sel, r, c), { r, c }); },
     /** Arrow keys: a cell (or, with `jump`, to the edge of the data) in direction (dr, dc); `extend` moves the far
@@ -220,8 +225,10 @@ export function createCommands(ctx) {
      *  (clearops.js), as one step of the history. */
     clearAs(what) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const step = clearChanges(ctx.workbook(), ctx.sheetIndex(), state.sel, what);
-      if (step.error) { ctx.alert(step.error); return false; }
+      const steps = eachArea().map((a) => clearChanges(ctx.workbook(), ctx.sheetIndex(), a, what));
+      const refused = steps.find((x) => x.error);
+      if (refused) { ctx.alert(refused.error); return false; }
+      const step = steps.length === 1 ? steps[0] : { ...steps[0], contents: steps.flatMap((x) => x.contents), styles: steps.flatMap((x) => x.styles), merges: steps[0].merges.filter((m) => steps.every((x) => x.merges.includes(m))) };
       if (what === 'contents' && !step.contents.length) return false;
       if (what === 'contents') return apply(step.contents);
       return runSteps([step]);

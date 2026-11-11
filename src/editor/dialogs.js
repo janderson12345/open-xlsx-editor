@@ -190,7 +190,8 @@ export function optionsBox(root, { title, text = '', groups = [], checks = [], b
 }
 
 /** Excel's Go To box (F5, Ctrl+G): the names and tables to go to in a list, and a Reference field (a pick fills it);
- *  resolves to the text to go to, or null for Cancel and Esc. */
+ *  resolves to the text to go to, goToBox.SPECIAL for Special... (Excel's Go To Special box next), or null for Cancel
+ *  and Esc. */
 export function goToBox(root, names) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
@@ -208,10 +209,12 @@ export function goToBox(root, names) {
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
     const row = document.createElement('div');
     row.className = 'oxe-dialog-buttons';
-    row.append(button('OK', ok), button('Cancel', () => done(null)));
+    row.append(button('Special...', () => done(goToBox.SPECIAL)), button('OK', ok), button('Cancel', () => done(null)));
     dlg.append(h, listLabel, list, fieldLabel, field, row);
   });
 }
+
+goToBox.SPECIAL = Symbol('Go To Special');
 
 /** Excel's Password box for opening a workbook saved with a password: "'name' is protected.", a Password field (its
  *  text hidden), OK and Cancel. Resolves to the password, or null. */

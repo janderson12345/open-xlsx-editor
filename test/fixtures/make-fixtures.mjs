@@ -17,6 +17,7 @@
 //                anchor-cases.mjs's sheet without its table: a stock list on B2:D12, a column chart of Qty
 //                anchored F3 to L15, a rectangle M5 to P9 and notes at A1, B6, D12 and F20 (test/anchors.test.js).
 //
+// special.xlsx  something for each of Go To Special's choices (special.mjs).
 // print-*.xlsx   probes for the print model: print area, titles and breaks; scale; fit to a page wide; headers and
 //                footers (printProbes below).
 // The zips are written with a fixed date, so the files only change when this script does.
@@ -25,6 +26,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { zipSync, strToU8 } from 'fflate';
 import { normalizeFormula } from '../../src/calc/tokens.js';
+import { special } from './special.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const X = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
@@ -829,4 +831,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   anchors();
   anchors(true);
   printProbes();
+  special({ write, contentTypes, rels, RT, CT, DECL, X, R, ROOT_RELS, docProps, PROPS_CT, STYLES, esc });
 }

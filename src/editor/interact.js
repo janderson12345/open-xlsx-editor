@@ -308,6 +308,7 @@ export function attachEditing(root, ctx) {
     if (pointing.control && pointing.press(at.r, at.c, e.shiftKey)) { pointingDrag = true; return; }
     view.focus({ preventScroll: true });
     if (e.shiftKey) cmd.run('extendTo', at.r, at.c);
+    else if (e.ctrlKey || e.metaKey) cmd.run('addArea', at.r, at.c); // (Ctrl: another range, dragged out as one is)
     else cmd.run('select', at.r, at.c);
     // (A double click edits. Taken from the click count: each click redraws the cells, so the browser's dblclick,
     // which wants both clicks on one element, doesn't come.)

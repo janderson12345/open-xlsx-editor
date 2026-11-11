@@ -69,6 +69,10 @@ PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
 `pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md).
 
+Go To Special: `special-cases.mjs` makes the cases, `excel-special.ps1 <cases.json> test/fixtures/special.xlsx
+test/special-excel.json` has Excel find each (the selection made, the choice asked as the box asks it, the result
+selected and read; nothing saved) (docs/GOTOSPECIAL.md).
+
 PDF export (src/pdf.js) is measured the same way: `OXE_EXPORT=1 node tools/excel-compare/print-ours.mjs <books> <out>` makes
 the PDFs through `exportPdf` instead of the browser's print (docs/PDF.md).
 

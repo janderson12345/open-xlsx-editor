@@ -1,0 +1,308 @@
+﻿[
+    {
+        "name":  "constants, all, from A1",
+        "address":  "A1:C1,E1,A2:B6,D1:D5,A9:B9,K12,B12:B13,J12:J13,A12:A14,C12:C15,A16:C17,A20:C20",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "formulas, all, from A1",
+        "address":  "E2:E3,G2:G4,C2:C6,B14,A15:B15,A21:C21",
+        "active":  "E2",
+        "error":  null
+    },
+    {
+        "name":  "constants, numbers, from A1",
+        "address":  "D4,B2:B6,A12:C12,K12,J12:J13,A14,C14:C15,A16:C16,A20:C20",
+        "active":  "D4",
+        "error":  null
+    },
+    {
+        "name":  "formulas, numbers, from A1",
+        "address":  "C2:C3,E2:E3,G2:G4,B14,A15:B15,A21:C21",
+        "active":  "C2",
+        "error":  null
+    },
+    {
+        "name":  "constants, text, from A1",
+        "address":  "B1:E1,D5,A1:A6,A9:B9,A13:C13,A17:C17",
+        "active":  "B1",
+        "error":  null
+    },
+    {
+        "name":  "formulas, text, from A1",
+        "address":  "C6",
+        "active":  "C6",
+        "error":  null
+    },
+    {
+        "name":  "constants, logicals, from A1",
+        "address":  "D2",
+        "active":  "D2",
+        "error":  null
+    },
+    {
+        "name":  "formulas, logicals, from A1",
+        "address":  "C5",
+        "active":  "C5",
+        "error":  null
+    },
+    {
+        "name":  "constants, errors, from A1",
+        "address":  "D3",
+        "active":  "D3",
+        "error":  null
+    },
+    {
+        "name":  "formulas, errors, from A1",
+        "address":  "C4",
+        "active":  "C4",
+        "error":  null
+    },
+    {
+        "name":  "constants, numbers and text, from A1",
+        "address":  "A1:E1,A2:B6,D4:D5,A9:B9,K12,B12:B13,J12:J13,A12:A14,C12:C15,A16:C17,A20:C20",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "formulas, numbers and text, from A1",
+        "address":  "C2:C3,E2:E3,G2:G4,C6,B14,A15:B15,A21:C21",
+        "active":  "C2",
+        "error":  null
+    },
+    {
+        "name":  "constants, numbers, in A1:D6",
+        "address":  "D4,B2:B6",
+        "active":  "D4",
+        "error":  null
+    },
+    {
+        "name":  "constants, all, in two ranges",
+        "address":  "A1:B3,D2:D5",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "formulas, all, in C1:E4",
+        "address":  "E2:E3,C2:C4",
+        "active":  "E2",
+        "error":  null
+    },
+    {
+        "name":  "blanks, from A1",
+        "address":  "G1,H1:K4,F1:F3,E4:F4,E5:K5,D6:K6,A7:K11,D12:I13,K13,D14:K21,A18:C19",
+        "active":  "G1",
+        "error":  null
+    },
+    {
+        "name":  "blanks, in A1:E8",
+        "address":  "E4:E5,D6:E6,A7:E8",
+        "active":  "E4",
+        "error":  null
+    },
+    {
+        "name":  "blanks, in A8:C10 (a merged range)",
+        "address":  "A8:C10",
+        "active":  "A8",
+        "error":  null
+    },
+    {
+        "name":  "notes, from A1",
+        "address":  "A2,D5",
+        "active":  "A2",
+        "error":  null
+    },
+    {
+        "name":  "notes, in B1:E6",
+        "address":  "D5",
+        "active":  "D5",
+        "error":  null
+    },
+    {
+        "name":  "current region, B3",
+        "address":  "A1:E6",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "current region, J12",
+        "address":  "J12:K13",
+        "active":  "J12",
+        "error":  null
+    },
+    {
+        "name":  "current region, an empty cell next to data (F7)",
+        "address":  "F7",
+        "active":  "F7",
+        "error":  null
+    },
+    {
+        "name":  "current region, an empty cell apart (M20)",
+        "address":  "M20",
+        "active":  "M20",
+        "error":  null
+    },
+    {
+        "name":  "current array, G3",
+        "address":  "G2:G4",
+        "active":  "G2",
+        "error":  null
+    },
+    {
+        "name":  "current array, not in one (A1)",
+        "address":  null,
+        "active":  null,
+        "error":  null
+    },
+    {
+        "name":  "row differences, A12:C16 by column A",
+        "address":  "C12:C13,B14,C15,B16",
+        "active":  "C12",
+        "error":  null
+    },
+    {
+        "name":  "row differences, A12:C16 by column B",
+        "address":  "A14,A16,C12:C16",
+        "active":  "A14",
+        "error":  null
+    },
+    {
+        "name":  "column differences, A12:C16 by row 12",
+        "address":  "A13:C14,A15:B15,A16:C16",
+        "active":  "A13",
+        "error":  null
+    },
+    {
+        "name":  "column differences, A12:C16 by row 14",
+        "address":  "A12:C13,A15:C16",
+        "active":  "A12",
+        "error":  null
+    },
+    {
+        "name":  "row differences, A17:C17 (case)",
+        "address":  "C17",
+        "active":  "C17",
+        "error":  null
+    },
+    {
+        "name":  "row differences, A21:C21 (relative formulas)",
+        "address":  "C21",
+        "active":  "C21",
+        "error":  null
+    },
+    {
+        "name":  "column differences, A20:C21 by row 20",
+        "address":  "A21:C21",
+        "active":  "A21",
+        "error":  null
+    },
+    {
+        "name":  "precedents, direct, E3",
+        "address":  "E2,C2",
+        "active":  "E2",
+        "error":  null
+    },
+    {
+        "name":  "precedents, all levels, E3",
+        "address":  "E2,C2,B2:B6",
+        "active":  "E2",
+        "error":  null
+    },
+    {
+        "name":  "precedents, direct, C2:C3",
+        "address":  "B2:B3",
+        "active":  "B2",
+        "error":  null
+    },
+    {
+        "name":  "dependents, direct, B2",
+        "address":  "C2,E2,G2:G4",
+        "active":  "C2",
+        "error":  null
+    },
+    {
+        "name":  "dependents, all levels, B2",
+        "address":  "C2,G2:G4,E2:E3",
+        "active":  "C2",
+        "error":  null
+    },
+    {
+        "name":  "dependents, all levels, B4",
+        "address":  "G2:G4,C4,E2:E3",
+        "active":  "G2",
+        "error":  null
+    },
+    {
+        "name":  "precedents, none (A1)",
+        "address":  null,
+        "active":  null,
+        "error":  null
+    },
+    {
+        "name":  "last cell, from A1",
+        "address":  "K21",
+        "active":  "K21",
+        "error":  null
+    },
+    {
+        "name":  "visible cells only, from A1",
+        "address":  "A1:E3,G1:XFD3,A5:E1048576,G5:XFD1048576",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "visible cells only, in A1:H8",
+        "address":  "A1:E3,G1:H3,A5:E8,G5:H8",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "visible cells only, in A1:B3 (nothing hidden)",
+        "address":  "A1:B3",
+        "active":  "A1",
+        "error":  null
+    },
+    {
+        "name":  "conditional formats, all, from A1",
+        "address":  "A2:A3,C2:C6",
+        "active":  "A2",
+        "error":  null
+    },
+    {
+        "name":  "conditional formats, same as C3",
+        "address":  "C2:C6",
+        "active":  "C2",
+        "error":  null
+    },
+    {
+        "name":  "conditional formats, all, in A1:B6",
+        "address":  "A2:A3",
+        "active":  "A2",
+        "error":  null
+    },
+    {
+        "name":  "data validation, all, from A1",
+        "address":  "B2:B6,D2:D3",
+        "active":  "B2",
+        "error":  null
+    },
+    {
+        "name":  "data validation, same as B3",
+        "address":  "B2:B6",
+        "active":  "B2",
+        "error":  null
+    },
+    {
+        "name":  "data validation, same as D2",
+        "address":  "D2:D3",
+        "active":  "D2",
+        "error":  null
+    },
+    {
+        "name":  "data validation, same as A1 (none)",
+        "address":  null,
+        "active":  null,
+        "error":  "No cells were found."
+    }
+]

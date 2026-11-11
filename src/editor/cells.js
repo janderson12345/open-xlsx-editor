@@ -1,6 +1,7 @@
 // The cells as the grid and print draw them: a cell's element (its text as shown, aligned, wrapped, running on into
 // empty neighbours, indented, in its format's classes), merged ranges, and numbers too wide for their column as #s.
 import { fontDescentPx } from './fonts.js';
+import { inSelection } from './selection.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colChars } from '../ooxml/units.js';
 import { MDW } from './geometry.js';
@@ -64,7 +65,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   }
   // (A note or comment thread: heard as the cell's description, from notemarks.js's texts.)
   if (st.idBase && st.notes?.has(`${r},${c}`)) el.setAttribute('aria-describedby', `${st.idBase}-note-${r}-${c}`);
-  if (st.sel && r >= st.sel.r0 && r <= st.sel.r1 && c >= st.sel.c0 && c <= st.sel.c1) el.setAttribute('aria-selected', 'true');
+  if (st.sel && inSelection(st.sel, r, c)) el.setAttribute('aria-selected', 'true');
   let x = st.cols.start(c);
   let w = st.cols.size(c);
   let hgt = st.rows.size(r);

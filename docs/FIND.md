@@ -35,8 +35,7 @@ They come from Excel's dialog, which COM doesn't reach, so their wording isn't m
 
 ## Not yet
 
-Look in Notes and Comments, Format (finding and replacing formats), Go To and Go To Special, and the Find All list of
-cells. (Replacing within a date now works as in Excel: docs/ENTRY.md.)
+Look in Notes and Comments, Format (finding and replacing formats), and the Find All list of cells. (Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
 
 ## Found on the way
 
