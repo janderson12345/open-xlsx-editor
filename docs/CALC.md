@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1400 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1450 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1400 of 1400 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1450 of 1450 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -97,6 +97,13 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       is #N/A). "da" and "e" are both deka. The binary prefixes (ki, Mi, ... Yi) are for bit and byte only.
     - Names are exact: "M", "FT" and " m" are #N/A, as are units of different kinds. TRUE is #VALUE!, and "2" is 2.
     - Temperatures go through kelvin, with "K" and "kel" taking a prefix ("mK"), and C, F, Rank and Reau not.
+  - `functions-bessel.js`: BESSELJ, BESSELY, BESSELI and BESSELK. Excel's are not the exact functions but Numerical
+    Recipes' approximations, good to about 1e-8: =BESSELJ(0,0) is 1.00000000283141. The rational and polynomial
+    forms for orders 0 and 1, then recurrences: up for Y, K, and J past its order; down (Miller's, 40 for the start)
+    for I and J. The coefficients are one printing's: Y0 past 8 shows 0.934945152e-7 where others print
+    0.934935152e-7. Measured on about 280 cases with cell values, then the probe's 50; all as Excel's to the last
+    bit or within 1e-15, but BESSELJ from 8 on (below). n is made whole, below 0 #NUM!; Y and K need x above 0;
+    J and Y are #NUM! from 2^27 on, as SIN is.
   - `functions-amort.js`: AMORLINC and AMORDEGRC, the French depreciation. Microsoft's page gives other rules than
     Excel's; these are Excel's, from about 600 cases with cell values in a hidden Excel, then the probe's 48:
     - AMORDEGRC's coefficient by the life (1 / rate): up to 2 years #NUM!, to 4 years 1.5, to 6 years 2, past that 2.5.
@@ -224,7 +231,10 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
   (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
   rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
-- **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD) and the BESSEL functions.
+- **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD).
+- **BESSELJ from 8 on** (where the order is below x): Excel's J0 and J1 there aren't the Numerical Recipes formulas the
+  rest follows, and are further from the true values (J1(8) is 0.2346283865070744, 8e-6 off). A least-squares fit
+  points at other coefficients in J1's far polynomial, not yet pinned down. Such a formula keeps the value Excel saved.
 - **AMORDEGRC bought on the first period's last day with a life of 3 years or less**: the rule here (declining, no
   halves, up to the life's periods) fits the two such assets measured, not more.
 - **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway

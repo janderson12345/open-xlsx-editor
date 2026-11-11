@@ -80,6 +80,7 @@ insides:
 | `src/calc/functions-dynamic.js` | Excel 365's dynamic array functions: SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, @ and D1#; docs/DYNAMIC.md. |
 | `src/calc/functions-arrays.js`, `functions-finance.js`, `functions-stats.js` | Excel 365's array shaping and LAMBDA helpers; loans, depreciation, rates and working days; statistics, distributions, numerals and a cell's formula and sheet (docs/CALC.md). |
 | `src/calc/functions-db.js`, `functions-bonds.js`, `criteria.js` | The database functions and their criteria (shared with Advanced Filter); coupons, bond prices and yields, and the discounted securities (docs/CALC.md). |
+| `src/calc/functions-bessel.js` | BESSELJ, BESSELY, BESSELI, BESSELK by the approximations Excel uses (docs/CALC.md). |
 | `src/calc/functions-amort.js` | AMORLINC and AMORDEGRC, the French depreciation, as Excel works them out (docs/CALC.md). |
 | `src/calc/functions-regex.js`, `regex.js` | REGEXTEST, REGEXEXTRACT, REGEXREPLACE: Excel's PCRE2 patterns and replacement text turned into JavaScript's (docs/CALC.md). |
 | `src/calc/functions-convert.js` | CONVERT, with Excel's units, factors and prefixes (docs/CALC.md). |

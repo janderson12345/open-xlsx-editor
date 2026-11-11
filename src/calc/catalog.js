@@ -115,7 +115,8 @@ const LIST = {
     DGET(database,field,criteria) DMAX(database,field,criteria) DMIN(database,field,criteria) DPRODUCT(database,field,criteria)
     DSTDEV(database,field,criteria) DSTDEVP(database,field,criteria) DSUM(database,field,criteria) DVAR(database,field,criteria)
     DVARP(database,field,criteria)`,
-  Engineering: `BIN2DEC(number) BIN2HEX(number,[places]) BIN2OCT(number,[places]) BITAND(number1,number2)
+  Engineering: `BESSELI(x,n) BESSELJ(x,n) BESSELK(x,n) BESSELY(x,n) BIN2DEC(number) BIN2HEX(number,[places])
+    BIN2OCT(number,[places]) BITAND(number1,number2)
     BITLSHIFT(number,shift_amount) BITOR(number1,number2) BITRSHIFT(number,shift_amount) BITXOR(number1,number2)
     DEC2BIN(number,[places]) DEC2HEX(number,[places]) DEC2OCT(number,[places]) DELTA(number1,[number2])
     COMPLEX(real_num,i_num,[suffix]) CONVERT(number,from_unit,to_unit) ERF(lower_limit,[upper_limit]) ERF.PRECISE(x) ERFC(x) ERFC.PRECISE(x)

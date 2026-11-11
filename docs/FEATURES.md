@@ -49,7 +49,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Undo and redo | Done | Cell contents and formats across sheets, and sheets inserted, renamed, moved, hidden, coloured and deleted (each one step, the sheet shown as it was). Excel can't undo deleting a sheet (it warns that the sheet goes for good); here Ctrl+Z brings it back, a difference kept on purpose. |
 | Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, a defined name, a table's name (its data rows) or a table reference ("Fruit[Qty]") typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). A new name typed there names the selection (docs/NAMES.md); showing a selected name missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
-| Recalculation | Done | 1400 of 1400 test formulas give Excel's results; 473 functions; table references (Fruit[Qty], [#Totals], [@Qty]). |
+| Recalculation | Done | 1450 of 1450 test formulas give Excel's results; 477 functions; table references (Fruit[Qty], [#Totals], [@Qty]). |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
 | Chart sheets | Kept | Tab shown, sheet not opened. |
 | Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |
@@ -125,7 +125,7 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Function Library (`function-library`) | Insert Function, the function lists | Partly | Insert Function (Shift+F3, fx): search, Most Recently Used, All and Excel's categories, each function's syntax; Recently Used and each category's list on the Formulas tab, More Functions for the rest; the choice typed into the cell, or at the caret of a cell being edited; the syntax screen tip, the argument typed in bold (docs/CALC.md). Excel's descriptions of each function and its Function Arguments box are missing. 473 functions work when typed. |
+| Function Library (`function-library`) | Insert Function, the function lists | Partly | Insert Function (Shift+F3, fx): search, Most Recently Used, All and Excel's categories, each function's syntax; Recently Used and each category's list on the Formulas tab, More Functions for the rest; the choice typed into the cell, or at the caret of a cell being edited; the syntax screen tip, the argument typed in bold (docs/CALC.md). Excel's descriptions of each function and its Function Arguments box are missing. 477 functions work when typed. |
 | | Dynamic arrays (spilling), LAMBDA, LET | Partly | Formulas spill as Excel 365's do, #SPILL! when blocked; SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, LET, LAMBDA, `D1#` and `@`; 20 of 20 cases Excel's, and Excel reads the files the same (docs/DYNAMIC.md). The newer array functions (TAKE, VSTACK, MAP...) missing. |
 | Defined Names (`defined-names`) | Name Manager, define, use in formula | Done | Name Manager (Ctrl+F3) and Define Name as Excel's, the Name Box naming the selection; Excel's rules for a name, 34 of 34 verdicts, and its saved order (docs/NAMES.md). Create from Selection and Use in Formula missing. |
 | Formula Auditing (`formula-auditing`) | Trace precedents and dependents, show formulas, evaluate | Missing | |
