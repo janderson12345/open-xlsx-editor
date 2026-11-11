@@ -279,6 +279,18 @@ export const PROBE_FORMULAS = [
   'SIN(PI())', 'COS(PI()/2)', 'SIN(2*PI())', 'COS(3*PI()/2)', 'SIN(1000*PI())', 'SIN(1E8)', 'COS(12345.678)', 'SIN(134217727)',
   'SIN(134217728)', 'COS(-134217728)', 'SIN(1E300)', 'TAN(PI()/2)', 'TAN(PI())', 'TAN(1.2)', 'TAN(1E8)', 'TAN(134217728)', 'SEC(PI()/2)',
   'CSC(PI())', 'COT(PI()/2)', 'COT(PI())', 'COT(0)', 'SEC(134217728)', 'COT(2.2)',
+  'CONVERT(1,"lbm","kg")', 'CONVERT(68,"F","C")', 'CONVERT(-40,"C","F")', 'CONVERT(500,"Rank","C")', 'CONVERT(37,"C","Rank")',
+  'CONVERT(10,"Reau","F")', 'CONVERT(1,"C","mK")', 'CONVERT(2.5,"mi","ft")', 'CONVERT(0.3,"ly","Nmi")', 'CONVERT(1234.5678,"pica","in")',
+  'CONVERT(1,"survey_mi","mi")', 'CONVERT(6,"stone","lbm")', 'CONVERT(1,"u","ozm")', 'CONVERT(30,"psi","mmHg")', 'CONVERT(760,"Torr","atm")',
+  'CONVERT(1,"lbf","dyn")', 'CONVERT(1,"BTU","cal")', 'CONVERT(1,"eV","BTU")', 'CONVERT(2.5,"HPh","flb")', 'CONVERT(1,"HP","PS")',
+  'CONVERT(1,"gal","uk_gal")', 'CONVERT(1,"cup","tsp")', 'CONVERT(1,"barrel","ft3")', 'CONVERT(1,"mi3","ly^3")', 'CONVERT(1,"us_acre","uk_acre")',
+  'CONVERT(1,"mi2","ft^2")', 'CONVERT(100,"kn","mph")', 'CONVERT(1,"admkn","kn")', 'CONVERT(1,"yr","day")', 'CONVERT(1234.5678,"ga","T")',
+  'CONVERT(1,"km","m")', 'CONVERT(1,"dam","m")', 'CONVERT(1,"em","m")', 'CONVERT(1,"Ym","m")', 'CONVERT(1,"ym","m")', 'CONVERT(1,"km2","m2")',
+  'CONVERT(1,"cm^3","m3")', 'CONVERT(1,"kar","ar")', 'CONVERT(1,"cl","l")', 'CONVERT(1,"Mm/hr","m/s")', 'CONVERT(1,"meV","J")',
+  'CONVERT(1,"kibyte","byte")', 'CONVERT(1,"Gibit","bit")', 'CONVERT(1,"Yibyte","bit")', 'CONVERT(1,"Mbyte","bit")', 'CONVERT(1,"kmph","mph")',
+  'CONVERT(1,"kibit","kbit")', 'CONVERT("2","m","ft")', 'CONVERT(TRUE,"m","ft")', 'CONVERT("x","m","ft")', 'CONVERT(1,"m","g")',
+  'CONVERT(1," m","ft")', 'CONVERT(1,"FT","m")', 'CONVERT(1,"kmm","m")', 'CONVERT(1,"kC","C")', 'CONVERT(1,"kft","m")', 'CONVERT(1,"kibyte","g")',
+  'CONVERT(1,"kig","g")', 'CONVERT(1,"kly3","l")',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

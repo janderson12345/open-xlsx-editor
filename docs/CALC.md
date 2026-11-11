@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1157 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1216 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1157 of 1157 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1216 of 1216 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -89,6 +89,14 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     - Powers and roots by the polar form, so IMPOWER("i",2) is -1+1.22514845490862E-16i. The tangent and the
       reciprocals by the double angle (tan(x+iy) = (sin 2x + i sinh 2y) / (cos 2x + cosh 2y)), the real functions'
       own for a real number; ±i and 0 where the double angle is past the largest number (IMTAN("1+400i") is i).
+  - `functions-convert.js`: CONVERT, with Excel's 152 unit names in 13 kinds. Each factor is Excel's own, read to
+    the last bit from CONVERT(1,unit,base) in a hidden Excel. A conversion is number × factor ÷ factor, which matches
+    Excel to the last bit in most cases and to 2 bits in the rest (724 cases). The units that take a prefix were
+    measured too: 40 of them, among them mph ("kmph"), ar ("kar" is 1000 ar) and the litre ("cl").
+    - A prefix is squared or cubed for a length squared or cubed ("km2" is 1E+06 m2), and only one is allowed ("kmm"
+      is #N/A). "da" and "e" are both deka. The binary prefixes (ki, Mi, ... Yi) are for bit and byte only.
+    - Names are exact: "M", "FT" and " m" are #N/A, as are units of different kinds. TRUE is #VALUE!, and "2" is 2.
+    - Temperatures go through kelvin, with "K" and "kel" taking a prefix ("mK"), and C, F, Rank and Reau not.
   - `trig.js`: sine and cosine as Excel works them out. The angle is brought near 0 with the x87's 64-bit π, not the
     true one, so =SIN(PI()) is 1.22514845490862E-16 and =COS(PI()/2) 6.1257422745431E-17 (the true values are
     1.22464679914735E-16 and 6.12323399573677E-17). From 2^27 on, #NUM! (=SIN(134217728)). TAN is SIN over COS
@@ -189,7 +197,7 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
   (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
   rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
 - **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD), AMORDEGRC and AMORLINC,
-  CONVERT, the BESSEL functions and the REGEX functions.
+  the BESSEL functions and the REGEX functions.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
