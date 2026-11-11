@@ -7,7 +7,8 @@ import { CF_PRESETS } from '../ooxml/cfedit.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
 import { specialBox } from './specialbox.js';
-import { insertPivot } from './pivotbox.js';
+import { insertPivot, showFieldList } from './pivotbox.js';
+import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor } from './namesbox.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
@@ -129,6 +130,11 @@ export function createActs(env) {
       const newName = () => defineNameFor(root, state.workbook, i, s, run);
       const opened = name === 'nameManager' ? nameManager(root, { workbook: () => state.workbook, run, newName }) : newName();
       return opened.then((x) => { state.grid.el.focus({ preventScroll: true }); return x; });
+    }
+    if (name === 'pivotFieldList') {
+      // (Show Field List: the PivotTable at the active cell's fields, moved.)
+      const s = editing().selection;
+      return showFieldList(root, state.workbook, i, { r: s.ar, c: s.ac }, (...a) => editing().run(...a)).then((done) => { state.grid.el.focus({ preventScroll: true }); return done; });
     }
     if (name === 'pivotBox') {
       // (Insert > PivotTable: its boxes, then the PivotTable made.)
@@ -313,6 +319,11 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
       { label: 'Paste', run: run('clipPaste'), disabled: ro || !allowed('clipPaste') }, { label: 'Paste Special...', run: run('pasteSpecialBox'), disabled: ro || !allowed('pasteSpecialBox') },
       'separator', { label: 'Insert...', run: () => lines(1), disabled: ro || !allowed('lines') }, { label: 'Delete...', run: () => lines(-1), disabled: ro || !allowed('lines') },
       { label: 'Clear Contents', run: () => editing().run('clear'), disabled: ro }, 'separator',
+      // (On a PivotTable's cell, Excel's Refresh and Show Field List.)
+      ...(() => {
+        const s = editing().selection;
+        return pivotAt(state.workbook, state.sheetIndex, s.ar, s.ac) ? [{ label: 'Refresh', run: () => editing().run('refreshPivots', false), disabled: ro }, { label: 'Show Field List', run: run('pivotFieldList'), disabled: ro }, 'separator'] : [];
+      })(),
       // (Excel's: New Note on a cell without one; Edit, Delete and Show/Hide Note on one with.)
       ...(() => {
         const s = editing().selection;

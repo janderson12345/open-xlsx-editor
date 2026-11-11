@@ -282,7 +282,8 @@ function layoutTable(wb, t, records, shared, sharedIndex, oldShared, fresh = fal
     }
     for (const v of shared[i]) if (!keys.includes(keyOf(v))) keys.push(keyOf(v));
     const values = keys.map((key) => shared[i][sharedIndex[i].get(key)]);
-    if (f.sortType === 'ascending' || (fresh && f.sortType !== 'descending')) values.sort(compareItems);
+    // (Fresh: a field just put on, with no items of its own yet, is listed sorted, as Excel lists a new one.)
+    if (f.sortType === 'ascending' || (fresh && !f.items && f.sortType !== 'descending')) values.sort(compareItems);
     if (f.sortType === 'descending') values.sort((a, b) => compareItems(b, a));
     return values;
   });

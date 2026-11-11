@@ -34,6 +34,23 @@ from Excel's dialog, which COM doesn't reach.
 
 **Undo:** a new PivotTable is one step that Ctrl+Z takes back, the new sheet it went on with it.
 
+## Show Field List (measured)
+
+Right-click a PivotTable's cell: **Show Field List** opens the PivotTable Fields box with the pivot's layout now; each
+field to Rows, Columns or Values (`src/ooxml/pivotfields.js`). The same menu has **Refresh**. Fields that stay in an
+area keep their order; one newly put there goes last, as Excel's field list adds it. One step that Ctrl+Z takes back.
+
+As Excel does it: a field taken off keeps its items (in the table) and its shared items (in the cache); one put on
+that has none yet gets them sorted A to Z; a value that stays keeps its name; the row and column lists and the values
+are made again, and the pivot is laid out by the same code as a refresh.
+
+**Measured:** `excel-pivot-move.ps1` built 10 pivots in Excel, each with one case's layout, and moved their fields to
+another's: a row field added and taken off, a value added and taken off, rows to columns and back, Count of Product
+for Sum of Units, a two-row, one-column layout and back, two values for a column layout. Moved here from Excel's own
+pivot of the first layout (`test/pivot-move.test.js`): 10 of 10 the same table, cache and records as Excel's, and the
+same cells. Saved and opened in Excel (`pivotmove-ours.mjs`, `excel-pivot-check.ps1`): 10 of 10 opened, and Excel's
+own refresh changed nothing.
+
 ## Refresh
 
 Pivot tables are kept as they are when a workbook is saved, and their sources follow a sheet rename. They can also be
@@ -111,8 +128,8 @@ Also not handled:
 - **Dates:** a date field is cached as numbers, where Excel caches dates.
 - **Missing items:** an item no longer in the data is dropped from the field. That case wasn't measured.
 - **Number formats:** a value field's number format isn't applied to cells the refresh newly fills.
-- **Changing pivots:** moving a PivotTable's fields once it is made can't be done here yet; the pivot's filter buttons
-  (Excel's pivotButton on its header cells) aren't written on a new one.
+- **Filter buttons:** the pivot's filter buttons (Excel's pivotButton on its header cells) aren't written on a new
+  one; filtering a field's items, and the field list's Filters area, aren't there yet.
 - **Pivot styles:** the PivotTable style's colours aren't drawn on the grid.
 
 Tests:

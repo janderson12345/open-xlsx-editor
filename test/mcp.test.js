@@ -77,6 +77,9 @@ test('an assistant reads, writes, reviews its changes, takes one back and saves 
     assert.equal(made.name, 'PivotTable1');
     assert.match((await s.tool('read_range', { path: 'fruit.xlsx', range: `'${made.sheet}'!A3:B4` })).text, /Row Labels \| Sum of Qty/);
     assert.match((await s.tool('review_changes', { path: 'fruit.xlsx' })).text, /PivotTable PivotTable1 made at/);
+    // (Its fields moved: Name by Flag, the count of Price beside the sum.)
+    assert.match((await s.tool('pivot_fields', { path: 'fruit.xlsx', pivot: 'PivotTable1', rows: ['Flag'], values: [{ field: 'Qty', fn: 'sum' }, { field: 'Price', fn: 'count' }] })).text, /^Now at /);
+    assert.match((await s.tool('read_range', { path: 'fruit.xlsx', range: `'${made.sheet}'!A3:C3` })).text, /Row Labels | Sum of Qty | Count of Price/);
     assert.ok((await s.tool('save_workbook', { path: 'fruit.xlsx' })).error);
     assert.equal((await s.tool('save_workbook', { path: 'fruit.xlsx', save_as: 'fruit (edited).xlsx' })).text, 'Saved fruit (edited).xlsx.');
     assert.ok((await s.tool('save_workbook', { path: 'fruit.xlsx', save_as: 'fruit (edited).xlsx' })).error);

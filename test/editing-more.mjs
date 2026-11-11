@@ -6,7 +6,7 @@ import { encryptWorkbook } from '../src/ooxml/encryption.js';
 import { pivotBook } from './pivots.js';
 import { editingPage } from './editing-kit.mjs';
 
-const { page, check, finish, openFixtureFrom, shown, sel, clickCell, ribbon } = await editingPage();
+const { page, check, finish, openFixtureFrom, shown, sel, clickCell, pointAt, ribbon } = await editingPage();
 
 // A workbook saved with a password (made here with a test password): Excel's Password box; a wrong one gets Excel's
 // words and nothing opens; the right one opens it, and it saves encrypted again.
@@ -177,5 +177,18 @@ await page.keyboard.press('Enter');
 const blocked = await shown(1, 7);
 await page.keyboard.press('Control+z');
 check(blocked === '#SPILL!' && await spilled() === sorted, 'a value typed in its way: #SPILL!; Ctrl+Z: it spills again', `${blocked} / ${await spilled()}`);
+
+// Show Field List on the PivotTable made above (right-click one of its cells): Region moved from Rows to Columns; the
+// pivot laid out again across, as Excel's field list lays it out.
+await page.evaluate((name) => { window.oxe.showSheet(name); window.oxe.select('A4'); }, madePivot.sheet);
+const a4 = await pointAt(3, 0);
+await page.mouse.click(a4.x, a4.y, { button: 'right' });
+await page.click('.oxe-menu [role="menuitem"]:text-is("Show Field List")');
+await page.waitForSelector('dialog.oxe-pivot-fields');
+const startArea = await page.inputValue('dialog.oxe-pivot-fields select[aria-label="Region: area"]');
+await page.selectOption('dialog.oxe-pivot-fields select[aria-label="Region: area"]', 'cols');
+await page.click('dialog.oxe-pivot-fields >> button:text-is("OK")');
+const across = await page.evaluate(() => { const sh = window.oxe.workbook.sheet(window.oxe.sheetIndex); return [2, 3, 4].map((r) => [0, 1, 2, 3, 4].map((c) => sh.cells.get(r)?.get(c)?.v ?? '').join('|')).join(' / '); });
+check(startArea === 'rows' && across === '|Column Labels||| / |East|North|South|Grand Total / Sum of Units|4|8|8|20', 'Show Field List: Region from Rows to Columns, the pivot laid out across', `${startArea} ${across}`);
 
 await finish();

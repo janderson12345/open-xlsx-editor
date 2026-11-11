@@ -1,7 +1,8 @@
 // Insert > PivotTable (commands.js shares its state with it): a new PivotTable made (pivotnew.js) on a new sheet or at a
 // cell of one there is, its row labels aligned left and its columns fitted, as Excel leaves a new one.
 import { createPivot, pivotSourceFields, layoutRefusal, applyPivot } from '../ooxml/pivotnew.js';
-import { readPivots } from '../ooxml/pivot.js';
+import { readPivots, pivotAt } from '../ooxml/pivot.js';
+import { movePivotFields } from '../ooxml/pivotfields.js';
 import { SheetError } from '../ooxml/sheetops.js';
 import { pxWidth } from '../ooxml/sizes.js';
 import { parseRange } from '../ooxml/refs.js';
@@ -45,6 +46,26 @@ export function pivotCommands(env) {
   }
 
   return {
+    /** Show Field List's answer: the PivotTable at the active cell laid out with `layout` (pivotfields.js), as one step
+     *  of the history; Excel's words when it can't be. */
+    movePivot(layout) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const p = pivotAt(wb, si, state.sel.ar, state.sel.ac);
+      if (!p) { ctx.announce('The active cell is not in a PivotTable'); return false; }
+      const before = wb.snapshot();
+      const out = movePivotFields(wb, p, layout);
+      if (out.error) { ctx.alert(out.error); return false; }
+      finish(wb, out);
+      fit(wb, si, out.changes.find((ch) => ch.si === si).area);
+      state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+      state.redo = [];
+      ctx.edited?.({ book: true });
+      ctx.changed?.();
+      ctx.announce('PivotTable fields changed');
+      return true;
+    },
     /** Insert > PivotTable: a PivotTable of `src` ({ si, r0, c0, r1, c1 }) with `layout` (pivotnew.js), at `at` ({ si,
      *  r, c }) or, with none, on a new sheet before the one shown at A3 (as Excel's New Worksheet puts it). On a sheet
      *  there is, one step of the history; Excel's question first ({ ask }) when it would cover cells with something in

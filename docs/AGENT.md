@@ -47,6 +47,7 @@ back are sheet-qualified, with the name quoted when it needs it.
 | `insertRows` / `deleteRows` / `insertColumns` / `deleteColumns` | As Excel's Insert and Delete (`rowcol.js`); refusals throw with the editor's words. |
 | `addSheet` / `renameSheet` / `deleteSheet` | As the tab menu does them; refusals throw with Excel's words. |
 | `pivot(source, { rows, columns, values }, { at })` | A PivotTable as Excel's Insert > PivotTable makes it (`pivotnew.js`, docs/PIVOT.md): field names to rows and columns, values summarized by sum, count, average, max or min; at a cell, or on a new sheet at A3. Returns its name, sheet and range. |
+| `pivotFields(which, { rows, columns, values })` | A PivotTable's fields moved (by its name or one of its cells), as Excel's field list moves them; returns its new range. |
 | `refreshPivots()` | Every PivotTable refreshed from its source, as Data > Refresh All. |
 | `defineName(name, refersTo, { sheet, comment })`, `editName(name, change)`, `deleteName(name)` | Defined names as Excel's Name Manager makes, changes and deletes them (names.js, docs/NAMES.md); Excel's refusals throw in its words. |
 | `calculate()` | Works out every formula again (Ctrl+Alt+F9). |
@@ -76,7 +77,7 @@ Protocol, over stdin and stdout, as open-docx-editor's server does for Word:
 
 - **Tools:** `list_workbooks`, `open_workbook` (a password), `list_sheets`, `list_names`, `read_range` (Markdown),
   `read_cells` (JSON), `find`, `list_notes`, `write_cells`, `set_values`, `insert_rows`, `delete_rows`,
-  `insert_columns`, `delete_columns`, `add_sheet`, `rename_sheet`, `delete_sheet`, `create_pivot`, `refresh_pivots`,
+  `insert_columns`, `delete_columns`, `add_sheet`, `rename_sheet`, `delete_sheet`, `create_pivot`, `pivot_fields`, `refresh_pivots`,
   `define_name`, `edit_name`, `delete_name`,
   `calculate`, `review_changes`, `revert_changes` and `save_workbook`.
 - **The review:** the server's instructions ask the assistant to show `review_changes` before saving and to take back

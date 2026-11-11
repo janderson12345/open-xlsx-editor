@@ -19,7 +19,8 @@ import { refName, rangeName, colIndex, MAX_ROWS, MAX_COLS } from './ooxml/refs.j
 import { sheetPrefix } from './calc/tokens.js';
 import { workbookChanges, changesMarkdown } from './agentreview.js';
 import { createPivot, applyPivot, PIVOT_FUNCTIONS } from './ooxml/pivotnew.js';
-import { readPivots, refreshPivot } from './ooxml/pivot.js';
+import { readPivots, refreshPivot, pivotAt } from './ooxml/pivot.js';
+import { pivotLayout, movePivotFields } from './ooxml/pivotfields.js';
 import { defineName, editName, deleteName } from './ooxml/names.js';
 
 /** Opens an .xlsx or .xlsm (bytes) for reading and editing; one saved with a password needs `password`. */
@@ -295,6 +296,28 @@ export class AgentWorkbook {
     const si = out.changes[0].si;
     this.log.push({ sheetId: this.wb.sheets[si].sheetId, text: `PivotTable ${out.name} made at ${this.qualified(si, area)}` });
     return { name: out.name, sheet: this.wb.sheets[si].name, range: this.qualified(si, area) };
+  }
+
+  /** A PivotTable's fields moved, as Excel's field list moves them (pivotfields.js): the pivot by its name or one of its
+   *  cells ("Pivot!A4"), the new layout by field names as for pivot(). Returns its new range; refusals throw. */
+  pivotFields(which, { rows = [], columns = [], values = [] } = {}) {
+    const all = readPivots(this.wb);
+    let p = all.find((x) => String(x.name).toLowerCase() === String(which).toLowerCase());
+    if (!p) { const a = this.where(which); p = pivotAt(this.wb, a.si, a.r0, a.c0); }
+    if (!p) throw new Error(`no PivotTable ${which}`);
+    const now = pivotLayout(this.wb, p);
+    if (!now) throw new Error("This PivotTable's values can't be changed here yet");
+    const field = (name) => { const i = now.names.findIndex((n) => n.toLowerCase() === String(name).toLowerCase()); if (i < 0) throw new Error(`no field named ${name}`); return i; };
+    const layout = { rows: rows.map(field), cols: columns.map(field), values: values.map((v) => ({ field: field(v.field), fn: v.fn || 'sum' })) };
+    let out = null;
+    this.edits.structure((wb) => {
+      out = movePivotFields(wb, p, layout);
+      if (!out.error) applyPivot(wb, out);
+    }, 'lines');
+    if (out.error) throw new Error(out.error);
+    const ch = out.changes.find((x) => x.si === p.si);
+    this.log.push({ sheetId: this.wb.sheets[p.si].sheetId, text: `PivotTable ${p.name}'s fields moved, now at ${this.qualified(p.si, ch.area)}` });
+    return this.qualified(p.si, ch.area);
   }
 
   /** Refresh every PivotTable from its source (Data > Refresh All). Returns their names; a refusal throws with the

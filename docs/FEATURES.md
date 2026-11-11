@@ -103,7 +103,7 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Tables (`tables`) | Table, PivotTable | Partly | Pivot sources follow a sheet rename. A PivotTable refreshed from its source as Excel refreshes it (Alt+F5, Data > Refresh All; docs/PIVOT.md): 8 of 8 cases the same cells and parts as Excel's refresh, and Excel opens the result. Insert > PivotTable makes one as Excel does (8 of 8 cases Excel's own parts and cells; docs/PIVOT.md), its fields chosen in a box. Moving fields afterwards, filters, grouping and calculated fields, missing. |
+| Tables (`tables`) | Table, PivotTable | Partly | Pivot sources follow a sheet rename. A PivotTable refreshed from its source as Excel refreshes it (Alt+F5, Data > Refresh All; docs/PIVOT.md): 8 of 8 cases the same cells and parts as Excel's refresh, and Excel opens the result. Insert > PivotTable makes one as Excel does (8 of 8 cases Excel's own parts and cells; docs/PIVOT.md), its fields chosen in a box; Show Field List moves them afterwards (10 of 10 moves Excel's own parts and cells). Filters, grouping and calculated fields missing. |
 | Illustrations (`illustrations`) | Pictures, shapes, icons | Kept | Not drawn on the grid. |
 | Charts (`charts`) | Charts | Partly | Column, bar, line, area, pie and doughnut drawn, with Excel's automatic axis (34 of 34) and live data; given to screen readers as figures with tables (docs/CHARTS.md). Editing and other kinds missing; kept. Series follow a sheet rename. |
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |

@@ -91,6 +91,10 @@ const TOOLS = [
     columns: { type: 'array', items: { type: 'string' }, description: 'Field names for columns (at most one).' }, values: { type: 'array', items: { type: 'object', properties: { field: { type: 'string' }, fn: { type: 'string' } } }, description: 'Values: [{"field": "Units", "fn": "sum"}].' },
     at: S('Where it goes, e.g. "Report!A3" (default: a new sheet).') }, ['path', 'source', 'values']),
     run: (a) => json(book(a.path).pivot(a.source, { rows: a.rows || [], columns: a.columns || [], values: a.values || [] }, { at: a.at ?? null })) },
+  { name: 'pivot_fields', description: 'Moves a PivotTable\'s fields, as Excel\'s field list does: its rows, columns and values given anew by field name.', inputSchema: obj({
+    pivot: S('The PivotTable: its name, or one of its cells ("Pivot!A4").'), rows: { type: 'array', items: { type: 'string' }, description: 'Field names for rows, in order.' },
+    columns: { type: 'array', items: { type: 'string' }, description: 'Field names for columns (at most one).' }, values: { type: 'array', items: { type: 'object', properties: { field: { type: 'string' }, fn: { type: 'string' } } }, description: 'Values: [{"field": "Units", "fn": "sum"}].' } }, ['path', 'pivot', 'values']),
+    run: (a) => `Now at ${book(a.path).pivotFields(a.pivot, { rows: a.rows || [], columns: a.columns || [], values: a.values || [] })}.` },
   { name: 'refresh_pivots', description: 'Refreshes every PivotTable from its source, as Data > Refresh All does.', inputSchema: obj({}),
     run: (a) => { const names = book(a.path).refreshPivots(); return names.length ? `Refreshed ${names.join(', ')}.` : 'No PivotTables.'; } },
   { name: 'define_name', description: 'Defines a name, as Excel\'s Define Name does: refers_to as typed ("=Data!$B$2:$B$9", "=0.07"), workbook-wide or on one sheet.', inputSchema: obj({ name: S('The name, e.g. "TaxRate".'), refers_to: S('What it refers to, e.g. "=Data!$B$2".'), sheet: S('A sheet to make it local to (default: the workbook).'), comment: S('A comment.') }, ['path', 'name', 'refers_to']),

@@ -68,7 +68,8 @@ editor's results.
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
 `pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md);
-`pivotnew-ours.mjs <folder>` with the same check, the editor's new PivotTables.
+`pivotnew-ours.mjs <folder>` with the same check, the editor's new PivotTables; `excel-pivot-move.ps1 <cases> <out.json>
+<books folder>` has Excel move a pivot's fields, and `pivotmove-ours.mjs <folder>` the editor's moves for the check.
 
 Defined names: `excel-names.ps1 <out.json> <books folder>` adds candidate names with Names.Add and saves names added out
 of order, for `test/names-excel.json` (docs/NAMES.md).

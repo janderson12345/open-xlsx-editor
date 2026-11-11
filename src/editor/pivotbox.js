@@ -4,7 +4,8 @@
 // Rows and Columns take their fields in the list's order; so do Values.
 import { modal, button, messageBox } from './dialogs.js';
 import { PIVOT_FUNCTIONS, pivotSourceFields, layoutRefusal } from '../ooxml/pivotnew.js';
-import { PIVOT_MESSAGES } from '../ooxml/pivot.js';
+import { PIVOT_MESSAGES, pivotAt } from '../ooxml/pivot.js';
+import { pivotLayout } from '../ooxml/pivotfields.js';
 import { goToTarget } from '../ooxml/goto.js';
 import { readTables } from '../ooxml/tables.js';
 import { currentRegion } from '../ooxml/special.js';
@@ -95,8 +96,9 @@ export function pivotSourceBox(root, { range = '' } = {}) {
 }
 
 /** The fields box for fields `names` (`numeric[i]`: field i holds only numbers): resolves to the layout ({ rows, cols,
- *  values: [{ field, fn }] }), or null. `check(layout)` says why a layout can't be made (shown in the box), or null. */
-export function pivotFieldsBox(root, names, numeric, check) {
+ *  values: [{ field, fn }] }), or null. `check(layout)` says why a layout can't be made (shown in the box), or null.
+ *  `start`: a pivot's layout now (Show Field List), its fields kept in their order, one newly put in an area last. */
+export function pivotFieldsBox(root, names, numeric, check, start = null) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     dlg.classList.add('oxe-pivot-fields');
@@ -107,8 +109,10 @@ export function pivotFieldsBox(root, names, numeric, check) {
       return s;
     };
     const rows = names.map((name, i) => {
-      const area = select(`${name}: area`, [['', '(not used)'], ['rows', 'Rows'], ['cols', 'Columns'], ['values', 'Values']], '');
-      const fn = select(`${name}: summarize by`, Object.entries(PIVOT_FUNCTIONS), numeric[i] ? 'sum' : 'count');
+      const value = start?.values.find((v) => v.field === i);
+      const now = start?.rows.includes(i) ? 'rows' : start?.cols.includes(i) ? 'cols' : value ? 'values' : '';
+      const area = select(`${name}: area`, [['', '(not used)'], ['rows', 'Rows'], ['cols', 'Columns'], ['values', 'Values']], now);
+      const fn = select(`${name}: summarize by`, Object.entries(PIVOT_FUNCTIONS), value ? value.fn : numeric[i] ? 'sum' : 'count');
       const sync = () => { fn.disabled = area.value !== 'values'; };
       area.addEventListener('change', sync);
       sync();
@@ -120,10 +124,15 @@ export function pivotFieldsBox(root, names, numeric, check) {
       make('tbody', {}, ...rows.map((x) => x.row)));
     const note = make('p', { className: 'oxe-dialog-text oxe-pivot-why', id: `${id}-why` });
     note.setAttribute('role', 'alert');
+    /** The fields in an area: those there already in their order, then the ones newly put there. */
+    const ordered = (where, was = []) => {
+      const now = rows.flatMap((x, i) => (x.area.value === where ? [i] : []));
+      return [...was.filter((i) => now.includes(i)), ...now.filter((i) => !was.includes(i))];
+    };
     const layout = () => ({
-      rows: rows.flatMap((x, i) => (x.area.value === 'rows' ? [i] : [])),
-      cols: rows.flatMap((x, i) => (x.area.value === 'cols' ? [i] : [])),
-      values: rows.flatMap((x, i) => (x.area.value === 'values' ? [{ field: i, fn: x.fn.value }] : [])),
+      rows: ordered('rows', start?.rows),
+      cols: ordered('cols', start?.cols),
+      values: ordered('values', start?.values.map((v) => v.field)).map((i) => ({ field: i, fn: rows[i].fn.value })),
     });
     const ok = () => {
       const l = layout();
@@ -138,4 +147,14 @@ export function pivotFieldsBox(root, names, numeric, check) {
       make('div', { className: 'oxe-dialog-buttons' }, button('OK', ok), button('Cancel', () => done(null))),
     );
   });
+}
+
+/** Show Field List, on a PivotTable's cell (r, c) of sheet si: the fields box with its layout now, then
+ *  `run('movePivot', layout)` (commands-pivot.js). */
+export async function showFieldList(root, wb, si, { r, c }, run) {
+  const p = pivotAt(wb, si, r, c);
+  const now = p && pivotLayout(wb, p);
+  if (!now) { await messageBox(root, p ? "This PivotTable's values can't be changed here yet" : 'The active cell is not in a PivotTable'); return false; }
+  const layout = await pivotFieldsBox(root, now.names, now.numeric, layoutRefusal, now);
+  return layout ? run('movePivot', layout) : false;
 }
