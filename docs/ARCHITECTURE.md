@@ -40,6 +40,7 @@ insides:
 | `src/ooxml/dvedit.js` | Data validation rules written as Excel's Data Validation box writes them; ranges split around a new rule; a rule in the box's terms (docs/VALIDATION.md). |
 | `src/ooxml/noteedit.js` | Notes written and deleted as Excel's New Note writes them: the comments part, the VML box, the parts and relationships made when the sheet has none (docs/NOTES.md). |
 | `src/editor/reviewtab.js` | The Review tab: Notes. |
+| `src/editor/acts.js` | The ribbon's actions (the act dispatcher) and the boxes and menus they open: Insert and Delete, Paste Special, Sort, the validation question, a list's choices, a filter's list, the cell's and headings' menus, Row Height and Column Width; given `index.js`'s state and helpers as one object. |
 | `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |
 | `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, the proposal left to edit on one cell (docs/AUTOSUM.md). |
