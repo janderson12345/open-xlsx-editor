@@ -25,7 +25,8 @@ test('every formula of formulas.xlsx works out as Excel works it out (test/formu
     const { r, c } = parseRef(ref);
     const cell = wb.sheet(wb.sheetIndexOf(sheet)).cells.get(r)?.get(c);
     // (RATE and IRR are searches Excel promises to 0.0000001, its last digits its own search's: compared to 1e-9.)
-    const near = /^=(_xlfn\.)?(RATE|IRR)\(/.test(formula) ? 1e-9 : 1e-15 * Math.abs(Number(v));
+    // (XIRR's Excel promises to 0.000001%: compared to 1e-8.)
+    const near = /^=(_xlfn\.)?(RATE|IRR)\(/.test(formula) ? 1e-9 : /^=XIRR\(/.test(formula) ? 1e-8 : 1e-15 * Math.abs(Number(v));
     const ok = t === 'n' ? cell?.t === 'n' && Math.abs(cell.v - Number(v)) <= near
       : t === 's' ? cell?.t === 'str' && cell.v === v
         : t === 'b' ? cell?.t === 'b' && cell.v === v

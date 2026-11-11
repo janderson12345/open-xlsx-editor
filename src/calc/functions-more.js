@@ -220,7 +220,7 @@ def('YEARFRAC', (a, ctx) => {
 // digit (PMT(0.05/12,360,200000) is -1073.6432460242781, FV(0.06/12,120,-100) 16387.934680645605).
 
 /** (1 + r)^n by repeated squaring (a whole n), else as JavaScript raises it. */
-function grow(r, n) {
+export function grow(r, n) {
   if (!Number.isInteger(n)) return (1 + r) ** n;
   let b = 1 + r;
   let e = Math.abs(n);
@@ -229,8 +229,8 @@ function grow(r, n) {
   return n < 0 ? 1 / g : g;
 }
 const pv = (rate, n, pmt, fv, type) => (rate === 0 ? -(fv + pmt * n) : -(fv + pmt * (1 + rate * type) * (grow(rate, n) - 1) / rate) / grow(rate, n));
-const fv = (rate, n, pmt, p, type) => (rate === 0 ? -(p + pmt * n) : -(p * grow(rate, n) + pmt * (1 + rate * type) * (grow(rate, n) - 1) / rate));
-const pmt = (rate, n, p, f, type) => {
+export const fv = (rate, n, pmt, p, type) => (rate === 0 ? -(p + pmt * n) : -(p * grow(rate, n) + pmt * (1 + rate * type) * (grow(rate, n) - 1) / rate));
+export const pmt = (rate, n, p, f, type) => {
   if (n === 0) throw E.num;
   if (rate === 0) return -(p + f) / n;
   const g = Math.exp(n * Math.log1p(rate));

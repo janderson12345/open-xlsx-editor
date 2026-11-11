@@ -253,6 +253,7 @@ export class Calc {
       rowsOf: (si) => book.sheet(si).cells,
       extent: (si) => { const m = book.sheet(si); return { maxRow: m.maxRow, maxCol: m.maxCol }; },
       sheetIndex: (name) => book.sheetIndexOf(name),
+      sheetCount: () => book.sheets.length,
       tableArea: (table, spec) => tableArea(this.tables, table, spec, ctx.here),
       // (For SUBTOTAL: a cell's own formula, and whether its row is hidden.)
       formulaOf: (si, r, c) => book.sheet(si).cells.get(r)?.get(c)?.f || null,

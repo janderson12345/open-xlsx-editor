@@ -123,6 +123,43 @@ export const PROBE_FORMULAS = [
   'SUM(Fruit[[Qty]:[Price]])', 'SUMIFS(Fruit[Price],Fruit[Name],"Apple")', 'XLOOKUP("Fig",Fruit[Name],Fruit[Price])', 'SUM(fruit[qty])',
   'Fruit[[#Headers],[Price]]', 'COLUMNS(Fruit[#All])', 'SUBTOTAL(109,Fruit[Price])', 'Fruit[[#This Row],[Name]]',
   'AVERAGE(Fruit[[#Data],[Price]])', 'COUNTA(Fruit[[#Headers],[#Data],[Name]])', 'MATCH("Cherry",Fruit[Name],0)', 'SUM(Fruit[[#All],[Qty]:[Price]])',
+  // Excel 365's array functions (each array joined into one text, its shape by ROWS and COLUMNS)
+  'TEXTJOIN(",",FALSE,TAKE({1,2,3;4,5,6;7,8,9},2))', 'TEXTJOIN(",",FALSE,TAKE({1,2,3;4,5,6;7,8,9},-1))', 'TEXTJOIN(",",FALSE,TAKE({1,2,3;4,5,6;7,8,9},,2))',
+  'TEXTJOIN(",",FALSE,TAKE({1,2,3;4,5,6;7,8,9},-2,-1))', 'ROWS(TAKE({1,2,3;4,5,6;7,8,9},5))', 'TAKE({1,2,3},0)', 'TEXTJOIN(",",FALSE,DROP({1,2,3;4,5,6;7,8,9},1))',
+  'TEXTJOIN(",",FALSE,DROP({1,2,3;4,5,6;7,8,9},-1,1))', 'DROP({1,2,3;4,5,6},2)', 'TEXTJOIN(",",FALSE,VSTACK({1,2},{3;4}))', 'ROWS(VSTACK({1,2},{3;4}))',
+  'TEXTJOIN(",",FALSE,HSTACK({1;2},{3,4}))', 'COLUMNS(HSTACK({1;2},{3,4}))', 'TEXTJOIN(",",FALSE,VSTACK(Data!A2:A3,"x"))',
+  'TEXTJOIN(",",FALSE,CHOOSECOLS({1,2,3;4,5,6},1,3))', 'TEXTJOIN(",",FALSE,CHOOSECOLS({1,2,3;4,5,6},-1))', 'TEXTJOIN(",",FALSE,CHOOSEROWS({1,2,3;4,5,6},2))',
+  'CHOOSECOLS({1,2,3;4,5,6},4)', 'TEXTJOIN(",",FALSE,TOCOL({1,2,3;4,5,6}))', 'TEXTJOIN(",",FALSE,TOROW({1,2,3;4,5,6},0,TRUE))', 'TEXTJOIN(",",FALSE,TOCOL({1,#N/A,3},2))',
+  'TEXTJOIN(",",FALSE,TOCOL(Data!E2:E9,1))', 'TEXTJOIN(",",FALSE,WRAPROWS({1,2,3,4,5},2))', 'TEXTJOIN(",",FALSE,WRAPROWS({1,2,3,4,5},2,0))',
+  'ROWS(WRAPCOLS({1,2,3,4,5},2))', 'TEXTJOIN(",",FALSE,WRAPCOLS({1,2,3,4,5},2,"-"))', 'TEXTJOIN(",",FALSE,EXPAND({1,2},2,3))', 'TEXTJOIN(",",FALSE,EXPAND({1,2},2,3,"-"))',
+  'EXPAND({1,2},1)', 'TEXTJOIN("|",FALSE,TEXTSPLIT("a,b,c",","))', 'TEXTJOIN("|",FALSE,TEXTSPLIT("a,b;c,d",",",";"))', 'ROWS(TEXTSPLIT("a,b;c,d",",",";"))',
+  'TEXTJOIN("|",FALSE,TEXTSPLIT("a,,b",",",,TRUE))', 'TEXTJOIN("|",FALSE,TEXTSPLIT("a-b_c",{"-","_"}))', 'TEXTJOIN("|",FALSE,TEXTSPLIT("aXbxc","x",,,1))',
+  'TEXTJOIN("|",FALSE,TEXTSPLIT("a,b;c",",",";"))', 'TEXTJOIN("|",FALSE,TEXTSPLIT("a,b;c",",",";",,,"-"))',
+  'TEXTJOIN(",",FALSE,MAP({1,2,3},LAMBDA(x,x*2)))', 'REDUCE(0,{1,2,3},LAMBDA(a,v,a+v))', 'TEXTJOIN(",",FALSE,SCAN(0,{1,2,3},LAMBDA(a,v,a+v)))',
+  'TEXTJOIN(",",FALSE,BYROW({1,2;3,4},LAMBDA(r,SUM(r))))', 'TEXTJOIN(",",FALSE,BYCOL({1,2;3,4},LAMBDA(c,MAX(c))))', 'TEXTJOIN(",",FALSE,MAKEARRAY(2,3,LAMBDA(r,c,r*c)))',
+  'LAMBDA(a,b,IF(ISOMITTED(b),a,a+b))(1,)', 'LAMBDA(a,b,IF(ISOMITTED(b),a,a+b))(1,2)', 'VALUETOTEXT(123)', 'VALUETOTEXT("a",1)', 'ARRAYTOTEXT({1,"a";TRUE,2})',
+  'ARRAYTOTEXT({1,"a"},1)',
+  // Loans, depreciation and rates
+  'IPMT(0.1/12,1,36,8000)', 'PPMT(0.1/12,1,24,2000)', 'IPMT(0.1,3,3,8000)', 'CUMIPMT(0.09/12,360,125000,13,24,0)', 'CUMPRINC(0.09/12,360,125000,13,24,0)',
+  'CUMIPMT(0.09/12,360,125000,1,1,0)', 'SLN(30000,7500,10)', 'DDB(2400,300,10,1)', 'DDB(2400,300,10,10)', 'DDB(2400,300,120,1,2)', 'DB(1000000,100000,6,1,7)',
+  'DB(1000000,100000,6,7,7)', 'DB(1000000,100000,6,2)', 'EFFECT(0.0525,4)', 'NOMINAL(0.053543,4)', 'XNPV(0.09,{-10000,2750,4250,3250,2750},{39448,39508,39751,39859,39904})',
+  'XIRR({-10000,2750,4250,3250,2750},{39448,39508,39751,39859,39904})',
+  // Statistics
+  'CORREL({3,2,4,5,6},{9,7,12,15,17})', 'PEARSON({3,2,4,5,6},{9,7,12,15,17})', 'SLOPE({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})', 'INTERCEPT({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})',
+  'RSQ({2,3,9,1,8,7,5},{6,5,11,7,5,4,4})', 'FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})', 'FORECAST.LINEAR(30,{6,7,9,15,21},{20,28,31,38,40})',
+  'COVARIANCE.P({3,2,4,5,6},{9,7,12,15,17})', 'COVARIANCE.S({3,2,4,5,6},{9,7,12,15,17})', 'CORREL(Data!B2:B9,Data!C2:C9)', 'GEOMEAN(4,5,8,7,11,4,3)',
+  'HARMEAN(4,5,8,7,11,4,3)', 'AVEDEV(4,5,6,7,5,4,3)', 'DEVSQ(4,5,8,7,11,4,3)', 'SKEW(3,4,5,2,3,4,5,6,4,7)', 'KURT(3,4,5,2,3,4,5,6,4,7)', 'STANDARDIZE(42,40,1.5)',
+  'PERMUT(100,3)', 'FISHER(0.75)', 'NORM.DIST(42,40,1.5,TRUE)', 'NORM.DIST(42,40,1.5,FALSE)', 'NORM.S.DIST(1.333333,TRUE)', 'NORM.S.DIST(1.333333,FALSE)',
+  'NORM.INV(0.908789,40,1.5)', 'NORM.S.INV(0.908789)', 'NORM.S.INV(0.001)', 'EXPON.DIST(0.2,10,TRUE)', 'EXPON.DIST(0.2,10,FALSE)', 'POISSON.DIST(2,5,FALSE)',
+  'POISSON.DIST(2,5,TRUE)', 'BINOM.DIST(6,10,0.5,FALSE)', 'BINOM.DIST(6,10,0.5,TRUE)',
+  // Hyperbolic and reciprocal trigonometry, numerals and bases
+  'SINH(1)', 'COSH(1)', 'TANH(0.5)', 'SEC(1)', 'CSC(1)', 'COT(1)', 'COT(0)', 'ROMAN(499)', 'ROMAN(1999)', 'ROMAN(4000)', 'ARABIC("MCMXCIX")', 'ARABIC("-IV")',
+  'BASE(255,16)', 'BASE(7,2,8)', 'DECIMAL("FF",16)', 'DECIMAL("111",2)', 'DEC2BIN(9)', 'DEC2BIN(-1)', 'DEC2BIN(9,8)', 'BIN2DEC("1111111111")', 'DEC2HEX(255)',
+  'DEC2HEX(-1)', 'HEX2DEC("FFFFFFFFFF")', 'HEX2DEC("A5")', 'MULTINOMIAL(2,3,4)',
+  // Formulas, sheets, times and working days
+  'ISFORMULA(B2)', 'ISFORMULA(A2)', 'FORMULATEXT(B10)', 'FORMULATEXT(A2)', 'SHEET()', 'SHEET("My Data")', 'SHEETS()', 'TIMEVALUE("6:35 PM")',
+  'TIMEVALUE("22-Aug-2011 6:35 AM")', 'WORKDAY.INTL(DATE(2024,1,1),10,7)', 'WORKDAY.INTL(DATE(2024,1,1),10,"0000011")', 'NETWORKDAYS.INTL(DATE(2024,1,1),DATE(2024,1,31),11)',
+  'NETWORKDAYS.INTL(DATE(2024,1,1),DATE(2024,1,31),"0010001")',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

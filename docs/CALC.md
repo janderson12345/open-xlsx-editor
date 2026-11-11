@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 541 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 677 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **541 of 541 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9).
+`test/formulas-excel.json`. `npm test` checks every one: **677 of 677 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8).
 
 ## How it works
 
@@ -23,6 +23,18 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
     GCD, LCM, CEILING.MATH and FLOOR.MATH; TYPE and ERROR.TYPE. Excel raises 1 + rate to a whole number of periods by
     repeated squaring in PV and FV but through logarithms in PMT, and each is computed so, to Excel's last digit. RATE
     and IRR are found by Newton's method (IRR on the discount factor, so IRR({-100,10}) is -0.9).
+  - `functions-arrays.js`: Excel 365's TAKE, DROP, VSTACK, HSTACK, CHOOSECOLS, CHOOSEROWS, TOCOL, TOROW, WRAPROWS,
+    WRAPCOLS, EXPAND, TEXTSPLIT, VALUETOTEXT and ARRAYTOTEXT, and the LAMBDA helpers MAP, REDUCE, SCAN, BYROW, BYCOL,
+    MAKEARRAY and ISOMITTED (docs/DYNAMIC.md for spilling).
+  - `functions-finance.js`: IPMT, PPMT, CUMIPMT, CUMPRINC, SLN, DDB, DB, EFFECT, NOMINAL, XNPV, XIRR; TIMEVALUE (read as an
+    entry is read), WORKDAY.INTL and NETWORKDAYS.INTL (Excel's weekend numbers and seven-day strings). As with PV and FV,
+    each computed the way that gives Excel's last digit: DDB's book value and EFFECT by repeated squaring, IPMT's
+    balance through logarithms.
+  - `functions-stats.js`: CORREL, PEARSON, SLOPE, INTERCEPT, RSQ, FORECAST and FORECAST.LINEAR, COVARIANCE.P and .S,
+    GEOMEAN, HARMEAN, AVEDEV, DEVSQ, SKEW, KURT, STANDARDIZE, PERMUT, FISHER; NORM.DIST, NORM.S.DIST, NORM.INV, NORM.S.INV
+    (W. J. Cody's erfc, the inverse polished by Halley's method: to 15 digits), EXPON.DIST, POISSON.DIST, BINOM.DIST;
+    SINH, COSH, TANH, SEC, CSC, COT; ROMAN, ARABIC, BASE, DECIMAL, DEC2BIN, BIN2DEC, DEC2HEX, HEX2DEC, MULTINOMIAL;
+    ISFORMULA, FORMULATEXT, SHEET and SHEETS.
   - Table references (`ooxml/tables.js`): Fruit[Qty] is the column's data rows; [#All], [#Data], [#Headers], [#Totals]
     and two of them together; [[Qty]:[Price]] the columns between; [#This Row] (shown [@Qty]) the formula's own row,
     from any sheet by the row's number, #VALUE! past the table's rows (Excel's answers in test/formulas-excel.json).

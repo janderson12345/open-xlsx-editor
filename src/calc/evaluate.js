@@ -9,6 +9,9 @@ import './functions-text.js';
 import './functions-lookup.js';
 import './functions-more.js';
 import './functions-dynamic.js';
+import './functions-arrays.js';
+import './functions-finance.js';
+import './functions-stats.js';
 
 /** x^y as Excel has it: 0^0 is #NUM!, 0 to a negative power #DIV/0!, a negative number to a fractional power #NUM!
  *  unless it is an odd root (=(-8)^(1/3) is -2). */
@@ -134,7 +137,17 @@ function apply(fn, argNodes, ctx, mode) {
   return within(fn.scope, binds, fn.body, ctx, mode);
 }
 
+/** A LAMBDA called with values already worked out (MAP, REDUCE, SCAN, BYROW...: functions-arrays.js). */
+function applyValues(fn, vals, ctx) {
+  if (isError(fn)) return fn;
+  if (!(fn instanceof Lambda) || vals.length !== fn.params.length) return E.value;
+  const binds = new Map(fn.params.map((p, k) => [p, vals[k]]));
+  const v = within(fn.scope, binds, fn.body, ctx, 'array');
+  return v instanceof Lambda ? E.calc : v;
+}
+
 function call(node, ctx, mode) {
+  ctx.callLambda ||= (fn, vals) => applyValues(fn, vals, ctx);
   if (node.name === 'LET') return letOf(node, ctx, mode);
   if (node.name === 'LAMBDA') {
     const params = node.args.slice(0, -1);
