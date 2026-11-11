@@ -19,6 +19,7 @@ export const PREFIXED = new Set([
   'Z.TEST', 'T.TEST', 'PHI', 'GAUSS', 'AGGREGATE', 'PERCENTRANK.INC', 'PERCENTRANK.EXC', 'MODE.MULT', 'MUNIT', 'BITAND',
   'BITOR', 'BITXOR', 'BITLSHIFT', 'BITRSHIFT', 'ERF.PRECISE', 'ERFC.PRECISE', 'ACOT', 'ACOTH', 'COTH', 'CSCH', 'SECH',
   'COMBINA', 'PERMUTATIONA', 'PDURATION', 'RRI', 'CEILING.PRECISE', 'FLOOR.PRECISE', 'SKEW.P', 'BINOM.DIST.RANGE',
+  'IMCOSH', 'IMCOT', 'IMCSC', 'IMCSCH', 'IMSEC', 'IMSECH', 'IMSINH', 'IMTAN',
 ]);
 /** Of those, the ones the file names with a second prefix (`_xlfn._xlws.SORT`), as Excel 365 writes them. */
 const WORKSHEET_PREFIXED = new Set(['SORT', 'FILTER']);

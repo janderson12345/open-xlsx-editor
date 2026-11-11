@@ -80,6 +80,7 @@ insides:
 | `src/calc/functions-dynamic.js` | Excel 365's dynamic array functions: SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, @ and D1#; docs/DYNAMIC.md. |
 | `src/calc/functions-arrays.js`, `functions-finance.js`, `functions-stats.js` | Excel 365's array shaping and LAMBDA helpers; loans, depreciation, rates and working days; statistics, distributions, numerals and a cell's formula and sheet (docs/CALC.md). |
 | `src/calc/functions-db.js`, `functions-bonds.js`, `criteria.js` | The database functions and their criteria (shared with Advanced Filter); coupons, bond prices and yields, and the discounted securities (docs/CALC.md). |
+| `src/calc/functions-complex.js`, `trig.js` | The complex-number functions (COMPLEX, IMSUM and the rest); sine and cosine reduced by the x87's π, as Excel's (docs/CALC.md). |
 | `src/calc/functions-dist.js`, `functions-agg.js`, `functions-eng.js` | The t, chi-squared, F, gamma, beta and other distributions and their tests; AGGREGATE, matrices and LINEST and its kin; bits, bases, hyperbolics and more money (docs/CALC.md). |
 | `src/calc/spill.js` | Spilling: a dynamic formula's array placed from its cell, #SPILL! when blocked, cells left emptied, readers worked out again. |
 | `src/ooxml/spillxml.js`, `src/ooxml/dynamicmeta.js` | Dynamic array formulas in the file as Excel 365 writes them: the anchor's `t="array"`, `ref` and `cm`, and `xl/metadata.xml`'s XLDAPR entry. |

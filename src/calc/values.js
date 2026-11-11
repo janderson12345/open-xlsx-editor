@@ -143,7 +143,11 @@ export function textToNumber(text, date1904 = false) {
 /** A number as text, as Excel turns one into text (=1/3&"" is "0.333333333333333"): 15 significant digits, written out
  *  in full when that takes at most 20 characters (0.000000000000000001, 12345678901234500000), else in scientific
  *  notation (1E-19, 1.23456789012345E-05, 1E+20). Measured on 33 numbers in formulas.xlsx. */
-export function numberText(n) {
+export const numberText = (n) => digitsText(n, 20);
+/** A part of a complex number as text: the same, with room for 21 characters (COMPLEX(1E-19,1) is
+ *  "0.0000000000000000001+i", COMPLEX(1E20,1) "100000000000000000000+i"). */
+export const complexPartText = (n) => digitsText(n, 21);
+function digitsText(n, width) {
   if (n === 0) return '0';
   const { digits, exp } = decimal(Math.abs(n));
   const sign = n < 0 ? '-' : '';
@@ -152,7 +156,7 @@ export function numberText(n) {
     const frac = digits.slice(exp + 1);
     fixed = `${digits.slice(0, exp + 1).padEnd(exp + 1, '0')}${frac ? `.${frac}` : ''}`;
   } else fixed = `0.${'0'.repeat(-exp - 1)}${digits}`;
-  if (fixed.length <= 20) return sign + fixed;
+  if (fixed.length <= width) return sign + fixed;
   const e = `E${exp < 0 ? '-' : '+'}${String(Math.abs(exp)).padStart(2, '0')}`;
   return `${sign}${digits[0]}${digits.length > 1 ? `.${digits.slice(1)}` : ''}${e}`;
 }

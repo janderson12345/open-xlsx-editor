@@ -116,8 +116,13 @@ const LIST = {
   Engineering: `BIN2DEC(number) BIN2HEX(number,[places]) BIN2OCT(number,[places]) BITAND(number1,number2)
     BITLSHIFT(number,shift_amount) BITOR(number1,number2) BITRSHIFT(number,shift_amount) BITXOR(number1,number2)
     DEC2BIN(number,[places]) DEC2HEX(number,[places]) DEC2OCT(number,[places]) DELTA(number1,[number2])
-    ERF(lower_limit,[upper_limit]) ERF.PRECISE(x) ERFC(x) ERFC.PRECISE(x) GESTEP(number,[step]) HEX2BIN(number,[places])
-    HEX2DEC(number) HEX2OCT(number,[places]) OCT2BIN(number,[places]) OCT2DEC(number) OCT2HEX(number,[places])`,
+    COMPLEX(real_num,i_num,[suffix]) ERF(lower_limit,[upper_limit]) ERF.PRECISE(x) ERFC(x) ERFC.PRECISE(x)
+    GESTEP(number,[step]) HEX2BIN(number,[places]) HEX2DEC(number) HEX2OCT(number,[places]) IMABS(inumber)
+    IMAGINARY(inumber) IMARGUMENT(inumber) IMCONJUGATE(inumber) IMCOS(inumber) IMCOSH(inumber) IMCOT(inumber)
+    IMCSC(inumber) IMCSCH(inumber) IMDIV(inumber1,inumber2) IMEXP(inumber) IMLN(inumber) IMLOG10(inumber)
+    IMLOG2(inumber) IMPOWER(inumber,number) IMPRODUCT(inumber1,[inumber2],...) IMREAL(inumber) IMSEC(inumber)
+    IMSECH(inumber) IMSIN(inumber) IMSINH(inumber) IMSQRT(inumber) IMSUB(inumber1,inumber2)
+    IMSUM(inumber1,[inumber2],...) IMTAN(inumber) OCT2BIN(number,[places]) OCT2DEC(number) OCT2HEX(number,[places])`,
   Information: `ERROR.TYPE(error_val) ISBLANK(value) ISERR(value) ISERROR(value) ISEVEN(number) ISFORMULA(reference)
     ISLOGICAL(value) ISNA(value) ISNONTEXT(value) ISNUMBER(value) ISODD(number) ISOMITTED(argument) ISREF(value)
     ISTEXT(value) N(value) NA() SHEET([value]) SHEETS([reference]) TYPE(value)`,

@@ -260,6 +260,22 @@ export const PROBE_FORMULAS = [
   'DISC(DATE(2023,11,1),DATE(2024,5,1),98.5,100,1)', 'INTRATE(DATE(2023,11,1),DATE(2024,5,1),985000,1000000,1)',
   'RECEIVED(DATE(2023,11,1),DATE(2024,5,1),985000,0.03,1)', 'PRICEDISC(DATE(2023,11,1),DATE(2024,5,1),0.03,100,1)',
   'YIELDDISC(DATE(2023,11,1),DATE(2024,5,1),98.5,100,1)', 'DISC(DATE(2023,11,1),DATE(2024,5,31),98.5,100,4)',
+  'COMPLEX(3,4)', 'COMPLEX(3,4,"j")', 'COMPLEX(0,-1)', 'COMPLEX(1,0)', 'COMPLEX(0,0)', 'COMPLEX(1/3,2/3)', 'COMPLEX(1E-19,1)', 'COMPLEX(1.5E-19,1)',
+  'COMPLEX(-1E20,1)', 'COMPLEX(1E21,1)', 'COMPLEX(1,-2.5E-11)', 'COMPLEX(1.2345678901234E-8,1)', 'COMPLEX(3,4,"I")', 'COMPLEX(1,2,"")',
+  'COMPLEX(1,TRUE)', 'COMPLEX("2",1)', 'IMSUM("3+4i","5-3i")', 'IMSUM("3+4i","5-3j")', 'IMSUM("3+4j","5-3j")', 'IMSUM(1,2)', 'IMSUM({"1+i","2"})',
+  'IMSUM("1E308","1E308")', 'IMSUM(Data!B2:B9)', 'IMSUM(Data!E2:E3)', 'IMSUM(Data!A2)', 'IMSUM(Data!G2)', 'IMPRODUCT(Data!B2:B4)',
+  'IMPRODUCT(Data!B6:B8)', 'IMREAL(Data!F2)', 'IMSUB("13+4i","5+3i")', 'IMSUB("3j","2i")', 'IMPRODUCT("3+4i","5-3i")', 'IMPRODUCT("2j","i")',
+  'IMPRODUCT("1E200","1E200")', 'IMPRODUCT(TRUE,1)', 'IMDIV("-238+240i","10+24i")', 'IMDIV("1+i","0")', 'IMDIV("1","1E-300+1E-300i")',
+  'IMDIV("2+5i","0.3-7i")', 'IMABS("5+12i")', 'IMABS("3E200+4E200i")', 'IMABS("1E308+1E308i")', 'IMAGINARY("-i")', 'IMAGINARY("3+-4i")',
+  'IMAGINARY("3--4i")', 'IMAGINARY("3 +i")', 'IMAGINARY("3+ i")', 'IMAGINARY("++i")', 'IMAGINARY("1+2%i")', 'IMAGINARY("1+(2)i")',
+  'IMAGINARY("1e+3i")', 'IMREAL("1,000+2i")', 'IMREAL(" 3+4i ")', 'IMREAL("3+4I")', 'IMREAL("1+2")', 'IMREAL("")', 'IMREAL(TRUE)',
+  'IMREAL("1E-400")', 'IMARGUMENT("3+4i")', 'IMARGUMENT("0")', 'IMARGUMENT("-1-0i")', 'IMCONJUGATE("j")', 'IMCONJUGATE("-0")', 'IMCOS("1+i")',
+  'IMSIN("4+3i")', 'IMSIN("3.14159265358979")', 'IMSIN("134217728")', 'IMSIN("1+710i")', 'IMCOS("-5+0.75i")', 'IMTAN("4+3i")', 'IMTAN("1+20i")',
+  'IMTAN("1+400i")', 'IMTAN("1.5707963267949")', 'IMCOT("4+3i")', 'IMCOT("0")', 'IMSEC("4+3i")', 'IMSEC("1000i")', 'IMCSC("0.5-2i")',
+  'IMCOSH("4+3i")', 'IMCOSH("710")', 'IMSINH("1.5-0.7i")', 'IMSECH("0.5-2i")', 'IMSECH("400")', 'IMCSCH("4+3i")', 'IMEXP("1+i")',
+  'IMEXP("3.14159265358979i")', 'IMEXP("709.7+i")', 'IMEXP("710")', 'IMLN("3+4i")', 'IMLN("-1")', 'IMLN("0")', 'IMLOG10("0.001+2i")', 'IMLOG2("-8")',
+  'IMPOWER("2+3i",3)', 'IMPOWER("i",2)', 'IMPOWER("-8",1/3)', 'IMPOWER("1.5-2i",2.5)', 'IMPOWER("-3+i",-3)', 'IMPOWER("0",0)', 'IMPOWER("2",1024)',
+  'IMPOWER("2",TRUE)', 'IMPOWER("2j",2)', 'IMSQRT("-4")', 'IMSQRT("i")', 'IMSQRT("3-4i")',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
