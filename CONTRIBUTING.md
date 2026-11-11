@@ -16,7 +16,10 @@ node tools/check-ooxml.mjs test/fixtures test/out   # structural check of the fi
 
 The browser tests need Node 20 or later (Playwright) and a Chromium: `npx playwright install chromium`, or point
 `CHROMIUM_PATH` at an installed Edge or Chrome.
-CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull request.
+CI (`.github/workflows/ci.yml`) runs all of the above on every push and pull request. Before pushing, run its steps
+here in its order with `npm run ci`. The pre-push hook runs the quick ones (lint with its byte scan, unit tests, the
+fixtures unchanged, the package check) and stops a push that would fail them; turn it on once with
+`git config core.hooksPath .githooks`.
 
 ## Where things are
 

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Before a push: CI's quick steps (.github/workflows/ci.yml), so a push doesn't fail on GitHub for something a local
+# run would have caught. The browser suites take minutes; run them with `npm run ci` before pushing (CONTRIBUTING.md).
+# Turned on with: git config core.hooksPath .githooks
+set -e
+echo "pre-push: lint, unit tests, fixtures unchanged, package check"
+npm run --silent lint
+npm test --silent > /dev/null 2>&1 || { echo "pre-push: npm test failed; run it to see why"; exit 1; }
+npm run --silent fixtures > /dev/null
+git diff --exit-code --quiet test/fixtures || { echo "pre-push: the fixtures generator changes test/fixtures; commit what it makes"; exit 1; }
+node tools/check-ooxml.mjs test/fixtures test/out > /dev/null
+echo "pre-push: all passed"
