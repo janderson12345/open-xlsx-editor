@@ -44,7 +44,7 @@ defined name, or Excel's refusal in its words: 60 of 60. Sorted by the editor, s
 
 ## Not yet
 
-Filter (AutoFilter's buttons; autofilters in files are kept), sorting by cell colour, font colour or icon, custom
-lists as an order, Excel's question about numbers stored as text (sorted as text here, as without it), sorting a
-table (ListObject) or within a filter, the Data tab's Sort & Filter group, the cells' menu's Sort, and the sort
-state Excel saves with the sheet. Notes, hyperlinks, conditional formats and data validation stay where they are.
+Sorting by cell colour, font colour or icon, custom lists as an order, Excel's question about numbers stored as text
+(sorted as text here, as without it), sorting a table (ListObject) or within a filter, the cells' menu's Sort, and the
+sort state Excel saves with the sheet. Notes, hyperlinks, conditional formats and data validation stay where they are.
+(Filter, and the Data tab's Sort & Filter group, are done: docs/FILTER.md.)
