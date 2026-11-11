@@ -118,8 +118,8 @@ Also not handled:
 Tests:
 
 - `test/pivot.test.js`: the 8 cases unchanged and refreshed, against Excel's cells and parts, and the refusals.
-- `test/editing.mjs`: Alt+F5 after the source changes, Ctrl+Z, and Data > Refresh All.
+- `test/editing-more.mjs`: Alt+F5 after the source changes, Ctrl+Z, and Data > Refresh All.
 - `test/a11y.mjs`: axe on the Data tab and its menu, and on Insert > PivotTable's two boxes.
 - `test/pivotnew.test.js`: the 8 cases made new, against Excel's parts and cells; saved, opened and refreshed; the
   refusals.
-- `test/editing.mjs` also: Insert > PivotTable from a table typed in, Region to Rows and Units to Values, on a new sheet.
+- `test/editing-more.mjs` also: Insert > PivotTable from a table typed in, Region to Rows and Units to Values, on a new sheet.

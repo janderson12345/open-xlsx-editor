@@ -96,6 +96,6 @@ agent's `read()`.
 At Excel's default width, `$1,234.50 ` shows as `########`. `read()` gives text at any width, so that cell differed
 until the column was widened.
 
-Tests: `test/agent.test.js` covers the standalone agent, and `test/editing.mjs` covers `api.agent()` (an entry drawn,
+Tests: `test/agent.test.js` covers the standalone agent, and `test/editing-data.mjs` covers `api.agent()` (an entry drawn,
 Ctrl+Z taking it back, an added sheet given a tab, its review and a cell put back). PivotTables made through the agent
 are `pivotnew.js`'s, measured against Excel in docs/PIVOT.md.

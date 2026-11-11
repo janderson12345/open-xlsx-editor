@@ -1,0 +1,277 @@
+// Browser check of editing, continued on a fresh basic.xlsx: Sort, AutoSum, the Name Box, the agent, Filter, data
+// validation, sizes, Find and Replace, View, and entries as Excel reads them.
+// Run after `npm run build`: node test/editing-data.mjs [outDir]
+import { openFixture } from './browser.mjs';
+import { editingPage } from './editing-kit.mjs';
+
+const { page, check, finish, shown, sel, value, ribbon, menu } = await editingPage();
+const bar = () => page.evaluate(() => document.querySelector('.oxe-formula').value);
+
+await openFixture(page, 'basic.xlsx');
+
+// Sort: E2:E10 (Yes and No) selected, Sort & Filter > Sort Z to A: Excel's Sort Warning (data beside), Sort with the
+// selection expanded: the Yes rows first, each row kept whole, the total under them left; Ctrl+Z. A1:F10, Custom
+// Sort...: the headers guessed, Choice Z to A then Amount largest first; OK; Ctrl+Z.
+const rowsOf = () => page.evaluate(() => Array.from({ length: 9 }, (_, k) => { const l = window.oxe.workbook.sheet(0).cells.get(k + 1); return `${l?.get(0)?.v}|${l?.get(1)?.v}|${l?.get(4)?.v}`; }));
+const rowsWere = await rowsOf();
+const totalLabel = await value('A11');
+await page.evaluate(() => window.oxe.select('E2'));
+await page.focus('.oxe-grid');
+for (let k = 0; k < 8; k++) await page.keyboard.press('Shift+ArrowDown');
+let warning = '';
+await ribbon('Sort & Filter', async () => {
+  await page.click('.oxe-pop >> text=Sort Z to A');
+  await page.waitForSelector('dialog.oxe-dialog');
+  warning = await page.textContent('dialog.oxe-dialog .oxe-dialog-text');
+  await page.click('dialog.oxe-dialog >> button:text-is("Sort")');
+});
+let rowsNow = await rowsOf();
+const yesFirst = rowsNow.findIndex((x) => x.endsWith('|No')) > rowsNow.findLastIndex((x) => x.endsWith('|Yes'));
+check(/^There is data next to your selection/.test(warning) && yesFirst && [...rowsNow].sort().join() === [...rowsWere].sort().join() && await value('A11') === totalLabel,
+  'Sort Z to A on E2:E10: Excel’s Sort Warning, the selection expanded, Yes rows first, rows whole, the total left', rowsNow.join(' '));
+await page.keyboard.press('Control+z');
+check((await rowsOf()).join() === rowsWere.join(), 'Ctrl+Z: the rows back in their order');
+await page.evaluate(() => window.oxe.select('A1'));
+await page.focus('.oxe-grid');
+for (let k = 0; k < 5; k++) await page.keyboard.press('Shift+ArrowRight');
+for (let k = 0; k < 9; k++) await page.keyboard.press('Shift+ArrowDown');
+let headed = false;
+await ribbon('Sort & Filter', async () => {
+  await page.click('.oxe-pop >> text=Custom Sort...');
+  await page.waitForSelector('dialog.oxe-sort-box');
+  headed = await page.isChecked('dialog.oxe-sort-box >> input[type=checkbox]');
+  await page.selectOption('.oxe-sort-level >> nth=0 >> select >> nth=0', { label: 'Choice' });
+  await page.selectOption('.oxe-sort-level >> nth=0 >> select >> nth=1', { label: 'Z to A' });
+  await page.click('dialog.oxe-sort-box >> button:text-is("Add Level")');
+  await page.selectOption('.oxe-sort-level >> nth=1 >> select >> nth=0', { label: 'Amount' });
+  await page.selectOption('.oxe-sort-level >> nth=1 >> select >> nth=1', { label: 'Largest to Smallest' });
+  await page.click('dialog.oxe-sort-box >> button:text-is("OK")');
+});
+rowsNow = await rowsOf();
+const byBoth = rowsNow.every((x, k) => k === 0 || (() => { const [, a, e] = rowsNow[k - 1].split('|'); const [, b, f] = x.split('|'); return e > f || (e === f && Number(a) >= Number(b)); })());
+check(headed && byBoth && await value('A1') === 'Item', 'Custom Sort... on A1:F10: headers guessed, Choice Z to A then Amount largest first, the header row left', rowsNow.join(' '));
+await page.keyboard.press('Control+z');
+check((await rowsOf()).join() === rowsWere.join(), 'Ctrl+Z: as before');
+
+// AutoSum: 5 and 7 typed in Q40:Q41; on Q42 Alt+= opens the cell with Excel's =SUM(Q40:Q41), Enter enters it.
+// Q40:Q42 selected, AutoSum > Average: =AVERAGE(Q40:Q41) in the blank Q42. Ctrl+Z each.
+await page.evaluate(() => window.oxe.select('Q40'));
+await page.focus('.oxe-grid');
+for (const n of ['5', '7']) { await page.keyboard.type(n); await page.keyboard.press('Enter'); }
+await page.keyboard.press('Alt+Equal');
+await page.waitForSelector('.oxe-editor:visible');
+const proposed = await page.evaluate(() => document.querySelector('.oxe-editor').value);
+await page.keyboard.press('Enter');
+const q42 = () => page.evaluate(() => { const c = window.oxe.workbook.sheet(0).cells.get(41)?.get(16); return c && (c.f != null || c.v != null) ? `${c.f}=${c.v}` : ''; });
+check(proposed === '=SUM(Q40:Q41)' && await q42() === 'SUM(Q40:Q41)=12', 'Alt+= under 5 and 7: Excel’s =SUM(Q40:Q41) proposed, Enter: 12', `${proposed} ${await q42()}`);
+await page.keyboard.press('Control+z');
+await page.evaluate(() => window.oxe.select('Q40'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+ArrowDown');
+await page.keyboard.press('Shift+ArrowDown');
+await menu('AutoSum (Alt+=) options', 'Average');
+check(await q42() === 'AVERAGE(Q40:Q41)=6', 'Q40:Q42, AutoSum > Average: =AVERAGE(Q40:Q41) in the blank Q42', await q42());
+for (let k = 0; k < 3; k++) await page.keyboard.press('Control+z');
+check(await q42() === '' && await value('Q40') === null, 'Ctrl+Z: Q40:Q42 empty again', `${await q42()} ${await value('Q40')} ${await value('Q41')}`);
+
+// The Name Box: C3:D4 typed and Enter: that range selected, C3 active, back on the sheet; "1abc": Excel's words.
+await page.click('.oxe-namebox');
+await page.keyboard.type('c3:d4');
+await page.keyboard.press('Enter');
+const went = await page.evaluate(() => ({ sel: window.oxe.selection, box: document.querySelector('.oxe-namebox').value, grid: document.activeElement === window.oxe.grid.el }));
+check(went.sel.r0 === 2 && went.sel.c0 === 2 && went.sel.r1 === 3 && went.sel.c1 === 3 && went.sel.ar === 2 && went.box === 'C3' && went.grid, 'Name Box, c3:d4 and Enter: C3:D4 selected, C3 active, back on the sheet', JSON.stringify(went));
+await page.click('.oxe-namebox');
+await page.keyboard.type('1abc');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog');
+check(/^You must enter a valid reference/.test(await page.textContent('dialog.oxe-dialog')), 'Name Box, 1abc: Excel’s words', await page.textContent('dialog.oxe-dialog'));
+await page.keyboard.press('Enter');
+await page.click('.oxe-namebox');
+await page.keyboard.press('Escape');
+check(await page.evaluate(() => document.querySelector('.oxe-namebox').value) === 'C3', 'Esc: the Name Box shows the active cell again');
+await page.focus('.oxe-grid');
+await page.keyboard.press('F5');
+await page.waitForSelector('dialog.oxe-dialog >> text=Go To');
+await page.fill('dialog.oxe-dialog input.oxe-dialog-field', 'd4');
+await page.keyboard.press('Enter');
+check(await page.evaluate(() => window.oxe.selection.ar === 3 && window.oxe.selection.ac === 3), 'F5: Excel’s Go To box; d4 and Enter: D4 selected');
+
+// The agent on the open workbook: its entry drawn at once, one step that Ctrl+Z takes back; a sheet it adds gets a tab.
+const agentCell = async () => (await shown(8, 7)) ?? "";
+const agentWrote = await page.evaluate(() => window.oxe.agent().write({ H9: '50%' }));
+check(agentWrote.written.length === 1 && await agentCell() === '50%', 'api.agent().write: H9 entered as typed, drawn as 50%', JSON.stringify(agentWrote));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+check(await agentCell() === '', 'Ctrl+Z: the agent’s entry taken back');
+const agentSheet = await page.evaluate(() => { const name = window.oxe.agent().addSheet('From agent'); return { name, tabs: [...document.querySelectorAll('.oxe-tab')].map((t) => t.textContent) }; });
+check(agentSheet.name === 'From agent' && agentSheet.tabs.includes('From agent'), 'api.agent().addSheet: a tab for it', JSON.stringify(agentSheet));
+await page.evaluate(() => window.oxe.agent().deleteSheet('From agent'));
+// Its review: what one agent changed since it was made, and a cell put back as it was, drawn.
+const agentReview = await page.evaluate(() => {
+  const a = window.oxe.agent();
+  a.write({ H9: 'kiwi' });
+  const before = a.changes().cells.filter((c) => c.kind === 'edited').map((c) => `${c.ref}:${c.before.value}>${c.after.value}`);
+  const back = a.revert(['H9']);
+  return { before, back, after: a.changes().cells.length };
+});
+check(agentReview.before.length === 1 && /H9:null>kiwi/.test(agentReview.before[0]) && agentReview.back.reverted.length === 1 && agentReview.after === 0 && await agentCell() === '',
+  'api.agent().changes: H9 entered; revert puts it back, drawn empty', JSON.stringify(agentReview));
+
+// Filter: B3, Ctrl+Shift+L: buttons on the heading row. Choice's button, "No" unticked, OK: the No rows hidden. E1,
+// Alt+Down: the same list; Clear Filter From "Choice": all shown. Ctrl+Shift+L: off, no buttons.
+await page.evaluate(() => window.oxe.select('B3'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+Shift+KeyL');
+const head = await page.evaluate(() => window.oxe.workbook.sheet(0).autoFilter?.r0);
+check(head === 0 && await page.locator('.oxe-filters .oxe-filter-btn').count() > 0, 'Ctrl+Shift+L on B3: the filter on, buttons on the heading row');
+const noRows = await page.evaluate(() => [...window.oxe.workbook.sheet(0).cells].filter(([r, l]) => r > 0 && r < 10 && l.get(4)?.v === 'No').map(([r]) => r));
+await page.click('.oxe-grid .oxe-filters .oxe-filter-btn[data-col="4"]');
+await page.waitForSelector('dialog.oxe-filter-box');
+const listed = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-filter-box .oxe-filter-list label')].map((l) => l.textContent));
+await page.click('dialog.oxe-filter-box >> label:text-is("No")');
+await page.click('dialog.oxe-filter-box >> button:text-is("OK")');
+const hiddenNow = () => page.evaluate(() => [...window.oxe.workbook.sheet(0).rows].filter(([, x]) => x.hidden).map(([r]) => r).sort((a, b) => a - b));
+check(listed.includes('(Select All)') && listed.includes('No') && listed.includes('Yes') && (await hiddenNow()).join() === noRows.join(), 'Choice’s button, No unticked, OK: the No rows hidden', `${listed.join('|')} / ${await hiddenNow()} vs ${noRows}`);
+await page.evaluate(() => window.oxe.select('E1'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Alt+ArrowDown');
+await page.waitForSelector('dialog.oxe-filter-box');
+await page.click('dialog.oxe-filter-box >> button:text-is("Clear Filter From \\"Choice\\"")');
+check((await hiddenNow()).length === 0, 'E1, Alt+Down, Clear Filter From "Choice": every row shown');
+await page.keyboard.press('Control+Shift+KeyL');
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).autoFilter) === null && await page.locator('.oxe-filters .oxe-filter-btn').count() === 0, 'Ctrl+Shift+L: the filter off, its buttons gone');
+
+// Data validation: basic.xlsx's E2:E10 is a list (Yes, No). E3 selected: its button; picked No: entered. "Maybe"
+// typed into E4: Excel's refusal, Retry or Cancel; Cancel: E4 as it was; Retry: back in the cell's editor.
+await page.evaluate(() => window.oxe.select('E3'));
+await page.focus('.oxe-grid');
+check(await page.isVisible('.oxe-dv-btn'), 'E3, in a list rule: its dropdown button');
+await page.click('.oxe-dv-btn');
+await page.waitForSelector('dialog.oxe-pick-box');
+const offered = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-pick-box option')].map((o) => o.textContent).join(','));
+await page.selectOption('dialog.oxe-pick-box select', { label: 'No' });
+await page.keyboard.press('Enter');
+check(offered === 'Yes,No' && await value('E3') === 'No', 'its list offers Yes, No; No picked: entered', `${offered} ${await value('E3')}`);
+await page.keyboard.press('Control+z');
+const e4 = await value('E4');
+await page.evaluate(() => window.oxe.select('E4'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('Maybe');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog');
+const refusal = await page.textContent('dialog.oxe-dialog');
+await page.click('dialog.oxe-dialog >> button:text-is("Cancel")');
+check(/doesn't match the data validation restrictions/.test(refusal) && /Retry/.test(refusal) && await value('E4') === e4, 'Maybe typed into E4: Excel’s refusal; Cancel: E4 as it was', refusal);
+await page.keyboard.type('Maybe');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog');
+await page.click('dialog.oxe-dialog >> button:text-is("Retry")');
+const again = await page.evaluate(() => document.querySelector('.oxe-editor')?.value);
+await page.keyboard.press('Escape');
+check(again === 'Maybe' && await value('E4') === e4, 'Retry: back in the editor with Maybe', String(again));
+
+// Sizes: column B's edge dragged 40px wider, stored as Excel stores it; column A's edge double-clicked (AutoFit);
+// Ctrl+Z; Home, Format, Row Height... 30 for row 3; Ctrl+9 hides it, Ctrl+Shift+9 shows it again.
+const colPx = (c) => page.evaluate((c) => window.oxe.grid.geometry().cols.size(c), c);
+const colOf = (c) => page.evaluate((c) => window.oxe.workbook.sheet(0).cols.find((x) => x.min <= c && x.max >= c) || null, c);
+await page.evaluate(() => { window.oxe.select('A1'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+const edgeX = (c) => page.evaluate((c) => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); return { x: v.left + geo.rowHeadW + geo.cols.start(c + 1) - 1, y: v.top + geo.colHeadH / 2 }; }, c);
+const bWas = await colPx(1);
+let edge = await edgeX(1);
+await page.mouse.move(edge.x, edge.y);
+await page.mouse.down();
+await page.mouse.move(edge.x + 20, edge.y, { steps: 3 });
+const tip = await page.textContent('.oxe-guide-tip');
+await page.mouse.move(edge.x + 40, edge.y, { steps: 3 });
+await page.mouse.up();
+const bNow = await colPx(1);
+check(bNow === bWas + 40 && (await colOf(1)).width === Math.trunc((bNow / 7) * 256) / 256 && /^Width: [\d.]+ \(\d+ pixels\)$/.test(tip), 'column B dragged 40px wider: its width stored in Excel’s units, Excel’s tip while dragging', `${bWas} -> ${bNow} ${tip}`);
+await page.keyboard.press('Control+z');
+check(await colPx(1) === bWas, 'Ctrl+Z: column B as it was');
+edge = await edgeX(0);
+await page.mouse.dblclick(edge.x, edge.y);
+const colA = await colOf(0);
+check(colA && colA.width > 0 && await colPx(0) > 30, 'column A’s edge double-clicked: AutoFit to its text', JSON.stringify(colA));
+await page.keyboard.press('Control+z');
+await page.evaluate(() => window.oxe.select('A3'));
+await page.focus('.oxe-grid');
+await ribbon('Format', async () => { await page.click('.oxe-pop >> text=Row Height...'); await page.fill('.oxe-dialog-field', '30'); await page.keyboard.press('Enter'); });
+await page.waitForFunction(() => window.oxe.workbook.sheet(0).rows.get(2)?.ht === 30);
+check(await page.evaluate(() => window.oxe.grid.geometry().rows.size(2)) === 40, 'Format, Row Height... 30: row 3 is 30pt (40 pixels)');
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+9');
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).rows.get(2)?.hidden === true && window.oxe.grid.geometry().rows.size(2) === 0), 'Ctrl+9: row 3 hidden');
+await page.keyboard.press('Control+Shift+9');
+check(await page.evaluate(() => window.oxe.grid.geometry().rows.size(2)) === 40, 'Ctrl+Shift+9: shown again, still 30pt');
+
+// Find and Replace: Ctrl+F, "Item", Enter goes from A1 to the next match, then the next; Find All counts them. Ctrl+H,
+// "Item" with "Thing", Replace All; Esc back to the sheet, Ctrl+Z puts them back.
+await page.evaluate(() => window.oxe.select('A1'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+f');
+await page.waitForSelector('.oxe-findbar:not([hidden])');
+await page.keyboard.type('Item');
+await page.keyboard.press('Enter');
+const firstHit = await sel();
+await page.keyboard.press('Enter');
+const secondHit = await sel();
+check(firstHit.ar === 1 && firstHit.ac === 0 && secondHit.ar === 2 && await page.evaluate(() => document.activeElement.classList.contains('oxe-findbox')), 'Ctrl+F, Item, Enter twice: A2 then A3, the box keeping focus', JSON.stringify([firstHit, secondHit]));
+await page.click('.oxe-findbar button[title="Find All"]');
+const found = await page.textContent('.oxe-findinfo');
+check(/^\d+ cell\(s\) found$/.test(found), 'Find All: the cells found counted', found);
+await page.keyboard.press('Control+h');
+await page.fill('.oxe-replrow .oxe-findbox', 'Thing');
+await page.click('.oxe-findbar button[title="Replace All"]');
+const done = await page.textContent('.oxe-findinfo');
+check(/^All done\. We made \d+ replacements?\./.test(done) && /^Thing/.test(String(await value('A3'))), 'Ctrl+H, Replace All: Item made Thing, said as Excel says it', done);
+await page.keyboard.press('Escape');
+check(await page.isHidden('.oxe-findbar') && await page.evaluate(() => document.activeElement.classList.contains('oxe-grid')), 'Esc: the bar closed, back in the sheet');
+await page.keyboard.press('Control+z');
+check(/^Item/.test(String(await value('A3'))), 'Ctrl+Z: every replacement undone at once');
+
+// View: Freeze Panes at C3 from the View tab; scrolled far down and right, a click where A1 shows still selects A1.
+// Ctrl+wheel zooms by 10%. Unfreeze Panes, and zoom back to 100%.
+await page.evaluate(() => { window.oxe.select('C3'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+await page.click('.oxe-rtab >> text="View"');
+await menu('Freeze Panes', 'Freeze Panes');
+check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":2,"cols":2}' && await page.isVisible('.oxe-pane-top') && await page.isVisible('.oxe-pane-corner'), 'View, Freeze Panes at C3: rows 1-2 and columns A-B frozen');
+await page.evaluate(() => { window.oxe.grid.el.scrollTop = 2000; window.oxe.grid.el.scrollLeft = 600; });
+await page.waitForTimeout(100);
+const a1 = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); return { x: v.left + geo.rowHeadW + 10, y: v.top + geo.colHeadH + 6 }; });
+await page.mouse.click(a1.x, a1.y);
+check((await sel()).ar === 0 && (await sel()).ac === 0, 'scrolled away, a click on the frozen corner selects A1', JSON.stringify(await sel()));
+await page.mouse.move(a1.x + 200, a1.y + 200);
+await page.keyboard.down('Control');
+await page.mouse.wheel(0, -100);
+await page.keyboard.up('Control');
+await page.waitForFunction(() => window.oxe.grid.view().zoom === 110);
+check(await page.evaluate(() => window.oxe.workbook.sheet(0).zoom) === 110, 'Ctrl+wheel: zoom 110%, kept for the file');
+await menu('Freeze Panes', 'Unfreeze Panes');
+await ribbon('100%');
+check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":0,"cols":0}' && await page.evaluate(() => window.oxe.grid.view().zoom) === 100 && await page.isHidden('.oxe-pane-top'), 'Unfreeze Panes and 100%: as before');
+await page.click('.oxe-rtab >> text=Home');
+
+// Entries as Excel reads them: a date typed into G40 is a date, shown and in the formula bar as one; F2 and Enter keep
+// it; $1,234.50 is currency; Ctrl+Z takes the value and its format away together.
+const codeAt = (ref) => page.evaluate((ref) => { const wb = window.oxe.workbook; const cell = wb.sheet(0).cells.get(Number(ref.slice(1)) - 1)?.get(ref.charCodeAt(0) - 65); const xf = wb.styles.cellXfs[cell?.s || 0]; return wb.styles.numFmts[xf.numFmtId] ?? ({ 14: 'm/d/yyyy', 0: 'General', 8: 'currency' })[xf.numFmtId] ?? String(xf.numFmtId); }, ref);
+await page.evaluate(() => window.oxe.select('G40'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('1/2/2024');
+await page.keyboard.press('Enter');
+check(await value('G40') === 45293 && await shown(39, 6) === '1/2/2024' && await codeAt('G40') === 'm/d/yyyy', 'typed 1/2/2024: the date 45293, shown 1/2/2024', `${await value('G40')} ${await shown(39, 6)}`);
+await page.evaluate(() => window.oxe.select('G40'));
+check(await bar() === '1/2/2024', 'the formula bar shows it as a date', await bar());
+await page.focus('.oxe-grid');
+await page.keyboard.press('F2');
+await page.keyboard.press('Enter');
+check(await value('G40') === 45293, 'F2 and Enter: still the same date');
+await page.evaluate(() => window.oxe.select('G41'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('$1,234.50');
+await page.keyboard.press('Enter');
+check(await value('G41') === 1234.5 && /\$"?#,##0\.00/.test(await codeAt('G41')), 'typed $1,234.50: 1234.5 as currency (shown ######## in a column this narrow, as in Excel)', await codeAt('G41'));
+await page.keyboard.press('Control+z');
+check(await value('G41') === null && await codeAt('G41') === 'General', 'Ctrl+Z: the value and its format gone together');
+
+
+await finish();

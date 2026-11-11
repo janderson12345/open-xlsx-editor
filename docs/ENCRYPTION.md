@@ -54,5 +54,5 @@ Tests:
   - round trips, including a password beyond ASCII
   - the four refusals
   - an encrypted workbook edited and saved encrypted, its password changed and then removed
-- `test/editing.mjs`: the Password box, a wrong password, then the right one, and the workbook saved encrypted again.
+- `test/editing-more.mjs`: the Password box, a wrong password, then the right one, and the workbook saved encrypted again.
 - `test/a11y.mjs`: axe on the Password box, in light and dark.
