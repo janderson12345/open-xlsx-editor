@@ -27,6 +27,7 @@ try {
     $sr = $ws.Range($spec.sheet.shape)
     $sh = $ws.Shapes.AddShape(1, $sr.Left, $sr.Top, $sr.Width, $sr.Height)
     foreach ($n in $spec.sheet.notes) { [void]$ws.Range($n).AddComment("note $n") }
+    if ($spec.sheet.formula) { $ws.Range($spec.sheet.formula.at).Formula = $spec.sheet.formula.text }
     $before = @{ chart = (Box $co); shape = (Box $sh) }
     $refused = $null
     $s = $case.step
@@ -38,10 +39,14 @@ try {
       if ($s.do -eq 'delete') { if ($null -ne $shift) { [void]$r.Delete($shift) } else { [void]$r.Delete() } }
     } catch { $refused = $_.Exception.Message }
     $table = if ($ws.ListObjects.Count) { $ws.ListObjects.Item(1).Range.Address($false, $false) } else { $null }
+    $columns = if ($ws.ListObjects.Count) { @($ws.ListObjects.Item(1).ListColumns | ForEach-Object { $_.Name }) } else { @() }
+    $header = if ($ws.ListObjects.Count -and $ws.ListObjects.Item(1).ShowHeaders) { @($ws.ListObjects.Item(1).HeaderRowRange.Cells | ForEach-Object { "$($_.Address($false, $false))=$($_.Value2)" }) } else { @() }
+    $formula = $null
+    if ($spec.sheet.formula) { $hit = $ws.UsedRange.Find('SUM(', [Type]::Missing, -4123, 2); if ($hit) { $formula = "$($hit.Address($false, $false)) $($hit.Formula) = $($hit.Text)" } }
     $charts = @(); foreach ($c in $ws.ChartObjects()) { $charts += , (Box $c) }
     $shapes = @(); foreach ($p in $ws.Shapes) { if ($p.Type -eq 1) { $shapes += , (Box $p) } }
     $notes = @(); foreach ($c in $ws.Comments) { $notes += $c.Parent.Address($false, $false) }
-    $results += [pscustomobject]@{ name = $case.name; refused = $refused; table = $table; charts = $charts; shapes = $shapes; notes = $notes; before = $before }
+    $results += [pscustomobject]@{ name = $case.name; refused = $refused; table = $table; columns = $columns; header = $header; formula = $formula; charts = $charts; shapes = $shapes; notes = $notes; before = $before }
     $wb.Close($false)
   }
 } finally { $x.Quit(); [void][Runtime.InteropServices.Marshal]::ReleaseComObject($x) }

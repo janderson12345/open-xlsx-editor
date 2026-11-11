@@ -49,7 +49,8 @@ test('an agent writes blocks of values, inserts rows, adds and renames sheets, a
   assert.deepEqual(a.read('Summary!A1:B3').rows.map((r) => r.map((x) => x.value)), [['Fruit', 'Qty'], ['=not a formula', 3], [true, null]]);
   a.insertRows(2, 1, { sheet: 'Summary' });
   assert.deepEqual(a.read('Summary!A1:A4').rows.map((r) => r[0].value), ['Fruit', null, '=not a formula', true]);
-  assert.throws(() => a.insertRows(2, 1, { sheet: 'Data' }), /can't be inserted or deleted yet/, "Data has a table: the editor's refusal comes back");
+  a.insertRows(3, 1, { sheet: 'Data' });
+  assert.equal(a.names().find((x) => x.name === 'Fruit').refersTo, 'Data!A1:E10', 'a row inserted inside the Fruit table widens it');
   a.renameSheet('Summary', 'Totals');
   assert.throws(() => a.renameSheet('Totals', 'Data'), /already|taken|name/i);
   const again = openWorkbook(a.save());

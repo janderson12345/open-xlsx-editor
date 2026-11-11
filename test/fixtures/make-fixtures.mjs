@@ -13,7 +13,8 @@
 //                Excel writes chart parts.
 // notes.xlsx     notes and a threaded comment with a reply, written as Excel writes them (comments, the VML that
 //                shows notes, threadedComments, persons), made-up people.
-// anchors.xlsx   anchor-cases.mjs's sheet without its table: a stock list on B2:D12, a column chart of Qty
+// anchors.xlsx   (and anchors-table.xlsx, with the table Stock and a formula reading it in A20)
+//                anchor-cases.mjs's sheet without its table: a stock list on B2:D12, a column chart of Qty
 //                anchored F3 to L15, a rectangle M5 to P9 and notes at A1, B6, D12 and F20 (test/anchors.test.js).
 //
 // The zips are written with a fixed date, so the files only change when this script does.
@@ -724,9 +725,10 @@ function charts() {
   write('charts.xlsx', files);
 }
 
-// The sheet of tools/excel-compare/anchor-cases.mjs (without its table), as Excel writes its parts: a drawing with a
-// chart and a rectangle on two-cell anchors, notes in the comments part and the VML that shows them.
-function anchors() {
+// The sheet of tools/excel-compare/anchor-cases.mjs, as Excel writes its parts: a drawing with a chart and a rectangle
+// on two-cell anchors, notes in the comments part and the VML that shows them; with `table`, also the table Stock on
+// B2:D12 and a formula reading two of its columns in A20 (anchors-table.xlsx).
+function anchors(table = false) {
   const C = 'http://schemas.openxmlformats.org/drawingml/2006/chart';
   const A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
   const XDR = 'http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing';
@@ -735,7 +737,9 @@ function anchors() {
   const price = items.map((_, i) => ((i * 5) % 9) + 0.5);
   const t = (ref, text) => `<c r="${ref}" t="inlineStr"><is><t>${esc(text)}</t></is></c>`;
   const v = (ref, n) => `<c r="${ref}"><v>${n}</v></c>`;
-  const rows = [`<row r="2">${t('B2', 'Item')}${t('C2', 'Qty')}${t('D2', 'Price')}</row>`, ...items.map((it, i) => `<row r="${i + 3}">${t(`B${i + 3}`, it)}${v(`C${i + 3}`, qty[i])}${v(`D${i + 3}`, price[i])}</row>`)].join('');
+  const sum = qty.reduce((a, b) => a + b, 0) + items.length;
+  const formulaRow = table ? `<row r="20"><c r="A20"><f>SUM(Stock[Qty])+COUNTA(Stock[Price])</f><v>${sum}</v></c></row>` : '';
+  const rows = [`<row r="2">${t('B2', 'Item')}${t('C2', 'Qty')}${t('D2', 'Price')}</row>`, ...items.map((it, i) => `<row r="${i + 3}">${t(`B${i + 3}`, it)}${v(`C${i + 3}`, qty[i])}${v(`D${i + 3}`, price[i])}</row>`)].join('') + formulaRow;
   const num = `<c:numCache><c:formatCode>General</c:formatCode><c:ptCount val="10"/>${qty.map((q, i) => `<c:pt idx="${i}"><c:v>${q}</c:v></c:pt>`).join('')}</c:numCache>`;
   const chart = `${DECL}<c:chartSpace xmlns:c="${C}" xmlns:a="${A}" xmlns:r="${R}"><c:roundedCorners val="0"/><c:chart><c:autoTitleDeleted val="1"/><c:plotArea><c:layout/><c:barChart><c:barDir val="col"/><c:grouping val="clustered"/><c:varyColors val="0"/>` +
     `<c:ser><c:idx val="0"/><c:order val="0"/><c:val><c:numRef><c:f>Stock!$C$3:$C$12</c:f>${num}</c:numRef></c:val></c:ser><c:gapWidth val="219"/><c:axId val="10"/><c:axId val="20"/></c:barChart>` +
@@ -751,16 +755,19 @@ function anchors() {
     `<x:ClientData ObjectType="Note"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>${c + 1}, 15, ${r}, 10, ${c + 3}, 31, ${r + 4}, 9</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>${r}</x:Row><x:Column>${c}</x:Column></x:ClientData></v:shape>`;
   const vml = `<xml ${VML_NS}><o:shapelayout v:ext="edit"><o:idmap v:ext="edit" data="1"/></o:shapelayout><v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe"><v:stroke joinstyle="miter"/><v:path gradientshapeok="t" o:connecttype="rect"/></v:shapetype>${notesAt.map(box).join('')}</xml>`;
   const comments = `${DECL}<comments xmlns="${X}"><authors><author>Avery Chen</author></authors><commentList>${notesAt.map(([r, c]) => `<comment ref="${col(c)}${r + 1}" authorId="0" shapeId="0"><text><t>note ${col(c)}${r + 1}</t></text></comment>`).join('')}</commentList></comments>`;
-  write('anchors.xlsx', {
-    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/comments1.xml', CT('comments')],
+  const tablePart = `${DECL}<table xmlns="${X}" id="1" name="Stock" displayName="Stock" ref="B2:D12" totalsRowShown="0"><autoFilter ref="B2:D12"/><tableColumns count="3"><tableColumn id="1" name="Item"/><tableColumn id="2" name="Qty"/><tableColumn id="3" name="Price"/></tableColumns>` +
+    '<tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/></table>';
+  write(table ? 'anchors-table.xlsx' : 'anchors.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/comments1.xml', CT('comments')], ...(table ? [['xl/tables/table1.xml', CT('table')]] : []),
       ['xl/drawings/drawing1.xml', 'application/vnd.openxmlformats-officedocument.drawing+xml'], ['xl/charts/chart1.xml', 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml'], ...PROPS_CT])
       .replace('<Default Extension="xml"', '<Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/><Default Extension="xml"'),
     '_rels/.rels': ROOT_RELS,
     ...docProps(),
     'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Stock" sheetId="1" r:id="rId1"/></sheets></workbook>`,
     'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml']]),
-    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><sheetData>${rows}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><drawing r:id="rId1"/><legacyDrawing r:id="rId2"/></worksheet>`,
-    'xl/worksheets/_rels/sheet1.xml.rels': rels([['rId1', RT('drawing'), '../drawings/drawing1.xml'], ['rId2', RT('vmlDrawing'), '../drawings/vmlDrawing1.vml'], ['rId3', RT('comments'), '../comments1.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><sheetData>${rows}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/><drawing r:id="rId1"/><legacyDrawing r:id="rId2"/>${table ? '<tableParts count="1"><tablePart r:id="rId4"/></tableParts>' : ''}</worksheet>`,
+    'xl/worksheets/_rels/sheet1.xml.rels': rels([['rId1', RT('drawing'), '../drawings/drawing1.xml'], ['rId2', RT('vmlDrawing'), '../drawings/vmlDrawing1.vml'], ['rId3', RT('comments'), '../comments1.xml'], ...(table ? [['rId4', RT('table'), '../tables/table1.xml']] : [])]),
+    ...(table ? { 'xl/tables/table1.xml': tablePart } : {}),
     'xl/drawings/drawing1.xml': drawing,
     'xl/drawings/_rels/drawing1.xml.rels': rels([['rId1', RT('chart'), '../charts/chart1.xml']]),
     'xl/charts/chart1.xml': chart,
@@ -785,4 +792,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   notes();
   charts();
   anchors();
+  anchors(true);
 }

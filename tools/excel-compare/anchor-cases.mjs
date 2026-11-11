@@ -34,4 +34,25 @@ const cases = [
   step('insert F5 shifting down (under the chart)', { do: 'insert', range: 'F5', shift: 'down' }),
   step('insert A6 shifting right (the note at B6)', { do: 'insert', range: 'A6', shift: 'right' }),
 ];
+// With the table, more about tables: its edges, its header row, part of it, a formula reading a column of it.
+if (sheet.table) {
+  sheet.formula = { at: 'A20', text: '=SUM(Stock[Qty])+COUNTA(Stock[Price])' };
+  cases.push(
+    step('insert row 2 (above the header)', { do: 'insert', range: '2:2' }),
+    step('insert row 13 (just below the table)', { do: 'insert', range: '13:13' }),
+    step('insert row 12 (above the last row)', { do: 'insert', range: '12:12' }),
+    step('delete row 2 (the header row)', { do: 'delete', range: '2:2' }),
+    step('delete rows 1:3 (the header and a row)', { do: 'delete', range: '1:3' }),
+    step('delete rows 3:12 (all of the data)', { do: 'delete', range: '3:12' }),
+    step('insert column B (at the left edge of the table)', { do: 'insert', range: 'B:B' }),
+    step('insert column E (at the right edge of the table)', { do: 'insert', range: 'E:E' }),
+    step('insert column D (before the last column)', { do: 'insert', range: 'D:D' }),
+    step('delete column D (the last column)', { do: 'delete', range: 'D:D' }),
+    step('delete columns C:E (two table columns and one after)', { do: 'delete', range: 'C:E' }),
+    step('insert B13:D13 shifting down (under the table)', { do: 'insert', range: 'B13:D13', shift: 'down' }),
+    step('insert E3:E4 shifting right (beside the table)', { do: 'insert', range: 'E3:E4', shift: 'right' }),
+    step('insert B3:D3 shifting right (the table width)', { do: 'insert', range: 'B3:D3', shift: 'right' }),
+    step('delete B2:D2 shifting up (the header row cells)', { do: 'delete', range: 'B2:D2', shift: 'up' }),
+  );
+}
 console.log(JSON.stringify({ sheet, cases }, null, 1));

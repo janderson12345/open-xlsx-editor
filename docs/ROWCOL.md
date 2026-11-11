@@ -75,12 +75,37 @@ Results: all 20 steps put the chart, the rectangle and the notes where Excel did
 `test/anchors-excel.json`). The editor's 20 results were saved (`anchors-ours.mjs`) and opened in Excel
 (`excel-anchors-check.ps1`), and Excel read every one back the same.
 
-On the same sheet with a table, deleting rows 3:14 (the table's data and all of the chart's rows) left Excel's chart
-one row tall instead of deleting it. That is the only case where the table changed what happened to a drawing.
+## Tables
+
+Measured on the same sheet with the table Stock on B2:D12 and `=SUM(Stock[Qty])+COUNTA(Stock[Price])` in A20
+(`anchor-cases.mjs`, `test/fixtures/anchors-table.xlsx`). The same 20 steps were done, plus 15 at the table's edges,
+its header row, all of its data and part of it (`src/ooxml/anchors.js`).
+
+| What | As Excel does it |
+|---|---|
+| Lines inserted strictly inside the table (a row above its last row, a column between two of its columns) | It widens. New columns are named Column1, Column2 (the first names not taken), in its header too. |
+| A row inserted just below it, a column just right of it | It stays as it was. |
+| A row inserted above it, a column at its left edge | It moves. |
+| Lines deleted inside it | It narrows. A formula's reference to a deleted column becomes `#REF!` (`=SUM(#REF!)+COUNTA(Stock[Price])`). |
+| All of its data rows deleted (its header kept) | Excel keeps the first data row as it is and deletes the others, so the rows deleted are one fewer. |
+| All of it deleted | It is deleted, and its references become `#REF!`. |
+| Its header row deleted without the rest | Refused. COM says only that the Delete failed, so the editor's words are its own. |
+| Cells shifted through part of it | Refused: "This won't work because it would move cells in a table on your worksheet." Across its whole width (or height) it widens, narrows or moves as for lines. |
+
+Results: all 35 steps match Excel (`test/tables.test.js` against `test/tables-excel.json`). That covers the table's
+range, its column names, where the formula went with its text and value, and the chart, rectangle and notes. Six of
+the steps are refused, as Excel refuses them. The editor's 29 results, opened in Excel, read back 29 of 29 as Excel did
+them.
+
+One rule explains the chart Excel left one row tall when rows 3:14 were deleted: those rows held all the table's data,
+so Excel kept row 3 and deleted only 4:14.
+
+Not measured: a table's totals row (deleting it without the rest of the table is refused), and calculated columns
+(Excel fills their formula into rows inserted inside the table; the editor doesn't yet).
 
 ## Not yet
 
-A sheet with tables, pivot tables, slicers or timelines is refused ("Rows and columns can't be inserted or
+A sheet with pivot tables, slicers or timelines is refused ("Rows and columns can't be inserted or
 deleted yet on a sheet with...", or "Cells can't..."): their ranges aren't moved yet. Also missing: page
 breaks, pivot caches' source ranges on other sheets, and the Insert Options button (format from below, clear
 formatting). One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is

@@ -14,7 +14,11 @@ try {
     $charts = @(); foreach ($c in $ws.ChartObjects()) { $charts += , (Box $c) }
     $shapes = @(); foreach ($p in $ws.Shapes) { if ($p.Type -eq 1) { $shapes += , (Box $p) } }
     $notes = @(); foreach ($c in $ws.Comments) { $notes += $c.Parent.Address($false, $false) }
-    $results += [pscustomobject]@{ file = $_.Name; charts = $charts; shapes = $shapes; notes = $notes }
+    $table = if ($ws.ListObjects.Count) { $ws.ListObjects.Item(1).Range.Address($false, $false) } else { $null }
+    $columns = if ($ws.ListObjects.Count) { @($ws.ListObjects.Item(1).ListColumns | ForEach-Object { $_.Name }) } else { @() }
+    $hit = $ws.UsedRange.Find('SUM(', [Type]::Missing, -4123, 2)
+    $formula = if ($hit) { "$($hit.Address($false, $false)) $($hit.Formula) = $($hit.Text)" } else { $null }
+    $results += [pscustomobject]@{ file = $_.Name; charts = $charts; shapes = $shapes; notes = $notes; table = $table; columns = $columns; formula = $formula }
     $wb.Close($false)
   }
 } finally { $x.Quit(); [void][Runtime.InteropServices.Marshal]::ReleaseComObject($x) }

@@ -155,3 +155,169 @@ function dropRel(pkg, partPath, id) {
   const text = pkg.text(relsPath);
   if (text) pkg.setText(relsPath, text.replace(new RegExp(`<Relationship\\b[^>]*\\sId="${id}"[^>]*/>`), ''));
 }
+
+// --- Tables ----------------------------------------------------------------------------------------------------------
+// As Excel does it (tools/excel-compare/excel-anchors.ps1 on anchor-cases.mjs): lines inserted strictly inside a
+// table widen it (a new column named Column1, Column2... in its header); at its edges (the line after it, the column
+// before it) they move it or leave it; lines deleted inside narrow it, its formulas' references to a deleted column
+// become #REF!; all of its data rows deleted leave the header and one empty row; all of it deleted deletes it (its
+// references #REF!). Its header row deleted without all of it, and cells shifted through part of it, are refused.
+
+export const TABLE_MESSAGES = {
+  shift: "This won't work because it would move cells in a table on your worksheet.",
+  header: "A table's header row can't be deleted without the rest of the table.",
+  totals: "A table's totals row can't be deleted without the rest of the table yet.",
+};
+
+/** The tables of sheet si: [{ path, relId, name, r0, c0, r1, c1, headers, totals, columns }]. */
+function tablesOf(wb, si) {
+  return relsOf(wb, wb.sheets[si].path, `${REL}/table`).map((rel) => {
+    const text = wb.pkg.text(rel.target) || '';
+    const ref = /<table\b[^>]*\sref="([A-Z]+)(\d+):([A-Z]+)(\d+)"/.exec(text);
+    if (!ref) return null;
+    const col = (s) => [...s].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+    return {
+      path: rel.target, relId: rel.id,
+      name: /<table\b[^>]*\sdisplayName="([^"]*)"/.exec(text)?.[1] || /<table\b[^>]*\sname="([^"]*)"/.exec(text)?.[1],
+      r0: Number(ref[2]) - 1, c0: col(ref[1]), r1: Number(ref[4]) - 1, c1: col(ref[3]),
+      headers: /<table\b[^>]*\sheaderRowCount="0"/.test(text) ? 0 : 1,
+      totals: /<table\b[^>]*\stotalsRowCount="[1-9]/.test(text) ? 1 : 0,
+      columns: [...text.matchAll(/<tableColumn\b[^>]*\sname="([^"]*)"/g)].map((m) => m[1]),
+    };
+  }).filter(Boolean);
+}
+
+/**
+ * Rows deleted (n < 0) that hold all of a table's data rows but not its header: Excel keeps the first data row, as
+ * it is, and deletes the others (the table left its header and that row). Returns the rows to delete then, [at, n]
+ * (n 0: nothing).
+ */
+export function keepTableRow(wb, si, axis, at, n, band) {
+  if (axis !== 'row' || n >= 0) return [at, n];
+  for (const t of tablesOf(wb, si)) {
+    if (!t.headers || t.totals) continue;
+    if (band && (band[0] > t.c0 || band[1] < t.c1)) continue;
+    const last = at - n - 1;
+    if (at === t.r0 + 1 && last >= t.r1) return [at + 1, n + 1];
+  }
+  return [at, n];
+}
+
+/**
+ * What a change does to each table of sheet si: [{ t, shift } (moved), { t, grow: { index, count } }, { t, shift,
+ * shrink: [indexes] } or { t, gone }]. A change Excel refuses calls `refuse(message)`, which throws.
+ */
+export function planTables(wb, si, axis, at, n, band, refuse) {
+  const plans = [];
+  for (const t of tablesOf(wb, si)) {
+    const [l0, l1, p0, p1] = axis === 'row' ? [t.r0, t.r1, t.c0, t.c1] : [t.c0, t.c1, t.r0, t.r1];
+    if (band) {
+      // (Cells shifted: the table is touched when cells of it move; then only across its whole width, or height.)
+      const touched = p1 >= band[0] && p0 <= band[1] && l1 >= at;
+      if (!touched) continue;
+      if (band[0] > p0 || band[1] < p1) refuse(TABLE_MESSAGES.shift);
+    }
+    if (n > 0) {
+      if (at <= l0) plans.push({ t, shift: n });
+      else if (at <= l1) plans.push({ t, grow: { index: at - l0, count: n } });
+      continue;
+    }
+    const a = at;
+    const b = at - n - 1;
+    if (a > l1) continue;
+    if (b < l0) { plans.push({ t, shift: n }); continue; }
+    if (a <= l0 && b >= l1) { plans.push({ t, gone: true }); continue; }
+    if (axis === 'row' && t.headers && a <= l0) refuse(TABLE_MESSAGES.header);
+    if (axis === 'row' && t.totals && b >= l1) refuse(TABLE_MESSAGES.totals);
+    const before = Math.max(0, Math.min(b, l0 - 1) - a + 1);
+    const inside = [];
+    for (let k = Math.max(a, l0); k <= Math.min(b, l1); k++) inside.push(k - l0);
+    plans.push({ t, shift: -before, shrink: inside });
+  }
+  return plans;
+}
+
+/**
+ * Make the plans (planTables) after the sheet's cells moved: each table part's ref, autoFilter and columns; new columns'
+ * names in the header cells (`doc`, the sheet's moved XML, through `setCell(doc, r, c, text)`); deleted tables' parts.
+ * Returns the table references to make #REF!: [{ table, columns (names, or null for the whole table) }].
+ */
+export function applyTables(wb, si, axis, plans, doc, setCell) {
+  const pkg = wb.pkg;
+  const dead = [];
+  const name = (r, c) => { let s = ''; for (let k = c + 1; k > 0; k = Math.floor((k - 1) / 26)) s = String.fromCharCode(65 + ((k - 1) % 26)) + s; return `${s}${r + 1}`; };
+  const COLUMN = /<tableColumn\b[^>]*?(?:\/>|>[\s\S]*?<\/tableColumn>)/g;
+  for (const plan of plans) {
+    const t = plan.t;
+    if (plan.gone) {
+      dead.push({ table: t.name, columns: null });
+      for (const el of [...doc.documentElement.getElementsByTagNameNS('*', 'tablePart')]) {
+        if (el.getAttributeNS(REL, 'id') === t.relId || el.getAttribute('r:id') === t.relId) el.parentNode.removeChild(el);
+      }
+      const wrap = doc.documentElement.getElementsByTagNameNS('*', 'tableParts')[0];
+      if (wrap) {
+        const left = wrap.getElementsByTagNameNS('*', 'tablePart').length;
+        if (left) wrap.setAttribute('count', String(left)); else wrap.parentNode.removeChild(wrap);
+      }
+      dropRel(pkg, wb.sheets[si].path, t.relId);
+      pkg.removeTree(t.path);
+      continue;
+    }
+    let { r0, c0, r1, c1 } = t;
+    let text = pkg.text(t.path);
+    if (plan.shift) { if (axis === 'row') { r0 += plan.shift; r1 += plan.shift; } else { c0 += plan.shift; c1 += plan.shift; } }
+    if (plan.grow) {
+      if (axis === 'row') r1 += plan.grow.count;
+      else {
+        c1 += plan.grow.count;
+        // New columns in their place, named as Excel names them: Column1, Column2..., the first names not taken.
+        const taken = new Set(t.columns.map((x) => x.toLowerCase()));
+        let id = Math.max(0, ...[...text.matchAll(/<tableColumn\b[^>]*\sid="(\d+)"/g)].map((m) => Number(m[1])));
+        const added = [];
+        for (let k = 1; added.length < plan.grow.count; k++) if (!taken.has(`column${k}`)) added.push(`Column${k}`);
+        const cols = [...text.matchAll(COLUMN)].map((m) => m[0]);
+        cols.splice(plan.grow.index, 0, ...added.map((nm) => `<tableColumn id="${++id}" name="${nm}"/>`));
+        text = text.replace(/<tableColumns\b[^>]*>[\s\S]*?<\/tableColumns>/, `<tableColumns count="${cols.length}">${cols.join('')}</tableColumns>`);
+        if (t.headers) added.forEach((nm, k) => setCell(doc, r0, c0 + plan.grow.index + k, nm));
+      }
+    }
+    if (plan.shrink && plan.shrink.length) {
+      if (axis === 'row') {
+        r1 -= plan.shrink.length;
+        // (All of its data rows deleted: the header and one empty row, as Excel leaves it.)
+        if (r1 < r0 + t.headers) r1 = r0 + t.headers;
+      } else {
+        c1 -= plan.shrink.length;
+        const kept = [...text.matchAll(COLUMN)].map((m) => m[0]).filter((_, k) => !plan.shrink.includes(k));
+        text = text.replace(/<tableColumns\b[^>]*>[\s\S]*?<\/tableColumns>/, `<tableColumns count="${kept.length}">${kept.join('')}</tableColumns>`);
+        dead.push({ table: t.name, columns: plan.shrink.map((k) => t.columns[k]) });
+      }
+    }
+    const ref = `${name(r0, c0)}:${name(r1, c1)}`;
+    text = text.replace(/(<table\b[^>]*\sref=")[^"]*"/, `$1${ref}"`)
+      .replace(/(<autoFilter\b[^>]*\sref=")[^"]*"/, `$1${name(r0, c0)}:${name(r1 - t.totals, c1)}"`)
+      .replace(/(<sortState\b[^>]*\sref=")[^"]*"/, `$1${name(r0 + t.headers, c0)}:${name(r1 - t.totals, c1)}"`);
+    pkg.setText(t.path, text);
+  }
+  return dead;
+}
+
+/** A formula's table references to deleted columns, or to a deleted table, as #REF! (as Excel writes them). */
+export function deadTableRefs(text, dead, tokenize) {
+  let toks;
+  try { toks = tokenize(text); } catch { return text; }
+  let out = '';
+  let last = 0;
+  for (const tk of toks) {
+    if (tk.type !== 'struct' || !tk.table) continue;
+    const d = dead.find((x) => x.table && x.table.toLowerCase() === tk.table.toLowerCase());
+    if (!d) continue;
+    // (The columns it names: [Qty], [[#Data],[Qty]], [@Qty], or Qty alone between the brackets.)
+    const named = [...tk.spec.matchAll(/\[([^\]#@][^\]]*)\]|@([^\]]+)/g)].map((m) => (m[1] ?? m[2]).replace(/'(.)/g, '$1').toLowerCase());
+    const plain = /^[^[#@]/.test(tk.spec) ? [tk.spec.replace(/'(.)/g, '$1').toLowerCase()] : [];
+    if (d.columns != null && ![...named, ...plain].some((nm) => d.columns.some((c) => c.toLowerCase() === nm))) continue;
+    out += `${text.slice(last, tk.start)}#REF!`;
+    last = tk.end;
+  }
+  return out + text.slice(last);
+}
