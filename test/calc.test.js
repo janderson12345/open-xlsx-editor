@@ -36,6 +36,19 @@ test('every formula of formulas.xlsx works out as Excel works it out (test/formu
   assert.deepEqual(wrong, []);
 });
 
+test('opening: formulas saved without a result are worked out (Excel\'s results), cached ones kept, an unchanged save the same bytes', () => {
+  const excel = JSON.parse(fs.readFileSync('test/formulas-excel.json', 'utf8'));
+  const wb = book('formulas.xlsx');
+  assert.ok(wb.calculateMissing() > 390);
+  const [sheet, ref, , , v] = excel.cells.find((x) => x[3] === 'n');
+  assert.ok(Math.abs(value(wb, wb.sheetIndexOf(sheet), ref) - Number(v)) < 1e-9, `${sheet}!${ref}`);
+  const src = unzipSync(new Uint8Array(fs.readFileSync('test/fixtures/formulas.xlsx')));
+  const saved = unzipSync(wb.toBytes());
+  for (const name of Object.keys(src)) assert.deepEqual(saved[name], src[name], name);
+  // (A workbook with its results saved: nothing to work out.)
+  assert.equal(book('basic.xlsx').calculateMissing(), 0);
+});
+
 test('formulas as tokens: moved (shared formulas), as typed, as shown', () => {
   assert.equal(shiftFormula('B2*2+$B$2+B$2+$B2', 3, 1), 'C5*2+$B$2+C$2+$B5');
   assert.equal(shiftFormula('SUM(A:A,2:2,Data!A1:B2)', 1, 1), 'SUM(B:B,3:3,Data!B2:C3)');

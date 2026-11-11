@@ -37,6 +37,9 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
   - **Results.** Each result is written into the cell's `<v>`, and its `t` set to `str`, `b` or `e`. The formula
     itself is kept as written.
 - **Formulas Excel saved are trusted until something they read changes,** as Excel trusts them when it opens a file.
+- **Opening.** Formulas the file came without a result for are worked out (`Workbook.calculateMissing`), with the
+  formulas that read them, as Excel does when it opens such a file; the results saved with the others are kept. They
+  are shown at once, and saved with a sheet once it is edited, so a workbook saved unchanged is the same bytes.
 - **Shared formulas.** A shared formula's later cells carry only `si`. They read the group's first formula, moved to
   their own position (`shiftFormula`). When one cell of the group changes, every cell is first written out with its
   own formula.

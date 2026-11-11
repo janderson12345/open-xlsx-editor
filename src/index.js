@@ -55,7 +55,8 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs.
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
- *   features?: Record<string, boolean>, toolbar?: boolean, statusBar?: boolean, onChange?: () => void }} [options]
+ *   features?: Record<string, boolean>, toolbar?: boolean, statusBar?: boolean, calculateOnOpen?: boolean,
+ *   onChange?: () => void }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
   const root = document.createElement('div');
@@ -230,6 +231,8 @@ export function mountXlsxEditor(host, options = {}) {
           }
         });
       }
+      // (Formulas saved without a result, as some programs save them, worked out now, as Excel does on opening.)
+      if (options.calculateOnOpen !== false) wb.calculateMissing();
       const i = wb.activeSheet;
       const sheet = wb.sheet(i);
       state.workbook = wb;

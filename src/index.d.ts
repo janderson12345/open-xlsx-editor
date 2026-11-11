@@ -146,6 +146,8 @@ export declare function mountXlsxEditor(
     features?: Record<string, boolean>;
     /** false hides the ribbon but keeps editing. */
     toolbar?: boolean;
+    /** false leaves formulas saved without a result empty on opening (by default they are worked out, as Excel does). */
+    calculateOnOpen?: boolean;
     onChange?: () => void;
   },
 ): XlsxEditor;

@@ -420,6 +420,23 @@ export class Workbook {
     return this.calc.calculateAll();
   }
 
+  /** Work out the formulas the file came without a result for (as programs other than Excel may save them), and those
+   *  that read them, as Excel works them out on opening such a file; every other formula keeps the result saved with
+   *  it. The results are shown, and saved with a sheet once it is edited: a workbook opened and saved unchanged still
+   *  comes back byte for byte. Returns how many had none. */
+  calculateMissing() {
+    const also = [];
+    this.sheets.forEach((info, si) => {
+      if (info.kind !== 'worksheet' || !info.path) return;
+      for (const [r, line] of this.sheet(si).cells) for (const [c, cell] of line) if (cell.f != null && cell.v == null) also.push({ si, r, c });
+    });
+    if (!also.length) return 0;
+    const dirty = new Set(this.dirty);
+    this.calc.recalc([], also);
+    this.dirty = dirty;
+    return also.length;
+  }
+
   /** Write a formula's result into a cell (from the engine); nothing changes if it is the value the cell has. */
   writeResult(i, r, c, value) {
     const part = this._part(i);

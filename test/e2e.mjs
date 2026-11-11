@@ -41,6 +41,10 @@ for (const f of fs.readdirSync('test/fixtures').filter((n) => n.endsWith('.xlsx'
   check(touched.length === 1 && touched[0] === sheetPath, `${f}: an edit rewrites only ${sheetPath}`, touched.join(', '));
 }
 
+// formulas.xlsx is saved without formula results: worked out on opening, as Excel does (Calc!B2 =SUM over Data!B2:B9).
+await openFixture(page, 'formulas.xlsx');
+check(await cellTextAt(1, 1) === '3', 'formulas.xlsx: a formula saved without its result shows Excel\'s result on opening', await cellTextAt(1, 1));
+
 // basic.xlsx: values, widths, a hidden column, a tall and a hidden row, a merged range, text running on.
 await openFixture(page, 'basic.xlsx');
 check(await cellTextAt(0, 0) === 'Item', 'basic: A1 "Item"');

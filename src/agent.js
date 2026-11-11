@@ -24,7 +24,9 @@ import { readPivots, refreshPivot } from './ooxml/pivot.js';
 /** Opens an .xlsx or .xlsm (bytes) for reading and editing; one saved with a password needs `password`. */
 export function openWorkbook(bytes, { password = null } = {}) {
   const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
-  const book = new AgentWorkbook(Workbook.fromBytes(data, { password }), null, { baseline: () => Workbook.fromBytes(data, { password }) });
+  // (Formulas saved without a result are worked out on opening, as Excel and the editor do.)
+  const load = () => { const wb = Workbook.fromBytes(data, { password }); wb.calculateMissing(); return wb; };
+  const book = new AgentWorkbook(load(), null, { baseline: load });
   book.reopenable = true;
   return book;
 }
