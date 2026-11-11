@@ -47,7 +47,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Typing, F2, Enter/Tab/Esc, Alt+Enter, Delete | Done | |
 | Entries read as Excel reads them | Done | Dates, times, currency, thousands, percentages, exponents, fractions, with the format Excel gives the cell (docs/ENTRY.md). United States settings only. |
 | Undo and redo | Done | Cell contents and formats across sheets, and sheets inserted, renamed, moved, hidden, coloured and deleted (each one step, the sheet shown as it was). Excel can't undo deleting a sheet (it warns that the sheet goes for good); here Ctrl+Z brings it back, a difference kept on purpose. |
-| Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, a defined name, a table's name (its data rows) or a table reference ("Fruit[Qty]") typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). Naming a selection from it, and showing a selected name, missing. |
+| Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, a defined name, a table's name (its data rows) or a table reference ("Fruit[Qty]") typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). A new name typed there names the selection (docs/NAMES.md); showing a selected name missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
 | Recalculation | Done | 541 of 541 test formulas give Excel's results; 189 functions; table references (Fruit[Qty], [#Totals], [@Qty]). |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
@@ -127,7 +127,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Function Library (`function-library`) | Insert Function, the function lists | Missing | 189 functions work when typed (docs/CALC.md). |
 | | Dynamic arrays (spilling), LAMBDA, LET | Partly | Formulas spill as Excel 365's do, #SPILL! when blocked; SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, LET, LAMBDA, `D1#` and `@`; 20 of 20 cases Excel's, and Excel reads the files the same (docs/DYNAMIC.md). The newer array functions (TAKE, VSTACK, MAP...) missing. |
-| Defined Names (`defined-names`) | Name Manager, define, use in formula | Partly | Names in formulas work out and follow sheet renames; no way to add or change one. |
+| Defined Names (`defined-names`) | Name Manager, define, use in formula | Done | Name Manager (Ctrl+F3) and Define Name as Excel's, the Name Box naming the selection; Excel's rules for a name, 34 of 34 verdicts, and its saved order (docs/NAMES.md). Create from Selection and Use in Formula missing. |
 | Formula Auditing (`formula-auditing`) | Trace precedents and dependents, show formulas, evaluate | Missing | |
 | Calculation (`calculation`) | Automatic, manual, Calculate Now | Partly | Always automatic. |
 

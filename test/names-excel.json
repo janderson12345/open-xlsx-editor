@@ -1,0 +1,142 @@
+{
+ "verdicts": [
+  {
+   "name": "Rate",
+   "ok": true
+  },
+  {
+   "name": "rate2",
+   "ok": true
+  },
+  {
+   "name": "my rate",
+   "ok": false
+  },
+  {
+   "name": "1abc",
+   "ok": false
+  },
+  {
+   "name": "_x",
+   "ok": true
+  },
+  {
+   "name": "\\x",
+   "ok": false
+  },
+  {
+   "name": "Tax.Rate",
+   "ok": true
+  },
+  {
+   "name": "A1",
+   "ok": false
+  },
+  {
+   "name": "a1",
+   "ok": false
+  },
+  {
+   "name": "XFD1",
+   "ok": false
+  },
+  {
+   "name": "XFE1",
+   "ok": true
+  },
+  {
+   "name": "AB12C",
+   "ok": true
+  },
+  {
+   "name": "R1C1",
+   "ok": false
+  },
+  {
+   "name": "R",
+   "ok": false
+  },
+  {
+   "name": "C",
+   "ok": false
+  },
+  {
+   "name": "r",
+   "ok": false
+  },
+  {
+   "name": "c",
+   "ok": false
+  },
+  {
+   "name": "RC",
+   "ok": false
+  },
+  {
+   "name": "R2",
+   "ok": false
+  },
+  {
+   "name": "C3",
+   "ok": false
+  },
+  {
+   "name": "RC1",
+   "ok": false
+  },
+  {
+   "name": "R1C",
+   "ok": false
+  },
+  {
+   "name": "Rate?",
+   "ok": true
+  },
+  {
+   "name": "Q1-Q2",
+   "ok": false
+  },
+  {
+   "name": "Total!",
+   "ok": false
+  },
+  {
+   "name": "Sales%",
+   "ok": false
+  },
+  {
+   "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+   "ok": true
+  },
+  {
+   "name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+   "ok": false
+  },
+  {
+   "name": "TRUE",
+   "ok": false
+  },
+  {
+   "name": "Print_Area",
+   "ok": false
+  },
+  {
+   "name": "abc d",
+   "ok": false
+  },
+  {
+   "name": "x$",
+   "ok": false
+  },
+  {
+   "name": "_",
+   "ok": true
+  },
+  {
+   "name": "\\",
+   "ok": true
+  }
+ ],
+ "sameNameOnASheet": true,
+ "definedNames": "<definedNames><definedName name=\"_under\">\"text\"</definedName><definedName name=\"alpha\">Sheet1!$A$1:$B$2</definedName><definedName name=\"Beta\">0.07</definedName><definedName name=\"Dup\" localSheetId=\"1\">Sheet2!$A$1</definedName><definedName name=\"dup\">Sheet1!$B$1</definedName><definedName name=\"Gamma\">SUM(Sheet1!$A$1:$A$3)*2</definedName><definedName name=\"Hidden1\" hidden=\"1\">Sheet1!$E$5</definedName><definedName name=\"Local\" localSheetId=\"1\">Sheet2!$D$4</definedName><definedName name=\"_xlnm.Print_Area\" localSheetId=\"1\">Sheet1!$A$1</definedName><definedName name=\"Zeta\">Sheet1!$C$3</definedName></definedNames>"
+}

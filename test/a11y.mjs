@@ -190,6 +190,17 @@ for (const colorScheme of ['light', 'dark']) {
       const pivotFieldsAxe = await axe();
       t.check(!pivotSourceAxe.length && !pivotFieldsAxe.length, `${colorScheme}: Insert > PivotTable's two boxes, no axe violations`, [...pivotSourceAxe, ...pivotFieldsAxe].join(String.fromCharCode(10) + '     '));
       await page.keyboard.press('Escape');
+      // (Formulas > Name Manager, and its New... box.)
+      await page.click('.oxe-rtab >> text=Formulas');
+      await page.click('.oxe-toolbar button[title="Name Manager (Ctrl+F3)"]');
+      await page.waitForSelector('dialog.oxe-name-manager');
+      const managerAxe = await axe();
+      await page.click('dialog.oxe-name-manager >> button:text-is("New...")');
+      await page.waitForSelector('dialog.oxe-name-box');
+      const newNameAxe = await axe();
+      t.check(!managerAxe.length && !newNameAxe.length, `${colorScheme}: the Name Manager and its New Name box, no axe violations`, [...managerAxe, ...newNameAxe].join(String.fromCharCode(10) + '     '));
+      await page.keyboard.press('Escape');
+      await page.keyboard.press('Escape');
       await page.click('.oxe-rtab >> text="View"');
       await page.click('.oxe-toolbar button[title="Freeze Panes"]');
       const viewTab = await axe();

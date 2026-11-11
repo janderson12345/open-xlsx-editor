@@ -8,6 +8,7 @@ import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
 import { specialBox } from './specialbox.js';
 import { insertPivot } from './pivotbox.js';
+import { nameManager, defineNameFor } from './namesbox.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
@@ -116,6 +117,18 @@ export function createActs(env) {
         if (text) editing().run('nameBox', text);
         state.grid.el.focus({ preventScroll: true });
       });
+    }
+    if (name === 'nameManager' || name === 'defineName') {
+      // (Formulas > Defined Names: each change one step of the history, Excel's words when it refuses.)
+      const run = (fn) => {
+        let refused = null;
+        editing().run('sheetChange', (wb) => { try { fn(wb); } catch (e) { refused = e.message; return false; } return true; });
+        return refused;
+      };
+      const s = editing().selection;
+      const newName = () => defineNameFor(root, state.workbook, i, s, run);
+      const opened = name === 'nameManager' ? nameManager(root, { workbook: () => state.workbook, run, newName }) : newName();
+      return opened.then((x) => { state.grid.el.focus({ preventScroll: true }); return x; });
     }
     if (name === 'pivotBox') {
       // (Insert > PivotTable: its boxes, then the PivotTable made.)

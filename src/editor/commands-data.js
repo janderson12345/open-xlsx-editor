@@ -1,11 +1,13 @@
 // Commands that move data (commands.js shares its state with them): copy, cut and paste (Paste Special too), fill
 // and AutoFill, sort, AutoSum, the Name Box and the filter.
-import { refName } from '../ooxml/refs.js';
+import { refName, colName } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
+import { validName, defineName } from '../ooxml/names.js';
+import { sheetPrefix } from '../calc/tokens.js';
 import { specialCells, firstShown } from '../ooxml/special.js';
 import { areasOf, areasSelection } from './selection.js';
 import { filterArea } from '../ooxml/filterops.js';
@@ -123,6 +125,15 @@ export function dataCommands(env) {
     /** The Name Box: go to the reference or name typed (goto.js), on its sheet; Excel's words when it can't. */
     nameBox(text) {
       const to = goToTarget(ctx.workbook(), ctx.sheetIndex(), text);
+      // (A name that isn't there yet names the selection, workbook-wide, as Excel's Name Box does.)
+      if (to.error && to.name && validName(text.trim())) {
+        const s = state.sel;
+        const abs = (r, c) => `$${colName(c)}$${r + 1}`;
+        const refersTo = `=${sheetPrefix(ctx.workbook().sheets[ctx.sheetIndex()].name)}${abs(s.r0, s.c0)}${s.r0 === s.r1 && s.c0 === s.c1 ? '' : `:${abs(s.r1, s.c1)}`}`;
+        const done = commands.sheetChange((wb) => { defineName(wb, { name: text.trim(), refersTo }); });
+        if (done) ctx.announce(`${text.trim()} names the selection`);
+        return done;
+      }
       if (to.error) { if (to.name) ctx.announce(to.error); else ctx.alert(to.error); return false; }
       if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
       show(to.sel, null, 'Went to ');

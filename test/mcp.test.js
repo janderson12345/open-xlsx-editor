@@ -42,7 +42,7 @@ test('an assistant reads, writes, reviews its changes, takes one back and saves 
     assert.equal(init.result.serverInfo.name, 'open-xlsx-editor');
     assert.match(init.result.instructions, /review_changes/);
     const tools = (await s.call('tools/list', {})).result.tools.map((t) => t.name);
-    for (const t of ['list_sheets', 'read_range', 'write_cells', 'set_values', 'insert_rows', 'create_pivot', 'review_changes', 'revert_changes', 'save_workbook']) assert.ok(tools.includes(t), t);
+    for (const t of ['list_sheets', 'read_range', 'write_cells', 'set_values', 'insert_rows', 'create_pivot', 'define_name', 'delete_name', 'review_changes', 'revert_changes', 'save_workbook']) assert.ok(tools.includes(t), t);
     assert.equal((await s.tool('list_workbooks', {})).text, 'fruit.xlsx');
     const sheets = JSON.parse((await s.tool('list_sheets', { path: 'fruit.xlsx' })).text);
     assert.deepEqual(sheets.map((x) => x.name), ['Calc', 'Data', 'My Data']);
@@ -65,6 +65,13 @@ test('an assistant reads, writes, reviews its changes, takes one back and saves 
     assert.match((await s.tool('revert_changes', { path: 'fruit.xlsx', cells: ["'My Data'!A2"] })).text, /use revertAll/);
     assert.equal((await s.tool('revert_changes', { path: 'fruit.xlsx', all: true })).text, 'Every change taken back.');
     assert.equal((await s.tool('review_changes', { path: 'fruit.xlsx' })).text, 'No changes.');
+    // A defined name, used in a formula; the review lists it.
+    assert.equal((await s.tool('define_name', { path: 'fruit.xlsx', name: 'Markup', refers_to: '=1.5' })).text, 'Defined Markup.');
+    assert.ok((await s.tool('define_name', { path: 'fruit.xlsx', name: 'my markup', refers_to: '=2' })).error);
+    await s.tool('write_cells', { path: 'fruit.xlsx', cells: { "'My Data'!B1": '=Markup*2' } });
+    assert.equal(JSON.parse((await s.tool('read_cells', { path: 'fruit.xlsx', range: "'My Data'!B1" })).text).rows[0][0].value, 3);
+    assert.match((await s.tool('review_changes', { path: 'fruit.xlsx' })).text, /Name Markup defined as =1.5/);
+    await s.tool('revert_changes', { path: 'fruit.xlsx', all: true });
     // A PivotTable of the table, on a new sheet; then saved as a copy, which opens with it.
     const made = JSON.parse((await s.tool('create_pivot', { path: 'fruit.xlsx', source: 'Fruit', rows: ['Name'], values: [{ field: 'Qty', fn: 'sum' }] })).text);
     assert.equal(made.name, 'PivotTable1');

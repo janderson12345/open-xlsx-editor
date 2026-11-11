@@ -20,6 +20,7 @@ import { sheetPrefix } from './calc/tokens.js';
 import { workbookChanges, changesMarkdown } from './agentreview.js';
 import { createPivot, applyPivot, PIVOT_FUNCTIONS } from './ooxml/pivotnew.js';
 import { readPivots, refreshPivot } from './ooxml/pivot.js';
+import { defineName, editName, deleteName } from './ooxml/names.js';
 
 /** Opens an .xlsx or .xlsm (bytes) for reading and editing; one saved with a password needs `password`. */
 export function openWorkbook(bytes, { password = null } = {}) {
@@ -371,6 +372,28 @@ export class AgentWorkbook {
     const wb = this._baseline();
     this._wb = () => wb;
     this.log = [];
+  }
+
+  /** A defined name, as Excel's Define Name makes it (names.js): `refersTo` as typed ("=Data!$B$2:$B$9", "=0.07"),
+   *  workbook-wide or local to `sheet`. Excel's refusals throw in its words. */
+  defineName(name, refersTo, { sheet = null, comment = '' } = {}) {
+    const local = sheet == null ? null : this.defaultSheet(sheet);
+    this.edits.structure((wb) => defineName(wb, { name, refersTo, sheet: local, comment }), 'lines');
+    this.log.push({ sheetId: null, text: `Name ${name} defined as ${String(refersTo).replace(/^=?/, '=')}` });
+  }
+
+  /** A defined name changed: { name (renamed: formulas follow), refersTo, comment }. */
+  editName(name, change, { sheet = null } = {}) {
+    const local = sheet == null ? null : this.defaultSheet(sheet);
+    this.edits.structure((wb) => editName(wb, { name, sheet: local }, change), 'lines');
+    this.log.push({ sheetId: null, text: `Name ${name} changed${change.name && change.name !== name ? ` to ${change.name}` : ''}` });
+  }
+
+  /** A defined name deleted (formulas using it show #NAME?). */
+  deleteName(name, { sheet = null } = {}) {
+    const local = sheet == null ? null : this.defaultSheet(sheet);
+    this.edits.structure((wb) => deleteName(wb, { name, sheet: local }), 'lines');
+    this.log.push({ sheetId: null, text: `Name ${name} deleted` });
   }
 
   /** Work out every formula again (Excel's Ctrl+Alt+F9). */

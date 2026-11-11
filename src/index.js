@@ -22,6 +22,7 @@ import { viewTab } from './editor/viewtab.js';
 import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
+import { formulasTab } from './editor/formulastab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { selectionStats } from './ooxml/stats.js';
@@ -182,6 +183,7 @@ export function mountXlsxEditor(host, options = {}) {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
+        Formulas: (kit) => formulasTab(kit, { act }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
@@ -270,6 +272,7 @@ export function mountXlsxEditor(host, options = {}) {
           askInvalid: (info) => askInvalid(info),
           selectionShown: () => { for (const f of [...state.onSelect]) f(); return showValidation(); },
           goToBox: () => act('goToBox'),
+          nameManager: () => act('nameManager'),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           editNote: () => act('editNote'),
           fitWidth: (c) => state.grid.fitWidth(c),

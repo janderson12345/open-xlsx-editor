@@ -1277,6 +1277,36 @@
   display: none;
 }
 
+/* Formulas > Name Manager (namesbox.js): its names in a list, the one chosen marked; the New / Edit Name box. */
+.oxe-names-list {
+  max-height: 14em;
+  overflow: auto;
+  border: 1px solid var(--oxe-head-line);
+  margin: 6px 0 10px;
+}
+.oxe-names-table {
+  width: 100%;
+  margin: 0;
+}
+.oxe-names-row {
+  cursor: default;
+}
+.oxe-names-row[aria-selected="true"] {
+  background: var(--oxe-sel-fill, rgba(33, 115, 70, 0.15));
+}
+.oxe-names-row:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: -2px;
+}
+.oxe-names-actions {
+  justify-content: flex-start;
+}
+.oxe-name-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
 /* Excel's Go To Special box (specialbox.js): its choices in two columns, each one's options indented under it. */
 .oxe-special-choices {
   margin: 0 0 10px;
