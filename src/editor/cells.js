@@ -6,6 +6,7 @@ import { cellDisplay } from '../ooxml/numfmt.js';
 import { colChars } from '../ooxml/units.js';
 import { MDW } from './geometry.js';
 import { setVars, div } from './dom.js';
+import { iconElement } from './cficons.js';
 
 /** The merged range a cell is inside, if any. */
 export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
@@ -71,7 +72,11 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     if (cf.bold !== undefined) el.classList.add(cf.bold ? 'oxe-cf-bold' : 'oxe-cf-normal');
     if (cf.italic !== undefined) el.classList.add(cf.italic ? 'oxe-cf-italic' : 'oxe-cf-upright');
     if (cf.strike) el.classList.add('oxe-cf-strike');
+    if (cf.hideValue) el.classList.add('oxe-cf-novalue');
   }
+  // (An icon set's icon at the cell's left: put in after the text, which stays the cell's first child.)
+  const cfIcon = cf?.icon ? iconElement(cf.icon.set, cf.icon.index) : null;
+  if (cfIcon) el.classList.add('oxe-cf-iconed');
   // (A note or comment thread: heard as the cell's description, from notemarks.js's texts.)
   if (st.idBase && st.notes?.has(`${r},${c}`)) el.setAttribute('aria-describedby', `${st.idBase}-note-${r}-${c}`);
   if (st.sel && inSelection(st.sel, r, c)) el.setAttribute('aria-selected', 'true');
@@ -108,6 +113,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     vars['--oxe-indent'] = align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen);
   }
   el.appendChild(textSpan(shown, clean));
+  if (cfIcon) el.appendChild(cfIcon);
   const color = shown.color && st.color ? st.color(shown.color) : null;
   if (color) {
     el.classList.add('oxe-nf-color');

@@ -12,6 +12,13 @@ export const NUMBER_FORMATS = [
   ['Long Date', '[$-x-sysdate]dddd, mmmm dd, yyyy'], ['Time', '[$-x-systime]h:mm:ss AM/PM'], ['Percentage', '0.00%'],
   ['Fraction', '# ?/?'], ['Scientific', '0.00E+00'], ['Text', '@'],
 ];
+/** The Data Bars gallery: gradient then solid fill, each in Excel's six colours. */
+const BAR_MENU = ['gradient', 'solid'].flatMap((fill) => [['blue', 'Blue'], ['green', 'Green'], ['red', 'Red'], ['orange', 'Orange'], ['lightBlue', 'Light Blue'], ['purple', 'Purple']].map(([c, l]) => [fill, c, l]));
+/** The Icon Sets gallery, by Excel's names: Directional, Shapes, Indicators, Ratings. */
+const ICON_MENU = [['3Arrows', '3 Arrows (Colored)'], ['3ArrowsGray', '3 Arrows (Gray)'], ['3Triangles', '3 Triangles'], ['4Arrows', '4 Arrows (Colored)'], ['4ArrowsGray', '4 Arrows (Gray)'],
+  ['5Arrows', '5 Arrows (Colored)'], ['5ArrowsGray', '5 Arrows (Gray)'], ['3TrafficLights1', '3 Traffic Lights (Unrimmed)'], ['3TrafficLights2', '3 Traffic Lights (Rimmed)'], ['3Signs', '3 Signs'],
+  ['4RedToBlack', 'Red To Black'], ['4TrafficLights', '4 Traffic Lights'], ['3Symbols', '3 Symbols (Circled)'], ['3Symbols2', '3 Symbols (Uncircled)'], ['3Flags', '3 Flags'],
+  ['3Stars', '3 Stars'], ['4Rating', '4 Ratings'], ['5Quarters', '5 Quarters'], ['5Rating', '5 Ratings'], ['5Boxes', '5 Boxes']];
 /** The Borders menu, as Excel lists it. */
 const BORDERS = [['bottom', 'Bottom Border'], ['top', 'Top Border'], ['left', 'Left Border'], ['right', 'Right Border'], null,
   ['none', 'No Border'], ['all', 'All Borders'], ['outside', 'Outside Borders'], ['thickOutside', 'Thick Outside Borders'], null,
@@ -106,8 +113,10 @@ export function homeTab(kit, { act, color }) {
       el('div', { class: 'oxe-cap' }, 'Top/Bottom Rules'), item('Top 10 Items...', f('cfAdd', 'top')), item('Top 10%...', f('cfAdd', 'topPercent')),
       item('Bottom 10 Items...', f('cfAdd', 'bottom')), item('Bottom 10%...', f('cfAdd', 'bottomPercent')), item('Above Average...', f('cfAdd', 'above')),
       item('Below Average...', f('cfAdd', 'below')), el('hr'),
+      el('div', { class: 'oxe-cap' }, 'Data Bars'), ...BAR_MENU.map(([fill, color, label]) => item(`${label} Data Bar (${fill === 'solid' ? 'Solid' : 'Gradient'} Fill)`, f('cfAdd', 'dataBar', color, fill))), el('hr'),
+      el('div', { class: 'oxe-cap' }, 'Icon Sets'), ...ICON_MENU.map(([set, label]) => item(label, f('cfAdd', 'iconSet', set))), el('hr'),
       el('div', { class: 'oxe-cap' }, 'Color Scales'), item('Red - Yellow - Green Color Scale', f('cfAdd', 'scale3')), item('Orange - Yellow Color Scale', f('cfAdd', 'scale2')), el('hr'),
-      item('Clear Rules from Selected Cells', f('cfClear', 'selection')), item('Clear Rules from Entire Sheet', f('cfClear', 'sheet'))],
+      item('New Rule...', f('cfNewRule')), item('Clear Rules from Selected Cells', f('cfClear', 'selection')), item('Clear Rules from Entire Sheet', f('cfClear', 'sheet')), item('Manage Rules...', f('cfManager'))],
       { label: 'Conditional Formatting', big: true })),
     grp('Cells', col(
       sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Cells...', f('insertCells'), { hint: 'Ctrl++' }), item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),

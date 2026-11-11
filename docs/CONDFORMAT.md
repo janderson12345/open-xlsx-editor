@@ -58,8 +58,52 @@ Two things the measurement could not settle, because Excel's COM is not its menu
 gives a later rule the lower priority. The editor follows the menu: a new rule doesn't stop, and it comes first
 (priority 1, as the Rules Manager lists the newest first). The tests compare everything else and set those two aside.
 
+## Data bars and icon sets (`src/ooxml/cfext.js`, `cfbars.js`, `cfbarsedit.js`)
+
+Home > Conditional Formatting > Data Bars (gradient or solid, Excel's six colours) and Icon Sets (Excel's twenty), and
+New Rule's "Format all cells based on their values".
+
+Measured over COM (`tools/excel-compare/excel-cf-bars.ps1`: `AddDatabar` set as the ribbon gives it, and
+`AddIconSetCondition` with each set, on a new workbook; `test/cfbars-excel.json`): 33 of 33 rules written here as Excel
+writes them, the rule and its extLst part text for text, Excel's made-up ids aside. Excel opened the workbook written
+here (`excel-cf-bars-check.ps1`, `test/cfbars-readback-excel.json`) and read each column's rule back: its kind, a bar's
+colour, fill, border and automatic ends, an icon set's set.
+
+| Rule | As Excel writes it |
+|---|---|
+| A data bar | A `cfRule` of type dataBar (min, max, its colour) with an `x14:id`; in the worksheet's extLst the `x14:cfRule` of that id: min and max length 0 and 100, automatic min and max, negative bars red (`FFFF0000`), a black axis. Gradient: a border in the bar's colour, the negative border red. Solid: `gradient="0"`, no border. |
+| An icon set | A `cfRule` of type iconSet with the set's name (none for 3 Traffic Lights, the default) and its thresholds in percent: 0, 33, 67; 0, 25, 50, 75; 0, 20, 40, 60, 80. |
+| Excel 2010's sets | 3 Stars, 3 Triangles and 5 Boxes: an `x14:cfRule` in the extLst alone, with its own priority and `xm:f` thresholds. |
+| The extLst | Its conditional formats ext comes first among the sheet's exts. Its rules' priorities count with the others. |
+
+What they draw follows Excel's documented rules, not measured (COM can't read back a bar's length or a cell's icon).
+- **Bar ends:** the min and max are the lowest and highest values; automatic ones are 0 when that is further out. They can also be a number, a percent of the span, or a percentile.
+- **Bar length:** between the rule's min and max lengths.
+- **Axis:** with negative numbers and an automatic axis, the axis falls where 0 does, and negative bars run left from it in the negative colour.
+- **Icons:** each number gets the last icon whose threshold it reaches. Thresholds can be a percent of the span, a percentile or a number.
+
+## The Rules Manager (`src/ooxml/cfmanage.js`, `src/editor/cfmanager.js`)
+
+Manage Rules... lists the rules for the selection or the whole sheet in priority order: each with its description, the
+cells it applies to (editable), and Stop If True. New Rule..., Delete Rule, Move Up and Move Down are each one step of
+Undo. New Rule offers Excel's six rule types: based on values (colour scales, data bars, icon sets), cell value with
+all eight comparisons, top or bottom, above or below average, unique or duplicate, and a formula.
+
+Measured over COM (`tools/excel-compare/excel-cf-manage.ps1`, `test/cfmanage-excel.json`): Excel's four rules on a
+sheet, each change made here, 5 of 5 as Excel makes them.
+
+| Change | As Excel makes it |
+|---|---|
+| Delete | The rule goes, with its extLst part (the ext and extLst too when left empty); the others keep their priorities, gaps and all. |
+| A rule given priority p | Every other rule from p on one later. Move Up gives the rule above's priority; Move Down moves the rule below up. |
+| Sent last | One more than the last. |
+| Stop If True | `stopIfTrue="1"` after the priority. |
+| Applies to | The rule moves to a `conditionalFormatting` of its own just after the one it was in. |
+
+A formula rule is `type="expression"` with its formula, as Excel writes it (its own rules from COM, `stopIfTrue`
+aside, which COM always sets).
+
 ## Not yet
 
-Data bars and icon sets (stored in the sheet's extLst by Excel 2010 and later), date rules ("a date occurring")
-checked against today's date, a rule's number format and borders, editing a rule (the Rules Manager), New Rule, and
-the other presets of Color Scales.
+Date rules ("a date occurring") checked against today's date, a rule's number format and borders, editing a rule's
+settings (Edit Rule), custom thresholds and colours in New Rule, and the other presets of Color Scales.

@@ -7,6 +7,7 @@ import { parseRef, parseRange } from './refs.js';
 import { stringItemText } from './strings.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { readColor } from './styles.js';
+import { readExtRules, readDataBar, readIconSet, extIdOf } from './cfext.js';
 
 /** A cell as stored: `t` its type (n number, s string, b boolean, e error, str formula text, d ISO date), `v` its
  *  value (null for a cell that only carries a style), `s` its style (an index into cellXfs), `f` its formula text.
@@ -132,6 +133,8 @@ function readAutoFilter(el, ns) {
  */
 function readCondFormats(root, ns) {
   const flag = (el, name, dflt = false) => { const v = attr(el, name); return v == null ? dflt : v === '1' || v === 'true'; };
+  // (Data bars' settings and Excel 2010's icon sets are in the worksheet's extLst: cfext.js.)
+  const ext = readExtRules(root, ns);
   return kids(root, 'conditionalFormatting', ns).map((cf) => ({
     ranges: (attr(cf, 'sqref') || '').split(/\s+/).map(parseRange).filter(Boolean),
     rules: kids(cf, 'cfRule', ns).map((r) => {
@@ -142,9 +145,12 @@ function readCondFormats(root, ns) {
         text: attr(r, 'text'), rank: Number(attr(r, 'rank') || 10), percent: flag(r, 'percent'), bottom: flag(r, 'bottom'),
         aboveAverage: flag(r, 'aboveAverage', true), equalAverage: flag(r, 'equalAverage'),
         colorScale: scale ? { cfvo: kids(scale, 'cfvo', ns).map((v) => ({ type: attr(v, 'type'), val: attr(v, 'val') })), colors: kids(scale, 'color', ns).map(readColor) } : null,
+        dataBar: kid(r, 'dataBar', ns) ? { ...readDataBar(kid(r, 'dataBar', ns), ns), ...(ext.bars.get(extIdOf(r, ns)) || {}), fill: readDataBar(kid(r, 'dataBar', ns), ns).fill, showValue: readDataBar(kid(r, 'dataBar', ns), ns).showValue } : null,
+        iconSet: kid(r, 'iconSet', ns) ? readIconSet(kid(r, 'iconSet', ns), ns) : null,
+        ext: extIdOf(r, ns),
       };
     }),
-  }));
+  })).concat(ext.extra);
 }
 
 /**

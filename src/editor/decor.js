@@ -58,6 +58,8 @@ export function decorations(st, win) {
         const m = merge || { r0: r, c0: c, r1: r, c1: c };
         if (m.r0 === r && m.c0 === c) { const el = rect(st, m.r0, m.c0, m.r1, m.c1, 'oxe-cf-fill', ox, oy); el.style.setProperty('--oxe-cf', cf.fill); fills.push(el); }
       }
+      // (A data bar: from its start to its end across the cell, a pixel in from the gridlines, and the axis dashed.)
+      if (cf?.bar) fills.push(...dataBar(st, r, c, cf.bar, ox, oy));
       const cell = line?.get(c);
       if (!cell || !cell.s) continue;
       const d = deco(cell.s);
@@ -75,6 +77,32 @@ export function decorations(st, win) {
     }
   }
   return { fills, edges };
+}
+
+/** A data bar's elements in cell (r, c): the bar (gradient: its colour fading to white towards its end, as Excel draws
+ *  it; a border in its border colour) and, when it has one, the axis. */
+function dataBar(st, r, c, bar, ox, oy) {
+  const x = st.cols.start(c) + ox;
+  const w = st.cols.size(c);
+  const y = st.rows.start(r) + oy;
+  const h = st.rows.size(r);
+  if (w < 4 || h < 4) return [];
+  const inner = w - 3;
+  const from = x + 1 + bar.from * inner;
+  const width = Math.max(0, (bar.to - bar.from) * inner);
+  const el = div('oxe-fill oxe-cf-bar');
+  setVars(el, { '--oxe-x': from, '--oxe-y': y + 1, '--oxe-w': width, '--oxe-h': h - 3 });
+  // (Pointing away from the axis: a negative bar's gradient fades leftwards.)
+  el.style.background = bar.gradient ? `linear-gradient(to ${bar.negative ? 'left' : 'right'}, ${bar.color}, #ffffff)` : bar.color;
+  if (bar.border) el.style.boxShadow = `inset 0 0 0 1px ${bar.border}`;
+  const out = [el];
+  if (bar.axis != null) {
+    const axis = div('oxe-fill oxe-cf-axis');
+    setVars(axis, { '--oxe-x': x + 1 + bar.axis * inner, '--oxe-y': y + 1, '--oxe-w': 1, '--oxe-h': h - 3 });
+    axis.style.borderLeft = `1px dashed ${bar.axisColor}`;
+    out.push(axis);
+  }
+  return out;
 }
 
 /** A fill from the start of (r0, c0) to the end of (r1, c1); on screen it covers the gridline pixels inside. */

@@ -1,0 +1,209 @@
+{
+ "source": "tools/excel-compare/excel-cf-bars-check.ps1 on test/out/cf/cfbars.xlsx (cfbars.test.js)",
+ "rules": {
+  "icons5Boxes": {
+   "type": "iconSet",
+   "set": 20,
+   "count": 5
+  },
+  "barLightBlueSolid": {
+   "type": "dataBar",
+   "color": 15698432,
+   "solid": true,
+   "border": 0,
+   "min": 6,
+   "max": 7
+  },
+  "barGreenSolid": {
+   "type": "dataBar",
+   "color": 8700771,
+   "solid": true,
+   "border": 0,
+   "min": 6,
+   "max": 7
+  },
+  "barNegative": {
+   "type": "dataBar",
+   "color": 13012579,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  },
+  "icons3TrafficLights2": {
+   "type": "iconSet",
+   "set": 5,
+   "count": 3
+  },
+  "icons4Rating": {
+   "type": "iconSet",
+   "set": 12,
+   "count": 4
+  },
+  "icons4RedToBlack": {
+   "type": "iconSet",
+   "set": 11,
+   "count": 4
+  },
+  "barRedSolid": {
+   "type": "dataBar",
+   "color": 5920255,
+   "solid": true,
+   "border": 0,
+   "min": 6,
+   "max": 7
+  },
+  "icons3Flags": {
+   "type": "iconSet",
+   "set": 3,
+   "count": 3
+  },
+  "icons5ArrowsGray": {
+   "type": "iconSet",
+   "set": 15,
+   "count": 5
+  },
+  "icons3Symbols": {
+   "type": "iconSet",
+   "set": 7,
+   "count": 3
+  },
+  "icons4Arrows": {
+   "type": "iconSet",
+   "set": 9,
+   "count": 4
+  },
+  "icons3Stars": {
+   "type": "iconSet",
+   "set": 18,
+   "count": 3
+  },
+  "icons3Signs": {
+   "type": "iconSet",
+   "set": 6,
+   "count": 3
+  },
+  "icons3Symbols2": {
+   "type": "iconSet",
+   "set": 8,
+   "count": 3
+  },
+  "barBlueSolid": {
+   "type": "dataBar",
+   "color": 13012579,
+   "solid": true,
+   "border": 0,
+   "min": 6,
+   "max": 7
+  },
+  "barOrangeSolid": {
+   "type": "dataBar",
+   "color": 2668287,
+   "solid": true,
+   "border": 0,
+   "min": 6,
+   "max": 7
+  },
+  "icons4TrafficLights": {
+   "type": "iconSet",
+   "set": 13,
+   "count": 4
+  },
+  "icons3TrafficLights1": {
+   "type": "iconSet",
+   "set": 4,
+   "count": 3
+  },
+  "barGreenGradient": {
+   "type": "dataBar",
+   "color": 8700771,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  },
+  "icons5Quarters": {
+   "type": "iconSet",
+   "set": 17,
+   "count": 5
+  },
+  "barRedGradient": {
+   "type": "dataBar",
+   "color": 5920255,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  },
+  "barBlueGradient": {
+   "type": "dataBar",
+   "color": 13012579,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  },
+  "icons5Rating": {
+   "type": "iconSet",
+   "set": 16,
+   "count": 5
+  },
+  "icons4ArrowsGray": {
+   "type": "iconSet",
+   "set": 10,
+   "count": 4
+  },
+  "icons3Triangles": {
+   "type": "iconSet",
+   "set": 19,
+   "count": 3
+  },
+  "icons3ArrowsGray": {
+   "type": "iconSet",
+   "set": 2,
+   "count": 3
+  },
+  "barPurpleSolid": {
+   "type": "dataBar",
+   "color": 8061142,
+   "solid": true,
+   "border": 0,
+   "min": 6,
+   "max": 7
+  },
+  "barPurpleGradient": {
+   "type": "dataBar",
+   "color": 8061142,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  },
+  "icons3Arrows": {
+   "type": "iconSet",
+   "set": 1,
+   "count": 3
+  },
+  "icons5Arrows": {
+   "type": "iconSet",
+   "set": 14,
+   "count": 5
+  },
+  "barOrangeGradient": {
+   "type": "dataBar",
+   "color": 2668287,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  },
+  "barLightBlueGradient": {
+   "type": "dataBar",
+   "color": 15698432,
+   "solid": false,
+   "border": 1,
+   "min": 6,
+   "max": 7
+  }
+ }
+}

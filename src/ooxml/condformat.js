@@ -3,10 +3,11 @@
 // its format sets and a rule before it hasn't, and Stop If True ends the cell's rules there. Cell value rules compare
 // as Excel compares (a blank as 0 or "", text after every number, case aside, errors never); text, blank and error
 // rules are the formulas Excel writes for them; top and bottom, average, duplicates and colour scales look at the
-// range's values. Data bars and icon sets aren't drawn yet.
+// range's values; data bars and icon sets by Excel's documented rules (cfbars.js).
 import { shiftFormula } from '../calc/tokens.js';
 import { resolveColor } from './theme.js';
 import { MAX_ROWS, MAX_COLS } from './refs.js';
+import { barSpans, iconIndexes } from './cfbars.js';
 
 const isError = (v) => v && typeof v === 'object' && v.code != null;
 /** A cell's value as a rule sees it: null for a blank. */
@@ -114,7 +115,8 @@ function rangeTest(sheet, ranges, rule) {
 
 /**
  * What sheet si's conditional formats give its cells: Map("r,c" => { fill, color ("#RRGGBB"), bold, italic, strike,
- * underline }), only what a rule sets.
+ * underline, bar: { from, to, color, gradient, border, axis, axisColor }, icon: { set, index }, hideValue }), only what a
+ * rule sets.
  */
 export function conditionalLooks(wb, si) {
   const sheet = wb.sheet(si);
@@ -144,6 +146,25 @@ export function conditionalLooks(wb, si) {
         if (stopped.has(key)) continue;
         const look = out.get(key) || {};
         if (look.fill === undefined) look.fill = fill;
+        out.set(key, look);
+      }
+      continue;
+    }
+    if ((rule.type === 'dataBar' && rule.dataBar) || (rule.type === 'iconSet' && rule.iconSet)) {
+      // (A cell's first data bar and first icon set, by priority; cfbars.js works them out.)
+      const cells = [...cellsOf(sheet, ranges)].map(([r, c]) => [r, c, sheet.cells.get(r)?.get(c)?.v]).filter(([r, c]) => !stopped.has(`${r},${c}`));
+      const bar = rule.dataBar;
+      const found = bar ? barSpans(cells, bar) : iconIndexes(cells, rule.iconSet);
+      for (const [key, got] of found) {
+        const look = out.get(key) || {};
+        if (bar && look.bar === undefined) {
+          const neg = got.negative && !bar.negativeSame;
+          look.bar = { ...got, color: color(neg ? bar.negativeFill || bar.fill : bar.fill) || '#638EC6', gradient: bar.gradient, border: bar.border ? color(neg ? bar.negativeBorder || bar.borderColor : bar.borderColor) || null : null, axisColor: color(bar.axisColor) || '#000000' };
+          if (bar.showValue === false) look.hideValue = true;
+        } else if (!bar && look.icon === undefined) {
+          look.icon = { set: rule.iconSet.set, index: got };
+          if (rule.iconSet.showValue === false) look.hideValue = true;
+        }
         out.set(key, look);
       }
       continue;

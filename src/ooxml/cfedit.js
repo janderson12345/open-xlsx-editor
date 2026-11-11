@@ -10,6 +10,8 @@ import { parseRange, rangeName, MAX_ROWS, MAX_COLS } from './refs.js';
 import { readDxf } from './styles.js';
 import { parseInput } from './input.js';
 import { subtract } from './dvedit.js';
+import { barRuleXml, addX14Rule, x14Rules } from './cfbarsedit.js';
+import { X14, XM } from './cfext.js';
 
 /** The menu's preset formats: [font colour, fill colour] (ARGB, null for none). */
 export const CF_PRESETS = {
@@ -24,7 +26,8 @@ export const CF_SCALES = {
   3: ['FFF8696B', 'FFFFEB84', 'FF63BE7B'],
   2: ['FFFF7128', 'FFFFEF9C'],
 };
-const OPS = { greaterThan: 'greaterThan', lessThan: 'lessThan', between: 'between', equal: 'equal' };
+const OPS = { greaterThan: 'greaterThan', lessThan: 'lessThan', between: 'between', equal: 'equal', notBetween: 'notBetween', notEqual: 'notEqual',
+  greaterThanOrEqual: 'greaterThanOrEqual', lessThanOrEqual: 'lessThanOrEqual' };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** A dxf for a preset, as Excel writes it. */
@@ -45,10 +48,11 @@ export function cfFormula(typed) {
  * The cfRule for `rule` (dxfId the preset's format, priority as given, `at` the range's first cell for formulas that
  * read it), as Excel writes it. `rule`: { kind: 'cellIs', operator, f1, f2 } | { kind: 'containsText', text } |
  * { kind: 'duplicate', unique } | { kind: 'top10', rank, percent, bottom } | { kind: 'average', below } |
- * { kind: 'colorScale', points } (each with `preset`, but the colour scale).
+ * { kind: 'expression', formula } | { kind: 'colorScale', points } (each with `preset`, but the colour scale), or
+ * cfbarsedit.js's data bars and icon sets.
  */
 export function cfRuleXml(rule, dxfId, priority, at) {
-  const a = [`type="${{ cellIs: 'cellIs', containsText: 'containsText', duplicate: rule.unique ? 'uniqueValues' : 'duplicateValues', top10: 'top10', average: 'aboveAverage', colorScale: 'colorScale' }[rule.kind]}"`];
+  const a = [`type="${{ cellIs: 'cellIs', containsText: 'containsText', duplicate: rule.unique ? 'uniqueValues' : 'duplicateValues', top10: 'top10', average: 'aboveAverage', colorScale: 'colorScale', expression: 'expression' }[rule.kind]}"`];
   if (rule.kind !== 'colorScale') a.push(`dxfId="${dxfId}"`);
   a.push(`priority="${priority}"`);
   if (rule.kind === 'average' && rule.below) a.push('aboveAverage="0"');
@@ -58,7 +62,9 @@ export function cfRuleXml(rule, dxfId, priority, at) {
   if (rule.kind === 'containsText') a.push('operator="containsText"', `text="${esc(rule.text)}"`);
   if (rule.kind === 'top10') a.push(`rank="${rule.rank}"`);
   let body = '';
-  if (rule.kind === 'cellIs') body = `<formula>${esc(cfFormula(rule.f1))}</formula>${rule.operator === 'between' ? `<formula>${esc(cfFormula(rule.f2))}</formula>` : ''}`;
+  if (rule.kind === 'cellIs') body = `<formula>${esc(cfFormula(rule.f1))}</formula>${rule.operator === 'between' || rule.operator === 'notBetween' ? `<formula>${esc(cfFormula(rule.f2))}</formula>` : ''}`;
+  // (Use a formula: the formula as typed, without its =, as Excel's New Rule writes it.)
+  if (rule.kind === 'expression') body = `<formula>${esc(String(rule.formula || '').trim().replace(/^=/, ''))}</formula>`;
   if (rule.kind === 'containsText') body = `<formula>${esc(`NOT(ISERROR(SEARCH("${String(rule.text).replace(/"/g, '""')}",${at})))`)}</formula>`;
   if (rule.kind === 'colorScale') {
     const colors = CF_SCALES[rule.points === 2 ? 2 : 3];
@@ -82,7 +88,8 @@ export function addConditional(wb, si, ranges, rule) {
   const ns = root.namespaceURI;
   const p = root.prefix ? `${root.prefix}:` : '';
   let dxfId = null;
-  if (rule.kind !== 'colorScale') {
+  const bars = rule.kind === 'dataBar' || rule.kind === 'iconSet';
+  if (rule.kind !== 'colorScale' && !bars) {
     const sroot = wb.stylesDoc.documentElement;
     const sns = sroot.namespaceURI;
     let dxfs = kid(sroot, 'dxfs', sns);
@@ -99,9 +106,17 @@ export function addConditional(wb, si, ranges, rule) {
     wb.dirty.add(wb.stylesPath);
   }
   // Every rule of the sheet one later: the new one first.
-  for (const r of doc.getElementsByTagNameNS(ns, 'cfRule')) r.setAttribute('priority', String(Number(r.getAttribute('priority') || 0) + 1));
+  // (Excel 2010's rules in the extLst have priorities among the others: cfbarsedit.js.)
+  for (const r of [...doc.getElementsByTagNameNS(ns, 'cfRule'), ...x14Rules(doc).filter((x) => x.hasAttribute('priority'))]) r.setAttribute('priority', String(Number(r.getAttribute('priority') || 0) + 1));
   const sqref = ranges.map(rangeName).join(' ');
-  const xml = cfRuleXml(rule, dxfId, 1, rangeName({ r0: ranges[0].r0, c0: ranges[0].c0, r1: ranges[0].r0, c1: ranges[0].c0 })).replace(/<(\/?)(cfRule|formula|colorScale|cfvo|color)\b/g, `<$1${p}$2`);
+  let base = null;
+  if (bars) {
+    const made = barRuleXml(rule, 1);
+    if (made.x14) addX14Rule(doc, made.x14, sqref);
+    base = made.base;
+    if (!base) return;
+  }
+  const xml = (base ?? cfRuleXml(rule, dxfId, 1, rangeName({ r0: ranges[0].r0, c0: ranges[0].c0, r1: ranges[0].r0, c1: ranges[0].c0 }))).replace(/<(\/?)(cfRule|formula|colorScale|cfvo|color|dataBar|iconSet|extLst|ext)\b/g, `<$1${p}$2`);
   const ruleEl = doc.importNode(parseXml(`<w xmlns${root.prefix ? `:${root.prefix}` : ''}="${ns}">${xml}</w>`).documentElement.firstChild, true);
   let cf = kids(root, 'conditionalFormatting', ns).find((e) => e.getAttribute('sqref') === sqref);
   if (!cf) {
@@ -118,10 +133,19 @@ export function clearConditional(wb, si, ranges = null) {
   const doc = wb._part(si).doc;
   const root = doc.documentElement;
   const ns = root.namespaceURI;
-  for (const cf of kids(root, 'conditionalFormatting', ns)) {
-    if (!ranges) { root.removeChild(cf); continue; }
-    let parts = (cf.getAttribute('sqref') || '').split(/\s+/).map(parseRange).filter(Boolean);
+  const trim = (sqref) => {
+    let parts = (sqref || '').split(/\s+/).map(parseRange).filter(Boolean);
     for (const s of ranges) parts = parts.flatMap((x) => subtract(x, { r0: s.r0, c0: s.c0, r1: Math.min(s.r1, MAX_ROWS - 1), c1: Math.min(s.c1, MAX_COLS - 1) }));
-    if (parts.length) cf.setAttribute('sqref', parts.map(rangeName).join(' ')); else root.removeChild(cf);
+    return parts.map(rangeName).join(' ');
+  };
+  for (const cf of kids(root, 'conditionalFormatting', ns)) {
+    const left = ranges ? trim(cf.getAttribute('sqref')) : '';
+    if (left) cf.setAttribute('sqref', left); else root.removeChild(cf);
+  }
+  // (The extLst's rules, data bars' settings and Excel 2010's icon sets, likewise.)
+  for (const cf of [...doc.getElementsByTagNameNS(X14, 'conditionalFormatting')]) {
+    const sq = kid(cf, 'sqref', XM);
+    const left = ranges && sq ? trim(sq.textContent) : '';
+    if (left) sq.textContent = left; else cf.parentNode.removeChild(cf);
   }
 }

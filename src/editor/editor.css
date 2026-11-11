@@ -1551,6 +1551,26 @@
   white-space: pre-wrap;
 }
 
+/* Data bars and icon sets (ooxml/cfbars.js): a bar inside its cell under the text, a dashed axis; an icon at the
+   cell's left, the text keeping its alignment in the room beside it. */
+.oxe-fill.oxe-cf-bar,
+.oxe-fill.oxe-cf-axis {
+  box-sizing: border-box;
+}
+.oxe-cell .oxe-cf-icon {
+  position: absolute;
+  left: 2px;
+  bottom: 3px;
+  width: 12px;
+  height: 12px;
+  line-height: 0;
+}
+.oxe-cell.oxe-cf-iconed {
+  --oxe-pad-l: 17px;
+}
+.oxe-cell.oxe-cf-novalue > .oxe-tx {
+  visibility: hidden;
+}
 /* Conditional formats (ooxml/condformat.js): a rule's fill and font over the cell's own (four parts, to outrank the
    cell format classes cellstyles.js scopes to the editor). */
 .oxe-fill.oxe-cf-fill {

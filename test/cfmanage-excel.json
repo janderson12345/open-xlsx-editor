@@ -1,0 +1,42 @@
+{
+ "source": "tools/excel-compare/excel-cf-manage.ps1: Excel 365, 1 to 10 in A1:A10 and four rules (greater than 5, a data bar, 3 arrows, =MOD(A1,2)=0), then one Rules Manager change a case; saved; the conditionalFormatting elements and the extLst",
+ "cases": {
+  "start": {
+   "cf": [
+    "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"dataBar\" priority=\"2\"><dataBar><cfvo type=\"min\"/><cfvo type=\"max\"/><color rgb=\"FF638EC6\"/></dataBar><extLst><ext uri=\"{B025F937-C7B1-47D3-B67F-A62EFF666E3E}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:id>{4489E8D5-5833-41C3-9739-66A1D3F44D22}</x14:id></ext></extLst></cfRule><cfRule type=\"iconSet\" priority=\"3\"><iconSet iconSet=\"3Arrows\"><cfvo type=\"percent\" val=\"0\"/><cfvo type=\"percent\" val=\"33\"/><cfvo type=\"percent\" val=\"67\"/></iconSet></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"4\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule></conditionalFormatting>"
+   ],
+   "ext": "<extLst><ext uri=\"{78C0D931-6437-407d-A8EE-F0AAD7539E65}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:conditionalFormattings><x14:conditionalFormatting xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:cfRule type=\"dataBar\" id=\"{4489E8D5-5833-41C3-9739-66A1D3F44D22}\"><x14:dataBar minLength=\"0\" maxLength=\"100\" negativeBarColorSameAsPositive=\"1\" axisPosition=\"none\"><x14:cfvo type=\"min\"/><x14:cfvo type=\"max\"/></x14:dataBar></x14:cfRule><xm:sqref>A1:A10</xm:sqref></x14:conditionalFormatting></x14:conditionalFormattings></ext></extLst>"
+  },
+  "deleteSecond": {
+   "cf": [
+    "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"iconSet\" priority=\"3\"><iconSet iconSet=\"3Arrows\"><cfvo type=\"percent\" val=\"0\"/><cfvo type=\"percent\" val=\"33\"/><cfvo type=\"percent\" val=\"67\"/></iconSet></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"4\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule></conditionalFormatting>"
+   ],
+   "ext": ""
+  },
+  "thirdUp": {
+   "cf": [
+    "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"dataBar\" priority=\"3\"><dataBar><cfvo type=\"min\"/><cfvo type=\"max\"/><color rgb=\"FF638EC6\"/></dataBar><extLst><ext uri=\"{B025F937-C7B1-47D3-B67F-A62EFF666E3E}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:id>{28FD8C0E-1E28-4779-8514-DD5963A27771}</x14:id></ext></extLst></cfRule><cfRule type=\"iconSet\" priority=\"2\"><iconSet iconSet=\"3Arrows\"><cfvo type=\"percent\" val=\"0\"/><cfvo type=\"percent\" val=\"33\"/><cfvo type=\"percent\" val=\"67\"/></iconSet></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"5\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule></conditionalFormatting>"
+   ],
+   "ext": "<extLst><ext uri=\"{78C0D931-6437-407d-A8EE-F0AAD7539E65}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:conditionalFormattings><x14:conditionalFormatting xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:cfRule type=\"dataBar\" id=\"{28FD8C0E-1E28-4779-8514-DD5963A27771}\"><x14:dataBar minLength=\"0\" maxLength=\"100\" negativeBarColorSameAsPositive=\"1\" axisPosition=\"none\"><x14:cfvo type=\"min\"/><x14:cfvo type=\"max\"/></x14:dataBar></x14:cfRule><xm:sqref>A1:A10</xm:sqref></x14:conditionalFormatting></x14:conditionalFormattings></ext></extLst>"
+  },
+  "firstLast": {
+   "cf": [
+    "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"5\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"dataBar\" priority=\"2\"><dataBar><cfvo type=\"min\"/><cfvo type=\"max\"/><color rgb=\"FF638EC6\"/></dataBar><extLst><ext uri=\"{B025F937-C7B1-47D3-B67F-A62EFF666E3E}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:id>{49B58EB3-1F8E-463B-A6C8-4BEED13BEB4E}</x14:id></ext></extLst></cfRule><cfRule type=\"iconSet\" priority=\"3\"><iconSet iconSet=\"3Arrows\"><cfvo type=\"percent\" val=\"0\"/><cfvo type=\"percent\" val=\"33\"/><cfvo type=\"percent\" val=\"67\"/></iconSet></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"4\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule></conditionalFormatting>"
+   ],
+   "ext": "<extLst><ext uri=\"{78C0D931-6437-407d-A8EE-F0AAD7539E65}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:conditionalFormattings><x14:conditionalFormatting xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:cfRule type=\"dataBar\" id=\"{49B58EB3-1F8E-463B-A6C8-4BEED13BEB4E}\"><x14:dataBar minLength=\"0\" maxLength=\"100\" negativeBarColorSameAsPositive=\"1\" axisPosition=\"none\"><x14:cfvo type=\"min\"/><x14:cfvo type=\"max\"/></x14:dataBar></x14:cfRule><xm:sqref>A1:A10</xm:sqref></x14:conditionalFormatting></x14:conditionalFormattings></ext></extLst>"
+  },
+  "stopFormula": {
+   "cf": [
+    "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"dataBar\" priority=\"2\"><dataBar><cfvo type=\"min\"/><cfvo type=\"max\"/><color rgb=\"FF638EC6\"/></dataBar><extLst><ext uri=\"{B025F937-C7B1-47D3-B67F-A62EFF666E3E}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:id>{904ADB8E-53D1-4FDA-B75C-3B03B7D0CB16}</x14:id></ext></extLst></cfRule><cfRule type=\"iconSet\" priority=\"3\"><iconSet iconSet=\"3Arrows\"><cfvo type=\"percent\" val=\"0\"/><cfvo type=\"percent\" val=\"33\"/><cfvo type=\"percent\" val=\"67\"/></iconSet></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"4\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule></conditionalFormatting>"
+   ],
+   "ext": "<extLst><ext uri=\"{78C0D931-6437-407d-A8EE-F0AAD7539E65}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:conditionalFormattings><x14:conditionalFormatting xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:cfRule type=\"dataBar\" id=\"{904ADB8E-53D1-4FDA-B75C-3B03B7D0CB16}\"><x14:dataBar minLength=\"0\" maxLength=\"100\" negativeBarColorSameAsPositive=\"1\" axisPosition=\"none\"><x14:cfvo type=\"min\"/><x14:cfvo type=\"max\"/></x14:dataBar></x14:cfRule><xm:sqref>A1:A10</xm:sqref></x14:conditionalFormatting></x14:conditionalFormattings></ext></extLst>"
+  },
+  "widen": {
+   "cf": [
+    "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"dataBar\" priority=\"2\"><dataBar><cfvo type=\"min\"/><cfvo type=\"max\"/><color rgb=\"FF638EC6\"/></dataBar><extLst><ext uri=\"{B025F937-C7B1-47D3-B67F-A62EFF666E3E}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:id>{D6E307E8-FB6E-481A-8182-C3FA93D6201E}</x14:id></ext></extLst></cfRule><cfRule type=\"iconSet\" priority=\"3\"><iconSet iconSet=\"3Arrows\"><cfvo type=\"percent\" val=\"0\"/><cfvo type=\"percent\" val=\"33\"/><cfvo type=\"percent\" val=\"67\"/></iconSet></cfRule></conditionalFormatting>",
+    "<conditionalFormatting sqref=\"A1:B10\"><cfRule type=\"expression\" dxfId=\"0\" priority=\"4\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule></conditionalFormatting>"
+   ],
+   "ext": "<extLst><ext uri=\"{78C0D931-6437-407d-A8EE-F0AAD7539E65}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:conditionalFormattings><x14:conditionalFormatting xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:cfRule type=\"dataBar\" id=\"{D6E307E8-FB6E-481A-8182-C3FA93D6201E}\"><x14:dataBar minLength=\"0\" maxLength=\"100\" negativeBarColorSameAsPositive=\"1\" axisPosition=\"none\"><x14:cfvo type=\"min\"/><x14:cfvo type=\"max\"/></x14:dataBar></x14:cfRule><xm:sqref>A1:A10</xm:sqref></x14:conditionalFormatting></x14:conditionalFormattings></ext></extLst>"
+  }
+ }
+}

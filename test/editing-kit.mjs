@@ -43,7 +43,8 @@ export async function editingPage() {
     if (more) await page.click('.oxe-more');
     await page.click(btn);
     await then();
-    if (more && await page.isVisible('.oxe-more')) await page.click('.oxe-more');
+    // (Not while the choice opened a box: the box holds the page until it's answered.)
+    if (more && await page.isVisible('.oxe-more') && !(await page.isVisible('dialog[open]'))) await page.click('.oxe-more');
   };
   const menu = (title, item) => ribbon(title, () => page.click(`.oxe-pop >> text=${item}`));
 

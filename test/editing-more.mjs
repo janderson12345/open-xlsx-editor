@@ -300,4 +300,28 @@ await page.click(`${box} >> button:text-is("Close")`);
 await page.keyboard.press('Control+z');
 check(oneLeft === 'Check these totals' && await threadNow() === 'Check these totals | Done, checked', 'the reply deleted; Ctrl+Z brings it back', `${oneLeft} / ${await threadNow()}`);
 
+// Conditional formatting on a new sheet's numbers 1 to 5: a blue data bar from the menu (drawn: the largest bar the
+// widest), an icon set (5's icon the top one), New Rule's formula rule, and the Rules Manager deleting the data bar.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for (let r = 1; r <= 5; r++) o.enter(`A${r}`, String(r)); o.select('A1'); o.command('extendTo', 4, 0); });
+await page.click('.oxe-rtab >> text=Home');
+await menu('Conditional Formatting', 'Blue Data Bar (Gradient Fill)');
+await menu('Conditional Formatting', '3 Arrows (Colored)');
+const barWidths = await page.evaluate(() => [...document.querySelectorAll('.oxe-cf-bar')].map((b) => parseFloat(b.style.getPropertyValue('--oxe-w'))));
+const icons = await page.evaluate(() => document.querySelectorAll('.oxe-cf-icon').length);
+check(barWidths.length === 5 && barWidths[4] > barWidths[0] * 4 && icons === 5, 'Data Bars and Icon Sets from the menu: five bars, the largest widest, five icons', `${barWidths} / ${icons}`);
+await menu('Conditional Formatting', 'New Rule...');
+await page.waitForSelector('dialog.oxe-cf-new');
+await page.selectOption('dialog.oxe-cf-new select.oxe-dialog-list', 'formula');
+await page.fill('dialog.oxe-cf-new .oxe-cf-panel input[type=text]', '=MOD(A1,2)=0');
+await page.click('dialog.oxe-cf-new >> button:text-is("OK")');
+const typesNow = () => page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).condFormats.flatMap((c) => c.rules).sort((a, b) => a.priority - b.priority).map((r) => r.type).join(','));
+check(await typesNow() === 'expression,iconSet,dataBar', 'New Rule (Use a formula): first, before the others', await typesNow());
+await menu('Conditional Formatting', 'Manage Rules...');
+await page.waitForSelector('dialog.oxe-cf-manager');
+await page.click('dialog.oxe-cf-manager tr.oxe-names-row:has-text("Data Bar") td >> nth=0');
+await page.click('dialog.oxe-cf-manager >> button:text-is("Delete Rule")');
+await page.waitForFunction(() => document.querySelectorAll('dialog.oxe-cf-manager tr.oxe-names-row').length === 2);
+await page.click('dialog.oxe-cf-manager >> button:text-is("Close")');
+check(await typesNow() === 'expression,iconSet' && await page.evaluate(() => document.querySelectorAll('.oxe-cf-bar').length) === 0, 'Rules Manager: the data bar deleted, its bars gone', await typesNow());
+
 await finish();

@@ -2,22 +2,14 @@
 // one object): the act dispatcher, Insert and Delete, Paste Special, Sort and its warning, the validation question and
 // message, a list's choices, a filter's list, the cell's and the headings' menus, Row Height and Column Width.
 import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
-import { sortBox, filterBox, pickBox, validationBox, cfRuleBox } from './datadialogs.js';
-import { CF_PRESETS } from '../ooxml/cfedit.js';
+import { createMoreActs } from './acts-more.js';
+import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
 import { specialBox } from './specialbox.js';
 import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor } from './namesbox.js';
-import { formatCellsBox } from './formatbox.js';
-import { threadBox } from './threadbox.js';
-import { addThread, replyThread, editThread } from '../ooxml/threadedit.js';
-import { insertChart } from '../ooxml/chartnew.js';
-import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
-import { chartBox } from './chartbox.js';
-import { currentRegion } from '../ooxml/special.js';
-import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
@@ -31,8 +23,6 @@ import { mergeLoss } from '../ooxml/mergeops.js';
 import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
 
 /** The Paste menu's choices, as Paste Special options. */
-/** The Font tab's list: the theme's fonts first, then these. */
-const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Consolas', 'Courier New', 'Georgia', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'];
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
 const PASTE_CHOICES = { All: 'all', Formulas: 'formulas', Values: 'values', Formats: 'formats', 'All except borders': 'noBorders',
@@ -76,12 +66,17 @@ export function createActs(env) {
       return done;
     },
   };
+  let more = null;
+  const moreAct = (name, args, i) => (more ??= createMoreActs({ ...env, act }))(name, args, i);
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
     if (name === 'painting') return painter.active();
     if (!state.workbook) return false;
     if (!allowed(name, args[0])) return false;
     const i = state.sheetIndex;
+    // (Charts, comments, Format Cells and conditional formatting: acts-more.js.)
+    const more = moreAct(name, args, i);
+    if (more !== undefined) return more;
     if (name === 'deleteShownSheet') return sheetActs.remove(i);
     if (name === 'renameShownSheet') return sheetActs.rename(i);
     if (name === 'hideShownSheet') return editing().run('hideSheet', i);
@@ -117,65 +112,11 @@ export function createActs(env) {
         state.grid.el.focus({ preventScroll: true });
       });
     }
-    if (name === 'commentBox') {
-      // (Excel's comment thread on the active cell: started, replied to, a comment edited or a reply deleted, the whole
-      // thread deleted; each one step of Undo, the box opened again on the thread after each.)
-      const s = editing().selection;
-      const ref = `${colName(s.ac)}${s.ar + 1}`;
-      const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
-      if (n?.kind === 'note') return messageBox(root, `${ref} has a note: a cell has a note or a comment, not both.`);
-      const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
-      return threadBox(root, { ref, items: n?.items || [], at: { x: box.right + 8, y: box.top }, readOnly: state.readOnly }).then((answer) => {
-        state.grid.el.focus({ preventScroll: true });
-        if (!answer) return false;
-        const who = options.author || 'Author';
-        let refused = null;
-        editing().run('sheetChange', (wb, si) => {
-          try {
-            if (answer.removeAll) return deleteNote(wb, si, s.ar, s.ac);
-            if (answer.post != null) { if (n) replyThread(wb, si, s.ar, s.ac, answer.post, who); else addThread(wb, si, s.ar, s.ac, answer.post, who); }
-            else if (answer.remove != null) editThread(wb, si, s.ar, s.ac, answer.remove, null);
-            else if (answer.edit != null) editThread(wb, si, s.ar, s.ac, answer.edit, answer.text);
-          } catch (e) { refused = e.message; return false; }
-          return true;
-        });
-        if (refused) return messageBox(root, refused).then(() => false);
-        return answer.removeAll ? true : act('commentBox');
-      });
-    }
     if (name === 'deleteNote') {
       const s = editing().selection;
       return editing().run('sheetChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
     }
     if (name === 'showNote') { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); }
-    if (name === 'cfAdd') {
-      // (Excel's Conditional Formatting menu: the rule's box, then the rule for the selection.)
-      const s = editing().selection;
-      const sel = [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }];
-      const add = (rule) => editing().run('sheetChange', (wb, si) => wb.setConditional(si, sel, rule));
-      const presets = Object.entries(CF_PRESETS).map(([value, p]) => ({ value, label: p.label }));
-      const kind = args[0];
-      if (kind === 'scale3' || kind === 'scale2') return add({ kind: 'colorScale', points: kind === 'scale2' ? 2 : 3 });
-      const WORDS = { greaterThan: 'GREATER THAN', lessThan: 'LESS THAN', between: 'BETWEEN', equal: 'EQUAL TO', containsText: 'CONTAIN THE TEXT' };
-      const TITLES = { greaterThan: 'Greater Than', lessThan: 'Less Than', between: 'Between', equal: 'Equal To', containsText: 'Text That Contains', duplicate: 'Duplicate Values', top: 'Top 10 Items', topPercent: 'Top 10%', bottom: 'Bottom 10 Items', bottomPercent: 'Bottom 10%', above: 'Above Average', below: 'Below Average' };
-      const ranked = ['top', 'topPercent', 'bottom', 'bottomPercent'].includes(kind);
-      const text = WORDS[kind] ? `Format cells that are ${WORDS[kind]}:` : ranked ? `Format cells that rank in the ${kind.startsWith('top') ? 'TOP' : 'BOTTOM'}:` : kind === 'duplicate' ? '' : `Format cells that are ${kind === 'above' ? 'ABOVE' : 'BELOW'} AVERAGE for the selected range`;
-      const inputs = kind === 'between' ? [{ label: 'From', value: '' }, { label: 'and', value: '' }] : WORDS[kind] ? [{ label: 'Value', value: '' }] : ranked ? [{ label: kind.endsWith('Percent') ? 'Percent' : 'Items', value: '10' }] : [];
-      return cfRuleBox(root, { title: TITLES[kind], text, inputs, choice: kind === 'duplicate' ? [{ value: 'duplicate', label: 'Duplicate' }, { value: 'unique', label: 'Unique' }] : null, presets, preset: kind === 'below' ? 'yellow' : 'lightRed' }).then((a) => {
-        if (a) {
-          if (WORDS[kind] && kind !== 'containsText') add({ kind: 'cellIs', operator: kind, f1: a.values[0], f2: a.values[1], preset: a.preset });
-          else if (kind === 'containsText') add({ kind: 'containsText', text: a.values[0], preset: a.preset });
-          else if (kind === 'duplicate') add({ kind: 'duplicate', unique: a.choice === 'unique', preset: a.preset });
-          else if (ranked) add({ kind: 'top10', rank: Math.max(1, Math.round(Number(a.values[0]) || 10)), percent: kind.endsWith('Percent'), bottom: kind.startsWith('bottom'), preset: a.preset });
-          else add({ kind: 'average', below: kind === 'below', preset: a.preset });
-        }
-        state.grid.el.focus({ preventScroll: true });
-      });
-    }
-    if (name === 'cfClear') {
-      const s = editing().selection;
-      return editing().run('sheetChange', (wb, si) => wb.setConditional(si, args[0] === 'sheet' ? null : [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], null));
-    }
     if (name === 'validationBox') {
       // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
       const s = editing().selection;
@@ -213,58 +154,6 @@ export function createActs(env) {
       // (Insert > PivotTable: its boxes, then the PivotTable made.)
       const s = editing().selection;
       return insertPivot(root, state.workbook, i, { r: s.ar, c: s.ac }, (...a) => editing().run(...a)).then((done) => { state.grid.el.focus({ preventScroll: true }); return done; });
-    }
-    if (name === 'insertChart') {
-      // (Insert > Charts: the selection charted; one cell selected, the table round it, as Excel takes it.)
-      const s = editing().selection;
-      const sel = s.r0 === s.r1 && s.c0 === s.c1 ? currentRegion(state.workbook.sheet(i), s.r0, s.c0) : s;
-      let made = null;
-      const done = editing().run('sheetChange', (wb, si) => { made = insertChart(wb, si, sel, args[0]); return !!made; });
-      if (!done && !made && !state.readOnly) return messageBox(root, 'Select the cells to chart first: a table with numbers in it.').then(() => false);
-      return done;
-    }
-    if (name === 'chartAnchor') return editing().run('sheetChange', (wb, si) => { setChartAnchor(wb, si, args[0], args[1], args[2]); });
-    if (name === 'chartDelete') return editing().run('sheetChange', (wb, si) => { deleteChart(wb, si, args[0]); });
-    if (name === 'chartEdit') {
-      // (Edit Chart's answer: each change as Excel writes it, chartedit.js; refused for a chart written otherwise.)
-      const [k, change] = args;
-      let refused = null;
-      const done = editing().run('sheetChange', (wb, si) => {
-        try {
-          if (change.kind) setChartKind(wb, si, k, change.kind);
-          if ('title' in change) setChartTitle(wb, si, k, change.title);
-          if ('legend' in change) setChartLegend(wb, si, k, change.legend);
-          if ('labels' in change) setChartLabels(wb, si, k, change.labels);
-        } catch (e) { refused = e.message; return false; }
-        return true;
-      });
-      if (refused) return messageBox(root, refused).then(() => false);
-      state.picker?.pick(k, false);
-      return done;
-    }
-    if (name === 'chartBox') {
-      const chart = (state.charts || []).find((c) => c.index === args[0]);
-      if (!chart) return false;
-      return chartBox(root, chart).then((change) => {
-        state.grid.el.focus({ preventScroll: true });
-        return change ? act('chartEdit', args[0], change) : false;
-      });
-    }
-    if (name === 'formatCellsBox') {
-      // (Ctrl+1: the active cell's format in Excel's box; what was changed there given to the selection.)
-      const wb = state.workbook;
-      const s = editing().selection;
-      const cell = wb.sheet(i).cells.get(s.ar)?.get(s.ac) || null;
-      const xf = xfOf(wb.styles, cell?.s || 0);
-      const font = wb.styles.fonts[xf.fontId];
-      const look = { xf, font, fontName: fontFamily(font, wb.theme), fontNames: [...new Set([wb.theme.fonts.minor, wb.theme.fonts.major, ...FONT_NAMES])],
-        fill: wb.styles.fills[xf.fillId], border: wb.styles.borders[xf.borderId], code: editing().look().code, cell, date1904: wb.date1904,
-        many: areasOf(s).some((a) => a.r1 > a.r0 || a.c1 > a.c0), color: (c) => state.looks?.color(c) };
-      return formatCellsBox(root, look, args[0]).then((change) => {
-        if (change) editing().run('formatCells', change);
-        state.grid.el.focus({ preventScroll: true });
-        return !!change;
-      });
     }
     if (name === 'specialBox') {
       // (Excel's Go To Special box; its choice found and selected.)

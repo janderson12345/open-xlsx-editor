@@ -301,6 +301,15 @@ export class Workbook {
     this.edited = true;
   }
 
+  /** A change to sheet i's conditional formats made by `fn()` (cfmanage.js: the Rules Manager's), the sheet read again. */
+  changeConditional(i, fn) {
+    const part = this._part(i);
+    fn();
+    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
+  }
+
   /** Give cells `ranges` of sheet i the data validation `rule` (dvedit.js), or none (null: Clear All). */
   setValidation(i, ranges, rule) {
     const part = this._part(i);
