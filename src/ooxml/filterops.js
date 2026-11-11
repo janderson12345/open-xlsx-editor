@@ -1,14 +1,18 @@
 // AutoFilter as Excel does it (measured over COM with Range.AutoFilter, and the XML Excel then saves: docs/FILTER.md).
 // Turned on from one cell it takes the data around it. A column filtered by values keeps the rows whose shown text is
-// one of them, case aside, and blanks when asked; the rest are hidden. The sheet's autoFilter element and the hidden
-// _xlnm._FilterDatabase name are written as Excel writes them; a kind of filter not read here (custom, top 10,
-// colour, dates) is kept as it is.
+// one of them, case aside, and blanks when asked; the rest are hidden. Text, number, top 10, average, date and colour
+// filters are filtermore.js's. The sheet's autoFilter element and the hidden _xlnm._FilterDatabase name are written as
+// Excel writes them; a kind of filter not read here (icons) is kept as it is.
 import { kids, kid, attr } from './xml.js';
 import { rangeName } from './refs.js';
 import { formatCodeOf } from './styles.js';
 import { cellText } from './numfmt.js';
 import { sortArea, compareText, SORT_MESSAGES } from './sortops.js';
 import { AFTER_MERGES } from './sheetedit.js';
+import { kid as kidOf, parseXml } from './xml.js';
+import { columnTest, filterColumnXml, dxfFillColor, colorDxfXml, todaySerial } from './filtermore.js';
+import { xfOf } from './styles.js';
+import { resolveColor } from './theme.js';
 
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 /** The worksheet elements that follow autoFilter (CT_Worksheet's order), for placing it when it is new. */
@@ -32,7 +36,7 @@ export function shownText(wb, cell) {
   return String(cell.v);
 }
 
-/** Whether row r passes column c's filter (one read here). */
+/** Whether row r passes column c's list of values. */
 function passes(wb, sheet, r, c, col) {
   const cell = sheet.cells.get(r)?.get(c);
   if (blank(cell)) return col.blank;
@@ -40,17 +44,39 @@ function passes(wb, sheet, r, c, col) {
   return col.values.some((v) => v.toLowerCase() === text);
 }
 
+/** A test of the rows of `filter` for its column c's filter (`today` a serial date, for the date filters). */
+export function rowTest(wb, sheet, filter, c, col, today = todaySerial()) {
+  if (!col.custom && !col.top10 && !col.dynamic && !col.color) return (r) => passes(wb, sheet, r, c, col);
+  const cell = (r) => sheet.cells.get(r)?.get(c);
+  const rows = [];
+  for (let r = filter.r0 + 1; r <= filter.r1; r++) rows.push(r);
+  const color = (x) => resolveColor(x, wb.theme, wb.styles.palette);
+  return columnTest(col, {
+    value: (r) => (blank(cell(r)) ? null : cell(r).v),
+    text: (r) => shownText(wb, cell(r)),
+    rows,
+    cellLook: (r) => {
+      const xf = xfOf(wb.styles, cell(r)?.s || 0);
+      const fill = wb.styles.fills[xf.fillId];
+      const font = wb.styles.fonts[xf.fontId];
+      return { fill: fill?.pattern === 'solid' ? color(fill.fg) : null, font: font?.color && !font.color.auto && !(font.color.theme === 1 && !font.color.tint) ? color(font.color) : null };
+    },
+    dxfColor: (id) => dxfFillColor(wb, id),
+    today,
+  });
+}
+
 /**
  * The rows of `filter` ({ r0, c0, r1, c1, columns }) to hide: those failing a column filtered by values. Where a filter
  * of a kind not read here is set, a row passing the others keeps the hidden state it has.
  */
-export function hiddenRows(wb, si, filter) {
+export function hiddenRows(wb, si, filter, today = todaySerial()) {
   const sheet = wb.sheet(si);
-  const plain = [...filter.columns].filter(([, col]) => !col.other);
+  const plain = [...filter.columns].filter(([, col]) => !col.other).map(([c, col]) => rowTest(wb, sheet, filter, c, col, today));
   const other = plain.length < filter.columns.size;
   const out = new Set();
   for (let r = filter.r0 + 1; r <= filter.r1; r++) {
-    const fails = plain.some(([c, col]) => !passes(wb, sheet, r, c, col));
+    const fails = plain.some((test) => !test(r));
     if (fails || (other && sheet.rows.get(r)?.hidden)) out.add(r);
   }
   return out;
@@ -69,12 +95,13 @@ function listOrder(a, b) {
  */
 export function filterChoices(wb, si, filter, c) {
   const sheet = wb.sheet(si);
-  const others = [...filter.columns].filter(([k, col]) => k !== c && !col.other);
+  const others = [...filter.columns].filter(([k, col]) => k !== c && !col.other).map(([k, col]) => rowTest(wb, sheet, filter, k, col));
   const mine = filter.columns.get(c);
+  const listed = mine && !mine.other && !mine.custom && !mine.top10 && !mine.dynamic && !mine.color;
   const seen = new Map();
   let blanks = false;
   for (let r = filter.r0 + 1; r <= filter.r1; r++) {
-    if (others.some(([k, col]) => !passes(wb, sheet, r, k, col))) continue;
+    if (others.some((test) => !test(r))) continue;
     const cell = sheet.cells.get(r)?.get(c);
     if (blank(cell)) { blanks = true; continue; }
     const text = shownText(wb, cell);
@@ -82,14 +109,15 @@ export function filterChoices(wb, si, filter, c) {
     if (!seen.has(key)) seen.set(key, { text, number: typeof cell.v === 'number' ? cell.v : null });
   }
   const values = [...seen.values()].sort(listOrder).map(({ text }) => ({
-    text, checked: !mine || mine.other || mine.values.some((v) => v.toLowerCase() === text.toLowerCase()),
+    text, checked: !listed || mine.values.some((v) => v.toLowerCase() === text.toLowerCase()),
   }));
-  return { values, blanks: blanks ? !mine || mine.other || mine.blank : null };
+  return { values, blanks: blanks ? !listed || mine.blank : null };
 }
 
 /** Write `filter` as the sheet's autoFilter element (null: taken out). A column of a kind not read here keeps its XML;
- *  values are written in order, as Excel writes them. */
-export function setAutoFilterXml(doc, filter) {
+ *  values are written in order, as Excel writes them; the other filters as filtermore.js writes them (`wb` and `si`
+ *  for their values, the average, and a colour filter's dxf). */
+export function setAutoFilterXml(doc, filter, wb = null, si = null, today = todaySerial()) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   let el = kid(root, 'autoFilter', ns);
@@ -106,6 +134,18 @@ export function setAutoFilterXml(doc, filter) {
   for (const [c, col] of [...filter.columns].sort((a, b) => a[0] - b[0])) {
     const id = c - filter.c0;
     if (col.other) { if (old.has(id)) el.insertBefore(old.get(id), after); continue; }
+    if (wb && (col.custom || col.top10 || col.dynamic || col.color)) {
+      const sheet = wb.sheet(si);
+      const values = [];
+      for (let r = filter.r0 + 1; r <= filter.r1; r++) { const x = sheet.cells.get(r)?.get(c); if (!blank(x)) values.push(x.v); }
+      const nums = values.filter((v) => typeof v === 'number');
+      const average = nums.reduce((s, v) => s + v, 0) / (nums.length || 1);
+      if (col.color && col.color.rgb && col.color.dxfId == null) col.color.dxfId = addDxf(wb, colorDxfXml(col.color.rgb));
+      const inner = filterColumnXml(col, { values, average, today, dxfId: col.color?.dxfId ?? 0 });
+      const fc = doc.importNode(parseXml(`<w xmlns="${ns}"><filterColumn colId="${id}">${inner}</filterColumn></w>`).documentElement.firstChild, true);
+      el.insertBefore(fc, after);
+      continue;
+    }
     const fc = make(doc, ns, 'filterColumn');
     fc.setAttribute('colId', String(id));
     const filters = make(doc, ns, 'filters');
@@ -118,4 +158,21 @@ export function setAutoFilterXml(doc, filter) {
     fc.appendChild(filters);
     el.insertBefore(fc, after);
   }
+}
+
+/** A dxf added to the workbook's styles (its dxfs made when there are none); returns its index. */
+function addDxf(wb, xml) {
+  const sroot = wb.stylesDoc.documentElement;
+  const sns = sroot.namespaceURI;
+  let dxfs = kidOf(sroot, 'dxfs', sns);
+  if (!dxfs) {
+    dxfs = wb.stylesDoc.createElementNS(sns, sroot.prefix ? `${sroot.prefix}:dxfs` : 'dxfs');
+    const after = [...sroot.childNodes].find((n) => n.nodeType === 1 && ['tableStyles', 'colors', 'extLst'].includes(n.localName));
+    sroot.insertBefore(dxfs, after || null);
+  }
+  dxfs.appendChild(wb.stylesDoc.importNode(parseXml(`<w xmlns="${sns}">${xml}</w>`).documentElement.firstChild, true));
+  const n = kids(dxfs, 'dxf', sns).length;
+  dxfs.setAttribute('count', String(n));
+  wb.dirty.add(wb.stylesPath);
+  return n - 1;
 }

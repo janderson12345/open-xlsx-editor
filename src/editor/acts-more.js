@@ -18,6 +18,7 @@ import { chartBox } from './chartbox.js';
 import { currentRegion } from '../ooxml/special.js';
 import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { newRuleBox, rulesManager } from './cfmanager.js';
+import { advancedFilterBox } from './advfilterbox.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
@@ -135,6 +136,18 @@ export function createMoreActs(env) {
         if (change) editing().run('formatCells', change);
         state.grid.el.focus({ preventScroll: true });
         return !!change;
+      });
+    }
+    if (name === 'advancedFilterBox') {
+      // (Data > Advanced: the table round the active cell offered as the list; Excel's words when it refuses.)
+      const s = editing().selection;
+      const list = currentRegion(state.workbook.sheet(i), s.ar, s.ac);
+      return advancedFilterBox(root, { list }).then((spec) => {
+        state.grid.el.focus({ preventScroll: true });
+        if (!spec) return false;
+        let refused = null;
+        editing().run('sheetChange', (wb, si) => { refused = wb.advancedFilter(si, spec); return !refused; });
+        return refused ? messageBox(root, refused).then(() => false) : true;
       });
     }
     if (name === 'cfNewRule') {

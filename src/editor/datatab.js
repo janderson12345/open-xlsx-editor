@@ -14,7 +14,7 @@ export function dataTab(kit, { act }) {
       col(btn('A↓', 'Sort A to Z', f('sortAsc')), btn('Z↓', 'Sort Z to A', f('sortDesc'))),
       btn('⇅', 'Sort...', f('sortBox'), { label: 'Sort', big: true }),
       btn('⏷', 'Filter (Ctrl+Shift+L)', f('filterToggle'), { label: 'Filter', big: true }),
-      col(btn('✕', 'Clear', f('filterClear'), { label: 'Clear' }), btn('↻', 'Reapply', f('filterReapply'), { label: 'Reapply' }))),
+      col(btn('✕', 'Clear', f('filterClear'), { label: 'Clear' }), btn('↻', 'Reapply', f('filterReapply'), { label: 'Reapply' }), btn('⚙', 'Advanced...', f('advancedFilterBox'), { label: 'Advanced' }))),
     grp('Data Tools', btn('☑', 'Data Validation...', f('validationBox'), { label: 'Data Validation', big: true })),
   ];
   return { groups, update() {} };

@@ -1,0 +1,155 @@
+{
+ "source": "tools/excel-compare/excel-advfilter.ps1",
+ "cases": [
+  {
+   "name": "rows or, columns and",
+   "error": null,
+   "criteria": [
+    "Team|Qty",
+    "red|>2",
+    "blue|"
+   ],
+   "action": 1,
+   "unique": false,
+   "hidden": [
+    2,
+    5
+   ],
+   "copied": [],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>",
+    "<definedName name=\"_xlnm.Criteria\" localSheetId=\"0\">Sheet1!$F$1:$G$3</definedName>"
+   ],
+   "autoFilter": ""
+  },
+  {
+   "name": "text begins with",
+   "error": null,
+   "criteria": [
+    "Name",
+    "a"
+   ],
+   "action": 1,
+   "unique": false,
+   "hidden": [
+    3,
+    5,
+    6,
+    7,
+    8
+   ],
+   "copied": [],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>",
+    "<definedName name=\"_xlnm.Criteria\" localSheetId=\"0\">Sheet1!$F$1:$F$2</definedName>"
+   ],
+   "autoFilter": ""
+  },
+  {
+   "name": "exact text",
+   "error": null,
+   "criteria": [
+    "Name",
+    "=\"=pear\""
+   ],
+   "action": 1,
+   "unique": false,
+   "hidden": [
+    2,
+    4,
+    5,
+    6,
+    7,
+    9
+   ],
+   "copied": [],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>",
+    "<definedName name=\"_xlnm.Criteria\" localSheetId=\"0\">Sheet1!$F$1:$F$2</definedName>"
+   ],
+   "autoFilter": ""
+  },
+  {
+   "name": "two conditions on a column",
+   "error": null,
+   "criteria": [
+    "Qty|Qty",
+    ">=2|<7"
+   ],
+   "action": 1,
+   "unique": false,
+   "hidden": [
+    2,
+    5,
+    7,
+    9
+   ],
+   "copied": [],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>",
+    "<definedName name=\"_xlnm.Criteria\" localSheetId=\"0\">Sheet1!$F$1:$G$2</definedName>"
+   ],
+   "autoFilter": ""
+  },
+  {
+   "name": "unique in place",
+   "error": null,
+   "criteria": null,
+   "action": 1,
+   "unique": true,
+   "hidden": [
+    8
+   ],
+   "copied": [],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>"
+   ],
+   "autoFilter": ""
+  },
+  {
+   "name": "copied to I1",
+   "error": null,
+   "criteria": [
+    "Team",
+    "blue"
+   ],
+   "action": 2,
+   "unique": false,
+   "hidden": [],
+   "copied": [
+    "Name|Qty|Team",
+    "pear|2|blue",
+    "kiwi|10|blue",
+    "pear|2|blue"
+   ],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>",
+    "<definedName name=\"_xlnm.Criteria\" localSheetId=\"0\">Sheet1!$F$1:$F$2</definedName>",
+    "<definedName name=\"_xlnm.Extract\" localSheetId=\"0\">Sheet1!$I$1:$K$1</definedName>"
+   ],
+   "autoFilter": ""
+  },
+  {
+   "name": "copied, unique",
+   "error": null,
+   "criteria": [
+    "Team",
+    "blue"
+   ],
+   "action": 2,
+   "unique": true,
+   "hidden": [],
+   "copied": [
+    "Name|Qty|Team",
+    "pear|2|blue",
+    "kiwi|10|blue"
+   ],
+   "names": [
+    "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$9</definedName>",
+    "<definedName name=\"_xlnm.Criteria\" localSheetId=\"0\">Sheet1!$F$1:$F$2</definedName>",
+    "<definedName name=\"_xlnm.Extract\" localSheetId=\"0\">Sheet1!$I$1:$K$1</definedName>"
+   ],
+   "autoFilter": ""
+  }
+ ]
+}

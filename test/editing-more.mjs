@@ -324,4 +324,36 @@ await page.waitForFunction(() => document.querySelectorAll('dialog.oxe-cf-manage
 await page.click('dialog.oxe-cf-manager >> button:text-is("Close")');
 check(await typesNow() === 'expression,iconSet' && await page.evaluate(() => document.querySelectorAll('.oxe-cf-bar').length) === 0, 'Rules Manager: the data bar deleted, its bars gone', await typesNow());
 
+// Filters on a new sheet's table: Number Filters > greater than 2 on Qty, then Advanced Filter in place with a criteria
+// range (Team blue), and Clear showing the rows again.
+await page.evaluate(() => {
+  const o = window.oxe;
+  o.command('insertSheet');
+  [['Name', 'Qty', 'Team'], ['apple', 1, 'red'], ['pear', 2, 'blue'], ['fig', 3, 'red'], ['kiwi', 10, 'blue']].forEach((row, r) => row.forEach((v, c) => o.enter(String.fromCharCode(65 + c) + (r + 1), String(v))));
+  o.enter('F1', 'Team'); o.enter('F2', 'blue');
+  o.select('A1');
+});
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+Shift+L');
+const hiddenNow = () => page.evaluate(() => [...window.oxe.workbook.sheet(window.oxe.sheetIndex).rows].filter(([, r]) => r.hidden).map(([r]) => r + 1).sort((a, b) => a - b).join(','));
+await page.evaluate(() => window.oxe.select('B1'));
+await page.keyboard.press('Alt+ArrowDown');
+await page.waitForSelector('dialog.oxe-filter-box');
+await page.click('dialog.oxe-filter-box >> button:text-is("Number Filters...")');
+await page.waitForSelector('dialog.oxe-custom-filter');
+await page.selectOption('dialog.oxe-custom-filter fieldset select >> nth=0', '>');
+await page.fill('dialog.oxe-custom-filter input[aria-label="First value"]', '2');
+await page.click('dialog.oxe-custom-filter >> button:text-is("OK")');
+check(await hiddenNow() === '2,3', 'Number Filters: Qty greater than 2 hides the rows of 1 and 2', await hiddenNow());
+await page.keyboard.press('Control+Shift+L');
+await page.click('.oxe-rtab >> text=Data');
+await page.evaluate(() => window.oxe.select('A1'));
+await ribbon('Advanced...');
+await page.waitForSelector('dialog.oxe-adv-filter');
+await page.fill('dialog.oxe-adv-filter .oxe-fc-field:has-text("Criteria range") input', '$F$1:$F$2');
+await page.click('dialog.oxe-adv-filter >> button:text-is("OK")');
+check(await hiddenNow() === '2,4', 'Advanced Filter in place: Team blue keeps pear and kiwi', await hiddenNow());
+await page.locator('.oxe-toolbar button[title="Clear"]:visible').click();
+check(await hiddenNow() === '', 'Clear shows the rows again', await hiddenNow());
+
 await finish();

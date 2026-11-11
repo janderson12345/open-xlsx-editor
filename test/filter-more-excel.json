@@ -1,0 +1,507 @@
+{
+ "source": "tools/excel-compare/excel-filter-more.ps1",
+ "today": 46337,
+ "cases": [
+  {
+   "name": "text equals",
+   "how": [
+    1,
+    "=pear"
+   ],
+   "hidden": [
+    2,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{12EFA607-3F9E-49A0-833C-6D25AB09A9A2}\"><filterColumn colId=\"0\"><filters><filter val=\"pear\"/></filters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "begins with",
+   "how": [
+    1,
+    "=a*"
+   ],
+   "hidden": [
+    3,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{28BDB437-6B35-4980-A799-24629067D79A}\"><filterColumn colId=\"0\"><customFilters><customFilter val=\"a*\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "ends with",
+   "how": [
+    1,
+    "=*e"
+   ],
+   "hidden": [
+    3,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{F3182A99-D4F0-4B16-B248-148D3E273673}\"><filterColumn colId=\"0\"><customFilters><customFilter val=\"*e\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "contains",
+   "how": [
+    1,
+    "=*an*"
+   ],
+   "hidden": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{54AA4DFF-91A1-4319-B165-CBEAE0EFFEA8}\"><filterColumn colId=\"0\"><customFilters><customFilter val=\"*an*\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "does not contain",
+   "how": [
+    1,
+    "<>*an*"
+   ],
+   "hidden": [
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{96F80ECA-A971-457A-BBD2-C3524E41D1A4}\"><filterColumn colId=\"0\"><customFilters><customFilter operator=\"notEqual\" val=\"*an*\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "does not equal",
+   "how": [
+    3,
+    "<>red"
+   ],
+   "hidden": [
+    2,
+    4,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{0480E3CC-1BE8-48FD-B141-C5FDD66F0A5B}\"><filterColumn colId=\"2\"><customFilters><customFilter operator=\"notEqual\" val=\"red\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "greater than",
+   "how": [
+    2,
+    ">2"
+   ],
+   "hidden": [
+    2,
+    3,
+    5
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{5ADDF9B6-4A5A-48F2-AFAE-F65CB3799041}\"><filterColumn colId=\"1\"><customFilters><customFilter operator=\"greaterThan\" val=\"2\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "less than or equal",
+   "how": [
+    2,
+    "<=2"
+   ],
+   "hidden": [
+    4,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{98F33B77-407D-44B4-A0BB-788A73F8C932}\"><filterColumn colId=\"1\"><customFilters><customFilter operator=\"lessThanOrEqual\" val=\"2\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "between",
+   "how": [
+    2,
+    ">=2",
+    1,
+    "<=7"
+   ],
+   "hidden": [
+    2,
+    5,
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{826B86BF-F494-4B8A-9937-18C0C1065701}\"><filterColumn colId=\"1\"><customFilters and=\"1\"><customFilter operator=\"greaterThanOrEqual\" val=\"2\"/><customFilter operator=\"lessThanOrEqual\" val=\"7\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "below or above",
+   "how": [
+    2,
+    "<2",
+    2,
+    ">7"
+   ],
+   "hidden": [
+    3,
+    4,
+    6,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{94ACCFCB-5219-42D4-A531-37481FC1A14F}\"><filterColumn colId=\"1\"><customFilters><customFilter operator=\"lessThan\" val=\"2\"/><customFilter operator=\"greaterThan\" val=\"7\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "text or",
+   "how": [
+    1,
+    "=a*",
+    2,
+    "=k*"
+   ],
+   "hidden": [
+    3,
+    5,
+    6,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{A7324CC7-F700-44B3-B423-81C712E911D5}\"><filterColumn colId=\"0\"><customFilters><customFilter val=\"a*\"/><customFilter val=\"k*\"/></customFilters></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "top 3 items",
+   "how": [
+    2,
+    "3",
+    3
+   ],
+   "hidden": [
+    2,
+    3,
+    5,
+    6
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{5353C93F-F360-448A-A955-958BE54765D2}\"><filterColumn colId=\"1\"><top10 val=\"3\" filterVal=\"3\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "bottom 2 items",
+   "how": [
+    2,
+    "2",
+    4
+   ],
+   "hidden": [
+    3,
+    4,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{1AE457E3-3D03-40D4-A03A-23C4EE69B873}\"><filterColumn colId=\"1\"><top10 top=\"0\" val=\"2\" filterVal=\"1\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "top 50 percent",
+   "how": [
+    2,
+    "50",
+    5
+   ],
+   "hidden": [
+    2,
+    3,
+    5,
+    6
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{6CDE3E8E-0959-468E-A160-18373E874E24}\"><filterColumn colId=\"1\"><top10 percent=\"1\" val=\"50\" filterVal=\"3\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "bottom 30 percent",
+   "how": [
+    2,
+    "30",
+    6
+   ],
+   "hidden": [
+    3,
+    4,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{141D24E1-A457-4B71-B40A-F1EEC79BEDE6}\"><filterColumn colId=\"1\"><top10 top=\"0\" percent=\"1\" val=\"30\" filterVal=\"1\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "above average",
+   "how": [
+    2,
+    33,
+    11
+   ],
+   "hidden": [
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{E4056EF6-B9A4-4437-9CA0-11ACC6392B30}\"><filterColumn colId=\"1\"><dynamicFilter type=\"aboveAverage\" val=\"3.7857142857142856\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "below average",
+   "how": [
+    2,
+    34,
+    11
+   ],
+   "hidden": [
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{0A0B0312-CF02-4DC2-A69C-AD52C32BDBA4}\"><filterColumn colId=\"1\"><dynamicFilter type=\"belowAverage\" val=\"3.7857142857142856\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "today",
+   "how": [
+    4,
+    1,
+    11
+   ],
+   "hidden": [
+    2,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{73A84A17-2158-4D53-91FE-9492B5EF37BA}\"><filterColumn colId=\"3\"><dynamicFilter type=\"today\" val=\"46337\" maxVal=\"46338\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "yesterday",
+   "how": [
+    4,
+    2,
+    11
+   ],
+   "hidden": [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{65ABAD05-6160-4C28-8886-869FC3807BC4}\"><filterColumn colId=\"3\"><dynamicFilter type=\"yesterday\" val=\"46336\" maxVal=\"46337\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "tomorrow",
+   "how": [
+    4,
+    3,
+    11
+   ],
+   "hidden": [
+    2,
+    3,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{BDF6F379-AE00-4FED-BB82-B71EBE3550E7}\"><filterColumn colId=\"3\"><dynamicFilter type=\"tomorrow\" val=\"46338\" maxVal=\"46339\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "this week",
+   "how": [
+    4,
+    4,
+    11
+   ],
+   "hidden": [
+    5,
+    6,
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{A870A002-EF12-483C-82EC-EE1FA3BDD06D}\"><filterColumn colId=\"3\"><dynamicFilter type=\"thisWeek\" val=\"46334\" maxVal=\"46341\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "last week",
+   "how": [
+    4,
+    5,
+    11
+   ],
+   "hidden": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{A013A09A-03C5-4B88-9B6F-984B08A82767}\"><filterColumn colId=\"3\"><dynamicFilter type=\"lastWeek\" val=\"46327\" maxVal=\"46334\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "this month",
+   "how": [
+    4,
+    7,
+    11
+   ],
+   "hidden": [
+    5,
+    6,
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{6FABE433-4F0E-493A-9C56-7750F9569E12}\"><filterColumn colId=\"3\"><dynamicFilter type=\"thisMonth\" val=\"46327\" maxVal=\"46357\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "last month",
+   "how": [
+    4,
+    8,
+    11
+   ],
+   "hidden": [
+    2,
+    3,
+    4,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{78F7F6F4-68BE-4A83-A41B-9648F9A92D59}\"><filterColumn colId=\"3\"><dynamicFilter type=\"lastMonth\" val=\"46296\" maxVal=\"46327\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "next month",
+   "how": [
+    4,
+    9,
+    11
+   ],
+   "hidden": [
+    2,
+    3,
+    4,
+    5,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{CEAC9241-E885-4798-9905-D6E19AF73292}\"><filterColumn colId=\"3\"><dynamicFilter type=\"nextMonth\" val=\"46357\" maxVal=\"46388\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "this year",
+   "how": [
+    4,
+    13,
+    11
+   ],
+   "hidden": [
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{9854DB41-F347-4307-AF3F-D811FE82CAD1}\"><filterColumn colId=\"3\"><dynamicFilter type=\"thisYear\" val=\"46023\" maxVal=\"46388\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "last year",
+   "how": [
+    4,
+    14,
+    11
+   ],
+   "hidden": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{C799119C-1977-4DC8-B41F-DCDB37C72216}\"><filterColumn colId=\"3\"><dynamicFilter type=\"lastYear\" val=\"45658\" maxVal=\"46023\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "year to date",
+   "how": [
+    4,
+    16,
+    11
+   ],
+   "hidden": [
+    4,
+    6,
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{769F0FD6-737B-45A9-9A4F-A9D5E7D03012}\"><filterColumn colId=\"3\"><dynamicFilter type=\"yearToDate\" val=\"46023\" maxVal=\"46338\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "this quarter",
+   "how": [
+    4,
+    10,
+    11
+   ],
+   "hidden": [
+    7
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{04260A40-12A7-4F3F-A5A3-825428F54AC0}\"><filterColumn colId=\"3\"><dynamicFilter type=\"thisQuarter\" val=\"46296\" maxVal=\"46388\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"0\"/>"
+  },
+  {
+   "name": "fill yellow",
+   "how": [
+    1,
+    65535,
+    8
+   ],
+   "hidden": [
+    2,
+    4,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{ECC96100-0A5D-479F-896C-6C78C5202009}\"><filterColumn colId=\"0\"><colorFilter dxfId=\"0\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFFFF00\"/><bgColor rgb=\"FFFFFFFF\"/></patternFill></fill></dxf></dxfs>"
+  },
+  {
+   "name": "font red",
+   "how": [
+    1,
+    255,
+    9
+   ],
+   "hidden": [
+    2,
+    3,
+    5,
+    6,
+    7,
+    8
+   ],
+   "autoFilter": "<autoFilter ref=\"A1:D8\" xr:uid=\"{12B9D048-B99B-4164-84D0-1A1D4819C71E}\"><filterColumn colId=\"0\"><colorFilter dxfId=\"0\" cellColor=\"0\"/></filterColumn></autoFilter>",
+   "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFF0000\"/><bgColor rgb=\"FFFFFFFF\"/></patternFill></fill></dxf></dxfs>"
+  }
+ ]
+}

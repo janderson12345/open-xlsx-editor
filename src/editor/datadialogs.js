@@ -82,7 +82,7 @@ export function sortBox(root, { lines, start }) {
  * `at`: { x, y } where it opens (the button's bottom left, in the window). `choices`: filterops.js filterChoices.
  * Resolves to { do: 'asc' | 'desc' | 'clear' } or { do: 'apply', values, blank, all }, or null for Cancel and Esc.
  */
-export function filterBox(root, { title, at, choices, numbers = false, filtered = false }) {
+export function filterBox(root, { title, at, choices, numbers = false, filtered = false, kind = numbers ? 'Number' : 'Text' }) {
   return modal(root, (dlg, done, id) => {
     const make = (tag, props = {}, ...kids) => {
       const x = document.createElement(tag);
@@ -98,7 +98,9 @@ export function filterBox(root, { title, at, choices, numbers = false, filtered 
     const head = make('div', { className: 'oxe-filter-actions' },
       item(numbers ? 'Sort Smallest to Largest' : 'Sort A to Z', () => done({ do: 'asc' })),
       item(numbers ? 'Sort Largest to Smallest' : 'Sort Z to A', () => done({ do: 'desc' })),
-      item(`Clear Filter From "${title}"`, () => done({ do: 'clear' }), !filtered));
+      item(`Clear Filter From "${title}"`, () => done({ do: 'clear' }), !filtered),
+      // (Excel's Text, Number or Date Filters and Filter by Color: filterbox.js's box.)
+      item(`${kind} Filters...`, () => done({ do: 'custom' })));
     const search = make('input', { type: 'search', className: 'oxe-dialog-field', id: `${id}-search`, placeholder: 'Search', 'aria-label': 'Search' });
     const list = make('div', { className: 'oxe-filter-list', role: 'group', 'aria-label': 'Values' });
     const entries = choices.values.map((v) => ({ label: v.text === '' ? ' ' : v.text, value: v.text, checked: v.checked }));

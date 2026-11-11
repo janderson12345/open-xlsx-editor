@@ -3,6 +3,7 @@
 // message, a list's choices, a filter's list, the cell's and the headings' menus, Row Height and Column Width.
 import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
 import { createMoreActs } from './acts-more.js';
+import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
@@ -307,7 +308,29 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     const title = shownText(wb, wb.sheet(si).cells.get(f.r0)?.get(c)) || `Column ${colName(c)}`;
     const choices = filterChoices(wb, si, f, c);
     const numbers = choices.values.length > 0 && choices.values.every((v) => v.text !== '' && Number.isFinite(Number(v.text.replace(/,/g, ''))));
-    const got = await filterBox(root, { title, at: { x: rect.left, y: rect.bottom + 2 }, choices, numbers, filtered: f.columns.has(c) });
+    // (A column of dates: Date Filters; its fills and font colours offered to filter by.)
+    const sheet = wb.sheet(si);
+    const dates = [];
+    const fills = new Set();
+    const fonts = new Set();
+    for (let r = f.r0 + 1; r <= f.r1; r++) {
+      const cell = sheet.cells.get(r)?.get(c);
+      if (!cell) continue;
+      if (typeof cell.v === 'number' && isDateFormat(formatCodeOf(wb.styles, cell.s || 0))) dates.push(r);
+      const xf = wb.styles.cellXfs[cell.s || 0] || wb.styles.cellXfs[0];
+      const fill = wb.styles.fills[xf.fillId];
+      if (fill?.pattern === 'solid' && state.looks.color(fill.fg)) fills.add(state.looks.color(fill.fg).toUpperCase());
+      const fc = wb.styles.fonts[xf.fontId]?.color;
+      if (fc && !fc.auto && !(fc.theme === 1 && !fc.tint) && state.looks.color(fc)) fonts.add(state.looks.color(fc).toUpperCase());
+    }
+    const kind = dates.length && dates.length === choices.values.length ? 'Date' : numbers ? 'Number' : 'Text';
+    const got = await filterBox(root, { title, at: { x: rect.left, y: rect.bottom + 2 }, choices, numbers, filtered: f.columns.has(c), kind });
+    if (got?.do === 'custom') {
+      const col = await customFilterBox(root, { title, kind: kind.toLowerCase(), colors: { fill: [...fills], font: [...fonts] } });
+      if (col && !state.readOnly) editing().run('filterBy', c, col);
+      state.grid.el.focus({ preventScroll: true });
+      return true;
+    }
     if (got && !state.readOnly) {
       if (got.do === 'asc' || got.do === 'desc') editing().run('filterSort', c, got.do === 'desc');
       else if (got.do === 'clear') editing().run('filterBy', c, null);

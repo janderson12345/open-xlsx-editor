@@ -32,10 +32,46 @@ filter, range and hidden rows.
 
 The list itself (its order, one entry for texts alike but for case, values only from rows the other columns let
 through) and Clear Filter From follow Excel's interface, which COM doesn't reach. A filter of a kind not read here
-(custom conditions, top 10, colours, date groups) is kept as Excel wrote it, and its rows stay as they were.
+(icons, date groups) is kept as Excel wrote it, and its rows stay as they were.
+
+## Text, Number, Date and Color filters (`src/ooxml/filtermore.js`, `src/editor/filterbox.js`)
+
+A column's list has Text Filters..., Number Filters... or Date Filters... (by what the column holds): Excel's Custom
+AutoFilter with two conditions (And or Or: equals, does not equal, begins and ends with, contains and does not contain,
+greater and less than; * and ? wildcards), and the choices that take no value. Those are Top 10 (items or percent, top
+or bottom) and Above or Below Average for numbers; today, this week, last month, this quarter, this year and the like
+for dates; and the column's fill and font colours.
+
+Measured over COM (`tools/excel-compare/excel-filter-more.ps1`: 31 filters of `Range.AutoFilter` on the same made-up table,
+its dates days either side of =TODAY(), Excel's day recorded; `test/filter-more-excel.json`). Here the same table and
+day, the same filters: 31 of 31 hide Excel's rows and write Excel's autoFilter, and the colour filters Excel's dxf.
+
+| Filter | As Excel writes and applies it |
+|---|---|
+| Equals a value without wildcards | A list of that value, as a ticked value is. |
+| Other conditions | `customFilters` (`and="1"` for And) of `customFilter`s: `operator` (none for equals) and `val`, wildcards kept. Numbers compare with numbers, text with text by its letters, case aside; a blank never passes a comparison. |
+| Top 10 | `top10` (`top="0"` for bottom, `percent="1"`), `val` the number asked for, `filterVal` the last value kept: n% of the count, at least one (50% of 7: 3); ties kept. |
+| Above and below average | `dynamicFilter` with the average as `val`. |
+| Dates | `dynamicFilter` with `val` and `maxVal` the days the span covers, from today (a week from Sunday). Applied again, they span from the day it is. |
+| By colour | `colorFilter` pointing to a dxf of the colour as a solid fill's foreground, white behind; `cellColor="0"` for a font colour. |
+
+## Advanced Filter (`src/ooxml/advfilter.js`, `src/editor/advfilterbox.js`)
+
+Data > Advanced...: filter the list in place or copy to another location, with a criteria range and Unique records
+only. Data > Clear shows the rows an in-place Advanced Filter hid.
+
+Measured over COM (`tools/excel-compare/excel-advfilter.ps1`: 7 cases of `Range.AdvancedFilter`; `test/advfilter-excel.json`):
+7 of 7 hide or copy Excel's rows and write Excel's names.
+
+| Rule | Seen |
+|---|---|
+| The criteria's headings name the list's columns; a row's cells must all hold (And), any row may (Or); a blank cell holds for anything. | Team red and Qty >2, or Team blue: apple and fig hidden. |
+| Text alone means "begins with", case aside; ="=x" the value x exactly; >, >=, <, <=, <> compare. | a: apple, Apple, avocado. =pear: both pears. |
+| Unique records only drops a row the same as one before it. | The second pear, 2, blue hidden. |
+| Copied: the heading and the rows passing, at the cell given; nothing hidden. | |
+| Names: `_xlnm._FilterDatabase` (hidden) for the list, `_xlnm.Criteria` for the criteria, `_xlnm.Extract` for the copy's heading row. | Extract: `Sheet1!$I$1:$K$1`. |
 
 ## Not yet
 
-Text, number and date filters (custom conditions, top 10, above average), filtering by colour, date grouping in the
-list, sorting while rows are filtered out (Excel sorts only the rows shown), the filter growing as rows are added
-below, tables' own filters, and Advanced Filter.
+Date grouping in the list, sorting while rows are filtered out (Excel sorts only the rows shown), the filter growing as
+rows are added below, tables' own filters, and filtering by an icon.

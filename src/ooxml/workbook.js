@@ -15,6 +15,7 @@ import { changeLines } from './rowcol.js';
 import { setColumns, setRows } from './sizes.js';
 import { setFreeze, setZoom } from './view.js';
 import { setAutoFilterXml, hiddenRows } from './filterops.js';
+import { applyAdvancedFilter } from './advfilter.js';
 import { sheetPrefix } from '../calc/tokens.js';
 import { colName } from './refs.js';
 import { Calc } from '../calc/engine.js';
@@ -322,10 +323,10 @@ export class Workbook {
   setAutoFilter(i, filter) {
     const part = this._part(i);
     const was = part.model.autoFilter;
-    setAutoFilterXml(part.doc, filter);
+    setAutoFilterXml(part.doc, filter, this, i, this.today);
     const area = filter || was;
     if (area) {
-      const hide = filter ? hiddenRows(this, i, filter) : new Set();
+      const hide = filter ? hiddenRows(this, i, filter, this.today) : new Set();
       // (Runs of rows alike written at once.)
       for (let r = area.r0 + 1; r <= area.r1;) {
         const on = hide.has(r);
@@ -342,11 +343,19 @@ export class Workbook {
     this.resetCalc();
   }
 
+  /**
+   * Data > Advanced: the rows of `list` on sheet i passing `criteria` (advfilter.js), without later duplicates when
+   * `unique`; in place, the others hidden; with `copyTo` ({ r, c }) the heading and the rows passing written there
+   * (their values and formats). Excel's names written as it writes them: _xlnm._FilterDatabase (hidden) for the list,
+   * _xlnm.Criteria for the criteria, _xlnm.Extract for the copy's heading row. Returns null, or Excel's words.
+   */
+  advancedFilter(i, spec) { return applyAdvancedFilter(this, i, spec); }
+
   /** The hidden name Excel keeps a sheet's filter range in: _xlnm._FilterDatabase, local to the sheet. */
-  _filterName(i, area) {
+  _filterName(i, area, name = '_xlnm._FilterDatabase', hidden = true) {
     const abs = (r, c) => `$${colName(c)}$${r + 1}`;
     const text = `${sheetPrefix(this.sheets[i].name)}${abs(area.r0, area.c0)}:${abs(area.r1, area.c1)}`;
-    const found = this.definedNames.find((d) => d.name === '_xlnm._FilterDatabase' && d.sheet === i);
+    const found = this.definedNames.find((d) => d.name === name && d.sheet === i);
     if (found) {
       if (found.text !== text) { found.text = text; found.el.textContent = text; this.bookDirty = true; }
       return;
@@ -360,12 +369,12 @@ export class Workbook {
       root.insertBefore(names, [...root.childNodes].find((n) => n.nodeType === 1 && AFTER.includes(n.localName)) || null);
     }
     const el = this.doc.createElementNS(this.ns, 'definedName');
-    el.setAttribute('name', '_xlnm._FilterDatabase');
+    el.setAttribute('name', name);
     el.setAttribute('localSheetId', String(i));
-    el.setAttribute('hidden', '1');
+    if (hidden) el.setAttribute('hidden', '1');
     el.textContent = text;
     names.appendChild(el);
-    this.definedNames.push(withEl({ name: '_xlnm._FilterDatabase', sheet: i, text }, el));
+    this.definedNames.push(withEl({ name, sheet: i, text }, el));
     this.bookDirty = true;
   }
 

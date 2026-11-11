@@ -8,6 +8,7 @@ import { stringItemText } from './strings.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { readColor } from './styles.js';
 import { readExtRules, readDataBar, readIconSet, extIdOf } from './cfext.js';
+import { readFilterColumn } from './filtermore.js';
 
 /** A cell as stored: `t` its type (n number, s string, b boolean, e error, str formula text, d ISO date), `v` its
  *  value (null for a cell that only carries a style), `s` its style (an index into cellXfs), `f` its formula text.
@@ -114,15 +115,8 @@ function readAutoFilter(el, ns) {
   const area = el && parseRange(attr(el, 'ref'));
   if (!area) return null;
   const columns = new Map();
-  for (const fc of kids(el, 'filterColumn', ns)) {
-    const filters = kid(fc, 'filters', ns);
-    const plain = filters && [...filters.childNodes].every((n) => n.nodeType !== 1 || n.localName === 'filter');
-    columns.set(area.c0 + Number(attr(fc, 'colId')), {
-      values: filters ? kids(filters, 'filter', ns).map((f) => attr(f, 'val') ?? '') : [],
-      blank: !!filters && (attr(filters, 'blank') === '1' || attr(filters, 'blank') === 'true'),
-      other: !plain,
-    });
-  }
+  // (Each column's filter: a list of values, or filtermore.js's text, number, top 10, average, date or colour filter.)
+  for (const fc of kids(el, 'filterColumn', ns)) columns.set(area.c0 + Number(attr(fc, 'colId')), readFilterColumn(fc, ns));
   return { ...area, columns };
 }
 

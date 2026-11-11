@@ -1,6 +1,6 @@
 // Commands that move data (commands.js shares its state with them): copy, cut and paste (Paste Special too), fill
 // and AutoFill, sort, AutoSum, the Name Box and the filter.
-import { refName, colName } from '../ooxml/refs.js';
+import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
@@ -163,13 +163,24 @@ export function dataCommands(env) {
       const f = sheet().autoFilter;
       if (!f || ctx.readOnly()) return false;
       const columns = new Map(f.columns);
-      if (show) columns.set(c, { values: show.values, blank: !!show.blank, other: false });
+      // (A list of values, or filtermore.js's other filters as they come.)
+      if (show) columns.set(c, show.values ? { values: show.values, blank: !!show.blank, other: false } : { ...show, other: false });
       else columns.delete(c);
       return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns })) === true;
     },
     /** Home > Sort & Filter > Clear (every column's filter taken off, the buttons kept), and Reapply (the rows
      *  filtered again, after edits). */
-    filterClear() { const f = sheet().autoFilter; return !!f && f.columns.size > 0 && commands.filterAll(new Map()); },
+    filterClear() {
+      const f = sheet().autoFilter;
+      if (f) return f.columns.size > 0 && commands.filterAll(new Map());
+      // (An Advanced Filter in place: its list's rows shown again, as Excel's Clear does.)
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const db = wb.definedNames.find((d) => d.name === '_xlnm._FilterDatabase' && d.sheet === si);
+      const area = db && parseRange(db.text.replace(/^.*!/, '').replace(/\$/g, ''));
+      if (!area || ctx.readOnly()) return false;
+      return commands.sheetChange((book, k) => { book.setLines(k, 'row', area.r0 + 1, area.r1, { hidden: false }); });
+    },
     filterReapply() { const f = sheet().autoFilter; return !!f && commands.filterAll(f.columns); },
     filterAll(columns) {
       const f = sheet().autoFilter;
