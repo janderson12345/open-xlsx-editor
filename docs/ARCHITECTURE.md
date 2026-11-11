@@ -34,6 +34,8 @@ insides:
 | `src/pdf.js` | PDF export from the print layout (pdf-lib, fontkit): fills, borders and cell text at the layout's places, clipped to their cells; docs/PDF.md. |
 | `src/collab.js` | Co-editing over Yjs: `connectWorkbook(api, ydoc)`; cell contents shared cell by cell from `api.onEdit`, made with the `remoteContents` command; any other change shared as the workbook's bytes; docs/COLLAB.md. |
 | `src/collab-peers.js` | Others' cursors in a co-edited workbook: this editor's selection put in the provider's awareness (throttled, from `api.onSelect`), the others' read back for the sheet shown and given to the grid; each person's colour and the flag's text colour by contrast. |
+| `bin/oxe-mcp.mjs` | The MCP server: the agent interface as tools for an AI assistant, over stdin and stdout, within one folder; docs/AGENT.md. |
+| `src/agentreview.js` | An agent's edits reviewed: the workbook now beside the one opened, cell by cell; docs/AGENT.md. |
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes, tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
 | `src/ooxml/pivotnew.js` | A new PivotTable (Insert > PivotTable), its parts written as Excel writes a new one, then laid out by pivot.js's refresh; docs/PIVOT.md. |

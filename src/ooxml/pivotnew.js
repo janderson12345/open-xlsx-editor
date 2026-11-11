@@ -128,6 +128,20 @@ export function createPivot(wb, src, at, layout, { now = new Date(), name = null
   return { ...done, name: pivotName, path: tablePath };
 }
 
+/** A new pivot's cells made (createPivot's `out`) and its row labels aligned left, as Excel leaves a new one. */
+export function applyPivot(wb, out) {
+  for (const ch of out.changes) {
+    if (ch.contents.length) wb.apply(ch.si, ch.contents);
+    if (!ch.labels) continue;
+    const cells = [];
+    for (let r = ch.labels.r0; r <= ch.labels.r1; r++) {
+      const s = wb.sheet(ch.si).cells.get(r)?.get(ch.labels.c0)?.s || 0;
+      cells.push({ r, c: ch.labels.c0, s: wb.styleWith(s, { align: { horizontal: 'left' } }) });
+    }
+    wb.setStyles(ch.si, cells);
+  }
+}
+
 /** The workbook's <pivotCache cacheId r:id/> (in <pivotCaches>, after calcPr, as the schema orders it). */
 function addCacheEntry(wb, cacheId, rId) {
   const root = wb.doc.documentElement;

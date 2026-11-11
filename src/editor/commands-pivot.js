@@ -1,6 +1,6 @@
 // Insert > PivotTable (commands.js shares its state with it): a new PivotTable made (pivotnew.js) on a new sheet or at a
 // cell of one there is, its row labels aligned left and its columns fitted, as Excel leaves a new one.
-import { createPivot, pivotSourceFields, layoutRefusal } from '../ooxml/pivotnew.js';
+import { createPivot, pivotSourceFields, layoutRefusal, applyPivot } from '../ooxml/pivotnew.js';
 import { readPivots } from '../ooxml/pivot.js';
 import { pxWidth } from '../ooxml/sizes.js';
 import { parseRange } from '../ooxml/refs.js';
@@ -18,17 +18,7 @@ export function pivotCommands(env) {
 
   /** The cells and look of a new pivot: its cells made, its row labels aligned left, its columns fitted. */
   function finish(wb, out) {
-    for (const ch of out.changes) {
-      if (ch.contents.length) wb.apply(ch.si, ch.contents);
-      if (ch.labels) {
-        const cells = [];
-        for (let r = ch.labels.r0; r <= ch.labels.r1; r++) {
-          const s = wb.sheet(ch.si).cells.get(r)?.get(ch.labels.c0)?.s || 0;
-          cells.push({ r, c: ch.labels.c0, s: wb.styleWith(s, { align: { horizontal: 'left' } }) });
-        }
-        wb.setStyles(ch.si, cells);
-      }
-    }
+    applyPivot(wb, out);
     ctx.restyled?.(); // (the grid learns the new cell format)
   }
   /** The pivot's columns fitted (on the sheet shown, where the grid measures text), as Excel fits a new one. */

@@ -324,12 +324,15 @@ export function mountXlsxEditor(host, options = {}) {
      *  history, drawn as it is made. */
     agent() {
       if (!state.workbook) throw new Error('no workbook open');
+      // (Its changes() compare with the workbook as it is now, before this agent's edits.)
+      const was = state.workbook.toBytes();
+      const password = state.workbook.encryption?.password ?? null;
       return new AgentWorkbook(() => state.workbook, {
         cells: (si, contents, styles) => {
           if (!editing().run('applyChanges', [{ si, contents, styles }])) throw new Error(state.readOnly ? 'The workbook is read-only' : "You can't change part of an array");
         },
         structure: (run, kind) => editing().run('agentChange', run, kind),
-      });
+      }, { baseline: () => Workbook.fromBytes(was, { password }) });
     },
     /** The password the workbook is saved with (a new one, as Excel's Encrypt with Password), or null to save it
      *  without one. */

@@ -11,6 +11,8 @@ keyboard or mouse, type over a cell or press F2, Delete, undo and redo. Formulas
 out (181 functions and table references; 541 of 541 test formulas give Excel's results), again whenever what they read changes, and
 can be typed, pointing at cells with the arrow keys or the mouse, on this sheet or another, as in Excel. Saving
 rewrites only the parts you changed; every other part goes back byte for byte.
+An AI assistant can read and edit workbooks too, through an MCP server (`open-xlsx-editor-mcp`) or the agent
+interface, and every change it makes can be reviewed cell by cell and taken back before saving (docs/AGENT.md).
 Sister project of open-docx-editor, built the same way.
 
 ```js

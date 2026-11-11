@@ -620,6 +620,16 @@ check(await agentCell() === '', 'Ctrl+Z: the agent’s entry taken back');
 const agentSheet = await page.evaluate(() => { const name = window.oxe.agent().addSheet('From agent'); return { name, tabs: [...document.querySelectorAll('.oxe-tab')].map((t) => t.textContent) }; });
 check(agentSheet.name === 'From agent' && agentSheet.tabs.includes('From agent'), 'api.agent().addSheet: a tab for it', JSON.stringify(agentSheet));
 await page.evaluate(() => window.oxe.agent().deleteSheet('From agent'));
+// Its review: what one agent changed since it was made, and a cell put back as it was, drawn.
+const agentReview = await page.evaluate(() => {
+  const a = window.oxe.agent();
+  a.write({ H9: 'kiwi' });
+  const before = a.changes().cells.filter((c) => c.kind === 'edited').map((c) => `${c.ref}:${c.before.value}>${c.after.value}`);
+  const back = a.revert(['H9']);
+  return { before, back, after: a.changes().cells.length };
+});
+check(agentReview.before.length === 1 && /H9:null>kiwi/.test(agentReview.before[0]) && agentReview.back.reverted.length === 1 && agentReview.after === 0 && await agentCell() === '',
+  'api.agent().changes: H9 entered; revert puts it back, drawn empty', JSON.stringify(agentReview));
 
 // Filter: B3, Ctrl+Shift+L: buttons on the heading row. Choice's button, "No" unticked, OK: the No rows hidden. E1,
 // Alt+Down: the same list; Clear Filter From "Choice": all shown. Ctrl+Shift+L: off, no buttons.

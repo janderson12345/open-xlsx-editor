@@ -17,10 +17,16 @@ import { readTables } from './ooxml/tables.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from './ooxml/validation.js';
 import { refName, rangeName, colIndex, MAX_ROWS, MAX_COLS } from './ooxml/refs.js';
 import { sheetPrefix } from './calc/tokens.js';
+import { workbookChanges, changesMarkdown } from './agentreview.js';
+import { createPivot, applyPivot, PIVOT_FUNCTIONS } from './ooxml/pivotnew.js';
+import { readPivots, refreshPivot } from './ooxml/pivot.js';
 
 /** Opens an .xlsx or .xlsm (bytes) for reading and editing; one saved with a password needs `password`. */
 export function openWorkbook(bytes, { password = null } = {}) {
-  return new AgentWorkbook(Workbook.fromBytes(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), { password }));
+  const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const book = new AgentWorkbook(Workbook.fromBytes(data, { password }), null, { baseline: () => Workbook.fromBytes(data, { password }) });
+  book.reopenable = true;
+  return book;
 }
 
 /** A cell's value as JavaScript has it: a number, string or boolean, an error as its text ("#DIV/0!"), or null. */
@@ -33,9 +39,14 @@ function valueOf(cell) {
 
 export class AgentWorkbook {
   /** `edits`: how changes are made, { cells(si, contents, styles), structure(fn, kind: 'lines' | 'sheets') } (an
-   *  editor's, for its history). */
-  constructor(wb, edits = null) {
+   *  editor's, for its history). `baseline()`: the workbook as it was before this agent's edits, for changes() and
+   *  revert(). */
+  constructor(wb, edits = null, { baseline = null } = {}) {
     this._wb = typeof wb === 'function' ? wb : () => wb;
+    this._baseline = baseline;
+    this._base = null;
+    /** Rows, columns and PivotTables changed, in order: [{ sheetId, text }] (for changes()). */
+    this.log = [];
     this.edits = edits || {
       cells: (si, contents, styles) => {
         const { circular } = this.wb.apply(si, contents);
@@ -237,6 +248,9 @@ export class AgentWorkbook {
     const si = this.defaultSheet(sheet);
     if (!Number.isInteger(n) || n === 0) throw new Error('count must be a whole number other than 0');
     this.edits.structure((wb) => wb.changeLines(si, axis, at, n), 'lines');
+    const what = axis === 'row' ? `row${Math.abs(n) > 1 ? 's' : ''}` : `column${Math.abs(n) > 1 ? 's' : ''}`;
+    const where = axis === 'row' ? `row ${at + 1}` : `column ${refName(0, at).replace(/\d+$/, '')}`;
+    this.log.push({ sheetId: this.wb.sheets[si].sheetId, text: `${Math.abs(n)} ${what} ${n > 0 ? 'inserted before' : 'deleted from'} ${where} on ${this.wb.sheets[si].name}` });
   }
 
   /** A new worksheet (at the end, or before sheet `before`); returns its name. Excel's refusals throw. */
@@ -249,6 +263,113 @@ export class AgentWorkbook {
 
   renameSheet(sheet, name) { const si = this.defaultSheet(sheet); this.edits.structure((wb) => wb.renameSheet(si, name), 'sheets'); }
   deleteSheet(sheet) { const si = this.defaultSheet(sheet); this.edits.structure((wb) => wb.deleteSheet(si), 'sheets'); }
+
+  /**
+   * A PivotTable of `source` (a range with its headings, or a table's name) made as Excel's Insert > PivotTable makes
+   * it: `rows` and `columns` field names in order, `values` [{ field, fn: 'sum' | 'count' | 'average' | 'max' |
+   * 'min' }]. At `at` ("Report!A3"), or on a new sheet at A3. Returns { name, sheet, range }; Excel's refusals throw.
+   */
+  pivot(source, { rows = [], columns = [], values = [] } = {}, { at = null, sheet = null } = {}) {
+    const t = readTables(this.wb).find((x) => x.name.toLowerCase() === String(source).toLowerCase());
+    const src = t ? { si: t.si, r0: t.r0, c0: t.c0, r1: t.r1 - t.totals, c1: t.c1 } : this.where(source, { sheet });
+    const heads = [];
+    for (let c = src.c0; c <= src.c1; c++) heads.push(String(this.wb.sheet(src.si).cells.get(src.r0)?.get(c)?.v ?? '').toLowerCase());
+    const field = (name) => { const i = heads.indexOf(String(name).toLowerCase()); if (i < 0) throw new Error(`no field named ${name} in ${this.qualified(src.si, src)}`); return i; };
+    const layout = {
+      rows: rows.map(field), cols: columns.map(field),
+      values: values.map((v) => { if (!PIVOT_FUNCTIONS[v.fn || 'sum']) throw new Error(`not a function for values: ${v.fn}`); return { field: field(v.field), fn: v.fn || 'sum' }; }),
+    };
+    const place = at ? this.where(at, { sheet }) : null;
+    let out = null;
+    this.edits.structure((wb) => {
+      let si = place ? place.si : wb.addSheet(wb.sheets.length);
+      out = createPivot(wb, src, { si, r: place ? place.r0 : 2, c: place ? place.c0 : 0 }, layout);
+      if (out.error) { if (!place) wb.deleteSheet(si); si = -1; return; }
+      applyPivot(wb, out);
+    }, 'sheets');
+    if (out.error) throw new Error(out.error);
+    const area = out.changes[0].area;
+    const si = out.changes[0].si;
+    this.log.push({ sheetId: this.wb.sheets[si].sheetId, text: `PivotTable ${out.name} made at ${this.qualified(si, area)}` });
+    return { name: out.name, sheet: this.wb.sheets[si].name, range: this.qualified(si, area) };
+  }
+
+  /** Refresh every PivotTable from its source (Data > Refresh All). Returns their names; a refusal throws with the
+   *  editor's words, nothing refreshed. */
+  refreshPivots() {
+    const done = [];
+    this.edits.structure((wb) => {
+      const list = readPivots(wb).filter((p, k, a) => a.findIndex((q) => q.cachePath === p.cachePath) === k);
+      const outs = [];
+      const before = wb.snapshot();
+      for (const p of list) {
+        const out = refreshPivot(wb, p);
+        if (out.error) { wb.restore(before); done.length = 0; throw new Error(out.why ? `${out.error}: ${out.why}.` : out.error); }
+        outs.push(out);
+        done.push(p.name);
+      }
+      for (const out of outs) for (const ch of out.changes) if (ch.contents.length) wb.apply(ch.si, ch.contents);
+    }, 'lines');
+    return done;
+  }
+
+  // --- Review ---------------------------------------------------------------------------------------------------
+
+  /** The workbook as it was before this agent's edits (read only), or null when there is none to compare with. */
+  base() {
+    if (!this._baseline) return null;
+    if (!this._base) this._base = new AgentWorkbook(this._baseline());
+    return this._base;
+  }
+
+  /** What this agent's edits changed (agentreview.js): { sheets, structure, cells: [{ ref, kind ('edited' or
+   *  'result'), before, after }], more }; with `markdown`, the same as a summary to read. */
+  changes({ limit = 500, markdown = false } = {}) {
+    const base = this.base();
+    if (!base) throw new Error('no workbook to compare with: changes are kept from when the agent opened it');
+    const ch = workbookChanges(base, this, this.log, { limit });
+    return markdown ? changesMarkdown(ch) : ch;
+  }
+
+  /** Cells put back as they were before this agent's edits (["Data!B2", "C3"]), formats included. Refused on a sheet
+   *  whose rows or columns this agent moved, where the cells no longer line up: use revertAll there. Returns
+   *  { reverted, refused }. */
+  revert(refs, { sheet = null } = {}) {
+    const base = this.base();
+    if (!base) throw new Error('no workbook to compare with');
+    const reverted = [];
+    const refused = [];
+    const bySheet = new Map();
+    for (const ref of refs) {
+      let a;
+      try { a = this.where(ref, { sheet }); } catch (e) { refused.push({ ref, error: e.message }); continue; }
+      const id = this.wb.sheets[a.si].sheetId;
+      const bi = base.wb.sheets.findIndex((s) => s.sheetId === id);
+      if (bi < 0) { refused.push({ ref, error: 'the sheet is new: delete it instead' }); continue; }
+      if (this.log.some((e) => e.sheetId === id)) { refused.push({ ref, error: 'rows, columns or a PivotTable changed on this sheet: use revertAll' }); continue; }
+      const bsh = base.wb.sheet(bi);
+      if (!bySheet.has(a.si)) bySheet.set(a.si, { contents: [], styles: [] });
+      const put = bySheet.get(a.si);
+      for (let r = a.r0; r <= a.r1; r++) {
+        for (let c = a.c0; c <= a.c1; c++) {
+          const was = base.cell(bi, bsh, r, c);
+          put.contents.push(was.formula != null ? { r, c, formula: was.formula.slice(1) } : { r, c, value: was.value });
+          put.styles.push({ r, c, s: bsh.cells.get(r)?.get(c)?.s || 0 });
+        }
+      }
+      reverted.push(this.qualified(a.si, a));
+    }
+    for (const [si, { contents, styles }] of bySheet) this.edits.cells(si, contents, styles);
+    return { reverted, refused };
+  }
+
+  /** Every edit of this agent taken back: the workbook as it was opened. (Not in an editor, where Undo does it.) */
+  revertAll() {
+    if (!this.reopenable) throw new Error('in an editor, take the edits back with Undo');
+    const wb = this._baseline();
+    this._wb = () => wb;
+    this.log = [];
+  }
 
   /** Work out every formula again (Excel's Ctrl+Alt+F9). */
   calculate() { this.wb.calculate(); }
