@@ -47,6 +47,22 @@ export function rowDescents(sheet, deco) {
   return out;
 }
 
+/** The height (pt) Excel gives a row for turned text (Format Cells > Alignment > Orientation), measured over COM with
+ *  Calibri 11 (Rows.AutoFit after Range.Orientation): stacked letters (255) a line each and 1.5pt more ('ab' 31.5,
+ *  'Stack' 76.5, 'Hello world text' 241.5); text at an angle its width up the angle and a line's height across it,
+ *  the width 1.14 times the canvas's (Excel's GDI widths are wider): 'Hello world text' at 15, 30, 45, 60 and 90
+ *  degrees 36, 52.5, 66, 76.5 and 81pt, worked out here within 2pt. Without a canvas (Node) only stacked text grows. */
+export function turnedPt(text, rotation, font, linePt) {
+  const plain = text.replace(/[\r\n]/g, '');
+  if (rotation === 255) return linePt * [...plain].length + 1.5;
+  if (typeof document === 'undefined') return linePt;
+  ctx = ctx || document.createElement('canvas').getContext('2d');
+  ctx.font = font;
+  const a = (Math.abs(rotation > 90 ? 90 - rotation : rotation) * Math.PI) / 180;
+  const px = ctx.measureText(plain).width * 1.14 * Math.sin(a) + (linePt / 0.75) * Math.cos(a);
+  return Math.max(linePt, px * 0.75);
+}
+
 /** Heights in points for the rows Excel sizes: Map(row -> pt), for rows with cells and no customHeight. `deco(s)`
  *  gives a cell format's font ({ family, sizePx, css }) and alignment (cellstyles.js); `cols` the screen columns,
  *  whose widths wrapped lines are counted in (less the cell's 2px padding each side). */
@@ -66,6 +82,7 @@ export function autoRowHeights(sheet, deco, cols) {
       let lines = 1;
       if (d.align.wrap && cell.t === 's' && cell.v) lines = countLines(cell.v, d.font.css, cols.size(c) - 4);
       best = Math.max(best, rowPt.get(s) * lines);
+      if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, rowPt.get(s)));
     }
     out.set(r, best);
   }

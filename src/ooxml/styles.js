@@ -5,23 +5,38 @@ import { INDEXED } from './theme.js';
 import { BUILTIN_FORMATS } from './format.js';
 
 /** Excel's font when styles.xml is missing or has none: the body font of the theme, 11pt. */
-const FALLBACK_FONT = { name: 'Calibri', size: 11, scheme: 'minor', b: false, i: false, u: null, strike: false, color: null };
+const FALLBACK_FONT = { name: 'Calibri', size: 11, scheme: 'minor', b: false, i: false, u: null, strike: false, color: null, vertAlign: null };
 const NO_FILL = { pattern: 'none', fg: null, bg: null };
 const NO_SIDE = { style: null, color: null };
-const NO_BORDER = { left: NO_SIDE, right: NO_SIDE, top: NO_SIDE, bottom: NO_SIDE };
-const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0 };
+const NO_BORDER = { left: NO_SIDE, right: NO_SIDE, top: NO_SIDE, bottom: NO_SIDE, diagonal: NO_SIDE, diagonalUp: false, diagonalDown: false };
+const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 };
+/** A cell's protection when its format says nothing: locked, formula shown. */
+const PROTECTED = { locked: true, hidden: false };
 
+const isOn = (v) => v === '1' || v === 'true';
 /** A cell format's `alignment`: horizontal (general, left, center, right, fill, justify, centerContinuous,
- *  distributed), vertical (top, center, bottom, justify, distributed), wrapping and indent (in levels). Rotation and
- *  shrink-to-fit are not read yet. */
+ *  distributed), vertical (top, center, bottom, justify, distributed), wrapping, indent (in levels), rotation (Excel's
+ *  textRotation: 1 to 90 degrees up, 91 to 180 down by 90 less, 255 the letters stacked), shrink to fit and reading
+ *  order (0 by context, 1 left to right, 2 right to left). */
 export function readAlignment(el) {
   if (!el) return NO_ALIGN;
   return {
     horizontal: attr(el, 'horizontal') || 'general',
     vertical: attr(el, 'vertical') || 'bottom',
-    wrap: attr(el, 'wrapText') === '1' || attr(el, 'wrapText') === 'true',
+    wrap: isOn(attr(el, 'wrapText')),
     indent: Number(attr(el, 'indent') || 0),
+    rotation: Number(attr(el, 'textRotation') || 0),
+    shrink: isOn(attr(el, 'shrinkToFit')),
+    readingOrder: Number(attr(el, 'readingOrder') || 0),
   };
+}
+
+/** A cell format's `protection`: locked (on unless it says 0) and hidden (its formula not shown when the sheet is
+ *  protected). */
+export function readProtection(el) {
+  if (!el) return PROTECTED;
+  const locked = attr(el, 'locked');
+  return { locked: locked == null || isOn(locked), hidden: isOn(attr(el, 'hidden')) };
 }
 
 /** A colour element as { rgb, theme, indexed, auto, tint } (theme.js resolveColor turns it into RRGGBB), or null. */
@@ -44,12 +59,21 @@ export function readFont(el, ns) {
     u: u ? attr(u, 'val') || 'single' : null,
     strike: !!onOff(kid(el, 'strike', ns)),
     color: readColor(kid(el, 'color', ns)),
+    vertAlign: val('vertAlign') || null, // 'superscript', 'subscript' or null
   };
 }
 
-/** One `fill`: its pattern (solid, a hatch, or none) with foreground and background colours. Gradient fills are read
- *  as none for now. (In a solid fill the colour is the foreground's, as Excel writes it.) */
+/** One `fill`: its pattern (solid, a hatch, or none) with foreground and background colours, or a gradient
+ *  ({ pattern: 'gradient', gradient: { type: 'linear' | 'path', degree, left, right, top, bottom, stops: [{ position,
+ *  color }] } }, its first stop's colour as fg). (In a solid fill the colour is the foreground's, as Excel writes it.) */
 export function readFill(el, ns) {
+  const g = kid(el, 'gradientFill', ns);
+  if (g) {
+    const n = (name) => Number(attr(g, name) || 0);
+    const stops = kids(g, 'stop', ns).map((s) => ({ position: Number(attr(s, 'position') || 0), color: readColor(kid(s, 'color', ns)) }));
+    const gradient = { type: attr(g, 'type') === 'path' ? 'path' : 'linear', degree: n('degree'), left: n('left'), right: n('right'), top: n('top'), bottom: n('bottom'), stops };
+    return { pattern: 'gradient', fg: stops[0]?.color || null, bg: null, gradient };
+  }
   const p = kid(el, 'patternFill', ns);
   if (!p) return NO_FILL;
   return { pattern: attr(p, 'patternType') || 'none', fg: readColor(kid(p, 'fgColor', ns)), bg: readColor(kid(p, 'bgColor', ns)) };
@@ -75,14 +99,15 @@ export function readBorder(el, ns) {
     const style = s && attr(s, 'style');
     return style && style !== 'none' ? { style, color: readColor(kid(s, 'color', ns)) } : NO_SIDE;
   };
-  return { left: side('left') === NO_SIDE ? side('start') : side('left'), right: side('right') === NO_SIDE ? side('end') : side('right'), top: side('top'), bottom: side('bottom') };
+  return { left: side('left') === NO_SIDE ? side('start') : side('left'), right: side('right') === NO_SIDE ? side('end') : side('right'), top: side('top'), bottom: side('bottom'),
+    diagonal: side('diagonal'), diagonalUp: isOn(attr(el, 'diagonalUp')), diagonalDown: isOn(attr(el, 'diagonalDown')) };
 }
 
 /** One `xf` of cellXfs or cellStyleXfs: its font, fill, border (indexes kept inside the lists), number format,
- *  alignment and cell style (`xfId`). */
+ *  alignment, protection and cell style (`xfId`). */
 export function readXf(el, ns, { fonts, fills, borders }) {
   const id = (name, list) => Math.min(Number(attr(el, name) || 0), list.length - 1);
-  return { fontId: id('fontId', fonts), fillId: id('fillId', fills), borderId: id('borderId', borders), numFmtId: Number(attr(el, 'numFmtId') || 0), align: readAlignment(kid(el, 'alignment', ns)), xfId: Number(attr(el, 'xfId') || 0) };
+  return { fontId: id('fontId', fonts), fillId: id('fillId', fills), borderId: id('borderId', borders), numFmtId: Number(attr(el, 'numFmtId') || 0), align: readAlignment(kid(el, 'alignment', ns)), protection: readProtection(kid(el, 'protection', ns)), xfId: Number(attr(el, 'xfId') || 0) };
 }
 
 /** The typeface a font is drawn in: the theme's for a scheme font (Excel uses the theme's font whatever `name` says),
@@ -97,7 +122,7 @@ export function fontFamily(font, theme) {
  *  Excel's defaults). `normal` is the Normal style's font (cellStyleXfs 0), the one column widths are measured in;
  *  `palette` the indexed colours (the workbook's own `indexedColors`, else the legacy palette). */
 export function readStyles(doc) {
-  if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN }], normal: FALLBACK_FONT, palette: INDEXED, numFmts: {}, dxfs: [] };
+  if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN, protection: PROTECTED }], normal: FALLBACK_FONT, palette: INDEXED, numFmts: {}, dxfs: [] };
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const fonts = kids(kid(root, 'fonts', ns), 'font', ns).map((el) => readFont(el, ns));
@@ -108,7 +133,7 @@ export function readStyles(doc) {
   if (!borders.length) borders.push(NO_BORDER);
   const xf = (el) => readXf(el, ns, { fonts, fills, borders });
   const cellXfs = kids(kid(root, 'cellXfs', ns), 'xf', ns).map(xf);
-  if (!cellXfs.length) cellXfs.push({ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN });
+  if (!cellXfs.length) cellXfs.push({ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN, protection: PROTECTED });
   const styleXfs = kids(kid(root, 'cellStyleXfs', ns), 'xf', ns).map(xf);
   const custom = kids(kid(kid(root, 'colors', ns), 'indexedColors', ns), 'rgbColor', ns).map((el) => (attr(el, 'rgb') || '').slice(-6));
   const palette = custom.length ? [...custom, ...INDEXED.slice(custom.length)] : INDEXED;

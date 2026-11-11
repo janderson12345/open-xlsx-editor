@@ -222,6 +222,45 @@
 .oxe-wrap.oxe-h-right > .oxe-tx {
   text-align: right;
 }
+/* Text orientation (Format Cells > Alignment): turned about its middle by Excel's angle, or its letters stacked one
+   above the other; either may reach past the cell. Superscript and subscript raise or lower the text a third of a
+   line. (Drawn from the settings; not yet measured against Excel's own drawing.) */
+.oxe-cell.oxe-rot,
+.oxe-cell.oxe-stack {
+  overflow: visible;
+}
+.oxe-rot > .oxe-tx {
+  display: inline-block;
+  transform: translate(var(--oxe-rot-dx, 0px), var(--oxe-rot-dy, 0px)) rotate(calc(var(--oxe-rot) * -1));
+  transform-origin: center;
+}
+.oxe-stack > .oxe-tx {
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+}
+.oxe-sup > .oxe-tx {
+  top: -0.33em;
+}
+.oxe-sub > .oxe-tx {
+  top: 0.25em;
+}
+/* Diagonal lines (Format Cells > Border): corner to corner across the cell, under the text. */
+.oxe-diag {
+  position: absolute;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
+  top: var(--oxe-y);
+  width: var(--oxe-w);
+  height: var(--oxe-h);
+  pointer-events: none;
+}
+.oxe-diag-up {
+  background: linear-gradient(to top left, transparent calc(50% - var(--oxe-bw) / 2), var(--oxe-ec) calc(50% - var(--oxe-bw) / 2),
+    var(--oxe-ec) calc(50% + var(--oxe-bw) / 2), transparent calc(50% + var(--oxe-bw) / 2));
+}
+.oxe-diag-down {
+  background: linear-gradient(to top right, transparent calc(50% - var(--oxe-bw) / 2), var(--oxe-ec) calc(50% - var(--oxe-bw) / 2),
+    var(--oxe-ec) calc(50% + var(--oxe-bw) / 2), transparent calc(50% + var(--oxe-bw) / 2));
+}
 /* Number formats: a section's colour ([Red]) over the font's; padding (_x) as a hidden x; fill (*x) as x repeated
    across whatever room is left, pushing what follows it to the right (format.js, grid.js textSpan). */
 .oxe-root .oxe-cell.oxe-nf-color.oxe-nf-color {
@@ -1628,4 +1667,147 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* The Format Cells box (formatbox.js): its tabs in a row, one panel shown, fields label above control. */
+.oxe-dialog.oxe-format-box {
+  max-width: min(620px, calc(100vw - 32px));
+  width: 620px;
+}
+.oxe-fc-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  border-bottom: 1px solid var(--oxe-head-line);
+  margin-bottom: 10px;
+}
+.oxe-fc-tab {
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.oxe-fc-tab[aria-selected="true"] {
+  border-color: var(--oxe-head-line);
+  background: var(--oxe-bg);
+  font-weight: 600;
+}
+.oxe-fc-panel {
+  min-height: 260px;
+}
+.oxe-fc-grid,
+.oxe-fc-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 16px;
+  align-items: start;
+}
+.oxe-format-box fieldset {
+  margin: 0;
+  padding: 6px 10px 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+}
+.oxe-fc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 8px;
+}
+.oxe-fc-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+.oxe-fc-num {
+  width: 6em;
+}
+.oxe-fc-sample {
+  display: block;
+  min-height: 1.5em;
+  margin: 0 0 8px;
+  padding: 4px 6px;
+  border: 1px solid var(--oxe-head-line);
+}
+.oxe-fc-color {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.oxe-fc-preview,
+.oxe-fc-fill-sample {
+  grid-column: 1 / -1;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--oxe-head-line);
+  background: #ffffff;
+  color: #000000;
+}
+.oxe-fc-presets {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+/* The Border tab's pad: side buttons around a preview cell, as Excel lays them out. */
+.oxe-fc-border-pad {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr 1fr 28px;
+  grid-template-rows: 28px 28px 28px 28px;
+  gap: 4px;
+}
+.oxe-fc-side {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 3px;
+  background: var(--oxe-bg) no-repeat center / 16px 16px;
+  color: inherit;
+  cursor: pointer;
+}
+.oxe-fc-side[aria-pressed="true"] {
+  background-color: var(--oxe-sel-fill);
+  border-color: var(--oxe-accent, #217346);
+}
+.oxe-fc-side::before { content: ''; display: block; margin: auto; background: currentColor; }
+.oxe-fc-side-top { grid-area: 1 / 1; }
+.oxe-fc-side-horizontal { grid-area: 2 / 1; }
+.oxe-fc-side-bottom { grid-area: 3 / 1; }
+.oxe-fc-side-diagonalUp { grid-area: 4 / 1; }
+.oxe-fc-side-left { grid-area: 4 / 2; }
+.oxe-fc-side-vertical { grid-area: 4 / 3; }
+.oxe-fc-side-right { grid-area: 4 / 4; }
+.oxe-fc-side-diagonalDown { grid-area: 4 / 5; }
+.oxe-fc-side-top::before, .oxe-fc-side-horizontal::before, .oxe-fc-side-bottom::before { width: 16px; height: 2px; }
+.oxe-fc-side-left::before, .oxe-fc-side-vertical::before, .oxe-fc-side-right::before { width: 2px; height: 16px; }
+.oxe-fc-side-diagonalUp::before, .oxe-fc-side-diagonalDown::before { width: 2px; height: 18px; transform: rotate(45deg); }
+.oxe-fc-side-diagonalDown::before { transform: rotate(-45deg); }
+.oxe-fc-border-preview {
+  grid-area: 1 / 2 / 4 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #000000;
+  outline: 1px dotted var(--oxe-head-line);
+}
+.oxe-fc-diag-up {
+  background: linear-gradient(to top left, transparent calc(50% - 0.5px), #000 calc(50% - 0.5px), #000 calc(50% + 0.5px), transparent calc(50% + 0.5px)) #ffffff;
+}
+.oxe-fc-diag-down {
+  background: linear-gradient(to top right, transparent calc(50% - 0.5px), #000 calc(50% - 0.5px), #000 calc(50% + 0.5px), transparent calc(50% + 0.5px)) #ffffff;
+}
+.oxe-fc-diag-up.oxe-fc-diag-down {
+  background: linear-gradient(to top left, transparent calc(50% - 0.5px), #000 calc(50% - 0.5px), #000 calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(to top right, transparent calc(50% - 0.5px), #000 calc(50% - 0.5px), #000 calc(50% + 0.5px), transparent calc(50% + 0.5px)) #ffffff;
+}
+/* Format Painter waiting for cells: a brush beside the pointer over the grid. */
+.oxe-root.oxe-painting .oxe-grid {
+  cursor: copy;
 }

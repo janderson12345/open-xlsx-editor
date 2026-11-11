@@ -9,6 +9,11 @@ import { BUILTIN_FORMATS } from './format.js';
 /** Excel's order of a font's children, and of a border's sides. */
 const FONT_ORDER = ['b', 'i', 'strike', 'condense', 'extend', 'outline', 'shadow', 'u', 'vertAlign', 'sz', 'color', 'name', 'family', 'charset', 'scheme'];
 const SIDE_ORDER = ['start', 'left', 'end', 'right', 'top', 'bottom', 'diagonal', 'vertical', 'horizontal'];
+/** Excel's order of an alignment's attributes (its saved styles.xml: tools/excel-compare/excel-formatcells.ps1). */
+const ALIGN_ORDER = ['horizontal', 'vertical', 'textRotation', 'wrapText', 'indent', 'relativeIndent', 'justifyLastLine', 'shrinkToFit', 'readingOrder'];
+/** The alignment change's keys and the attributes they set, each with the value Excel leaves out. */
+const ALIGN_KEYS = { horizontal: ['horizontal', 'general'], vertical: ['vertical', 'bottom'], rotation: ['textRotation', 0], wrap: ['wrapText', false],
+  indent: ['indent', 0], shrink: ['shrinkToFit', false], readingOrder: ['readingOrder', 0] };
 /** Excel's built-in cell styles the Number group applies: builtinId and number format. */
 export const CELL_STYLES = { Comma: { builtinId: 3, numFmtId: 43 }, Currency: { builtinId: 4, numFmtId: 44 }, Percent: { builtinId: 5, numFmtId: 9 } };
 /** Built-in formats whose codes depend on the computer's locale: Excel writes their codes out (numFmts) when it uses
@@ -147,23 +152,60 @@ class Formats {
       if (change.color) placeChild(el, setColor(make(this.doc, 'color'), change.color), FONT_ORDER);
       else placeChild(el, setColor(make(this.doc, 'color'), { theme: 1 }), FONT_ORDER);
     }
+    if ('vertAlign' in change) {
+      removeChild(el, 'vertAlign');
+      if (change.vertAlign) {
+        const v = make(this.doc, 'vertAlign');
+        v.setAttribute('val', change.vertAlign);
+        placeChild(el, v, FONT_ORDER);
+      }
+    }
     return this.add('fonts', el, (x, i) => { this.wb.styles.fonts[i] = readFont(x, this.ns); });
   }
 
-  /** A solid fill of a colour, or none (null: fill 0, which every workbook has as "none"). */
-  fill(color) {
-    if (!color) return 0;
+  /** A fill: a colour (solid), { pattern, fg, bg } (a hatch or shade: its pattern colour and the cell's, either left
+   *  out for automatic), { gradient: { type, degree, left, right, top, bottom, stops: [{ position, color }] } }, or
+   *  none (null: fill 0, which every workbook has as "none"). Written as Excel writes each (excel-formatcells.ps1). */
+  fill(change) {
+    if (!change) return 0;
     const el = make(this.doc, 'fill');
-    const p = el.appendChild(make(this.doc, 'patternFill'));
-    p.setAttribute('patternType', 'solid');
-    p.appendChild(setColor(make(this.doc, 'fgColor'), color));
-    p.appendChild(setColor(make(this.doc, 'bgColor'), { indexed: 64 }));
+    if (change.gradient) {
+      const g = el.appendChild(make(this.doc, 'gradientFill'));
+      const { type, degree, stops } = change.gradient;
+      if (type === 'path') {
+        g.setAttribute('type', 'path');
+        for (const k of ['left', 'right', 'top', 'bottom']) if (change.gradient[k]) g.setAttribute(k, String(change.gradient[k]));
+      } else if (degree) g.setAttribute('degree', String(degree));
+      for (const s of stops) {
+        const stop = g.appendChild(make(this.doc, 'stop'));
+        stop.setAttribute('position', String(s.position));
+        stop.appendChild(setColor(make(this.doc, 'color'), s.color));
+      }
+    } else {
+      const p = el.appendChild(make(this.doc, 'patternFill'));
+      const pattern = change.pattern || 'solid';
+      p.setAttribute('patternType', pattern);
+      // (Solid: the colour, with indexed 64 behind it. A pattern: the colours chosen.)
+      const fg = pattern === 'solid' ? change.fg || change : change.fg;
+      const bg = pattern === 'solid' ? { indexed: 64 } : change.bg;
+      if (fg) p.appendChild(setColor(make(this.doc, 'fgColor'), fg));
+      if (bg) p.appendChild(setColor(make(this.doc, 'bgColor'), bg));
+    }
     return this.add('fills', el, (x, i) => { this.wb.styles.fills[i] = readFill(x, this.ns); });
   }
 
-  /** A border with some sides changed: { left, right, top, bottom }, each { style, color } or null (no line). */
-  border(borderId, sides) {
+  /** A border with some sides changed: { left, right, top, bottom, diagonal }, each { style, color } or null (no
+   *  line), and which diagonals are drawn (diagonalUp, diagonalDown: true or false; left out, unchanged). */
+  border(borderId, change) {
     const el = this.copy('borders', 'border', borderId);
+    const { diagonalUp, diagonalDown, ...sides } = change;
+    // (Excel writes diagonalUp before diagonalDown, and neither when off.)
+    const up = diagonalUp ?? el.getAttribute('diagonalUp') === '1';
+    const down = diagonalDown ?? el.getAttribute('diagonalDown') === '1';
+    el.removeAttribute('diagonalUp');
+    el.removeAttribute('diagonalDown');
+    if (up) el.setAttribute('diagonalUp', '1');
+    if (down) el.setAttribute('diagonalDown', '1');
     for (const [name, side] of Object.entries(sides)) {
       // (A right-to-left file may name the sides start and end.)
       if (name === 'left') removeChild(el, 'start');
@@ -228,8 +270,9 @@ class Formats {
   }
 
   /**
-   * Cell format `s` with a change: { font: {...} (see font()), fill: colour or null, border: { side: ... } (see
-   * border()), align: { horizontal, vertical, wrap, indent }, numFmt: code, style: 'Percent' | 'Comma' | 'Currency' }.
+   * Cell format `s` with a change: { font: {...} (see font()), fill (see fill()), border: { side: ... } (see
+   * border()), align: { horizontal, vertical, wrap, indent, rotation, shrink, readingOrder }, protection: { locked,
+   * hidden }, numFmt: code, style: 'Percent' | 'Comma' | 'Currency' }.
    * Returns the index of the cell format.
    */
   xf(s, change) {
@@ -246,15 +289,33 @@ class Formats {
     } else if (change.numFmt != null) set('numFmtId', this.numFmt(change.numFmt), 'applyNumberFormat');
     if (change.align) {
       const a = kid(el, 'alignment', this.ns) || make(this.doc, 'alignment');
-      const { horizontal, vertical, wrap, indent } = change.align;
-      const put = (k, v, dflt) => (v == null || v === dflt ? a.removeAttribute(k) : a.setAttribute(k, String(v)));
-      if (horizontal !== undefined) put('horizontal', horizontal, 'general');
-      if (vertical !== undefined) put('vertical', vertical, 'bottom');
-      if (wrap !== undefined) put('wrapText', wrap ? 1 : null, null);
-      if (indent !== undefined) put('indent', indent || null, null);
+      const values = Object.fromEntries([...a.attributes].map((x) => [x.name, x.value]));
+      for (const [key, [name, dflt]] of Object.entries(ALIGN_KEYS)) {
+        if (change.align[key] === undefined) continue;
+        const v = change.align[key];
+        if (v == null || v === dflt || v === false) delete values[name];
+        else values[name] = v === true ? '1' : String(v);
+      }
+      // (An indented or Fill-aligned cell can't be rotated: Excel drops the rotation, whichever came first.)
+      if (Number(values.indent || 0) > 0 || values.horizontal === 'fill') delete values.textRotation;
+      for (const x of [...a.attributes]) a.removeAttribute(x.name);
+      const rank = (n) => (ALIGN_ORDER.includes(n) ? ALIGN_ORDER.indexOf(n) : 99);
+      for (const name of Object.keys(values).sort((p, q) => rank(p) - rank(q))) a.setAttribute(name, values[name]);
       if (a.attributes.length) placeChild(el, a, ['alignment', 'protection', 'extLst']);
       else removeChild(el, 'alignment');
       el.setAttribute('applyAlignment', '1');
+    }
+    if (change.protection) {
+      const p = kid(el, 'protection', this.ns) || make(this.doc, 'protection');
+      const locked = change.protection.locked ?? p.getAttribute('locked') !== '0';
+      const hidden = change.protection.hidden ?? p.getAttribute('hidden') === '1';
+      p.removeAttribute('locked');
+      p.removeAttribute('hidden');
+      if (!locked) p.setAttribute('locked', '0');
+      if (hidden) p.setAttribute('hidden', '1');
+      if (p.attributes.length) placeChild(el, p, ['alignment', 'protection', 'extLst']);
+      else removeChild(el, 'protection');
+      el.setAttribute('applyProtection', '1');
     }
     if (!el.getAttribute('xfId')) el.setAttribute('xfId', '0');
     return this.add('cellXfs', el, (x, i) => { styles.cellXfs[i] = readXf(x, this.ns, styles); });

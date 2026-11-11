@@ -68,12 +68,12 @@ test('fills and borders from styles.xml', () => {
   assert.equal(box.left.color.indexed, 12);
 });
 
-test('alignment from cell formats: horizontal, vertical, wrap, indent', () => {
+test('alignment from cell formats: horizontal, vertical, wrap, indent (rotation, shrink and reading order none)', () => {
   const { styles } = open('align.xlsx');
   const a = (s) => styles.cellXfs[s].align;
-  assert.deepEqual(a(0), { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0 });
-  assert.deepEqual(a(2), { horizontal: 'center', vertical: 'bottom', wrap: false, indent: 0 });
-  assert.deepEqual(a(8), { horizontal: 'left', vertical: 'top', wrap: false, indent: 0 });
+  assert.deepEqual(a(0), { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 });
+  assert.deepEqual(a(2), { horizontal: 'center', vertical: 'bottom', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 });
+  assert.deepEqual(a(8), { horizontal: 'left', vertical: 'top', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 });
   assert.equal(a(13).indent, 2);
   assert.deepEqual([a(15).wrap, a(15).vertical], [true, 'top']);
 });

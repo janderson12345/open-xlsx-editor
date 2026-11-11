@@ -166,6 +166,8 @@ export function attachEditing(root, ctx) {
     if (e.altKey && !ctrl && key === 'ArrowDown' && ctx.filterMenu?.()) { /* opened */ }
     else if (ARROWS[key]) cmd.run('move', ARROWS[key][0], ARROWS[key][1], { extend: e.shiftKey, jump: ctrl });
     else if (key === 'Tab') cmd.run('move', 0, e.shiftKey ? -1 : 1);
+    // (Format Painter waiting: Enter paints the selection, as a click does.)
+    else if (key === 'Enter' && ctx.painting?.()) ctx.painted();
     else if (key === 'Enter') cmd.run('move', e.shiftKey ? -1 : 1, 0);
     else if (key === 'Home') cmd.run('home', { sheetStart: ctrl });
     else if (key === 'End' && ctrl) cmd.run('end');
@@ -174,6 +176,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'F5' && e.altKey && !e.shiftKey) cmd.run('refreshPivots', ctrl);
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
     else if (key === 'F3' && ctrl && !e.shiftKey && !e.altKey) ctx.nameManager?.();
+    // (Ctrl+1: Format Cells. Taken from the key's code, as Ctrl+Shift+1 is "!".)
+    else if (ctrl && !e.altKey && !e.shiftKey && e.code === 'Digit1') ctx.formatCells?.();
     // (Shift+F2: Excel's New Note, or Edit Note on a cell with one.)
     else if (key === 'F2' && e.shiftKey) ctx.editNote?.();
     else if (key === 'F2') startEdit('edit');
@@ -398,8 +402,11 @@ export function attachEditing(root, ctx) {
       grid.showGuide(null);
       if (Math.round(r.now) !== Math.round(r.size)) cmd.run('resizeLines', r.axis, r.index, r.now);
     }
+    // (Format Painter waiting: the cells just selected get the copied formats.)
+    const selected = dragging;
     dragging = false;
     pointingDrag = false;
+    if (selected && ctx.painting?.()) ctx.painted();
   };
   window.addEventListener('mousemove', onMove);
   window.addEventListener('mouseup', onUp);
@@ -414,6 +421,9 @@ export function attachEditing(root, ctx) {
       if (text != null) navigator.clipboard?.writeText(text).catch(() => {});
       view.focus({ preventScroll: true });
     },
+    /** Format Painter's copy: the selection kept, outlined, as Copy keeps it but leaving the system clipboard
+     *  alone. False if it couldn't be copied. */
+    pickFormats() { return takeClip(false) != null; },
     /** The ribbon's Paste: the system clipboard's text if the browser lets it be read, else what was copied here. */
     async pasteIn() {
       let text = null;

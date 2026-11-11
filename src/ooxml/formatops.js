@@ -103,11 +103,15 @@ const sameLine = (a, b) => !!a && !!b && a.style === b.style && isAuto(a.color) 
 
 /** A border preset of the Borders menu over the selection. A side drawn on the selection's edge takes the
  *  neighbour's facing side away, unless it is the same line (Excel keeps one line between two cells). */
-export function setBorders(wb, si, sel, preset) {
+export const setBorders = (wb, si, sel, preset) => drawBorders(wb, si, sel, PRESETS[preset]);
+
+/** Borders over the selection: `sidesAt(at)` gives each cell's sides from where it is ({ top, bottom, left, right }:
+ *  on the selection's edge), undefined to leave one. `out` holds cells already changed ({ r, c, s } by "r:c"), whose
+ *  new formats the borders go on. */
+function drawBorders(wb, si, sel, sidesAt, out = new Map()) {
   const sheet = wb.sheet(si);
-  const out = new Map();
   const put = (r, c, sides) => {
-    const s = styleAt(sheet, r, c);
+    const s = out.get(`${r}:${c}`)?.s ?? styleAt(sheet, r, c);
     out.set(`${r}:${c}`, { r, c, s: wb.styleWith(s, { border: sides }) });
   };
   const cells = cellsOf(sheet, sel);
@@ -115,11 +119,11 @@ export function setBorders(wb, si, sel, preset) {
   const c1 = Math.max(...cells.map((x) => x.c));
   for (const { r, c } of cells) {
     const at = { top: r === sel.r0, bottom: r === r1, left: c === sel.c0, right: c === c1 };
-    const sides = Object.fromEntries(Object.entries(PRESETS[preset](at)).filter(([, v]) => v !== undefined));
+    const sides = Object.fromEntries(Object.entries(sidesAt(at)).filter(([, v]) => v !== undefined));
     if (!Object.keys(sides).length) continue;
     put(r, c, sides);
     for (const [side, line] of Object.entries(sides)) {
-      if (!at[side]) continue;
+      if (!at[side] || !STEP[side]) continue;
       const nr = r + STEP[side][0];
       const nc = c + STEP[side][1];
       if (nr < 0 || nc < 0) continue;
@@ -129,6 +133,31 @@ export function setBorders(wb, si, sel, preset) {
         put(nr, nc, { [OPPOSITE[side]]: null });
       }
     }
+  }
+  return [...out.values()];
+}
+
+/** What the Format Cells box chose, over the selection: `change` is stylesedit.js's (font, fill, align, numFmt,
+ *  protection) for every cell, with `borders` (the Border tab) instead of `border`: { outline: { left, right, top,
+ *  bottom }, inside: { horizontal, vertical }, diagonal, diagonalUp, diagonalDown }, each line { style, color } or
+ *  null for none, left out to keep. The outline goes on the selection's edge, the inside lines between its cells, the
+ *  diagonals on every cell; a side drawn on the edge takes the neighbour's facing side away, as the ribbon's do. */
+export function formatCells(wb, si, sel, change) {
+  const { borders, ...rest } = change;
+  const out = new Map();
+  if (Object.keys(rest).length) for (const x of formatEach(wb, si, sel, rest)) out.set(`${x.r}:${x.c}`, x);
+  if (borders) {
+    const o = borders.outline || {};
+    const inside = borders.inside || {};
+    drawBorders(wb, si, sel, (at) => ({
+      left: at.left ? o.left : inside.vertical,
+      right: at.right ? o.right : inside.vertical,
+      top: at.top ? o.top : inside.horizontal,
+      bottom: at.bottom ? o.bottom : inside.horizontal,
+      diagonal: borders.diagonal,
+      diagonalUp: borders.diagonalUp,
+      diagonalDown: borders.diagonalDown,
+    }), out);
   }
   return [...out.values()];
 }

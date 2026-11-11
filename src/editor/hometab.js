@@ -77,6 +77,7 @@ export function homeTab(kit, { act, color }) {
     center: toggle('≡', 'Center', f('align', 'horizontal', 'center')),
     right: toggle('⫸', 'Align Right', f('align', 'horizontal', 'right')),
     undo: btn('↶', 'Undo (Ctrl+Z)', f('undo')),
+    painter: toggle('🖌', 'Format Painter: press twice to keep it on', f('formatPainter'), { label: 'Format Painter' }),
     redo: btn('↷', 'Redo (Ctrl+Y)', f('redo')),
   };
   const sheetMenu = (icon, label, title, items) => menu(icon, title, items, { label, big: false });
@@ -85,7 +86,7 @@ export function homeTab(kit, { act, color }) {
     grp('Clipboard', split('📋', 'Paste (Ctrl+V)', f('clipPaste'), () => [item('Paste', f('clipPaste'), { hint: 'Ctrl+V' }), item('Formulas', f('pasteAs', 'formulas')),
       item('Values', f('pasteAs', 'values')), item('Formatting', f('pasteAs', 'formats')), item('Transpose', f('pasteAs', 'transpose')), item('Paste Link', f('pasteAs', 'link')),
       el('hr'), item('Paste Special...', f('pasteSpecialBox'), { hint: 'Ctrl+Alt+V' })], { label: 'Paste', big: true }),
-      col(btn('✂', 'Cut (Ctrl+X)', f('clipCut'), { label: 'Cut' }), btn('⧉', 'Copy (Ctrl+C)', f('clipCopy'), { label: 'Copy' }))),
+      col(btn('✂', 'Cut (Ctrl+X)', f('clipCut'), { label: 'Cut' }), btn('⧉', 'Copy (Ctrl+C)', f('clipCopy'), { label: 'Copy' }), b.painter)),
     grp('Font', col(
       line(fontSel, sizeSel, btn('A⁺', 'Increase Font Size', f('stepFont', 1)), btn('A⁻', 'Decrease Font Size', f('stepFont', -1))),
       line(b.bold, b.italic, b.underline, b.strike, bordersBtn, fillBtn, fontColorBtn))),
@@ -118,7 +119,8 @@ export function homeTab(kit, { act, color }) {
         el('div', { class: 'oxe-cap' }, 'Visibility'), item('Hide Rows', f('hideLines', 'row', true), { hint: 'Ctrl+9' }), item('Hide Columns', f('hideLines', 'col', true), { hint: 'Ctrl+0' }),
         item('Unhide Rows', f('hideLines', 'row', false), { hint: 'Ctrl+Shift+9' }), item('Unhide Columns', f('hideLines', 'col', false)),
         item('Hide Sheet', f('hideShownSheet')), item('Unhide Sheet...', f('unhideSheet')), el('hr'),
-        el('div', { class: 'oxe-cap' }, 'Organize Sheets'), item('Rename Sheet', f('renameShownSheet'))]))),
+        el('div', { class: 'oxe-cap' }, 'Organize Sheets'), item('Rename Sheet', f('renameShownSheet')), el('hr'),
+        item('Format Cells...', f('formatCellsBox'), { hint: 'Ctrl+1' })]))),
     grp('Editing', col(
       split('∑', 'AutoSum (Alt+=)', f('autoSum', 'sum'), () => [item('Sum', f('autoSum', 'sum'), { hint: 'Alt+=' }), item('Average', f('autoSum', 'average')),
         item('Count Numbers', f('autoSum', 'count')), item('Max', f('autoSum', 'max')), item('Min', f('autoSum', 'min'))], { label: 'AutoSum' }),
@@ -144,6 +146,8 @@ export function homeTab(kit, { act, color }) {
   };
   return {
     groups,
+    /** Format Painter's button pressed while it waits for cells. */
+    painting(on) { b.painter.setOn(on); },
     /** The controls from the active cell's look: { font, fontName, xf, code, fonts: { minor, major }, canUndo, canRedo }. */
     update(look) {
       closeMenu();

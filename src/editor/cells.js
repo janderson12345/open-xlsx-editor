@@ -10,7 +10,9 @@ import { setVars, div } from './dom.js';
 /** The merged range a cell is inside, if any. */
 export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
 
-const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0 };
+const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 };
+/** Excel's textRotation as degrees counter-clockwise: 1 to 90 up, 91 to 180 down (91 is -1); 255, stacked, is none. */
+export const rotationDegrees = (r) => (!r || r === 255 ? 0 : r <= 90 ? r : 90 - r);
 /** An indent level in px: 10.08 in print (Excel's PDF of test/fixtures/align.xlsx: one, two and three levels from
  *  either side), 9 on screen (not yet measured). */
 const INDENT_PX = { screen: 9, print: 10.08 };
@@ -51,8 +53,15 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const h = shown.hashes ? 'center' : shown.textFormat && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
   // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)
   const clean = (t) => (wrap ? t.replace(/\r/g, '') : t.replace(/[\r\n]/g, ''));
-  const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}`, 'gridcell');
+  // (Rotated, stacked or shrunk text stays in its own cell, as wrapped text does.)
+  const turn = rotationDegrees(align.rotation);
+  const stacked = align.rotation === 255;
+  const shrink = align.shrink && !wrap && cell.v != null;
+  const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}${turn ? ' oxe-rot' : ''}${stacked ? ' oxe-stack' : ''}`, 'gridcell');
+  if (align.readingOrder === 2) el.dir = 'rtl';
   if (st.classOf) el.classList.add(st.classOf(cell.s || 0));
+  // (Superscript or subscript: raised or lowered, cellstyles.js.)
+  if (look?.sup) el.classList.add(look.sup);
   el.setAttribute('aria-colindex', String(c + 2));
   if (st.idBase) el.id = `${st.idBase}-${r}-${c}`;
   // (A conditional format's font: its colour and weight over the cell's own, ooxml/condformat.js.)
@@ -75,7 +84,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     el.setAttribute('aria-rowspan', String(merge.r1 - merge.r0 + 1));
     w = st.cols.start(merge.c1 + 1) - x;
     hgt = st.rows.start(merge.r1 + 1) - st.rows.start(r);
-  } else if (isText && !wrap) {
+  } else if (isText && !wrap && !turn && !stacked && !shrink) {
     const [begin, end] = runOn(st, r, c, line, win);
     const left = st.cols.start(begin);
     const right = st.cols.start(end);
@@ -105,8 +114,12 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     el.style.setProperty('--oxe-nf-color', color);
   }
   // (A formatted number wider than its cell shows #s instead; fitNumbers checks once the cell is in the page.)
-  if (shown.fit) el.dataset.oxeFit = '1';
+  // (Shrink to fit makes the font smaller instead: fitNumbers again.)
+  if (shrink) el.dataset.oxeShrink = '1';
+  else if (shown.fit) el.dataset.oxeFit = '1';
   setVars(el, vars);
+  // (An angle, not a length: set as one, setVars giving px.)
+  if (turn) el.style.setProperty('--oxe-rot', `${turn}deg`);
   return el;
 }
 
@@ -134,15 +147,38 @@ function textSpan(shown, clean) {
 }
 
 let measure = null;
+/** Turned text kept inside its cell: the span turns about its middle, so it is moved by half the difference between
+ *  its turned box and its own, towards the cell's inside (up for bottom-aligned text, right for left-aligned). All the
+ *  sizes are read before any is set, so the page is laid out once. */
+function placeTurned(container) {
+  const moves = [...container.querySelectorAll('.oxe-cell.oxe-rot')].map((el) => {
+    const span = el.firstElementChild;
+    const a = (parseFloat(el.style.getPropertyValue('--oxe-rot')) * Math.PI) / 180;
+    const w = span.offsetWidth;
+    const h = span.offsetHeight;
+    const dw = (w * Math.abs(Math.cos(a)) + h * Math.abs(Math.sin(a)) - w) / 2;
+    const dh = (w * Math.abs(Math.sin(a)) + h * Math.abs(Math.cos(a)) - h) / 2;
+    const cl = el.classList;
+    return [span, cl.contains('oxe-h-left') ? dw : cl.contains('oxe-h-right') ? -dw : 0, cl.contains('oxe-v-top') ? dh : cl.contains('oxe-v-center') ? 0 : -dh];
+  });
+  for (const [span, dx, dy] of moves) {
+    span.style.setProperty('--oxe-rot-dx', `${dx.toFixed(2)}px`);
+    span.style.setProperty('--oxe-rot-dy', `${dy.toFixed(2)}px`);
+  }
+}
+
 /** The canvas AutoFit measures text with. */
 let fitCtx = null;
-/** Replace formatted numbers wider than their cells with #s, as Excel does (as many as fit). Run once the cells are in
+/** Replace formatted numbers wider than their cells with #s, as Excel does (as many as fit), and make shrink-to-fit
+ *  text smaller until it fits. Run once the cells are in
  *  the page, so one layout serves them all; the width is measured in the cell's own font. */
 export function fitNumbers(container) {
-  const cells = container.querySelectorAll('.oxe-cell[data-oxe-fit]');
+  placeTurned(container);
+  const cells = container.querySelectorAll('.oxe-cell[data-oxe-fit], .oxe-cell[data-oxe-shrink]');
   if (!cells.length) return;
   measure = measure || document.createElement('canvas').getContext('2d');
   const jobs = [];
+  const shrinks = [];
   for (const el of cells) {
     const span = el.firstElementChild;
     const cs = getComputedStyle(span);
@@ -151,8 +187,14 @@ export function fitNumbers(container) {
     measure.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
     // (Padding pieces count; a fill shrinks to nothing.)
     const text = [...span.childNodes].map((n) => (n.classList && n.classList.contains('oxe-repeat') ? '' : n.textContent)).join('');
-    if (measure.measureText(text).width > room + 0.5) jobs.push([span, Math.max(1, Math.floor(room / measure.measureText('#').width))]);
+    const wide = measure.measureText(text).width;
+    if (wide <= room + 0.5) continue;
+    if (el.dataset.oxeShrink) shrinks.push([span, (parseFloat(cs.fontSize) * Math.max(room, 1)) / wide]);
+    else jobs.push([span, Math.max(1, Math.floor(room / measure.measureText('#').width))]);
   }
+  // (Shrink to fit: the font made small enough for the text to fit the cell's width. Not yet measured against the
+  // sizes Excel picks.)
+  for (const [span, px] of shrinks) span.style.fontSize = `${px.toFixed(2)}px`;
   for (const [span, n] of jobs) {
     span.classList.remove('oxe-parts', 'oxe-parts-fill');
     span.textContent = '#'.repeat(n);

@@ -191,4 +191,44 @@ await page.click('dialog.oxe-pivot-fields >> button:text-is("OK")');
 const across = await page.evaluate(() => { const sh = window.oxe.workbook.sheet(window.oxe.sheetIndex); return [2, 3, 4].map((r) => [0, 1, 2, 3, 4].map((c) => sh.cells.get(r)?.get(c)?.v ?? '').join('|')).join(' / '); });
 check(startArea === 'rows' && across === '|Column Labels||| / |East|North|South|Grand Total / Sum of Units|4|8|8|20', 'Show Field List: Region from Rows to Columns, the pivot laid out across', `${startArea} ${across}`);
 
+// The Format Cells box (Ctrl+1) on B2:C3 of a new sheet: Alignment 45 degrees, Font bold, Border Outline (thin),
+// Fill a solid colour; OK gives the four cells those, the outline on the range's edge only. Then Format Painter: B2's
+// formats picked up and painted on E5 with one click.
+await page.evaluate(() => window.oxe.command('insertSheet'));
+await page.evaluate(() => { window.oxe.enter('B2', 'abc'); window.oxe.select('B2'); window.oxe.command('extendTo', 2, 2); });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+1');
+await page.waitForSelector('dialog.oxe-format-box');
+await page.click('dialog.oxe-format-box [role=tab]:text-is("Alignment")');
+await page.fill('dialog.oxe-format-box .oxe-fc-panel:not([hidden]) input[type=number] >> nth=1', '45');
+await page.click('dialog.oxe-format-box [role=tab]:text-is("Font")');
+await page.selectOption('dialog.oxe-format-box .oxe-fc-panel:not([hidden]) select >> nth=0', 'b');
+await page.click('dialog.oxe-format-box [role=tab]:text-is("Border")');
+await page.click('dialog.oxe-format-box .oxe-fc-panel:not([hidden]) button:text-is("Outline")');
+await page.click('dialog.oxe-format-box [role=tab]:text-is("Fill")');
+await page.selectOption('dialog.oxe-format-box .oxe-fc-panel:not([hidden]) select >> nth=0', 'FFFFFF00');
+await page.click('dialog.oxe-format-box >> button:text-is("OK")');
+const boxed = await page.evaluate(() => {
+  const wb = window.oxe.workbook;
+  const sh = wb.sheet(window.oxe.sheetIndex);
+  return [[1, 1], [1, 2], [2, 1], [2, 2]].map(([r, c]) => {
+    const xf = wb.styles.cellXfs[sh.cells.get(r)?.get(c)?.s || 0];
+    const b = wb.styles.borders[xf.borderId];
+    return [xf.align.rotation, wb.styles.fonts[xf.fontId].b ? 'b' : '-', wb.styles.fills[xf.fillId].fg?.rgb, ['left', 'top', 'right', 'bottom'].filter((k) => b[k].style).join('+')].join(' ');
+  }).join(' / ');
+});
+check(boxed === '45 b FFFFFF00 left+top / 45 b FFFFFF00 top+right / 45 b FFFFFF00 left+bottom / 45 b FFFFFF00 right+bottom',
+  'Format Cells on B2:C3: rotation, bold and fill on every cell, the outline on the edge only', boxed);
+const turned = await page.evaluate(() => getComputedStyle(document.querySelector('.oxe-row[aria-rowindex="3"] .oxe-cell[aria-colindex="3"] > .oxe-tx')).transform);
+check(turned !== 'none', 'B2 drawn turned', turned);
+await page.evaluate(() => window.oxe.select('B2'));
+await page.click('.oxe-rtab >> text=Home');
+await ribbon('Format Painter: press twice to keep it on');
+await clickCell(4, 4);
+const painted = await page.evaluate(() => { const sh = window.oxe.workbook.sheet(window.oxe.sheetIndex); return [sh.cells.get(1).get(1).s, sh.cells.get(4)?.get(4)?.s, document.querySelector('.oxe-root').classList.contains('oxe-painting')]; });
+check(painted[0] === painted[1] && !painted[2], 'Format Painter: the format of B2 on E5 with one click, then off', JSON.stringify(painted));
+await page.keyboard.press('Control+z');
+const unpainted = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(4)?.get(4)?.s || 0);
+check(unpainted === 0, 'Ctrl+Z takes the painted format away', String(unpainted));
+
 await finish();

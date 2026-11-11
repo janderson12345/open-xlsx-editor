@@ -70,20 +70,20 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Clipboard (`clipboard`) | Cut, Copy, Paste | Done | As Excel moves formulas, and the formulas that read cut cells. |
 | | Paste Special | Partly | Excel's box (all, formulas, values, formats, all except borders, column widths, the number-format pairs; the four operations, Skip blanks, Transpose, Paste Link) and the Paste menu; for cells copied here (docs/CLIPBOARD.md). Not yet: comments, validation, source theme, merging conditional formats. |
-| | Format Painter | Missing | |
+| | Format Painter | Done | Copies the selection's formats and gives them to the next cells selected (click or drag, or Enter), as Paste Special > Formats does; pressed twice, it stays on until pressed again or Esc. |
 | Undo (`undo`) | Undo, Redo | Done | |
 | Font (`font`) | Font, size, grow and shrink | Done | Grow and Shrink step through Excel's sizes. The font list is a fixed one with the theme's fonts first. |
 | | Bold, italic, underline, strikethrough | Done | Ctrl+B, I, U, 5 (and 2, 3, 4). Double underline is shown, not offered. |
-| | Borders | Done | Excel's 13 presets. Line colour and style, and Draw Borders, missing. |
+| | Borders | Done | Excel's 13 presets; any line style and colour, inside lines and diagonals in Format Cells. Draw Borders missing. |
 | | Fill colour, font colour | Done | Excel's palette: the theme's colours and tints, the standard ones. More Colors missing. |
-| | Pattern and gradient fills | Partly | Solid and pattern fills shown; gradients not. |
-| Alignment (`alignment`) | Horizontal and vertical | Done | Left, center, right; top, middle, bottom. Justify, distributed, fill and center across selection are shown, not offered. |
+| | Pattern and gradient fills | Done | Format Cells > Fill: pattern style and colour, two-colour gradients (Fill Effects), written as Excel writes them; gradients drawn, patterns drawn as their blend of colours. |
+| Alignment (`alignment`) | Horizontal and vertical | Done | Left, center, right; top, middle, bottom on the ribbon; justify, distributed, fill and center across selection in Format Cells. |
 | | Wrap text | Done | |
 | | Indent | Done | |
-| | Orientation (rotated text) | Missing | |
+| | Orientation (rotated text) | Done | Format Cells > Alignment: -90 to 90 degrees or stacked, as Excel stores them; drawn turned inside the cell, rows grown as Excel grows them (stacked exactly, angles within 2pt). |
 | | Merge & Center, Merge Across, Merge Cells, Unmerge | Done | Excel's question before values are discarded. |
-| | Shrink to fit | Missing | |
-| Number (`number`) | Number format list, currency, %, comma, decimals | Done | Every format code Excel has is shown; the list offers Excel's eleven. $, % and comma apply Excel's cell styles. The Format Cells dialog missing. |
+| | Shrink to fit | Done | Format Cells > Alignment; the text drawn small enough to fit (Excel's own steps of size not measured). |
+| Number (`number`) | Number format list, currency, %, comma, decimals | Done | Every format code Excel has is shown; the list offers Excel's eleven. $, % and comma apply Excel's cell styles. Format Cells (Ctrl+1, also on the cell menu and Cells > Format) has all six tabs: Number, Alignment, Font, Border, Fill, Protection. |
 | Styles (`styles`) | Conditional Formatting | Partly | Highlight Cells Rules, Top/Bottom Rules, two Color Scales and Clear Rules added from the menu as Excel writes them (14 of 14 drawn the same by Excel; docs/CONDFORMAT.md). Drawn as Excel draws it: cell values, formulas, text, top and bottom, average, duplicates, blanks, errors, colour scales (docs/CONDFORMAT.md). Data bars, icon sets and the menu missing; kept. |
 | | Format as Table | Kept | |
 | | Cell Styles | Kept | Cells show their style's formatting. |

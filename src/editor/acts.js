@@ -10,6 +10,8 @@ import { specialBox } from './specialbox.js';
 import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor } from './namesbox.js';
+import { formatCellsBox } from './formatbox.js';
+import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
@@ -23,6 +25,8 @@ import { mergeLoss } from '../ooxml/mergeops.js';
 import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
 
 /** The Paste menu's choices, as Paste Special options. */
+/** The Font tab's list: the theme's fonts first, then these. */
+const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Consolas', 'Courier New', 'Georgia', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'];
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
 const PASTE_CHOICES = { All: 'all', Formulas: 'formulas', Values: 'values', Formats: 'formats', 'All except borders': 'noBorders',
@@ -32,8 +36,43 @@ const OPERATIONS = { None: null, Add: 'add', Subtract: 'subtract', Multiply: 'mu
 /** The actions: `env` is mountXlsxEditor's shared state and helpers (index.js). Returns each by name. */
 export function createActs(env) {
   const { root, state, options, editing, menu, sheetActs, allowed } = env;
+  /** Format Painter: the selection's formats copied (outlined as a copy is), then given to the next cells selected by
+   *  Paste Special > Formats (clipops.js, as measured for paste-excel.json), once; pressed twice quickly, kept for
+   *  every selection until it is pressed again or Esc lets the copy go. */
+  const painter = {
+    now: null,
+    active() { if (this.now && state.clip !== this.now.clip) this.stop(false); return !!this.now; },
+    stop(drop = true) {
+      const was = this.now;
+      this.now = null;
+      root.classList.remove('oxe-painting');
+      if (drop && was && state.clip === was.clip) editing().run('dropClip');
+      state.ribbon?.painting?.(false);
+    },
+    toggle() {
+      if (this.active()) {
+        // (A second press soon after the first, nothing painted yet: kept on, as Excel's double click keeps it.)
+        if (!this.now.lock && !this.now.used && Date.now() - this.now.at < 500) { this.now.lock = true; return true; }
+        this.stop();
+        return true;
+      }
+      if (!state.editing.pickFormats()) return false;
+      this.now = { clip: state.clip, lock: false, used: false, at: Date.now() };
+      root.classList.add('oxe-painting');
+      state.ribbon?.painting?.(true);
+      return true;
+    },
+    paint() {
+      if (!this.active()) return false;
+      this.now.used = true;
+      const done = editing().run('pasteSpecial', { paste: 'formats' });
+      if (!this.now.lock) this.stop();
+      return done;
+    },
+  };
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
+    if (name === 'painting') return painter.active();
     if (!state.workbook) return false;
     if (!allowed(name, args[0])) return false;
     const i = state.sheetIndex;
@@ -53,6 +92,8 @@ export function createActs(env) {
     if (name === 'rowHeightBox' || name === 'columnWidthBox') return sizeBox(name === 'rowHeightBox' ? 'row' : 'col');
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
+    if (name === 'formatPainter') return painter.toggle();
+    if (name === 'paintFormats') return painter.paint();
     if (name === 'pasteSpecialBox') return pasteSpecialBox();
     if (name === 'sortAsc' || name === 'sortDesc') return sortQuick(name === 'sortDesc');
     if (name === 'sortBox') return customSort();
@@ -140,6 +181,22 @@ export function createActs(env) {
       // (Insert > PivotTable: its boxes, then the PivotTable made.)
       const s = editing().selection;
       return insertPivot(root, state.workbook, i, { r: s.ar, c: s.ac }, (...a) => editing().run(...a)).then((done) => { state.grid.el.focus({ preventScroll: true }); return done; });
+    }
+    if (name === 'formatCellsBox') {
+      // (Ctrl+1: the active cell's format in Excel's box; what was changed there given to the selection.)
+      const wb = state.workbook;
+      const s = editing().selection;
+      const cell = wb.sheet(i).cells.get(s.ar)?.get(s.ac) || null;
+      const xf = xfOf(wb.styles, cell?.s || 0);
+      const font = wb.styles.fonts[xf.fontId];
+      const look = { xf, font, fontName: fontFamily(font, wb.theme), fontNames: [...new Set([wb.theme.fonts.minor, wb.theme.fonts.major, ...FONT_NAMES])],
+        fill: wb.styles.fills[xf.fillId], border: wb.styles.borders[xf.borderId], code: editing().look().code, cell, date1904: wb.date1904,
+        many: areasOf(s).some((a) => a.r1 > a.r0 || a.c1 > a.c0), color: (c) => state.looks?.color(c) };
+      return formatCellsBox(root, look, args[0]).then((change) => {
+        if (change) editing().run('formatCells', change);
+        state.grid.el.focus({ preventScroll: true });
+        return !!change;
+      });
     }
     if (name === 'specialBox') {
       // (Excel's Go To Special box; its choice found and selected.)
@@ -319,6 +376,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
       { label: 'Paste', run: run('clipPaste'), disabled: ro || !allowed('clipPaste') }, { label: 'Paste Special...', run: run('pasteSpecialBox'), disabled: ro || !allowed('pasteSpecialBox') },
       'separator', { label: 'Insert...', run: () => lines(1), disabled: ro || !allowed('lines') }, { label: 'Delete...', run: () => lines(-1), disabled: ro || !allowed('lines') },
       { label: 'Clear Contents', run: () => editing().run('clear'), disabled: ro }, 'separator',
+      { label: 'Format Cells...', run: run('formatCellsBox'), disabled: ro || !allowed('formatCellsBox') }, 'separator',
       // (On a PivotTable's cell, Excel's Refresh and Show Field List.)
       ...(() => {
         const s = editing().selection;

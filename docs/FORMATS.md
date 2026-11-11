@@ -61,8 +61,42 @@ in each; cleared here and opened in Excel, the three that clear read back as Exc
 A click on a merged cell selects the whole merged range in Excel; here a selection of one of its cells clears the
 whole range in the same way.
 
+## Format Cells (`src/editor/formatbox.js`, `formatops.js` formatCells)
+
+Ctrl+1 opens Excel's box on the active cell's format; only what is changed in it is given to the selection, each other
+setting staying as each cell has it. How Excel saves each setting was measured over COM
+(`tools/excel-compare/excel-formatcells.ps1`: one cell per setting on a new workbook, saved, its `xf`, font, fill and
+border read back; `test/formatcells-excel.json`). `test/formatcells.test.js` makes all 43 here and expects Excel's text.
+
+| Rule | Seen |
+|---|---|
+| Rotation is `textRotation`: 1 to 90 degrees up as themselves, -1 to -90 as 91 to 180, stacked letters 255. | 45: 45; -90: 180; vertical text: 255. |
+| An indented or Fill-aligned cell isn't rotated: Excel drops the rotation, whichever was set first. Centred text keeps it. | Indent 2 then 30 degrees, or 30 then indent: `horizontal="left" indent="2"`, no rotation. |
+| Wrap text and shrink to fit can both be on in the file (the box offers one or the other). | `wrapText="1" shrinkToFit="1"`. |
+| The alignment's attributes go in Excel's order: horizontal, vertical, textRotation, wrapText, indent, shrinkToFit, readingOrder. | `horizontal="left" indent="2" shrinkToFit="1"`. |
+| A gradient is `gradientFill` with its stops; degree 0 is left out; a path gradient has `type="path"` and its rectangle. | `<gradientFill degree="90"><stop position="0">...` |
+| A pattern's own colour is `fgColor`, the cell's colour `bgColor`; a shade without colours has none. | Reverse diagonal stripe, red on yellow: `fgColor` FF0000, `bgColor` FFFF00; 50% gray: `mediumGray` alone. |
+| Diagonals are `diagonalUp` and `diagonalDown` on the border (in that order) and one `diagonal` line for both. | `<border diagonalUp="1" diagonalDown="1">...<diagonal style="thin">` |
+| Superscript and subscript are the font's `vertAlign`; the accounting underlines `singleAccounting`, `doubleAccounting`. | |
+| Protection: `locked="0"` when unlocked, `hidden="1"` when hidden, nothing when locked and shown. | |
+| Over a range, the outline goes on its edge and the inside lines on both facing sides of each pair of cells. | D2:F4: E3 dashed all round, D2 thin left and top. |
+
+Rows grow for turned text as Excel's AutoFit grows them (Calibri 11, measured with `Rows.AutoFit`): stacked letters a
+line each and 1.5pt ('ab' 31.5, 'Stack' 76.5); text at an angle by its width up the angle and a line across it, within
+2pt of Excel's 36 to 81pt for 15 to 90 degrees.
+
+Not settled: a range's border over COM also took a matching thin line off the neighbour beyond its edge (G3's left
+beside F3's new right), where the ribbon's Borders measured earlier keeps a matching line; this follows the ribbon.
+The degrees the box's own Fill Effects variants give, and the font sizes Excel steps through when shrinking, are not
+yet measured.
+
+## Format Painter
+
+Format Painter copies the selection (outlined, as a copy is, the system clipboard left alone) and pastes its formats
+on the next cells selected, through Paste Special > Formats (measured for `test/paste-excel.json`). Pressed twice
+quickly it stays on; Esc, or pressing it again, ends it.
+
 ## Not yet
 
-Text orientation, shrink to fit, the Format Cells dialog, cell styles other than the three above,
-pattern and gradient fills, and formatting whole rows or columns (a selection past the used range is cut to it: Excel
+Cell styles other than the three above, and formatting whole rows or columns (a selection past the used range is cut to it: Excel
 gives the row or column itself the format).

@@ -114,6 +114,8 @@ export function createRibbon(container, { tabs, home }) {
     el: container,
     /** Each tab's controls set to the active cell's look (formatops.js activeLook, plus what the tab needs). */
     update(look) { for (const tab of Object.values(built)) tab.update?.(look); },
+    /** Format Painter on (waiting for cells) or off: its button pressed or not. */
+    painting(on) { for (const tab of Object.values(built)) tab.painting?.(on); },
     setFeatures(f) { features = { ...features, ...f }; applyFeatures(); },
     get features() { return { ...features }; },
     showTab,

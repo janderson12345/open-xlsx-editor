@@ -277,6 +277,8 @@ export function createCommands(ctx) {
     },
     /** Every selected cell with the same format change (stylesedit.js: font, fill, border, align, numFmt, style). */
     format(change) { return formatting(fmt.formatEach, change); },
+    /** The Format Cells box's answer (formatops.js formatCells: borders by outline and inside lines). */
+    formatCells(change) { return formatting(fmt.formatCells, change); },
     /** Bold (b), Italic (i), Underline (u) or Strikethrough (strike), following the active cell. */
     toggleFont(key) { return formatting(fmt.toggleFont, key); },
     /** Grow (1) or Shrink (-1) Font. */

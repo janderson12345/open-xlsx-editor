@@ -63,6 +63,15 @@ export function decorations(st, win) {
       const d = deco(cell.s);
       if (d.fill && !merge && !cf?.fill) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
       for (const side of d.sides) edges.push(...edge(st, r, c, side, ox, oy));
+      if (d.diag) {
+        const m = merge || { r0: r, c0: c, r1: r, c1: c };
+        if (m.r0 === r && m.c0 === c) for (const dir of ['up', 'down']) if (d.diag[dir]) {
+          const el = rect(st, m.r0, m.c0, m.r1, m.c1, `oxe-diag oxe-diag-${dir} ${d.diag.cls}`, ox, oy);
+          el.classList.remove('oxe-fill');
+          el.style.setProperty('--oxe-bw', `${edgeWidth(d.diag.style, st.print)}px`);
+          edges.push(el);
+        }
+      }
     }
   }
   return { fills, edges };

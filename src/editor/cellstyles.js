@@ -17,9 +17,17 @@ const LINE = { dotted: 'dotted', hair: 'solid', dashed: 'dashed', mediumDashed: 
 
 const mix = (a, b, t) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * t + parseInt(b.slice(i, i + 2), 16) * (1 - t)).toString(16).padStart(2, '0')).join('');
 
-/** A fill's colour, or null when there is none. */
+/** A gradient fill as CSS: Excel's degree 0 runs left to right, 90 top to bottom (CSS's 90deg and 180deg); a path
+ *  gradient spreads out from its rectangle (drawn as a circle from the rectangle's corner, for now). */
+function gradientCss({ type, degree, left, top, stops }, theme, palette) {
+  const list = stops.map((x) => `${resolveColor(x.color, theme, palette) || '#FFFFFF'} ${(x.position * 100).toFixed(2)}%`).join(', ');
+  return type === 'path' ? `radial-gradient(farthest-corner at ${left * 100}% ${top * 100}%, ${list})` : `linear-gradient(${degree + 90}deg, ${list})`;
+}
+
+/** A fill's colour (a gradient's CSS background), or null when there is none. */
 function fillColor(fill, theme, palette) {
   if (!fill || fill.pattern === 'none') return null;
+  if (fill.pattern === 'gradient') return fill.gradient.stops.length ? gradientCss(fill.gradient, theme, palette) : null;
   const fg = resolveColor(fill.fg, theme, palette) || '#000000';
   if (fill.pattern === 'solid') return fg;
   // (A pattern's background is white unless given; indexed 64 there is the system background.)
@@ -59,9 +67,15 @@ export function applyCellStyles(root, workbook) {
   const decos = styles.cellXfs.map((xf, i) => {
     css.push(`${scope} .oxe-s${i} { ${fontRules(styles.fonts[xf.fontId], theme, palette, normalFamily)}; }`);
     const fill = fillColor(styles.fills[xf.fillId], theme, palette);
-    if (fill) css.push(`${scope} .oxe-f${i} { background-color: ${fill}; }`);
+    if (fill) css.push(`${scope} .oxe-f${i} { background: ${fill}; }`);
     const border = styles.borders[xf.borderId];
     const sides = [];
+    let diag = null;
+    if (border.diagonal?.style && (border.diagonalUp || border.diagonalDown)) {
+      const cls = `oxe-e${i}-diag`;
+      css.push(`${scope} .${cls} { --oxe-ec: ${resolveColor(border.diagonal.color, theme, palette) || '#000000'}; }`);
+      diag = { up: border.diagonalUp, down: border.diagonalDown, style: border.diagonal.style, cls };
+    }
     for (const name of ['left', 'right', 'top', 'bottom']) {
       const side = border[name];
       if (!side.style) continue;
@@ -76,7 +90,8 @@ export function applyCellStyles(root, workbook) {
     const sizePx = (f.size * 4) / 3;
     // (The font as canvas text measures it, for counting wrapped lines: rowheights.js.)
     const fontCss = `${f.i ? 'italic ' : ''}${f.b ? 'bold ' : ''}${sizePx}px ${fontStack(family)}`;
-    return { fill, fillClass: `oxe-f${i}`, sides, align: xf.align, code: formatCodeOf(styles, i), font: { family, sizePx, css: fontCss } };
+    const sup = f.vertAlign === 'superscript' ? 'oxe-sup' : f.vertAlign === 'subscript' ? 'oxe-sub' : null;
+    return { fill, fillClass: `oxe-f${i}`, sides, diag, sup, align: xf.align, code: formatCodeOf(styles, i), font: { family, sizePx, css: fontCss } };
   });
   let el = root.querySelector(':scope > style.oxe-styles');
   if (!el) {
