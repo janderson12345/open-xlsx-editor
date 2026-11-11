@@ -22,7 +22,10 @@ jobs:
       # The fixtures are what the generator makes: nobody edited one by hand.
       - run: npm run fixtures && git diff --exit-code test/fixtures
       # Browser tests: open, scroll and save each fixture in the demo (standards mode asserted); axe in light and dark.
-      - run: npx playwright install --with-deps chromium
+      # (The runner's own Chrome, as the tests run locally: installing Playwright's needs the Ubuntu mirror, which has
+      # failed whole runs. Playwright's only when the runner has no Chrome.)
+      - run: |
+          if command -v google-chrome >/dev/null; then echo "CHROMIUM_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"; else npx playwright install --with-deps chromium; fi
       - run: npm run test:e2e
       # Fixtures and saved workbooks: well-formed parts, relationships, content types, indexes in range.
       - run: node tools/check-ooxml.mjs test/fixtures test/out
