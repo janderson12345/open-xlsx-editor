@@ -356,4 +356,52 @@ check(await hiddenNow() === '2,4', 'Advanced Filter in place: Team blue keeps pe
 await page.locator('.oxe-toolbar button[title="Clear"]:visible').click();
 check(await hiddenNow() === '', 'Clear shows the rows again', await hiddenNow());
 
+// The data tools on a new sheet: Fill > Series (1 by 3 down A1:A4), Flash Fill (Ctrl+E) of first names, Remove
+// Duplicates on a list, Text to Columns at commas, and Move or Copy > Create a copy, then Ctrl+Z taking the copy back.
+await page.evaluate(() => {
+  const o = window.oxe;
+  o.command('insertSheet');
+  o.enter('A1', '1');
+  [['Full', 'First'], ['Avery Chen', 'Avery'], ['Sam Lee', ''], ['Jo Park', '']].forEach((row, r) => row.forEach((v, c) => { if (v) o.enter(String.fromCharCode(67 + c) + (r + 1), v); }));
+  [['Fruit'], ['pear'], ['fig'], ['Pear'], ['kiwi']].forEach((row, r) => o.enter(`F${r + 1}`, row[0]));
+  o.enter('H1', 'a,b,c');
+  o.select('A1'); o.command('extendTo', 3, 0);
+});
+const cellText = (ref) => page.evaluate((ref) => { const r = Number(ref.slice(1)) - 1; const c = ref.charCodeAt(0) - 65; const x = window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(r)?.get(c); return x?.v == null ? '' : String(x.v); }, ref);
+await page.click('.oxe-rtab >> text=Home');
+await menu('Fill', 'Series...');
+await page.waitForSelector('dialog.oxe-series-box');
+await page.fill('dialog.oxe-series-box .oxe-fc-field:has-text("Step value") input', '3');
+await page.click('dialog.oxe-series-box >> button:text-is("OK")');
+check([await cellText('A2'), await cellText('A4')].join() === '4,10', 'Fill > Series: 1, 4, 7, 10', [await cellText('A2'), await cellText('A4')].join());
+await page.evaluate(() => window.oxe.select('D3'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+e');
+check([await cellText('D3'), await cellText('D4')].join() === 'Sam,Jo', 'Flash Fill (Ctrl+E): first names', [await cellText('D3'), await cellText('D4')].join());
+await page.evaluate(() => { window.oxe.select('F1'); window.oxe.command('extendTo', 4, 5); });
+await page.click('.oxe-rtab >> text=Data');
+await ribbon('Remove Duplicates...');
+await page.waitForSelector('dialog.oxe-dups-box');
+await page.click('dialog.oxe-dups-box >> button:text-is("OK")');
+await page.waitForSelector('dialog.oxe-dialog >> text=duplicate values found and removed');
+await page.keyboard.press('Enter');
+check([await cellText('F2'), await cellText('F3'), await cellText('F4'), await cellText('F5')].join() === 'pear,fig,kiwi,', 'Remove Duplicates: Pear gone, kiwi moved up', [await cellText('F4'), await cellText('F5')].join());
+await page.evaluate(() => window.oxe.select('H1'));
+await ribbon('Text to Columns...');
+await page.waitForSelector('dialog.oxe-ttc-box');
+await page.locator('dialog.oxe-ttc-box label:text-is("Comma")').click();
+await page.click('dialog.oxe-ttc-box >> button:text-is("OK")');
+check([await cellText('H1'), await cellText('I1'), await cellText('J1')].join() === 'a,b,c', 'Text to Columns: a, b, c', [await cellText('H1'), await cellText('I1')].join());
+const sheetsNow = () => page.evaluate(() => window.oxe.workbook.sheets.map((s) => s.name).join('|'));
+const before = await sheetsNow();
+const tab = page.locator('.oxe-tab[aria-selected="true"]').first();
+await tab.click({ button: 'right' });
+await page.click('.oxe-menu [role="menuitem"]:text-is("Move or Copy...")');
+await page.waitForSelector('dialog.oxe-movecopy-box');
+await page.locator('dialog.oxe-movecopy-box label:text-is("Create a copy")').click();
+await page.click('dialog.oxe-movecopy-box >> button:text-is("OK")');
+const after = await sheetsNow();
+await page.keyboard.press('Control+z');
+check(after.split('|').length === before.split('|').length + 1 && /\(2\)/.test(after) && await sheetsNow() === before, 'Move or Copy > Create a copy: a "(2)" sheet; Ctrl+Z takes it back', after);
+
 await finish();

@@ -92,9 +92,9 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Insert and delete sheets | Done | Cells > Insert, Delete; also on the tab menu. |
 | | Row height, column width (and AutoFit) | Done | Dragging a heading's edge, double-click and Format's AutoFit, the Row Height and Column Width boxes; stored as Excel stores them. AutoFit's width is within a few pixels of Excel's (docs/SIZES.md). |
 | | Hide and unhide rows, columns | Done | |
-| | Rename, hide and unhide sheet | Done | Cells > Format; moving and tab colour on the tab menu. |
+| | Rename, hide and unhide sheet | Done | Cells > Format; moving, tab colour and Move or Copy (a copy as Excel copies it, docs/DATATOOLS.md) on the tab menu. |
 | Editing (`editing`) | AutoSum | Done | Sum, Average, Count Numbers, Max, Min and Alt+= as Excel places and fills them (docs/AUTOSUM.md). More Functions... missing. |
-| | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md). Series..., Justify, Across Worksheets missing. |
+| | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md); Series... and Flash Fill (Ctrl+E) as Excel (docs/DATATOOLS.md). Justify, Across Worksheets missing. |
 | | Clear (all, formats, contents) | Partly | Clear All, Clear Formats, Clear Contents as Excel (docs/FORMATS.md). Clear Comments and Notes, Clear Hyperlinks missing. |
 | | Sort & Filter | Done | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right) as Excel sorts (docs/SORT.md); Filter (Ctrl+Shift+L), its buttons and lists, Clear and Reapply as Excel filters (docs/FILTER.md). Text, Number and Date Filters, Top 10, averages and Filter by Color as Excel (31 of 31). |
 | | Find & Select | Partly | Find and Replace; Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special (Excel's box and Find & Select's shortcuts; every choice but Objects; docs/GOTOSPECIAL.md). |
@@ -138,7 +138,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
 | Queries & Connections (`queries-and-connections`) | Refresh All | Partly | Refreshes the workbook's PivotTables (Ctrl+Alt+F5); Refresh, the one at the active cell (Alt+F5). Data connections aren't refreshed. |
 | Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Done | Sort A to Z, Z to A, Sort..., Filter, Clear and Reapply on the Data tab, as in Home > Editing (docs/SORT.md, docs/FILTER.md). Text, Number and Date Filters, Top 10, averages and Filter by Color (31 of 31 as Excel), and Advanced Filter in place or copied (7 of 7). |
-| Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Missing | |
+| Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Done | Text to Columns (delimited), Flash Fill, Remove Duplicates as Excel (24 of 24 with Series; docs/DATATOOLS.md). Fixed width not yet. |
 | | Data Validation (lists, rules) | Done | Typed values checked as Excel checks them, its Stop, Warning and Information boxes; a list's dropdown; the input message; Excel's Data Validation box to add, change and clear rules, written as Excel writes them (15 of 15; docs/VALIDATION.md). Circle Invalid Data missing. |
 | Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |
 

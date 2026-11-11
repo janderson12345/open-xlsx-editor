@@ -15,7 +15,8 @@ export function dataTab(kit, { act }) {
       btn('⇅', 'Sort...', f('sortBox'), { label: 'Sort', big: true }),
       btn('⏷', 'Filter (Ctrl+Shift+L)', f('filterToggle'), { label: 'Filter', big: true }),
       col(btn('✕', 'Clear', f('filterClear'), { label: 'Clear' }), btn('↻', 'Reapply', f('filterReapply'), { label: 'Reapply' }), btn('⚙', 'Advanced...', f('advancedFilterBox'), { label: 'Advanced' }))),
-    grp('Data Tools', btn('☑', 'Data Validation...', f('validationBox'), { label: 'Data Validation', big: true })),
+    grp('Data Tools', btn('⫼', 'Text to Columns...', f('textToColumnsBox'), { label: 'Text to Columns', big: true }), col(btn('⚡', 'Flash Fill (Ctrl+E)', f('flashFill'), { label: 'Flash Fill' }),
+      btn('⊖', 'Remove Duplicates...', f('removeDuplicatesBox'), { label: 'Remove Duplicates' })), btn('☑', 'Data Validation...', f('validationBox'), { label: 'Data Validation', big: true })),
   ];
   return { groups, update() {} };
 }

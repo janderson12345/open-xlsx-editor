@@ -140,6 +140,7 @@ export function tabMenuEntries(wb, i, { act, color, readOnly }) {
     { label: 'Rename', disabled: readOnly, run: () => act.rename(i) },
     { label: 'Move Left', disabled: readOnly || at <= 0, run: () => act.run('moveSheet', i, shown[at - 1]) },
     { label: 'Move Right', disabled: readOnly || at < 0 || at >= shown.length - 1, run: () => act.run('moveSheet', i, shown[at + 1]) },
+    { label: 'Move or Copy...', disabled: readOnly || wb.sheets[i].kind !== 'worksheet', run: () => act.moveCopy?.(i) },
     { label: 'Tab Color', disabled: readOnly || wb.sheets[i].kind !== 'worksheet', colors },
     'separator',
     { label: 'Hide', disabled: readOnly, run: () => act.run('hideSheet', i) },

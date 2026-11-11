@@ -73,6 +73,16 @@ export function dataCommands(env) {
       show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
       return true;
     },
+    /** A data tool's steps (datatools.js, flashfill.js) as one step of the history, the cells it changed selected,
+     *  `words` said. */
+    runTool(steps, words = '') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (!runSteps(steps)) return false;
+      const area = steps[0].area;
+      if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, words);
+      else if (words) ctx.announce(words);
+      return true;
+    },
     /** Fill Down ('down', Ctrl+D), Right ('right', Ctrl+R), Up or Left over the selection (fillops.js fillCopy), as one
      *  step of the history. */
     fill(dir) {

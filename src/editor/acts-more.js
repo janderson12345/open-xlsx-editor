@@ -19,6 +19,9 @@ import { currentRegion } from '../ooxml/special.js';
 import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { newRuleBox, rulesManager } from './cfmanager.js';
 import { advancedFilterBox } from './advfilterbox.js';
+import { seriesBox, removeDuplicatesBox, textToColumnsBox, moveCopyBox } from './datatoolboxes.js';
+import { fillSeries, removeDuplicates, textToColumns } from '../ooxml/datatools.js';
+import { flashFill } from '../ooxml/flashfill.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
@@ -148,6 +151,63 @@ export function createMoreActs(env) {
         let refused = null;
         editing().run('sheetChange', (wb, si) => { refused = wb.advancedFilter(si, spec); return !refused; });
         return refused ? messageBox(root, refused).then(() => false) : true;
+      });
+    }
+    if (name === 'seriesBox') {
+      // (Home > Fill > Series...: the selection's first cells carried on.)
+      const s = editing().selection;
+      return seriesBox(root, { across: s.c1 - s.c0 > s.r1 - s.r0 }).then((o) => {
+        state.grid.el.focus({ preventScroll: true });
+        return o ? editing().run('runTool', fillSeries(state.workbook, i, s, o), 'Filled ') : false;
+      });
+    }
+    if (name === 'flashFill') {
+      // (Ctrl+E: the active cell's column, from its examples, over the rows of the table round it.)
+      const s = editing().selection;
+      const region = currentRegion(state.workbook.sheet(i), s.ar, s.ac);
+      const sources = [];
+      for (let c = region.c0; c <= region.c1; c++) if (c !== s.ac) sources.push(c);
+      const got = flashFill(state.workbook, i, { col: s.ac, r0: region.r0 + 1, r1: region.r1, sourceCols: sources.filter((c) => c < s.ac).length ? sources.filter((c) => c < s.ac) : sources });
+      if (got.error) return messageBox(root, got.error).then(() => false);
+      return editing().run('runTool', got.steps, `Flash Fill changed ${got.filled} cells. `);
+    }
+    if (name === 'removeDuplicatesBox') {
+      // (Data > Remove Duplicates: the table round the active cell, its columns by heading; Excel's message after.)
+      const s = editing().selection;
+      const wb = state.workbook;
+      const sheet = wb.sheet(i);
+      const range = s.r0 === s.r1 && s.c0 === s.c1 ? currentRegion(sheet, s.r0, s.c0) : s;
+      const heads = [];
+      for (let c = range.c0; c <= range.c1; c++) { const v = sheet.cells.get(range.r0)?.get(c)?.v; heads.push({ c, text: v == null ? '' : String(v) }); }
+      const headers = heads.every((h) => h.text !== '' && Number.isNaN(Number(h.text)));
+      return removeDuplicatesBox(root, { columns: heads.map((h) => ({ c: h.c, label: headers ? h.text : `Column ${colName(h.c)}` })), headers }).then((o) => {
+        state.grid.el.focus({ preventScroll: true });
+        if (!o) return false;
+        const got = removeDuplicates(state.workbook, i, range, o.cols, o.header);
+        editing().run('runTool', got.steps);
+        const words = got.removed ? `${got.removed} duplicate values found and removed; ${got.kept} unique values remain.` : `No duplicate values found.`;
+        return messageBox(root, words).then(() => true);
+      });
+    }
+    if (name === 'textToColumnsBox') {
+      // (Data > Text to Columns: one column of the selection, split across from it.)
+      const s = editing().selection;
+      if (s.c0 !== s.c1) return messageBox(root, 'Microsoft Excel can convert only one column at a time. The range can be many rows tall but no more than one column wide. Try again by selecting cells in one column only.');
+      return textToColumnsBox(root, { dest: `$${colName(s.c0)}$${s.r0 + 1}` }).then((o) => {
+        state.grid.el.focus({ preventScroll: true });
+        return o ? editing().run('runTool', textToColumns(state.workbook, i, s, o), 'Converted ') : false;
+      });
+    }
+    if (name === 'moveCopyBox') {
+      // (A sheet tab's Move or Copy...: moved before the sheet chosen, or copied there.)
+      const k = args[0] ?? i;
+      const wb = state.workbook;
+      return moveCopyBox(root, { name: wb.sheets[k].name, sheets: wb.sheets.map((x) => x.name), at: k }).then((o) => {
+        state.grid.el.focus({ preventScroll: true });
+        if (!o) return false;
+        if (o.copy) return editing().run('copySheet', k, o.before);
+        const to = o.before > k ? o.before - 1 : o.before;
+        return to === k ? true : editing().run('moveSheet', k, Math.min(to, wb.sheets.length - 1));
       });
     }
     if (name === 'cfNewRule') {

@@ -110,6 +110,7 @@ export function mountXlsxEditor(host, options = {}) {
   const menu = createMenu(root);
   const sheetActs = {
     run: (name, ...args) => editing().run(name, ...args),
+    moveCopy: (i) => act('moveCopyBox', i),
     rename: (i) => {
       if (state.readOnly) return;
       state.tabs.editName(i, async (name) => {
@@ -281,6 +282,7 @@ export function mountXlsxEditor(host, options = {}) {
           nameManager: () => act('nameManager'),
           painting: () => act('painting'),
           commentBox: () => act('commentBox'),
+          flashFill: () => act('flashFill'),
           chartKey: (e) => state.picker?.onKey(e),
           formatCells: () => act('formatCellsBox'),
           painted: () => act('paintFormats'),

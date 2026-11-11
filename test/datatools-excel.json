@@ -1,0 +1,1058 @@
+{
+ "source": "tools/excel-compare/excel-datatools.ps1",
+ "cases": [
+  {
+   "name": "series linear down",
+   "error": null,
+   "cells": {
+    "A1": [
+     "1",
+     "Double",
+     "General",
+     "1"
+    ],
+    "A2": [
+     "3",
+     "Double",
+     "General",
+     "3"
+    ],
+    "A3": [
+     "5",
+     "Double",
+     "General",
+     "5"
+    ],
+    "A4": [
+     "7",
+     "Double",
+     "General",
+     "7"
+    ],
+    "A5": [
+     "9",
+     "Double",
+     "General",
+     "9"
+    ],
+    "A6": [
+     "11",
+     "Double",
+     "General",
+     "11"
+    ]
+   }
+  },
+  {
+   "name": "series linear stop",
+   "error": null,
+   "cells": {
+    "A1": [
+     "5",
+     "Double",
+     "General",
+     "5"
+    ],
+    "A2": [
+     "8",
+     "Double",
+     "General",
+     "8"
+    ],
+    "A3": [
+     "11",
+     "Double",
+     "General",
+     "11"
+    ],
+    "A4": [
+     "14",
+     "Double",
+     "General",
+     "14"
+    ]
+   }
+  },
+  {
+   "name": "series growth",
+   "error": null,
+   "cells": {
+    "A1": [
+     "2",
+     "Double",
+     "General",
+     "2"
+    ],
+    "A2": [
+     "6",
+     "Double",
+     "General",
+     "6"
+    ],
+    "A3": [
+     "18",
+     "Double",
+     "General",
+     "18"
+    ],
+    "A4": [
+     "54",
+     "Double",
+     "General",
+     "54"
+    ],
+    "A5": [
+     "162",
+     "Double",
+     "General",
+     "162"
+    ]
+   }
+  },
+  {
+   "name": "series across",
+   "error": null,
+   "cells": {
+    "A1": [
+     "10",
+     "Double",
+     "General",
+     "10"
+    ],
+    "B1": [
+     "7.5",
+     "Double",
+     "General",
+     "7.5"
+    ],
+    "C1": [
+     "5",
+     "Double",
+     "General",
+     "5"
+    ],
+    "D1": [
+     "2.5",
+     "Double",
+     "General",
+     "2.5"
+    ],
+    "E1": [
+     "0",
+     "Double",
+     "General",
+     "0"
+    ]
+   }
+  },
+  {
+   "name": "series months",
+   "error": null,
+   "cells": {
+    "A1": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46053"
+    ],
+    "A2": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46081"
+    ],
+    "A3": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46112"
+    ],
+    "A4": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46142"
+    ],
+    "A5": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46173"
+    ]
+   }
+  },
+  {
+   "name": "series weekdays",
+   "error": null,
+   "cells": {
+    "A1": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46339"
+    ],
+    "A2": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46342"
+    ],
+    "A3": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46343"
+    ],
+    "A4": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46344"
+    ],
+    "A5": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46345"
+    ],
+    "A6": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46346"
+    ]
+   }
+  },
+  {
+   "name": "series days by 7",
+   "error": null,
+   "cells": {
+    "A1": [
+     "1/1/2026",
+     "Double",
+     "m/d/yyyy",
+     "46023"
+    ],
+    "A2": [
+     "1/8/2026",
+     "Double",
+     "m/d/yyyy",
+     "46030"
+    ],
+    "A3": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46037"
+    ],
+    "A4": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46044"
+    ]
+   }
+  },
+  {
+   "name": "series years",
+   "error": null,
+   "cells": {
+    "A1": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "45351"
+    ],
+    "A2": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "45716"
+    ],
+    "A3": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "46081"
+    ]
+   }
+  },
+  {
+   "name": "series trend",
+   "error": null,
+   "cells": {
+    "A1": [
+     "1.166667",
+     "Double",
+     "General",
+     "1.16666666666667"
+    ],
+    "A2": [
+     "2.666667",
+     "Double",
+     "General",
+     "2.66666666666667"
+    ],
+    "A3": [
+     "4.166667",
+     "Double",
+     "General",
+     "4.16666666666667"
+    ],
+    "A4": [
+     "5.666667",
+     "Double",
+     "General",
+     "5.66666666666667"
+    ],
+    "A5": [
+     "7.166667",
+     "Double",
+     "General",
+     "7.16666666666667"
+    ],
+    "A6": [
+     "8.666667",
+     "Double",
+     "General",
+     "8.66666666666667"
+    ]
+   }
+  },
+  {
+   "name": "series two columns",
+   "error": null,
+   "cells": {
+    "A1": [
+     "1",
+     "Double",
+     "General",
+     "1"
+    ],
+    "B1": [
+     "10",
+     "Double",
+     "General",
+     "10"
+    ],
+    "A2": [
+     "6",
+     "Double",
+     "General",
+     "6"
+    ],
+    "B2": [
+     "15",
+     "Double",
+     "General",
+     "15"
+    ],
+    "A3": [
+     "11",
+     "Double",
+     "General",
+     "11"
+    ],
+    "B3": [
+     "20",
+     "Double",
+     "General",
+     "20"
+    ],
+    "A4": [
+     "16",
+     "Double",
+     "General",
+     "16"
+    ],
+    "B4": [
+     "25",
+     "Double",
+     "General",
+     "25"
+    ]
+   }
+  },
+  {
+   "name": "remove duplicates all columns",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Name",
+     "String",
+     "General",
+     "Name"
+    ],
+    "B1": [
+     "Team",
+     "String",
+     "General",
+     "Team"
+    ],
+    "A2": [
+     "pear",
+     "String",
+     "General",
+     "pear"
+    ],
+    "B2": [
+     "red",
+     "String",
+     "General",
+     "red"
+    ],
+    "D2": [
+     "beside",
+     "String",
+     "General",
+     "beside"
+    ],
+    "A3": [
+     "fig",
+     "String",
+     "General",
+     "fig"
+    ],
+    "B3": [
+     "blue",
+     "String",
+     "General",
+     "blue"
+    ],
+    "A4": [
+     "pear",
+     "String",
+     "General",
+     "pear"
+    ],
+    "B4": [
+     "blue",
+     "String",
+     "General",
+     "blue"
+    ]
+   }
+  },
+  {
+   "name": "remove duplicates one column",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Name",
+     "String",
+     "General",
+     "Name"
+    ],
+    "B1": [
+     "Team",
+     "String",
+     "General",
+     "Team"
+    ],
+    "A2": [
+     "pear",
+     "String",
+     "General",
+     "pear"
+    ],
+    "B2": [
+     "red",
+     "String",
+     "General",
+     "red"
+    ],
+    "A3": [
+     "kiwi",
+     "String",
+     "General",
+     "kiwi"
+    ],
+    "B3": [
+     "blue",
+     "String",
+     "General",
+     "blue"
+    ]
+   }
+  },
+  {
+   "name": "remove duplicates numbers no header",
+   "error": null,
+   "cells": {
+    "A1": [
+     "1",
+     "Double",
+     "General",
+     "1"
+    ],
+    "A2": [
+     "2",
+     "Double",
+     "General",
+     "2"
+    ],
+    "A3": [
+     "3",
+     "Double",
+     "General",
+     "3"
+    ]
+   }
+  },
+  {
+   "name": "text to columns comma",
+   "error": null,
+   "cells": {
+    "A1": [
+     "a",
+     "String",
+     "General",
+     "a"
+    ],
+    "B1": [
+     "b",
+     "String",
+     "General",
+     "b"
+    ],
+    "C1": [
+     "c",
+     "String",
+     "General",
+     "c"
+    ],
+    "A2": [
+     "1",
+     "Double",
+     "General",
+     "1"
+    ],
+    "B2": [
+     "2.5",
+     "Double",
+     "General",
+     "2.5"
+    ],
+    "C2": [
+     "x",
+     "String",
+     "General",
+     "x"
+    ],
+    "A3": [
+     "one",
+     "String",
+     "General",
+     "one"
+    ],
+    "C3": [
+     "three",
+     "String",
+     "General",
+     "three"
+    ],
+    "A4": [
+     "solo",
+     "String",
+     "General",
+     "solo"
+    ]
+   }
+  },
+  {
+   "name": "text to columns space consecutive",
+   "error": null,
+   "cells": {
+    "A1": [
+     "John",
+     "String",
+     "General",
+     "John"
+    ],
+    "B1": [
+     "Smith",
+     "String",
+     "General",
+     "Smith"
+    ],
+    "A2": [
+     "Mary",
+     "String",
+     "General",
+     "Mary"
+    ],
+    "B2": [
+     "Ann",
+     "String",
+     "General",
+     "Ann"
+    ],
+    "C2": [
+     "Lee",
+     "String",
+     "General",
+     "Lee"
+    ],
+    "B3": [
+     "lead",
+     "String",
+     "General",
+     "lead"
+    ]
+   }
+  },
+  {
+   "name": "text to columns tab and semicolon",
+   "error": null,
+   "cells": {
+    "A1": [
+     "a",
+     "String",
+     "General",
+     "a"
+    ],
+    "B1": [
+     "b",
+     "String",
+     "General",
+     "b"
+    ],
+    "C1": [
+     "c",
+     "String",
+     "General",
+     "c"
+    ],
+    "A2": [
+     "1",
+     "Double",
+     "General",
+     "1"
+    ],
+    "B2": [
+     "2",
+     "Double",
+     "General",
+     "2"
+    ]
+   }
+  },
+  {
+   "name": "text to columns quoted",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Smith, John",
+     "String",
+     "General",
+     "Smith, John"
+    ],
+    "B1": [
+     "42",
+     "Double",
+     "General",
+     "42"
+    ],
+    "A2": [
+     "x",
+     "String",
+     "General",
+     "x"
+    ],
+    "B2": [
+     "y",
+     "String",
+     "General",
+     "y"
+    ]
+   }
+  },
+  {
+   "name": "text to columns dates and zeros",
+   "error": null,
+   "cells": {
+    "A1": [
+     "7",
+     "Double",
+     "General",
+     "7"
+    ],
+    "B1": [
+     "3/4/2026",
+     "Double",
+     "m/d/yyyy",
+     "46085"
+    ],
+    "C1": [
+     "TRUE",
+     "Boolean",
+     "General",
+     "True"
+    ],
+    "D1": [
+     "-5%",
+     "Double",
+     "0%",
+     "-0.05"
+    ]
+   }
+  },
+  {
+   "name": "text to columns elsewhere",
+   "error": null,
+   "cells": {
+    "A1": [
+     "a-b",
+     "String",
+     "General",
+     "a-b"
+    ],
+    "C1": [
+     "a",
+     "String",
+     "General",
+     "a"
+    ],
+    "D1": [
+     "b",
+     "String",
+     "General",
+     "b"
+    ],
+    "A2": [
+     "c-d",
+     "String",
+     "General",
+     "c-d"
+    ],
+    "C2": [
+     "c",
+     "String",
+     "General",
+     "c"
+    ],
+    "D2": [
+     "d",
+     "String",
+     "General",
+     "d"
+    ]
+   }
+  },
+  {
+   "name": "flash fill first names",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Full",
+     "String",
+     "General",
+     "Full"
+    ],
+    "B1": [
+     "First",
+     "String",
+     "General",
+     "First"
+    ],
+    "A2": [
+     "Avery Chen",
+     "String",
+     "General",
+     "Avery Chen"
+    ],
+    "B2": [
+     "Avery",
+     "String",
+     "General",
+     "Avery"
+    ],
+    "A3": [
+     "Sam Lee",
+     "String",
+     "General",
+     "Sam Lee"
+    ],
+    "B3": [
+     "Sam",
+     "String",
+     "General",
+     "Sam"
+    ],
+    "A4": [
+     "Jo Park",
+     "String",
+     "General",
+     "Jo Park"
+    ],
+    "B4": [
+     "Jo",
+     "String",
+     "General",
+     "Jo"
+    ],
+    "A5": [
+     "Rin Ito",
+     "String",
+     "General",
+     "Rin Ito"
+    ],
+    "B5": [
+     "Rin",
+     "String",
+     "General",
+     "Rin"
+    ]
+   }
+  },
+  {
+   "name": "flash fill initials",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Full",
+     "String",
+     "General",
+     "Full"
+    ],
+    "B1": [
+     "Short",
+     "String",
+     "General",
+     "Short"
+    ],
+    "A2": [
+     "Avery Chen",
+     "String",
+     "General",
+     "Avery Chen"
+    ],
+    "B2": [
+     "A. Chen",
+     "String",
+     "General",
+     "A. Chen"
+    ],
+    "A3": [
+     "Sam Lee",
+     "String",
+     "General",
+     "Sam Lee"
+    ],
+    "B3": [
+     "S. Lee",
+     "String",
+     "General",
+     "S. Lee"
+    ],
+    "A4": [
+     "Jo Park",
+     "String",
+     "General",
+     "Jo Park"
+    ],
+    "B4": [
+     "J. Park",
+     "String",
+     "General",
+     "J. Park"
+    ]
+   }
+  },
+  {
+   "name": "flash fill upper",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Code",
+     "String",
+     "General",
+     "Code"
+    ],
+    "B1": [
+     "Up",
+     "String",
+     "General",
+     "Up"
+    ],
+    "A2": [
+     "ab-12",
+     "String",
+     "General",
+     "ab-12"
+    ],
+    "B2": [
+     "AB-12",
+     "String",
+     "General",
+     "AB-12"
+    ],
+    "A3": [
+     "cd-34",
+     "String",
+     "General",
+     "cd-34"
+    ],
+    "B3": [
+     "CD-34",
+     "String",
+     "General",
+     "CD-34"
+    ],
+    "A4": [
+     "ef-56",
+     "String",
+     "General",
+     "ef-56"
+    ],
+    "B4": [
+     "EF-56",
+     "String",
+     "General",
+     "EF-56"
+    ]
+   }
+  },
+  {
+   "name": "flash fill join",
+   "error": null,
+   "cells": {
+    "A1": [
+     "First",
+     "String",
+     "General",
+     "First"
+    ],
+    "B1": [
+     "Last",
+     "String",
+     "General",
+     "Last"
+    ],
+    "C1": [
+     "Both",
+     "String",
+     "General",
+     "Both"
+    ],
+    "A2": [
+     "Avery",
+     "String",
+     "General",
+     "Avery"
+    ],
+    "B2": [
+     "Chen",
+     "String",
+     "General",
+     "Chen"
+    ],
+    "C2": [
+     "Chen, Avery",
+     "String",
+     "General",
+     "Chen, Avery"
+    ],
+    "A3": [
+     "Sam",
+     "String",
+     "General",
+     "Sam"
+    ],
+    "B3": [
+     "Lee",
+     "String",
+     "General",
+     "Lee"
+    ],
+    "C3": [
+     "Lee, Sam",
+     "String",
+     "General",
+     "Lee, Sam"
+    ],
+    "A4": [
+     "Jo",
+     "String",
+     "General",
+     "Jo"
+    ],
+    "B4": [
+     "Park",
+     "String",
+     "General",
+     "Park"
+    ],
+    "C4": [
+     "Park, Jo",
+     "String",
+     "General",
+     "Park, Jo"
+    ]
+   }
+  },
+  {
+   "name": "flash fill digits",
+   "error": null,
+   "cells": {
+    "A1": [
+     "Ref",
+     "String",
+     "General",
+     "Ref"
+    ],
+    "B1": [
+     "No",
+     "String",
+     "General",
+     "No"
+    ],
+    "A2": [
+     "INV-0042-X",
+     "String",
+     "General",
+     "INV-0042-X"
+    ],
+    "B2": [
+     "42",
+     "Double",
+     "General",
+     "42"
+    ],
+    "A3": [
+     "INV-0107-Y",
+     "String",
+     "General",
+     "INV-0107-Y"
+    ],
+    "B3": [
+     "7",
+     "Double",
+     "General",
+     "7"
+    ],
+    "A4": [
+     "INV-2300-Z",
+     "String",
+     "General",
+     "INV-2300-Z"
+    ],
+    "B4": [
+     "0",
+     "Double",
+     "General",
+     "0"
+    ]
+   }
+  }
+ ],
+ "copy": {
+  "sheets": [
+   "Data",
+   "Data (2)"
+  ],
+  "book": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x15 xr xr6 xr10 xr2\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr6=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision6\" xmlns:xr10=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision10\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\"><fileVersion appName=\"xl\" lastEdited=\"7\" lowestEdited=\"7\" rupBuild=\"30527\"/><workbookPr defaultThemeVersion=\"202300\"/><mc:AlternateContent xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\"><mc:Choice Requires=\"x15\"><x15ac:absPath url=\"C:\\Code\\CodeOther\\OpenXlsxEditor\\probe\\\" xmlns:x15ac=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/ac\"/></mc:Choice></mc:AlternateContent><xr:revisionPtr revIDLastSave=\"0\" documentId=\"8_{5FD7E52B-6C78-4334-8DF1-DA30804C6F3E}\" xr6:coauthVersionLast=\"47\" xr6:coauthVersionMax=\"47\" xr10:uidLastSave=\"{00000000-0000-0000-0000-000000000000}\"/><bookViews><workbookView xWindow=\"-10170\" yWindow=\"-20020\" windowWidth=\"21380\" windowHeight=\"15350\" activeTab=\"1\" xr2:uid=\"{7609BF7A-8CEB-4A7B-8993-3D10B8FD8E89}\"/></bookViews><sheets><sheet name=\"Data\" sheetId=\"1\" r:id=\"rId1\"/><sheet name=\"Data (2)\" sheetId=\"2\" r:id=\"rId2\"/></sheets><definedNames><definedName name=\"Everywhere\" localSheetId=\"1\">'Data (2)'!$A$1</definedName><definedName name=\"Everywhere\">Data!$A$1</definedName><definedName name=\"Local\" localSheetId=\"0\">Data!$B$2</definedName><definedName name=\"Local\" localSheetId=\"1\">'Data (2)'!$B$2</definedName></definedNames><calcPr calcId=\"191029\"/><extLst><ext uri=\"{140A7094-0E35-4892-8432-C4D2E57EDEB5}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:workbookPr chartTrackingRefBase=\"1\"/></ext><ext uri=\"{B58B0392-4F1F-4190-BB64-5DF3571DCE5F}\" xmlns:xcalcf=\"http://schemas.microsoft.com/office/spreadsheetml/2018/calcfeatures\"><xcalcf:calcFeatures><xcalcf:feature name=\"microsoft.com:RD\"/><xcalcf:feature name=\"microsoft.com:Single\"/><xcalcf:feature name=\"microsoft.com:FV\"/><xcalcf:feature name=\"microsoft.com:CNMTM\"/><xcalcf:feature name=\"microsoft.com:LET_WF\"/><xcalcf:feature name=\"microsoft.com:LAMBDA_WF\"/><xcalcf:feature name=\"microsoft.com:ARRAYTEXT_WF\"/></xcalcf:calcFeatures></ext><ext uri=\"{D14903EA-33C4-47F7-8F05-3474C54BE107}\" xmlns:xlwcv=\"http://schemas.microsoft.com/office/spreadsheetml/2024/workbookCompatibilityVersion\"><xlwcv:version setVersion=\"2\"/></ext></extLst></workbook>",
+  "sheet1": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{9FA9585E-E775-4785-9557-9A26D348A87A}\"><dimension ref=\"A1:E3\"/><sheetViews><sheetView workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><cols><col min=\"1\" max=\"1\" width=\"15.7109375\" customWidth=\"1\"/></cols><sheetData><row r=\"1\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" s=\"1\" t=\"s\"><v>0</v></c><c r=\"B1\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"D1\" s=\"2\"/><c r=\"E1\" s=\"2\"/></row><row r=\"2\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>1</v></c><c r=\"B2\"><v>3</v></c></row><row r=\"3\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>2</v></c><c r=\"B3\"><f>B2*2</f><v>6</v></c></row></sheetData><mergeCells count=\"1\"><mergeCell ref=\"D1:E1\"/></mergeCells><conditionalFormatting sqref=\"B2:B3\"><cfRule type=\"cellIs\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>4</formula></cfRule></conditionalFormatting><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/></worksheet>",
+  "sheet2": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{5F27CFE3-DA0E-4841-9ED6-630A46AB47D3}\"><dimension ref=\"A1:E3\"/><sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><cols><col min=\"1\" max=\"1\" width=\"15.7109375\" customWidth=\"1\"/></cols><sheetData><row r=\"1\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" s=\"1\" t=\"s\"><v>0</v></c><c r=\"B1\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"D1\" s=\"2\"/><c r=\"E1\" s=\"2\"/></row><row r=\"2\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>1</v></c><c r=\"B2\"><v>3</v></c></row><row r=\"3\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>2</v></c><c r=\"B3\"><f>B2*2</f><v>6</v></c></row></sheetData><mergeCells count=\"1\"><mergeCell ref=\"D1:E1\"/></mergeCells><conditionalFormatting sqref=\"B2:B3\"><cfRule type=\"cellIs\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>4</formula></cfRule></conditionalFormatting><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/></worksheet>"
+ }
+}

@@ -180,6 +180,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'F3' && ctrl && !e.shiftKey && !e.altKey) ctx.nameManager?.();
     // (Ctrl+Alt+M: New Comment, or the active cell's thread to reply to.)
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'm') ctx.commentBox?.();
+    // (Ctrl+E: Flash Fill.)
+    else if (ctrl && !e.altKey && !e.shiftKey && key.toLowerCase() === 'e') ctx.flashFill?.();
     // (Ctrl+1: Format Cells. Taken from the key's code, as Ctrl+Shift+1 is "!".)
     else if (ctrl && !e.altKey && !e.shiftKey && e.code === 'Digit1') ctx.formatCells?.();
     // (Shift+F2: Excel's New Note, or Edit Note on a cell with one.)

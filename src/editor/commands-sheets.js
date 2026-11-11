@@ -2,6 +2,7 @@
 // hide, colour and delete, through sheetOp.
 import { cellSelection } from './selection.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
+import { copySheet } from '../ooxml/sheetcopy.js';
 
 /** The sheet commands, and sheetOp (for the others): `env` is createCommands's shared state and helpers. */
 export function sheetCommands(env) {
@@ -73,6 +74,11 @@ export function sheetCommands(env) {
     insertSheet({ after = false } = {}) {
       let at = -1;
       return sheetOp((wb) => { at = wb.addSheet(ctx.sheetIndex() + (after ? 1 : 0)); }, () => at);
+    },
+    /** Move or Copy > Create a copy: sheet i copied before index `before` (sheetcopy.js), the copy shown. */
+    copySheet(i, before) {
+      let at = -1;
+      return sheetOp((wb) => { at = copySheet(wb, i, before); }, () => at);
     },
     /** Rename sheet i (Excel's refusals said in its words). */
     renameSheet(i, name) { return sheetOp((wb) => wb.renameSheet(i, name)); },
