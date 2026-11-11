@@ -392,3 +392,29 @@ export function passwordBox(root, fileName) {
     dlg.append(h, text, label, field, row);
   });
 }
+
+/** Excel's note being written or edited, beside the cell (`at`, a screen point): its author's name in bold, the text
+ *  in a box to type in. Escape or OK keeps what was typed (Escape keeps it as Excel's note does); Cancel leaves the note
+ *  as it was. Resolves to the text, or null. */
+export function noteBox(root, { title, author, text = '', at }) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.classList.add('oxe-note-edit');
+    dlg.style.setProperty('--oxe-fx', `${Math.round(at.x)}px`);
+    dlg.style.setProperty('--oxe-fy', `${Math.round(at.y)}px`);
+    const h = Object.assign(document.createElement('h2'), { id: `${id}-title`, className: 'oxe-dialog-title', textContent: title });
+    const who = Object.assign(document.createElement('p'), { className: 'oxe-note-author', textContent: author ? `${author}:` : '' });
+    const area = Object.assign(document.createElement('textarea'), { className: 'oxe-note-text', value: text, rows: 5, spellcheck: true });
+    area.setAttribute('aria-labelledby', `${id}-title`);
+    area.dataset.first = '';
+    area.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); done(area.value); }
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); done(area.value); }
+    });
+    const row = document.createElement('div');
+    row.className = 'oxe-dialog-buttons';
+    row.append(button('OK', () => done(area.value)), button('Cancel', () => done(null)));
+    dlg.append(h, who, area, row);
+    queueMicrotask(() => { area.selectionStart = area.selectionEnd = area.value.length; });
+  });
+}

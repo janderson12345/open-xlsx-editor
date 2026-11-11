@@ -105,11 +105,25 @@ const thread = await page.evaluate(() => document.querySelector('.oxe-thread-box
 check(/Avery Chen/.test(thread) && /Sam Rivera/.test(thread) && /checked against the invoice/.test(thread), 'the pointer on C3: the thread, with its reply', thread);
 await page.mouse.move(5, 5);
 await page.evaluate(() => window.oxe.select('B2'));
+// (A cell's menu, Show/Hide Note: the note beside it with the author in bold; again: hidden.)
+const b2At = await page.evaluate(() => { const r = document.querySelector('.oxe-sel-active').getBoundingClientRect(); return { x: r.left + 10, y: r.top + 6 }; });
+const showHide = async () => { await page.mouse.click(b2At.x, b2At.y, { button: 'right' }); await page.click('.oxe-menu >> text=Show/Hide Note'); };
+await showHide();
+const note = await page.evaluate(() => { const b = document.querySelector('.oxe-note-box:not(.oxe-thread-box)'); return b ? { text: b.textContent, bold: b.querySelector('strong')?.textContent } : null; });
+await showHide();
+check(note?.bold === 'Avery Chen:' && /Check this total/.test(note.text) && !(await page.isVisible('.oxe-note-box')), 'Show/Hide Note on B2: its note, the author in bold; again: hidden', JSON.stringify(note));
+// Shift+F2 on B2: Excel's Edit Note, its text to type in; changed and OK: the note's new text, the author kept; Ctrl+Z.
 await page.focus('.oxe-grid');
 await page.keyboard.press('Shift+F2');
-const note = await page.evaluate(() => { const b = document.querySelector('.oxe-note-box:not(.oxe-thread-box)'); return b ? { text: b.textContent, bold: b.querySelector('strong')?.textContent } : null; });
-await page.keyboard.press('Shift+F2');
-check(note?.bold === 'Avery Chen:' && /Check this total/.test(note.text) && !(await page.isVisible('.oxe-note-box')), 'Shift+F2 on B2: its note, the author in bold; again: hidden', JSON.stringify(note));
+await page.waitForSelector('dialog.oxe-note-edit');
+const editing = await page.evaluate(() => ({ title: document.querySelector('dialog.oxe-note-edit h2').textContent, text: document.activeElement.value }));
+await page.fill('dialog.oxe-note-edit textarea', 'Checked on Monday');
+await page.click('dialog.oxe-note-edit >> text=OK');
+const edited = await page.evaluate(() => document.getElementById(document.querySelector('.oxe-row[aria-rowindex="3"] .oxe-cell[aria-colindex="3"]').getAttribute('aria-describedby'))?.textContent);
+check(editing.title === 'Edit Note for B2' && editing.text === 'Check this total' && edited === 'Note. Avery Chen: Checked on Monday', 'Shift+F2: Edit Note for B2 with its text; OK: the new text, Avery Chen still its author', `${JSON.stringify(editing)} ${edited}`);
+await page.keyboard.press('Control+z');
+const undone = await page.evaluate(() => document.getElementById(document.querySelector('.oxe-row[aria-rowindex="3"] .oxe-cell[aria-colindex="3"]').getAttribute('aria-describedby'))?.textContent);
+check(undone === 'Note. Avery Chen: Check this total', 'Ctrl+Z: the note as it was', undone);
 
 // Conditional formats: basic.xlsx's B2:B10 bold when over 5: B7 (6) bold, B5 (4) not; 50 typed into B2: bold at once.
 await openFixture(page, 'basic.xlsx');

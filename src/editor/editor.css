@@ -1455,6 +1455,26 @@
 .oxe-dv-prompt-text {
   margin-top: 2px;
 }
+/* A note being written (dialogs.js noteBox): beside its cell, in a note's colours. */
+.oxe-dialog.oxe-note-edit {
+  position: fixed;
+  inset: var(--oxe-fy) auto auto var(--oxe-fx);
+  margin: 0;
+  width: 240px;
+  background: #ffffe1;
+  color: #000000;
+}
+.oxe-note-edit .oxe-note-author {
+  margin: 0 0 4px;
+  font-weight: bold;
+}
+.oxe-note-edit .oxe-note-text {
+  box-sizing: border-box;
+  width: 100%;
+  font: 12px/1.35 var(--oxe-ui-font);
+  background: #ffffff;
+  color: #000000;
+}
 .oxe-dialog.oxe-pick-box {
   position: fixed;
   inset: var(--oxe-fy) auto auto var(--oxe-fx);

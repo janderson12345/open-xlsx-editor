@@ -8,7 +8,8 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox, noteBox } from './editor/dialogs.js';
+import { setNote, deleteNote } from './ooxml/noteedit.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { goToNames } from './ooxml/goto.js';
 import { filterChoices, shownText } from './ooxml/filterops.js';
@@ -25,6 +26,7 @@ import { createFindBar } from './editor/findbar.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
 import { dataTab } from './editor/datatab.js';
+import { reviewTab } from './editor/reviewtab.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
@@ -170,6 +172,25 @@ export function mountXlsxEditor(host, options = {}) {
     if (name === 'pasteSpecialBox') return pasteSpecialBox();
     if (name === 'sortAsc' || name === 'sortDesc') return sortQuick(name === 'sortDesc');
     if (name === 'sortBox') return customSort();
+    if (name === 'editNote') {
+      // (Excel's New Note and Edit Note: the active cell's note in a box to type in, beside the cell.)
+      const s = editing().selection;
+      const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
+      if (n?.kind === 'thread') return messageBox(root, "Threaded comments can't be edited here yet.");
+      const body = n ? n.runs.filter((x, k) => !(k === 0 && x.bold)).map((x) => x.text).join('').replace(/^\n/, '') : '';
+      const author = n ? n.author || (n.runs[0]?.bold ? n.runs[0].text.replace(/:$/, '') : '') : options.author || 'Author';
+      const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
+      const ref = `${colName(s.ac)}${s.ar + 1}`;
+      return noteBox(root, { title: n ? `Edit Note for ${ref}` : `New Note for ${ref}`, author, text: body, at: { x: box.right + 8, y: box.top } }).then((text) => {
+        if (text != null && (n || text !== '')) editing().run('notesChange', (wb, si) => setNote(wb, si, s.ar, s.ac, text, options.author || 'Author'));
+        state.grid.el.focus({ preventScroll: true });
+      });
+    }
+    if (name === 'deleteNote') {
+      const s = editing().selection;
+      return editing().run('notesChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
+    }
+    if (name === 'showNote') { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); }
     if (name === 'goToBox') {
       // (Excel's Go To: a name, a table or a reference; gone to as the Name Box goes.)
       return goToBox(root, goToNames(state.workbook, i)).then((text) => {
@@ -316,6 +337,8 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
   const showConditional = () => {
     if (!state.grid || !state.workbook) return;
     state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex));
+    // (Notes too: written, deleted, or moved with rows and columns.)
+    state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
     // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)
     const charts = readCharts(state.workbook, state.sheetIndex).filter((c) => c.kind);
     state.grid.setCharts(charts, state.workbook.theme);
@@ -358,7 +381,14 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     menu.open([{ label: 'Cut', run: run('clipCut'), disabled: ro || !allowed('clipCut') }, { label: 'Copy', run: run('clipCopy'), disabled: !allowed('clipCopy') },
       { label: 'Paste', run: run('clipPaste'), disabled: ro || !allowed('clipPaste') }, { label: 'Paste Special...', run: run('pasteSpecialBox'), disabled: ro || !allowed('pasteSpecialBox') },
       'separator', { label: 'Insert...', run: () => lines(1), disabled: ro || !allowed('lines') }, { label: 'Delete...', run: () => lines(-1), disabled: ro || !allowed('lines') },
-      { label: 'Clear Contents', run: () => editing().run('clear'), disabled: ro }],
+      { label: 'Clear Contents', run: () => editing().run('clear'), disabled: ro }, 'separator',
+      // (Excel's: New Note on a cell without one; Edit, Delete and Show/Hide Note on one with.)
+      ...(() => {
+        const s = editing().selection;
+        const has = readNotes(state.workbook, state.sheetIndex).has(`${s.ar},${s.ac}`);
+        return has ? [{ label: 'Edit Note', run: run('editNote'), disabled: ro }, { label: 'Delete Note', run: run('deleteNote'), disabled: ro }, { label: 'Show/Hide Note', run: run('showNote') }]
+          : [{ label: 'New Note', run: run('editNote'), disabled: ro }];
+      })()],
     point, { label: 'Cell' });
   };
   /** The menu of a row or column heading. */
@@ -418,6 +448,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Data: (kit) => dataTab(kit, { act }),
+        Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
       },
       home: () => state.grid?.el.focus({ preventScroll: true }),
@@ -501,6 +532,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
           selectionShown: () => showValidation(),
           goToBox: () => act('goToBox'),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
+          editNote: () => act('editNote'),
           fitWidth: (c) => state.grid.fitWidth(c),
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),

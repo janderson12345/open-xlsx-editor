@@ -123,6 +123,14 @@ for (const colorScheme of ['light', 'dark']) {
       t.check(!passwordDialog.length && await page.evaluate(() => document.activeElement.type === 'password'), `${colorScheme}: the Password box, no axe violations, its field focused`, passwordDialog.join('\n     '));
       await page.keyboard.press('Escape');
       await page.focus('.oxe-grid');
+      await page.evaluate(() => window.oxe.select('C7'));
+      await page.focus('.oxe-grid');
+      await page.keyboard.press('Shift+F2');
+      await page.waitForSelector('dialog.oxe-note-edit');
+      const noteEdit = await axe();
+      t.check(!noteEdit.length && await page.evaluate(() => document.activeElement.tagName === 'TEXTAREA'), `${colorScheme}: the New Note box, no axe violations, its text focused`, noteEdit.join(String.fromCharCode(10) + '     '));
+      await page.click('dialog.oxe-note-edit >> text=Cancel');
+      await page.focus('.oxe-grid');
       await page.keyboard.press('F5');
       await page.waitForSelector('dialog.oxe-dialog');
       const goTo = await axe();
@@ -146,7 +154,7 @@ for (const colorScheme of ['light', 'dark']) {
       const dataTab = await axe();
       t.check(!dataTab.length, `${colorScheme}: the Data tab with its Refresh All menu, no axe violations`, dataTab.join('\n     '));
       await page.keyboard.press('Escape');
-      await page.click('.oxe-rtab >> text=View');
+      await page.click('.oxe-rtab >> text="View"');
       await page.click('.oxe-toolbar button[title="Freeze Panes"]');
       const viewTab = await axe();
       t.check(!viewTab.length, `${colorScheme}: the View tab with its Freeze Panes menu, no axe violations`, viewTab.join('\n     '));

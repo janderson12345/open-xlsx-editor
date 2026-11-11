@@ -736,7 +736,7 @@ check(/^Item/.test(String(await value('A3'))), 'Ctrl+Z: every replacement undone
 // View: Freeze Panes at C3 from the View tab; scrolled far down and right, a click where A1 shows still selects A1.
 // Ctrl+wheel zooms by 10%. Unfreeze Panes, and zoom back to 100%.
 await page.evaluate(() => { window.oxe.select('C3'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
-await page.click('.oxe-rtab >> text=View');
+await page.click('.oxe-rtab >> text="View"');
 await menu('Freeze Panes', 'Freeze Panes');
 check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":2,"cols":2}' && await page.isVisible('.oxe-pane-top') && await page.isVisible('.oxe-pane-corner'), 'View, Freeze Panes at C3: rows 1-2 and columns A-B frozen');
 await page.evaluate(() => { window.oxe.grid.el.scrollTop = 2000; window.oxe.grid.el.scrollLeft = 600; });

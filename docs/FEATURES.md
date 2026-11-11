@@ -108,7 +108,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Charts (`charts`) | Charts | Partly | Column, bar, line, area, pie and doughnut drawn, with Excel's automatic axis (34 of 34) and live data; given to screen readers as figures with tables (docs/CHARTS.md). Editing and other kinds missing; kept. Series follow a sheet rename. |
 | Sparklines (`sparklines`) | Line, column, win/loss | Kept | |
 | Links (`links`) | Hyperlinks | Kept | Not clickable yet; follow a sheet rename. |
-| Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover and Shift+F2, read to screen readers (docs/NOTES.md). Adding and editing missing; kept. |
+| Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover, read to screen readers; notes written, edited and deleted as Excel writes them (Shift+F2, the cell's menu, Review > Notes; docs/NOTES.md). Threads shown and deleted, not edited. |
 | Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers printed and exported as Excel prints them (docs/PRINT.md); not editable yet. |
 
 ## Page Layout (`layout`)
@@ -148,7 +148,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Proofing (`proofing`) | Spelling | Missing | |
 | Accessibility (`accessibility`) | Check Accessibility | Missing | |
-| Comments (`comments`) | New, show, delete comments; notes | Partly | Shown (docs/NOTES.md); new, edit and delete missing. |
+| Comments (`comments`) | New, show, delete comments; notes | Partly | Notes: New, Edit, Delete, Show/Hide (docs/NOTES.md); threaded comments shown and deleted, not written. |
 | Protect (`protect`) | Protect sheet, protect workbook | Kept | Not enforced: a protected sheet can be edited. |
 
 ## View (`view`)

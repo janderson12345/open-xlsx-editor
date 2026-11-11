@@ -173,7 +173,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
     else if (key === 'F5' && e.altKey && !e.shiftKey) cmd.run('refreshPivots', ctrl);
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
-    else if (key === 'F2' && e.shiftKey) { if (!ctx.toggleNote?.()) announce('This cell has no note'); }
+    // (Shift+F2: Excel's New Note, or Edit Note on a cell with one.)
+    else if (key === 'F2' && e.shiftKey) ctx.editNote?.();
     else if (key === 'F2') startEdit('edit');
     else if (key === 'F11' && e.shiftKey) cmd.run('insertSheet');
     else if (key === 'Delete') cmd.run('clear');

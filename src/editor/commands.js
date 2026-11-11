@@ -383,6 +383,19 @@ export function createCommands(ctx) {
       ctx.announce(list.length === 1 ? 'PivotTable refreshed' : `${list.length} PivotTables refreshed`);
       return true;
     },
+    /** A change to the sheet's notes, `run(wb, si)` (noteedit.js setNote, deleteNote), as one step of the history. */
+    notesChange(run) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const before = wb.snapshot();
+      if (run(wb, ctx.sheetIndex()) === false) return false;
+      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+      state.redo = [];
+      ctx.edited?.({ book: true });
+      ctx.reloaded?.();
+      ctx.changed?.();
+      return true;
+    },
     /** Cell contents [{ r, c, value } or { r, c, formula }] of sheet si that another editor of a shared workbook
      *  changed (collab.js): made here outside the history, and drawn. */
     remoteContents(si, contents) {
