@@ -37,7 +37,10 @@ for (const f of fs.readdirSync('test/fixtures').filter((n) => n.endsWith('.xlsx'
   fs.writeFileSync(`${outDir}/${f.replace('.xlsx', '.edited.xlsx')}`, edited);
   const eo = unzipSync(edited);
   const sheetPath = await page.evaluate(() => window.oxe.workbook.sheets[window.oxe.sheetIndex].path);
-  const touched = Object.keys(src).filter((k) => !Buffer.from(eo[k]).equals(Buffer.from(src[k])));
+  // (The workbook part may change too, only to ask Excel to work the formulas out on opening: when the sheet holds a
+  // #SPILL! or #CALC!, saved as #VALUE! for Excel to show as its own, docs/DYNAMIC.md.)
+  const book = (bytes) => Buffer.from(bytes).toString('utf8').replace(/<calcPr fullCalcOnLoad="1"\/>/, '').replace(/ fullCalcOnLoad="1"/, '');
+  const touched = Object.keys(src).filter((k) => !Buffer.from(eo[k]).equals(Buffer.from(src[k])) && !(k === 'xl/workbook.xml' && book(eo[k]) === book(src[k])));
   check(touched.length === 1 && touched[0] === sheetPath, `${f}: an edit rewrites only ${sheetPath}`, touched.join(', '));
 }
 
