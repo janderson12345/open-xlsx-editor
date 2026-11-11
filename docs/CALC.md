@@ -13,8 +13,10 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
     level work left to right, so `=2^3^2` is 64.
 - **Working them out.**
   - `evaluate.js` handles the operators, references and names.
-  - `functions.js` holds about 130 functions: maths, statistics, logic, information, text, lookup (VLOOKUP, INDEX,
-    MATCH, XLOOKUP, OFFSET, INDIRECT), the IF/IFS family and dates.
+  - About 130 functions in three files, by Excel's categories: `functions.js` (maths, statistics, logic, information
+    and the IF/IFS family, plus the helpers the others share), `functions-text.js` (text, and dates and times) and
+    `functions-lookup.js` (lookup: VLOOKUP, INDEX, MATCH, XLOOKUP, OFFSET, INDIRECT; and SUMIF, COUNTIFS and the other
+    conditional sums and counts).
   - `functions-more.js` holds 54 more: SUBTOTAL (hidden rows left out by 101 to 111, other subtotals always), RANK,
     PERCENTILE, QUARTILE and MODE; NETWORKDAYS, WORKDAY, DATEDIF, WEEKNUM, ISOWEEKNUM and YEARFRAC; PMT, PV, FV, NPER,
     RATE, NPV and IRR; LOOKUP, XMATCH and ADDRESS; TEXTBEFORE, TEXTAFTER, NUMBERVALUE, FIXED and DOLLAR; trigonometry,

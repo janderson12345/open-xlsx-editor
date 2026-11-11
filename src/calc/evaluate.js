@@ -5,6 +5,8 @@ import { Area, Arr, Union, MISSING, XlError, E, errorOf, Unsupported, isError, s
   closeToZero } from './values.js';
 import { FUNCTIONS } from './functions.js';
 // (More functions, registered into FUNCTIONS once it is made.)
+import './functions-text.js';
+import './functions-lookup.js';
 import './functions-more.js';
 
 /** x^y as Excel has it: 0^0 is #NUM!, 0 to a negative power #DIV/0!, a negative number to a fractional power #NUM!

@@ -4,7 +4,9 @@
 // a delimiter, NUMBERVALUE, FIXED and DOLLAR; trigonometry, GCD and LCM, CEILING.MATH and FLOOR.MATH; TYPE and
 // ERROR.TYPE. Registered into functions.js's table.
 import { Area, Arr, Union, MISSING, XlError, E, toNum, compare, finite } from './values.js';
-import { FUNCTIONS, def, lifted, given, one, num, text, opt, values, numbers, vector, roundDec, position, serialOf } from './functions.js';
+import { FUNCTIONS, def, lifted, given, one, num, text, opt, values, numbers, vector, roundDec } from './functions.js';
+import { serialOf } from './functions-text.js';
+import { position } from './functions-lookup.js';
 import { dateParts } from '../ooxml/format.js';
 import { colName } from '../ooxml/refs.js';
 
