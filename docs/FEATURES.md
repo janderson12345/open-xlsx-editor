@@ -139,7 +139,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Queries & Connections (`queries-and-connections`) | Refresh All | Partly | Refreshes the workbook's PivotTables (Ctrl+Alt+F5); Refresh, the one at the active cell (Alt+F5). Data connections aren't refreshed. |
 | Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Partly | Sort A to Z, Z to A, Sort..., Filter, Clear and Reapply on the Data tab, as in Home > Editing (docs/SORT.md, docs/FILTER.md). Advanced Filter missing. |
 | Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Missing | |
-| | Data Validation (lists, rules) | Partly | Typed values checked as Excel checks them, its Stop, Warning and Information boxes; a list's dropdown; the input message (docs/VALIDATION.md). The box to add and change rules missing. |
+| | Data Validation (lists, rules) | Done | Typed values checked as Excel checks them, its Stop, Warning and Information boxes; a list's dropdown; the input message; Excel's Data Validation box to add, change and clear rules, written as Excel writes them (15 of 15; docs/VALIDATION.md). Circle Invalid Data missing. |
 | Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |
 
 ## Review (`review`)

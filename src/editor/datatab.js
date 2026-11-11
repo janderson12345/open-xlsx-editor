@@ -1,6 +1,7 @@
 // The Data tab, Excel's groups in Excel's order as far as they are here: Queries & Connections (Refresh All, its
 // menu Refresh All and Refresh: the workbook's PivotTables, or the one at the active cell, pivot.js) and Sort & Filter
-// (Sort A to Z, Sort Z to A, Sort..., Filter, Clear, Reapply: the commands Home > Editing's menu runs too).
+// (Sort A to Z, Sort Z to A, Sort..., Filter, Clear, Reapply: the commands Home > Editing's menu runs too) and Data
+// Tools (Data Validation..., dvedit.js).
 
 /** The Data tab. `act(name, ...args)` runs a command. */
 export function dataTab(kit, { act }) {
@@ -14,6 +15,7 @@ export function dataTab(kit, { act }) {
       btn('⇅', 'Sort...', f('sortBox'), { label: 'Sort', big: true }),
       btn('⏷', 'Filter (Ctrl+Shift+L)', f('filterToggle'), { label: 'Filter', big: true }),
       col(btn('✕', 'Clear', f('filterClear'), { label: 'Clear' }), btn('↻', 'Reapply', f('filterReapply'), { label: 'Reapply' }))),
+    grp('Data Tools', btn('☑', 'Data Validation...', f('validationBox'), { label: 'Data Validation', big: true })),
   ];
   return { groups, update() {} };
 }

@@ -841,6 +841,16 @@ check(await pivotShown() === '150,Central,100,434', 'Data > Refresh All: refresh
 await page.evaluate(() => { window.oxe.showSheet('Src'); window.oxe.select('B3'); });
 await page.click('.oxe-toolbar button[title="Filter (Ctrl+Shift+L)"]');
 check(await page.evaluate(() => { const f = window.oxe.workbook.sheet(window.oxe.sheetIndex).autoFilter; return f && `${f.r0},${f.c0},${f.r1},${f.c1}`; }) === '0,0,18,4', 'Data > Filter: the filter on over A1:E19', await page.evaluate(() => JSON.stringify(window.oxe.workbook.sheet(window.oxe.sheetIndex).autoFilter)));
+// Data > Data Validation... on G2:G4: Allow List, Source Yes,No, OK: the rule on the three cells; Maybe refused.
+await page.evaluate(() => { window.oxe.select('G2'); window.oxe.command('extendTo', 3, 6); });
+await page.click('.oxe-toolbar button[title="Data Validation..."]');
+await page.waitForSelector('dialog.oxe-dv-box');
+await page.selectOption('dialog.oxe-dv-box select >> nth=0', 'list');
+await page.fill('dialog.oxe-dv-box .oxe-dv-panel:not([hidden]) input[type=text] >> nth=0', 'Yes,No');
+await page.click('dialog.oxe-dv-box >> text=OK');
+const dv = await page.evaluate(() => { const v = window.oxe.workbook.sheet(window.oxe.sheetIndex).validations; return v.map((x) => `${x.type}:${x.ranges.map((r) => `${r.r0},${r.c0},${r.r1},${r.c1}`).join(' ')}:${x.formulas[0]}`).join(';'); });
+const maybe = await page.evaluate(() => window.oxe.enter('G3', 'Maybe'));
+check(dv === 'list:1,6,3,6:"Yes,No"' && maybe?.invalid?.style === 'stop', 'Data Validation box: a list rule on G2:G4; Maybe refused (Stop)', `${dv} ${JSON.stringify(maybe)}`);
 await page.click('.oxe-rtab >> text=Home');
 
 check(!errors.length, 'no page errors', errors.join('\n     '));

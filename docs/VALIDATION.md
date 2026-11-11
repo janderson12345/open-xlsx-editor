@@ -33,8 +33,39 @@ and expects Excel's verdict for every cell: 15 of 15.
 
 The boxes' buttons and words follow Excel's interface, which COM doesn't reach.
 
+## Writing rules
+
+Data > Data Validation... opens Excel's box for the selection, holding the active cell's rule. It has three tabs:
+
+- **Settings:** Allow (any value, whole number, decimal, list, date, time, text length, custom), Data (between,
+  not between, equal to, not equal to, greater than, less than, and or equal to), the values, which are labelled
+  Minimum, Maximum, Value, Source or Formula as the choices make them, Ignore blank, and In-cell dropdown.
+- **Input Message:** whether to show it, its title and its message.
+- **Error Alert:** whether to show it, its style (Stop, Warning, Information), its title and its message.
+
+OK gives the selection the rule; Clear All, then OK, takes its rules away. The selection's cells come out of any
+rule they were in (that rule's ranges split around them), and the new rule is added after the others, as Excel does.
+Each change is one step of the undo history (`src/ooxml/dvedit.js`).
+
+A rule is written as Excel writes it:
+
+- **Attributes** in its order, `operator` left out for between.
+- **A typed list** in quotes (`"a,b,c"`).
+- **A reference or formula** without its `=`.
+- **A date or time** as its serial number, to 15 significant digits (17:00 is 0.708333333333333).
+- **A list without its dropdown** as `showDropDown="1"`.
+
+Measured: each of the 15 rules of `dv-cases.mjs`, written here, gives the `dataValidation` element Excel saved for it
+(`test/dvedit.test.js` against `test/dv-excel.json`), less Excel's `xr:uid`, and each cell is judged as Excel judged
+it. `dv-ours.mjs` writes five rules (one split by another, one with its messages and a Warning, a list without its
+dropdown) and Excel read all 10 cells checked as written (`excel-dv-check.ps1`): types, comparisons, values, styles,
+titles, messages and the dropdown.
+
+A fix with this: rules covering several ranges (`sqref="A1:A3 A6:A10"`) were read as one. The reader split the
+list on the letter s, not on spaces. Conditional formats had the same fault, also fixed.
+
 ## Not yet
 
-The Data Validation box to add or change rules, Circle Invalid Data, a list's choices from a name defined as a formula
+Circle Invalid Data, "Apply these changes to all other cells with the same settings", a list's choices from a name defined as a formula
 of another kind, and rules following their cells when rows are inserted or sorted (their ranges move with inserted
 rows already).

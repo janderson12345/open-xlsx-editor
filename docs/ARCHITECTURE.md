@@ -36,6 +36,7 @@ insides:
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes, tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
 | `src/ooxml/pivot.js` | PivotTables: read from their parts, refreshed from their source as Excel's Refresh does (cache, records, items, compact layout); docs/PIVOT.md. |
+| `src/ooxml/dvedit.js` | Data validation rules written as Excel's Data Validation box writes them; ranges split around a new rule; a rule in the box's terms (docs/VALIDATION.md). |
 | `src/ooxml/noteedit.js` | Notes written and deleted as Excel's New Note writes them: the comments part, the VML box, the parts and relationships made when the sheet has none (docs/NOTES.md). |
 | `src/editor/reviewtab.js` | The Review tab: Notes. |
 | `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter. |

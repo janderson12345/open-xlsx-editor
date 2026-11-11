@@ -418,3 +418,103 @@ export function noteBox(root, { title, author, text = '', at }) {
     queueMicrotask(() => { area.selectionStart = area.selectionEnd = area.value.length; });
   });
 }
+
+/**
+ * Excel's Data Validation box, its three tabs: Settings (Allow, Data, the values, Ignore blank, In-cell dropdown),
+ * Input Message and Error Alert; Clear All, OK and Cancel. `rule` the active cell's (dvedit.js's form: { type, op, f1,
+ * f2, ignoreBlank, dropDown, prompt: { show, title, text }, error: { show, style, title, text } }), or null. Resolves to
+ * the rule, 'clear' (Clear All, then OK), or null.
+ */
+export function validationBox(root, rule = null) {
+  const r = rule || { type: 'any', op: 'between', f1: '', f2: '', ignoreBlank: true, dropDown: true, prompt: { show: true, title: '', text: '' }, error: { show: true, style: 'stop', title: '', text: '' } };
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.classList.add('oxe-dv-box');
+    const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+    const field = (label, input) => { input.id ||= `${id}-${Math.random().toString(36).slice(2, 8)}`; return el('div', { className: 'oxe-dv-field' }, el('label', { htmlFor: input.id, textContent: label }), input); };
+    const select = (options, value) => { const s = el('select', { className: 'oxe-dialog-list' }); s.append(...options.map(([v, t]) => el('option', { value: v, textContent: t }))); s.value = value; return s; };
+    const check = (label, on) => { const c = el('input', { type: 'checkbox', checked: on }); return [c, el('label', { className: 'oxe-dv-check' }, c, ` ${label}`)]; };
+    const text = (value) => el('input', { type: 'text', className: 'oxe-dialog-field', value: value || '', spellcheck: false });
+    // Settings.
+    const allow = select([['any', 'Any value'], ['whole', 'Whole number'], ['decimal', 'Decimal'], ['list', 'List'], ['date', 'Date'], ['time', 'Time'], ['length', 'Text length'], ['custom', 'Custom']], r.type);
+    allow.dataset.first = '';
+    const op = select([['between', 'between'], ['notBetween', 'not between'], ['equal', 'equal to'], ['notEqual', 'not equal to'], ['greater', 'greater than'], ['less', 'less than'], ['greaterEqual', 'greater than or equal to'], ['lessEqual', 'less than or equal to']], r.op || 'between');
+    const f1 = text(r.f1);
+    const f2 = text(r.f2);
+    const [blank, blankRow] = check('Ignore blank', r.ignoreBlank !== false);
+    const [drop, dropRow] = check('In-cell dropdown', r.dropDown !== false);
+    const opField = field('Data:', op);
+    const f1Field = field('Minimum:', f1);
+    const f2Field = field('Maximum:', f2);
+    const settings = el('div', { className: 'oxe-dv-panel' }, field('Allow:', allow), blankRow, opField, f1Field, f2Field, dropRow);
+    const layout = () => {
+      const t = allow.value;
+      const ranged = !['any', 'list', 'custom'].includes(t);
+      const two = ranged && (op.value === 'between' || op.value === 'notBetween');
+      opField.hidden = !ranged;
+      f1Field.hidden = t === 'any';
+      f2Field.hidden = !two;
+      dropRow.hidden = t !== 'list';
+      blankRow.hidden = t === 'any';
+      f1Field.querySelector('label').textContent = t === 'list' ? 'Source:' : t === 'custom' ? 'Formula:' : two ? 'Minimum:' : ['greater', 'greaterEqual'].includes(op.value) ? 'Minimum:' : ['less', 'lessEqual'].includes(op.value) ? 'Maximum:' : 'Value:';
+    };
+    allow.addEventListener('change', layout);
+    op.addEventListener('change', layout);
+    layout();
+    // Input Message, Error Alert.
+    const [showPrompt, showPromptRow] = check('Show input message when cell is selected', r.prompt?.show !== false);
+    const promptTitle = text(r.prompt?.title);
+    const promptText = el('textarea', { className: 'oxe-dialog-field', rows: 3, value: r.prompt?.text || '' });
+    const message = el('div', { className: 'oxe-dv-panel' }, showPromptRow, field('Title:', promptTitle), field('Input message:', promptText));
+    const [showError, showErrorRow] = check('Show error alert after invalid data is entered', r.error?.show !== false);
+    const style = select([['stop', 'Stop'], ['warning', 'Warning'], ['information', 'Information']], r.error?.style || 'stop');
+    const errorTitle = text(r.error?.title);
+    const errorText = el('textarea', { className: 'oxe-dialog-field', rows: 3, value: r.error?.text || '' });
+    const alertPanel = el('div', { className: 'oxe-dv-panel' }, showErrorRow, field('Style:', style), field('Title:', errorTitle), field('Error message:', errorText));
+    // The tabs (a tablist, as ARIA describes one).
+    const panels = [['Settings', settings], ['Input Message', message], ['Error Alert', alertPanel]];
+    const list = el('div', { className: 'oxe-dv-tabs' });
+    list.setAttribute('role', 'tablist');
+    list.setAttribute('aria-label', 'Data Validation');
+    const tabs = panels.map(([name, panel], k) => {
+      const tab = el('button', { type: 'button', id: `${id}-tab${k}`, textContent: name, className: 'oxe-dv-tab' });
+      tab.setAttribute('role', 'tab');
+      panel.id = `${id}-panel${k}`;
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tab.id);
+      tab.setAttribute('aria-controls', panel.id);
+      return tab;
+    });
+    const show = (k) => tabs.forEach((t, j) => { t.setAttribute('aria-selected', String(j === k)); t.tabIndex = j === k ? 0 : -1; panels[j][1].hidden = j !== k; });
+    tabs.forEach((t, k) => {
+      t.addEventListener('click', () => show(k));
+      t.addEventListener('keydown', (e) => {
+        const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (step) { e.preventDefault(); const n = (k + step + tabs.length) % tabs.length; show(n); tabs[n].focus(); }
+      });
+    });
+    list.append(...tabs);
+    show(0);
+    let cleared = false;
+    const clearAll = () => {
+      cleared = true;
+      allow.value = 'any'; op.value = 'between'; f1.value = ''; f2.value = '';
+      blank.checked = true; drop.checked = true; showPrompt.checked = true; showError.checked = true;
+      promptTitle.value = ''; promptText.value = ''; style.value = 'stop'; errorTitle.value = ''; errorText.value = '';
+      layout();
+    };
+    const ok = () => {
+      if (allow.value === 'any' && cleared && !promptTitle.value && !promptText.value) { done('clear'); return; }
+      done({
+        type: allow.value, op: op.value, f1: f1.value, f2: f2.value, ignoreBlank: blank.checked, dropDown: drop.checked,
+        prompt: { show: showPrompt.checked, title: promptTitle.value, text: promptText.value },
+        error: { show: showError.checked, style: style.value, title: errorTitle.value, text: errorText.value },
+      });
+    };
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') { e.preventDefault(); ok(); } });
+    const h = el('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Data Validation' });
+    const row = el('div', { className: 'oxe-dialog-buttons' });
+    row.append(button('Clear All', clearAll), button('OK', ok), button('Cancel', () => done(null)));
+    dlg.append(h, list, settings, message, alertPanel, row);
+  });
+}

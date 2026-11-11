@@ -19,6 +19,7 @@ import { colName } from './refs.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.js';
+import { setValidation as setValidationXml } from './dvedit.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
  *  `standalone="yes"`). */
@@ -285,6 +286,15 @@ export class Workbook {
    * of its range shown, and its range kept in the sheet's hidden _xlnm._FilterDatabase name (left when it's off, as
    * Excel leaves it).
    */
+  /** Give cells `ranges` of sheet i the data validation `rule` (dvedit.js), or none (null: Clear All). */
+  setValidation(i, ranges, rule) {
+    const part = this._part(i);
+    setValidationXml(part.doc, ranges, rule, this.date1904);
+    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
+  }
+
   setAutoFilter(i, filter) {
     const part = this._part(i);
     const was = part.model.autoFilter;

@@ -133,7 +133,7 @@ function readAutoFilter(el, ns) {
 function readCondFormats(root, ns) {
   const flag = (el, name, dflt = false) => { const v = attr(el, name); return v == null ? dflt : v === '1' || v === 'true'; };
   return kids(root, 'conditionalFormatting', ns).map((cf) => ({
-    ranges: (attr(cf, 'sqref') || '').split(/s+/).map(parseRange).filter(Boolean),
+    ranges: (attr(cf, 'sqref') || '').split(/\s+/).map(parseRange).filter(Boolean),
     rules: kids(cf, 'cfRule', ns).map((r) => {
       const scale = kid(r, 'colorScale', ns);
       return {
@@ -156,7 +156,7 @@ function readCondFormats(root, ns) {
 function readValidations(root, ns) {
   const flag = (el, name) => attr(el, name) === '1' || attr(el, name) === 'true';
   return kids(kid(root, 'dataValidations', ns), 'dataValidation', ns).map((v) => ({
-    ranges: (attr(v, 'sqref') || '').split(/s+/).map(parseRange).filter(Boolean),
+    ranges: (attr(v, 'sqref') || '').split(/\s+/).map(parseRange).filter(Boolean),
     type: attr(v, 'type') || 'none', operator: attr(v, 'operator') || 'between',
     formulas: [kid(v, 'formula1', ns), kid(v, 'formula2', ns)].filter(Boolean).map((f) => f.textContent),
     allowBlank: flag(v, 'allowBlank'), dropDown: !flag(v, 'showDropDown'),

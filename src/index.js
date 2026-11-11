@@ -8,7 +8,7 @@ import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
-import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox, noteBox } from './editor/dialogs.js';
+import { messageBox, unhideBox, numberBox, optionsBox, sortBox, filterBox, pickBox, goToBox, passwordBox, noteBox, validationBox } from './editor/dialogs.js';
 import { setNote, deleteNote } from './ooxml/noteedit.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { goToNames } from './ooxml/goto.js';
@@ -27,6 +27,7 @@ import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
 import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
+import { boxRule } from './ooxml/dvedit.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { mergeLoss } from './ooxml/mergeops.js';
@@ -182,15 +183,23 @@ export function mountXlsxEditor(host, options = {}) {
       const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
       const ref = `${colName(s.ac)}${s.ar + 1}`;
       return noteBox(root, { title: n ? `Edit Note for ${ref}` : `New Note for ${ref}`, author, text: body, at: { x: box.right + 8, y: box.top } }).then((text) => {
-        if (text != null && (n || text !== '')) editing().run('notesChange', (wb, si) => setNote(wb, si, s.ar, s.ac, text, options.author || 'Author'));
+        if (text != null && (n || text !== '')) editing().run('sheetChange', (wb, si) => setNote(wb, si, s.ar, s.ac, text, options.author || 'Author'));
         state.grid.el.focus({ preventScroll: true });
       });
     }
     if (name === 'deleteNote') {
       const s = editing().selection;
-      return editing().run('notesChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
+      return editing().run('sheetChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
     }
     if (name === 'showNote') { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); }
+    if (name === 'validationBox') {
+      // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
+      const s = editing().selection;
+      return validationBox(root, boxRule(ruleAt(state.workbook.sheet(i), s.ar, s.ac), state.workbook.date1904)).then((rule) => {
+        if (rule) editing().run('sheetChange', (wb, si) => wb.setValidation(si, [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], rule === 'clear' ? null : rule));
+        state.grid.el.focus({ preventScroll: true });
+      });
+    }
     if (name === 'goToBox') {
       // (Excel's Go To: a name, a table or a reference; gone to as the Name Box goes.)
       return goToBox(root, goToNames(state.workbook, i)).then((text) => {

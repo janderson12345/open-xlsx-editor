@@ -383,8 +383,9 @@ export function createCommands(ctx) {
       ctx.announce(list.length === 1 ? 'PivotTable refreshed' : `${list.length} PivotTables refreshed`);
       return true;
     },
-    /** A change to the sheet's notes, `run(wb, si)` (noteedit.js setNote, deleteNote), as one step of the history. */
-    notesChange(run) {
+    /** A change to the sheet's notes or rules, `run(wb, si)` (noteedit.js setNote, deleteNote; Workbook
+     *  setValidation), as one step of the history. */
+    sheetChange(run) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const wb = ctx.workbook();
       const before = wb.snapshot();

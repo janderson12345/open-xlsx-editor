@@ -154,6 +154,11 @@ for (const colorScheme of ['light', 'dark']) {
       const dataTab = await axe();
       t.check(!dataTab.length, `${colorScheme}: the Data tab with its Refresh All menu, no axe violations`, dataTab.join('\n     '));
       await page.keyboard.press('Escape');
+      await page.click('.oxe-toolbar button[title="Data Validation..."]');
+      await page.waitForSelector('dialog.oxe-dv-box');
+      const dvBox = await axe();
+      t.check(!dvBox.length && await page.evaluate(() => document.activeElement.tagName === 'SELECT'), `${colorScheme}: the Data Validation box, no axe violations, Allow focused`, dvBox.join(String.fromCharCode(10) + '     '));
+      await page.keyboard.press('Escape');
       await page.click('.oxe-rtab >> text="View"');
       await page.click('.oxe-toolbar button[title="Freeze Panes"]');
       const viewTab = await axe();
