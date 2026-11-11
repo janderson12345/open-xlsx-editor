@@ -9,6 +9,7 @@ import { serialOf } from './functions-text.js';
 import { position } from './functions-lookup.js';
 import { dateParts } from '../ooxml/format.js';
 import { colName } from '../ooxml/refs.js';
+import { sin, cos, tan, TRIG_LIMIT } from './trig.js';
 
 const sorted = (args, ctx) => numbers(args, ctx).sort((a, b) => a - b);
 
@@ -407,9 +408,11 @@ lifted('UNICHAR', (a, ctx) => { const n = Math.trunc(num(a[0], ctx)); if (n < 1 
 // ---- Trigonometry, GCD and LCM, rounding to a multiple
 
 const trig = (names, fn) => lifted(names, (a, ctx) => finite(fn(num(a[0], ctx))));
-trig('SIN', Math.sin);
-trig('COS', Math.cos);
-trig('TAN', Math.tan);
+// (Excel's sine and cosine, trig.js: =SIN(PI()) is 1.22514845490862E-16, =SIN(134217728) #NUM!.)
+const circular = (names, fn) => lifted(names, (a, ctx) => { const x = num(a[0], ctx); if (Math.abs(x) >= TRIG_LIMIT) throw E.num; return finite(fn(x)); });
+circular('SIN', sin);
+circular('COS', cos);
+circular('TAN', tan);
 lifted('ASIN', (a, ctx) => { const x = num(a[0], ctx); if (x < -1 || x > 1) throw E.num; return Math.asin(x); });
 lifted('ACOS', (a, ctx) => { const x = num(a[0], ctx); if (x < -1 || x > 1) throw E.num; return Math.acos(x); });
 trig('ATAN', Math.atan);

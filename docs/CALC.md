@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1134 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1157 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1134 of 1134 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1157 of 1157 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -91,7 +91,9 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       own for a real number; ±i and 0 where the double angle is past the largest number (IMTAN("1+400i") is i).
   - `trig.js`: sine and cosine as Excel works them out. The angle is brought near 0 with the x87's 64-bit π, not the
     true one, so =SIN(PI()) is 1.22514845490862E-16 and =COS(PI()/2) 6.1257422745431E-17 (the true values are
-    1.22464679914735E-16 and 6.12323399573677E-17). From 2^27 on, #NUM!. The complex functions use it.
+    1.22464679914735E-16 and 6.12323399573677E-17). From 2^27 on, #NUM! (=SIN(134217728)). TAN is SIN over COS
+    (=TAN(PI()/2) is 1.63245522776191E+16), COT COS over SIN. SIN, COS, TAN, SEC, CSC, COT and the complex functions
+    use it.
   - Table references (`ooxml/tables.js`): Fruit[Qty] is the column's data rows; [#All], [#Data], [#Headers], [#Totals]
     and two of them together; [[Qty]:[Price]] the columns between; [#This Row] (shown [@Qty]) the formula's own row,
     from any sheet by the row's number, #VALUE! past the table's rows (Excel's answers in test/formulas-excel.json).
@@ -188,8 +190,6 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
   rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
 - **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD), AMORDEGRC and AMORLINC,
   CONVERT, the BESSEL functions and the REGEX functions.
-- **SIN, COS and TAN** don't yet use `trig.js`, so =SIN(PI()) here is the true 1.22464679914735E-16, and =SIN(1E20) a
-  number where Excel's is #NUM!.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.

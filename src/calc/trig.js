@@ -1,7 +1,7 @@
 // Sine and cosine as Excel works them out: the angle brought within π/4 of a multiple of π/2 by the 64-bit π of the
 // x87's extended precision (0xC90FDAA22168C235 × 2^-62), not the true π. So =SIN(PI()) is 1.22514845490862E-16, not
 // 1.22464679914735E-16, and =COS(PI()/2) is 6.1257422745431E-17: measured with Application.Evaluate. Elsewhere the
-// two agree to the last digit. The complex-number functions (functions-complex.js) use these.
+// two agree to the last digit. SIN, COS, TAN, SEC, CSC, COT and the complex-number functions use these.
 
 const PI_L = 0xC90FDAA22168C235n;
 // (π/2 in three parts of 26, 26 and 12 bits, so that k times each, for k below 2^27, is exact.)
@@ -25,3 +25,7 @@ export function cos(x) {
   const { q, r } = reduce(x);
   return q === 0 ? Math.cos(r) : q === 1 ? -Math.sin(r) : q === 2 ? -Math.cos(r) : Math.sin(r);
 }
+/** tan x as sin x over cos x, so =TAN(PI()/2) is 1.63245522776191E+16, as Excel's. */
+export const tan = (x) => sin(x) / cos(x);
+/** Excel's circular functions give #NUM! from 2^27 on (=SIN(134217728), =TAN(-134217728)). */
+export const TRIG_LIMIT = 2 ** 27;

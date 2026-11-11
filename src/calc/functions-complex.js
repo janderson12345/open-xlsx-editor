@@ -5,12 +5,10 @@
 // Registered into functions.js's table; evaluate.js imports this file.
 import { Area, Arr, Union, E, XlError, MISSING, textToNumber, complexPartText } from './values.js';
 import { def, lifted, given, one, cellsIn } from './functions.js';
-import { sin as xsin, cos as xcos } from './trig.js';
+import { sin as xsin, cos as xcos, TRIG_LIMIT } from './trig.js';
 
 /** Excel's smallest normal number: text reading as less (1E-400) is #NUM!, as is text reading as more than the largest. */
 const TINY = 2.2250738585072014e-308;
-/** Excel's circular functions give #NUM! from 2^27 on (=SIN(134217728)). */
-const TRIG_LIMIT = 2 ** 27;
 
 /** A part of a complex number as text: a number as Excel reads one (" 4", "$2", "(2)", "2%", "1,000", "1e3"). */
 function part(s) {

@@ -6,6 +6,7 @@
 import { Area, E, finite, scalar, toText, toBool, matrix } from './values.js';
 import { def, given, num, text, numbers } from './functions.js';
 import { displayFormula } from './tokens.js';
+import { sin, cos, TRIG_LIMIT } from './trig.js';
 
 // ---- Pairs of numbers
 
@@ -178,10 +179,17 @@ def('BINOM.DIST', (a, ctx) => {
 def('SINH', (a, ctx) => finite(Math.sinh(num(a[0], ctx))));
 def('COSH', (a, ctx) => finite(Math.cosh(num(a[0], ctx))));
 def('TANH', (a, ctx) => Math.tanh(num(a[0], ctx)));
-const recip = (f) => (a, ctx) => { const v = f(num(a[0], ctx)); if (v === 0) throw E.div0; return 1 / v; };
-def('SEC', recip(Math.cos));
-def('CSC', recip(Math.sin));
-def('COT', recip(Math.tan));
+// (As Excel's, from trig.js's sine and cosine: =COT(PI()/2) is 6.1257422745431E-17, =SEC(134217728) #NUM!.)
+const ratio = (top, bottom) => (a, ctx) => {
+  const x = num(a[0], ctx);
+  if (Math.abs(x) >= TRIG_LIMIT) throw E.num;
+  const v = bottom(x);
+  if (v === 0) throw E.div0;
+  return top(x) / v;
+};
+def('SEC', ratio(() => 1, cos));
+def('CSC', ratio(() => 1, sin));
+def('COT', ratio(cos, sin));
 const ROMAN = [[1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'], [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'], [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
 def('ROMAN', (a, ctx) => {
   let n = Math.trunc(num(a[0], ctx));

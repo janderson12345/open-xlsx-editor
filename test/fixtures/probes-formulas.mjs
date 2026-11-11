@@ -276,6 +276,9 @@ export const PROBE_FORMULAS = [
   'IMEXP("3.14159265358979i")', 'IMEXP("709.7+i")', 'IMEXP("710")', 'IMLN("3+4i")', 'IMLN("-1")', 'IMLN("0")', 'IMLOG10("0.001+2i")', 'IMLOG2("-8")',
   'IMPOWER("2+3i",3)', 'IMPOWER("i",2)', 'IMPOWER("-8",1/3)', 'IMPOWER("1.5-2i",2.5)', 'IMPOWER("-3+i",-3)', 'IMPOWER("0",0)', 'IMPOWER("2",1024)',
   'IMPOWER("2",TRUE)', 'IMPOWER("2j",2)', 'IMSQRT("-4")', 'IMSQRT("i")', 'IMSQRT("3-4i")',
+  'SIN(PI())', 'COS(PI()/2)', 'SIN(2*PI())', 'COS(3*PI()/2)', 'SIN(1000*PI())', 'SIN(1E8)', 'COS(12345.678)', 'SIN(134217727)',
+  'SIN(134217728)', 'COS(-134217728)', 'SIN(1E300)', 'TAN(PI()/2)', 'TAN(PI())', 'TAN(1.2)', 'TAN(1E8)', 'TAN(134217728)', 'SEC(PI()/2)',
+  'CSC(PI())', 'COT(PI()/2)', 'COT(PI())', 'COT(0)', 'SEC(134217728)', 'COT(2.2)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
