@@ -36,7 +36,7 @@ insides:
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes, tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
 | `src/ooxml/pivot.js` | PivotTables: read from their parts, refreshed from their source as Excel's Refresh does (cache, records, items, compact layout); docs/PIVOT.md. |
-| `src/editor/datatab.js` | The Data tab: Refresh All and Refresh. |
+| `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |
 | `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, the proposal left to edit on one cell (docs/AUTOSUM.md). |
 | `src/ooxml/validation.js` | Data validation judged as Excel judges it: blanks, types, Excel's comparisons, text length, typed and cell lists, custom formulas; a list's choices (docs/VALIDATION.md). |

@@ -837,6 +837,10 @@ check(await shown(5, 1) === '168' && await shown(6, 0) === 'Grand Total', 'Ctrl+
 await page.click('.oxe-rtab >> text=Data');
 await page.click('.oxe-toolbar button[title="Refresh All (Ctrl+Alt+F5)"]');
 check(await pivotShown() === '150,Central,100,434', 'Data > Refresh All: refreshed again', await pivotShown());
+// Data > Sort & Filter: Filter on the source sheet turns the filter on over its table of data.
+await page.evaluate(() => { window.oxe.showSheet('Src'); window.oxe.select('B3'); });
+await page.click('.oxe-toolbar button[title="Filter (Ctrl+Shift+L)"]');
+check(await page.evaluate(() => { const f = window.oxe.workbook.sheet(window.oxe.sheetIndex).autoFilter; return f && `${f.r0},${f.c0},${f.r1},${f.c1}`; }) === '0,0,18,4', 'Data > Filter: the filter on over A1:E19', await page.evaluate(() => JSON.stringify(window.oxe.workbook.sheet(window.oxe.sheetIndex).autoFilter)));
 await page.click('.oxe-rtab >> text=Home');
 
 check(!errors.length, 'no page errors', errors.join('\n     '));
