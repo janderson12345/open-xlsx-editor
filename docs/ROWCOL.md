@@ -103,11 +103,32 @@ so Excel kept row 3 and deleted only 4:14.
 Not measured: a table's totals row (deleting it without the rest of the table is refused), and calculated columns
 (Excel fills their formula into rows inserted inside the table; the editor doesn't yet).
 
+## PivotTables
+
+Measured by `tools/excel-compare/excel-pivot-lines.ps1` with a pivot table at Pivot!C5 (rows Region, Sum of Units)
+of Src!A1:E19: 18 steps on the pivot's sheet and 10 on its source's (`src/ooxml/anchors.js`).
+
+| What | As Excel does it |
+|---|---|
+| Lines before the pivot | It moves. |
+| Lines after it | It stays. |
+| All of it deleted | It is deleted. Its cache stays in the workbook. |
+| Lines through it, cells shifted through part of its rows or columns | Refused: "We can't make this change for the selected cells because it will affect a PivotTable..." |
+| Cells shifted across its whole width (or height) | It moves. |
+| Lines on the source's sheet | The cache's source range follows, as a reference does: it grows, shrinks and moves. When all of it is deleted, Excel leaves it as it was. |
+
+Results: 28 of 28 steps match Excel (`test/pivot-lines.test.js` against `test/pivot-lines-excel.json`): the
+pivot's location, its source, and a value beside it. The editor's 22 results opened in Excel read back 22 of 22 as
+Excel did them. Excel's own refresh of each moved pivot left it where it was.
+
+One step Excel takes its own way: a cell inserted inside the pivot, shifting down, leaves Excel's pivot with an empty
+cell in it. The editor refuses it, as it refuses any cells shifted through part of a pivot.
+
 ## Not yet
 
-A sheet with pivot tables, slicers or timelines is refused ("Rows and columns can't be inserted or
+A sheet with slicers or timelines is refused ("Rows and columns can't be inserted or
 deleted yet on a sheet with...", or "Cells can't..."): their ranges aren't moved yet. Also missing: page
-breaks, pivot caches' source ranges on other sheets, and the Insert Options button (format from below, clear
+breaks and the Insert Options button (format from below, clear
 formatting). One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is
 `=SUM(A3:A3)` in Excel after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to
 `=SUM(D3:D3)`.

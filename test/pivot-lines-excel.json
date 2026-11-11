@@ -1,0 +1,282 @@
+[
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "1:1",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C6:D10",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A2"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "6:7",
+        "shift":  null,
+        "refused":  "We can\u0027t make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.",
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "20:20",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "1:1",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C4:D8",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  null
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "6:7",
+        "shift":  null,
+        "refused":  "We can\u0027t make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.",
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "1:12",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  null,
+        "source":  null,
+        "beside":  null
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "1:4",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C1:D5",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  null
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "A:A",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "D5:E9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "B1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "D:D",
+        "shift":  null,
+        "refused":  "We can\u0027t make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.",
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "A:A",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "B5:C9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  null
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "D:D",
+        "shift":  null,
+        "refused":  "We can\u0027t make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.",
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "A:F",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  null,
+        "source":  null,
+        "beside":  null
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "F:F",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "C6",
+        "shift":  "down",
+        "refused":  null,
+        "pivot":  "C5:D10",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "A2:H2",
+        "shift":  "down",
+        "refused":  null,
+        "pivot":  "C6:D10",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "A6",
+        "shift":  "right",
+        "refused":  "We can\u0027t make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.",
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "insert",
+        "range":  "F6",
+        "shift":  "right",
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Pivot",
+        "do":  "delete",
+        "range":  "C12:D12",
+        "shift":  "up",
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "insert",
+        "range":  "5:5",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R20C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "insert",
+        "range":  "1:1",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R2C1:R20C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "delete",
+        "range":  "5:6",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R17C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "insert",
+        "range":  "20:20",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "delete",
+        "range":  "19:19",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R18C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "insert",
+        "range":  "C:C",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C6",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "delete",
+        "range":  "C:C",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C4",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "insert",
+        "range":  "A:A",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C2:R19C6",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "delete",
+        "range":  "1:19",
+        "shift":  null,
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    },
+    {
+        "sheet":  "Src",
+        "do":  "insert",
+        "range":  "B5",
+        "shift":  "down",
+        "refused":  null,
+        "pivot":  "C5:D9",
+        "source":  "Src!R1C1:R19C5",
+        "beside":  "A1"
+    }
+]

@@ -321,3 +321,86 @@ export function deadTableRefs(text, dead, tokenize) {
   }
   return out + text.slice(last);
 }
+
+// --- PivotTables -----------------------------------------------------------------------------------------------------
+// As Excel does it (tools/excel-compare/excel-pivot-lines.ps1): lines before a pivot move it, lines after it leave it,
+// all of it deleted deletes it (its cache stays, as a workbook's caches may outlive their pivots); lines through it,
+// and cells shifted through part of it, are refused in Excel's words. Its cache's source range follows its source
+// sheet's lines as a reference does, and stays as it was when all of it is deleted (Excel keeps it).
+
+export const PIVOT_LINE_MESSAGE = "We can't make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.";
+
+const areaOf = (ref) => {
+  const m = /^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/.exec(ref || '');
+  if (!m) return null;
+  const col = (s) => [...s].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+  return { r0: Number(m[2]) - 1, c0: col(m[1]), r1: Number(m[4] ?? m[2]) - 1, c1: col(m[3] ?? m[1]) };
+};
+const refOf = ({ r0, c0, r1, c1 }) => {
+  const name = (r, c) => { let s = ''; for (let k = c + 1; k > 0; k = Math.floor((k - 1) / 26)) s = String.fromCharCode(65 + ((k - 1) % 26)) + s; return `${s}${r + 1}`; };
+  return r0 === r1 && c0 === c1 ? name(r0, c0) : `${name(r0, c0)}:${name(r1, c1)}`;
+};
+
+/** What a change does to each pivot table on sheet si: [{ p, area, shift } or { p, gone }]; Excel's refusals through
+ *  `refuse(message)`, which throws. `pivots`: readPivots(wb). */
+export function planPivots(wb, si, axis, at, n, band, refuse, pivots) {
+  const plans = [];
+  for (const p of pivots) {
+    if (p.si !== si) continue;
+    const area = areaOf(/<location\b[^>]*\sref="([^"]+)"/.exec(wb.pkg.text(p.path) || '')?.[1]);
+    if (!area) continue;
+    const [l0, l1, p0, p1] = axis === 'row' ? [area.r0, area.r1, area.c0, area.c1] : [area.c0, area.c1, area.r0, area.r1];
+    if (band) {
+      const touched = p1 >= band[0] && p0 <= band[1] && l1 >= at;
+      if (!touched) continue;
+      if (band[0] > p0 || band[1] < p1) refuse(PIVOT_LINE_MESSAGE);
+    }
+    if (n > 0) {
+      if (at <= l0) plans.push({ p, area, shift: n });
+      else if (at <= l1) refuse(PIVOT_LINE_MESSAGE);
+      continue;
+    }
+    const last = at - n - 1;
+    if (at > l1) continue;
+    if (last < l0) plans.push({ p, area, shift: n });
+    else if (at <= l0 && last >= l1) plans.push({ p, gone: true });
+    else refuse(PIVOT_LINE_MESSAGE);
+  }
+  return plans;
+}
+
+/** Make the plans (planPivots): each pivot's location moved, a deleted one's part and relationship removed. */
+export function applyPivots(wb, si, axis, plans) {
+  const pkg = wb.pkg;
+  for (const plan of plans) {
+    const { p } = plan;
+    if (plan.gone) {
+      const rel = pkg.readRels(wb.sheets[si].path).find((r) => r.target === p.path);
+      if (rel) dropRel(pkg, wb.sheets[si].path, rel.id);
+      pkg.removeTree(p.path);
+      continue;
+    }
+    const a = { ...plan.area };
+    if (axis === 'row') { a.r0 += plan.shift; a.r1 += plan.shift; } else { a.c0 += plan.shift; a.c1 += plan.shift; }
+    pkg.setText(p.path, pkg.text(p.path).replace(/(<location\b[^>]*\sref=")[^"]*"/, `$1${refOf(a)}"`));
+  }
+}
+
+/** Every pivot cache whose source is a range of the sheet named `sheet`: its range as `move(area)` gives it (null:
+ *  all of it deleted, left as it was). */
+export function movePivotSources(wb, sheet, move) {
+  const pkg = wb.pkg;
+  const unescape = (s) => s.replace(/&apos;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  for (const path of Object.keys(pkg.files).filter((k) => /^xl\/pivotCache\/pivotCacheDefinition[^/]*\.xml$/i.test(k))) {
+    const text = pkg.text(path);
+    const out = text.replace(/<worksheetSource\b[^>]*\/>/, (el) => {
+      const name = /\ssheet="([^"]*)"/.exec(el)?.[1];
+      const ref = /\sref="([^"]*)"/.exec(el)?.[1];
+      if (name == null || ref == null || unescape(name).toLowerCase() !== sheet.toLowerCase()) return el;
+      const area = areaOf(ref);
+      const next = area && move(area);
+      return next ? el.replace(` ref="${ref}"`, ` ref="${refOf(next)}"`) : el;
+    });
+    if (out !== text) pkg.setText(path, out);
+  }
+}

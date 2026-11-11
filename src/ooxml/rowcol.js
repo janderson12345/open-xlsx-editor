@@ -4,8 +4,8 @@
 // follows (tokens.js shiftRefs), defined names and chart series too. New rows take the format of the row above, new
 // columns the format and width of the column to their left. Afterwards the sheet is read again and the workbook worked
 // out again. Notes and threaded comments go with their cells, pictures, charts and shapes with whole rows and
-// columns, tables grown, narrowed, moved or deleted (anchors.js). A sheet with pivot tables, slicers or timelines is
-// refused for now: their positions aren't moved yet.
+// columns, tables grown, narrowed, moved or deleted, pivot tables moved or deleted and pivot caches' sources followed
+// (anchors.js). A sheet with slicers or timelines is refused for now: their positions aren't moved yet.
 //
 // Inserting and deleting cells (the rest of their columns shifting down or up, or of their rows right or left) is the
 // same change limited to a band of columns (or rows): changeLines's `band`, docs/ROWCOL.md.
@@ -15,17 +15,18 @@ import { readSheet } from './sheet.js';
 import { pinRefs, forgetRows, setCellXml } from './sheetedit.js';
 import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tokens.js';
 import { SheetError, mapFormulas } from './sheetops.js';
-import { moveNotes, moveDrawings, planTables, applyTables, deadTableRefs, keepTableRow } from './anchors.js';
+import { moveNotes, moveDrawings, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
+import { readPivots } from './pivot.js';
 
 export const ROWCOL_MESSAGES = {
   offSheet: 'To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet. Select another location in which to insert new cells, or delete data from the end of your worksheet.',
   array: "You can't change part of an array.",
-  parts: "Rows and columns can't be inserted or deleted yet on a sheet with pivot tables, slicers or timelines.",
-  cellParts: "Cells can't be inserted or deleted yet on a sheet with pivot tables, slicers or timelines.",
+  parts: "Rows and columns can't be inserted or deleted yet on a sheet with slicers or timelines.",
+  cellParts: "Cells can't be inserted or deleted yet on a sheet with slicers or timelines.",
   unmerge: 'This operation will cause some merged cells to unmerge. Do you wish to continue?',
 };
 /** Relationships of a sheet whose parts hold positions this doesn't move yet. */
-const ANCHORED = /\/(pivotTable|slicer|timeline)$/;
+const ANCHORED = /\/(slicer|timeline)$/;
 
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
@@ -317,6 +318,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   if (split.length && !unmerge) throw Object.assign(new SheetError(ROWCOL_MESSAGES.unmerge), { ask: true });
   // (Tables first: a change Excel refuses for one is refused before anything moves.)
   const tables = planTables(wb, si, axis, at, n, band, (message) => { throw new SheetError(message); });
+  const pivots = planPivots(wb, si, axis, at, n, band, (message) => { throw new SheetError(message); }, readPivots(wb));
   const info = wb.sheets[si];
   const { doc } = wb._part(si);
   // Formulas first, while every cell is where it was (shared ones on this sheet written out cell by cell).
@@ -333,6 +335,9 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   // Tables: their ranges, columns and header names; references to what was deleted of them made #REF!.
   const dead = applyTables(wb, si, axis, tables, doc, setCellXml);
   for (const name of new Set(dead.map((d) => d.table))) mapFormulas(wb, (text) => deadTableRefs(text, dead, tokenize), { name });
+  // Pivot tables on the sheet moved (or gone); every pivot cache reading the sheet, its source range as a reference.
+  applyPivots(wb, si, axis, pivots);
+  movePivotSources(wb, info.name, (area) => shiftRange(area, axis, at, n, band));
   // The sheet read again from its moved XML, and everything worked out again.
   wb._parsed.set(info, { doc, model: readSheet(doc, wb.sharedStrings) });
   wb.dirty.add(info.path);

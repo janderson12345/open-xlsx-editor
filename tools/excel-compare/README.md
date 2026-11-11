@@ -61,6 +61,10 @@ Notes, pictures, charts and shapes when rows and columns move: `anchor-cases.mjs
 `anchors-ours.mjs <folder> [--table]` with `excel-anchors-check.ps1 <folder> <out.json>` has Excel read back the
 editor's results (docs/ROWCOL.md).
 
+PivotTables when rows and columns move: `excel-pivot-lines.ps1 <pivot-cases.json> <out.json>` (nothing saved), and
+`pivot-lines-ours.mjs <folder>` with `excel-pivot-lines-check.ps1 <folder> <out.json>` for Excel reading back the
+editor's results.
+
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
 `pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md).
