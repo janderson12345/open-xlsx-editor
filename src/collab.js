@@ -7,18 +7,25 @@
 // Anything else (formats, merges, rows and columns inserted or deleted, sheets, filters, sizes) is shared as the whole
 // workbook: the editor that made it saves and publishes the bytes, and the others reopen them, on the sheet they were
 // on. Freeze panes and zoom stay each person's own, as in Excel. Undo takes back this editor's own changes.
+//
+// With the provider's awareness, each editor's selection goes to the others, who draw it on the grid in that person's
+// colour with their name (collab-peers.js).
+import { shareCursors } from './collab-peers.js';
+
 const ORIGIN = 'oxe-local';
 
 /**
  * Shares the workbook open in `api` (mountXlsxEditor's) through `ydoc`, the Y.Doc your provider syncs. In a room that
  * has a workbook, that one is opened here; in an empty room, the one open here becomes the room's. `ready`: a promise
  * that settles once the provider has synced (y-websocket: `new Promise((r) => provider.once('synced', r))`), waited
- * for before deciding which. `awareness` (the provider's) gets `user` ({ name, color }). Opening another file in the
- * editor afterwards makes it the room's. Returns { stop() }.
+ * for before deciding which. `awareness` (the provider's) gets `user` ({ name, color }) and this editor's cursor, and
+ * the others' cursors are drawn from it. Opening another file in the editor afterwards makes it the room's. Returns
+ * { stop() }.
  */
 export async function connectWorkbook(api, ydoc, { ready = null, awareness = null, user = { name: 'Author', color: '#2b6cdf' } } = {}) {
   await ready;
   const files = ydoc.getMap('oxe-files');
+  let cursors = null; // (others' cursors, once the room's workbook is open here)
   const cells = ydoc.getMap('oxe-cells');
   if (awareness) awareness.setLocalStateField('user', user);
   const open = api.open;
@@ -61,6 +68,7 @@ export async function connectWorkbook(api, ydoc, { ready = null, awareness = nul
       if (sel) api.command('select', sel.ar, sel.ac);
     } finally { quiet = false; }
     take([...cells.keys()]);
+    cursors?.redraw();
   }
 
   /** Publish the workbook here as the room's: its bytes, the contents so far in them. */
@@ -76,6 +84,7 @@ export async function connectWorkbook(api, ydoc, { ready = null, awareness = nul
 
   if (files.get('xlsx')) openRoom();
   else publish();
+  if (awareness) cursors = shareCursors(api, awareness);
 
   const onFiles = (e, tr) => { if (tr.origin !== ORIGIN && e.keysChanged.has('xlsx')) openRoom(); };
   const onCells = (e, tr) => {
@@ -110,6 +119,7 @@ export async function connectWorkbook(api, ydoc, { ready = null, awareness = nul
       files.unobserve(onFiles);
       cells.unobserve(onCells);
       stopEdits();
+      cursors?.stop();
       api.open = open;
     },
   };

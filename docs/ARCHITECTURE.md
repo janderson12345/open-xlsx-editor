@@ -33,6 +33,7 @@ insides:
 | `src/ooxml/headerfooter.js` | Headers and footers: Excel's codes read into sections and runs, fields filled in per page (docs/PRINT.md). |
 | `src/pdf.js` | PDF export from the print layout (pdf-lib, fontkit): fills, borders and cell text at the layout's places, clipped to their cells; docs/PDF.md. |
 | `src/collab.js` | Co-editing over Yjs: `connectWorkbook(api, ydoc)`; cell contents shared cell by cell from `api.onEdit`, made with the `remoteContents` command; any other change shared as the workbook's bytes; docs/COLLAB.md. |
+| `src/collab-peers.js` | Others' cursors in a co-edited workbook: this editor's selection put in the provider's awareness (throttled, from `api.onSelect`), the others' read back for the sheet shown and given to the grid; each person's colour and the flag's text colour by contrast. |
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes, tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
 | `src/ooxml/pivotnew.js` | A new PivotTable (Insert > PivotTable), its parts written as Excel writes a new one, then laid out by pivot.js's refresh; docs/PIVOT.md. |
@@ -82,6 +83,7 @@ insides:
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
 | `src/editor/selection.js` | The selection (active cell and range, and with Ctrl the other ranges) and its overlay, with the fill handle and the outline of a fill being dragged; view state only. |
+| `src/editor/peers.js` | Others' cursors in a co-edited workbook drawn in the grid's overlay, under this editor's selection: the active cell outlined in the person's colour, their ranges shaded, their name on a flag. |
 | `src/editor/navigate.js` | Moving as Excel does: a step (over merged ranges), Ctrl+arrow to the edges of blocks, Ctrl+End. |
 | `src/editor/findbar.js` | The Find and Replace bar under the ribbon (Ctrl+F, Ctrl+H), from open-docx-editor's, with Excel's options. |
 | `src/editor/ribbonkit.js` | The ribbon's building blocks: buttons, toggles, split buttons, groups, the one drop-down menu, select fields, line icons. From open-docx-editor. |

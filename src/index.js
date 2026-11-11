@@ -62,7 +62,7 @@ export function mountXlsxEditor(host, options = {}) {
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { onEdit: new Set(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
+  const state = { onEdit: new Set(), onSelect: new Set(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
     features: { ...(options.features || {}) }, toolbar: options.toolbar !== false };
   const at = (ref) => {
     const p = typeof ref === 'string' ? parseRef(ref) : ref;
@@ -265,7 +265,7 @@ export function mountXlsxEditor(host, options = {}) {
           autoSum: (fn) => act('autoSum', fn),
           filterMenu: () => filterMenu() || listMenu(),
           askInvalid: (info) => askInvalid(info),
-          selectionShown: () => showValidation(),
+          selectionShown: () => { for (const f of [...state.onSelect]) f(); return showValidation(); },
           goToBox: () => act('goToBox'),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           editNote: () => act('editNote'),
@@ -343,6 +343,9 @@ export function mountXlsxEditor(host, options = {}) {
     /** Call `fn` after each edit made here (not one from another editor of a shared workbook): { cells: [{ si,
      *  contents }] } for cell contents alone, { book: true } for anything else. Returns a function that stops it. */
     onEdit(fn) { state.onEdit.add(fn); return () => state.onEdit.delete(fn); },
+    /** Call `fn` each time the selection here is shown anew (moved, extended, another sheet shown). Returns a function
+     *  that stops it. */
+    onSelect(fn) { state.onSelect.add(fn); return () => state.onSelect.delete(fn); },
     /** Run a named command (commands.js) with its arguments. */
     command: (name, ...args) => editing().run(name, ...args),
     get selection() { return state.editing ? state.editing.commands.selection : null; },

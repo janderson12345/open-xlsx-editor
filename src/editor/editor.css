@@ -746,6 +746,44 @@
   background: transparent;
 }
 
+/* Other people's cursors in a co-edited workbook (peers.js), as Excel for the web shows co-authors: the active cell
+   outlined in the person's colour, their ranges lightly shaded, their name on a flag at the cell's top-right corner.
+   The colour (--oxe-peer) and the flag's text colour (--oxe-peer-ink: black or white, whichever contrasts more) are
+   set per person. */
+.oxe-peer-range,
+.oxe-peer-active {
+  position: absolute;
+  box-sizing: border-box;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x) - 1px);
+  top: calc(var(--oxe-y) - 1px);
+  width: calc(var(--oxe-w) + 1px);
+  height: calc(var(--oxe-h) + 1px);
+}
+.oxe-peer-range {
+  background: color-mix(in srgb, var(--oxe-peer) 12%, transparent);
+  border: 1px solid var(--oxe-peer);
+}
+.oxe-peer-active {
+  border: 2px solid var(--oxe-peer);
+}
+.oxe-peer-flag {
+  position: absolute;
+  bottom: 100%;
+  right: -2px;
+  max-width: 16em;
+  padding: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 11px/16px var(--oxe-ui-font);
+  background: var(--oxe-peer);
+  color: var(--oxe-peer-ink);
+}
+.oxe-peer-flag-below {
+  top: 100%;
+  bottom: auto;
+}
+
 /* The cells copied or cut, until pasted or let go (Esc): a dashed outline that moves, as Excel's does. */
 .oxe-clip {
   position: absolute;
