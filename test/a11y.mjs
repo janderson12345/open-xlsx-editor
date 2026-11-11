@@ -179,6 +179,17 @@ for (const colorScheme of ['light', 'dark']) {
       const gotoSpecialAxe = await axe();
       t.check(!gotoSpecialAxe.length && await page.evaluate(() => document.activeElement.type === 'radio'), `${colorScheme}: the Go To Special box, no axe violations, a choice focused`, gotoSpecialAxe.join(String.fromCharCode(10) + '     '));
       await page.keyboard.press('Escape');
+      // (Insert > PivotTable: its source box, then its fields box, from A1:B3 typed in.)
+      await page.click('.oxe-rtab >> text=Insert');
+      await page.click('.oxe-toolbar button[title="PivotTable"]');
+      await page.waitForSelector('dialog.oxe-pivot-box');
+      const pivotSourceAxe = await axe();
+      await page.fill('dialog.oxe-pivot-box input[type="text"]', 'A1:B3');
+      await page.click('dialog.oxe-pivot-box >> button:text-is("OK")');
+      await page.waitForSelector('dialog.oxe-pivot-fields');
+      const pivotFieldsAxe = await axe();
+      t.check(!pivotSourceAxe.length && !pivotFieldsAxe.length, `${colorScheme}: Insert > PivotTable's two boxes, no axe violations`, [...pivotSourceAxe, ...pivotFieldsAxe].join(String.fromCharCode(10) + '     '));
+      await page.keyboard.press('Escape');
       await page.click('.oxe-rtab >> text="View"');
       await page.click('.oxe-toolbar button[title="Freeze Panes"]');
       const viewTab = await axe();

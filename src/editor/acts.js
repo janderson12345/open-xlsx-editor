@@ -7,6 +7,7 @@ import { CF_PRESETS } from '../ooxml/cfedit.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
 import { goToNames } from '../ooxml/goto.js';
 import { specialBox } from './specialbox.js';
+import { insertPivot } from './pivotbox.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
@@ -115,6 +116,11 @@ export function createActs(env) {
         if (text) editing().run('nameBox', text);
         state.grid.el.focus({ preventScroll: true });
       });
+    }
+    if (name === 'pivotBox') {
+      // (Insert > PivotTable: its boxes, then the PivotTable made.)
+      const s = editing().selection;
+      return insertPivot(root, state.workbook, i, { r: s.ar, c: s.ac }, (...a) => editing().run(...a)).then((done) => { state.grid.el.focus({ preventScroll: true }); return done; });
     }
     if (name === 'specialBox') {
       // (Excel's Go To Special box; its choice found and selected.)

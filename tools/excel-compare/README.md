@@ -67,7 +67,8 @@ editor's results.
 
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
-`pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md).
+`pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md);
+`pivotnew-ours.mjs <folder>` with the same check, the editor's new PivotTables.
 
 Go To Special: `special-cases.mjs` makes the cases, `excel-special.ps1 <cases.json> test/fixtures/special.xlsx
 test/special-excel.json` has Excel find each (the selection made, the choice asked as the box asks it, the result

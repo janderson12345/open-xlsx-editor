@@ -1218,6 +1218,27 @@
   gap: 4px 24px;
 }
 
+/* Insert > PivotTable's boxes (pivotbox.js): the source and where it goes; the fields, each to an area. */
+.oxe-pivot-box .oxe-dialog-field:disabled {
+  opacity: 0.55;
+}
+.oxe-pivot-table {
+  border-collapse: collapse;
+  margin: 0 0 8px;
+}
+.oxe-pivot-table th,
+.oxe-pivot-table td {
+  padding: 3px 8px 3px 0;
+  text-align: left;
+  font-weight: normal;
+}
+.oxe-pivot-table thead th {
+  font-weight: 600;
+}
+.oxe-pivot-why:empty {
+  display: none;
+}
+
 /* Excel's Go To Special box (specialbox.js): its choices in two columns, each one's options indented under it. */
 .oxe-special-choices {
   margin: 0 0 10px;

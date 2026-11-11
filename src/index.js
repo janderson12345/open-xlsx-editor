@@ -21,6 +21,7 @@ import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
 import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
+import { insertTab } from './editor/inserttab.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { selectionStats } from './ooxml/stats.js';
@@ -179,6 +180,7 @@ export function mountXlsxEditor(host, options = {}) {
     state.ribbon = createRibbon(el, {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
+        Insert: (kit) => insertTab(kit, { act }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),

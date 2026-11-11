@@ -906,6 +906,35 @@ const special = await page.evaluate(() => {
 });
 check(special.numbers > 0 && special.wrong === 0, 'Go To Special > Constants, Numbers: the number constants selected, nothing else', JSON.stringify(special));
 
+// Insert > PivotTable: a small table on a sheet of its own, Region to Rows and Units to Values; the pivot on a new
+// sheet at A3, its items sorted, as Excel makes one.
+await page.evaluate(() => {
+  window.oxe.command('insertSheet');
+  const data = [['Region', 'Units'], ['South', 5], ['North', 7], ['South', 3], ['East', 4], ['North', 1]];
+  data.forEach((row, r) => row.forEach((v, c) => window.oxe.command('setValue', r, c, v)));
+  window.oxe.select('A1');
+});
+const sourceSheet = await page.evaluate(() => window.oxe.workbook.sheets[window.oxe.sheetIndex].name);
+await page.click('.oxe-rtab >> text=Insert');
+await ribbon('PivotTable', async () => {
+  await page.waitForSelector('dialog.oxe-pivot-box');
+  const guess = await page.inputValue('dialog.oxe-pivot-box input[type="text"]');
+  check(guess === `${sourceSheet}!$A$1:$B$6`, 'Insert > PivotTable: the table round the active cell offered as the source', guess);
+  await page.click('dialog.oxe-pivot-box >> button:text-is("OK")');
+  await page.waitForSelector('dialog.oxe-pivot-fields');
+  await page.selectOption('dialog.oxe-pivot-fields select[aria-label="Region: area"]', 'rows');
+  await page.selectOption('dialog.oxe-pivot-fields select[aria-label="Units: area"]', 'values');
+  await page.click('dialog.oxe-pivot-fields >> button:text-is("OK")');
+});
+const madePivot = await page.evaluate(() => {
+  const sh = window.oxe.workbook.sheet(window.oxe.sheetIndex);
+  const out = [];
+  for (let r = 2; r <= 6; r++) out.push([0, 1].map((c) => sh.cells.get(r)?.get(c)?.v ?? '').join('='));
+  return { sheet: window.oxe.workbook.sheets[window.oxe.sheetIndex].name, cells: out.join(' ') };
+});
+check(madePivot.sheet !== sourceSheet && madePivot.cells === 'Row Labels=Sum of Units East=4 North=8 South=8 Grand Total=20', 'PivotTable made on a new sheet: Row Labels, East, North, South, Grand Total 20', JSON.stringify(madePivot));
+await page.click('.oxe-rtab >> text=Home');
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

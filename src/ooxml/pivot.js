@@ -202,10 +202,12 @@ function sharedAttrs(values, shared) {
 
 /**
  * Refresh the pivot tables of the cache of pivot `p` (readPivots) from its source, as Excel's Refresh does. Returns
- * { changes: [{ si, contents }] } for the cells (the caller makes them, for its history), having rewritten the cache,
- * the records and each table's location and items; or { error } with Excel's words, nothing changed.
+ * { changes: [{ si, contents, area, labels }] } for the cells (the caller makes them, for its history; `area` the
+ * table's new location, `labels` its row labels' range or null), having rewritten the cache, the records and each
+ * table's location and items; or { error } with Excel's words, nothing changed. `fresh`: a PivotTable just made
+ * (pivotnew.js), whose items Excel lists sorted, as Sort A to Z would, though the field isn't marked sorted.
  */
-export function refreshPivot(wb, p) {
+export function refreshPivot(wb, p, { fresh = false } = {}) {
   const pkg = wb.pkg;
   const cacheText = pkg.text(p.cachePath);
   const cacheRoot = pkg.xml(p.cachePath).documentElement;
@@ -244,7 +246,7 @@ export function refreshPivot(wb, p) {
   });
   const sharedIndex = shared.map((s) => s && new Map(s.map((v, k) => [keyOf(v), k])));
   const edits = [];
-  for (const t of tables) edits.push(layoutTable(wb, t, records, shared, sharedIndex, oldShared));
+  for (const t of tables) edits.push(layoutTable(wb, t, records, shared, sharedIndex, oldShared, fresh));
   // The cache: shared items, the record count; the records.
   let cacheOut = cacheText.replace(/ recordCount="\d+"/, ` recordCount="${records.length}"`);
   let k = 0;
@@ -265,7 +267,7 @@ export function refreshPivot(wb, p) {
 }
 
 /** One table laid out again: its part rewritten, and the cell changes of its sheet returned ({ si, contents }). */
-function layoutTable(wb, t, records, shared, sharedIndex, oldShared) {
+function layoutTable(wb, t, records, shared, sharedIndex, oldShared, fresh = false) {
   const def = t.def;
   // Each field's items in the order shown: the old ones still in the data, then new ones as they first come; sorted
   // when the field sorts.
@@ -280,7 +282,7 @@ function layoutTable(wb, t, records, shared, sharedIndex, oldShared) {
     }
     for (const v of shared[i]) if (!keys.includes(keyOf(v))) keys.push(keyOf(v));
     const values = keys.map((key) => shared[i][sharedIndex[i].get(key)]);
-    if (f.sortType === 'ascending') values.sort(compareItems);
+    if (f.sortType === 'ascending' || (fresh && f.sortType !== 'descending')) values.sort(compareItems);
     if (f.sortType === 'descending') values.sort((a, b) => compareItems(b, a));
     return values;
   });
@@ -368,10 +370,14 @@ function layoutTable(wb, t, records, shared, sharedIndex, oldShared) {
     return field.endsWith('/>') ? `${field.slice(0, -2)}>${items}</pivotField>` : field.replace(/>/, `>${items}`);
   });
   const block = (name, list) => `<${name} count="${list.length}">${list.join('')}</${name}>`;
-  for (const [name, list, after] of [['rowItems', rowItems, /<\/rowFields>|<\/pivotFields>/], ['colItems', colItems, /<\/colFields>|<\/rowItems>/]]) {
+  // (Where a part has none yet, as a new one hasn't: after the element the schema puts first among those there.)
+  for (const [name, list, after] of [['rowItems', rowItems, ['</rowFields>', '</pivotFields>']], ['colItems', colItems, ['</colFields>', '</rowItems>', '</rowFields>', '</pivotFields>']]]) {
     const re = new RegExp(`<${name}\\b[^>]*?(?:/>|>[\\s\\S]*?</${name}>)`);
     if (re.test(text)) text = text.replace(re, block(name, list));
-    else text = text.replace(after, (m) => `${m}${block(name, list)}`);
+    else {
+      const end = after.find((tag) => text.includes(tag));
+      text = text.replace(end, `${end}${block(name, list)}`);
+    }
   }
   wb.pkg.setText(t.path, text);
   // The cells: the new layout's, and the old location's emptied where the new one has nothing.
@@ -391,6 +397,7 @@ function layoutTable(wb, t, records, shared, sharedIndex, oldShared) {
       if (!same || (cell && cell.f != null)) contents.push({ r, c, value: v });
     }
   }
-  return { si: t.si, contents };
+  const labels = rows.length ? { r0: area.r0 + firstDataRow, c0: area.c0, r1: area.r1, c1: area.c0 } : null;
+  return { si: t.si, contents, area, labels };
 }
 
