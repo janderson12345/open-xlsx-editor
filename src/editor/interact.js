@@ -8,6 +8,7 @@ import { createCommands } from './commands.js';
 import { createCellEditor } from './celleditor.js';
 import { createFormulaBar } from './formulabar.js';
 import { createPointing } from './pointing.js';
+import { attachFunctionTip } from './fntip.js';
 import { announce } from './live.js';
 import { refName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
@@ -50,6 +51,8 @@ export function attachEditing(root, ctx) {
     grid,
     onKey: (e) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'PageDown' || e.key === 'PageUp') && pointing.ready) { cmd.run('nextSheet', e.key === 'PageDown' ? 1 : -1); return true; }
+      // (Shift+F3: Insert Function, its choice typed at the caret.)
+      if (e.key === 'F3' && e.shiftKey && !e.ctrlKey && !e.altKey && ctx.insertFunction) { ctx.insertFunction(); return true; }
       return pointing.key(e);
     },
     onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
@@ -62,6 +65,8 @@ export function attachEditing(root, ctx) {
     },
     onCancel: () => view.focus({ preventScroll: true }),
   });
+  // (Inside a function's parentheses, its syntax under the cell, as Excel shows it.)
+  attachFunctionTip(editor.el, grid.overlay);
   cmd = createCommands({
     ...ctx,
     announce,
@@ -178,6 +183,7 @@ export function attachEditing(root, ctx) {
     else if (key === 'F5' && e.altKey && !e.shiftKey) cmd.run('refreshPivots', ctrl);
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
     else if (key === 'F3' && ctrl && !e.shiftKey && !e.altKey) ctx.nameManager?.();
+    else if (key === 'F3' && e.shiftKey && !ctrl && !e.altKey) ctx.insertFunction?.();
     // (Ctrl+Alt+M: New Comment, or the active cell's thread to reply to.)
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'm') ctx.commentBox?.();
     // (Ctrl+E: Flash Fill.)
@@ -421,6 +427,14 @@ export function attachEditing(root, ctx) {
     commands: cmd,
     /** The active cell opened for editing with `text` (AutoSum's proposal, waiting for Enter as in Excel). */
     editWith(text) { startEdit('enter', text); },
+    /** Insert Function's choice: typed at the caret of the cell being edited, or the active cell opened with
+     *  "=NAME(". `hold` keeps the editor open while the box is up. */
+    get editorOpen() { return editor.isOpen; },
+    holdEditor(on) { editor.hold(on); },
+    typeFunction(name) {
+      if (!editor.isOpen) { startEdit('enter', `=${name}(`); return; }
+      editor.insert(editor.el.value === '' ? `=${name}(` : `${name}(`);
+    },
     /** The ribbon's Copy and Cut: the clipboard written through the async API (a button has no clipboard event). */
     copyOut(cut = false) {
       const text = takeClip(cut);

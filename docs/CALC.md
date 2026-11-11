@@ -103,6 +103,27 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     sheet's active cell. Enter puts the formula into its own cell, on its own sheet; Esc goes back without it.
   - **Merged cells.** A merged cell is pointed at by its top-left cell. Excel's behaviour here isn't measured.
 
+## The Function Library
+
+- **The list** (`calc/catalog.js`): every function the engine works out, in Excel's categories as Microsoft's "Excel
+  functions (by category)" has them, and its syntax with Excel's argument names, the optional ones in brackets
+  (`SUM(number1, [number2], ...)`). Where that list names a function under two categories, it is in one: CONCATENATE
+  in Text, FORECAST in Statistical, FLOOR in Math & Trig, LET in Logical. DATEDIF is left out, as Excel leaves it out of
+  its lists. `test/catalog.test.js` checks that the list and the engine agree.
+- **Insert Function** (Shift+F3, or fx on the Formulas tab; `editor/functionbox.js`): Excel's box. Search for a
+  function and Go lists the functions whose names hold the words, under Recommended. A category shows its functions:
+  Most Recently Used (Excel's list to start with: SUM, AVERAGE, IF, HYPERLINK, COUNT, MAX, SIN, SUMIF, PMT, STDEV,
+  then the ones picked, newest first), All, or one of Excel's. The syntax of the one picked is under the list. OK opens
+  the active cell with `=NAME(`. In a cell being edited, Shift+F3 keeps it open and types `NAME(` at the caret.
+- **The Formulas tab's lists**: Recently Used, Financial, Logical, Text, Date & Time, Lookup & Reference, Math & Trig,
+  and More Functions (Statistical, Engineering, Information, Compatibility). A function picked is typed as Insert
+  Function types it. Each one's syntax is its tooltip.
+- **The screen tip** (`editor/fntip.js`): inside a function's parentheses in a cell being edited, its syntax under the
+  cell, the argument the caret is in in bold. Repeated arguments go on with the last one named (SUMIFS's pairs two by
+  two). Text in quotes, sheet names and array constants are passed over.
+- **Not yet**: Excel's description of each function, and its Function Arguments box (Excel opens it after Insert
+  Function; here the arguments are typed).
+
 ## What Excel does (measured)
 
 | Rule | Seen |

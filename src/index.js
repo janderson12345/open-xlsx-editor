@@ -188,12 +188,13 @@ export function mountXlsxEditor(host, options = {}) {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
-        Formulas: (kit) => formulasTab(kit, { act }),
+        Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
       },
-      home: () => state.grid?.el.focus({ preventScroll: true }),
+      // (Not while a cell is being edited: a function from the Function Library was just typed into it.)
+      home: () => { if (!state.editing?.editorOpen) state.grid?.el.focus({ preventScroll: true }); },
     });
     placeRibbon();
     // (Find and Replace: a bar under the ribbon, there with the ribbon hidden too.)
@@ -280,6 +281,7 @@ export function mountXlsxEditor(host, options = {}) {
           selectionShown: () => { for (const f of [...state.onSelect]) f(); return showValidation(); },
           goToBox: () => act('goToBox'),
           nameManager: () => act('nameManager'),
+          insertFunction: () => act('insertFunction'),
           painting: () => act('painting'),
           commentBox: () => act('commentBox'),
           flashFill: () => act('flashFill'),

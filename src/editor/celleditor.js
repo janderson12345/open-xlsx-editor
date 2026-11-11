@@ -15,6 +15,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   box.spellcheck = false;
   box.setAttribute('aria-label', 'Cell contents');
   let open = null; // { r, c, mode }
+  let held = null; // (a box over it, Insert Function's: losing focus doesn't finish; the caret kept: [start, end])
 
   const size = () => {
     // (As wide as the text needs, never narrower than the cell; as tall as its lines.)
@@ -44,7 +45,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     if (open.mode === 'enter' && MOVES[e.key]) { e.preventDefault(); finish(MOVES[e.key]); }
   });
   box.addEventListener('input', () => open && size());
-  box.addEventListener('blur', () => finish(null));
+  box.addEventListener('blur', () => { if (!held) finish(null); });
 
   function close() {
     if (!open) return;
@@ -72,6 +73,18 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     /** Enter what is typed, without moving (another sheet is about to be shown). */
     commit: () => finish(null),
     get isOpen() { return !!open; },
+    /** Kept open while a box is over it (`on`), or no longer. */
+    hold(on) { held = on && open ? [box.selectionStart, box.selectionEnd] : null; },
+    /** `text` typed at the caret (in place of what is selected), as edit mode. */
+    insert(text) {
+      if (!open) return;
+      const [start, end] = held || [box.selectionStart, box.selectionEnd];
+      box.focus({ preventScroll: true });
+      box.setRangeText(text, start, end, 'end');
+      open.mode = 'edit';
+      size();
+      box.dispatchEvent(new Event('input'));
+    },
     /** 'enter' or 'edit' (null when closed), and the cell being edited. */
     get mode() { return open ? open.mode : null; },
     get at() { return open ? { r: open.r, c: open.c } : null; },

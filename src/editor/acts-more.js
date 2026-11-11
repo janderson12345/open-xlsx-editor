@@ -23,6 +23,8 @@ import { seriesBox, removeDuplicatesBox, textToColumnsBox, moveCopyBox } from '.
 import { fillSeries, removeDuplicates, textToColumns } from '../ooxml/datatools.js';
 import { flashFill } from '../ooxml/flashfill.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
+import { insertFunctionBox } from './functionbox.js';
+import { DEFAULT_RECENT } from '../calc/catalog.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
 const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Consolas', 'Courier New', 'Georgia', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'];
@@ -32,6 +34,23 @@ const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Con
 export function createMoreActs(env) {
   const { root, state, options, editing, act } = env;
   return (name, args, i) => {
+    if (name === 'insertFunction') {
+      // (Formulas > Insert Function, Shift+F3, or a function from the Function Library's lists (args[0]): typed at the
+      // caret of the cell being edited, or the active cell opened with "=NAME(", and put first in Most Recently Used.)
+      const ed = state.editing;
+      if (state.readOnly || !ed) return false;
+      const editingNow = ed.editorOpen;
+      ed.holdEditor(true);
+      const recent = state.recentFunctions || DEFAULT_RECENT;
+      const chosen = args[0] ? Promise.resolve(args[0]) : insertFunctionBox(root, { recent });
+      return chosen.then((fn) => {
+        if (!fn) { ed.holdEditor(false); if (!editingNow) state.grid.el.focus({ preventScroll: true }); return false; }
+        state.recentFunctions = [fn, ...recent.filter((n) => n !== fn)].slice(0, 10);
+        ed.typeFunction(fn);
+        ed.holdEditor(false);
+        return true;
+      });
+    }
     if (name === 'commentBox') {
       // (Excel's comment thread on the active cell: started, replied to, a comment edited or a reply deleted, the whole
       // thread deleted; each one step of Undo, the box opened again on the thread after each.)

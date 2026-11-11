@@ -1890,3 +1890,28 @@
   display: flex;
   gap: 6px;
 }
+
+/* Long menus (the Function Library's lists) scroll. */
+.oxe-pop { max-height: min(70vh, 520px); overflow-y: auto; }
+
+/* Insert Function (functionbox.js). */
+.oxe-function-box { width: min(460px, calc(100vw - 32px)); }
+.oxe-function-search { display: flex; gap: 6px; }
+.oxe-function-search .oxe-dialog-field { flex: 1; min-width: 0; }
+.oxe-function-list { width: 100%; }
+.oxe-function-syntax { min-height: 2.6em; font-family: Consolas, 'Courier New', monospace; overflow-wrap: anywhere; }
+
+/* The function screen tip under a cell being edited (fntip.js). */
+.oxe-fntip {
+  position: absolute;
+  z-index: 6;
+  padding: 2px 6px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 3px;
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 12px 'Segoe UI', system-ui, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}

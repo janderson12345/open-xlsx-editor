@@ -298,5 +298,50 @@ check(await value('G41') === 1234.5 && /\$"?#,##0\.00/.test(await codeAt('G41'))
 await page.keyboard.press('Control+z');
 check(await value('G41') === null && await codeAt('G41') === 'General', 'Ctrl+Z: the value and its format gone together');
 
+// Formulas > Insert Function: Excel's box, Most Recently Used first (SUM at the top); Statistical, T.TEST picked: its
+// syntax under the list; OK: the cell opened with =T.TEST( and the screen tip, array1 in bold, array2 after a comma.
+// Shift+F3 in a cell being edited (=1+): the box over it, SUM chosen, typed at the caret; the tip follows. Math & Trig
+// > ROUND: =ROUND( in the active cell.
+const editorText = () => page.evaluate(() => document.querySelector('.oxe-editor')?.value ?? null);
+const tipBold = () => page.evaluate(() => { const t = document.querySelector('.oxe-fntip'); return t ? `${t.textContent}|${t.querySelector('b')?.textContent}` : null; });
+await page.evaluate(() => window.oxe.select('J45'));
+await page.click('.oxe-rtab >> text=Formulas');
+await ribbon('Insert Function (Shift+F3)');
+await page.waitForSelector('dialog.oxe-function-box');
+const firstListed = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-function-box .oxe-function-list option')].slice(0, 3).map((o) => o.value).join());
+await page.selectOption('dialog.oxe-function-box select.oxe-dialog-select', 'Statistical');
+await page.selectOption('dialog.oxe-function-box .oxe-function-list', 'T.TEST');
+const syntax = await page.textContent('dialog.oxe-function-box .oxe-function-syntax');
+await page.click('dialog.oxe-function-box >> button:text-is("OK")');
+await page.waitForFunction(() => document.querySelector('.oxe-editor')?.value === '=T.TEST(');
+const tip1 = await tipBold();
+await page.keyboard.type('B2:B4,');
+const tip2 = await tipBold();
+check(firstListed === 'SUM,AVERAGE,IF' && syntax === 'T.TEST(array1, array2, tails, type)' && tip1 === 'T.TEST(array1, array2, tails, type)|array1' && tip2.endsWith('|array2'),
+  'Insert Function: Most Recently Used first; Statistical > T.TEST, its syntax; OK: =T.TEST( and the tip, the argument typed in bold', JSON.stringify({ firstListed, syntax, tip1, tip2 }));
+await page.keyboard.press('Escape');
+await page.focus('.oxe-grid');
+await page.keyboard.type('=1+');
+await page.keyboard.press('Shift+F3');
+await page.waitForSelector('dialog.oxe-function-box');
+const recentNow = await page.evaluate(() => document.querySelector('dialog.oxe-function-box .oxe-function-list option')?.value);
+await page.fill('dialog.oxe-function-box input.oxe-dialog-field', 'sum');
+await page.keyboard.press('Enter');
+const searched = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-function-box .oxe-function-list option')].slice(0, 2).map((o) => o.value).join());
+await page.selectOption('dialog.oxe-function-box .oxe-function-list', 'SUM');
+await page.click('dialog.oxe-function-box >> button:text-is("OK")');
+await page.waitForFunction(() => !document.querySelector('dialog.oxe-function-box'));
+const typedIn = await editorText();
+const tip3 = await tipBold();
+check(recentNow === 'T.TEST' && searched === 'SUM,SUMIF' && typedIn === '=1+SUM(' && tip3 === 'SUM(number1, [number2], ...)|number1',
+  'Shift+F3 while editing =1+: T.TEST now most recent; search "sum"; SUM typed at the caret, the cell still being edited', JSON.stringify({ recentNow, searched, typedIn, tip3 }));
+await page.keyboard.type('2,3)');
+await page.keyboard.press('Enter');
+await page.evaluate(() => window.oxe.select('J46'));
+await ribbon('Math & Trig', () => page.click('.oxe-pop button:has(span:text-is("ROUND"))'));
+await page.waitForFunction(() => document.querySelector('.oxe-editor')?.value === '=ROUND(');
+await page.keyboard.type('2.567,1)');
+await page.keyboard.press('Enter');
+check(await value('J45') === 6 && await value('J46') === 2.6, 'entered: =1+SUM(2,3) is 6; Math & Trig > ROUND: =ROUND(2.567,1) is 2.6', JSON.stringify([await value('J45'), await value('J46')]));
 
 await finish();
