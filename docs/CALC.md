@@ -1,14 +1,17 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 677 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 917 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **677 of 677 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8).
+`test/formulas-excel.json`. `npm test` checks every one: **917 of 917 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
+1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
+2e-14 of these).
 
 ## How it works
 
 - **Reading formulas.**
-  - `tokens.js` reads a formula into tokens.
+  - `tokens.js` reads a formula into tokens (`prefixed.js`: the newer functions the file names with `_xlfn.`).
   - `parse.js` builds a tree by Excel's precedence. Negation binds tightest, so `=-2^2` is 4, and operators of one
     level work left to right, so `=2^3^2` is 64.
 - **Working them out.**
@@ -35,6 +38,23 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
     (W. J. Cody's erfc, the inverse polished by Halley's method: to 15 digits), EXPON.DIST, POISSON.DIST, BINOM.DIST;
     SINH, COSH, TANH, SEC, CSC, COT; ROMAN, ARABIC, BASE, DECIMAL, DEC2BIN, BIN2DEC, DEC2HEX, HEX2DEC, MULTINOMIAL;
     ISFORMULA, FORMULATEXT, SHEET and SHEETS.
+  - `functions-dist.js`: the distributions the others lack, on Lanczos' log-gamma and the regularised incomplete gamma
+    (series and continued fraction) and beta (continued fraction) functions, inverses by bisection then Newton: T.DIST,
+    .2T, .RT, T.INV, .2T; CHISQ.DIST, .RT, CHISQ.INV, .RT; F.DIST, .RT, F.INV, .RT; GAMMA, GAMMALN(.PRECISE), GAMMA.DIST,
+    GAMMA.INV; BETA.DIST, BETA.INV; LOGNORM.DIST, LOGNORM.INV; WEIBULL.DIST; NEGBINOM.DIST; HYPGEOM.DIST (the ways
+    multiplied out, so exact); BINOM.INV; CONFIDENCE.NORM and .T; Z.TEST, T.TEST (paired, equal and unequal
+    variances), CHISQ.TEST, F.TEST; PHI, GAUSS, FISHERINV; and the names of Excel 2007 and before for each (TDIST,
+    CHIDIST, FDIST, NORMDIST, CRITBINOM...). Degrees of freedom are cut to whole numbers, T.DIST's too.
+  - `functions-agg.js`: AGGREGATE (its options leave out nested subtotals, hidden rows and errors; functions 1 to 13
+    take references only, an array #VALUE!), FREQUENCY, TRIMMEAN, PERCENTRANK(.INC, .EXC), MODE.MULT; VARA, VARPA,
+    STDEVA, STDEVPA (text 0 and TRUE 1 in ranges, only the numbers of an array), STEYX, PROB; MMULT, MDETERM, MINVERSE,
+    MUNIT; SUMX2MY2, SUMX2PY2, SUMXMY2; LINEST, LOGEST, TREND and GROWTH. LINEST takes the xs and ys from their means
+    first, as Excel does, so an exact line has residuals of exactly 0 and its F is #NUM!.
+  - `functions-eng.js`: BITAND, BITOR, BITXOR, BITLSHIFT, BITRSHIFT; OCT2DEC, DEC2OCT, BIN2HEX, HEX2BIN, BIN2OCT,
+    OCT2BIN, HEX2OCT, OCT2HEX; DELTA, GESTEP, ERF, ERFC (.PRECISE); ACOSH, ASINH, ATANH, ACOT, ACOTH, COTH, CSCH, SECH;
+    COMBINA, PERMUTATIONA, FACTDOUBLE, SERIESSUM, SQRTPI; DAYS360 (Excel's US method leaves an end on the last of
+    February as it is); HYPERLINK, AREAS; FVSCHEDULE, PDURATION, RRI, ISPMT, MIRR (from the two NPVs, as Excel defines
+    it), SYD, VDB, DOLLARDE, DOLLARFR, TBILLPRICE, TBILLYIELD, TBILLEQ.
   - Table references (`ooxml/tables.js`): Fruit[Qty] is the column's data rows; [#All], [#Data], [#Headers], [#Totals]
     and two of them together; [[Qty]:[Price]] the columns between; [#This Row] (shown [@Qty]) the formula's own row,
     from any sheet by the row's number, #VALUE! past the table's rows (Excel's answers in test/formulas-excel.json).

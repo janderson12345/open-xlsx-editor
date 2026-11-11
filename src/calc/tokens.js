@@ -1,25 +1,13 @@
 // Formulas as tokens: what the parser reads, and what moves a formula to another cell (a shared formula's other cells)
 // or turns it between the file's form (_xlfn.CONCAT) and what a person types and sees (CONCAT).
 import { colIndex, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
+import { PREFIXED, fileName } from './prefixed.js';
 
 /** Error values as Excel writes them. */
 export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#GETTING_DATA', '#SPILL!',
   '#CALC!', '#FIELD!', '#BLOCKED!', '#CONNECT!', '#BUSY!', '#UNKNOWN!'];
 
-/** Functions newer than Excel 2007, which the file names with a prefix (`_xlfn.CONCAT`) so that older versions show
- *  #NAME? instead of misreading them. Only the ones the engine knows: others typed are kept as typed. */
-export const PREFIXED = new Set(['CONCAT', 'TEXTJOIN', 'IFS', 'SWITCH', 'MAXIFS', 'MINIFS', 'XLOOKUP', 'XMATCH', 'IFNA',
-  'DAYS', 'XOR', 'STDEV.S', 'STDEV.P', 'VAR.S', 'VAR.P', 'CEILING.MATH', 'FLOOR.MATH', 'ISOWEEKNUM', 'PERCENTILE.INC', 'PERCENTILE.EXC',
-  'QUARTILE.INC', 'QUARTILE.EXC', 'RANK.EQ', 'RANK.AVG', 'MODE.SNGL', 'TEXTBEFORE', 'TEXTAFTER', 'NUMBERVALUE', 'UNICODE', 'UNICHAR',
-  'SEQUENCE', 'SORTBY', 'UNIQUE', 'LET', 'LAMBDA', 'ANCHORARRAY', 'SINGLE', 'SORT', 'FILTER',
-  'TAKE', 'DROP', 'VSTACK', 'HSTACK', 'CHOOSECOLS', 'CHOOSEROWS', 'TOCOL', 'TOROW', 'WRAPROWS', 'WRAPCOLS', 'EXPAND', 'TEXTSPLIT', 'ISOMITTED', 'MAP',
-  'REDUCE', 'SCAN', 'BYROW', 'BYCOL', 'MAKEARRAY', 'VALUETOTEXT', 'ARRAYTOTEXT', 'NORM.DIST', 'NORM.S.DIST', 'NORM.INV', 'NORM.S.INV', 'EXPON.DIST',
-  'POISSON.DIST', 'BINOM.DIST', 'COVARIANCE.P', 'COVARIANCE.S', 'FORECAST.LINEAR', 'SEC', 'CSC', 'COT', 'ARABIC', 'BASE', 'DECIMAL', 'ISFORMULA',
-  'FORMULATEXT', 'SHEET', 'SHEETS', 'NETWORKDAYS.INTL', 'WORKDAY.INTL']);
-/** Of those, the ones the file names with a second prefix (`_xlfn._xlws.SORT`), as Excel 365 writes them. */
-const WORKSHEET_PREFIXED = new Set(['SORT', 'FILTER']);
-/** A newer function's name as the file has it. */
-export const fileName = (name) => (WORKSHEET_PREFIXED.has(name) ? `_xlfn._xlws.${name}` : PREFIXED.has(name) ? `_xlfn.${name}` : name);
+export { PREFIXED, fileName };
 
 export class FormulaError extends Error {
   constructor(message, pos) {

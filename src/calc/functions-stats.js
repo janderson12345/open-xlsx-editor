@@ -252,3 +252,6 @@ def('SHEET', (a, ctx) => {
   return si + 1;
 });
 def('SHEETS', (a, ctx) => (given(a[0]) ? 1 : ctx.sheetCount()));
+
+// (For the other distributions, functions-dist.js.)
+export { erfc, normCdf, normPdf, normInv, logFact, cum, sampleSd, mean };
