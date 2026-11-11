@@ -7,33 +7,9 @@
 import { shownText } from './filterops.js';
 import { setRows } from './sizes.js';
 import { readSheet } from './sheet.js';
+import { cellTest } from '../calc/criteria.js';
 
 const blank = (cell) => !cell || cell.v == null || cell.v === '';
-const pattern = (v, whole) => new RegExp(`^${String(v).replace(/~([*?~])|([*?])|([.+^${}()|[\]\\])/g, (m, lit, wild, re) => (lit ? `\\${lit}` : wild === '*' ? '[\\s\\S]*' : wild ? '[\\s\\S]' : `\\${re}`))}${whole ? '$' : ''}`, 'i');
-
-/** One criteria cell's test of a value (and its shown text). */
-function cellTest(raw) {
-  const s = String(raw);
-  const m = /^(<>|>=|<=|=|>|<)?([\s\S]*)$/.exec(s);
-  const op = m[1] || '';
-  const val = m[2];
-  const n = Number(val);
-  const numeric = val.trim() !== '' && Number.isFinite(n);
-  return (v, text) => {
-    if (op === '' || op === '=') {
-      if (op === '=' && val === '') return v == null || v === '';
-      if (numeric && typeof v === 'number') return v === n;
-      // (Alone: begins with; after =: the whole of it.)
-      return pattern(val, op === '=').test(text);
-    }
-    if (op === '<>') return !(numeric && typeof v === 'number' ? v === n : pattern(val, true).test(text));
-    if (v == null || v === '') return false;
-    let d;
-    if (numeric) { if (typeof v !== 'number') return false; d = v - n; } else { if (typeof v === 'number') return false; d = text.toLowerCase().localeCompare(val.toLowerCase()); }
-    return op === '>' ? d > 0 : op === '>=' ? d >= 0 : op === '<' ? d < 0 : d <= 0;
-  };
-}
-
 /**
  * The rows of `list` ({ r0, c0, r1, c1 }, its heading first) on sheet si that pass `criteria` (a range, on any sheet:
  * { si, r0, c0, r1, c1 }, or null for every row), without later duplicates when `unique`. Returns { rows: [r], error }.

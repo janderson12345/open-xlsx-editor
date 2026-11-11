@@ -8,7 +8,7 @@ const book = () => openWorkbook(fs.readFileSync('test/fixtures/formulas.xlsx'));
 
 test('an agent reads the sheets, names and tables, and a range by reference, name or table', () => {
   const a = book();
-  assert.deepEqual(a.sheets().map((s) => [s.name, s.used, s.tables.join()]), [['Calc', 'A2:F904', ''], ['Data', 'A1:J9', 'Fruit'], ['My Data', 'A1:A2', '']]);
+  assert.deepEqual(a.sheets().map((s) => [s.name, s.used, s.tables.join()]), [['Calc', 'A2:F1016', ''], ['Data', 'A1:Q9', 'Fruit'], ['My Data', 'A1:A2', '']]);
   assert.deepEqual(a.names().map((n) => [n.name, n.refersTo, n.table]), [['Fruit', 'Data!A1:E9', true], ['Items', 'Data!$A$2:$A$9', false], ['Rate', 'Data!$C$2', false]]);
   const qty = a.read('Fruit[Qty]');
   assert.equal(qty.range, 'Data!B2:B9');
@@ -25,7 +25,7 @@ test('an agent gets a Markdown table, finds cells and reads formulas', () => {
   const a = book();
   const md = a.markdown('Data!A1:B3');
   assert.equal(md, 'Data!A1:B3\n\n|  | A | B |\n|---|---|---|\n| 1 | Name | Qty |\n| 2 | Apple | 3 |\n| 3 | Banana | 5 |');
-  assert.deepEqual(a.find('apple', { lookIn: 'values', within: 'sheet', sheet: 'Data' }).map((h) => h.ref), ['Data!A2', 'Data!A5', 'Data!A9']);
+  assert.deepEqual(a.find('apple', { lookIn: 'values', within: 'sheet', sheet: 'Data' }).map((h) => h.ref), ['Data!A2', 'Data!L2', 'Data!A5', 'Data!A9']);
   const f = a.read('Calc!B2').rows[0][0];
   assert.equal(f.formula, '=Data!B2:B9');
 });

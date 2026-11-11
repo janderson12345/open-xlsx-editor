@@ -5,7 +5,17 @@
 // checks that each is here). DATEDIF, which Excel leaves out of its lists, is left out too.
 
 const LIST = {
-  Financial: `CUMIPMT(rate,nper,pv,start_period,end_period,type) CUMPRINC(rate,nper,pv,start_period,end_period,type)
+  Financial: `ACCRINT(issue,first_interest,settlement,rate,par,frequency,[basis],[calc_method])
+    ACCRINTM(issue,settlement,rate,par,[basis]) COUPDAYBS(settlement,maturity,frequency,[basis])
+    COUPDAYS(settlement,maturity,frequency,[basis]) COUPDAYSNC(settlement,maturity,frequency,[basis])
+    COUPNCD(settlement,maturity,frequency,[basis]) COUPNUM(settlement,maturity,frequency,[basis])
+    COUPPCD(settlement,maturity,frequency,[basis]) DISC(settlement,maturity,pr,redemption,[basis])
+    DURATION(settlement,maturity,coupon,yld,frequency,[basis]) INTRATE(settlement,maturity,investment,redemption,[basis])
+    MDURATION(settlement,maturity,coupon,yld,frequency,[basis]) PRICE(settlement,maturity,rate,yld,redemption,frequency,[basis])
+    PRICEDISC(settlement,maturity,discount,redemption,[basis]) PRICEMAT(settlement,maturity,issue,rate,yld,[basis])
+    RECEIVED(settlement,maturity,investment,discount,[basis]) YIELD(settlement,maturity,rate,pr,redemption,frequency,[basis])
+    YIELDDISC(settlement,maturity,pr,redemption,[basis]) YIELDMAT(settlement,maturity,issue,rate,pr,[basis])
+    CUMIPMT(rate,nper,pv,start_period,end_period,type) CUMPRINC(rate,nper,pv,start_period,end_period,type)
     DB(cost,salvage,life,period,[month]) DDB(cost,salvage,life,period,[factor]) DOLLARDE(fractional_dollar,fraction)
     DOLLARFR(decimal_dollar,fraction) EFFECT(nominal_rate,npery) FV(rate,nper,pmt,[pv],[type]) FVSCHEDULE(principal,schedule)
     IPMT(rate,per,nper,pv,[fv],[type]) IRR(values,[guess]) ISPMT(rate,per,nper,pv) MIRR(values,finance_rate,reinvest_rate)
@@ -52,10 +62,10 @@ const LIST = {
     XMATCH(lookup_value,lookup_array,[match_mode],[search_mode])`,
   'Math & Trig': `ABS(number) ACOS(number) ACOSH(number) ACOT(number) ACOTH(number) AGGREGATE(function_num,options,ref1,...)
     ARABIC(text) ASIN(number) ASINH(number) ATAN(number) ATAN2(x_num,y_num) ATANH(number) BASE(number,radix,[min_length])
-    CEILING(number,significance) CEILING.MATH(number,[significance],[mode]) COMBIN(number,number_chosen)
+    CEILING(number,significance) CEILING.MATH(number,[significance],[mode]) CEILING.PRECISE(number,[significance]) COMBIN(number,number_chosen)
     COMBINA(number,number_chosen) COS(number) COSH(number) COT(number) COTH(number) CSC(number) CSCH(number)
     DECIMAL(text,radix) DEGREES(angle) EVEN(number) EXP(number) FACT(number) FACTDOUBLE(number) FLOOR(number,significance)
-    FLOOR.MATH(number,[significance],[mode]) GCD(number1,[number2],...) INT(number) LCM(number1,[number2],...) LN(number)
+    FLOOR.MATH(number,[significance],[mode]) FLOOR.PRECISE(number,[significance]) ISO.CEILING(number,[significance]) GCD(number1,[number2],...) INT(number) LCM(number1,[number2],...) LN(number)
     LOG(number,[base]) LOG10(number) MDETERM(array) MINVERSE(array) MMULT(array1,array2) MOD(number,divisor)
     MROUND(number,multiple) MULTINOMIAL(number1,[number2],...) MUNIT(dimension) ODD(number) PI() POWER(number,power)
     PRODUCT(number1,[number2],...) QUOTIENT(numerator,denominator) RADIANS(angle) RAND() RANDBETWEEN(bottom,top)
@@ -68,7 +78,8 @@ const LIST = {
   Statistical: `AVEDEV(number1,[number2],...) AVERAGE(number1,[number2],...) AVERAGEA(value1,[value2],...)
     AVERAGEIF(range,criteria,[average_range]) AVERAGEIFS(average_range,criteria_range1,criteria1,...)
     BETA.DIST(x,alpha,beta,cumulative,[A],[B]) BETA.INV(probability,alpha,beta,[A],[B])
-    BINOM.DIST(number_s,trials,probability_s,cumulative) BINOM.INV(trials,probability_s,alpha)
+    BINOM.DIST(number_s,trials,probability_s,cumulative) BINOM.DIST.RANGE(trials,probability_s,number_s,[number_s2])
+    BINOM.INV(trials,probability_s,alpha)
     CHISQ.DIST(x,deg_freedom,cumulative) CHISQ.DIST.RT(x,deg_freedom) CHISQ.INV(probability,deg_freedom)
     CHISQ.INV.RT(probability,deg_freedom) CHISQ.TEST(actual_range,expected_range) CONFIDENCE.NORM(alpha,standard_dev,size)
     CONFIDENCE.T(alpha,standard_dev,size) CORREL(array1,array2) COUNT(value1,[value2],...) COUNTA(value1,[value2],...)
@@ -91,13 +102,17 @@ const LIST = {
     PERCENTRANK.EXC(array,x,[significance]) PERCENTRANK.INC(array,x,[significance]) PERMUT(number,number_chosen)
     PERMUTATIONA(number,number_chosen) PHI(x) POISSON.DIST(x,mean,cumulative)
     PROB(x_range,prob_range,[lower_limit],[upper_limit]) QUARTILE.EXC(array,quart) QUARTILE.INC(array,quart)
-    RANK.AVG(number,ref,[order]) RANK.EQ(number,ref,[order]) RSQ(known_y's,known_x's) SKEW(number1,[number2],...)
+    RANK.AVG(number,ref,[order]) RANK.EQ(number,ref,[order]) RSQ(known_y's,known_x's) SKEW(number1,[number2],...) SKEW.P(number1,[number2],...)
     SLOPE(known_y's,known_x's) SMALL(array,k) STANDARDIZE(x,mean,standard_dev) STDEV.P(number1,[number2],...)
     STDEV.S(number1,[number2],...) STDEVA(value1,[value2],...) STDEVPA(value1,[value2],...) STEYX(known_y's,known_x's)
     T.DIST(x,deg_freedom,cumulative) T.DIST.2T(x,deg_freedom) T.DIST.RT(x,deg_freedom) T.INV(probability,deg_freedom)
     T.INV.2T(probability,deg_freedom) T.TEST(array1,array2,tails,type) TREND(known_y's,[known_x's],[new_x's],[const])
     TRIMMEAN(array,percent) VAR.P(number1,[number2],...) VAR.S(number1,[number2],...) VARA(value1,[value2],...)
     VARPA(value1,[value2],...) WEIBULL.DIST(x,alpha,beta,cumulative) Z.TEST(array,x,[sigma])`,
+  Database: `DAVERAGE(database,field,criteria) DCOUNT(database,[field],criteria) DCOUNTA(database,[field],criteria)
+    DGET(database,field,criteria) DMAX(database,field,criteria) DMIN(database,field,criteria) DPRODUCT(database,field,criteria)
+    DSTDEV(database,field,criteria) DSTDEVP(database,field,criteria) DSUM(database,field,criteria) DVAR(database,field,criteria)
+    DVARP(database,field,criteria)`,
   Engineering: `BIN2DEC(number) BIN2HEX(number,[places]) BIN2OCT(number,[places]) BITAND(number1,number2)
     BITLSHIFT(number,shift_amount) BITOR(number1,number2) BITRSHIFT(number,shift_amount) BITXOR(number1,number2)
     DEC2BIN(number,[places]) DEC2HEX(number,[places]) DEC2OCT(number,[places]) DELTA(number1,[number2])
@@ -108,7 +123,7 @@ const LIST = {
     ISTEXT(value) N(value) NA() SHEET([value]) SHEETS([reference]) TYPE(value)`,
   Compatibility: `BETADIST(x,alpha,beta,[A],[B]) BETAINV(probability,alpha,beta,[A],[B])
     BINOMDIST(number_s,trials,probability_s,cumulative) CHIDIST(x,deg_freedom) CHIINV(probability,deg_freedom)
-    CHITEST(actual_range,expected_range) CONFIDENCE(alpha,standard_dev,size) CRITBINOM(trials,probability_s,alpha)
+    CHITEST(actual_range,expected_range) CONFIDENCE(alpha,standard_dev,size) COVAR(array1,array2) CRITBINOM(trials,probability_s,alpha)
     EXPONDIST(x,lambda,cumulative) FDIST(x,deg_freedom1,deg_freedom2) FINV(probability,deg_freedom1,deg_freedom2)
     FTEST(array1,array2) GAMMADIST(x,alpha,beta,cumulative) GAMMAINV(probability,alpha,beta)
     HYPGEOMDIST(sample_s,number_sample,population_s,number_pop) LOGINV(probability,mean,standard_dev)
@@ -121,7 +136,7 @@ const LIST = {
 };
 
 /** The categories in the order of Excel's Insert Function box. */
-export const CATEGORIES = ['Financial', 'Date & Time', 'Math & Trig', 'Statistical', 'Lookup & Reference', 'Text', 'Logical', 'Information', 'Engineering', 'Compatibility'];
+export const CATEGORIES = ['Financial', 'Date & Time', 'Math & Trig', 'Statistical', 'Lookup & Reference', 'Database', 'Text', 'Logical', 'Information', 'Engineering', 'Compatibility'];
 
 /** Excel's Most Recently Used list as it stands before anything is picked. */
 export const DEFAULT_RECENT = ['SUM', 'AVERAGE', 'IF', 'HYPERLINK', 'COUNT', 'MAX', 'SIN', 'SUMIF', 'PMT', 'STDEV'];

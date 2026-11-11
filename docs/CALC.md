@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 917 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1029 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **917 of 917 as Excel** (to 15 digits; RATE and IRR, searches Excel promises to 0.0000001, to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1029 of 1029 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -55,6 +55,24 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     COMBINA, PERMUTATIONA, FACTDOUBLE, SERIESSUM, SQRTPI; DAYS360 (Excel's US method leaves an end on the last of
     February as it is); HYPERLINK, AREAS; FVSCHEDULE, PDURATION, RRI, ISPMT, MIRR (from the two NPVs, as Excel defines
     it), SYD, VDB, DOLLARDE, DOLLARFR, TBILLPRICE, TBILLYIELD, TBILLEQ.
+  - `functions-db.js`: the database functions (DSUM, DAVERAGE, DCOUNT, DCOUNTA, DGET, DMAX, DMIN, DPRODUCT, DSTDEV,
+    DSTDEVP, DVAR, DVARP), their criteria read as Advanced Filter reads them (`criteria.js`, shared with
+    `ooxml/advfilter.js`); CEILING.PRECISE, FLOOR.PRECISE, ISO.CEILING, SKEW.P, BINOM.DIST.RANGE, COVAR.
+  - `functions-bonds.js`: securities. COUPPCD, COUPNCD, COUPNUM, COUPDAYBS, COUPDAYS, COUPDAYSNC; PRICE, YIELD,
+    DURATION, MDURATION; ACCRINT, ACCRINTM; DISC, INTRATE, RECEIVED, PRICEDISC, YIELDDISC, PRICEMAT, YIELDMAT. Coupon
+    dates step back from maturity, kept at the month's end when maturity is. What Excel was seen to do (each measured
+    with Evaluate in a hidden Excel, then checked by the probe on cases it wasn't worked out from):
+    - COUPDAYS with basis 1 runs from the coupon date before settlement to the same day 12/frequency months on
+      (February 29 to August 29: 182 days, not the 184 to August 31). PRICE, YIELD and DURATION take the actual period
+      (184) instead. COUPDAYSNC counts 30/360 days with basis 4 and takes COUPDAYS - COUPDAYBS with basis 0.
+    - PRICE, YIELD and DURATION take the days to the next coupon as COUPDAYS - COUPDAYBS, but for basis 1.
+    - ACCRINT: the coupon periods from issue to settlement, stepped from first_interest. A period that ends before
+      settlement counts 1. A part counts its days (by the basis) over the period's length: 360 or 365 over the
+      frequency, or with basis 1 the days of the period that ends at first_interest. A period ending on settlement is a
+      part (August 31 to February 28: 178 of 180). With calc_method FALSE, the days from issue to settlement over that
+      length, whatever Microsoft's page says about first_interest.
+    - DISC and its kin with basis 1 take YEARFRAC's year (366 over a February 29); PRICEMAT and YIELDMAT the year up
+      to settlement's. DISC is (1 - pr/redemption) x (year / days), to Excel's last digit.
   - Table references (`ooxml/tables.js`): Fruit[Qty] is the column's data rows; [#All], [#Data], [#Headers], [#Totals]
     and two of them together; [[Qty]:[Price]] the columns between; [#This Row] (shown [@Qty]) the formula's own row,
     from any sheet by the row's number, #VALUE! past the table's rows (Excel's answers in test/formulas-excel.json).
@@ -116,8 +134,8 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
   then the ones picked, newest first), All, or one of Excel's. The syntax of the one picked is under the list. OK opens
   the active cell with `=NAME(`. In a cell being edited, Shift+F3 keeps it open and types `NAME(` at the caret.
 - **The Formulas tab's lists**: Recently Used, Financial, Logical, Text, Date & Time, Lookup & Reference, Math & Trig,
-  and More Functions (Statistical, Engineering, Information, Compatibility). A function picked is typed as Insert
-  Function types it. Each one's syntax is its tooltip.
+  and More Functions (Statistical, Engineering, Information, Compatibility). Database is in Insert Function only, as
+  in Excel. A function picked is typed as Insert Function types it. Each one's syntax is its tooltip.
 - **The screen tip** (`editor/fntip.js`): inside a function's parentheses in a cell being edited, its syntax under the
   cell, the argument the caret is in in bold. Repeated arguments go on with the last one named (SUMIFS's pairs two by
   two). Text in quotes, sheet names and array constants are passed over.
@@ -146,6 +164,11 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
 
 ## Not yet
 
+- **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
+  (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
+  rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
+- **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD), AMORDEGRC and AMORLINC,
+  CONVERT, the complex-number functions (IMSUM and the rest), the BESSEL functions and the REGEX functions.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
 - **Intersection and 3D references.** The space operator (intersection) and 3D references (`Sheet1:Sheet3!A1`)
   aren't read, nor are structured references to tables. Formulas using them keep Excel's values.
