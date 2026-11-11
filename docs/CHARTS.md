@@ -1,13 +1,62 @@
 # Charts
 
-How charts are drawn (`src/ooxml/charts.js` reads them, `src/editor/chartview.js` draws them). Read only: the chart
-parts are saved as they are, and a chart's data follows its cells (a value typed in redraws it).
+How charts are drawn (`src/ooxml/charts.js` reads them, `src/editor/chartview.js` draws them), inserted
+(`src/ooxml/chartnew.js`, `chartxml.js`) and edited (`src/ooxml/chartedit.js`). A chart's data follows its cells
+(a value typed in redraws it); a chart not edited is saved as it was.
+
+## Inserting a chart (Insert > Charts)
+
+Fourteen kinds, by Excel's menus: clustered, stacked and 100% stacked column and bar; line, with or without markers;
+pie and doughnut; area and stacked area; scatter with markers, straight lines or smooth lines. One cell selected: the
+table round it (its current region), as Excel takes it.
+
+Measured over COM (`tools/excel-compare/excel-chart-insert.ps1`: `Shapes.AddChart2` of each kind in Excel's default
+style on a small made-up table, saved, `test/chartnew-excel.json`):
+
+- Each kind's chart part is Excel's text for text (14 of 14), but for the two axis ids and the series' unique ids,
+  which Excel makes up afresh each time (made up here too). The chart's style and colour parts Excel adds alongside
+  are not written: Excel opens the chart without them and draws it in the same default style.
+- The anchor: where Excel puts a 5 by 3 inch chart from its top-left cell (from F2: to M16, 304800 and 76200 EMU in).
+  Insert > Charts puts it two columns past the selection, a row below its top.
+- Excel opened the workbook of all fourteen written here (`excel-chart-readback.ps1`, `test/chartnew-readback-excel.json`)
+  and read each as the type it made, with its two series' formulas and its title.
+
+Which cells are series, as Excel takes them (ten shapes of selection; each series' formula from `AddChart2`):
+
+| Rule | Seen |
+|---|---|
+| The first row holds the names (or categories) when none of its cells is a number; the first column likewise. A blank corner makes both labels. | Region, Sales, Cost over names and numbers: names B1 and C1, categories A2:A5. Years under a "Year" heading: the years are numbers, so data. Years under a blank corner: categories. |
+| Series run down the columns when the numbers have more rows than columns; else, ties included, along the rows. | 4 rows by 2: two series. 2 rows by 6: two series along the rows. 3 by 3: three series along the rows. |
+| A title Excel makes itself: the series' name with one series, or for a pie (which draws only its first series), else "Chart Title". | |
+
+## Editing a chart
+
+Click a chart to pick it (outlined, eight handles; Ctrl+Alt+5 from the keyboard, Tab to the next). Drag to move it,
+a handle to size it, the arrow keys to move it a cell; Delete deletes it; Enter or its menu's Edit Chart... opens the
+box for its kind, title, legend and data labels. Each is one step of Undo.
+
+Measured over COM on a clustered column chart (`tools/excel-compare/excel-chart-edit.ps1`, `test/chartedit-excel.json`):
+15 of 15 edits written here as Excel writes them, text for text.
+
+| Edit | As Excel writes it |
+|---|---|
+| A title's text | A `c:tx` of rich text in the title (14pt, Excel's grey); `autoTitleDeleted` 0. |
+| No title | No `c:title`; `autoTitleDeleted` 1. |
+| Legend moved, or none | `legendPos` b, t, l, r; none: no `c:legend`. |
+| Data labels (Show) | Each series a `c:dLbls` of values (9pt, 75% grey, leader lines in an extension), the chart's own `showVal` 1. |
+| Change Chart Type | The series kept, drawn as a new chart of that kind is, but: the old gap width kept; pie and doughnut slices without outlines; a doughnut's hole 50%; a scatter chart's hidden line 25400 EMU. The old axes kept and turned: positions for bar, `crossBetween` midCat for area and scatter, a category axis becoming the scatter's x value axis. The title, legend and blanks setting as they were. |
+
+Moved or sized: the anchor's two corners, as the cells and offsets under the new rectangle (not yet measured against
+Excel's own rounding). Deleted: the anchor, its relationship and the chart part with what only it uses.
+
+Not yet: editing a chart part not written with the `c:` prefix (refused with a message), the data range, series
+one at a time, axis titles, secondary axes, combo charts and the 2016 kinds (waterfall, histogram, treemap, ...).
 
 ## What is read
 
 From each sheet's drawing, every two-cell anchor whose graphic frame points to a chart part: where it sits (its two
-corner cells and the offsets into them), its kind (column, bar, line, area, pie, doughnut; clustered, stacked, 100%
-stacked), its title (its own text, a cell, or, with none, the series' name when there is one series), its legend's
+corner cells and the offsets into them), its kind (column, bar, line, area, pie, doughnut, scatter; clustered, stacked,
+100% stacked), its title (its own text, a cell, or, with none, the series' name when there is one series), its legend's
 place, and its series: names, categories and values read from the cells they point to in this workbook, else from the
 file's cache. `test/fixtures/charts.xlsx` is written as Excel writes chart parts; opened in Excel over COM, it reads
 four charts of the kinds, series and titles the editor reads, at the same places.

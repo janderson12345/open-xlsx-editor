@@ -264,6 +264,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       showNote(st.noteOpen === key && st.notePinned ? null : key, true);
       return true;
     },
+    /** What runs after the charts are drawn (chartpick.js: the picked one's outline put back). */
+    onChartsDrawn(fn) { st.onChartsDrawn = fn; },
     /** The sheet's charts (ooxml/charts.js readCharts), drawn over the cells in the workbook's theme. */
     setCharts(charts, theme) {
       st.charts = charts;

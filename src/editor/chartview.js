@@ -1,14 +1,16 @@
 // A chart (ooxml/charts.js) drawn as SVG, in the look of Excel's default chart style: a white area with a light grey
 // border, the title in grey 14pt, grey 9pt axis labels, light grey gridlines, series in the theme's accent colours,
-// the legend under or beside the plot. Column, bar (clustered, stacked, 100%), line, area, pie and doughnut. The value
+// the legend under or beside the plot. Column, bar (clustered, stacked, 100%), line, area, pie, doughnut and scatter. The value
 // axis is Excel's (charts.js valueAxis). Pictures only: what a screen reader hears is chartFigure's table.
-import { valueAxis } from '../ooxml/charts.js';
+import { valueAxis, autoScale } from '../ooxml/charts.js';
 import { resolveColor } from '../ooxml/theme.js';
 import { cellText } from '../ooxml/numfmt.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const GREY = '#595959';
 const LINE = '#D9D9D9';
+/** Data labels' grey (Excel's 75% text colour). */
+const LABEL = '#404040';
 const FONT = 'Aptos Narrow, Calibri, Carlito, sans-serif';
 
 /** The colour of series (or, varying by point, point) i: its own, else the theme's accents in turn, darker past six. */
@@ -93,6 +95,10 @@ function drawPie(svg, chart, entries, box) {
     else if (hole) { const [x3, y3] = pt(hole, b); const [x4, y4] = pt(hole, a); d = `M ${x1} ${y1} A ${r} ${r} 0 ${big} 1 ${x2} ${y2} L ${x3} ${y3} A ${hole} ${hole} 0 ${big} 0 ${x4} ${y4} Z`; }
     else d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${big} 1 ${x2} ${y2} Z`;
     svg.append(el('path', { d, fill: entries[i]?.color || '#999', stroke: '#FFFFFF', 'stroke-width': 1 }));
+    if (chart.labels) {
+      const [lx, ly] = pt(hole ? (r + hole) / 2 : r * 0.65, (a + b) / 2);
+      svg.append(el('text', { x: lx, y: ly + 4, 'text-anchor': 'middle', 'font-size': 12, fill: '#404040' }, String(chart.series[0].values[i])));
+    }
     a = b;
   });
 }
@@ -104,7 +110,13 @@ function drawAxes(svg, chart, theme, { top, right, bottom, date1904 }) {
   const ticks = [];
   for (let v = axis.min, k = 0; v <= axis.max + axis.major * 1e-9 && k < 200; k++, v = axis.min + k * axis.major) ticks.push(Number(v.toPrecision(15)));
   const horizontal = chart.kind === 'bar' && chart.dir === 'bar';
-  const cats = chart.cats.length ? chart.cats : (chart.series[0]?.values || []).map((_, i) => String(i + 1));
+  const scatter = chart.kind === 'scatter';
+  // (A scatter chart's x axis is a value axis too: Excel's automatic scale over the x values.)
+  const xs = scatter ? chart.series.flatMap((s) => s.xs || []).filter((x) => typeof x === 'number') : [];
+  const xAxis = scatter ? autoScale(Math.min(...xs, Infinity) === Infinity ? 0 : Math.min(...xs), Math.max(...xs, -Infinity) === -Infinity ? 0 : Math.max(...xs)) : null;
+  const xTicks = [];
+  if (xAxis) for (let k = 0, v = xAxis.min; v <= xAxis.max + xAxis.major * 1e-9 && k < 200; k++, v = xAxis.min + k * xAxis.major) xTicks.push(Number(v.toPrecision(15)));
+  const cats = scatter ? xTicks.map((t) => cellText({ t: 'n', v: t }, Infinity, 'General', date1904).trim()) : chart.cats.length ? chart.cats : (chart.series[0]?.values || []).map((_, i) => String(i + 1));
   const n = cats.length || 1;
   const valueW = chart.axis.hidden ? 0 : Math.max(...ticks.map((t) => widthOf(label(t), 12)), 0);
   const catW = chart.catHidden ? 0 : Math.max(...cats.map((c) => widthOf(c ?? '', 12)), 0);
@@ -117,6 +129,16 @@ function drawAxes(svg, chart, theme, { top, right, bottom, date1904 }) {
     const p = toV(t);
     if (chart.axis.gridlines) svg.append(horizontal ? el('line', { x1: p, x2: p, y1: plot.y, y2: plot.y + plot.h, stroke: LINE }) : el('line', { x1: plot.x, x2: plot.x + plot.w, y1: p, y2: p, stroke: LINE }));
     if (!chart.axis.hidden) svg.append(horizontal ? el('text', { x: p, y: plot.y + plot.h + 16, 'text-anchor': 'middle', 'font-size': 12, fill: GREY }, label(t)) : el('text', { x: plot.x - 6, y: p + 4, 'text-anchor': 'end', 'font-size': 12, fill: GREY }, label(t)));
+  }
+  if (scatter) {
+    const toX = (x) => plot.x + ((x - xAxis.min) / (xAxis.max - xAxis.min)) * plot.w;
+    xTicks.forEach((t, i) => {
+      const p = toX(t);
+      if (chart.xGridlines) svg.append(el('line', { x1: p, x2: p, y1: plot.y, y2: plot.y + plot.h, stroke: LINE }));
+      if (!chart.catHidden) svg.append(el('text', { x: p, y: plot.y + plot.h + 17, 'text-anchor': 'middle', 'font-size': 12, fill: GREY }, cats[i]));
+    });
+    drawScatter(svg, chart, { toX, toV, colors: chart.series.map((s, i) => colorFor(chart, theme, i, s.color)) });
+    return;
   }
   // Category labels, and the category axis line at zero.
   const band = (horizontal ? plot.h : plot.w) / n;
@@ -161,6 +183,11 @@ function drawBars(svg, chart, { plot, band, toV, colors, horizontal, n }) {
       svg.append(horizontal
         ? el('rect', { x: Math.min(p1, p2), y: along, width: Math.abs(p2 - p1), height: w, fill: colors[si] })
         : el('rect', { x: along, y: Math.min(p1, p2), width: w, height: Math.abs(p2 - p1), fill: colors[si] }));
+      if (chart.labels) {
+        const t = String(s.values[i]);
+        svg.append(horizontal ? el('text', { x: Math.max(p1, p2) + 4, y: along + w / 2 + 4, 'font-size': 12, fill: LABEL }, t)
+          : el('text', { x: along + w / 2, y: Math.min(p1, p2) - 4, 'text-anchor': 'middle', 'font-size': 12, fill: LABEL }, t));
+      }
     }
   });
 }
@@ -187,11 +214,32 @@ function drawLines(svg, chart, { plot, band, toV, colors, n }) {
       if (chart.kind === 'area') svg.append(el('path', { d: `${d} L ${r[r.length - 1][0]} ${toV(0)} L ${r[0][0]} ${toV(0)} Z`, fill: colors[si], 'fill-opacity': 0.85 }));
       else svg.append(el('path', { d, fill: 'none', stroke: colors[si], 'stroke-width': 3, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
       if (chart.kind === 'line' && s.marker && s.marker !== 'none') for (const [x, y] of r) svg.append(el('circle', { cx: x, cy: y, r: 3.5, fill: colors[si] }));
+      if (chart.labels) r.forEach(([x, y]) => { const i = pts.indexOf(pts.find((p) => p && p[0] === x && p[1] === y)); svg.append(el('text', { x, y: y - 7, 'text-anchor': 'middle', 'font-size': 12, fill: LABEL }, String(s.values[i]))); });
     }
   });
 }
 
-const KIND_NAMES = { bar: 'Column chart', line: 'Line chart', area: 'Area chart', pie: 'Pie chart', doughnut: 'Doughnut chart' };
+/** Scatter series: a marker at each (x, y), joined by straight lines (or, smoothed, by curves through them) when the
+ *  series has a line. */
+function drawScatter(svg, chart, { toX, toV, colors }) {
+  chart.series.forEach((s, si) => {
+    const pts = [];
+    s.values.forEach((v, i) => { if (typeof v === 'number' && typeof s.xs?.[i] === 'number') pts.push([toX(s.xs[i]), toV(v)]); });
+    if (s.line && pts.length > 1) {
+      let d = `M ${pts[0][0]} ${pts[0][1]}`;
+      for (let i = 1; i < pts.length; i++) {
+        if (!s.smooth) { d += ` L ${pts[i][0]} ${pts[i][1]}`; continue; }
+        // (A Catmull-Rom curve through the points, drawn as cubic Béziers.)
+        const [p0, p1, p2, p3] = [pts[i - 2] || pts[i - 1], pts[i - 1], pts[i], pts[i + 1] || pts[i]];
+        d += ` C ${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`;
+      }
+      svg.append(el('path', { d, fill: 'none', stroke: colors[si], 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+    }
+    if (s.marker !== 'none') for (const [x, y] of pts) svg.append(el('circle', { cx: x, cy: y, r: 3.5, fill: colors[si] }));
+  });
+}
+
+const KIND_NAMES = { bar: 'Column chart', line: 'Line chart', area: 'Area chart', pie: 'Pie chart', doughnut: 'Doughnut chart', scatter: 'Scatter chart' };
 /** What a screen reader is given for a chart: a figure with its title and kind, and its data as a table. */
 export function chartFigure(chart) {
   const fig = document.createElement('figure');
@@ -231,6 +279,7 @@ export function drawCharts(st, win) {
     if (!box || box.key !== key) {
       const div = document.createElement('div');
       div.className = 'oxe-chart';
+      div.dataset.oxeChart = String(ch.index ?? st.charts.indexOf(ch));
       div.append(chartSvg(ch, { width: w, height: h, theme: st.theme, date1904: st.date1904 }));
       box = { key, div };
       st.chartCache.set(ch, box);
@@ -240,4 +289,5 @@ export function drawCharts(st, win) {
     out.push(box.div);
   }
   layer.replaceChildren(...out);
+  st.onChartsDrawn?.();
 }

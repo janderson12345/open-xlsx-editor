@@ -85,15 +85,16 @@ function data(wb, el, numeric) {
 }
 
 /** The text of a title, or null when the chart has none (its own rich text, the cell it points to). */
-function titleText(wb, chart, series) {
+function titleText(wb, chart, series, kind) {
   const t = kid(chart, 'title', C);
   if (!t) return null;
   const rich = kid(kid(t, 'tx', C), 'rich', C);
   if (rich) return [...rich.getElementsByTagNameNS(A, 't')].map((x) => x.textContent).join('');
   const ref = kid(kid(t, 'tx', C), 'strRef', C);
   if (ref) return data(wb, kid(t, 'tx', C), false).values.join('');
-  // (A title with no text of its own: the series' name, when there is one series.)
-  return series.length === 1 ? series[0].name : 'Chart Title';
+  // (A title with no text of its own: the series' name when there is one series, or for a pie, which draws only its
+  // first; else Excel's 'Chart Title'. Excel's reading of charts written here: test/chartnew-readback-excel.json.)
+  return series.length === 1 || (kind === 'pie' && series.length) ? series[0].name : 'Chart Title';
 }
 
 /** A shape's solid fill or line colour, as the theme or RGB the file names: { theme, rgb, lumMod, lumOff } or null. */
@@ -105,7 +106,7 @@ function colorOf(spPr) {
   return c.localName === 'srgbClr' ? { rgb: attr(c, 'val', null) } : { scheme: attr(c, 'val', null), lumMod: mod('lumMod'), lumOff: mod('lumOff') };
 }
 
-const KINDS = { barChart: 'bar', bar3DChart: 'bar', lineChart: 'line', line3DChart: 'line', areaChart: 'area', area3DChart: 'area', pieChart: 'pie', pie3DChart: 'pie', doughnutChart: 'doughnut' };
+const KINDS = { barChart: 'bar', bar3DChart: 'bar', lineChart: 'line', line3DChart: 'line', areaChart: 'area', area3DChart: 'area', pieChart: 'pie', pie3DChart: 'pie', doughnutChart: 'doughnut', scatterChart: 'scatter' };
 
 /** One chart part: { kind, dir, grouping, title, legend, series, axis, cats } (kind null for a kind not drawn yet). */
 function readChart(wb, doc) {
@@ -116,10 +117,18 @@ function readChart(wb, doc) {
   const kind = KINDS[group.localName];
   const series = kids(group, 'ser', C).map((s, i) => {
     const name = data(wb, kid(s, 'tx', C), false).values[0] ?? kid(kid(s, 'tx', C), 'v', C)?.textContent ?? `Series${i + 1}`;
-    const values = data(wb, kid(s, 'val', C), true);
-    return { name, values: values.values, code: values.code, cats: data(wb, kid(s, 'cat', C), false).values, color: colorOf(kid(s, 'spPr', C)), index: Number(val(s, 'idx') ?? i), marker: val(kid(s, 'marker', C), 'symbol') };
+    // (A scatter chart's series have x and y values: xs numbers, or 1, 2, 3... when they are text, as Excel plots them.)
+    const values = data(wb, kid(s, 'val', C) || kid(s, 'yVal', C), true);
+    const xVal = kid(s, 'xVal', C);
+    const xs = xVal ? data(wb, xVal, true).values.map((x, k) => (typeof x === 'number' ? x : k + 1)) : null;
+    const line = kid(kid(s, 'spPr', C), 'ln', A);
+    return { name, values: values.values, code: values.code, cats: data(wb, kid(s, 'cat', C) || xVal, false).values, xs, color: colorOf(kid(s, 'spPr', C)), index: Number(val(s, 'idx') ?? i),
+      marker: val(kid(s, 'marker', C), 'symbol'), line: !kid(line, 'noFill', A), smooth: val(s, 'smooth') === '1' };
   });
-  const valAx = kid(plot, 'valAx', C);
+  // (The value axis: a scatter chart's is its upright one, the other its x axis.)
+  const valAxes = kids(plot, 'valAx', C);
+  const valAx = valAxes.find((ax) => ['l', 'r'].includes(val(ax, 'axPos'))) || valAxes[0];
+  const xAx = kind === 'scatter' ? valAxes.find((ax) => ax !== valAx) : null;
   const scaling = kid(valAx, 'scaling', C);
   const num = (name) => { const v = val(scaling, name) ?? val(valAx, name); return v == null ? null : Number(v); };
   const legend = kid(chart, 'legend', C);
@@ -132,12 +141,16 @@ function readChart(wb, doc) {
     gapWidth: Number(val(group, 'gapWidth') ?? 150),
     overlap: Number(val(group, 'overlap') ?? (/stacked/i.test(val(group, 'grouping') || '') ? 100 : 0)),
     holeSize: Number(val(group, 'holeSize') ?? 50),
-    title: val(chart, 'autoTitleDeleted') === '1' ? null : titleText(wb, chart, series),
+    title: val(chart, 'autoTitleDeleted') === '1' ? null : titleText(wb, chart, series, kind),
+    ownTitle: !!kid(kid(chart, 'title', C), 'tx', C),
+    // (Data labels showing values: the chart's own setting, or any series'.)
+    labels: [kid(group, 'dLbls', C), ...kids(group, 'ser', C).map((s) => kid(s, 'dLbls', C))].some((d) => val(d, 'showVal') === '1'),
     legend: legend ? val(legend, 'legendPos') || 'r' : null,
     series,
     cats: series[0]?.cats || [],
     axis: { min: num('min'), max: num('max'), major: valAx && val(valAx, 'majorUnit') != null ? Number(val(valAx, 'majorUnit')) : null, gridlines: !!kid(valAx, 'majorGridlines', C), code: attr(kid(valAx, 'numFmt', C), 'formatCode', null), linked: attr(kid(valAx, 'numFmt', C), 'sourceLinked', null) === '1', hidden: deleted(valAx) },
-    catHidden: deleted(kid(plot, 'catAx', C)),
+    catHidden: deleted(kid(plot, 'catAx', C) || xAx),
+    xGridlines: !!kid(xAx, 'majorGridlines', C),
   };
 }
 

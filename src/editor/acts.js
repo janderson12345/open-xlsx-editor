@@ -11,6 +11,10 @@ import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor } from './namesbox.js';
 import { formatCellsBox } from './formatbox.js';
+import { insertChart } from '../ooxml/chartnew.js';
+import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
+import { chartBox } from './chartbox.js';
+import { currentRegion } from '../ooxml/special.js';
 import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
@@ -181,6 +185,42 @@ export function createActs(env) {
       // (Insert > PivotTable: its boxes, then the PivotTable made.)
       const s = editing().selection;
       return insertPivot(root, state.workbook, i, { r: s.ar, c: s.ac }, (...a) => editing().run(...a)).then((done) => { state.grid.el.focus({ preventScroll: true }); return done; });
+    }
+    if (name === 'insertChart') {
+      // (Insert > Charts: the selection charted; one cell selected, the table round it, as Excel takes it.)
+      const s = editing().selection;
+      const sel = s.r0 === s.r1 && s.c0 === s.c1 ? currentRegion(state.workbook.sheet(i), s.r0, s.c0) : s;
+      let made = null;
+      const done = editing().run('sheetChange', (wb, si) => { made = insertChart(wb, si, sel, args[0]); return !!made; });
+      if (!done && !made && !state.readOnly) return messageBox(root, 'Select the cells to chart first: a table with numbers in it.').then(() => false);
+      return done;
+    }
+    if (name === 'chartAnchor') return editing().run('sheetChange', (wb, si) => { setChartAnchor(wb, si, args[0], args[1], args[2]); });
+    if (name === 'chartDelete') return editing().run('sheetChange', (wb, si) => { deleteChart(wb, si, args[0]); });
+    if (name === 'chartEdit') {
+      // (Edit Chart's answer: each change as Excel writes it, chartedit.js; refused for a chart written otherwise.)
+      const [k, change] = args;
+      let refused = null;
+      const done = editing().run('sheetChange', (wb, si) => {
+        try {
+          if (change.kind) setChartKind(wb, si, k, change.kind);
+          if ('title' in change) setChartTitle(wb, si, k, change.title);
+          if ('legend' in change) setChartLegend(wb, si, k, change.legend);
+          if ('labels' in change) setChartLabels(wb, si, k, change.labels);
+        } catch (e) { refused = e.message; return false; }
+        return true;
+      });
+      if (refused) return messageBox(root, refused).then(() => false);
+      state.picker?.pick(k, false);
+      return done;
+    }
+    if (name === 'chartBox') {
+      const chart = (state.charts || []).find((c) => c.index === args[0]);
+      if (!chart) return false;
+      return chartBox(root, chart).then((change) => {
+        state.grid.el.focus({ preventScroll: true });
+        return change ? act('chartEdit', args[0], change) : false;
+      });
     }
     if (name === 'formatCellsBox') {
       // (Ctrl+1: the active cell's format in Excel's box; what was changed there given to the selection.)
@@ -369,6 +409,12 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     return true;
   };
   /** The menu of a cell (right-click): Excel's, as far as the editor goes. */
+  /** A chart's menu (right click, Shift+F10): Edit Chart..., Delete. */
+  const chartMenu = (point, k) => {
+    const ro = state.readOnly;
+    menu.open([{ label: 'Edit Chart...', run: () => act('chartBox', k), disabled: ro }, 'separator', { label: 'Delete', run: () => act('chartDelete', k), disabled: ro }], point,
+      { back: () => state.grid.el.focus({ preventScroll: true }) });
+  };
   const cellMenu = (point) => {
     const ro = state.readOnly;
     const run = (name, ...a) => () => act(name, ...a);
@@ -415,5 +461,5 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     if (n == null) return false;
     return editing().run(rows ? 'rowHeight' : 'columnWidth', n);
   };
-  return { act, lines, pasteSpecialBox, sortWarning, sortQuick, customSort, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, headerMenu, sizeBox };
+  return { act, lines, pasteSpecialBox, sortWarning, sortQuick, customSort, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu, sizeBox };
 }

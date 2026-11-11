@@ -159,6 +159,8 @@ export function attachEditing(root, ctx) {
 
   view.addEventListener('keydown', (e) => {
     if (e.target !== view) return;
+    // (A chart picked, or Ctrl+Alt+5 to pick one: its keys first, chartpick.js.)
+    if (ctx.chartKey?.(e)) { e.preventDefault(); return; }
     const ctrl = e.ctrlKey || e.metaKey;
     const key = e.key;
     let handled = true;

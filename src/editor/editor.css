@@ -1659,6 +1659,40 @@
   left: var(--oxe-x);
   top: var(--oxe-y);
   line-height: 0;
+  pointer-events: auto;
+  cursor: move;
+}
+/* A picked chart (chartpick.js): outlined, with eight handles; sized, an outline of its new size. */
+.oxe-chart.oxe-chart-on {
+  outline: 2px solid var(--oxe-accent, #217346);
+  outline-offset: 1px;
+}
+.oxe-chart-h {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -5px 0 0 -5px;
+  border: 1px solid var(--oxe-accent, #217346);
+  background: #ffffff;
+}
+.oxe-chart-h-nw, .oxe-chart-h-n, .oxe-chart-h-ne { top: 0; }
+.oxe-chart-h-w, .oxe-chart-h-e { top: 50%; }
+.oxe-chart-h-sw, .oxe-chart-h-s, .oxe-chart-h-se { top: 100%; }
+.oxe-chart-h-nw, .oxe-chart-h-w, .oxe-chart-h-sw { left: 0; }
+.oxe-chart-h-n, .oxe-chart-h-s { left: 50%; }
+.oxe-chart-h-ne, .oxe-chart-h-e, .oxe-chart-h-se { left: 100%; }
+.oxe-chart-h-nw, .oxe-chart-h-se { cursor: nwse-resize; }
+.oxe-chart-h-ne, .oxe-chart-h-sw { cursor: nesw-resize; }
+.oxe-chart-h-n, .oxe-chart-h-s { cursor: ns-resize; }
+.oxe-chart-h-e, .oxe-chart-h-w { cursor: ew-resize; }
+.oxe-chart.oxe-chart-sizing::after {
+  content: '';
+  position: absolute;
+  left: var(--oxe-ghost-x);
+  top: var(--oxe-ghost-y);
+  width: var(--oxe-ghost-w);
+  height: var(--oxe-ghost-h);
+  outline: 1px dashed #404040;
 }
 .oxe-chart-figures {
   position: absolute;

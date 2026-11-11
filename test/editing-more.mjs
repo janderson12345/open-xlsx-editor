@@ -6,7 +6,7 @@ import { encryptWorkbook } from '../src/ooxml/encryption.js';
 import { pivotBook } from './pivots.js';
 import { editingPage } from './editing-kit.mjs';
 
-const { page, check, finish, openFixtureFrom, shown, sel, clickCell, pointAt, ribbon } = await editingPage();
+const { page, check, finish, openFixtureFrom, shown, sel, clickCell, pointAt, ribbon, menu } = await editingPage();
 
 // A workbook saved with a password (made here with a test password): Excel's Password box; a wrong one gets Excel's
 // words and nothing opens; the right one opens it, and it saves encrypted again.
@@ -230,5 +230,41 @@ check(painted[0] === painted[1] && !painted[2], 'Format Painter: the format of B
 await page.keyboard.press('Control+z');
 const unpainted = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(4)?.get(4)?.s || 0);
 check(unpainted === 0, 'Ctrl+Z takes the painted format away', String(unpainted));
+
+// Insert > Charts on a new sheet's table: a clustered column chart beside it, drawn; picked with a click and dragged
+// a column right; Edit Chart (Enter) gives it a title; Delete deletes it and Ctrl+Z brings it back.
+await page.evaluate(() => {
+  const o = window.oxe;
+  o.command('insertSheet');
+  [['Region', 'Sales', 'Cost'], ['North', 120, 80], ['South', 95, 70], ['East', 140, 90]].forEach((row, r) => row.forEach((v, c) => o.enter(String.fromCharCode(65 + c) + (r + 1), String(v))));
+  o.select('A1');
+});
+await page.click('.oxe-rtab >> text=Insert');
+await menu('Insert Column or Bar Chart', 'Clustered Column');
+await page.waitForSelector('.oxe-chart');
+const chartsNow = () => page.evaluate(() => window.oxe.workbook && [...document.querySelectorAll('.oxe-chart')].map((d) => d.dataset.oxeChart).join(','));
+const anchorNow = () => page.evaluate(() => { const s = document.querySelector('.oxe-chart'); return s ? s.style.getPropertyValue('--oxe-x') : null; });
+check(await chartsNow() === '0', 'Insert > Charts > Clustered Column: the chart drawn beside the table', await chartsNow());
+const chartX0 = await anchorNow();
+const chartBox0 = await page.locator('.oxe-chart').boundingBox();
+await page.mouse.move(chartBox0.x + 100, chartBox0.y + 100);
+await page.mouse.down();
+await page.mouse.move(chartBox0.x + 140, chartBox0.y + 100, { steps: 4 });
+await page.mouse.move(chartBox0.x + 170, chartBox0.y + 100, { steps: 4 });
+await page.mouse.up();
+const chartX1 = await anchorNow();
+check(parseFloat(chartX1) > parseFloat(chartX0) + 50, 'the chart dragged right: its anchor moved', `${chartX0} -> ${chartX1}`);
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-chart-box');
+await page.selectOption('dialog.oxe-chart-box select >> nth=1', 'text');
+await page.fill('dialog.oxe-chart-box input[type=text]', 'Sales by region');
+await page.click('dialog.oxe-chart-box >> button:text-is("OK")');
+const titled = await page.evaluate(() => [...document.querySelectorAll('.oxe-chart svg text')].some((t) => t.textContent === 'Sales by region'));
+check(titled, 'Edit Chart: the title drawn');
+await page.keyboard.press('Delete');
+const chartGone = await chartsNow();
+await page.keyboard.press('Control+z');
+await page.waitForSelector('.oxe-chart');
+check(chartGone === '' && await chartsNow() === '0', 'Delete deletes the picked chart; Ctrl+Z brings it back', `${chartGone} / ${await chartsNow()}`);
 
 await finish();

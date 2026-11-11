@@ -4,6 +4,7 @@ import { Workbook } from './ooxml/workbook.js';
 import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
 import { createActs } from './editor/acts.js';
+import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { attachEditing } from './editor/interact.js';
@@ -145,7 +146,9 @@ export function mountXlsxEditor(host, options = {}) {
     // (Notes too: written, deleted, or moved with rows and columns.)
     state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
     // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)
-    const charts = readCharts(state.workbook, state.sheetIndex).filter((c) => c.kind);
+    // (Each with its place among the sheet's charts, which the chart edits go by: chartedit.js.)
+    const charts = readCharts(state.workbook, state.sheetIndex).map((c, index) => ({ ...c, index })).filter((c) => c.kind);
+    state.charts = charts;
     state.grid.setCharts(charts, state.workbook.theme);
     let figures = root.querySelector(':scope > .oxe-chart-figures');
     if (!figures && charts.length) { figures = document.createElement('section'); figures.className = 'oxe-chart-figures'; figures.setAttribute('aria-label', 'Charts on this sheet'); root.append(figures); }
@@ -215,7 +218,7 @@ export function mountXlsxEditor(host, options = {}) {
     .filter((t) => t.state === 'visible');
 
   // (The ribbon's actions and their boxes and menus, editor/acts.js, given this editor's state and helpers.)
-  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed });
+  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed });
   const api = {
     /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). One saved
      *  with a password opens with `password`; without one, Excel's Password box asks for it and a promise is
@@ -247,6 +250,8 @@ export function mountXlsxEditor(host, options = {}) {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
         state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
         state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
+        state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], act, menu: (point, k) => chartMenu(point, k), readOnly: () => state.readOnly });
+        state.grid.onChartsDrawn(() => state.picker?.redrawn());
         state.grid.setNotes(readNotes(wb, i));
         showConditional();
         state.editing = attachEditing(root, {
@@ -275,6 +280,7 @@ export function mountXlsxEditor(host, options = {}) {
           goToBox: () => act('goToBox'),
           nameManager: () => act('nameManager'),
           painting: () => act('painting'),
+          chartKey: (e) => state.picker?.onKey(e),
           formatCells: () => act('formatCellsBox'),
           painted: () => act('paintFormats'),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },

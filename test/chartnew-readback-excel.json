@@ -1,0 +1,117 @@
+{
+ "source": "tools/excel-compare/excel-chart-readback.ps1 on test/out/charts/chartnew-all.xlsx (chartnew.test.js)",
+ "charts": [
+  {
+   "sheet": "columnClustered",
+   "type": 51,
+   "series": 2,
+   "formula1": "=SERIES(columnClustered!$B$1,columnClustered!$A$2:$A$5,columnClustered!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "columnStacked",
+   "type": 52,
+   "series": 2,
+   "formula1": "=SERIES(columnStacked!$B$1,columnStacked!$A$2:$A$5,columnStacked!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "columnStacked100",
+   "type": 53,
+   "series": 2,
+   "formula1": "=SERIES(columnStacked100!$B$1,columnStacked100!$A$2:$A$5,columnStacked100!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "barClustered",
+   "type": 57,
+   "series": 2,
+   "formula1": "=SERIES(barClustered!$B$1,barClustered!$A$2:$A$5,barClustered!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "barStacked",
+   "type": 58,
+   "series": 2,
+   "formula1": "=SERIES(barStacked!$B$1,barStacked!$A$2:$A$5,barStacked!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "line",
+   "type": 4,
+   "series": 2,
+   "formula1": "=SERIES(line!$B$1,line!$A$2:$A$5,line!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "lineMarkers",
+   "type": 65,
+   "series": 2,
+   "formula1": "=SERIES(lineMarkers!$B$1,lineMarkers!$A$2:$A$5,lineMarkers!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "pie",
+   "type": 5,
+   "series": 2,
+   "formula1": "=SERIES(pie!$B$1,pie!$A$2:$A$5,pie!$B$2:$B$5,1)",
+   "title": "Sales",
+   "legend": true
+  },
+  {
+   "sheet": "doughnut",
+   "type": -4120,
+   "series": 2,
+   "formula1": "=SERIES(doughnut!$B$1,doughnut!$A$2:$A$5,doughnut!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "area",
+   "type": 1,
+   "series": 2,
+   "formula1": "=SERIES(area!$B$1,area!$A$2:$A$5,area!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "areaStacked",
+   "type": 76,
+   "series": 2,
+   "formula1": "=SERIES(areaStacked!$B$1,areaStacked!$A$2:$A$5,areaStacked!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "scatter",
+   "type": -4169,
+   "series": 2,
+   "formula1": "=SERIES(scatter!$B$1,scatter!$A$2:$A$5,scatter!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "scatterLines",
+   "type": 74,
+   "series": 2,
+   "formula1": "=SERIES(scatterLines!$B$1,scatterLines!$A$2:$A$5,scatterLines!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  },
+  {
+   "sheet": "scatterSmooth",
+   "type": 72,
+   "series": 2,
+   "formula1": "=SERIES(scatterSmooth!$B$1,scatterSmooth!$A$2:$A$5,scatterSmooth!$B$2:$B$5,1)",
+   "title": "Chart Title",
+   "legend": true
+  }
+ ]
+}
