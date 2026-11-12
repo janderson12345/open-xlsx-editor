@@ -26,7 +26,12 @@ Excel 365's dynamic array formulas: a formula whose answer is an array spills it
   (measured: five ranges through C1's =SEQUENCE(6,1,10,-1), refused; A1:B6 beside it sorts), as an old array
   formula's is.
 - Formulas in workbooks saved by older versions of Excel keep their old meaning: `=A1:A3` there is one value, A1:A3
-  cut to the formula's row (Excel 365 shows it as `=@A1:A3`, and so does the formula bar here).
+  cut to the formula's row. The formula bar (and F2) shows Excel 365's `@` wherever such a formula cuts a range or an
+  array to one value (`src/calc/legacyat.js`), so that typed back it keeps that meaning. Measured on 58 formulas (set by
+  Range.Formula in a hidden Excel, read back by Formula2), 57 the same here: a range where one value is wanted,
+  `=@A1:A3*2`, `=SUM(@A1:A3*2)`, `=VLOOKUP(@A1:A3,A1:B3,2,FALSE)`, `=COUNTIF(A1:A3,@A1:A3)`; a function giving
+  several cells there, `=@OFFSET(A1,0,0,2)`, `=@CHOOSE(1,A1:A3)`, `=@INDEX(A1:A3,0,1)`, `=@ROW(A1:A3)`; none where the
+  range is taken whole, `=SUMPRODUCT(A1:A3*2)`, `=MATCH(2,A1:A3,0)`, `=SUMIF(A1:A3,">1")`, `=N(A1:A3)`.
 
 ## The file (measured)
 
@@ -101,5 +106,5 @@ formula probe:
 - The blue outline Excel draws round a spill when its cell is selected.
 - (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array functions, MAP, REDUCE, SCAN, BYROW, BYCOL,
   MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF, RANDARRAY and TRIMRANGE are here, in the formula probe.)
-- `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an
-  old formula's operator cuts to one value (`=@A1:A3*2`).
+- An old formula's `@` is found by working the formula out at its cell, so where that gives an error before the array
+  comes out it isn't shown: `=SEQUENCE(A1:A3)` below row 3 is `=SEQUENCE(@A1:A3)` here, `=@SEQUENCE(@A1:A3)` in Excel.

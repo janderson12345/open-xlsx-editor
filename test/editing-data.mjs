@@ -458,4 +458,18 @@ await ribbon('Watch Window');
 check(watched.join() === 'Data||L47|14|=IF(L45>5,L45*2,0)' && updated.join() === 'Data||L47|18|=IF(L45>5,L45*2,0)' && left.length === 0,
   'Watch Window: L47 watched, 14 then 18 as L45 changes; Delete Watch', JSON.stringify({ watched, updated, left }));
 
+// A formula of the old kind (as a workbook from an older Excel holds it): the formula bar shows Excel 365's @ where it
+// cuts a range to one value, =@L50:L52*2 (measured: Formula2 of a formula set by Range.Formula), and F2 opens it so.
+await page.evaluate(() => {
+  const wb = window.oxe.workbook;
+  wb.apply(0, [{ r: 49, c: 11, value: 1 }, { r: 50, c: 11, value: 2 }, { r: 51, c: 11, value: 3 }, { r: 59, c: 13, formula: 'L50:L52*2', legacy: true }]);
+  window.oxe.select('N60');
+});
+const oldBar = await bar();
+await page.focus('.oxe-grid');
+await page.keyboard.press('F2');
+const oldEdit = await page.evaluate(() => document.querySelector('.oxe-editor')?.value ?? document.querySelector('.oxe-editor')?.textContent);
+await page.keyboard.press('Escape');
+check(oldBar === '=@L50:L52*2' && oldEdit === '=@L50:L52*2', 'an old formula in the formula bar and F2 with Excel 365’s @: =@L50:L52*2', JSON.stringify({ oldBar, oldEdit }));
+
 await finish();

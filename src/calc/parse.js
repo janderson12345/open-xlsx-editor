@@ -37,7 +37,7 @@ export function parseFormula(text) {
     if (is(t, 'op', '@')) { i++; return { k: 'fn', name: 'SINGLE', args: [unary()] }; }
     let node = called();
     // (Intersection, a space between references: tighter than negation and %, as Excel has it.)
-    while (is(peek(), 'op', ' ')) { i++; node = { k: 'isect', a: node, b: called() }; }
+    while (is(peek(), 'op', ' ')) { i++; node = { k: 'isect', a: node, b: called(), at: node.at }; }
     while (is(peek(), 'op', '%')) { i++; node = { k: 'pct', a: node }; }
     return node;
   }
@@ -47,7 +47,7 @@ export function parseFormula(text) {
     // formula to Excel.)
     while (is(peek(), 'op', ':')) {
       i++;
-      node = { k: 'range', a: node, b: invoked() };
+      node = { k: 'range', a: node, b: invoked(), at: node.at };
       if (['num', 'str', 'bool', 'arr'].includes(node.b.k) || ['num', 'str', 'bool', 'arr'].includes(node.a.k)) { i--; fail('A range needs references on both sides'); }
     }
     return node;
@@ -80,7 +80,14 @@ export function parseFormula(text) {
     i--;
     return fail('An array can hold only numbers, text, TRUE, FALSE and errors');
   }
+  /** A primary, with `at`: where its text starts (legacyat.js puts an @ there). */
   function primary() {
+    const at = toks[i]?.start;
+    const node = primaryOf();
+    if (node.at == null) node.at = at;
+    return node;
+  }
+  function primaryOf() {
     const t = toks[i++];
     if (!t) { i--; return fail('The formula ends too soon'); }
     switch (t.type) {

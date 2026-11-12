@@ -211,12 +211,16 @@ export function formatAfterEntry(current, parsed) {
  * (with its time as h:mm:ss AM/PM), a time alone as h:mm:ss AM/PM, a percentage as a percentage, other numbers in full,
  * booleans as TRUE and FALSE. Typed back, each gives the same value.
  */
-export function editText(cell, code = 'General', date1904 = false) {
+export function editText(cell, code = 'General', date1904 = false, at = null) {
   if (!cell) return '';
   if (cell.f) {
-    // (A formula of the old kind that is a whole range, A1:A3, works by implicit intersection: Excel 365 shows its @.)
-    const legacy = !cell.dynamic && !cell.array && /^('[^']+'|[^!(]+!)?\$?[A-Z]{1,3}\$?\d+:\$?[A-Z]{1,3}\$?\d+$/i.test(cell.f);
-    return `=${legacy ? '@' : ''}${displayFormula(cell.f)}`;
+    // (A formula of the old kind works by implicit intersection: Excel 365 shows an @ where it cuts a range to one value.
+    // `at` puts them in (calc/legacyat.js, which needs the cell's place); without it, a formula that is a whole range,
+    // A1:A3, gets its @.)
+    const old = !cell.dynamic && !cell.array;
+    if (old && at) return `=${at(displayFormula(cell.f))}`;
+    const whole = old && /^('[^']+'|[^!(]+!)?\$?[A-Z]{1,3}\$?\d+:\$?[A-Z]{1,3}\$?\d+$/i.test(cell.f);
+    return `=${whole ? '@' : ''}${displayFormula(cell.f)}`;
   }
   if (cell.v == null) return '';
   if (cell.t === 'b') return cell.v ? 'TRUE' : 'FALSE';

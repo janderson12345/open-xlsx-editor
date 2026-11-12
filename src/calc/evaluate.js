@@ -205,6 +205,12 @@ function call(node, ctx, mode) {
 
 /** The value of a formula's tree (a number, text, boolean, error, null for a blank, or an Area, Arr or Union). */
 export function evaluate(node, ctx, mode = 'scalar') {
+  const v = evaluated(node, ctx, mode);
+  // (Which part gave a range or an array, the outermost: legacyat.js.)
+  if (ctx.origin && (v instanceof Area || v instanceof Arr)) ctx.origin.set(v, node);
+  return v;
+}
+function evaluated(node, ctx, mode) {
   switch (node.k) {
     case 'num': case 'str': case 'bool': return node.v;
     case 'err': return errorOf(node.v);

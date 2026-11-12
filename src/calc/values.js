@@ -78,6 +78,8 @@ export function cellValue(cell) {
  *  formula's own column or row (implicit intersection, as Excel does in a formula that isn't an array formula), else
  *  #VALUE!; an array its first value. */
 export function scalar(v, ctx) {
+  // (A range or array cut to one value: what an old formula does where Excel 365 shows an @, legacyat.js.)
+  if (ctx.shrunk && ((v instanceof Area && v.size > 1) || (v instanceof Arr && (v.height > 1 || v.width > 1)))) ctx.shrunk(v);
   if (v instanceof Area) {
     if (v.size === 1) return ctx.cellValue(v.si, v.r0, v.c0);
     const { r, c } = ctx.here;

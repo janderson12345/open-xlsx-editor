@@ -13,6 +13,7 @@ import { announce } from './live.js';
 import { refName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
+import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
@@ -137,10 +138,12 @@ export function attachEditing(root, ctx) {
     after();
   }
   /** A cell's text as Excel's formula bar has it (a date as a date, a percentage as one). */
-  const barText = (cell) => editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904);
+  // (An old formula with the @s Excel 365 shows where it cuts a range to one value, at its cell: calc/legacyat.js.)
+  const barText = (cell, r, c) => editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
+    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown));
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
-    bar.show(refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac)));
+    bar.show(refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac), s.ar, s.ac));
   }
   const reopen = (text) => {
     const s = cmd.selection;
@@ -158,7 +161,7 @@ export function attachEditing(root, ctx) {
       return;
     }
     const cls = ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '';
-    editor.open(s.ar, s.ac, seed != null ? seed : barText(cell), mode, cls);
+    editor.open(s.ar, s.ac, seed != null ? seed : barText(cell, s.ar, s.ac), mode, cls);
     pointing.attach(editor.el);
   };
 

@@ -75,6 +75,7 @@ insides:
 | `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
 | `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
 | `src/calc/evaluate.js` | Operators, references, names and function calls; implicit intersection outside array formulas, element by element inside. |
+| `src/calc/legacyat.js` | The @s Excel 365 shows in a formula of the old kind, where it cuts a range to one value: found by working it out at its cell (docs/DYNAMIC.md). |
 | `src/calc/iterate.js` | Circular references: left out with iterative calculation off, gone round with it on, as Excel does (docs/CALC.md). |
 | `src/calc/threed.js` | 3D references (Jan:Apr!A1) and the intersection operator, and which functions take a 3D reference (docs/CALC.md). |
 | `src/calc/functions.js` | The worksheet functions, as Excel defines them: maths, statistics, logic, information, and the helpers the others share. |
