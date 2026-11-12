@@ -53,13 +53,25 @@ await clickCell(4, 9);
 await page.waitForSelector('dialog.oxe-dialog[role="alertdialog"]');
 const refusal = await page.textContent('dialog.oxe-dialog[role="alertdialog"]');
 await page.keyboard.press('Enter');
-const j3 = await pointAt(2, 9);
-await page.mouse.click(j3.x, j3.y, { button: 'right' });
+// (From the keyboard: Shift+F10 opens the cell's menu, its first item focused.)
+await page.evaluate(() => window.oxe.select('J3'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+F10');
 await page.waitForSelector('.oxe-menu >> text=Open Hyperlink');
+const menuFocused = await page.evaluate(() => !!document.activeElement.closest('.oxe-menu'));
 const items = await page.$$eval('.oxe-menu [role="menuitem"]', (xs) => xs.map((x) => x.textContent.trim()).join('|'));
 await page.click('.oxe-menu >> text=Open Hyperlink');
-check(ownTip.startsWith('Tip here - ') && /Cannot open the specified file\./.test(refusal || '') && /Open Hyperlink\|Remove Hyperlink/.test(items) && (await opened()).length === 2,
-  'a file’s path: its own ScreenTip, refused in Excel’s words; the cell menu’s Open Hyperlink opens J3’s address', JSON.stringify({ ownTip, refusal, items }));
+check(ownTip.startsWith('Tip here - ') && /Cannot open the specified file\./.test(refusal || '') && /Open Hyperlink\|Remove Hyperlink/.test(items) && menuFocused && (await opened()).length === 2,
+  'a file’s path: its own ScreenTip, refused in Excel’s words; Shift+F10, the cell menu’s Open Hyperlink opens J3’s address', JSON.stringify({ ownTip, refusal, items, menuFocused }));
+// (The menu key does the same, on another cell.)
+await page.evaluate(() => window.oxe.select('L2'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('ContextMenu');
+await page.waitForSelector('.oxe-menu >> text=Paste Special...');
+const keyMenu = await page.$$eval('.oxe-menu [role="menuitem"]', (xs) => xs.map((x) => x.textContent.trim()).includes('Link'));
+await page.keyboard.press('Escape');
+const backToGrid = await page.evaluate(() => document.activeElement.classList.contains('oxe-grid'));
+check(keyMenu && backToGrid, 'the menu key: the cell’s menu (with Link); Esc back to the grid', JSON.stringify({ keyMenu, backToGrid }));
 
 // Ctrl+K on an empty cell: Excel's Insert Hyperlink box; a web address and text to display; then Edit Hyperlink... on
 // the cell's menu, to a place in the workbook; then its Remove Link.

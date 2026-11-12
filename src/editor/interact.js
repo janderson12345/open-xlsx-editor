@@ -192,6 +192,11 @@ export function attachEditing(root, ctx) {
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
     // (Alt+Shift+F10: the error button's menu, on a cell with an error indicator.)
     else if (key === 'F10' && e.altKey && e.shiftKey) ctx.errorMenu?.();
+    // (Shift+F10 or the menu key: the cell's menu, beside the active cell, as a right click opens it.)
+    else if ((key === 'F10' && e.shiftKey && !e.altKey && !ctrl) || key === 'ContextMenu') {
+      const b = (root.querySelector('.oxe-sel-active') || view).getBoundingClientRect();
+      ctx.cellMenu?.({ x: b.left + Math.min(b.width, 40), y: b.bottom });
+    }
     // (Ctrl+`: Show Formulas, on or off.)
     else if (ctrl && !e.altKey && !e.shiftKey && e.code === 'Backquote') cmd.run('showFormulas');
     // (F9 Calculate Now, Shift+F9 Calculate Sheet, Ctrl+Alt+F9 every formula.)
@@ -353,6 +358,8 @@ export function attachEditing(root, ctx) {
   // it is already part of the selection, as in Excel. On a cell, the cell's menu (Cut, Copy, Paste, Paste Special...,
   // Insert..., Delete..., Clear Contents), the cell selected first unless it is in the selection.
   view.addEventListener('contextmenu', (e) => {
+    // (The menu key's own event, at no pointer: the keydown above opened the menu already.)
+    if (e.target === view && e.clientX === 0 && e.clientY === 0 && e.button === 0) { e.preventDefault(); return; }
     const at = grid.hitTest(e.clientX, e.clientY);
     if (at && at.r >= 0 && at.c >= 0) {
       e.preventDefault();
