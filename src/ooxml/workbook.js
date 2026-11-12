@@ -15,10 +15,8 @@ import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, 
 import { changeLines } from './rowcol.js';
 import { setColumns, setRows } from './sizes.js';
 import { setFreeze, setZoom, setShowFormulas } from './view.js';
-import { setAutoFilterXml, hiddenRows } from './filterops.js';
+import { applyAutoFilter, filterName } from './filterops.js';
 import { applyAdvancedFilter } from './advfilter.js';
-import { sheetPrefix } from '../calc/tokens.js';
-import { colName } from './refs.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.js';
@@ -322,28 +320,8 @@ export class Workbook {
     this.edited = true;
   }
 
-  setAutoFilter(i, filter) {
-    const part = this._part(i);
-    const was = part.model.autoFilter;
-    setAutoFilterXml(part.doc, filter, this, i, this.today);
-    const area = filter || was;
-    if (area) {
-      const hide = filter ? hiddenRows(this, i, filter, this.today) : new Set();
-      // (Runs of rows alike written at once.)
-      for (let r = area.r0 + 1; r <= area.r1;) {
-        const on = hide.has(r);
-        let end = r;
-        while (end + 1 <= area.r1 && hide.has(end + 1) === on) end++;
-        setRows(part.doc, r, end, { hidden: on });
-        r = end + 1;
-      }
-    }
-    if (filter) this._filterName(i, filter);
-    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
-    this.dirty.add(this.sheets[i].path);
-    this.edited = true;
-    this.resetCalc();
-  }
+  /** Sheet i's AutoFilter on (`filter`: its area and columns' filters) or off (null), rows hidden or shown (filterops.js). */
+  setAutoFilter(i, filter) { applyAutoFilter(this, i, filter); }
 
   /**
    * Data > Advanced: the rows of `list` on sheet i passing `criteria` (advfilter.js), without later duplicates when
@@ -353,32 +331,8 @@ export class Workbook {
    */
   advancedFilter(i, spec) { return applyAdvancedFilter(this, i, spec); }
 
-  /** The hidden name Excel keeps a sheet's filter range in: _xlnm._FilterDatabase, local to the sheet. */
-  _filterName(i, area, name = '_xlnm._FilterDatabase', hidden = true) {
-    const abs = (r, c) => `$${colName(c)}$${r + 1}`;
-    const text = `${sheetPrefix(this.sheets[i].name)}${abs(area.r0, area.c0)}:${abs(area.r1, area.c1)}`;
-    const found = this.definedNames.find((d) => d.name === name && d.sheet === i);
-    if (found) {
-      if (found.text !== text) { found.text = text; found.el.textContent = text; this.bookDirty = true; }
-      return;
-    }
-    const root = this.doc.documentElement;
-    let names = kid(root, 'definedNames', this.ns);
-    if (!names) {
-      names = this.doc.createElementNS(this.ns, 'definedNames');
-      // (CT_Workbook's order: definedNames comes after sheets, functionGroups and externalReferences.)
-      const AFTER = ['calcPr', 'oleSize', 'customWorkbookViews', 'pivotCaches', 'smartTagPr', 'smartTagTypes', 'webPublishing', 'fileRecoveryPr', 'webPublishObjects', 'extLst'];
-      root.insertBefore(names, [...root.childNodes].find((n) => n.nodeType === 1 && AFTER.includes(n.localName)) || null);
-    }
-    const el = this.doc.createElementNS(this.ns, 'definedName');
-    el.setAttribute('name', name);
-    el.setAttribute('localSheetId', String(i));
-    if (hidden) el.setAttribute('hidden', '1');
-    el.textContent = text;
-    names.appendChild(el);
-    this.definedNames.push(withEl({ name, sheet: i, text }, el));
-    this.bookDirty = true;
-  }
+  /** The hidden name Excel keeps a sheet's filter range in: _xlnm._FilterDatabase, local to the sheet (filterops.js). */
+  _filterName(i, area, name = '_xlnm._FilterDatabase', hidden = true) { filterName(this, i, area, name, hidden); }
 
   /** Sheet i's view changed (view.js): { freeze: { rows, cols }, active: { r, c }, topLeft }, { zoom } (percent) or
    *  { showFormulas }. */

@@ -4,7 +4,11 @@
 // filters are filtermore.js's. The sheet's autoFilter element and the hidden _xlnm._FilterDatabase name are written as
 // Excel writes them; a kind of filter not read here (icons) is kept as it is.
 import { kids, kid, attr } from './xml.js';
-import { rangeName } from './refs.js';
+import { rangeName, colName } from './refs.js';
+import { setRows } from './sizes.js';
+import { readSheet } from './sheet.js';
+import { withEl } from './sheetops.js';
+import { sheetPrefix } from '../calc/tokens.js';
 import { formatCodeOf } from './styles.js';
 import { cellText } from './numfmt.js';
 import { sortArea, compareText, SORT_MESSAGES } from './sortops.js';
@@ -175,4 +179,55 @@ function addDxf(wb, xml) {
   dxfs.setAttribute('count', String(n));
   wb.dirty.add(wb.stylesPath);
   return n - 1;
+}
+
+/** Sheet i's AutoFilter on (`filter`) or off (null): the autoFilter element, rows hidden or shown, the name. */
+export function applyAutoFilter(wb, i, filter) {
+  const part = wb._part(i);
+  const was = part.model.autoFilter;
+  setAutoFilterXml(part.doc, filter, wb, i, wb.today);
+  const area = filter || was;
+  if (area) {
+    const hide = filter ? hiddenRows(wb, i, filter, wb.today) : new Set();
+    // (Runs of rows alike written at once.)
+    for (let r = area.r0 + 1; r <= area.r1;) {
+      const on = hide.has(r);
+      let end = r;
+      while (end + 1 <= area.r1 && hide.has(end + 1) === on) end++;
+      setRows(part.doc, r, end, { hidden: on });
+      r = end + 1;
+    }
+  }
+  if (filter) filterName(wb, i, filter);
+  wb._parsed.set(wb.sheets[i], { doc: part.doc, model: readSheet(part.doc, wb.sharedStrings) });
+  wb.dirty.add(wb.sheets[i].path);
+  wb.edited = true;
+  wb.resetCalc();
+}
+
+/** The hidden name Excel keeps a sheet's filter range in: _xlnm._FilterDatabase, local to the sheet. */
+export function filterName(wb, i, area, name = '_xlnm._FilterDatabase', hidden = true) {
+  const abs = (r, c) => `$${colName(c)}$${r + 1}`;
+  const text = `${sheetPrefix(wb.sheets[i].name)}${abs(area.r0, area.c0)}:${abs(area.r1, area.c1)}`;
+  const found = wb.definedNames.find((d) => d.name === name && d.sheet === i);
+  if (found) {
+    if (found.text !== text) { found.text = text; found.el.textContent = text; wb.bookDirty = true; }
+    return;
+  }
+  const root = wb.doc.documentElement;
+  let names = kid(root, 'definedNames', wb.ns);
+  if (!names) {
+    names = wb.doc.createElementNS(wb.ns, 'definedNames');
+    // (CT_Workbook's order: definedNames comes after sheets, functionGroups and externalReferences.)
+    const AFTER = ['calcPr', 'oleSize', 'customWorkbookViews', 'pivotCaches', 'smartTagPr', 'smartTagTypes', 'webPublishing', 'fileRecoveryPr', 'webPublishObjects', 'extLst'];
+    root.insertBefore(names, [...root.childNodes].find((n) => n.nodeType === 1 && AFTER.includes(n.localName)) || null);
+  }
+  const el = wb.doc.createElementNS(wb.ns, 'definedName');
+  el.setAttribute('name', name);
+  el.setAttribute('localSheetId', String(i));
+  if (hidden) el.setAttribute('hidden', '1');
+  el.textContent = text;
+  names.appendChild(el);
+  wb.definedNames.push(withEl({ name, sheet: i, text }, el));
+  wb.bookDirty = true;
 }
