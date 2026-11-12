@@ -67,12 +67,23 @@ GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY (`src/calc/functions-groupby.js`), mea
 - **RANDARRAY**: 0 rows or columns #CALC!, fewer #VALUE!, min above max #VALUE!, whole numbers between bounds that
   aren't whole #VALUE!.
 
+TRIMRANGE and the trim references (`src/calc/functions-groupby.js`, `tokens.js`), measured on 27 formulas in a hidden
+Excel on a sheet with B3 1, C4 2, B6 3 and D3 `=""` (every spilled cell read), all 27 as Excel's here, then 15 in the
+formula probe:
+
+- **TRIMRANGE(range,[trim_rows],[trim_cols])** cuts the empty rows and columns off a range's edges: 0 none, 1 leading,
+  2 trailing, 3 both (left out). A formula answering "" is not empty. A1:E8 is B3:D6; with trim_cols 1, B3:E6. Above
+  3, #VALUE!; a range with nothing in it, #REF!; an array or one cell is as it was. A:E is B3:D6 as well.
+- **Trim references**: `A1:.E8` trims trailing empty rows and columns (A1:D6), `A1.:E8` leading (B3:E8), `A1.:.E8`
+  both. Whole columns and rows too: `B:.B` is 6 rows, `3:.6` 4. A reference with nothing in it is #REF!.
+- **The file**: `_xlfn._TRO_TRAILING(A1:E8)`, `_xlfn._TRO_LEADING`, `_xlfn._TRO_ALL`, and `_xlfn.TRIMRANGE`. Read
+  and written so here, shown as typed.
+
 ## Not yet
 
 - The blue outline Excel draws round a spill when its cell is selected.
-- TRIMRANGE and the trim references (A1:.A10). (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array
-  functions, MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY are
-  here, in the formula probe.)
+- (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array functions, MAP, REDUCE, SCAN, BYROW, BYCOL,
+  MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF, RANDARRAY and TRIMRANGE are here, in the formula probe.)
 - PIVOTBY of more than one row or column field (the formula keeps Excel's value), and sorted by a value column;
   GROUPBY's sort_order as an array of columns (#VALUE! here, as Excel gave it for {-1,3}).
 - A defined LAMBDA called with a name typed in another case (=twice(5)) is saved as TWICE(5); Excel writes it as the

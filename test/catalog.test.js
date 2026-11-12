@@ -7,8 +7,8 @@ import { catalog, CATEGORIES, functionInfo, syntaxOf, searchFunctions, DEFAULT_R
 import { callAt, argIndex } from '../src/editor/fntip.js';
 
 test('Insert Function lists every function the engine works out, in Excel\'s categories, and only those', () => {
-  // (Excel leaves DATEDIF out of its lists; ANCHORARRAY and SINGLE are the file's forms of D1# and @.)
-  const hidden = new Set(['DATEDIF', 'ANCHORARRAY', 'SINGLE']);
+  // (Excel leaves DATEDIF out of its lists; ANCHORARRAY and SINGLE are the file's forms of D1# and @, the _TRO_ ones of A1:.E8.)
+  const hidden = new Set(['DATEDIF', 'ANCHORARRAY', 'SINGLE', '_TRO_TRAILING', '_TRO_LEADING', '_TRO_ALL']);
   const listed = new Set(catalog().map((f) => f.name));
   assert.deepEqual(Object.keys(FUNCTIONS).filter((n) => !hidden.has(n) && !listed.has(n)), []);
   assert.deepEqual([...listed].filter((n) => !FUNCTIONS[n] || hidden.has(n)), []);

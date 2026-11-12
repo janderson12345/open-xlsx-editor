@@ -430,6 +430,10 @@ export const PROBE_FORMULAS = [
   'GROUPBY(Data!A2:A9,Data!C2:C9,SUM,5)', 'ROWS(GROUPBY(Data!A2:A9,Data!C2:C9,SUM,,0))', 'PERCENTOF(Data!C2:C4,Data!C2:C9)', 'PERCENTOF(1,0)',
   'SUM(MAP(Data!C2:C4,SQRT))', 'ROWS(RANDARRAY(4,2))&"x"&COLUMNS(RANDARRAY(4,2))', 'SUM(RANDARRAY(2,3,3,3,TRUE))', 'ERROR.TYPE(RANDARRAY(0))',
   'RANDARRAY(2,2,5,1)',
+  'ROWS(Data!A:.A)', 'COLUMNS(Data!1:.1)', 'ROWS(Data!A1:.H40)&"x"&COLUMNS(Data!A1:.H40)', 'SUM(Data!B:.B)', 'SUM(Data!B2.:B9)',
+  'COUNTA(Data!A.:.E)', 'ROWS(\'My Data\'!A1.:.D20)&"x"&COLUMNS(\'My Data\'!A1.:.D20)', 'INDEX(Data!A1:.E40,2,1)',
+  'ROWS(TRIMRANGE(Data!A1:H40))&"x"&COLUMNS(TRIMRANGE(Data!A1:H40))', 'ROWS(TRIMRANGE(Data!A1:H40,0,1))&"x"&COLUMNS(TRIMRANGE(Data!A1:H40,0,1))',
+  'ROWS(TRIMRANGE(Data!A1:H40,2))', 'TRIMRANGE(Data!A1:H40,4)', 'TRIMRANGE(Data!J1:K5)', 'TRIMRANGE({1,2;3,4})', 'SUM(TRIMRANGE(Data!B1:B40))',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

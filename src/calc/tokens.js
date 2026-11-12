@@ -493,12 +493,34 @@ function dynamicShownForm(text) {
   return kept.length ? splice(text, toks, kept) : text;
 }
 
+// Trim references, Excel 365's A1:.E8 (empty rows and columns at the end trimmed), A1.:E8 (at the start) and A1.:.E8
+// (both): in the file _xlfn._TRO_TRAILING(A1:E8), _TRO_LEADING and _TRO_ALL (measured).
+const END = String.raw`(?:\$?[A-Za-z]{1,3}\$?[0-9]{1,7}|\$?[A-Za-z]{1,3}|\$?[0-9]{1,7})`;
+const RE_TRIM = new RegExp(String.raw`((?:'(?:[^']|'')+'|[A-Za-z_][\w.]*)!)?(${END})(\.?):(\.?)(${END})(?![\w.(!])`, 'g');
+const TRO = { '.:': 'LEADING', ':.': 'TRAILING', '.:.': 'ALL' };
+/** Outside its strings, a typed formula's trim references in the file's form. */
+function trimFileForm(text) {
+  if (!/\.:|:\./.test(text)) return text;
+  return text.split(/("(?:[^"]|"")*")/).map((part, k) => (k % 2 ? part : part.replace(RE_TRIM, (m, sheet, a, lead, trail, b) => {
+    if (!lead && !trail) return m;
+    return `_xlfn._TRO_${TRO[`${lead}:${trail}`]}(${sheet || ''}${a}:${b})`;
+  }))).join('');
+}
+/** The file's trim references as typed: _xlfn._TRO_TRAILING(A1:E8) as A1:.E8. */
+function trimShownForm(text) {
+  return text.replace(/(?:_xlfn\.)?_TRO_(LEADING|TRAILING|ALL)\(([^()]*?):([^():]*)\)/gi, (m, kind, a, b) => {
+    const k = kind.toUpperCase();
+    return `${a}${k === 'TRAILING' ? '' : '.'}:${k === 'LEADING' ? '' : '.'}${b}`;
+  });
+}
+
 /** A formula from the file as Excel shows it: without the _xlfn. and _xlws. prefixes of newer functions, and with
  *  Excel 365's D1#, @ and LET's names as typed. */
 export function displayFormula(text) {
   try {
     const shown = /_xlfn\.(ANCHORARRAY|SINGLE)|_xlpm\.|_xleta\./i.test(text) ? dynamicShownForm(text) : text;
-    return mapRefs(shown, (t) => (t.type === 'func' && /^_xl(fn|ws)\./i.test(t.text) ? t.text.replace(/^(_xl(fn|ws)\.)+/i, '') : null));
+    // (Trim references last: A1:.E8 isn't a reference to read.)
+    return trimShownForm(mapRefs(shown, (t) => (t.type === 'func' && /^_xl(fn|ws)\./i.test(t.text) ? t.text.replace(/^(_xl(fn|ws)\.)+/i, '') : null)));
   } catch {
     return text;
   }
@@ -508,7 +530,7 @@ export function displayFormula(text) {
  *  FALSE in capitals, newer functions prefixed, missing closing brackets added. Throws a FormulaError when it doesn't
  *  read as a formula. */
 export function normalizeFormula(entry) {
-  const typed = dynamicFileForm(entry);
+  const typed = dynamicFileForm(trimFileForm(entry));
   const toks = tokenize(typed);
   let depth = 0;
   for (const t of toks) {

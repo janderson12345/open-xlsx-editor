@@ -109,3 +109,19 @@ test('formulas as typed and as the file has them: D1#, @, LET and LAMBDA names, 
   assert.equal(normalizeFormula('LET(a,SUM(A1,A2),a*2)'), '_xlfn.LET(_xlpm.a,SUM(A1,A2),_xlpm.a*2)');
   for (const f of ['SUM(D1#)', 'A2+@A1:A3', 'LET(x,A1,y,A2,x+y)', 'LAMBDA(x,x*2)(A1)', 'SORT(B1:B6,,-1)']) assert.equal(displayFormula(normalizeFormula(f)), f);
 });
+
+test('trim references as Excel 365 saves them (measured): _TRO_ in the file, the dots shown', () => {
+  const cases = [
+    ['SUM(A1:.E8)', 'SUM(_xlfn._TRO_TRAILING(A1:E8))'],
+    ['A1.:E8', '_xlfn._TRO_LEADING(A1:E8)'],
+    ['A1.:.E8+"a:.b"', '_xlfn._TRO_ALL(A1:E8)+"a:.b"'],
+    ['ROWS(B:.B)', 'ROWS(_xlfn._TRO_TRAILING(B:B))'],
+    ['ROWS(3:.6)', 'ROWS(_xlfn._TRO_TRAILING(3:6))'],
+    ["SUM('My Data'!A1:.B4)", "SUM(_xlfn._TRO_TRAILING('My Data'!A1:B4))"],
+  ];
+  for (const [typed, file] of cases) {
+    assert.equal(normalizeFormula(typed), file);
+    assert.equal(displayFormula(file), typed);
+  }
+  assert.equal(normalizeFormula('trimrange(a1:e8)'), '_xlfn.TRIMRANGE(A1:E8)');
+});

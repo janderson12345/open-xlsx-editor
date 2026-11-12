@@ -64,7 +64,7 @@ const LIST = {
     PIVOTBY(row_fields,col_fields,values,function,[field_headers],[row_total_depth],[row_sort_order],[col_total_depth],[col_sort_order],[filter_array],[relative_to])
     ROW([reference]) ROWS(array) SORT(array,[sort_index],[sort_order],[by_col])
     SORTBY(array,by_array1,[sort_order1],...) TAKE(array,rows,[columns]) TOCOL(array,[ignore],[scan_by_column])
-    TOROW(array,[ignore],[scan_by_column]) TRANSPOSE(array) UNIQUE(array,[by_col],[exactly_once])
+    TOROW(array,[ignore],[scan_by_column]) TRANSPOSE(array) TRIMRANGE(range,[trim_rows],[trim_cols]) UNIQUE(array,[by_col],[exactly_once])
     VLOOKUP(lookup_value,table_array,col_index_num,[range_lookup]) VSTACK(array1,[array2],...)
     WRAPCOLS(vector,wrap_count,[pad_with]) WRAPROWS(vector,wrap_count,[pad_with])
     XLOOKUP(lookup_value,lookup_array,return_array,[if_not_found],[match_mode],[search_mode])

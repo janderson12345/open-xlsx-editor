@@ -4,8 +4,8 @@
 // formula probe: headers found when the first value is text over a number, shown with 3, made up with 2 ("Row Field
 // 1", "Value 1"); totals at the end, at the start when negative, "Grand Total" with subtotals; sorted by the fields,
 // or by a value column; an empty cell of the answer is "" (not a blank). Registered into functions.js's table.
-import { Arr, E, XlError, MISSING, Lambda, Lambdas, Builtin, Unsupported, matrix, scalar, toBool, compare } from './values.js';
-import { def, given, num, numbers } from './functions.js';
+import { Area, Arr, E, XlError, MISSING, Lambda, Lambdas, Builtin, Unsupported, matrix, scalar, toBool, compare } from './values.js';
+import { def, given, num, numbers, cellsIn } from './functions.js';
 
 const ARRAY = { array: true };
 const whole = (v, ctx) => Math.trunc(num(v, ctx));
@@ -221,3 +221,26 @@ def('RANDARRAY', (a, ctx) => {
   const one = () => (ints ? min + Math.floor(Math.random() * (max - min + 1)) : min + Math.random() * (max - min));
   return new Arr(Array.from({ length: rows }, () => Array.from({ length: cols }, one)));
 }, { volatile: true });
+
+/** TRIMRANGE(range, [trim_rows], [trim_cols]): the range without its empty rows and columns at the edges (0 none, 1
+ *  leading, 2 trailing, 3 both, the default), still a reference (=SUM(TRIMRANGE(A:A)) sums what A holds). A cell
+ *  holding "" isn't empty. Nothing left: #REF!. An array comes back as it is. The trim references are this too:
+ *  A1:.E8 is _xlfn._TRO_TRAILING(A1:E8) in the file, A1.:E8 _TRO_LEADING, A1.:.E8 _TRO_ALL. */
+function trimRange(v, rowsHow, colsHow, ctx) {
+  if (v instanceof XlError) return v;
+  if (!(v instanceof Area)) return v;
+  let r0 = Infinity; let r1 = -1; let c0 = Infinity; let c1 = -1;
+  for (const [r, c, x] of cellsIn(v, ctx)) {
+    if (x == null) continue;
+    r0 = Math.min(r0, r); r1 = Math.max(r1, r); c0 = Math.min(c0, c); c1 = Math.max(c1, c);
+  }
+  if (r1 < 0) throw E.ref;
+  const lead = (how) => how === 1 || how === 3;
+  const trail = (how) => how === 2 || how === 3;
+  return new Area(v.si, lead(rowsHow) ? r0 : v.r0, lead(colsHow) ? c0 : v.c0, trail(rowsHow) ? r1 : v.r1, trail(colsHow) ? c1 : v.c1);
+}
+const how = (a, k, ctx) => { if (!given(a[k])) return 3; const n = whole(a[k], ctx); if (n < 0 || n > 3) throw E.value; return n; };
+def('TRIMRANGE', (a, ctx) => trimRange(a[0], how(a, 1, ctx), how(a, 2, ctx), ctx), ARRAY);
+def('_TRO_TRAILING', (a, ctx) => trimRange(a[0], 2, 2, ctx), ARRAY);
+def('_TRO_LEADING', (a, ctx) => trimRange(a[0], 1, 1, ctx), ARRAY);
+def('_TRO_ALL', (a, ctx) => trimRange(a[0], 3, 3, ctx), ARRAY);
