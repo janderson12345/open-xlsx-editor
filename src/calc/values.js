@@ -44,6 +44,14 @@ export class Arr {
 export class Lambda {
   constructor(params, body, scope) { this.params = params; this.body = body; this.scope = scope; }
 }
+/** A function named where a LAMBDA goes (an eta LAMBDA: =MAP(A1:A3,SQRT), =GROUPBY(...,SUM)), in the file _xleta.SUM. */
+export class Builtin extends Lambda {
+  constructor(name) { super(null, null, null); this.name = name; }
+}
+/** LAMBDAs side by side, HSTACK(SUM,AVERAGE): each a column of GROUPBY's and PIVOTBY's answer. */
+export class Lambdas {
+  constructor(list) { this.list = list; }
+}
 
 /** An argument left out (=IF(A1,,2)). */
 export const MISSING = Object.freeze({ missing: true });

@@ -2,6 +2,7 @@
 // or turns it between the file's form (_xlfn.CONCAT) and what a person types and sees (CONCAT).
 import { colIndex, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { PREFIXED, fileName } from './prefixed.js';
+import { functionInfo } from './catalog.js';
 
 /** Error values as Excel writes them. */
 export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#GETTING_DATA', '#SPILL!',
@@ -435,6 +436,32 @@ function dynamicFileForm(typed) {
     for (let j = k + 2; j < end; j++) if (toks[j].type === 'name' && names.includes(toks[j].text.replace(/^_xlpm\./i, '').toLowerCase())) params.set(j, `_xlpm.${toks[j].text.replace(/^_xlpm\./i, '')}`);
   });
   for (const [k, text] of params) edits.push({ from: k, to: k, text });
+  // (A function named on its own where a LAMBDA goes, an eta LAMBDA, =MAP(A1:A3,SQRT): _xleta.SQRT in the file, as
+  // Excel 365 writes it; HSTACK(SUM,AVERAGE) there too. Anywhere else a name is a defined name, Rate.)
+  const eta = (k) => { const t = toks[k]; if (t && t.type === 'name' && !params.has(k) && !/^_xl/i.test(t.text) && functionInfo(t.text.toUpperCase())) edits.push({ from: k, to: k, text: `_xleta.${t.text.toUpperCase()}` }); };
+  const argsOf = (k) => {
+    const end = closing(toks, k + 1);
+    const out = [[]];
+    let depth = 0;
+    for (let j = k + 2; j < end; j++) {
+      const x = toks[j];
+      if (x.type === 'punct' && (x.text === '(' || x.text === '{')) depth++;
+      if (x.type === 'punct' && (x.text === ')' || x.text === '}')) depth--;
+      if (depth === 0 && x.type === 'punct' && x.text === ',') out.push([]);
+      else out[out.length - 1].push(j);
+    }
+    return out;
+  };
+  toks.forEach((t, k) => {
+    if (t.type !== 'func') return;
+    const name = t.text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, '');
+    const at = { MAP: -1, REDUCE: -1, SCAN: -1, BYROW: 1, BYCOL: 1, MAKEARRAY: 2, GROUPBY: 2, PIVOTBY: 3 }[name];
+    if (at === undefined) return;
+    const args = argsOf(k);
+    const arg = args[at < 0 ? args.length - 1 : at] || [];
+    if (arg.length === 1) eta(arg[0]);
+    else if (arg.length && toks[arg[0]].type === 'func' && /^(_xlfn\.)?(HSTACK|VSTACK)$/i.test(toks[arg[0]].text)) for (const a of argsOf(arg[0])) if (a.length === 1) eta(a[0]);
+  });
   toks.forEach((t, k) => {
     if (t.type === 'ref' && t.spill) edits.push({ from: k, to: k, text: `_xlfn.ANCHORARRAY(${t.text.slice(0, -1)})` });
     if (t.type === 'op' && t.text === '@' && toks[k + 1]) {
@@ -460,7 +487,7 @@ function dynamicShownForm(text) {
     else if (name === 'SINGLE') {
       const end = closing(toks, k + 1);
       edits.push({ from: k, to: end, text: `@${dynamicShownForm(text.slice(toks[k + 2].start, toks[end - 1].end))}` });
-    } else if (t.type === 'name' && /^_xlpm\./i.test(t.text)) edits.push({ from: k, to: k, text: t.text.replace(/^_xlpm\./i, '') });
+    } else if (t.type === 'name' && /^_xl(pm|eta)\./i.test(t.text)) edits.push({ from: k, to: k, text: t.text.replace(/^_xl(pm|eta)\./i, '') });
   });
   const kept = edits.filter((e) => !edits.some((o) => o !== e && o.from <= e.from && o.to >= e.to && (o.from !== e.from || o.to !== e.to)));
   return kept.length ? splice(text, toks, kept) : text;
@@ -470,7 +497,7 @@ function dynamicShownForm(text) {
  *  Excel 365's D1#, @ and LET's names as typed. */
 export function displayFormula(text) {
   try {
-    const shown = /_xlfn\.(ANCHORARRAY|SINGLE)|_xlpm\./i.test(text) ? dynamicShownForm(text) : text;
+    const shown = /_xlfn\.(ANCHORARRAY|SINGLE)|_xlpm\.|_xleta\./i.test(text) ? dynamicShownForm(text) : text;
     return mapRefs(shown, (t) => (t.type === 'func' && /^_xl(fn|ws)\./i.test(t.text) ? t.text.replace(/^(_xl(fn|ws)\.)+/i, '') : null));
   } catch {
     return text;
@@ -481,7 +508,7 @@ export function displayFormula(text) {
  *  FALSE in capitals, newer functions prefixed, missing closing brackets added. Throws a FormulaError when it doesn't
  *  read as a formula. */
 export function normalizeFormula(entry) {
-  const typed = /[#@]|\b(LET|LAMBDA)\s*\(/i.test(entry) ? dynamicFileForm(entry) : entry;
+  const typed = dynamicFileForm(entry);
   const toks = tokenize(typed);
   let depth = 0;
   for (const t of toks) {

@@ -2,7 +2,7 @@
 // WRAPROWS, WRAPCOLS, EXPAND), split text into one (TEXTSPLIT), turn one into text (VALUETOTEXT, ARRAYTOTEXT), and
 // call a LAMBDA over one (MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY, ISOMITTED). Measured against Excel with the
 // formula probe (test/formulas-excel.json). Registered into functions.js's table; evaluate.js imports this file.
-import { Arr, MISSING, XlError, E, scalar, matrix, toText, toBool, Lambda } from './values.js';
+import { Arr, MISSING, XlError, E, scalar, matrix, toText, toBool, Lambda, Lambdas } from './values.js';
 import { def, given, num, text } from './functions.js';
 
 const ARRAY = { array: true };
@@ -39,7 +39,8 @@ function stack(args, ctx, across) {
   return new Arr(Array.from({ length: height }, (_, r) => ms.flatMap((m) => (r < m.length ? m[r] : Array(m[0].length).fill(E.na)))));
 }
 def('VSTACK', (a, ctx) => stack(a, ctx, false), ARRAY);
-def('HSTACK', (a, ctx) => stack(a, ctx, true), ARRAY);
+// (HSTACK of LAMBDAs, HSTACK(SUM,AVERAGE): the functions side by side, for GROUPBY and PIVOTBY: functions-groupby.js.)
+def('HSTACK', (a, ctx) => (a.length && a.every((x) => x instanceof Lambda) ? new Lambdas(a) : stack(a, ctx, true)), ARRAY);
 
 /** The rows (or columns) of `lines` by 1-based index, a negative one from the end; out of range: #VALUE!. */
 function choose(lines, picks, ctx) {

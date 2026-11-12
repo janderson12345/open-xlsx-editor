@@ -1,6 +1,7 @@
 // Working out a formula's tree: operators, references, names and function calls. A formula that isn't an array formula
 // works on single values: a range given to an operator is cut down to the formula's own row or column (implicit
 // intersection). The arguments of SUMPRODUCT and its kind, and array formulas, work on whole arrays, element by element.
+import { Builtin } from './values.js';
 import { Area, Arr, Union, MISSING, XlError, E, errorOf, Unsupported, isError, scalar, matrix, toNum, toText, compare, finite,
   closeToZero, Lambda } from './values.js';
 import { FUNCTIONS } from './functions.js';
@@ -23,6 +24,7 @@ import './functions-regex.js';
 import './functions-amort.js';
 import './functions-bessel.js';
 import './functions-oddbonds.js';
+import './functions-groupby.js';
 
 /** x^y as Excel has it: 0^0 is #NUM!, 0 to a negative power #DIV/0!, a negative number to a fractional power #NUM!
  *  unless it is an odd root (=(-8)^(1/3) is -2). */
@@ -142,6 +144,7 @@ function letOf(node, ctx, mode) {
 /** A LAMBDA called with arguments (worked out where it is called). */
 function apply(fn, argNodes, ctx, mode) {
   if (isError(fn)) return fn;
+  if (fn instanceof Builtin) return call({ k: 'fn', name: fn.name, args: argNodes }, ctx, mode);
   if (!(fn instanceof Lambda)) return E.value;
   if (argNodes.length !== fn.params.length) return E.value;
   const binds = new Map(fn.params.map((p, k) => [p, evaluate(argNodes[k], ctx, mode)]));
@@ -151,6 +154,7 @@ function apply(fn, argNodes, ctx, mode) {
 /** A LAMBDA called with values already worked out (MAP, REDUCE, SCAN, BYROW...: functions-arrays.js). */
 function applyValues(fn, vals, ctx) {
   if (isError(fn)) return fn;
+  if (fn instanceof Builtin) return call({ k: 'fn', name: fn.name, args: vals.map((v) => ({ k: 'val', v })) }, ctx, 'array');
   if (!(fn instanceof Lambda) || vals.length !== fn.params.length) return E.value;
   const binds = new Map(fn.params.map((p, k) => [p, vals[k]]));
   const v = within(fn.scope, binds, fn.body, ctx, 'array');
@@ -215,7 +219,11 @@ export function evaluate(node, ctx, mode = 'scalar') {
     case 'arr': return new Arr(node.rows.map((row) => row.map((v) => (v && v.err ? errorOf(v.err) : v))));
     case 'name': {
       const local = bound(ctx, node.name);
-      return local !== undefined ? local : ctx.name(node.name, mode);
+      if (local !== undefined) return local;
+      // (A function named on its own, SUM or the file's _xleta.SUM: an eta LAMBDA, unless a defined name is called so.)
+      const eta = node.name.replace(/^_xleta\./i, '').toUpperCase();
+      if (FUNCTIONS[eta] && (/^_xleta\./i.test(node.name) || !ctx.hasName?.(node.name))) return new Builtin(eta);
+      return ctx.name(node.name, mode);
     }
     case 'call': return apply(evaluate(node.f, ctx, mode), node.args, ctx, mode);
     case 'struct': {

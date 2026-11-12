@@ -418,6 +418,18 @@ export const PROBE_FORMULAS = [
   'ODDLPRICE(DATE(2008,2,7),DATE(2008,6,15),DATE(2007,10,15),-0.0375,0.0405,100,2,0)',
   'Twice(21)', 'Hyp(3,4)', 'WithRate(100)', 'Twice(1,2)', 'Twice()', 'Hyp(3)', 'SUM(MAP({1,2,3},Twice))', 'Twice(Data!B2)', 'Twice(Hyp(6,8))',
   'SUM(Twice({1,2,3}))',
+  'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!C2:C9,SUM))', 'TEXTJOIN("|",FALSE,GROUPBY(Data!A1:A9,Data!C1:C9,SUM,3))',
+  'TEXTJOIN("|",FALSE,GROUPBY(Data!A1:A9,Data!C1:C9,SUM))', 'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!C2:C9,AVERAGE,,0,-2))',
+  'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!C2:C9,SUM,2,-1))', 'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!C2:C9,HSTACK(SUM,COUNT)))',
+  'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!C2:C9,PERCENTOF))',
+  'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!C2:C9,LAMBDA(v,MAX(v)),,,,Data!C2:C9>1))', 'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:B9,Data!C2:C9,SUM,,2))',
+  'TEXTJOIN("|",FALSE,GROUPBY(Data!A2:A9,Data!B2:C9,SUM))', 'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,SUM))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,COUNT,,-1))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A1:A9,Data!E1:E9,Data!C1:C9,SUM,3,,,0))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,PERCENTOF))', 'GROUPBY(Data!A2:A8,Data!C2:C9,SUM)',
+  'GROUPBY(Data!A2:A9,Data!C2:C9,SUM,5)', 'ROWS(GROUPBY(Data!A2:A9,Data!C2:C9,SUM,,0))', 'PERCENTOF(Data!C2:C4,Data!C2:C9)', 'PERCENTOF(1,0)',
+  'SUM(MAP(Data!C2:C4,SQRT))', 'ROWS(RANDARRAY(4,2))&"x"&COLUMNS(RANDARRAY(4,2))', 'SUM(RANDARRAY(2,3,3,3,TRUE))', 'ERROR.TYPE(RANDARRAY(0))',
+  'RANDARRAY(2,2,5,1)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

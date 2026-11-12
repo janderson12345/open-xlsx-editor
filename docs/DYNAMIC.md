@@ -48,11 +48,33 @@ spill blocked, `SUM(D1#)`, LET, LAMBDA called, `@` on a range, `SUM(SEQUENCE(4))
 | Typed here (`test/dynamic.test.js`): the spill range, every cell's value or text, the formula as shown, the anchor's form in the file | 20 of 20 Excel's |
 | Saved here and opened in Excel (`dynamic-ours.mjs`, `excel-dynamic-check.ps1`): Excel's spill range, values, texts and formulas | 20 of 20 the same as Excel's own |
 
+GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY (`src/calc/functions-groupby.js`), measured on 55 formulas in a hidden Excel
+(each spilled answer read cell by cell), then 24 in the formula probe, all as Excel's:
+
+- **Functions as arguments**: a function named on its own where a LAMBDA goes is one (an eta LAMBDA, =MAP(A1:A3,SQRT));
+  the file has it as `_xleta.SQRT`, and HSTACK(SUM,AVERAGE) for several. Typed here it is written so; shown without.
+  On its own in a cell, =SQRT is #CALC!.
+- **Headers**: left out, the first row is a header when the first value is text and the one below a number (dropped,
+  not shown); 0 none, 1 there and dropped, 2 made up ("Row Field 1", "Value 1"), 3 there and shown. Several functions
+  add a row of their names (SUM, COUNT) above.
+- **Totals**: "Total" at the end; with subtotals (total_depth 2) a row for each group after its rows, and "Grand Total";
+  negative depths put them before. field_relationship 1 with subtotals is #VALUE!.
+- **Sorting**: by the fields; sort_order a field (negative: descending) or a value column (by the groups' answers).
+  Field values go numbers, text, TRUE and FALSE, then a blank, which is a group of its own.
+- **PIVOTBY**: the column field's values across, "Total" after (or before); a missing group "" (an empty cell of the
+  answer is "", not a blank, in both); with several value columns the row totals are left "", as Excel leaves them;
+  PERCENTOF of the column's total.
+- **RANDARRAY**: 0 rows or columns #CALC!, fewer #VALUE!, min above max #VALUE!, whole numbers between bounds that
+  aren't whole #VALUE!.
+
 ## Not yet
 
 - The blue outline Excel draws round a spill when its cell is selected.
-- RANDARRAY, GROUPBY, PIVOTBY, TRIMRANGE and PERCENTOF. (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer
-  array functions, MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY and ISOMITTED are here, in the formula probe.)
+- TRIMRANGE and the trim references (A1:.A10). (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array
+  functions, MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY are
+  here, in the formula probe.)
+- PIVOTBY of more than one row or column field (the formula keeps Excel's value), and sorted by a value column;
+  GROUPBY's sort_order as an array of columns (#VALUE! here, as Excel gave it for {-1,3}).
 - A defined LAMBDA called with a name typed in another case (=twice(5)) is saved as TWICE(5); Excel writes it as the
   name is (Twice(5)). Both work out the same, in both programs.
 - `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an

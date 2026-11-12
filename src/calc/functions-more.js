@@ -457,7 +457,8 @@ def('TYPE', (a, ctx) => {
   if (typeof x === 'boolean') return 4;
   return 1;
 });
-const ERROR_TYPES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#GETTING_DATA'];
+// (Excel 365's newer errors too: #SPILL! 9, #CALC! 14, measured =ERROR.TYPE(RANDARRAY(0)).)
+const ERROR_TYPES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#GETTING_DATA', '#SPILL!', '#CONNECT!', '#BLOCKED!', '#UNKNOWN!', '#FIELD!', '#CALC!'];
 def('ERROR.TYPE', (a, ctx) => {
   const v = a[0] instanceof Area ? ctx.cellValue(a[0].si, a[0].r0, a[0].c0) : a[0];
   if (!(v instanceof XlError)) throw E.na;
