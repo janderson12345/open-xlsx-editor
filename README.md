@@ -54,7 +54,7 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
   layout. `docs/CALC.md`: matching Excel's calculation. `docs/SHEETS.md`: matching Excel's sheet operations.
   `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut, paste and Paste Special.
   `docs/ROWCOL.md`: matching Excel's inserting and deleting of rows, columns and cells. `docs/SIZES.md`: widths, heights,
-  hiding. `docs/FIND.md`: Find and Replace. `docs/VIEW.md`: frozen panes, zoom, gridlines and headings.
+  hiding. `docs/FIND.md`: Find and Replace. `docs/VIEW.md`: frozen panes, zoom, gridlines and headings. `docs/PROOFING.md`: AutoCorrect and spelling.
   `docs/ENTRY.md`: how typed entries are read. `docs/FILL.md`: Fill and the fill handle. `docs/SORT.md`: Sort. `docs/AUTOSUM.md`: AutoSum. `docs/FILTER.md`: Filter. `docs/NOTES.md`: notes and comments. `docs/CONDFORMAT.md`: conditional formatting. `docs/VALIDATION.md`: data validation. `docs/FIDELITY.md`: what survives a save, checked by Excel. `docs/CHARTS.md`: charts.
   `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab.
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which

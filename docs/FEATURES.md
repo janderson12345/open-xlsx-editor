@@ -146,7 +146,7 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Proofing (`proofing`) | Spelling | Missing | |
+| Proofing (`proofing`) | Spelling | Partly | AutoCorrect as a cell is typed, with Excel's options and entries of its own replacement list (teh to the, (c) to ©, monday to Monday, THe to The); the browser's spelling underlines while text is typed (docs/PROOFING.md). The Spelling box (F7) is missing. |
 | Accessibility (`accessibility`) | Check Accessibility | Missing | |
 | Comments (`comments`) | New, show, delete comments; notes | Done | Notes: New, Edit, Delete, Show/Hide; threaded comments: New, Reply, Edit, Delete (docs/NOTES.md). Not yet: @mentions, resolving a thread. |
 | Protect (`protect`) | Protect sheet, protect workbook | Kept | Not enforced: a protected sheet can be edited. |

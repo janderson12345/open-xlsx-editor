@@ -2,6 +2,7 @@
 // Excel) and the cell's contents as they would be edited (a number in full, a formula with its = sign). Typing there
 // and pressing Enter enters it into the cell, as typing in the cell does. `onKey` sees each key first (pointing.js: F4,
 // and the arrows while a formula goes on on another sheet).
+import { autoCorrect } from './autocorrect.js';
 import { div } from './dom.js';
 
 /** A bar at the top of `root`; `onEnter(text)` when Enter is pressed in it, `onCancel()` on Esc, `onKey(e)` (true:
@@ -26,13 +27,14 @@ export function createFormulaBar(root, { onEnter, onCancel, onGo = null, onKey =
   input.type = 'text';
   input.spellcheck = false;
   input.setAttribute('aria-label', 'Formula bar');
+  const corrector = autoCorrect(input);
   bar.append(name, input);
   root.prepend(bar);
   input.addEventListener('focus', () => onFocus?.());
   input.addEventListener('blur', () => onBlur?.());
   input.addEventListener('keydown', (e) => {
     if (onKey?.(e)) { e.preventDefault(); return; }
-    if (e.key === 'Enter') { e.preventDefault(); onEnter(input.value); }
+    if (e.key === 'Enter') { e.preventDefault(); onEnter(corrector.finish()); }
     else if (e.key === 'Escape') { e.preventDefault(); onCancel(); }
   });
   return {
@@ -41,7 +43,7 @@ export function createFormulaBar(root, { onEnter, onCancel, onGo = null, onKey =
     show(ref, text) {
       shown = ref;
       if (document.activeElement !== name) name.value = ref;
-      if (document.activeElement !== input) input.value = text;
+      if (document.activeElement !== input) { input.value = text; corrector.refresh(); }
     },
     setReadOnly(flag) { input.readOnly = flag; },
     input,

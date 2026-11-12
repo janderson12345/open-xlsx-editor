@@ -430,4 +430,25 @@ await ribbon('Gridlines: Print'); await ribbon('Headings: Print'); await ribbon(
 check(sheetOpts === 'true,true,false' && printPressed === 'true' && await page.evaluate(() => { const s = window.oxe.workbook.sheet(window.oxe.sheetIndex); return [s.page.gridLines, s.page.headings, s.showGridLines].join(); }) === 'false,false,true',
   'Page Layout > Sheet Options: Print gridlines and headings ticked and unticked; View the gridlines switch', sheetOpts);
 
+
+// AutoCorrect as a cell is typed in (autocorrect.js; the list Excel's own): a word corrected when it ends and when the
+// cell is entered; Ctrl+Z while typing gives back what was typed; the spelling underlines on for text, off for a formula.
+await page.evaluate(() => window.oxe.select('K60'));
+await page.keyboard.type('teh cat on monday');
+const typedNow = await page.inputValue('.oxe-editor');
+const spelling = await page.evaluate(() => document.querySelector('.oxe-editor').spellcheck);
+await page.keyboard.press('Enter');
+await page.evaluate(() => window.oxe.select('K61'));
+await page.keyboard.type('adn ');
+await page.keyboard.press('Control+z');
+const undone = await page.inputValue('.oxe-editor');
+await page.keyboard.press('Escape');
+await page.keyboard.type('=1+1');
+const formulaSpelling = await page.evaluate(() => document.querySelector('.oxe-editor').spellcheck);
+await page.keyboard.press('Escape');
+const k60 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(59)?.get(10)?.v);
+check(typedNow === 'the cat on monday' && k60 === 'the cat on Monday' && undone === 'adn ' && spelling === true && formulaSpelling === false,
+  'AutoCorrect: teh to the as the word ends, monday to Monday on Enter, Ctrl+Z gives back what was typed; underlines for text only',
+  JSON.stringify({ typedNow, k60, undone, spelling, formulaSpelling }));
+
 await finish();

@@ -4,6 +4,7 @@
 // finish and move; Esc gives up; Alt+Enter is a line break. `onKey` sees each key first (pointing.js takes the arrows
 // while a formula is pointing).
 import { setVars } from './dom.js';
+import { autoCorrect } from './autocorrect.js';
 
 const MOVES = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
@@ -14,6 +15,8 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   box.className = 'oxe-editor';
   box.spellcheck = false;
   box.setAttribute('aria-label', 'Cell contents');
+  // (AutoCorrect and the spelling underlines while text is typed: autocorrect.js.)
+  const corrector = autoCorrect(box);
   let open = null; // { r, c, mode }
   let held = null; // (a box over it, Insert Function's: losing focus doesn't finish; the caret kept: [start, end])
 
@@ -24,7 +27,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   };
   const finish = (move) => {
     if (!open) return;
-    const text = box.value;
+    const text = corrector.finish();
     close();
     onFinish(text, move);
   };
@@ -63,6 +66,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
       open = { r, c, mode, w: rect.w, h: rect.h };
       box.className = `oxe-editor ${cls || ''}`;
       box.value = text;
+      corrector.refresh();
       setVars(box, { '--oxe-x': rect.x, '--oxe-y': rect.y });
       grid.overlay.appendChild(box);
       size();
