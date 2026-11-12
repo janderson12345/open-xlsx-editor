@@ -1,6 +1,8 @@
 // Following a hyperlink as Excel: a click on its cell follows it (a press held longer, or moved off the cell, selects
-// it instead), with the hand over it and Excel's ScreenTip (ooxml/links.js).
-import { hyperlinkAt, screenTip } from '../ooxml/links.js';
+// it instead), with the hand over it and Excel's ScreenTip (ooxml/links.js); a HYPERLINK formula's cell too
+// (calc/hyperlinkcell.js).
+import { screenTip } from '../ooxml/links.js';
+import { cellLink } from '../calc/hyperlinkcell.js';
 
 /** How long a press may last and still follow the link (Excel's "Click and hold to select this cell"). */
 const HOLD_MS = 500;
@@ -10,7 +12,7 @@ const HOLD_MS = 500;
 export function linkFollower(view, ctx) {
   let pressed = null;
   let over = null;
-  const linkAt = (at) => (at && at.r >= 0 && at.c >= 0 ? hyperlinkAt(ctx.workbook(), ctx.sheetIndex(), at.r, at.c) : null);
+  const linkAt = (at) => (at && at.r >= 0 && at.c >= 0 ? cellLink(ctx.workbook(), ctx.sheetIndex(), at.r, at.c) : null);
   return {
     press(at, e) {
       const plain = e.button === 0 && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey && e.detail === 1;

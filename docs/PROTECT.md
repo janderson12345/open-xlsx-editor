@@ -41,6 +41,9 @@ protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel 
 
   A hyperlink inserted (Insert > Link) needs Insert hyperlinks allowed and its cell unlocked, as Excel's did.
   Clear All of locked cells with notes or hyperlinks is refused as typing there is.
+- Typing a date, a percentage or a HYPERLINK formula into an unlocked cell of a protected sheet that doesn't allow
+  Format cells enters it without the format Excel would give it (refused whole before); what Excel does there wasn't
+  measured.
 - Protecting and unprotecting aren't steps of Undo.
 
 ## Protect Workbook

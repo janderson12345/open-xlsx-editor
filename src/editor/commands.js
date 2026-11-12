@@ -248,6 +248,8 @@ export function createCommands(ctx) {
         if (!valid(wb, si, rule, r, c, v)) return { invalid: { style: rule.errorStyle, title: rule.errorTitle, message: rule.error || VALIDATION_MESSAGE } };
       }
       // (A date, a time, currency or a percentage typed into a General cell gives it Excel's format: one step with the value.)
+      // (On a protected sheet that doesn't allow formatting, the entry alone: its cell may be unlocked.)
+      if (ch.style && protectionRefusal(wb, si, 'formatCells')) ch.style = null;
       if (!ch.style) return apply([ch.content]);
       return runSteps([{ si: ctx.sheetIndex(), contents: [ch.content], styles: [ch.style] }]);
     },

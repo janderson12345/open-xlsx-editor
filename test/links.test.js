@@ -70,3 +70,29 @@ test("Insert Hyperlink's fields as the address and place: http:// before an addr
   assert.equal(locationOf('Data', 'A1'), 'Data!A1');
   assert.equal(locationOf(null, 'MyName'), 'MyName');
 });
+
+test("HYPERLINK's cells as Excel's: the Hyperlink style when typed at the formula's top level; a click follows its link_location", async () => {
+  const { topLevelHyperlink, formulaLink, cellLink } = await import('../src/calc/hyperlinkcell.js');
+  const { entryChanges } = await import('../src/ooxml/entry.js');
+  assert.equal(topLevelHyperlink('HYPERLINK("https://example.com/a","Shown")'), true);
+  assert.equal(topLevelHyperlink('1+HYPERLINK("https://example.com/c",5)'), true);
+  assert.equal(topLevelHyperlink('IF(TRUE,HYPERLINK("https://example.com/d","In if"))'), false);
+  assert.equal(topLevelHyperlink('SUM(1,2)'), false);
+  const { wb, si } = book();
+  wb.setCell(si, 'B1', 'page');
+  wb.setFormula(si, 'A1', 'HYPERLINK("https://example.com/"&B1,"Shown")');
+  wb.setFormula(si, 'A2', 'HYPERLINK("#Sheet2!B5","Go")');
+  wb.setFormula(si, 'A3', 'IF(TRUE,HYPERLINK("https://example.com/d","In if"))');
+  wb.setFormula(si, 'A4', 'SUM(1,2)');
+  assert.deepEqual(formulaLink(wb, si, 0, 0), { address: 'https://example.com/page', location: null, display: null, tooltip: null });
+  assert.equal(formulaLink(wb, si, 1, 0).location, 'Sheet2!B5');
+  assert.equal(formulaLink(wb, si, 2, 0).address, 'https://example.com/d');
+  assert.equal(formulaLink(wb, si, 3, 0), null);
+  addHyperlink(wb, si, 5, 0, { address: 'https://example.com/own' });
+  assert.equal(cellLink(wb, si, 5, 0).address, 'https://example.com/own');
+  const typed = (text) => entryChanges(wb, si, 9, 0, text);
+  const style = (ch) => ch.style && wb.styles.cellXfs[ch.style.s].xfId;
+  assert.ok(style(typed('=HYPERLINK("https://example.com/a","Shown")')) > 0);
+  assert.ok(style(typed('=1+HYPERLINK("https://example.com/c",5)')) > 0);
+  assert.equal(typed('=IF(TRUE,HYPERLINK("https://example.com/d","In if"))').style, null);
+});

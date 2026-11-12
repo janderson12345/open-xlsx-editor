@@ -5,6 +5,7 @@ import { parseInput, formatAfterEntry } from './input.js';
 import { formatCodeOf } from './styles.js';
 import { spanSheetRefs, mapRefs } from '../calc/tokens.js';
 import { FUNCTIONS } from '../calc/functions.js';
+import { topLevelHyperlink } from '../calc/hyperlinkcell.js';
 
 /** A typed formula's 3D references as Excel takes them (measured): in the workbook's order, Apr:Jan!A1 as Jan:Apr!A1,
  *  and one sheet's, Jan:Jan!A1, as Jan!A1; the sheets named as the workbook names them. */
@@ -47,5 +48,7 @@ export function entryChanges(wb, si, r, c, text, today = new Date()) {
   if (parsed.error) return { error: parsed.error };
   const content = parsed.formula != null ? { r, c, formula: namesAsWritten(wb, si, inOrder(wb, parsed.formula)), ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
   const format = formatAfterEntry(code, parsed);
+  // (HYPERLINK at a formula's top level, typed into a cell of the Normal style: the Hyperlink style, as Excel gives it.)
+  if (!format && content.formula != null && wb.styles.cellXfs[s]?.xfId === 0 && topLevelHyperlink(content.formula)) return { content, style: { r, c, s: wb.styleWith(s, { style: 'Hyperlink' }) }, parsed };
   return { content, style: format ? { r, c, s: wb.styleWith(s, { numFmt: format }) } : null, parsed };
 }

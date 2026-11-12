@@ -30,6 +30,11 @@ ScreenTips and the Hyperlink style.
 - Home > Clear's Clear Hyperlinks and Remove Hyperlinks (docs/FORMATS.md), and hyperlinks following a sheet rename and
   rows and columns inserted or deleted (docs/ROWCOL.md), were there before.
 
+- A HYPERLINK formula's cell (`src/calc/hyperlinkcell.js`) is followed too: its link_location worked out in the
+  cell's place (=HYPERLINK("https://example.com/"&B1,"Shown") opens https://example.com/ and B1's text;
+  "#Sheet2!B5" goes to Sheet2's B5), with the same hand and ScreenTip; its cell menu has Open Hyperlink. Typed, the
+  cell gets the Hyperlink style when HYPERLINK is at the formula's top level, as Excel gives it (measured below).
+
 ## Excel's rules
 
 | Rule | Seen |
@@ -42,6 +47,12 @@ ScreenTips and the Hyperlink style.
 | The cell gets the built-in Hyperlink style: underlined, the theme's colour 10, nothing marked applied in the cell's format. | `<cellStyle name="Hyperlink" xfId="1" builtinId="8"/>`, `<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="1"/>` |
 | An address without a scheme is kept as given (a file's path). | `Target="example.com"` |
 
+A HYPERLINK formula, measured over COM (the formula set, the file saved): no `<hyperlink>` is written, its value is
+`friendly_name` (else `link_location`), and the cell gets the Hyperlink style when HYPERLINK is at the top level of
+the formula: =HYPERLINK(...) and =1+HYPERLINK(...,5) did, =IF(TRUE,HYPERLINK(...)) didn't. A place in the workbook is
+written "#Sheet2!B5". Which HYPERLINK a click follows when there are several wasn't measured (clicks can't be sent
+over COM); the first, depth first, is followed here.
+
 Excel also writes an `xr:uid` on each hyperlink; it is left out here (Excel doesn't need it).
 
 ## Not yet
@@ -50,4 +61,3 @@ Excel also writes an `xr:uid` on each hyperlink; it is left out here (Excel does
   (it can't read them); so were its refusals ("You must type a valid cell reference or select a location in this
   document."). Its Create New Document, Browse for File and Bookmark... aren't here.
 - Half a second for a held click is a guess; Excel's own time wasn't measured.
-- The HYPERLINK function's cells aren't followed.

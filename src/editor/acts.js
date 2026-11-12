@@ -4,6 +4,7 @@
 import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
 import { protectionRefusal } from '../ooxml/protection.js';
 import { hyperlinkAt } from '../ooxml/links.js';
+import { formulaLink } from '../calc/hyperlinkcell.js';
 import { createMoreActs } from './acts-more.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
@@ -378,6 +379,9 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
       ...(() => {
         const s = editing().selection;
         const h = hyperlinkAt(state.workbook, state.sheetIndex, s.ar, s.ac);
+        // (A HYPERLINK formula's cell: Open Hyperlink; it has no hyperlink of its own to edit or remove.)
+        const f = !h && formulaLink(state.workbook, state.sheetIndex, s.ar, s.ac);
+        if (f) return [{ label: 'Open Hyperlink', run: () => followLink(f) }, 'separator'];
         return h ? [{ label: 'Edit Hyperlink...', run: run('linkBox'), disabled: ro }, { label: 'Open Hyperlink', run: () => followLink(h) }, { label: 'Remove Hyperlink', run: () => editing().run('clearAs', 'removeHyperlinks'), disabled: ro }, 'separator']
           : [{ label: 'Link', run: run('linkBox'), disabled: ro }, 'separator'];
       })(),

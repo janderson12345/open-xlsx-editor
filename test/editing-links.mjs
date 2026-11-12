@@ -116,4 +116,14 @@ const undone = await linkOf(7, 9);
 check(shownAddr === 'http://www.example.com/new' && edited?.location === "'Notes & more'!C5" && !edited.address && removed === null && undone?.location === "'Notes & more'!C5",
   'Edit Hyperlink: the link shown, changed to a place in the workbook; Remove Link; Ctrl+Z brings it back', JSON.stringify({ shownAddr, edited, removed, undone }));
 
+// A HYPERLINK formula typed into J10: underlined in the Hyperlink style, as Excel gives it; a click opens its
+// link_location, worked out in the cell's place.
+await page.evaluate(() => { window.oxe.enter('K10', 'fn'); window.oxe.enter('J10', '=HYPERLINK("https://example.com/"&K10,"Function link")'); });
+const j10Look = await page.evaluate(() => { const el = document.querySelector('.oxe-row[aria-rowindex="11"] .oxe-cell[aria-colindex="11"]'); return el ? [el.textContent, getComputedStyle(el).textDecorationLine] : null; });
+await page.keyboard.press('Escape');
+await clickCell(9, 9);
+const fnOpened = (await opened()).at(-1);
+check(j10Look?.[0] === 'Function link' && /underline/.test(j10Look[1]) && fnOpened === 'https://example.com/fn',
+  'a HYPERLINK formula typed: the Hyperlink style; a click opens its link_location', JSON.stringify({ j10Look, fnOpened }));
+
 await finish();
