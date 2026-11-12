@@ -770,6 +770,15 @@
   position: absolute;
   inset: 0;
 }
+/* Tracer arrows (arrows.js), in the sheet's coordinates: the row headings' width included in their x. */
+.oxe-arrows {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--oxe-sheet-w);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+  overflow: visible;
+}
 .oxe-mark {
   position: absolute;
   box-sizing: border-box;

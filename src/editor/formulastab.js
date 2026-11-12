@@ -1,7 +1,7 @@
 // The Formulas tab, Excel's groups as far as they are here: Function Library (Insert Function, Shift+F3; AutoSum and
 // its choices; Recently Used and each category's functions, More Functions for the rest: functionbox.js and
 // calc/catalog.js), Defined Names (Name Manager, Ctrl+F3, and Define Name: namesbox.js and names.js), Formula Auditing
-// (Show Formulas, Ctrl+`) and Calculation (Calculation Options, Calculate Now, Calculate Sheet: ooxml/calcmode.js).
+// (Trace Precedents, Trace Dependents, Remove Arrows: tracing.js; Show Formulas, Ctrl+`) and Calculation (Calculation Options, Calculate Now, Calculate Sheet: ooxml/calcmode.js).
 import { el } from './ribbonkit.js';
 import { inCategory, functionInfo, syntaxOf, DEFAULT_RECENT } from '../calc/catalog.js';
 
@@ -33,7 +33,11 @@ export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'a
       col(more)),
     grp('Defined Names', btn('🏷', 'Name Manager (Ctrl+F3)', () => act('nameManager'), { label: 'Name Manager', big: true }),
       col(btn('＋', 'Define Name', () => act('defineName'), { label: 'Define Name' }))),
-    grp('Formula Auditing', showBtn),
+    grp('Formula Auditing', col(btn('⇢', 'Trace Precedents', () => act('trace', 'precedents'), { label: 'Trace Precedents' }),
+      btn('⇠', 'Trace Dependents', () => act('trace', 'dependents'), { label: 'Trace Dependents' }),
+      split('✕', 'Remove Arrows', () => act('removeArrows'), () => [item('Remove Arrows', () => act('removeArrows')),
+        item('Remove Precedent Arrows', () => act('removeArrows', 'precedents')), item('Remove Dependent Arrows', () => act('removeArrows', 'dependents'))], { label: 'Remove Arrows' })),
+      col(showBtn)),
     grp('Calculation', menu('⚙', 'Calculation Options', () => [['auto', 'Automatic'], ['autoNoTable', 'Automatic Except for Data Tables'], ['manual', 'Manual']]
       .map(([m, label]) => item(label, () => act('calcMode', m), { on: calcMode() === m, icon: calcMode() === m ? '✓' : ' ' })), { label: 'Calculation Options', big: true }),
     col(btn('▦', 'Calculate Now (F9)', () => act('calculate', 'now'), { label: 'Calculate Now' }),

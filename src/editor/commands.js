@@ -18,6 +18,7 @@ import { mergeChange } from '../ooxml/mergeops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
 import { clearChanges } from '../ooxml/clearops.js';
+import { traceLevel } from './tracing.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
@@ -42,6 +43,9 @@ export function createCommands(ctx) {
   const contents = (r, c) => contentsOn(sheet(), r, c, ctx.sheetIndex());
   const inArray = (r, c) => sheet().arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1);
   const idOf = (i) => ctx.workbook().sheets[i]?.sheetId;
+  /** Sheet i's tracer arrows and how far each trace has gone ({ arrows, precedents, dependents }), by its sheetId. */
+  state.traces = new Map();
+  const traceOf = (i) => { const id = idOf(i); if (!state.traces.has(id)) state.traces.set(id, { arrows: [], precedents: null, dependents: null }); return state.traces.get(id); };
   const indexOf = (id) => ctx.workbook().sheets.findIndex((s) => s.sheetId === id);
 
   /** Apply changes [{ r, c, value } or { r, c, formula }] as one step of the history; refused, whole, if a cell is part
@@ -323,6 +327,21 @@ export function createCommands(ctx) {
       ctx.grid.setView({ freeze });
       ctx.changed?.();
       ctx.announce(freeze.rows || freeze.cols ? `Frozen: ${freeze.rows} row${freeze.rows === 1 ? '' : 's'} and ${freeze.cols} column${freeze.cols === 1 ? '' : 's'}` : 'Panes unfrozen');
+      return true;
+    },
+    /** Formulas > Trace Precedents ('precedents') or Trace Dependents ('dependents') from the active cell: one level
+     *  more each time, as Excel's arrows (ooxml/trace.js, arrows.js). Not a step of the history; not saved. */
+    trace(kind) {
+      const added = traceLevel(ctx.workbook(), ctx.sheetIndex(), traceOf(ctx.sheetIndex()), kind, { r: state.sel.ar, c: state.sel.ac });
+      ctx.grid.setArrows(traceOf(ctx.sheetIndex()).arrows);
+      if (!added) ctx.announce(kind === 'precedents' ? 'No more precedents to trace' : 'No more dependents to trace');
+      return added > 0;
+    },
+    /** Remove Arrows (kind null), Remove Precedent Arrows or Remove Dependent Arrows, on the sheet shown. */
+    removeArrows(kind = null) {
+      const t = traceOf(ctx.sheetIndex());
+      if (kind) { t.arrows = t.arrows.filter((a) => a.kind !== kind); t[kind] = null; } else Object.assign(t, { arrows: [], precedents: null, dependents: null });
+      ctx.grid.setArrows(t.arrows);
       return true;
     },
     /** Formulas > Show Formulas (Ctrl+`): on, off, or turned over (no argument); a view change, not undone. */

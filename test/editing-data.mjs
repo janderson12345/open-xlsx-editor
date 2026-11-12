@@ -373,4 +373,19 @@ await page.keyboard.press('Control+Backquote');
 check(showing[0] === '=J45*2' && Math.abs(showing[1] - 2 * widthBefore) < 1 && showing[2] === 'true' && await shown(46, 9) === '2',
   'Ctrl+`: =J45*2 shown, the column twice as wide, Show Formulas pressed; again: the value', JSON.stringify({ showing, widthBefore, after: await shown(46, 9) }));
 
+// Formulas > Trace Precedents on J47 (=J45*2): one arrow, from J45; again: J45 holds a value, nothing more. Trace
+// Dependents from J45: J47's arrow (and J46's). Remove Arrows: none left.
+const arrowCount = () => page.evaluate(() => document.querySelectorAll('.oxe-arrows polygon').length);
+await page.evaluate(() => window.oxe.select('J47'));
+await ribbon('Trace Precedents');
+const first = await arrowCount();
+await ribbon('Trace Precedents');
+const second = await arrowCount();
+await page.evaluate(() => window.oxe.select('J45'));
+await ribbon('Trace Dependents');
+const withDependents = await arrowCount();
+await ribbon('Remove Arrows');
+check(first === 1 && second === 1 && withDependents === 3 && await arrowCount() === 0, 'Trace Precedents: 1 arrow, then no more; Trace Dependents of J45: 2 more; Remove Arrows: none',
+  JSON.stringify({ first, second, withDependents }));
+
 await finish();

@@ -58,6 +58,8 @@ export function sheetCommands(env) {
       const view = ctx.grid.el;
       if (from >= 0) state.views.set(idOf(from), { sel: state.sel, focus: state.focus, top: view.scrollTop, left: view.scrollLeft });
       ctx.showSheet(i);
+      // (Its own tracer arrows, if any were drawn on it.)
+      ctx.grid.setArrows(state.traces?.get(idOf(i))?.arrows || []);
       const back = state.views.get(idOf(i));
       if (back) { view.scrollTop = back.top; view.scrollLeft = back.left; }
       show(back ? back.sel : cellSelection(0, 0), back?.focus, `${wb.sheets[i].name}, `);

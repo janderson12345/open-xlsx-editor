@@ -89,6 +89,7 @@ insides:
 | `src/calc/functions-dist.js`, `functions-agg.js`, `functions-eng.js` | The t, chi-squared, F, gamma, beta and other distributions and their tests; AGGREGATE, matrices and LINEST and its kin; bits, bases, hyperbolics and more money (docs/CALC.md). |
 | `src/calc/spill.js` | Spilling: a dynamic formula's array placed from its cell, #SPILL! when blocked, cells left emptied, readers worked out again. |
 | `src/ooxml/spillxml.js`, `src/ooxml/dynamicmeta.js` | Dynamic array formulas in the file as Excel 365 writes them: the anchor's `t="array"`, `ref` and `cm`, and `xl/metadata.xml`'s XLDAPR entry. |
+| `src/ooxml/trace.js`, `src/editor/tracing.js`, `arrows.js` | Trace Precedents and Trace Dependents: what a formula reads and what reads a cell, a level at a time, drawn as Excel's tracer arrows (docs/CALC.md). |
 | `src/ooxml/calcmode.js` | Calculation Options: Automatic or Manual (changes waiting for F9), Calculate Now and Calculate Sheet, saved in calcPr (docs/CALC.md). |
 | `src/calc/engine.js` | `Calc`: what each formula reads, what a change reaches, the order to work them out in, results written back. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |

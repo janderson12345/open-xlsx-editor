@@ -207,8 +207,23 @@ Window.DisplayFormulas, its Range.Text and the file it saved):
 - Each cell shows what it holds, unformatted, as the formula bar has it: =A1*2, 1234.5 for 1,234.50, 45292 for a
   date, 0.25 for 25%, 007 for '007, 100000000000000000000 for 1E+20; an array formula without its braces. Formulas sit
   left, as text does, unless the cell is aligned otherwise.
-- **Not yet**: Trace Precedents and Trace Dependents, Remove Arrows, Error Checking, Evaluate Formula, the Watch Window.
-  How Excel aligns numbers in Show Formulas isn't measured (Range.Text can't say); here General's right.
+
+Trace Precedents and Trace Dependents (`ooxml/trace.js`, `editor/tracing.js`, `editor/arrows.js`), as Excel's arrows
+go (measured with a hidden Excel's ShowPrecedents, ShowDependents and NavigateArrow on
+=A1+A2+SUM(B1:B3)+Sheet2!A1+Rate+A1 and its dependents; `test/trace.test.js`):
+
+- One arrow for each different cell or range read: A1 read twice is one arrow. A defined name is traced to what it names
+  (Rate to D1). Everything on other sheets is one arrow of its own, from a worksheet icon (to it, for dependents).
+- Each click goes a level further, from the formulas the last level reached, until there is nothing more. A trace from
+  another cell starts afresh, the arrows drawn so far staying. Remove Arrows takes them all away; Remove Precedent
+  Arrows and Remove Dependent Arrows those of one kind.
+- Drawn as Excel draws them: a dot where the arrow starts and a head where it ends, a range boxed with the arrow from
+  its top-left cell, blue, red from a cell holding an error, dashed black to or from another sheet. Each sheet keeps
+  its own arrows; none is saved (Excel saves none).
+- **Not yet**: Excel takes arrows away when a formula they point to changes, rows or columns are inserted or cells
+  moved; here they stay until removed. The arrows' exact look (Excel's line widths, its icon) isn't measured. Double-
+  clicking an arrow to go to its other end. Error Checking, Evaluate Formula, the Watch Window. How Excel aligns numbers
+  in Show Formulas isn't measured (Range.Text can't say); here General's right.
 
 ## Calculation options
 

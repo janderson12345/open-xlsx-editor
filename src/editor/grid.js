@@ -12,6 +12,7 @@ import { columnFitWidth } from './cells.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { drawSelection, drawMarks, rangeBox, handleCorner } from './selection.js';
+import { arrowLayer, drawArrows } from './arrows.js';
 import { drawPeers } from './peers.js';
 import { drawFilterButtons } from './filterbuttons.js';
 import { drawNoteMarks } from './notemarks.js';
@@ -51,6 +52,7 @@ function draw(st, force = false) {
   drawPeers(st);
   drawSelection(st);
   drawMarks(st);
+  drawArrows(st);
   drawFilterButtons(st, win);
   drawNoteMarks(st, win);
   drawCharts(st, win);
@@ -96,7 +98,9 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   const selLayer = div('oxe-layer');
   const markLayer = div('oxe-layer');
   const clipLayer = div('oxe-layer');
-  overlay.append(peerLayer, selLayer, markLayer, clipLayer);
+  // (Formulas > Trace Precedents and Trace Dependents: their arrows, arrows.js.)
+  const traceLayer = arrowLayer();
+  overlay.append(peerLayer, selLayer, markLayer, clipLayer, traceLayer);
   // (Frozen panes: the rows above the freeze stuck under the column headings, the columns left of it beside the row
   // headings, the corner where they meet; each its own set of layers, hidden from assistive technology: the sheet's
   // own cells are under them.)
@@ -133,7 +137,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, chartLayer, noteLayer, filterLayer, dvLayer, noteTexts);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, peerLayer, selLayer, markLayer, clipLayer, filterLayer, noteLayer, noteTexts, dvLayer, chartLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, peerLayer, selLayer, markLayer, clipLayer, arrowLayer: traceLayer, filterLayer, noteLayer, noteTexts, dvLayer, chartLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -230,6 +234,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     setClip(rect) {
       st.clip = rect;
       drawClip(st);
+    },
+    /** The tracer arrows (arrows.js drawArrows; [] for none). */
+    setArrows(arrows) {
+      st.arrows = arrows;
+      drawArrows(st);
     },
     /** Outline a formula's ranges (selection.js drawMarks; [] for none). */
     setMarks(marks) {
