@@ -6,6 +6,8 @@ import { entryChanges } from './entry.js';
 import { cellsOf } from './formatops.js';
 import { formatCodeOf } from './styles.js';
 import { refName, colName } from './refs.js';
+import { readNotes } from './notes.js';
+import { setNote, deleteNote } from './noteedit.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
 const inside = (a, b) => a.r0 >= b.r0 && a.r1 <= b.r1 && a.c0 >= b.c0 && a.c1 <= b.c1;
@@ -26,7 +28,48 @@ export function snapshot(wb, si, sel, cut = false) {
     // (Each column's width when it isn't the standard one, for Paste Special's Column widths.)
     widths: Array.from({ length: rect.c1 - rect.c0 + 1 }, (_, dc) => sheet.cols.find((x) => x.min <= rect.c0 + dc && x.max >= rect.c0 + dc && x.width != null)?.width ?? null),
     merges: sheet.merges.filter((m) => inside(m, rect)).map((m) => ({ r0: m.r0 - rect.r0, c0: m.c0 - rect.c0, r1: m.r1 - rect.r0, c1: m.c1 - rect.c0 })),
+    // (The notes of the copied cells, with their authors: a paste brings them, as Excel's does.)
+    notes: [...readNotes(wb, si)].filter(([, n]) => n.kind === 'note').map(([key, n]) => { const [r, c] = key.split(',').map(Number); return { r, c, n }; })
+      .filter(({ r, c }) => r >= rect.r0 && r <= rect.r1 && c >= rect.c0 && c <= rect.c1)
+      .map(({ r, c, n }) => ({ dr: r - rect.r0, dc: c - rect.c0, author: n.author, text: noteBody(n) })),
   };
+}
+
+/** A note's own text, without the bold author line Excel puts before it. */
+const noteBody = (n) => n.runs.filter((x, k) => !(k === 0 && x.bold)).map((x) => x.text).join('').replace(/^\n/, '');
+
+/** What a paste does to notes, as Excel's Paste, Paste Special's All and Comments and Notes do (measured over COM):
+ *  each pasted cell ends with the copy's note there, or none (one there before is taken away, a comment thread too
+ *  where a note comes). `area` the pasted cells, the copy repeated over it every `rows` by `cols`; `transpose` as
+ *  pasteSpecial's. Changes the workbook; returns whether anything changed. */
+export function pasteNotes(wb, si, area, clip, { transpose = false } = {}) {
+  const h = clip.rect.r1 - clip.rect.r0 + 1;
+  const w = clip.rect.c1 - clip.rect.c0 + 1;
+  const [rows, cols] = transpose ? [w, h] : [h, w];
+  const want = new Map();
+  for (let tr = area.r0; tr <= area.r1; tr += rows) {
+    for (let tc = area.c0; tc <= area.c1; tc += cols) {
+      for (const x of clip.notes || []) {
+        const [dr, dc] = transpose ? [x.dc, x.dr] : [x.dr, x.dc];
+        want.set(`${tr + dr},${tc + dc}`, x);
+      }
+    }
+  }
+  let changed = false;
+  for (const [key, n] of readNotes(wb, si)) {
+    const [r, c] = key.split(',').map(Number);
+    if (r < area.r0 || r > area.r1 || c < area.c0 || c > area.c1) continue;
+    const next = want.get(key);
+    if (next && n.kind === 'note' && n.author === next.author && noteBody(n) === next.text) { want.delete(key); continue; }
+    deleteNote(wb, si, r, c);
+    changed = true;
+  }
+  for (const [key, x] of want) {
+    const [r, c] = key.split(',').map(Number);
+    setNote(wb, si, r, c, x.text, x.author || 'Author');
+    changed = true;
+  }
+  return changed;
 }
 
 /** Where a paste goes: the copy repeated over the selection when the selection is a whole number of copies in both
@@ -145,6 +188,7 @@ const PASTES = {
   formulas: { contents: 'formulas' },
   values: { contents: 'values' },
   formats: { format: 'all' },
+  comments: {},
   noBorders: { contents: 'formulas', format: 'noBorders' },
   formulasFormats: { contents: 'formulas', format: 'number' },
   valuesFormats: { contents: 'values', format: 'number' },

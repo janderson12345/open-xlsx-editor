@@ -18,7 +18,24 @@ import { filterArea } from '../ooxml/filterops.js';
 export const MULTIPLE_MESSAGE = "This action won't work on multiple selections.";
 
 export function dataCommands(env) {
-  const { allowed, commands, ctx, state, sheet, show, runSteps, sizeStep, moved } = env;
+  const { allowed, commands, ctx, state, sheet, show, runSteps, sizeStep, moved, idOf } = env;
+  /** Paste's steps run as one step of the history, the copy's notes put over the pasted cells too when `notes` is
+   *  the copy and has or meets any (clipops.js pasteNotes): then the step is the workbook before and after. */
+  function withNotes(steps, notes, opts = {}) {
+    const wb = ctx.workbook();
+    const si = ctx.sheetIndex();
+    const area = steps.find((x) => x.si === si)?.area;
+    if (!notes || !area) return runSteps(steps);
+    const before = wb.snapshot();
+    if (!runSteps(steps)) return false;
+    if (!clip.pasteNotes(wb, si, area, notes, opts)) return true;
+    // (The steps' own entry gives way to one for the whole paste, notes and all.)
+    state.undo.pop();
+    state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+    ctx.reloaded?.();
+    ctx.changed?.();
+    return true;
+  }
   return {
     /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
      *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
@@ -46,7 +63,7 @@ export function dataCommands(env) {
       const si = ctx.sheetIndex();
       const mine = state.clip && (text == null || text === state.clip.text || !text) && (!state.clip.cut || state.clip.wb === wb);
       const steps = mine ? (state.clip.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, state.clip) : text ? clip.pasteText(wb, si, state.sel, text) : null;
-      if (!steps || !runSteps(steps)) return false;
+      if (!steps || !withNotes(steps, mine && !state.clip.cut ? state.clip : null)) return false;
       if (mine && state.clip.cut) commands.dropClip();
       const area = steps.find((x) => x.si === si)?.area;
       if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');
@@ -68,7 +85,8 @@ export function dataCommands(env) {
       }
       if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
       const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste, op, skip, transpose });
-      if (!runSteps(steps)) return false;
+      // (All, All except borders and Comments and Notes bring the copy's notes, as Excel's do.)
+      if (!withNotes(steps, !link && ['all', 'noBorders', 'comments'].includes(paste) && !op && !skip ? copy : null, { transpose })) return false;
       const area = steps[0].area;
       show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
       return true;

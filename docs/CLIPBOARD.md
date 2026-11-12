@@ -62,9 +62,20 @@ Not measured: an operation with a TRUE or FALSE constant (left as it is here, as
 whose $ is on one part only (each part turned as above), column widths onto columns that had their own width (they
 keep it here), and merged ranges with Transpose (not pasted).
 
+## Notes pasted
+
+A copy carries its cells' notes (with their authors). Measured over COM (B2:C3 with a note on B2 copied; Paste,
+PasteSpecial xlPasteAll, xlPasteComments and xlPasteValues onto cells, some with notes of their own): Paste, All and
+Comments and Notes leave each pasted cell with the copy's note there, or none (a note there before is taken away, so
+F6's went when C3, which had none, was pasted over it); Values brings none. Here (`clipops.js` pasteNotes): Ctrl+V,
+Paste Special's All, All except borders and Comments and Notes do the same, over a repeated paste too,
+as one step of Undo with the cells (test/pastenotes.test.js, test/editing-more.mjs). A cut moves its cells, not its
+notes, yet; a comment thread isn't copied.
+
 ## Not yet
 
-Paste Special's Comments and Notes, Validation, All using Source theme and All merging conditional formats; Paste
+Paste Special's Validation, All using Source theme and All merging conditional formats; validation with Paste and All
+(Excel brings it); notes moved with a cut; comment threads copied; Paste
 Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
 program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was
 pasted onto (Excel shrinks it: `=SUM(A1:A3)` became `=SUM(A2:A3)` when A1 was moved onto A3).
