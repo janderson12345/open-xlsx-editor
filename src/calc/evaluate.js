@@ -150,12 +150,17 @@ function apply(fn, argNodes, ctx, mode) {
   if (!(fn instanceof Lambda)) return E.value;
   if (argNodes.length !== fn.params.length) return E.value;
   const binds = new Map(fn.params.map((p, k) => [p, evaluate(argNodes[k], ctx, mode)]));
-  return within(fn.scope, binds, fn.body, ctx, mode);
+  const v = within(fn.scope, binds, fn.body, ctx, mode);
+  // (A LAMBDA call giving a value, not a reference, makes the formula a dynamic one to Excel: dynamicResult.)
+  if (!(v instanceof Area) && !(v instanceof Union)) ctx.lambdaValue = true;
+  return v;
 }
 
 /** A LAMBDA called with values already worked out (MAP, REDUCE, SCAN, BYROW...: functions-arrays.js). */
 function applyValues(fn, vals, ctx) {
   if (isError(fn)) return fn;
+  // (MAP, REDUCE and the others make the formula a dynamic one to Excel, whatever they give: dynamicResult.)
+  ctx.lambdaValue = true;
   if (fn instanceof Builtin) return call({ k: 'fn', name: fn.name, args: vals.map((v) => ({ k: 'val', v })) }, ctx, 'array');
   if (!(fn instanceof Lambda) || vals.length !== fn.params.length) return E.value;
   const binds = new Map(fn.params.map((p, k) => [p, vals[k]]));
@@ -286,8 +291,10 @@ export function dynamicResult(tree, ctx) {
   if (v instanceof Union) return { value: E.value };
   if (v instanceof Arr || (v instanceof Area && v.size > 1)) return { rows: matrix(v, ctx).map((row) => row.map(one)) };
   // (A function that gives arrays, or a LAMBDA called, is an array formula to Excel even when its answer is one value,
-  // FILTER's if_empty or its #CALC!: kept as one of one, as Excel saves it.)
+  // FILTER's if_empty or its #CALC!: kept as one of one, as Excel saves it. Measured for LAMBDAs: a call giving a value
+  // anywhere in the formula (=LAMBDA(x,x*2)(3)+1, =Twice(3), a LET name called, IF(TRUE,LAMBDA(x,x)(5))), or MAP,
+  // REDUCE and the others; not one giving a reference, =SUM(LAMBDA(x,x)(A1:A3)), nor LET alone.)
   const value = one(scalar(v, ctx));
-  if (tree.k === 'call' || (tree.k === 'fn' && ARRAY_FUNCTIONS.has(tree.name))) return { rows: [[value]] };
+  if (tree.k === 'call' || ctx.lambdaValue || (tree.k === 'fn' && ARRAY_FUNCTIONS.has(tree.name))) return { rows: [[value]] };
   return { value };
 }

@@ -2,6 +2,7 @@ import './setup.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { strFromU8, unzipSync } from 'fflate';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { entryChanges } from '../src/ooxml/entry.js';
 import { parseRef, refName, rangeName } from '../src/ooxml/refs.js';
@@ -147,4 +148,21 @@ test("a LAMBDA kept in a LET name and called is written with _xlpm. there too, a
   const si = wb.addSheet(wb.sheets.length, 'L');
   wb.setFormula(si, 'A1', file);
   assert.equal(wb.sheet(si).cells.get(0).get(0).v, 6);
+});
+
+test('LAMBDA calls answering one value are saved as dynamic formulas, as Excel 365 saves them (14 measured)', () => {
+  // (A hidden Excel saved each with t="array" and cm="1" but the two marked plain: a LAMBDA call giving a reference,
+  // and LET alone.)
+  const cases = [['=LAMBDA(x,x*2)(3)', true], ['=LAMBDA(x,x*2)(3)+1', true], ['=SUM(LAMBDA(x,x)(A1:A3))', false],
+    ['=LET(f,LAMBDA(x,x*2),f(3))', true], ['=Twice(3)', true], ['=Twice(3)+1', true], ['=MAP(A1,LAMBDA(x,x*2))', true],
+    ['=SUM(MAP(A1:A3,LAMBDA(x,x*2)))', true], ['=LAMBDA(x,y,x+y)(1,2)', true], ['=IF(TRUE,LAMBDA(x,x)(5))', true],
+    ['=LET(x,2,x*3)', false], ['=REDUCE(0,A1:A3,LAMBDA(a,b,a+b))', true]];
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/formulas.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'L');
+  [1, 2, 3].forEach((v, r) => wb.setCell(si, { r, c: 0 }, v));
+  cases.forEach(([f], r) => wb.apply(si, [entryChanges(wb, si, r, 2, f).content]));
+  const files = unzipSync(wb.toBytes());
+  const xml = strFromU8(files[`xl/worksheets/sheet${wb.sheets.length}.xml`]);
+  const saved = cases.map((_, r) => new RegExp(`<c r="C${r + 1}"[^>]*cm="1"[^>]*><f t="array"`).test(xml));
+  assert.deepEqual(saved, cases.map(([, dynamic]) => dynamic));
 });

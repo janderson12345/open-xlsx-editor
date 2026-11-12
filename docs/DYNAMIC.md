@@ -35,6 +35,8 @@ Excel 365's dynamic array formulas: a formula whose answer is an array spills it
 | A formula whose answer is an array (even of one value, `SEQUENCE(1)`, or a function of arrays answering one value, FILTER's if_empty) | `<c r="D1" cm="1"><f t="array" ref="D1:D4">_xlfn.SEQUENCE(4)</f><v>1</v></c>`, the other cells values only (`t="str"` for text) |
 | `cm="1"` | the cell metadata block of `xl/metadata.xml`'s XLDAPR entry (`xda:dynamicArrayProperties fDynamic="1"`), the part related from the workbook as sheetMetadata |
 | A formula answering one value (LET, `SUM(SEQUENCE(4))`) | a plain `<f>` |
+| A formula with a LAMBDA call giving a value anywhere in it (`LAMBDA(x,x*2)(3)+1`, `Twice(3)`, a LET name called, `IF(TRUE,LAMBDA(x,x)(5))`), or MAP, REDUCE and the others, even inside `SUM` | a dynamic one, `t="array"` and `cm="1"`, though its answer is one value; a call giving a reference (`SUM(LAMBDA(x,x)(A1:A3))`) leaves it plain (14 measured, all as Excel's) |
+| A LAMBDA kept in a LET name, called (`f(3)`) | `_xlpm.f(3)` |
 | `D1#` | `_xlfn.ANCHORARRAY(D1)` |
 | `@x` inside a formula | `_xlfn.SINGLE(x)`; a formula that is all `@` (`=@A1:A3`) is written plain, `A1:A3`, the old kind |
 | LET and LAMBDA names | `_xlpm.x` |
@@ -101,5 +103,3 @@ formula probe:
   MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF, RANDARRAY and TRIMRANGE are here, in the formula probe.)
 - `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an
   old formula's operator cuts to one value (`=@A1:A3*2`).
-- A LAMBDA called where it is written is saved as a plain formula when its answer is one value; Excel saves it as a
-  dynamic one (both work out the same, in both programs).
