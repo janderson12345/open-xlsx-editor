@@ -453,6 +453,9 @@ export const PROBE_FORMULAS = [
   'COUNTIF(\'Data:My Data\'!A1:A2,"Apple")', 'ISREF(\'Data:My Data\'!A1)', 'SUM(Data!A1:C9 Data!B2:E3)', 'SUM(Data!B:B Data!3:3)',
   'Data!A1:A3 Data!C1:C3', 'TEXTJOIN("|",FALSE,Data!A1:C3 Data!B2:D4)', 'Data!A1:B2 \'My Data\'!A1', 'COUNTA(Items Data!A3:C3)',
   'INDEX(Data!A1:C9,0,2) Data!A3:C3', '-Data!B2:B9 Data!A3:C3',
+  'SUM(Data!C2:INDEX(Data!C:C,5))', 'COUNTA(Data!A1:INDEX(Data!A:A,9))', 'SUM(OFFSET(Data!C2,1,0):Data!C5)',
+  'ROWS(Data!A2:INDEX(Data!A2:A9,MATCH("Elder",Data!A2:A9,0)))', 'SUM(Data!B2:\'My Data\'!A1)', 'TEXTJOIN(",",TRUE,-Data!C2:C4)',
+  'SUM(INDEX(Data!A1:E9,2,2):INDEX(Data!A1:E9,4,3))', 'SUM(Data!C2:C3:Data!C5)', 'SUM(Data!A1:C9 Data!B2:Data!E3)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

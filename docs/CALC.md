@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1592 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1601 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1592 of 1592 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1601 of 1601 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -132,7 +132,7 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       =1+A1/2 stops at 1.9990234375 after 11 passes.
   - `threed.js`: 3D references (=SUM(Jan:Apr!A1), 'Feb:My Mar'!A1:B2) and the intersection operator, a space
     between references (=A1:C3 B2:D4 is B2:C3, spilled; =SUM(B:B 2:2) is B2). Measured on 86 formulas over four sheets
-    in a hidden Excel, 84 the same here (the two not read are in the gaps below), then the probe's 17:
+    in a hidden Excel, all the same here, then the probe's 17:
     - A 3D reference is the area on each sheet from the first to the last in the workbook's order. SUM, COUNT, COUNTA,
       AVERAGE(A), MAX(A), MIN(A), PRODUCT, STDEV, VAR and their kinds, and in Excel 365 also MEDIAN, LARGE, SMALL,
       PERCENTILE, QUARTILE, SUMSQ, AVEDEV, GEOMEAN, DEVSQ, SKEW, KURT, CONCAT, TEXTJOIN, AND, OR, VSTACK and HSTACK
@@ -147,6 +147,12 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       leaves the span's other sheets, deleted or moved out, gives way to the next of them inward (Jan:Apr with Jan
       deleted, or moved after Apr, is Feb:Apr; Feb:Mar with Feb gone is Mar!); one moved but still among them, and any
       other sheet, leaves it as it was; a sheet moved or inserted between the ends is read. Renaming an end renames it.
+    - The range operator between references (=SUM(A1:INDEX(A:A,3)), =OFFSET(A1,1,0):A4, =INDEX(..):INDEX(..)):
+      the range holding both, measured on 25 formulas, all as Excel's, then the probe's 9. Tightest of all
+      (=A1:B2 B2:C3:D4 is B2; =-A1:INDEX(A:A,2) spills -A1 and -A2); references on two sheets, or a 3D one, #VALUE!;
+      Jan:'My Mar'!A1 is Jan, a name, to 'My Mar'!A1, so #NAME?; a number or text on one side isn't a formula.
+      A formula whose range is worked out (INDEX's) is worked out at every change, as the cells between can be any.
+    - Negation over a range of several cells spills in a dynamic formula, =-A1:A2 as -A1 and -A2.
     - Rows or columns inserted or deleted, or cells cut and pasted, on one of its sheets leave a 3D reference as it
       was: it reads what is there now (8 cases measured, all as Excel's).
   - `functions-amort.js`: AMORLINC and AMORDEGRC, the French depreciation. Microsoft's page gives other rules than
@@ -386,8 +392,8 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
-- **3D references and intersection: what isn't yet as Excel.** `Jan:'My Mar'!A1` (a quote round one end only,
-  #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't read as formulas.
+- **The range operator and intersection in Evaluate Formula** are one step each, as a reference is (=SUM(A1:INDEX(A:A,3))
+  goes straight to its sum); Excel's steps there aren't measured.
 - **Iterative calculation: what isn't yet as Excel.** No on-screen switch for it (Excel's File > Options > Formulas):
   it is read from the file and kept, and `setIteration` (calcmode.js) turns it on. A circle whose cells change only
   in text or errors isn't measured: here only numbers count toward Maximum Change. Array and dynamic formulas in a

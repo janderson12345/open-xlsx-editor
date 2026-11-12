@@ -1589,4 +1589,13 @@
 ["Calc","B1576","=Data!A1:B2 'My Data'!A1","e","#VALUE!"],
 ["Calc","B1577","=COUNTA(Items Data!A3:C3)","n","1"],
 ["Calc","B1578","=INDEX(Data!A1:C9,0,2) Data!A3:C3","n","5"],
-["Calc","B1579","=-Data!B2:B9 Data!A3:C3","n","-5"]]}
+["Calc","B1579","=-Data!B2:B9 Data!A3:C3","n","-5"],
+["Calc","B1580","=SUM(Data!C2:INDEX(Data!C:C,5))","n","7.75"],
+["Calc","B1581","=COUNTA(Data!A1:INDEX(Data!A:A,9))","n","9"],
+["Calc","B1582","=SUM(OFFSET(Data!C2,1,0):Data!C5)","n","6.25"],
+["Calc","B1583","=ROWS(Data!A2:INDEX(Data!A2:A9,MATCH(\"Elder\",Data!A2:A9,0)))","n","5"],
+["Calc","B1584","=SUM(Data!B2:'My Data'!A1)","e","#VALUE!"],
+["Calc","B1585","=TEXTJOIN(\",\",TRUE,-Data!C2:C4)","e","#VALUE!"],
+["Calc","B1586","=SUM(INDEX(Data!A1:E9,2,2):INDEX(Data!A1:E9,4,3))","n","13.75"],
+["Calc","B1587","=SUM(Data!C2:C3:Data!C5)","n","7.75"],
+["Calc","B1588","=SUM(Data!A1:C9 Data!B2:Data!E3)","n","9.75"]]}

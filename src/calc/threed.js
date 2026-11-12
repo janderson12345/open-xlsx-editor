@@ -1,5 +1,6 @@
-// 3D references (=SUM(Jan:Apr!A1)) and the intersection operator (=A1:C3 B2:D4), as Excel 365 works them out,
-// measured with a hidden Excel on 86 formulas over four sheets. evaluate.js calls these.
+// 3D references (=SUM(Jan:Apr!A1)), the intersection operator (=A1:C3 B2:D4) and the range operator between
+// references (=A1:INDEX(A:A,3)), as Excel 365 works them out,
+// measured with a hidden Excel on 86 formulas over four sheets and 25 of the range operator. evaluate.js calls these.
 import { Area, Ref3D, E, isError } from './values.js';
 
 /** A 3D reference's areas, one a sheet from its first to its last in the workbook's order (Apr:Jan as Jan:Apr); one
@@ -25,6 +26,15 @@ export function intersect(a, b) {
   const r1 = Math.min(a.r1, b.r1);
   const c1 = Math.min(a.c1, b.c1);
   return r0 > r1 || c0 > c1 ? E.null : new Area(a.si, r0, c0, r1, c1);
+}
+
+/** The range operator between references (=A1:INDEX(A:A,3), =OFFSET(A1,1,0):A4): the smallest range holding both;
+ *  #VALUE! for references on different sheets, a 3D one or what isn't a reference (measured). */
+export function span(a, b) {
+  if (isError(a)) return a;
+  if (isError(b)) return b;
+  if (!(a instanceof Area) || !(b instanceof Area) || a.si !== b.si) return E.value;
+  return new Area(a.si, Math.min(a.r0, b.r0), Math.min(a.c0, b.c0), Math.max(a.r1, b.r1), Math.max(a.c1, b.c1));
 }
 
 // The functions that take a 3D reference in Excel 365 (Microsoft's list and more, measured): each sheet's area read

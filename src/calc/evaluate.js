@@ -5,7 +5,7 @@ import { Builtin } from './values.js';
 import { Area, Arr, Union, Ref3D, MISSING, XlError, E, errorOf, Unsupported, isError, scalar, matrix, toNum, toText, compare, finite,
   closeToZero, Lambda } from './values.js';
 import { FUNCTIONS } from './functions.js';
-import { threeD, intersect, refused3D, answer3D } from './threed.js';
+import { threeD, intersect, span, refused3D, answer3D } from './threed.js';
 // (More functions, registered into FUNCTIONS once it is made.)
 import './functions-text.js';
 import './functions-lookup.js';
@@ -216,6 +216,7 @@ export function evaluate(node, ctx, mode = 'scalar') {
       return new Area(si, a.r0, a.c0, a.r1, a.c1);
     }
     case 'isect': return intersect(evaluate(node.a, ctx, mode), evaluate(node.b, ctx, mode));
+    case 'range': return span(evaluate(node.a, ctx, mode), evaluate(node.b, ctx, mode));
     case 'union': {
       const items = node.items.map((n) => evaluate(n, ctx, mode));
       const err = items.find(isError);
@@ -239,7 +240,8 @@ export function evaluate(node, ctx, mode = 'scalar') {
     }
     case 'neg': case 'pos': case 'pct': {
       const a = operand(evaluate(node.a, ctx, mode), ctx, mode);
-      if (a instanceof Arr) return elementwise([a], ctx, ([x]) => unary(node.k, x, ctx));
+      // (Over a range of several cells too, as =-A1:A2 spills -A1 and -A2 in Excel 365.)
+      if (a instanceof Arr || (a instanceof Area && a.size > 1)) return elementwise([a], ctx, ([x]) => unary(node.k, x, ctx));
       return unary(node.k, a, ctx);
     }
     case 'bin': {

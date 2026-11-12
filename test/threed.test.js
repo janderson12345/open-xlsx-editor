@@ -112,3 +112,28 @@ test('rows inserted or deleted, or cells cut, on a sheet of a 3D reference leave
   // (Then a column on Feb: its B2:B4 is empty now, 609 less.)
   assert.equal(d1(), 'SUM(Jan:Apr!B2:B4)=2424');
 });
+
+test('the range operator between references: the range holding both, as Excel works it out (25 cases measured)', () => {
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'R');
+  const other = wb.addSheet(wb.sheets.length, 'S');
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) wb.setCell(si, { r, c }, 100 + (r + 1) * 10 + c + 1);
+  const at = (ref) => { const { r, c } = parseRef(ref); return wb.sheet(si).cells.get(r)?.get(c)?.v; };
+  const type = (ref, text) => { const { r, c } = parseRef(ref); const ch = entryChanges(wb, si, r, c, text); if (ch.content) wb.apply(si, [ch.content]); return ch; };
+  type('F1', '=SUM(A1:INDEX(A:A,3))');
+  type('F2', '=SUM(OFFSET(A1,1,0):A4)');
+  type('F3', '=SUM(INDEX(A:A,2):INDEX(C:C,3))');
+  type('F4', '=SUM(A1:B2 B2:C3:D4)');
+  type('F5', `=SUM(B2:${wb.sheets[other].name}!C3)`);
+  assert.deepEqual(['F1', 'F2', 'F3', 'F4', 'F5'].map(at), [363, 393, 762, 122, '#VALUE!']);
+  // (A number or text on one side isn't a formula, as Excel refuses it.)
+  assert.ok(type('F6', '=SUM(A1:5)').error);
+  // (Worked out again when a cell between the ends changes: B2 is in A1:INDEX(C:C,3).)
+  type('F7', '=SUM(A1:INDEX(C:C,3))');
+  const was = at('F7');
+  wb.setCell(si, 'B2', 1000);
+  assert.equal(at('F7'), was - 122 + 1000);
+  // (Negation over a range spills, as =-A1:A2 does in Excel 365.)
+  type('H1', '=-A1:INDEX(A:A,2)');
+  assert.deepEqual([at('H1'), at('H2')], [-111, -121]);
+});

@@ -9,7 +9,7 @@ export const functionName = (text) => text.toUpperCase().replace(/^(_XL(FN|WS)\.
 
 /** A formula (without "=") as a tree of { k, ... }: num, str, bool, err (`v`); ref (`sheet`, `book`, `area`); name;
  *  fn (`name`, `args`); missing (an argument left out); neg, pos, pct, paren (`a`); bin (`op`, `a`, `b`); isect
- *  (`a`, `b`: intersection); union (`items`); arr (`rows`). A 3D reference's ref has `sheets`, its first and last. Throws a FormulaError when it isn't a formula. */
+ *  (`a`, `b`: intersection); range (`a`, `b`: the range operator between references); union (`items`); arr (`rows`). A 3D reference's ref has `sheets`, its first and last. Throws a FormulaError when it isn't a formula. */
 export function parseFormula(text) {
   const toks = tokenize(text);
   let i = 0;
@@ -42,6 +42,17 @@ export function parseFormula(text) {
     return node;
   }
   function called() {
+    let node = invoked();
+    // (The range operator between references, A1:INDEX(A:A,3): tightest of all; a number or text there isn't a
+    // formula to Excel.)
+    while (is(peek(), 'op', ':')) {
+      i++;
+      node = { k: 'range', a: node, b: invoked() };
+      if (['num', 'str', 'bool', 'arr'].includes(node.b.k) || ['num', 'str', 'bool', 'arr'].includes(node.a.k)) { i--; fail('A range needs references on both sides'); }
+    }
+    return node;
+  }
+  function invoked() {
     let node = primary();
     // (A LAMBDA called where it is written: =LAMBDA(x,x*2)(3).)
     while (is(peek(), 'punct', '(') && (node.k === 'call' || (node.k === 'fn' && node.name === 'LAMBDA'))) node = { k: 'call', f: node, args: argList() };

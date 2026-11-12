@@ -54,6 +54,9 @@ export class Stepper {
       case 'paren': return this._next(node.a, at('a'), asArg) || { node, put };
       case 'neg': case 'pos': case 'pct': return this._next(node.a, at('a'), false) || { node, put };
       case 'bin': return this._next(node.a, at('a'), false) || this._next(node.b, at('b'), false) || { node, put };
+      // (Intersection and the range operator: one reference, as A1:A3 is; its parts aren't stepped into, where INDEX's
+      // value would stand for the reference it gives.)
+      case 'isect': case 'range': return asArg ? null : { node, put };
       case 'fn': {
         if (node.name === 'IF' || node.name === 'IFERROR') {
           const first = this._next(node.args[0], at('args', 0), false);
@@ -141,6 +144,8 @@ export class Stepper {
         case 'pos': put('+'); return print(node.a);
         case 'pct': print(node.a); return put('%');
         case 'bin': print(node.a); put(node.op); return print(node.b);
+        case 'isect': print(node.a); put(' '); return print(node.b);
+        case 'range': print(node.a); put(':'); return print(node.b);
         case 'union': put('('); node.items.forEach((x, i) => { if (i) put(','); print(x); }); return put(')');
         case 'fn': {
           if (node.name === 'SINGLE') { put('@'); return print(node.args[0]); }

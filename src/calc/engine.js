@@ -101,6 +101,20 @@ export class Calc {
           n.args.forEach(walk);
           return;
         case 'bin': case 'isect': walk(n.a); walk(n.b); return;
+        case 'range':
+          walk(n.a);
+          walk(n.b);
+          // (The cells between its ends are read too: two references on one sheet give the range at once; one worked
+          // out, as INDEX's, can be anywhere, so the formula is worked out at every change.)
+          if (n.a.k === 'ref' && n.b.k === 'ref' && !n.a.sheets && !n.b.sheets && n.a.book == null && n.b.book == null) {
+            const sa = n.a.sheet == null ? si : this.book.sheetIndexOf(n.a.sheet);
+            const sb = n.b.sheet == null ? si : this.book.sheetIndexOf(n.b.sheet);
+            const box = (x) => [Math.min(x.r0, x.r1), Math.min(x.c0, x.c1), Math.max(x.r0, x.r1), Math.max(x.c0, x.c1)];
+            const [ar0, ac0, ar1, ac1] = box(n.a.area);
+            const [br0, bc0, br1, bc1] = box(n.b.area);
+            if (sa >= 0 && sa === sb) e.deps.push({ si: sa, r0: Math.min(ar0, br0), c0: Math.min(ac0, bc0), r1: Math.max(ar1, br1), c1: Math.max(ac1, bc1) });
+          } else e.volatile = true;
+          return;
         case 'neg': case 'pos': case 'pct': case 'paren': walk(n.a); return;
         case 'union': n.items.forEach(walk);
       }
