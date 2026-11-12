@@ -16,6 +16,7 @@ import { editText } from '../ooxml/input.js';
 import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { contentsHidden } from '../ooxml/protection.js';
+import { linkFollower } from './linkfollow.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -340,6 +341,8 @@ export function attachEditing(root, ctx) {
     if (e.shiftKey) cmd.run('extendTo', at.r, at.c);
     else if (e.ctrlKey || e.metaKey) cmd.run('addArea', at.r, at.c); // (Ctrl: another range, dragged out as one is)
     else cmd.run('select', at.r, at.c);
+    // (A hyperlink's cell: followed when the click comes up quickly on it, linkfollow.js.)
+    links.press(at, e);
     // (A double click edits. Taken from the click count: each click redraws the cells, so the browser's dblclick,
     // which wants both clicks on one element, doesn't come.)
     if (e.detail === 2 && !e.shiftKey) { startEdit('edit'); return; }
@@ -368,6 +371,7 @@ export function attachEditing(root, ctx) {
   // A heading edge: the resize cursor over it; dragged, the row or column resized (a guide and Excel's tip while
   // dragging); double-clicked, AutoFit. Captured before the heading's own selecting.
   let resizing = null;
+  const links = linkFollower(view, ctx);
   view.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || pointing.control) return;
     const edge = grid.edgeAt(e.clientX, e.clientY);
@@ -393,6 +397,7 @@ export function attachEditing(root, ctx) {
     view.classList.toggle('oxe-resize-col', edge?.axis === 'col');
     view.classList.toggle('oxe-resize-row', edge?.axis === 'row');
     view.classList.toggle('oxe-fill-cursor', !edge && !e.buttons && grid.fillHandleAt(e.clientX, e.clientY));
+    links.hover(edge || e.buttons ? null : grid.hitTest(e.clientX, e.clientY));
   });
   const onMove = (e) => {
     if (filling) {
@@ -429,6 +434,7 @@ export function attachEditing(root, ctx) {
     }
     // (Format Painter waiting: the cells just selected get the copied formats.)
     const selected = dragging;
+    if (selected) links.release(grid.hitTest(e.clientX, e.clientY));
     dragging = false;
     pointingDrag = false;
     if (selected && ctx.painting?.()) ctx.painted();

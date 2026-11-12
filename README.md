@@ -63,7 +63,7 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
     `docs/ROWCOL.md`, `docs/SHEETS.md`, `docs/VIEW.md` (frozen panes, zoom, gridlines, headings), `docs/PROTECT.md`
     (Protect Sheet and Protect Workbook).
   - Data and objects: `docs/SORT.md`, `docs/FILTER.md`, `docs/DATATOOLS.md` (Flash Fill, Remove Duplicates, Text to
-    Columns...), `docs/PIVOT.md`, `docs/CHARTS.md`, `docs/NOTES.md` (notes and comments).
+    Columns...), `docs/PIVOT.md`, `docs/CHARTS.md`, `docs/NOTES.md` (notes and comments), `docs/LINKS.md` (hyperlinks).
   - Working with others: `docs/COLLAB.md` (co-editing), `docs/AGENT.md` (the agent interface).
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
   Word editor modules carry over.

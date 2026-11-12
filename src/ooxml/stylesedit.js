@@ -14,8 +14,10 @@ const ALIGN_ORDER = ['horizontal', 'vertical', 'textRotation', 'wrapText', 'inde
 /** The alignment change's keys and the attributes they set, each with the value Excel leaves out. */
 const ALIGN_KEYS = { horizontal: ['horizontal', 'general'], vertical: ['vertical', 'bottom'], rotation: ['textRotation', 0], wrap: ['wrapText', false],
   indent: ['indent', 0], shrink: ['shrinkToFit', false], readingOrder: ['readingOrder', 0] };
-/** Excel's built-in cell styles the Number group applies: builtinId and number format. */
-export const CELL_STYLES = { Comma: { builtinId: 3, numFmtId: 43 }, Currency: { builtinId: 4, numFmtId: 44 }, Percent: { builtinId: 5, numFmtId: 9 } };
+/** Excel's built-in cell styles the Number group applies, and Hyperlink (a hyperlink's cell, links.js): builtinId,
+ *  number format, and the font of its own (Hyperlink's: underlined, the theme's colour 10, measured). */
+export const CELL_STYLES = { Comma: { builtinId: 3, numFmtId: 43 }, Currency: { builtinId: 4, numFmtId: 44 }, Percent: { builtinId: 5, numFmtId: 9 },
+  Hyperlink: { builtinId: 8, numFmtId: 0, font: { u: 'single', color: { theme: 10 } } } };
 /** Built-in formats whose codes depend on the computer's locale: Excel writes their codes out (numFmts) when it uses
  *  them, so another locale reads the same thing. */
 const LOCALE_BUILTINS = new Set([5, 6, 7, 8, 41, 42, 43, 44]);
@@ -247,13 +249,16 @@ class Formats {
   /** The cellStyleXfs index of one of Excel's built-in cell styles (CELL_STYLES), added with its cellStyle entry when
    *  the workbook hasn't got it. */
   cellStyle(name) {
-    const { builtinId, numFmtId } = CELL_STYLES[name];
+    const { builtinId, numFmtId, font } = CELL_STYLES[name];
     const found = kids(kid(this.root, 'cellStyles', this.ns), 'cellStyle', this.ns).find((el) => attr(el, 'builtinId') === String(builtinId));
     if (found) return Number(attr(found, 'xfId') || 0);
     if (LOCALE_BUILTINS.has(numFmtId) && this.wb.styles.numFmts[numFmtId] == null) this.writeNumFmt(numFmtId, BUILTIN_FORMATS[numFmtId]);
-    // (As Excel writes a style's own format: the Normal font, no fill or border, and only its number format applied.)
+    // (As Excel writes a style's own format: the Normal font, no fill or border, and only its number format applied;
+    // a style with a font of its own, that font, and only it applied.)
     const xf = make(this.doc, 'xf');
-    for (const [k, v] of [['numFmtId', numFmtId], ['fontId', 0], ['fillId', 0], ['borderId', 0], ['applyFont', 0], ['applyFill', 0], ['applyBorder', 0], ['applyAlignment', 0], ['applyProtection', 0]]) xf.setAttribute(k, String(v));
+    const fontId = font ? this.font(0, font) : 0;
+    const applied = font ? [['applyNumberFormat', 0]] : [['applyFont', 0]];
+    for (const [k, v] of [['numFmtId', numFmtId], ['fontId', fontId], ['fillId', 0], ['borderId', 0], ...applied, ['applyFill', 0], ['applyBorder', 0], ['applyAlignment', 0], ['applyProtection', 0]]) xf.setAttribute(k, String(v));
     const parent = this.list('cellStyleXfs');
     parent.appendChild(xf);
     const xfId = kids(parent, 'xf', this.ns).length - 1;
@@ -283,7 +288,12 @@ class Formats {
     if (change.font) set('fontId', this.font(old.fontId, change.font), 'applyFont');
     if ('fill' in change) set('fillId', this.fill(change.fill), 'applyFill');
     if (change.border) set('borderId', this.border(old.borderId, change.border), 'applyBorder');
-    if (change.style) {
+    if (change.style && CELL_STYLES[change.style].font) {
+      // (Hyperlink: the style's own font given to the cell, nothing marked applied, as Excel writes it.)
+      const xfId = this.cellStyle(change.style);
+      set('xfId', xfId);
+      set('fontId', Number(attr(kids(this.list('cellStyleXfs'), 'xf', this.ns)[xfId], 'fontId') || 0));
+    } else if (change.style) {
       set('xfId', this.cellStyle(change.style));
       set('numFmtId', CELL_STYLES[change.style].numFmtId, 'applyNumberFormat');
     } else if (change.numFmt != null) set('numFmtId', this.numFmt(change.numFmt), 'applyNumberFormat');

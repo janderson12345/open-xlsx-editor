@@ -3,6 +3,7 @@
 // message, a list's choices, a filter's list, the cell's and the headings' menus, Row Height and Column Width.
 import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
 import { protectionRefusal } from '../ooxml/protection.js';
+import { hyperlinkAt } from '../ooxml/links.js';
 import { createMoreActs } from './acts-more.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
@@ -33,7 +34,7 @@ const OPERATIONS = { None: null, Add: 'add', Subtract: 'subtract', Multiply: 'mu
 
 /** The actions: `env` is mountXlsxEditor's shared state and helpers (index.js). Returns each by name. */
 export function createActs(env) {
-  const { root, state, options, editing, menu, sheetActs, allowed } = env;
+  const { root, state, options, editing, menu, sheetActs, allowed, followLink } = env;
   /** Format Painter: the selection's formats copied (outlined as a copy is), then given to the next cells selected by
    *  Paste Special > Formats (clipops.js, as measured for paste-excel.json), once; pressed twice quickly, kept for
    *  every selection until it is pressed again or Esc lets the copy go. */
@@ -372,6 +373,12 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
       ...(() => {
         const s = editing().selection;
         return pivotAt(state.workbook, state.sheetIndex, s.ar, s.ac) ? [{ label: 'Refresh', run: () => editing().run('refreshPivots', false), disabled: ro }, { label: 'Show Field List', run: run('pivotFieldList'), disabled: ro }, 'separator'] : [];
+      })(),
+      // (A hyperlink's cell: Excel's Open Hyperlink and Remove Hyperlink.)
+      ...(() => {
+        const s = editing().selection;
+        const h = hyperlinkAt(state.workbook, state.sheetIndex, s.ar, s.ac);
+        return h ? [{ label: 'Open Hyperlink', run: () => followLink(h) }, { label: 'Remove Hyperlink', run: () => editing().run('clearAs', 'removeHyperlinks'), disabled: ro }, 'separator'] : [];
       })(),
       // (Excel's: New Comment and New Note on a cell with neither; a thread's Reply to Comment and Delete Comment; a
       // note's Edit, Delete and Show/Hide Note.)

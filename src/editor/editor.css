@@ -841,6 +841,10 @@
 .oxe-grid.oxe-fill-cursor {
   cursor: crosshair;
 }
+/* Over a hyperlink's cell: the hand, as Excel's (linkfollow.js). */
+.oxe-grid.oxe-link-cursor {
+  cursor: pointer;
+}
 
 /* A formula's ranges while it is typed (selection.js drawMarks): each in its colour, the one pointed at dashed. */
 .oxe-layer {

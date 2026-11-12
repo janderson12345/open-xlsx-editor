@@ -8,6 +8,7 @@ import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
+import { followOf } from './ooxml/links.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
@@ -62,10 +63,12 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  *   turns off its keys (Ctrl+B with `font: false`).
  * - `toolbar`: false hides the ribbon but keeps editing.
  * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs.
+ * - `onLink(url)`: a hyperlink clicked that goes outside the workbook (http, https, mailto, ftp); without it, the
+ *   browser opens it in a new tab.
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
  *   features?: Record<string, boolean>, toolbar?: boolean, statusBar?: boolean, calculateOnOpen?: boolean,
- *   onChange?: () => void }} [options]
+ *   onChange?: () => void, onLink?: (url: string) => void }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
   const root = document.createElement('div');
@@ -247,7 +250,16 @@ export function mountXlsxEditor(host, options = {}) {
     .filter((t) => t.state === 'visible');
 
   // (The ribbon's actions and their boxes and menus, editor/acts.js, given this editor's state and helpers.)
-  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed });
+  // (A hyperlink followed: an address opened by the browser, or onLink; a place in the workbook gone to, as the Name
+  // Box goes; one a page can't open refused in Excel's words. ooxml/links.js.)
+  const followLink = (h) => {
+    const to = followOf(h);
+    if (to.refused) return alert(to.refused);
+    if (to.place) return editing().run('nameBox', to.place);
+    if (options.onLink) options.onLink(to.url);
+    else window.open(to.url, '_blank', 'noopener,noreferrer');
+  };
+  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink });
   const api = {
     /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). One saved
      *  with a password opens with `password`; without one, Excel's Password box asks for it and a promise is
@@ -293,6 +305,7 @@ export function mountXlsxEditor(host, options = {}) {
           sheetsChanged,
           alert,
           // (Excel's Unlock Range, for a change to an Allow Edit Range with a password: rangesbox.js.)
+          followLink,
           unlockRange: (name) => unlockRangeBox(root).then((pw) => pw != null && editing().run('unlockEditRange', name, pw)),
           grid: state.grid,
           looks: () => state.looks,
