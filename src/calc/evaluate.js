@@ -169,6 +169,9 @@ function call(node, ctx, mode) {
   const local = bound(ctx, node.name);
   if (local !== undefined) return apply(local, node.args, ctx, mode);
   const def = FUNCTIONS[node.name];
+  // (Not a function: a defined name holding a LAMBDA, called with these arguments, =Twice(21), as Excel 365 has it; a
+  // function of the same name comes first, as =Fact(5) is FACT's.)
+  if (!def && ctx.hasName?.(node.name)) return apply(ctx.name(node.name, mode), node.args, ctx, mode);
   if (!def) throw new Unsupported(`the function ${node.name}`);
   if (def.volatile) ctx.volatile = true;
   const argMode = def.array ? 'array' : mode;

@@ -55,7 +55,8 @@ test('Define Name, Edit Name and Delete as the Name Manager does them: formulas 
   editName(wb, { name: 'Rate2' }, { name: 'Rate3' });
   assert.equal(wb.sheet(data).cells.get(21).get(0).f, 'Rate3*4');
   assert.equal(wb.sheet(data).cells.get(21).get(0).v, 2);
-  assert.deepEqual(listNames(wb).map((n) => `${n.name}|${n.scope}|${n.refersTo}`), ['Items|Workbook|=Data!$A$2:$A$9', 'Rate|Workbook|=Data!$C$2', 'Rate3|Workbook|=0.5']);
+  // (The workbook's LAMBDAs kept in names, Twice, Hyp and WithRate, aside.)
+  assert.deepEqual(listNames(wb).filter((n) => !/LAMBDA/.test(n.refersTo)).map((n) => `${n.name}|${n.scope}|${n.refersTo}`), ['Items|Workbook|=Data!$A$2:$A$9', 'Rate|Workbook|=Data!$C$2', 'Rate3|Workbook|=0.5']);
   const again = Workbook.fromBytes(wb.toBytes());
   assert.equal(again.definedName('Rate3', null).text, '0.5');
 });

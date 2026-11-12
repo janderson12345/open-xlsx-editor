@@ -14,8 +14,12 @@ Excel 365's dynamic array formulas: a formula whose answer is an array spills it
 - When the answer grows, shrinks or goes, the cells it no longer fills are emptied, and formulas reading them work out
   again. `=SUM(D1#)` reads whatever D1 spills into.
 - Functions: SEQUENCE, SORT, SORTBY, UNIQUE, FILTER (with if_empty, else `#CALC!`), TRANSPOSE; LET (names bound in turn)
-  and LAMBDA (called where written, `=LAMBDA(x,x*2)(A1)`, or through a LET name); `@` for one value by implicit
-  intersection.
+  and LAMBDA (called where written, `=LAMBDA(x,x*2)(A1)`, through a LET name, or kept in a defined name and called by
+  it, `=Twice(21)`); `@` for one value by implicit intersection.
+- A LAMBDA kept in a defined name (Excel saves it as `_xlfn.LAMBDA(_xlpm.x,_xlpm.x*2)`, measured), as Excel 365 calls
+  it: =Twice(21) is 42, =WithRate(100) reads the names its LAMBDA reads, =Twice({1,2,3}) spills 2, 4, 6,
+  =MAP({1,2},Twice) passes it on, the wrong number of arguments is #VALUE!, =Twice alone #CALC!; a function of the same
+  name comes first (=Fact(5) is FACT's). Ten such formulas in the probe, all as Excel's.
 - Formulas in workbooks saved by older versions of Excel keep their old meaning: `=A1:A3` there is one value, A1:A3
   cut to the formula's row (Excel 365 shows it as `=@A1:A3`, and so does the formula bar here).
 
@@ -49,7 +53,8 @@ spill blocked, `SUM(D1#)`, LET, LAMBDA called, `@` on a range, `SUM(SEQUENCE(4))
 - The blue outline Excel draws round a spill when its cell is selected.
 - RANDARRAY, GROUPBY, PIVOTBY, TRIMRANGE and PERCENTOF. (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer
   array functions, MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY and ISOMITTED are here, in the formula probe.)
-- A LAMBDA kept in a defined name: =Twice(21) with Twice defined as =LAMBDA(x,x*2) is #NAME? here.
+- A defined LAMBDA called with a name typed in another case (=twice(5)) is saved as TWICE(5); Excel writes it as the
+  name is (Twice(5)). Both work out the same, in both programs.
 - `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an
   old formula's operator cuts to one value (`=@A1:A3*2`).
 - A LAMBDA called where it is written is saved as a plain formula when its answer is one value; Excel saves it as a

@@ -416,6 +416,8 @@ export const PROBE_FORMULAS = [
   'ODDFYIELD(DATE(2020,2,10),DATE(2025,6,30),DATE(2019,11,20),DATE(2020,6,30),0.0575,0,100,2,0)',
   'ODDLPRICE(DATE(2008,2,7),DATE(2008,6,15),DATE(2008,2,7),0.0375,0.0405,100,2,0)',
   'ODDLPRICE(DATE(2008,2,7),DATE(2008,6,15),DATE(2007,10,15),-0.0375,0.0405,100,2,0)',
+  'Twice(21)', 'Hyp(3,4)', 'WithRate(100)', 'Twice(1,2)', 'Twice()', 'Hyp(3)', 'SUM(MAP({1,2,3},Twice))', 'Twice(Data!B2)', 'Twice(Hyp(6,8))',
+  'SUM(Twice({1,2,3}))',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
@@ -456,7 +458,10 @@ export function formulas() {
     ...docProps(),
     'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Calc" sheetId="1" r:id="rId1"/><sheet name="Data" sheetId="2" r:id="rId2"/>` +
       '<sheet name="My Data" sheetId="3" r:id="rId3"/></sheets><definedNames><definedName name="Items">Data!$A$2:$A$9</definedName>' +
-      '<definedName name="Rate">Data!$C$2</definedName></definedNames></workbook>',
+      '<definedName name="Rate">Data!$C$2</definedName>' +
+      // (LAMBDAs kept in names, called from cells: Excel 365's form of them in the file.)
+      '<definedName name="Twice">_xlfn.LAMBDA(_xlpm.x,_xlpm.x*2)</definedName><definedName name="Hyp">_xlfn.LAMBDA(_xlpm.a,_xlpm.b,SQRT(_xlpm.a^2+_xlpm.b^2))</definedName>' +
+      '<definedName name="WithRate">_xlfn.LAMBDA(_xlpm.v,_xlpm.v*(1+Rate))</definedName></definedNames></workbook>',
     'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('worksheet'), 'worksheets/sheet2.xml'],
       ['rId3', RT('worksheet'), 'worksheets/sheet3.xml'], ['rId4', RT('styles'), 'styles.xml']]),
     'xl/worksheets/sheet1.xml': sheet(calcRows, '<cols><col min="1" max="1" width="50.7109375" customWidth="1"/><col min="2" max="2" width="30.7109375" customWidth="1"/></cols>'),

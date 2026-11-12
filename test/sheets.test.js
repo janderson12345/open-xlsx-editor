@@ -64,7 +64,8 @@ test('a rename rewrites every formula and name that reads the sheet; values stay
   assert.equal(cell(wb, 'Calc', 'B2').f, "'Sales 2024'!B2:B9");
   assert.equal(cell(wb, 'Calc', 'B5').f, "SUM('Sales 2024'!B2:B9*1)");
   assert.equal(cell(wb, 'Calc', 'B5').v, before);
-  assert.deepEqual(wb.definedNames.map((d) => d.text), ["'Sales 2024'!$A$2:$A$9", "'Sales 2024'!$C$2"]);
+  // (The workbook's LAMBDAs kept in names don't read the sheet: as they were.)
+  assert.deepEqual(wb.definedNames.map((d) => d.text).filter((t) => !/LAMBDA/.test(t)), ["'Sales 2024'!$A$2:$A$9", "'Sales 2024'!$C$2"]);
   const total = [...wb.sheet(0).cells].find(([, line]) => line.get(1)?.f === "SUM('Sales 2024'!B2:B9)");
   const was = total[1].get(1).v;
   wb.setCell(wb.sheetIndexOf('Sales 2024'), 'B3', 105);

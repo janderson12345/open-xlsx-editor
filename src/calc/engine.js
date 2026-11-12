@@ -84,7 +84,12 @@ export class Calc {
           return;
         }
         case 'fn':
-          if (!FUNCTIONS[n.name]) e.unsupported = true;
+          // (Not a function: a defined name holding a LAMBDA, called, =Twice(21); it reads what its formula reads.)
+          if (!FUNCTIONS[n.name]) {
+            const t = this.nameTree(n.name, si);
+            if (!t) e.unsupported = true;
+            else if (!seen.has(n.name.toUpperCase())) { seen.add(n.name.toUpperCase()); walk(t); }
+          }
           else if (FUNCTIONS[n.name].volatile) e.volatile = true;
           n.args.forEach(walk);
           return;
@@ -265,6 +270,7 @@ export class Calc {
         const t = this.nameTree(name, e.si);
         return t ? evaluate(t, ctx, mode) : E.name;
       },
+      hasName: (name) => !!this.nameTree(name, e.si),
     };
     return ctx;
   }
