@@ -2,9 +2,10 @@
 // works on single values: a range given to an operator is cut down to the formula's own row or column (implicit
 // intersection). The arguments of SUMPRODUCT and its kind, and array formulas, work on whole arrays, element by element.
 import { Builtin } from './values.js';
-import { Area, Arr, Union, MISSING, XlError, E, errorOf, Unsupported, isError, scalar, matrix, toNum, toText, compare, finite,
+import { Area, Arr, Union, Ref3D, MISSING, XlError, E, errorOf, Unsupported, isError, scalar, matrix, toNum, toText, compare, finite,
   closeToZero, Lambda } from './values.js';
 import { FUNCTIONS } from './functions.js';
+import { threeD, intersect, refused3D, answer3D } from './threed.js';
 // (More functions, registered into FUNCTIONS once it is made.)
 import './functions-text.js';
 import './functions-lookup.js';
@@ -181,6 +182,8 @@ function call(node, ctx, mode) {
   if (def.volatile) ctx.volatile = true;
   const argMode = def.array ? 'array' : mode;
   const args = node.args.map((n) => evaluate(n, ctx, argMode));
+  const refused = refused3D(node.name, args);
+  if (refused) return refused;
   const run = (list) => {
     try {
       const v = def.fn(list, ctx, argMode);
@@ -206,11 +209,13 @@ export function evaluate(node, ctx, mode = 'scalar') {
     case 'paren': return evaluate(node.a, ctx, mode);
     case 'ref': {
       if (node.book != null) throw new Unsupported('a link to another workbook');
+      if (node.sheets) return threeD(node, ctx);
       const si = node.sheet == null ? ctx.here.si : ctx.sheetIndex(node.sheet);
       if (si < 0) return E.ref;
       const a = node.area;
       return new Area(si, a.r0, a.c0, a.r1, a.c1);
     }
+    case 'isect': return intersect(evaluate(node.a, ctx, mode), evaluate(node.b, ctx, mode));
     case 'union': {
       const items = node.items.map((n) => evaluate(n, ctx, mode));
       const err = items.find(isError);
@@ -240,6 +245,7 @@ export function evaluate(node, ctx, mode = 'scalar') {
     case 'bin': {
       const a = operand(evaluate(node.a, ctx, mode), ctx, mode);
       const b = operand(evaluate(node.b, ctx, mode), ctx, mode);
+      if (a instanceof Ref3D || b instanceof Ref3D) return E.ref;
       if (a instanceof Union || b instanceof Union) return E.value;
       if (a instanceof Arr || b instanceof Arr || a instanceof Area || b instanceof Area) {
         return elementwise([a, b], ctx, ([x, y]) => binary(node.op, x, y, ctx));
@@ -258,6 +264,8 @@ export function result(tree, ctx, array = false) {
   let v = evaluate(tree, ctx, array ? 'array' : 'scalar');
   if (v instanceof Lambda) v = E.calc; // (a LAMBDA not called: Excel's #CALC!)
   const one = (x) => (x == null || x === MISSING ? 0 : x);
+  // (A 3D reference as a cell's answer is #REF! in Excel; several areas #VALUE!.)
+  if (v instanceof Ref3D) v = answer3D(tree);
   if (array) return matrix(v instanceof Union ? E.value : v, ctx).map((row) => row.map(one));
   return one(v instanceof Union ? E.value : scalar(v, ctx));
 }
@@ -272,6 +280,7 @@ export function dynamicResult(tree, ctx) {
   let v = evaluate(tree, ctx, 'array');
   if (v instanceof Lambda) v = E.calc;
   const one = (x) => (x == null || x === MISSING ? 0 : x);
+  if (v instanceof Ref3D) return { value: answer3D(tree) };
   if (v instanceof Union) return { value: E.value };
   if (v instanceof Arr || (v instanceof Area && v.size > 1)) return { rows: matrix(v, ctx).map((row) => row.map(one)) };
   // (A function that gives arrays, or a LAMBDA called, is an array formula to Excel even when its answer is one value,

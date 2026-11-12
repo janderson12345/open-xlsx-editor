@@ -1,7 +1,7 @@
 // The worksheet functions the engine knows, as Excel defines them. Each gets its arguments worked out (references as
 // Area, arrays as Arr, an argument left out as MISSING) and returns a value or throws an error value. A function the
 // engine doesn't know leaves its cell with the value Excel saved (values.js, Unsupported).
-import { Area, Arr, Union, MISSING, XlError, E, scalar, matrix, toNum, toText, toBool, compare, finite, textToNumber, closeToZero } from './values.js';
+import { Area, Arr, Union, Ref3D, MISSING, XlError, E, scalar, matrix, toNum, toText, toBool, compare, finite, textToNumber, closeToZero } from './values.js';
 
 export const FUNCTIONS = Object.create(null);
 /** `names`, space separated. `lift`: a function of single values, worked element by element when an array formula
@@ -315,7 +315,8 @@ lifted('ISLOGICAL', (a, ctx) => typeof kind(a, ctx) === 'boolean');
 lifted('ISERROR', (a, ctx) => kind(a, ctx) instanceof XlError);
 lifted('ISERR', (a, ctx) => { const v = kind(a, ctx); return v instanceof XlError && v !== E.na; });
 lifted('ISNA', (a, ctx) => kind(a, ctx) === E.na);
-def('ISREF', (a) => a[0] instanceof Area || a[0] instanceof Union);
+// (A 3D reference isn't one to ISREF in Excel: FALSE, measured.)
+def('ISREF', (a) => a[0] instanceof Area || (a[0] instanceof Union && !(a[0] instanceof Ref3D)));
 lifted('ISEVEN', (a, ctx) => Math.trunc(num(a[0], ctx)) % 2 === 0);
 lifted('ISODD', (a, ctx) => Math.abs(Math.trunc(num(a[0], ctx)) % 2) === 1);
 def('NA', () => E.na);

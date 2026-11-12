@@ -22,6 +22,8 @@ const STOP = String.raw`\s!'"(),;:{}\[\]=<>+\-*/^&%#$`;
 const RE_BOOK = /\[(\d+)\]/y;
 const RE_QSHEET = /'((?:[^']|'')+)'!/y;
 const RE_SHEET = new RegExp(`([^${STOP}0-9.][^${STOP}]*)!`, 'y');
+// (A 3D reference's sheets, Jan:Apr!, unless the first reads as a cell: S1:S4!A1 is S1 to S4!A1, as Excel reads it.)
+const RE_SHEETS = new RegExp(`([^${STOP}0-9.][^${STOP}]*):([^${STOP}0-9.][^${STOP}]*)!`, 'y');
 const CELL = '(\\$?)([A-Za-z]{1,3})(\\$?)([0-9]{1,7})';
 const RE_AREA = new RegExp(`${CELL}(?::${CELL})?`, 'y');
 const RE_COLS = /(\$?)([A-Za-z]{1,3}):(\$?)([A-Za-z]{1,3})/y;
@@ -57,13 +59,18 @@ function refAt(text, i) {
     j += m[0].length;
     const inner = /^\[(\d+)\](.*)$/.exec(sheet);
     if (inner) { book = inner[1]; sheet = inner[2]; }
+  } else if ((m = at(RE_SHEETS, text, j)) && !/^\$?[A-Za-z]{1,3}\$?[0-9]{1,7}$/.test(m[1])) {
+    sheet = `${m[1]}:${m[2]}`;
+    j += m[0].length;
   } else if ((m = at(RE_SHEET, text, j))) {
     sheet = m[1];
     j += m[0].length;
   }
+  // (Sheet names can't hold ":": one in the name, quoted or not, is a 3D reference's first and last sheets.)
+  const sheets = sheet != null && sheet.includes(':') ? sheet.split(':') : null;
   if (book != null && sheet == null) return null;
   const prefix = text.slice(i, j);
-  if (sheet != null && text.startsWith('#REF!', j)) return { end: j + 5, sheet, book, prefix, area: null };
+  if (sheet != null && text.startsWith('#REF!', j)) return { end: j + 5, sheet, sheets, book, prefix, area: null };
   let area = null;
   let end = j;
   if ((m = at(RE_AREA, text, j))) {
@@ -94,7 +101,7 @@ function refAt(text, i) {
     }
   }
   if (!area || (end < text.length && RE_AFTER_REF.test(text[end]))) return null;
-  return { end, sheet, book, prefix, area };
+  return { end, sheet, sheets, book, prefix, area };
 }
 
 /** A number written in a formula, as Excel keeps it: to 15 significant digits, the rest cut off (=1234567890123456
@@ -111,18 +118,33 @@ function literal(s) {
   return Number(`${kept || '0'}${m[3] ? `e${m[3]}` : ''}`);
 }
 
+// (What an intersection's space comes between: a reference, name or ")" before it, a reference, name, function or
+// "(" after.)
+const ENDS = new Set(['ref', 'name', 'struct', ')']);
+const STARTS = new Set(['ref', 'name', 'struct', 'func', '(']);
+
 /** A formula (without its "=") as tokens { type, text, start, end, ... }: num, str, bool, err (with `value`), ref (with
  *  `sheet`, `book`, `prefix` and `area`, or area null for Sheet1!#REF!), func (a name followed by "("), name, struct (a
  *  table reference, Fruit[Qty] or [@Qty]: `table` (null when unnamed) and `spec`, the brackets' text), op, punct.
- *  Spaces are skipped (Excel's intersection operator, a space between references, isn't read). */
+ *  Spaces are skipped, but for Excel's intersection operator: spaces between two references (or names, or a ")"
+ *  and a reference) are an op " " (=SUM(A1:C3 B2:D4)). */
 export function tokenize(text) {
   const out = [];
   const n = text.length;
   let i = 0;
-  const push = (type, end, extra = {}) => { out.push({ type, text: text.slice(i, end), start: i, end, ...extra }); i = end; };
+  let gap = -1;
+  const push = (type, end, extra = {}) => {
+    const prev = out[out.length - 1];
+    if (gap >= 0 && prev && ENDS.has(prev.type === 'punct' ? prev.text : prev.type) && STARTS.has(type === 'punct' ? text[i] : type)) {
+      out.push({ type: 'op', text: ' ', start: gap, end: gap + 1 });
+    }
+    gap = -1;
+    out.push({ type, text: text.slice(i, end), start: i, end, ...extra });
+    i = end;
+  };
   while (i < n) {
     const ch = text[i];
-    if (ch === ' ' || ch === '\n' || ch === '\r' || ch === '\t') { i++; continue; }
+    if (ch === ' ' || ch === '\n' || ch === '\r' || ch === '\t') { if (gap < 0) gap = i; i++; continue; }
     if (ch === '"') {
       let j = i + 1;
       let s = '';
@@ -383,6 +405,14 @@ export function renameSheetRefs(text, from, to) {
   const was = from.toLowerCase();
   try {
     return mapRefs(text, (t) => {
+      // (A 3D reference: an end renamed is renamed in it; one deleted is left as it is, worked out as #REF!.)
+      if (t.type === 'ref' && t.book == null && t.sheets) {
+        const ends = t.sheets.map((s) => (s.toLowerCase() === was ? to : s));
+        if (to == null || ends.every((s, k) => s === t.sheets[k])) return null;
+        const [a, b] = ends;
+        const plain = sheetPrefix(a) === `${a}!` && sheetPrefix(b) === `${b}!`;
+        return (plain ? `${a}:${b}!` : `'${`${a}:${b}`.replace(/'/g, "''")}'!`) + text.slice(t.start + t.prefix.length, t.end);
+      }
       if (t.type !== 'ref' || t.book != null || t.sheet == null || t.sheet.toLowerCase() !== was) return null;
       return to == null ? '#REF!' : sheetPrefix(to) + text.slice(t.start + t.prefix.length, t.end);
     });

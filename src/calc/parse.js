@@ -8,8 +8,8 @@ const BINARY = { '=': 1, '<>': 1, '<': 1, '>': 1, '<=': 1, '>=': 1, '&': 2, '+':
 export const functionName = (text) => text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, '');
 
 /** A formula (without "=") as a tree of { k, ... }: num, str, bool, err (`v`); ref (`sheet`, `book`, `area`); name;
- *  fn (`name`, `args`); missing (an argument left out); neg, pos, pct, paren (`a`); bin (`op`, `a`, `b`); union
- *  (`items`); arr (`rows`). Throws a FormulaError when it isn't a formula. */
+ *  fn (`name`, `args`); missing (an argument left out); neg, pos, pct, paren (`a`); bin (`op`, `a`, `b`); isect
+ *  (`a`, `b`: intersection); union (`items`); arr (`rows`). A 3D reference's ref has `sheets`, its first and last. Throws a FormulaError when it isn't a formula. */
 export function parseFormula(text) {
   const toks = tokenize(text);
   let i = 0;
@@ -35,10 +35,16 @@ export function parseFormula(text) {
     }
     // (@: implicit intersection, as the file's SINGLE function has it.)
     if (is(t, 'op', '@')) { i++; return { k: 'fn', name: 'SINGLE', args: [unary()] }; }
+    let node = called();
+    // (Intersection, a space between references: tighter than negation and %, as Excel has it.)
+    while (is(peek(), 'op', ' ')) { i++; node = { k: 'isect', a: node, b: called() }; }
+    while (is(peek(), 'op', '%')) { i++; node = { k: 'pct', a: node }; }
+    return node;
+  }
+  function called() {
     let node = primary();
     // (A LAMBDA called where it is written: =LAMBDA(x,x*2)(3).)
     while (is(peek(), 'punct', '(') && (node.k === 'call' || (node.k === 'fn' && node.name === 'LAMBDA'))) node = { k: 'call', f: node, args: argList() };
-    while (is(peek(), 'op', '%')) { i++; node = { k: 'pct', a: node }; }
     return node;
   }
   /** A bracketed list of arguments, from its "(": each an expression, or missing (left out). */
@@ -74,6 +80,7 @@ export function parseFormula(text) {
       case 'ref': {
         if (!t.area) return { k: 'err', v: '#REF!' };
         const ref = { k: 'ref', sheet: t.sheet, book: t.book, area: t.area, src: t.text };
+        if (t.sheets) ref.sheets = t.sheets;
         return t.spill ? { k: 'fn', name: 'ANCHORARRAY', args: [ref] } : ref;
       }
       case 'name': return { k: 'name', name: t.text };

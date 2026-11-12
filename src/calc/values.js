@@ -59,6 +59,9 @@ export const MISSING = Object.freeze({ missing: true });
 export class Union {
   constructor(areas) { this.areas = areas; }
 }
+/** A 3D reference (=SUM(Jan:Apr!A1)): the area on each sheet from the first to the last, in the workbook's order.
+ *  Functions of values read it as they read several areas; where one value or an array is wanted, Excel's #REF!. */
+export class Ref3D extends Union {}
 
 /** A cell of the model as a value. */
 export function cellValue(cell) {
@@ -84,6 +87,7 @@ export function scalar(v, ctx) {
     return E.value;
   }
   if (v instanceof Arr) return v.rows[0][0];
+  if (v instanceof Ref3D) return E.ref;
   if (v instanceof Union) return E.value;
   return v;
 }
@@ -100,6 +104,7 @@ export function matrix(v, ctx) {
     return out;
   }
   if (v instanceof Arr) return v.rows;
+  if (v instanceof Ref3D) throw E.ref;
   return [[v === MISSING ? null : v]];
 }
 

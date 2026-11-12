@@ -49,7 +49,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Undo and redo | Done | Cell contents and formats across sheets, and sheets inserted, renamed, moved, hidden, coloured and deleted (each one step, the sheet shown as it was). Excel can't undo deleting a sheet (it warns that the sheet goes for good); here Ctrl+Z brings it back, a difference kept on purpose. |
 | Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, a defined name, a table's name (its data rows) or a table reference ("Fruit[Qty]") typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). A new name typed there names the selection (docs/NAMES.md); showing a selected name missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
-| Recalculation | Done | 1575 of 1575 test formulas give Excel's results; 486 functions; table references (Fruit[Qty], [#Totals], [@Qty]). |
+| Recalculation | Done | 1592 of 1592 test formulas give Excel's results; 486 functions; table references (Fruit[Qty], [#Totals], [@Qty]); 3D references (Jan:Apr!A1) and intersection (A1:C3 B2:D4). |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
 | Chart sheets | Kept | Tab shown, sheet not opened. |
 | Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |

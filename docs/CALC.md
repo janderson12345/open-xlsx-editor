@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1575 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1592 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1575 of 1575 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1592 of 1592 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -118,6 +118,18 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     than Y1's (so J1(8) is 0.2346283865070744, 8e-6 from the function). Found from 221 points from 8 to 30, to the
     last bit. Measured on about 970 cases with cell values, then the probe's 60; all as Excel's to the last bit or
     within 1e-15. n is made whole, below 0 #NUM!; Y and K need x above 0; J and Y are #NUM! from 2^27 on, as SIN is.
+  - `threed.js`: 3D references (=SUM(Jan:Apr!A1), 'Feb:My Mar'!A1:B2) and the intersection operator, a space
+    between references (=A1:C3 B2:D4 is B2:C3, spilled; =SUM(B:B 2:2) is B2). Measured on 86 formulas over four sheets
+    in a hidden Excel, 84 the same here (the two not read are in the gaps below), then the probe's 17:
+    - A 3D reference is the area on each sheet from the first to the last in the workbook's order. SUM, COUNT, COUNTA,
+      AVERAGE(A), MAX(A), MIN(A), PRODUCT, STDEV, VAR and their kinds, and in Excel 365 also MEDIAN, LARGE, SMALL,
+      PERCENTILE, QUARTILE, SUMSQ, AVEDEV, GEOMEAN, DEVSQ, SKEW, KURT, CONCAT, TEXTJOIN, AND, OR, VSTACK and HSTACK
+      (sheet after sheet) and TOCOL take one; IF, CHOOSE and IFERROR pass it on; ISREF says FALSE.
+    - Functions that want a reference of one sheet (COUNTIF(S), SUMIF(S), ROWS, INDEX, N, AGGREGATE, SUBTOTAL,
+      COUNTBLANK) give #VALUE!; any other, and the reference as a value (=Jan:Apr!A1, +1, SUMPRODUCT, MODE), #REF!.
+    - The first name reading as a cell makes it a range, as Excel reads it: S1:S4!A1 is S1 to S4!A1.
+    - Intersection binds tighter than negation; no overlap is #NULL!; references on two sheets, or a 3D one, #VALUE!.
+    - The file has them as typed: `SUM(Jan:Apr!A1)`, `'Feb:My Mar'!A1:B2`, `A1:C3 B2:D4`.
   - `functions-amort.js`: AMORLINC and AMORDEGRC, the French depreciation. Microsoft's page gives other rules than
     Excel's; these are Excel's, from about 600 cases with cell values in a hidden Excel, then the probe's 48:
     - AMORDEGRC's coefficient by the life (1 / rate): up to 2 years #NUM!, to 4 years 1.5, to 6 years 2, past that 2.5.
@@ -355,8 +367,12 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
-- **Intersection and 3D references.** The space operator (intersection) and 3D references (`Sheet1:Sheet3!A1`)
-  aren't read, nor are structured references to tables. Formulas using them keep Excel's values.
+- **3D references and intersection: what isn't yet as Excel.** Read and worked out (`src/calc/threed.js`, below), but:
+  `Apr:Jan!A1` and `Jan:Jan!A1` are kept as typed, where Excel rewrites them `Jan:Apr!A1` and `Jan!A1` (both work out
+  the same); a sheet deleted at an end of one leaves it #REF!, where Excel moves the end in; `Jan:'My Mar'!A1` (a
+  quote round one end only, #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't
+  read as formulas. Rows inserted, or cells moved, on one of its sheets leave a 3D reference as it was (not yet
+  measured against Excel).
 - **Iterative calculation.** Circular references are left as they were and announced.
 - **Dates and times typed as entries** are read as dates and times (docs/ENTRY.md). Inside a formula, text such as
   "2024-01-02" or "1/2/2024" reads as a date.

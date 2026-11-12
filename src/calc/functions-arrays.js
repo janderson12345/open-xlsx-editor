@@ -2,11 +2,13 @@
 // WRAPROWS, WRAPCOLS, EXPAND), split text into one (TEXTSPLIT), turn one into text (VALUETOTEXT, ARRAYTOTEXT), and
 // call a LAMBDA over one (MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY, ISOMITTED). Measured against Excel with the
 // formula probe (test/formulas-excel.json). Registered into functions.js's table; evaluate.js imports this file.
-import { Arr, MISSING, XlError, E, scalar, matrix, toText, toBool, Lambda, Lambdas } from './values.js';
+import { Arr, Ref3D, MISSING, XlError, E, scalar, matrix, toText, toBool, Lambda, Lambdas } from './values.js';
 import { def, given, num, text } from './functions.js';
 
 const ARRAY = { array: true };
 const rowsOf = (v, ctx) => matrix(v, ctx);
+/** The arguments with a 3D reference as its sheets' areas, one after another (=VSTACK(Jan:Apr!A1:B2) stacks them). */
+const sheetwise = (args) => args.flatMap((x) => (x instanceof Ref3D ? x.areas : [x]));
 const columns = (m) => m[0].map((_, c) => m.map((row) => row[c]));
 const whole = (v, ctx) => Math.trunc(num(v, ctx));
 const flag = (v, ctx, dflt = false) => (given(v) ? toBool(scalar(v, ctx)) : dflt);
@@ -30,7 +32,7 @@ def('DROP', (a, ctx) => {
 
 /** Arrays stacked down (or across), the narrower (or shorter) padded with #N/A. */
 function stack(args, ctx, across) {
-  const ms = args.filter((x) => x !== MISSING && x !== undefined).map((x) => rowsOf(x, ctx));
+  const ms = sheetwise(args).filter((x) => x !== MISSING && x !== undefined).map((x) => rowsOf(x, ctx));
   if (!across) {
     const width = Math.max(...ms.map((m) => m[0].length));
     return new Arr(ms.flatMap((m) => m.map((row) => [...row, ...Array(width - row.length).fill(E.na)])));
@@ -60,7 +62,8 @@ def('CHOOSECOLS', (a, ctx) => { const got = choose(columns(rowsOf(a[0], ctx)), a
 
 /** TOCOL and TOROW's values: by rows (or columns), blanks (1), errors (2) or both (3) left out. */
 function flatten(a, ctx) {
-  const m = rowsOf(a[0], ctx);
+  // (A 3D reference: its sheets' areas one below another, then read across, as Excel does.)
+  const m = a[0] instanceof Ref3D ? a[0].areas.flatMap((x) => rowsOf(x, ctx)) : rowsOf(a[0], ctx);
   const ignore = given(a[1]) ? whole(a[1], ctx) : 0;
   const list = (flag(a[2], ctx) ? columns(m) : m).flat();
   return list.filter((v) => !((ignore & 1) && (v == null || v === MISSING)) && !((ignore & 2) && v instanceof XlError));

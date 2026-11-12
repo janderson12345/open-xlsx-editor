@@ -1,6 +1,6 @@
 // Text, and dates and times, as Excel defines them: registered into functions.js's table (evaluate.js imports
 // this file after it).
-import { Area, Arr, XlError, E, matrix, toText, textToNumber, dateSerial } from './values.js';
+import { Area, Arr, Union, XlError, E, matrix, toText, textToNumber, dateSerial } from './values.js';
 import { formatValue, dateParts } from '../ooxml/format.js';
 import { def, lifted, given, one, num, text, opt, values, bool } from './functions.js';
 
@@ -33,7 +33,9 @@ def('TEXTJOIN', (a, ctx) => {
   const skip = bool(a[1], ctx);
   const parts = [];
   for (const x of a.slice(2)) {
-    const list = x instanceof Area || x instanceof Arr ? matrix(x instanceof Area ? clampArea(x, ctx) : x, ctx).flat() : [one(x, ctx)];
+    // (Several areas, a 3D reference's sheets: each in turn.)
+    const areas = x instanceof Union ? x.areas : [x];
+    const list = areas.flatMap((y) => (y instanceof Area || y instanceof Arr ? matrix(y instanceof Area ? clampArea(y, ctx) : y, ctx).flat() : [one(y, ctx)]));
     for (const v of list) {
       if (v instanceof XlError) throw v;
       const s = toText(v);

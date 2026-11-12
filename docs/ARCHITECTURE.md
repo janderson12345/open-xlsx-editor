@@ -74,6 +74,7 @@ insides:
 | `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
 | `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
 | `src/calc/evaluate.js` | Operators, references, names and function calls; implicit intersection outside array formulas, element by element inside. |
+| `src/calc/threed.js` | 3D references (Jan:Apr!A1) and the intersection operator, and which functions take a 3D reference (docs/CALC.md). |
 | `src/calc/functions.js` | The worksheet functions, as Excel defines them: maths, statistics, logic, information, and the helpers the others share. |
 | `src/calc/functions-text.js` | Text, and dates and times. |
 | `src/calc/functions-lookup.js` | Lookup and reference, and the conditional sums and counts. |

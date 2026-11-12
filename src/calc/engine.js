@@ -69,6 +69,12 @@ export class Calc {
       switch (n.k) {
         case 'ref': {
           if (n.book != null) { e.unsupported = true; return; }
+          // (A 3D reference reads each sheet from its first to its last.)
+          if (n.sheets) {
+            const [s0, s1] = n.sheets.map((s) => this.book.sheetIndexOf(s));
+            if (s0 >= 0 && s1 >= 0) for (let s = Math.min(s0, s1); s <= Math.max(s0, s1); s++) walk({ ...n, sheets: null, sheet: this.book.sheets[s].name });
+            return;
+          }
           const s = n.sheet == null ? si : this.book.sheetIndexOf(n.sheet);
           if (s >= 0) e.deps.push({ si: s, r0: Math.min(n.area.r0, n.area.r1), c0: Math.min(n.area.c0, n.area.c1), r1: Math.max(n.area.r0, n.area.r1), c1: Math.max(n.area.c0, n.area.c1) });
           return;
@@ -93,7 +99,7 @@ export class Calc {
           else if (FUNCTIONS[n.name].volatile) e.volatile = true;
           n.args.forEach(walk);
           return;
-        case 'bin': walk(n.a); walk(n.b); return;
+        case 'bin': case 'isect': walk(n.a); walk(n.b); return;
         case 'neg': case 'pos': case 'pct': case 'paren': walk(n.a); return;
         case 'union': n.items.forEach(walk);
       }

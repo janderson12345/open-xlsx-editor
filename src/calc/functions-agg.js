@@ -3,7 +3,7 @@
 // sums of squares of differences (SUMX2MY2, SUMX2PY2, SUMXMY2); and POISSON and BINOMDIST, Excel 2007's names. As
 // Excel defines them, measured against Excel with the formula probe (test/formulas-excel.json). Registered into
 // functions.js's table; evaluate.js imports this file.
-import { Area, Arr, Union, XlError, E, finite, matrix, scalar, toBool } from './values.js';
+import { Area, Arr, Union, Ref3D, XlError, E, finite, matrix, scalar, toBool } from './values.js';
 import { FUNCTIONS, def, given, num, numbers } from './functions.js';
 
 const ARRAY = { array: true };
@@ -27,6 +27,7 @@ def('AGGREGATE', (a, ctx) => {
   const sources = withK ? [a[2]] : a.slice(2);
   const kept = [];
   for (const ref of sources) {
+    if (ref instanceof Ref3D) throw E.value;
     const areas = ref instanceof Area ? [ref] : ref instanceof Union ? ref.areas : null;
     // (Functions 1 to 13 take references only: an array is #VALUE!.)
     if (!areas && !withK) throw E.value;
@@ -112,7 +113,7 @@ function aValues(args, ctx) {
     if (v instanceof Area || v instanceof Union || v instanceof Arr) {
       // (In an array, as typed or worked out, only the numbers: text and TRUE/FALSE left out.)
       const inArray = v instanceof Arr;
-      for (const x of matrix(v, ctx).flat()) {
+      for (const x of (v instanceof Union ? v.areas : [v]).flatMap((y) => matrix(y, ctx).flat())) {
         if (x instanceof XlError) throw x;
         if (isNum(x)) out.push(x); else if (inArray) continue; else if (typeof x === 'boolean') out.push(x ? 1 : 0); else if (typeof x === 'string') out.push(0);
       }

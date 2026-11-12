@@ -448,6 +448,11 @@ export const PROBE_FORMULAS = [
   'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,SUM,,,,,,,5))',
   'BESSELJ(8,0)', 'BESSELJ(8,1)', 'BESSELJ(-9.5,1)', 'BESSELJ(10,2)', 'BESSELJ(13,5)', 'BESSELJ(25.5,0)', 'BESSELJ(25.5,1)', 'BESSELJ(100,3)',
   'BESSELJ(12345.6,1)', 'BESSELJ(-50.5,7)',
+  'SUM(\'Data:My Data\'!A1:B3)', 'COUNTA(\'Data:My Data\'!A1:A2)', 'COUNT(\'Data:My Data\'!A1:C9)', 'MAX(\'Data:My Data\'!A1:C9)',
+  'TEXTJOIN(",",TRUE,\'Data:My Data\'!A1:A2)', 'ROWS(VSTACK(\'Data:My Data\'!A1:B2))', 'SUMPRODUCT(\'Data:My Data\'!A1)',
+  'COUNTIF(\'Data:My Data\'!A1:A2,"Apple")', 'ISREF(\'Data:My Data\'!A1)', 'SUM(Data!A1:C9 Data!B2:E3)', 'SUM(Data!B:B Data!3:3)',
+  'Data!A1:A3 Data!C1:C3', 'TEXTJOIN("|",FALSE,Data!A1:C3 Data!B2:D4)', 'Data!A1:B2 \'My Data\'!A1', 'COUNTA(Items Data!A3:C3)',
+  'INDEX(Data!A1:C9,0,2) Data!A3:C3', '-Data!B2:B9 Data!A3:C3',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

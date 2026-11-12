@@ -3,7 +3,7 @@
 // DATEDIF, week numbers and YEARFRAC; loan and investment functions; LOOKUP, XMATCH and ADDRESS; text before and after
 // a delimiter, NUMBERVALUE, FIXED and DOLLAR; trigonometry, GCD and LCM, CEILING.MATH and FLOOR.MATH; TYPE and
 // ERROR.TYPE. Registered into functions.js's table.
-import { Area, Arr, Union, MISSING, XlError, E, toNum, compare, finite } from './values.js';
+import { Area, Arr, Union, Ref3D, MISSING, XlError, E, toNum, compare, finite } from './values.js';
 import { FUNCTIONS, def, lifted, given, one, num, text, opt, values, numbers, vector, roundDec } from './functions.js';
 import { serialOf } from './functions-text.js';
 import { position } from './functions-lookup.js';
@@ -23,6 +23,7 @@ def('SUBTOTAL', (a, ctx) => {
   if (!name) throw E.value;
   const kept = [];
   for (const ref of a.slice(1)) {
+    if (ref instanceof Ref3D) throw E.value;
     const areas = ref instanceof Area ? [ref] : ref instanceof Union ? ref.areas : null;
     if (!areas) throw E.value;
     for (const x of areas) {
