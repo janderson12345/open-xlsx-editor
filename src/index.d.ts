@@ -26,6 +26,8 @@ export interface SheetModel {
   merges: Range[];
   format: { defaultRowHeight: number; defaultColWidth: number | null; baseColWidth: number | null };
   showGridLines: boolean;
+  /** The row and column headings shown (View > Headings). */
+  showHeadings: boolean;
   maxRow: number;
   maxCol: number;
 }

@@ -129,6 +129,18 @@
   border-bottom: 1px solid var(--oxe-head-line);
 }
 
+/* View > Headings off: the headings take no room and aren't drawn, but stay for assistive technology (Excel's grid is
+   still read with its column letters and row numbers). */
+.oxe-noheads .oxe-colhead,
+.oxe-noheads .oxe-rowhead,
+.oxe-noheads .oxe-corner,
+.oxe-noheads .oxe-colheads-pin {
+  border: 0;
+  padding: 0;
+  color: transparent;
+  background: transparent;
+}
+
 /* Gridlines: each cell's right and bottom pixel. */
 .oxe-vline,
 .oxe-hline {
@@ -1326,6 +1338,7 @@
   color: var(--oxe-head-fg);
   font: 13px var(--oxe-ui-font);
 }
+.oxe-bar[hidden],
 .oxe-findbar[hidden],
 .oxe-findbar [hidden] { display: none; }
 .oxe-findrow,

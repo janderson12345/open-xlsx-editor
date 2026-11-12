@@ -87,6 +87,8 @@ export function attachEditing(root, ctx) {
       if (carried) pointing.sheetShown();
     },
     changed: () => { refreshBar(); ctx.lookChanged?.(); ctx.changed?.(); },
+    /** The formula bar shown (View > Formula Bar): set with `on`, and whether it is. */
+    formulaBar: (on) => { if (on != null) bar.el.hidden = !on; return !bar.el.hidden; },
   });
   const pointing = createPointing({
     grid,

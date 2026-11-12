@@ -14,7 +14,7 @@ import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { changeLines } from './rowcol.js';
 import { setColumns, setRows } from './sizes.js';
-import { setFreeze, setZoom, setShowFormulas } from './view.js';
+import { setFreeze, setZoom, setShowFormulas, setShown } from './view.js';
 import { applyAutoFilter, filterName } from './filterops.js';
 import { applyAdvancedFilter } from './advfilter.js';
 import { Calc } from '../calc/engine.js';
@@ -335,14 +335,16 @@ export class Workbook {
   _filterName(i, area, name = '_xlnm._FilterDatabase', hidden = true) { filterName(this, i, area, name, hidden); }
 
   /** Sheet i's view changed (view.js): { freeze: { rows, cols }, active: { r, c }, topLeft }, { zoom } (percent) or
-   *  { showFormulas }. */
-  setView(i, { freeze, active, topLeft, zoom, showFormulas }) {
+   *  { showFormulas }, { showGridLines }, { showHeadings }. */
+  setView(i, { freeze, active, topLeft, zoom, showFormulas, showGridLines, showHeadings }) {
     const part = this._part(i);
     if (freeze) setFreeze(part.doc, freeze, active, topLeft);
     if (zoom != null) setZoom(part.doc, zoom);
     part.model.freeze = freeze ? { rows: freeze.rows, cols: freeze.cols } : part.model.freeze;
     if (zoom != null) part.model.zoom = Math.round(Math.min(400, Math.max(10, zoom)));
     if (showFormulas != null) { setShowFormulas(part.doc, showFormulas); part.model.showFormulas = !!showFormulas; }
+    if (showGridLines != null) { setShown(part.doc, 'showGridLines', showGridLines); part.model.showGridLines = !!showGridLines; }
+    if (showHeadings != null) { setShown(part.doc, 'showRowColHeaders', showHeadings); part.model.showHeadings = !!showHeadings; }
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
   }

@@ -133,6 +133,7 @@ insides:
 | `src/editor/inserttab.js` | The Insert tab: Tables > PivotTable. |
 | `src/editor/formulastab.js`, `src/editor/namesbox.js` | The Formulas tab: Defined Names, Excel's Name Manager and its New / Edit Name box. |
 | `src/calc/catalog.js`, `src/editor/functionbox.js`, `src/editor/fntip.js` | The Function Library: each function's category and syntax, Excel's Insert Function box, and the syntax screen tip under a cell being edited. |
+| `src/editor/commands-view.js` | The view commands: Freeze Panes, Show Formulas, the zoom, Zoom to Selection and View > Show (Gridlines, Formula Bar, Headings); kept in the file but not in the undo history. |
 | `src/editor/commands-pivot.js` | The newPivot command: a PivotTable made on a new sheet or at a cell, styled and fitted, as one step. |
 | `src/editor/axis.js` | Sizes and offsets of rows or columns; binary search from a scroll position to an index. |
 | `src/editor/celltext.js` | The one place cell text is sized and placed: font size, line height, baseline shifts for top, middle and wrapped text, on screen and in print (custom properties). |

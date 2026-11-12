@@ -119,7 +119,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Page Setup (`page-setup`) | Margins, orientation, paper size, page order | Shown | Used when printing. |
 | | Print area, print titles, page breaks | Shown | Used when printing and exporting, as Excel does (docs/PRINT.md); can't be set here yet. |
 | Scale to Fit (`scale-to-fit`) | Width, height, scale | Shown | Used when printing and exporting, rows and columns in whole printer dots as Excel prints them (docs/PRINT.md); can't be set here yet. |
-| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Partly | Gridlines on screen follow the file; nothing can be changed. |
+| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Partly | Gridlines and headings on screen follow the file and are switched from View > Show (saved as Excel saves them; docs/VIEW.md). There's no Page Layout tab yet, so its Print boxes are missing; printing follows the file's. |
 
 ## Formulas (`formulas`)
 
@@ -156,7 +156,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Group | Feature | Status | Notes |
 |---|---|---|---|
 | Workbook Views (`workbook-views`) | Normal, Page Break Preview, Page Layout | Partly | Normal only. |
-| Show (`show`) | Gridlines, formula bar, headings | Partly | Gridlines follow the file; none can be switched. |
+| Show (`show`) | Gridlines, formula bar, headings | Done | Gridlines, Formula Bar and Headings switched on and off; gridlines and headings saved with the sheet as Excel saves them, the formula bar the editor's own, as Excel's is (docs/VIEW.md). Excel's Ruler only works in Page Layout view, which isn't here. |
 | Zoom (`zoom`) | Zoom, 100%, zoom to selection | Done | 10% to 400%, as Excel allows; saved with the sheet. |
 | Window (`window`) | Freeze Panes | Done | Freeze Panes, Top Row, First Column, Unfreeze, written as Excel writes them; frozen panes in a file shown frozen (docs/VIEW.md). |
 | | Split, new window | Missing | |

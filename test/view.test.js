@@ -52,3 +52,20 @@ test('Show Formulas as showFormulas="1" on the sheet view, as Excel writes it; o
   assert.doesNotMatch(viewTag(), /showFormulas/);
   assert.equal(wb.sheet(si).showFormulas, false);
 });
+
+test('View > Gridlines and Headings off as showGridLines="0" and showRowColHeaders="0", as Excel writes them; on again takes them away', () => {
+  // (Excel, Window.DisplayGridlines and DisplayHeadings set false then true, saved: <sheetView showGridLines="0"
+  // showRowColHeaders="0" ...>, then neither.)
+  const { wb, si } = fresh();
+  const viewTag = () => strFromU8(unzipSync(wb.toBytes())[wb.sheets[si].path]).match(/<sheetView\b[^>]*>/)[0];
+  wb.setView(si, { showGridLines: false });
+  assert.match(viewTag(), / showGridLines="0"/);
+  assert.doesNotMatch(viewTag(), /showRowColHeaders/);
+  wb.setView(si, { showHeadings: false });
+  assert.match(viewTag(), / showRowColHeaders="0"/);
+  const back = Workbook.fromBytes(wb.toBytes()).sheet(si);
+  assert.deepEqual([back.showGridLines, back.showHeadings], [false, false]);
+  wb.setView(si, { showGridLines: true, showHeadings: true });
+  assert.doesNotMatch(viewTag(), /showGridLines|showRowColHeaders/);
+  assert.deepEqual([wb.sheet(si).showGridLines, wb.sheet(si).showHeadings], [true, true]);
+});

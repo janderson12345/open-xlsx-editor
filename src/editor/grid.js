@@ -6,7 +6,7 @@
 // coordinates. Geometry goes through custom properties (--oxe-x, --oxe-y, --oxe-w, --oxe-h), never through styles
 // written for state.
 import { setVars, div } from './dom.js';
-import { sheetGeometry, MDW, COLHEAD_H, OVERSCAN } from './geometry.js';
+import { sheetGeometry, MDW, OVERSCAN } from './geometry.js';
 import { drawColumnHeadings, drawPanes, drawGridlines, drawRows } from './gridlayers.js';
 import { columnFitWidth } from './cells.js';
 import { decorations } from './decor.js';
@@ -24,12 +24,12 @@ import { colChars } from '../ooxml/units.js';
 
 /** The range of rows and columns in view (with overscan), from the scroll position. */
 function visibleWindow(st) {
-  const { view, rows, cols, rowHeadW } = st;
+  const { view, rows, cols, rowHeadW, colHeadH } = st;
   const z = (st.zoom || 100) / 100;
   const top = view.scrollTop / z;
   const left = view.scrollLeft / z;
   const w = Math.max(0, view.clientWidth / z - rowHeadW);
-  const h = Math.max(0, view.clientHeight / z - COLHEAD_H);
+  const h = Math.max(0, view.clientHeight / z - colHeadH);
   return {
     r0: Math.max(0, rows.indexAt(top) - OVERSCAN),
     r1: Math.min(rows.count - 1, rows.indexAt(top + h) + OVERSCAN),
@@ -169,8 +169,9 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color, rowDesc: rowDescents(next, nextLooks.deco) }, sheetGeometry(next, { auto }));
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));
-    setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': COLHEAD_H });
-    setVars(canvas, { '--oxe-sheet-w': st.rowHeadW + st.cols.end, '--oxe-sheet-h': COLHEAD_H + st.rows.end });
+    setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': st.colHeadH });
+    view.classList.toggle('oxe-noheads', !st.colHeadH);
+    setVars(canvas, { '--oxe-sheet-w': st.rowHeadW + st.cols.end, '--oxe-sheet-h': st.colHeadH + st.rows.end });
     applyView(next.freeze, next.zoom);
   };
   /** Frozen rows and columns and the zoom (percent) applied: the panes sized, the sheet scaled. */
@@ -189,7 +190,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   const toContent = (lx, ly) => {
     const z = st.zoom / 100;
     let x = lx / z - st.rowHeadW;
-    let y = ly / z - COLHEAD_H;
+    let y = ly / z - st.colHeadH;
     if (x >= st.paneW) x += view.scrollLeft / z;
     if (y >= st.paneH) y += view.scrollTop / z;
     return { x, y };
@@ -248,10 +249,10 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       draw(st, true);
       drawClip(st);
     },
-    /** The view as shown: { freeze, zoom, topLeft } (topLeft: the first cell of the scrolled part). */
+    /** The view as shown: { freeze, zoom, showFormulas, showGridLines, showHeadings, topLeft } (topLeft: the first cell of the scrolled part). */
     view: () => {
       const z = st.zoom / 100;
-      return { freeze: { ...st.freeze }, zoom: st.zoom, showFormulas: !!st.sheet?.showFormulas, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
+      return { freeze: { ...st.freeze }, zoom: st.zoom, showFormulas: !!st.sheet?.showFormulas, showGridLines: st.sheet?.showGridLines !== false, showHeadings: !!st.colHeadH, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
     },
     /** Outline the cells copied or cut, dashed, until they are pasted or let go ({ r0, c0, r1, c1 }; null for none). */
     setClip(rect) {
@@ -362,7 +363,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       const x = st.cols.start(c);
       const y = st.rows.start(r);
       const w = view.clientWidth / z - st.rowHeadW;
-      const h = view.clientHeight / z - COLHEAD_H;
+      const h = view.clientHeight / z - st.colHeadH;
       const left = view.scrollLeft / z;
       const top = view.scrollTop / z;
       if (c >= st.freeze.cols) {
@@ -376,7 +377,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       draw(st, true);
     },
     /** Rows in view, for paging. */
-    rowsInView: () => { const z = st.zoom / 100; return Math.max(1, st.rows.indexAt(view.scrollTop / z + view.clientHeight / z - COLHEAD_H) - st.rows.indexAt(view.scrollTop / z + st.paneH)); },
+    rowsInView: () => { const z = st.zoom / 100; return Math.max(1, st.rows.indexAt(view.scrollTop / z + view.clientHeight / z - st.colHeadH) - st.rows.indexAt(view.scrollTop / z + st.paneH)); },
     /** After cells changed: sizes worked out again (row heights follow their fonts), drawn where the view is. */
     refresh() {
       measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color });
@@ -424,7 +425,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
         setVars(tip, { '--oxe-x': x + 4, '--oxe-y': top + 2 });
         tip.textContent = `Width: ${(Math.max(0, size - 5) / MDW).toFixed(2)} (${Math.round(size)} pixels)`;
       } else {
-        const y = COLHEAD_H + st.rows.start(index) + size + (index < st.freeze.rows ? top : 0);
+        const y = st.colHeadH + st.rows.start(index) + size + (index < st.freeze.rows ? top : 0);
         setVars(line, { '--oxe-x': left, '--oxe-y': y, '--oxe-w': view.clientWidth / z, '--oxe-h': 1 });
         setVars(tip, { '--oxe-x': left + st.rowHeadW + 4, '--oxe-y': y + 4 });
         tip.textContent = `Height: ${(Math.round(size) * 0.75).toFixed(2)} (${Math.round(size)} pixels)`;
@@ -457,7 +458,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** The overlay element, which an in-cell editor joins. */
     overlay,
     /** Where a column and a row start and how large they are, in pixels (for tests and, later, layout checks). */
-    geometry: () => ({ rows: st.rows, cols: st.cols, rowHeadW: st.rowHeadW, colHeadH: COLHEAD_H }),
+    geometry: () => ({ rows: st.rows, cols: st.cols, rowHeadW: st.rowHeadW, colHeadH: st.colHeadH }),
     destroy() {
       resize?.disconnect();
       if (st.frame) cancelAnimationFrame(st.frame);

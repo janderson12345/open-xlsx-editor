@@ -166,7 +166,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (!state.ribbon || !state.workbook || !state.editing) return;
     const wb = state.workbook;
     const look = state.editing.commands.look();
-    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: state.grid.view() });
+    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: { ...state.grid.view(), formulaBar: !root.querySelector('.oxe-bar')?.hidden } });
     showStats();
   };
   /** The status bar: Excel's Average, Count and Sum of the selection (stats.js), or Count alone. */

@@ -9,6 +9,7 @@ import { sheetCommands } from './commands-sheets.js';
 import { dataCommands } from './commands-data.js';
 import { partCommands } from './commands-parts.js';
 import { pivotCommands } from './commands-pivot.js';
+import { viewCommands } from './commands-view.js';
 import { step, jump, lastCell } from './navigate.js';
 import { entryChanges } from '../ooxml/entry.js';
 import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
@@ -318,29 +319,6 @@ export function createCommands(ctx) {
       show(state.sel, state.focus);
       return true;
     },
-    /** Freeze Panes ('panes': above and left of the active cell; again when frozen, Unfreeze Panes, as Excel's menu
-     *  turns), Freeze Top Row ('topRow'), Freeze First Column ('firstColumn') or Unfreeze ('none'). A view change, kept
-     *  in the file but not in the undo history, as in Excel. */
-    freeze(kind) {
-      const wb = ctx.workbook();
-      const si = ctx.sheetIndex();
-      const now = wb.sheet(si).freeze || { rows: 0, cols: 0 };
-      const s = state.sel;
-      let freeze = { rows: 0, cols: 0 };
-      if (kind === 'topRow') freeze = { rows: 1, cols: 0 };
-      else if (kind === 'firstColumn') freeze = { rows: 0, cols: 1 };
-      else if (kind === 'panes' && !(now.rows || now.cols)) {
-        // (Excel freezes the middle of the window when A1 is active; here that needs another cell.)
-        if (!s.ar && !s.ac) { ctx.announce('Select the cell below and to the right of what should stay in place'); return false; }
-        freeze = { rows: s.ar, cols: s.ac };
-      }
-      const topLeft = ctx.grid.view().topLeft;
-      wb.setView(si, { freeze, active: { r: s.ar, c: s.ac }, topLeft });
-      ctx.grid.setView({ freeze });
-      ctx.changed?.();
-      ctx.announce(freeze.rows || freeze.cols ? `Frozen: ${freeze.rows} row${freeze.rows === 1 ? '' : 's'} and ${freeze.cols} column${freeze.cols === 1 ? '' : 's'}` : 'Panes unfrozen');
-      return true;
-    },
     /** Formulas > Trace Precedents ('precedents') or Trace Dependents ('dependents') from the active cell: one level
      *  more each time, as Excel's arrows (ooxml/trace.js, arrows.js). Not a step of the history; not saved. */
     trace(kind) {
@@ -354,45 +332,6 @@ export function createCommands(ctx) {
       const t = traceOf(ctx.sheetIndex());
       if (kind) { t.arrows = t.arrows.filter((a) => a.kind !== kind); t[kind] = null; } else Object.assign(t, { arrows: [], precedents: null, dependents: null });
       ctx.grid.setArrows(t.arrows);
-      return true;
-    },
-    /** Formulas > Show Formulas (Ctrl+`): on, off, or turned over (no argument); a view change, not undone. */
-    showFormulas(on) {
-      const wb = ctx.workbook();
-      const si = ctx.sheetIndex();
-      const now = on ?? !wb.sheet(si).showFormulas;
-      wb.setView(si, { showFormulas: now });
-      ctx.reloaded?.();
-      ctx.grid.scrollIntoView(state.focus.r, state.focus.c);
-      ctx.changed?.();
-      ctx.announce(now ? 'Showing formulas' : 'Showing values');
-      return true;
-    },
-    /** The sheet's zoom in percent (10 to 400, as Excel allows); a view change, not undone. */
-    zoom(percent) {
-      const z = Math.round(Math.min(400, Math.max(10, percent)));
-      ctx.workbook().setView(ctx.sheetIndex(), { zoom: z });
-      ctx.grid.setView({ zoom: z });
-      ctx.grid.scrollIntoView(state.focus.r, state.focus.c);
-      ctx.changed?.();
-      ctx.announce(`Zoom ${z}%`);
-      return true;
-    },
-    /** Zoom to Selection: the zoom at which the selection fills the window (cut to the used range when it runs past
-     *  it), as near as whole percent allows. */
-    zoomToSelection() {
-      const s = state.sel;
-      const sh = sheet();
-      const r1 = s.r1 - s.r0 > 10000 ? Math.max(s.r0, Math.min(s.r1, sh.maxRow)) : s.r1;
-      const c1 = s.c1 - s.c0 > 1000 ? Math.max(s.c0, Math.min(s.c1, sh.maxCol)) : s.c1;
-      const g = ctx.grid.geometry();
-      const w = g.cols.start(c1 + 1) - g.cols.start(s.c0);
-      const h = g.rows.start(r1 + 1) - g.rows.start(s.r0);
-      const view = ctx.grid.el;
-      // (The headings scale with the sheet, so they count with it.)
-      const z = Math.floor(Math.min(view.clientWidth / (Math.max(1, w) + g.rowHeadW), view.clientHeight / (Math.max(1, h) + g.colHeadH)) * 100);
-      commands.zoom(z);
-      ctx.grid.scrollToCell(s.r0, s.c0);
       return true;
     },
     /** A heading edge dragged to `px` pixels: line `index`, or every selected whole line when it is one of them (as
@@ -476,7 +415,7 @@ export function createCommands(ctx) {
   // use.)
   const env = { commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
   Object.assign(commands, sheetCommands(env));
-  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env));
+  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env));
 
   return {
     commands,

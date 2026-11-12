@@ -404,4 +404,20 @@ const after = await sheetsNow();
 await page.keyboard.press('Control+z');
 check(after.split('|').length === before.split('|').length + 1 && /\(2\)/.test(after) && await sheetsNow() === before, 'Move or Copy > Create a copy: a "(2)" sheet; Ctrl+Z takes it back', after);
 
+// View > Show: Gridlines, Formula Bar and Headings turned off and on again (Excel's saved form is tested in
+// view.test.js): the gridlines not drawn, the bar hidden, the headings taking no room; the buttons follow.
+await page.click('.oxe-rtab >> text="View"');
+const showState = () => page.evaluate(() => {
+  const g = window.oxe.grid.el;
+  const pressed = (l) => document.querySelector(`.oxe-toolbar button[title="${l}"]`)?.getAttribute('aria-pressed');
+  return [g.querySelectorAll('.oxe-lines > *').length > 0, !document.querySelector('.oxe-bar').hidden, g.querySelector('.oxe-corner').getBoundingClientRect().width > 0,
+    pressed('Gridlines'), pressed('Formula Bar'), pressed('Headings'), window.oxe.workbook.sheet(window.oxe.sheetIndex ?? 0).showHeadings].join();
+});
+const shownBefore = await showState();
+for (const l of ['Gridlines', 'Formula Bar', 'Headings']) await ribbon(l);
+const shownOff = await showState();
+for (const l of ['Gridlines', 'Formula Bar', 'Headings']) await ribbon(l);
+check(shownBefore === 'true,true,true,true,true,true,true' && shownOff === 'false,false,false,false,false,false,false' && await showState() === shownBefore,
+  'View > Show: Gridlines, Formula Bar and Headings off and on again', JSON.stringify({ shownBefore, shownOff }));
+
 await finish();

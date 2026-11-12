@@ -39,7 +39,9 @@ export function sheetGeometry(sheet, { print = false, normalFamily, auto = null,
   if (sheet.showFormulas) for (const [c, px] of colSizes) colSizes.set(c, px * 2);
   const rows = new Axis(rowCount, rowPx(sheet.format.defaultRowHeight), rowSizes);
   const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, MDW)) * (sheet.showFormulas ? 2 : 1), colSizes);
-  return { rows, cols, rowHeadW: Math.max(3, String(rowCount).length) * MDW + 12 };
+  // (View > Headings off: no room for them, as in Excel; showHeadings is undefined in a model made by hand.)
+  const heads = sheet.showHeadings !== false;
+  return { rows, cols, rowHeadW: heads ? Math.max(3, String(rowCount).length) * MDW + 12 : 0, colHeadH: heads ? COLHEAD_H : 0 };
 }
 
 /** The column headings' height and the room each row heading's digits need (view chrome, not workbook content). */

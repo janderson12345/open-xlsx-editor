@@ -94,6 +94,7 @@ export function readSheet(doc, sst = []) {
     arrays,
     format: { defaultRowHeight: num('defaultRowHeight') ?? 15, defaultColWidth: num('defaultColWidth'), baseColWidth: num('baseColWidth') },
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
+    showHeadings: !view || attr(view, 'showRowColHeaders') !== '0',
     ...readView(view, ns),
     page: readPageSetup(root, ns),
     autoFilter: readAutoFilter(kid(root, 'autoFilter', ns), ns),
