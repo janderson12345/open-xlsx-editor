@@ -12,6 +12,16 @@ import { iconElement } from './cficons.js';
 /** The merged range a cell is inside, if any. */
 export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
 
+/** What each error indicator says, as Excel's error button does. */
+const ERROR_TEXT = {
+  evalError: "This cell's formula results in an error.",
+  twoDigitTextYear: 'This cell contains a date string represented with only 2 digits for the year.',
+  numberStoredAsText: 'The number in this cell is formatted as text or preceded by an apostrophe.',
+  formula: 'The formula in this cell differs from the formulas in this area of the spreadsheet.',
+  formulaRange: 'The formula in this cell refers to a range that has additional numbers adjacent to it.',
+  unlockedFormula: 'This cell contains a formula and is not locked to protect it from being changed inadvertently.',
+};
+
 const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 };
 /** Excel's textRotation as degrees counter-clockwise: 1 to 90 up, 91 to 180 down (91 is -1); 255, stacked, is none. */
 export const rotationDegrees = (r) => (!r || r === 255 ? 0 : r <= 90 ? r : 90 - r);
@@ -86,6 +96,9 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   // (A note or comment thread: heard as the cell's description, from notemarks.js's texts.)
   if (st.idBase && st.notes?.has(`${r},${c}`)) el.setAttribute('aria-describedby', `${st.idBase}-note-${r}-${c}`);
   if (st.sel && inSelection(st.sel, r, c)) el.setAttribute('aria-selected', 'true');
+  // (Excel's error indicator, the green triangle in the top-left corner, and what it says: ooxml/errorcheck.js.)
+  const flags = st.errors?.get(`${r},${c}`);
+  if (flags) { el.classList.add('oxe-errmark'); el.setAttribute('aria-description', flags.map((f) => ERROR_TEXT[f]).join(' ')); }
   let x = st.cols.start(c);
   let w = st.cols.size(c);
   let hgt = st.rows.size(r);

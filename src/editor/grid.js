@@ -260,6 +260,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       st.cond = looks;
       draw(st, true);
     },
+    /** The cells with an error indicator (ooxml/errorcheck.js errorFlags: "r,c" => [rules]), marked. */
+    setErrors(flags) {
+      st.errors = flags;
+      draw(st, true);
+    },
     /** The sheet's notes and comment threads (ooxml/notes.js readNotes), marked and described. */
     setNotes(notes) {
       st.notes = notes;

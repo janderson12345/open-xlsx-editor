@@ -14,6 +14,7 @@ import { messageBox, unhideBox, passwordBox } from './editor/dialogs.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { readNotes } from './ooxml/notes.js';
 import { conditionalLooks } from './ooxml/condformat.js';
+import { errorFlags } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
 import { chartFigure } from './editor/chartview.js';
 import { createRibbon } from './editor/ribbon.js';
@@ -145,6 +146,8 @@ export function mountXlsxEditor(host, options = {}) {
   const showConditional = () => {
     if (!state.grid || !state.workbook) return;
     state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex));
+    // (Excel's error indicators, worked out again: errorcheck.js; `errorChecking: false` turns them off.)
+    state.grid.setErrors(options.errorChecking === false ? null : errorFlags(state.workbook, state.sheetIndex));
     // (Notes too: written, deleted, or moved with rows and columns.)
     state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
     // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)

@@ -222,8 +222,29 @@ go (measured with a hidden Excel's ShowPrecedents, ShowDependents and NavigateAr
   its own arrows; none is saved (Excel saves none).
 - **Not yet**: Excel takes arrows away when a formula they point to changes, rows or columns are inserted or cells
   moved; here they stay until removed. The arrows' exact look (Excel's line widths, its icon) isn't measured. Double-
-  clicking an arrow to go to its other end. Error Checking, Evaluate Formula, the Watch Window. How Excel aligns numbers
-  in Show Formulas isn't measured (Range.Text can't say); here General's right.
+  clicking an arrow to go to its other end. How Excel aligns numbers in Show Formulas isn't measured (Range.Text can't
+  say); here General's right.
+
+Error indicators (`ooxml/errorcheck.js`): Excel's green triangle in the top-left corner of a cell that breaks one of
+the rules Excel checks by default, each cell's message heard as its description (measured with a hidden Excel's
+Range.Errors on about 60 cells; `test/errorcheck.test.js` has them):
+
+- **Evaluates to an error**: a formula whose result is an error, but #N/A from a formula calling NA() (=NA(), =NA()+1;
+  =1/0+NA() is flagged, and so is =A1 reading an =NA()). An error typed as a value isn't.
+- **Number stored as text**: text that reads as a number ('123, '12.5, '1,234, '1e3, ' 7, '50%, '(5), '-3, '0012), not
+  a date or time ('1/2/2024, '12:30), 'TRUE, or the text a formula gives.
+- **Two-digit year**: text that reads as a date with a two-digit year ('1/2/24, 'Jan 2, 24, '2-Jan-24).
+- **Inconsistent formula**: the cells either side, left and right or above and below, hold one formula between them
+  (moved as a copy moves it) and this cell another (=E3*F3 between =E2+F2 and =E4+F4).
+- **Formula omits adjacent cells**: a number (a date too; not text, TRUE or a formula's result) just before or after a
+  range of one row or one column the formula reads, on whatever sheet that is (=SUM(N2:N4) with a number in N1). A
+  range of two rows and columns isn't checked, nor a number past a gap.
+- **Unlocked formula**: a formula in a cell whose format isn't locked.
+- A sheet's ignoredErrors (Excel's Ignore Error, saved in the file) turn a rule off for their cells.
+- **Not yet**: Excel's error button and its menu (Ignore Error, Convert to Number...), the Error Checking box, and the
+  rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
+  in M5 with a number in M4, when M7 held =M1+M2 (alone, Excel flags it). The triangle's green isn't measured. Evaluate
+  Formula, the Watch Window.
 
 ## Calculation options
 

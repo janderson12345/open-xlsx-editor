@@ -388,4 +388,11 @@ await ribbon('Remove Arrows');
 check(first === 1 && second === 1 && withDependents === 3 && await arrowCount() === 0, 'Trace Precedents: 1 arrow, then no more; Trace Dependents of J45: 2 more; Remove Arrows: none',
   JSON.stringify({ first, second, withDependents }));
 
+// Excel's error indicator: '123 typed is a number stored as text, its green triangle and what it says; 123 typed, none.
+const errMark = () => page.evaluate(() => document.querySelector('.oxe-row[aria-rowindex="46"] .oxe-cell[aria-colindex="12"]')?.getAttribute('aria-description') ?? null);
+await page.evaluate(() => window.oxe.enter('K45', "'123"));
+const flagged = await errMark();
+await page.evaluate(() => window.oxe.enter('K45', '123'));
+check(/formatted as text/.test(flagged || '') && await errMark() === null, "'123: the number-stored-as-text indicator; 123: none", JSON.stringify(flagged));
+
 await finish();

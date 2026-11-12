@@ -149,6 +149,16 @@
 }
 
 /* Cells: bottom-aligned (Excel's default), text left, numbers right, booleans and errors centred, never wrapped. */
+/* Excel's error indicator (ooxml/errorcheck.js): a green triangle in the cell's top-left corner. */
+.oxe-errmark::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-top: 6px solid #00a050;
+  border-right: 6px solid transparent;
+  pointer-events: none;
+}
 .oxe-cell {
   --oxe-pad-l: 2px;
   --oxe-pad-r: 2px;
