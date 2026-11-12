@@ -8,6 +8,7 @@ import { formatCodeOf } from './styles.js';
 import { refName, colName } from './refs.js';
 import { readNotes } from './notes.js';
 import { setNote, deleteNote } from './noteedit.js';
+import { addThread, replyThread, resolveThread } from './threadedit.js';
 import { boxRule, coalesce } from './dvedit.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
@@ -30,9 +31,10 @@ export function snapshot(wb, si, sel, cut = false) {
     widths: Array.from({ length: rect.c1 - rect.c0 + 1 }, (_, dc) => sheet.cols.find((x) => x.min <= rect.c0 + dc && x.max >= rect.c0 + dc && x.width != null)?.width ?? null),
     merges: sheet.merges.filter((m) => inside(m, rect)).map((m) => ({ r0: m.r0 - rect.r0, c0: m.c0 - rect.c0, r1: m.r1 - rect.r0, c1: m.c1 - rect.c0 })),
     // (The notes of the copied cells, with their authors: a paste brings them, as Excel's does.)
-    notes: [...readNotes(wb, si)].filter(([, n]) => n.kind === 'note').map(([key, n]) => { const [r, c] = key.split(',').map(Number); return { r, c, n }; })
+    // (Comment threads too: their comments, authors and times, and whether resolved, as Excel copies them.)
+    notes: [...readNotes(wb, si)].map(([key, n]) => { const [r, c] = key.split(',').map(Number); return { r, c, n }; })
       .filter(({ r, c }) => r >= rect.r0 && r <= rect.r1 && c >= rect.c0 && c <= rect.c1)
-      .map(({ r, c, n }) => ({ dr: r - rect.r0, dc: c - rect.c0, author: n.author, text: noteBody(n) })),
+      .map(({ r, c, n }) => ({ dr: r - rect.r0, dc: c - rect.c0, ...(n.kind === 'thread' ? { thread: { items: n.items, resolved: !!n.resolved } } : { author: n.author, text: noteBody(n) }) })),
     // (The validation rules over the copied cells, each with the parts of it in the copy: a paste brings them.)
     validations: (sheet.validations || []).filter((v) => v.type !== 'none').map((v) => ({ v, parts: v.ranges.map((a) => clipTo(a, rect)).filter(Boolean) })).filter((x) => x.parts.length),
   };
@@ -97,9 +99,9 @@ export function moveCutParts(wb, si, area, clip) {
 /** A note's own text, without the bold author line Excel puts before it. */
 const noteBody = (n) => n.runs.filter((x, k) => !(k === 0 && x.bold)).map((x) => x.text).join('').replace(/^\n/, '');
 
-/** What a paste does to notes, as Excel's Paste, Paste Special's All and Comments and Notes do (measured over COM):
- *  each pasted cell ends with the copy's note there, or none (one there before is taken away, a comment thread too
- *  where a note comes). `area` the pasted cells, the copy repeated over it every `rows` by `cols`; `transpose` as
+/** What a paste does to notes and comment threads, as Excel's Paste, Paste Special's All and Comments and Notes do
+ *  (measured over COM): each pasted cell ends with the copy's note or thread there (a thread with its replies, their
+ *  authors and times, and resolved if it was; new ids), or none (one there before is taken away). `area` the pasted cells, the copy repeated over it every `rows` by `cols`; `transpose` as
  *  pasteSpecial's. Changes the workbook; returns whether anything changed. */
 export function pasteNotes(wb, si, area, clip, { transpose = false } = {}) {
   const h = clip.rect.r1 - clip.rect.r0 + 1;
@@ -119,13 +121,22 @@ export function pasteNotes(wb, si, area, clip, { transpose = false } = {}) {
     const [r, c] = key.split(',').map(Number);
     if (r < area.r0 || r > area.r1 || c < area.c0 || c > area.c1) continue;
     const next = want.get(key);
-    if (next && n.kind === 'note' && n.author === next.author && noteBody(n) === next.text) { want.delete(key); continue; }
+    const same = next && (next.thread ? n.kind === 'thread' && !!n.resolved === next.thread.resolved && JSON.stringify(n.items) === JSON.stringify(next.thread.items)
+      : n.kind === 'note' && n.author === next.author && noteBody(n) === next.text);
+    if (same) { want.delete(key); continue; }
     deleteNote(wb, si, r, c);
     changed = true;
   }
   for (const [key, x] of want) {
     const [r, c] = key.split(',').map(Number);
-    setNote(wb, si, r, c, x.text, x.author || 'Author');
+    if (x.thread) {
+      // (A thread: its comment, its replies, each with its author and time, then resolved if it was.)
+      const [top, ...replies] = x.thread.items;
+      const at = (d) => ({ when: d ? new Date(d) : new Date() });
+      addThread(wb, si, r, c, top.text, top.author || 'Author', at(top.date));
+      for (const y of replies) replyThread(wb, si, r, c, y.text, y.author || 'Author', at(y.date));
+      if (x.thread.resolved) resolveThread(wb, si, r, c, true);
+    } else setNote(wb, si, r, c, x.text, x.author || 'Author');
     changed = true;
   }
   return changed;

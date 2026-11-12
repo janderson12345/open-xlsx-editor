@@ -69,7 +69,11 @@ PasteSpecial xlPasteAll, xlPasteComments and xlPasteValues onto cells, some with
 Comments and Notes leave each pasted cell with the copy's note there, or none (a note there before is taken away, so
 F6's went when C3, which had none, was pasted over it); Values brings none. Here (`clipops.js` pasteNotes): Ctrl+V,
 Paste Special's All, All except borders and Comments and Notes do the same, over a repeated paste too,
-as one step of Undo with the cells (test/pastenotes.test.js, test/editing-formats.mjs). A comment thread isn't copied.
+as one step of Undo with the cells (test/pastenotes.test.js, test/editing-formats.mjs).
+
+Comment threads too: measured over COM (B2 a thread with a reply, C2 a resolved one, B2:C2 pasted with Paste,
+PasteSpecial xlPasteComments, and cut), Excel writes each pasted thread with its comments' text, authors and times,
+`done="1"` kept, under new ids; a cut leaves none behind. The same here, with threadedit.js's own writing.
 
 ## Validation pasted
 
@@ -97,7 +101,7 @@ its first cell changes, as Excel's cut did.
 ## Not yet
 
 Paste Special's All using Source theme and All merging conditional formats; validation with Transpose; validation
-pasted or cut onto another sheet measured against Excel; comment threads copied; Paste
+pasted or cut onto another sheet measured against Excel; Paste
 Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
 program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was
 pasted onto (Excel shrinks it: `=SUM(A1:A3)` became `=SUM(A2:A3)` when A1 was moved onto A3).

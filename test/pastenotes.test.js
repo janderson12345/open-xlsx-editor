@@ -88,3 +88,27 @@ test('cells taken out of a rule rebase its formulas when its first cell changes,
   const v = wb.sheet(si).validations[0];
   assert.deepEqual([v.ranges.map((a) => `${a.r0},${a.c0}`), v.formulas], [['3,2'], ['C4>B4']]);
 });
+
+test("comment threads come with a paste and move with a cut, as Excel's: replies, authors, times and resolved kept, new ids", async () => {
+  const { addThread, replyThread, resolveThread } = await import('../src/ooxml/threadedit.js');
+  const { moveCutParts } = await import('../src/ooxml/clipops.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Threads');
+  const when = new Date(2026, 10, 12, 22, 5, 2, 180);
+  addThread(wb, si, 1, 1, 'first', 'Avery Chen', { when });
+  replyThread(wb, si, 1, 1, 'a reply', 'Blair Diaz', { when: new Date(2026, 10, 12, 22, 5, 2, 200) });
+  addThread(wb, si, 1, 2, 'second', 'Avery Chen', { when });
+  resolveThread(wb, si, 1, 2, true);
+  const copy = snapshot(wb, si, { ar: 1, ac: 1, r0: 1, c0: 1, r1: 1, c1: 2 });
+  pasteNotes(wb, si, { r0: 4, c0: 4, r1: 4, c1: 5 }, copy);
+  const n = readNotes(wb, si);
+  assert.deepEqual(n.get('4,4').items.map((x) => [x.author, x.text, x.date]), [['Avery Chen', 'first', '2026-11-12T22:05:02.18'], ['Blair Diaz', 'a reply', '2026-11-12T22:05:02.20']]);
+  assert.equal(n.get('4,5').resolved, true);
+  const part = () => wb.pkg.text(Object.keys(wb.pkg.files).find((k) => k.startsWith('xl/threadedComments/')));
+  assert.equal(new Set([...part().matchAll(/\sid="(\{[^}]+\})"/g)].map((m) => m[1])).size, 6);
+  // (Cut to E11: gone from B2:C2, there at E11:F11.)
+  const cut = snapshot(wb, si, { ar: 1, ac: 1, r0: 1, c0: 1, r1: 1, c1: 2 }, true);
+  moveCutParts(wb, si, { r0: 10, c0: 4, r1: 10, c1: 5 }, cut);
+  const after = readNotes(wb, si);
+  assert.deepEqual([after.has('1,1'), after.has('1,2'), after.get('10,4')?.items.length, after.get('10,5')?.resolved], [false, false, 2, true]);
+});
