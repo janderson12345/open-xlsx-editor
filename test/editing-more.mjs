@@ -521,4 +521,12 @@ await page.evaluate(() => window.oxe.undo());
 const sheetUndone = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.find((x) => 25 >= x.min && 25 <= x.max)?.style ?? 0);
 check(sheetBold === true && sheetUndone === 0, 'the whole sheet made bold: every column its own format; Ctrl+Z takes it away', JSON.stringify({ sheetBold, sheetUndone }));
 
+// Row 30 selected whole, its font made 20pt: the row grows, as Excel's (26.25pt: 35px).
+const row30 = () => page.evaluate(() => window.oxe.grid.geometry().rows.size(29));
+const row30Before = await row30();
+await page.evaluate(() => { window.oxe.command('selectLines', 'row', 29); window.oxe.command('format', { font: { size: 20 } }); });
+const row30After = await row30();
+await page.evaluate(() => window.oxe.undo());
+check(row30Before === 20 && row30After === 35 && await row30() === 20, 'a whole row made 20pt: it grows to 26.25pt as Excel’s; Ctrl+Z back', JSON.stringify({ row30Before, row30After }));
+
 await finish();

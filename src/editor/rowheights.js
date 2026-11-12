@@ -71,9 +71,18 @@ export function autoRowHeights(sheet, deco, cols) {
   if (!deco) return out;
   const merged = (r, c) => sheet.merges.some((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
   const rowPt = new Map(); // per cell format: one line's height in points
-  for (const [r, line] of sheet.cells) {
+  const lineOf = (s) => {
+    if (!rowPt.has(s)) { const d = deco(s); rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx) * 0.75); }
+    return rowPt.get(s);
+  };
+  // (A row with a format of its own, cells or not: its font's line, as Excel grows a row made 14pt to 18.75.)
+  const rows = new Set(sheet.cells.keys());
+  for (const [r, x] of sheet.rows) if (x.s) rows.add(r);
+  for (const r of rows) {
     if (sheet.rows.get(r)?.customHeight) continue;
+    const line = sheet.cells.get(r) || new Map();
     let best = sheet.format.defaultRowHeight;
+    if (sheet.rows.get(r)?.s) best = Math.max(best, lineOf(sheet.rows.get(r).s));
     for (const [c, cell] of line) {
       if (merged(r, c)) continue;
       const s = cell.s || 0;
@@ -82,6 +91,8 @@ export function autoRowHeights(sheet, deco, cols) {
       let lines = 1;
       if (d.align.wrap && cell.t === 's' && cell.v) lines = countLines(cell.v, d.font.css, cols.size(c) - 4);
       best = Math.max(best, rowPt.get(s) * lines);
+      // (Rich text: a run's larger font grows the row as Excel's does, a 16pt run in Aptos Narrow 11 to 21pt.)
+      if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3) * 0.75);
       if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, rowPt.get(s)));
     }
     out.set(r, best);

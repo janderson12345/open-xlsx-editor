@@ -134,8 +134,11 @@ a width or a format of its own (`<col min="1" max="2"/><col min="3" max="3" cust
 cells there are changed; no cell is made, a row with only a height is left. Done here the same way, Excel read it
 the same, cell for cell (XFD1048576 bold among them).
 
-Not yet: an outline's bottom on row 1,048,576 isn't drawn; a row made taller by a larger font (Excel grows it)
-isn't.
+A row with a format of its own grows to its font as Excel's does (Rows(7).Font.Size = 14: 18.75pt), cells or not
+(`src/editor/rowheights.js`); Excel fits a row without a height of its own when it opens the file, so none is
+written.
+
+Not yet: an outline's bottom on row 1,048,576 isn't drawn.
 
 ## Rich text
 
@@ -147,9 +150,9 @@ first run without one when it is the cell's own font; the cell's format takes th
 word made the cell's font struck). Shown as Excel shows them; Show Formulas, and a number format that changes the
 text, show it plain.
 
-Not yet: editing a cell's runs (typing replaces them with plain text, as a new value), copying them, and a row's
-height following a larger run (Excel's file says the height, so a file from Excel shows right; a row grown here
-doesn't).
+A run's larger font grows its row as Excel's does (a 16pt run beside Aptos Narrow 11: 21pt, measured).
+
+Not yet: editing a cell's runs (typing replaces them with plain text, as a new value), and copying them.
 
 ## Format Painter
 

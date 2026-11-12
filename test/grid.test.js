@@ -44,3 +44,21 @@ test('automatic row heights: tallest font, styled empty cells count, stored ht w
   const d = rowDescents(sheet, deco);
   assert.ok(d.get(10) > d.get(2)); // (the mixed row sits on the 20pt baseline)
 });
+
+test("a row grows for its own format's font and a rich-text run's, as Excel's: 14pt to 18.75, a 16pt run to 21 (measured over COM)", async () => {
+  const { autoRowHeights } = await import('../src/editor/rowheights.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Grow');
+  const big = wb.styleWith(0, { font: { size: 14 } });
+  wb.setLineStyles(si, { rows: [{ r: 6, s: big }] });
+  wb.setCell(si, 'A1', 'Plain big');
+  const sheet = wb.sheet(si);
+  sheet.cells.get(0).get(0).runs = [{ text: 'Plain ', font: null }, { text: 'big', font: { name: 'Calibri', size: 16, scheme: 'minor', b: false, i: false, u: null, strike: false, color: null, vertAlign: null } }];
+  const deco = (s) => {
+    const f = wb.styles.fonts[wb.styles.cellXfs[s].fontId];
+    return { font: { family: 'Calibri', sizePx: (f.size * 4) / 3, css: '' }, align: wb.styles.cellXfs[s].align };
+  };
+  const h = autoRowHeights(sheet, deco, sheetGeometry(sheet).cols);
+  assert.equal(h.get(6), 18.75);
+  assert.equal(h.get(0), 21);
+});
