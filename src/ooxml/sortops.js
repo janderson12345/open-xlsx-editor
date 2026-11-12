@@ -186,7 +186,10 @@ function mergedBlocks(sheet, area) {
  */
 export function sortChanges(wb, si, area, { keys, header = false, matchCase = false, leftToRight = false, textAsNumbers = false }) {
   const sheet = wb.sheet(si);
-  if (sheet.arrays.some((a) => a.r0 <= area.r1 && a.r1 >= area.r0 && a.c0 <= area.c1 && a.c1 >= area.c0)) return { error: SORT_MESSAGES.array };
+  const meets = (a) => a.r0 <= area.r1 && a.r1 >= area.r0 && a.c0 <= area.c1 && a.c1 >= area.c0;
+  if (sheet.arrays.some(meets)) return { error: SORT_MESSAGES.array };
+  // (A dynamic array's spill too, any part of it, its formula's cell in or not: Excel refuses, measured.)
+  for (const line of sheet.cells.values()) for (const cell of line.values()) if (cell.spill && meets(cell.spill)) return { error: SORT_MESSAGES.array };
   const block = mergedBlocks(sheet, area);
   if (!block) return { error: SORT_MESSAGES.merged };
   // (Lines are rows, or columns left to right; each unit is one line, or a merged range's height of them.)

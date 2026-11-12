@@ -21,6 +21,10 @@ Excel 365's dynamic array formulas: a formula whose answer is an array spills it
   =MAP({1,2},Twice) passes it on, the wrong number of arguments is #VALUE!, =Twice alone #CALC!; a function of the same
   name comes first (=Fact(5) is FACT's); typed in another case it is written as the name is (=twice(5) is
   Twice(5), measured). Ten such formulas in the probe, all as Excel's.
+- Rows inserted through a spill: the spill is worked out again from its cell, as Excel does. A sort whose range takes in
+  any part of a spill, its formula's cell in it or not, is refused with Excel's "You can't change part of an array."
+  (measured: five ranges through C1's =SEQUENCE(6,1,10,-1), refused; A1:B6 beside it sorts), as an old array
+  formula's is.
 - Formulas in workbooks saved by older versions of Excel keep their old meaning: `=A1:A3` there is one value, A1:A3
   cut to the formula's row (Excel 365 shows it as `=@A1:A3`, and so does the formula bar here).
 
@@ -99,5 +103,3 @@ formula probe:
   old formula's operator cuts to one value (`=@A1:A3*2`).
 - A LAMBDA called where it is written is saved as a plain formula when its answer is one value; Excel saves it as a
   dynamic one (both work out the same, in both programs).
-- Rows inserted or sorted through a spill: the spill is worked out again from its cell, as Excel does, but sorting rows
-  that hold spilled values sorts the values, where Excel refuses to sort part of a spill.

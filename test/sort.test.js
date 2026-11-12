@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 import { rangeName, parseRef } from '../src/ooxml/refs.js';
 import { sortArea, sortChanges, guessHeader, compareText, dataBeside, SORT_MESSAGES } from '../src/ooxml/sortops.js';
 import { readCases, area, build, cellsIn, excelCells, saveCase } from './steps.js';
+import fs from 'node:fs';
+import { Workbook } from '../src/ooxml/workbook.js';
+import { entryChanges } from '../src/ooxml/entry.js';
 
 // Sort, each case as Excel did it over COM (Worksheet.Sort as its Sort box applies one; Range.Sort with xlGuess for
 // the cases marked legacy, as its A to Z button guesses headers: tools/excel-compare/excel-steps.ps1 on
@@ -67,4 +70,17 @@ test('sort: text compared as Excel compares it, the refusals in its words', () =
   assert.equal(sortArea(sheet, area('F9')), null, 'an empty cell with nothing around it: nothing to sort');
   assert.equal(rangeName(dataBeside(sheet, area('A1:A3'))), 'A1:B3', 'one column of a table selected: the table beside it found');
   assert.equal(dataBeside(sheet, area('A1:B3')), null, 'the whole table selected: nothing left behind');
+});
+
+test("a sort through a dynamic array's spill is refused, as Excel refuses it (measured): any part, its formula's cell in or not", () => {
+  // (Excel, C1 =SEQUENCE(6,1,10,-1) spilling to C6 beside A1:B6: A1:C6, A2:C6, C1:C6, C2:C4 by any column, "You can't
+  // change part of an array.", nothing changed; A1:B6 sorts.)
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Spill');
+  for (let r = 0; r < 6; r++) { wb.setCell(si, { r, c: 0 }, 6 - r); wb.setCell(si, { r, c: 1 }, `w${r + 1}`); }
+  wb.apply(si, [entryChanges(wb, si, 0, 2, '=SEQUENCE(6,1,10,-1)').content]);
+  assert.deepEqual(wb.sheet(si).cells.get(0).get(2).spill, { r0: 0, c0: 2, r1: 5, c1: 2 });
+  const sort = (ref, at) => sortChanges(wb, si, area(ref), { keys: [{ at, desc: false }] }).error ?? 'sorted';
+  assert.deepEqual([sort('A1:C6', 0), sort('A2:C6', 0), sort('C1:C6', 2), sort('C2:C4', 2), sort('A1:C6', 2)], Array(5).fill(SORT_MESSAGES.array));
+  assert.equal(sort('A1:B6', 0), 'sorted');
 });
