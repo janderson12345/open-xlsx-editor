@@ -219,7 +219,7 @@ export function createCommands(ctx) {
     // (Whole columns or rows: the probe's formats are theirs, the rest the cells', formatops.js probeOf.)
     const rows = new Set(probes.map((p) => p.row).filter((x) => x != null));
     const cols = new Set(probes.map((p) => p.col).filter((x) => x != null));
-    const lines = { cols: out.filter((x) => rows.has(x.r)).map(({ c, s }) => ({ c, s })), rows: out.filter((x) => cols.has(x.c)).map(({ r, s }) => ({ r, s })) };
+    const lines = { cols: out.filter((x) => rows.has(x.r)).map(({ c, s }) => ({ c, s })), rows: out.filter((x) => cols.has(x.c) && !rows.has(x.r)).map(({ r, s }) => ({ r, s })) };
     return lineFormats(out.filter((x) => !rows.has(x.r) && !cols.has(x.c)), lines);
   };
   /** Whole rows or columns formatted, as Excel formats them: the cells there and where they cross a formatted row or

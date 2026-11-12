@@ -512,4 +512,13 @@ await page.evaluate(() => { window.oxe.undo(); window.oxe.undo(); });
 const colAfterUndo = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.find((x) => 12 >= x.min && 12 <= x.max)?.style ?? 0);
 check(colBold === true && farBold === true && colAfterUndo === 0, 'a whole column made bold: its own format, a cell typed far below bold; Ctrl+Z takes it away', JSON.stringify({ colBold, farBold, colAfterUndo }));
 
+// The whole sheet selected, Ctrl+B: every column its own format (Z9999 bold though empty), as Excel; Ctrl+Z.
+await page.evaluate(() => window.oxe.command('selectAll'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+b');
+const sheetBold = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); const col = sh.cols.find((x) => 25 >= x.min && 25 <= x.max); return col ? wb.styles.fonts[wb.styles.cellXfs[col.style].fontId].b : null; });
+await page.evaluate(() => window.oxe.undo());
+const sheetUndone = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.find((x) => 25 >= x.min && 25 <= x.max)?.style ?? 0);
+check(sheetBold === true && sheetUndone === 0, 'the whole sheet made bold: every column its own format; Ctrl+Z takes it away', JSON.stringify({ sheetBold, sheetUndone }));
+
 await finish();

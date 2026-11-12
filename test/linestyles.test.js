@@ -89,3 +89,36 @@ test("formatting whole rows and columns as Excel does: the lines' own formats, t
   wb.setCell(si, 'E40', 'e');
   assert.equal(look(s('E40')), 'f');
 });
+
+test("the whole sheet formatted as Excel does: every column its own format, split where one had a width or a format; the formatted rows and the cells there changed; no cell made", async () => {
+  const fmt = await import('../src/ooxml/formatops.js');
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'All');
+  wb.setCell(si, 'B1', 1); wb.setCell(si, 'D3', 3);
+  wb.setLines(si, 'col', 2, 2, { width: 20.7109375 });
+  wb.setLines(si, 'row', 5, 5, { height: 30 });
+  const format = (sel, change) => {
+    const probe = fmt.probeOf(wb.sheet(si), sel);
+    const out = fmt.formatEach(wb, si, { ...sel, ar: sel.r0, ac: sel.c0 }, change);
+    wb.setStyles(si, out.filter((x) => x.r !== probe.row && x.c !== probe.col));
+    wb.setLineStyles(si, { cols: out.filter((x) => x.r === probe.row).map(({ c, s }) => ({ c, s })), rows: out.filter((x) => x.c === probe.col && x.r !== probe.row).map(({ r, s }) => ({ r, s })) });
+  };
+  format({ r0: 7, c0: 0, r1: 7, c1: 16383 }, { font: { i: true } });
+  format({ r0: 0, c0: 4, r1: 1048575, c1: 4 }, { fill: { pattern: 'solid', fg: { rgb: 'FFFFFF00' } } });
+  const cellsBefore = [...wb.sheet(si).cells.values()].reduce((n, l) => n + l.size, 0);
+  format({ r0: 0, c0: 0, r1: 1048575, c1: 16383 }, { font: { b: true } });
+  const xml = serializeXml(wb._part(si).doc);
+  const sh = wb.sheet(si);
+  const look = (x) => { const xf = wb.styles.cellXfs[x]; const f = wb.styles.fonts[xf.fontId]; return `${f.b ? 'b' : ''}${f.i ? 'i' : ''}${xf.fillId ? 'f' : ''}`; };
+  // (Excel's: <col min="1" max="2" style="1"/><col min="3" max="3" style="1" customWidth="1"/><col min="4" max="4" style="1"/><col min="5" max="5" style="2"/><col min="6" max="16384" style="1"/>.)
+  const cols = [...xml.matchAll(/<col min="(\d+)" max="(\d+)"[^>]*?style="(\d+)"/g)].map((m) => `${m[1]}-${m[2]}:${look(Number(m[3]))}`);
+  assert.deepEqual(cols, ['1-2:b', '3-3:b', '4-4:b', '5-5:bf', '6-16384:b']);
+  assert.match(xml, /<col min="3" max="3" width="20.7109375" customWidth="1" style="\d+"\/>/);
+  assert.equal(look(sh.rows.get(7).s), 'bi');
+  assert.equal(sh.rows.get(5).s, undefined);
+  const s = (ref) => sh.cells.get(Number(ref.slice(1)) - 1)?.get(ref.charCodeAt(0) - 65)?.s;
+  assert.deepEqual(['B1', 'D3', 'E8'].map((ref) => look(s(ref))), ['b', 'b', 'bif']);
+  assert.equal([...sh.cells.values()].reduce((n, l) => n + l.size, 0), cellsBefore);
+  assert.equal(look(lineStyle(sh, 99, 25)), 'b');
+});

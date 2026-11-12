@@ -127,8 +127,15 @@ first and last columns; top on row 1). One step of Undo. Excel's own run of Rows
 D:E filled was made here the same way, and Excel read it with the same formats, cell for cell (B100 bold, D5 italic
 and filled, E900 filled).
 
-Not yet: the whole sheet selected (Ctrl+A) still formats the used range's cells; an outline's bottom on row
-1,048,576 isn't drawn; a row made taller by a larger font (Excel grows it) isn't.
+The whole sheet (Ctrl+A), measured over COM (`Cells.Font.Bold` after a column widened, a row heightened, a row
+italic and a column filled): every column gets its own format, its `<col>` elements split where a column already had
+a width or a format of its own (`<col min="1" max="2"/><col min="3" max="3" customWidth="1"/><col min="4" max="4"/>
+<col min="5" max="5"/><col min="6" max="16384"/>`, each with its style); the rows with a format of their own and the
+cells there are changed; no cell is made, a row with only a height is left. Done here the same way, Excel read it
+the same, cell for cell (XFD1048576 bold among them).
+
+Not yet: an outline's bottom on row 1,048,576 isn't drawn; a row made taller by a larger font (Excel grows it)
+isn't.
 
 ## Rich text
 

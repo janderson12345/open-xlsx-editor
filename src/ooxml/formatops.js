@@ -22,7 +22,14 @@ const wholeCols = (sel) => sel.c1 - sel.c0 > 1000;
  *  them, its new formats the columns' (rows') own, as Excel gives a formatted column one (commands.js lineFormats);
  *  { row, col }, null where there is none. A row (column) with a format of its own isn't one: it gets a cell. */
 export function probeOf(sheet, sel) {
-  if (wholeRows(sel) === wholeCols(sel)) return { row: null, col: null };
+  // (The whole sheet: both, the probe row's formats every column's, the probe column's each formatted row's; Excel
+  // gives every column its own format and changes the rows that have one, measured.)
+  if (wholeRows(sel) && wholeCols(sel)) {
+    let row = sheet.maxRow + 1;
+    while (sheet.rows.get(row)?.s) row++;
+    return { row: row < sel.r1 ? row : null, col: sheet.maxCol + 1 < sel.c1 ? sheet.maxCol + 1 : null, sheet: true };
+  }
+  if (!wholeRows(sel) && !wholeCols(sel)) return { row: null, col: null };
   if (wholeRows(sel)) {
     let row = Math.max(sel.r0, sheet.maxRow + 1);
     while (sheet.rows.get(row)?.s) row++;
@@ -40,6 +47,14 @@ export function cellsOf(sheet, sel, lines = false) {
   const r1 = wholeRows(sel) ? Math.max(sel.r0, Math.min(sel.r1, sheet.maxRow)) : sel.r1;
   const c1 = wholeCols(sel) ? Math.max(sel.c0, Math.min(sel.c1, sheet.maxCol)) : sel.c1;
   const probe = lines ? probeOf(sheet, sel) : { row: null, col: null };
+  if (probe.sheet && probe.row != null && probe.col != null) {
+    // (The whole sheet: the cells there are, every column on the probe row, each formatted row on the probe column.)
+    const out = [];
+    for (const [r, line] of sheet.cells) for (const c of line.keys()) out.push({ r, c });
+    for (let c = 0; c <= sel.c1; c++) out.push({ r: probe.row, c });
+    for (const [r, x] of sheet.rows) if (x.s) out.push({ r, c: probe.col });
+    return out;
+  }
   // (Whole lines formatted: the cells there are, and empty ones only where a formatted row or column crosses, as
   // Excel makes them; the rest have the line's own format.)
   const lineCell = probe.row != null ? (r, c) => sheet.cells.get(r)?.has(c) || !!sheet.rows.get(r)?.s
