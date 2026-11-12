@@ -49,7 +49,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Undo and redo | Done | Cell contents and formats across sheets, and sheets inserted, renamed, moved, hidden, coloured and deleted (each one step, the sheet shown as it was). Excel can't undo deleting a sheet (it warns that the sheet goes for good); here Ctrl+Z brings it back, a difference kept on purpose. |
 | Formula bar and name box | Partly | The Name Box shows the active cell; a cell, range, whole columns or rows, another sheet's, a defined name, a table's name (its data rows) or a table reference ("Fruit[Qty]") typed there and Enter goes to it (src/ooxml/goto.js, Excel's documented behaviour: COM doesn't reach the Name Box). A new name typed there names the selection (docs/NAMES.md); showing a selected name missing. |
 | Formulas typed, Point mode, F4 | Done | docs/CALC.md. |
-| Recalculation | Done | 1822 of 1822 test formulas give Excel's results; 495 of Excel's 519 functions (the 24 missing are listed under Functions below); table references (Fruit[Qty], [#Totals], [@Qty]); 3D references (Jan:Apr!A1), following sheets renamed, deleted and moved as Excel's do, intersection (A1:C3 B2:D4) and the range operator (A1:INDEX(A:A,3)). |
+| Recalculation | Done | 1870 of 1870 test formulas give Excel's results; 498 of Excel's 519 functions (the 21 missing are listed under Functions below); table references (Fruit[Qty], [#Totals], [@Qty]); 3D references (Jan:Apr!A1), following sheets renamed, deleted and moved as Excel's do, intersection (A1:C3 B2:D4) and the range operator (A1:INDEX(A:A,3)). |
 | Sheet tabs: show, insert, rename, move, colour, hide, unhide, delete | Done | docs/SHEETS.md. |
 | Chart sheets | Kept | Tab shown, sheet not opened. |
 | Copy, cut, paste (and paste from Excel or the web) | Done | Ctrl+C, X, V and the Clipboard group; text from other programs read as if typed (docs/CLIPBOARD.md). Their formats are not read. |
@@ -125,7 +125,7 @@ which is dropped when formulas change (Excel rebuilds it).
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Function Library (`function-library`) | Insert Function, the function lists | Partly | Insert Function (Shift+F3, fx): search, Most Recently Used, All and Excel's categories, each function's syntax; Recently Used and each category's list on the Formulas tab, More Functions for the rest; the choice typed into the cell, or at the caret of a cell being edited; the syntax screen tip, the argument typed in bold (docs/CALC.md). Excel's descriptions of each function and its Function Arguments box are missing. 495 of Excel's 519 functions work when typed (Functions, below). |
+| Function Library (`function-library`) | Insert Function, the function lists | Partly | Insert Function (Shift+F3, fx): search, Most Recently Used, All and Excel's categories, each function's syntax; Recently Used and each category's list on the Formulas tab, More Functions for the rest; the choice typed into the cell, or at the caret of a cell being edited; the syntax screen tip, the argument typed in bold (docs/CALC.md). Excel's descriptions of each function and its Function Arguments box are missing. 498 of Excel's 519 functions work when typed (Functions, below). |
 | | Dynamic arrays (spilling), LAMBDA, LET | Partly | Formulas spill as Excel 365's do, #SPILL! when blocked; SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, LET, LAMBDA, `D1#` and `@`; 20 of 20 cases Excel's, and Excel reads the files the same (docs/DYNAMIC.md). TAKE, VSTACK, MAP and the other newer array functions too; a LAMBDA kept in a defined name, called as a function (=Twice(21)); GROUPBY, PIVOTBY (any number of row and column fields, subtotals, relative_to), PERCENTOF, RANDARRAY and functions named as LAMBDAs (=MAP(A1:A3,SQRT)). TRIMRANGE and trim references (A1:.E8), 27 cases as Excel's. |
 | Defined Names (`defined-names`) | Name Manager, define, use in formula | Done | Name Manager (Ctrl+F3) and Define Name as Excel's, the Name Box naming the selection; Excel's rules for a name, 34 of 34 verdicts, and its saved order (docs/NAMES.md). Create from Selection and Use in Formula missing. |
 | Formula Auditing (`formula-auditing`) | Trace precedents and dependents, show formulas, evaluate | Partly | Trace Precedents and Trace Dependents a level at a time, Excel's arrows (a range boxed, red from an error, another sheet's from its icon), Remove Arrows; Show Formulas (Ctrl+`): what each cell holds, columns twice as wide, saved as Excel saves it (docs/CALC.md). Excel's error indicators (green triangles) for its six default rules, ignoredErrors kept (`errorChecking: false` turns them off); the error button and its menu (Convert to Number, Copy Formula from Above, Lock Cell, Ignore Error written as Excel writes it); the Error Checking box, through the sheet's errors from the active cell; Evaluate Formula a step at a time (Step In and Step Out not yet). the Watch Window (Add Watch, Delete Watch, saved as Excel saves it). Error Checking Options missing; arrows stay after edits until removed. |
@@ -136,12 +136,12 @@ which is dropped when formulas change (Excel rebuilds it).
 Excel 365 has 519 worksheet functions: the 520 on Microsoft's alphabetical list ("Excel functions (alphabetical)")
 plus BETA.INV, which that list leaves out, less EUROCONVERT (from the Euro Currency Tools add-in) and JIS (Japanese
 Excel only), which Excel 365 in English gives #NAME?. Each name was typed into Excel over COM (Formula2 "=NAME()"): a
-function it has refuses the empty call, an unknown name gives #NAME?. 495 of the 519 work here (`src/calc`; DATEDIF
-among them, which Excel too leaves out of Insert Function). The 24 missing:
+function it has refuses the empty call, an unknown name gives #NAME?. 498 of the 519 work here (`src/calc`; DATEDIF
+among them, which Excel too leaves out of Insert Function). The 21 missing:
 
 | Kind | Missing | Count | Notes |
 |---|---|---|---|
-| Possible here | BAHTTEXT, PHONETIC, ENCODEURL, FILTERXML | 4 | Thai number words; a cell's furigana; URL encoding; XPath over XML text. |
+| Possible here | FILTERXML | 1 | XPath over XML text. |
 | | GETPIVOTDATA | 1 | A value from a PivotTable (PivotTables are made and refreshed here). |
 | | FORECAST.ETS, FORECAST.ETS.CONFINT, FORECAST.ETS.SEASONALITY, FORECAST.ETS.STAT | 4 | Excel's AAA exponential smoothing; its exact fitting is to be measured. |
 | Need something outside the workbook | CUBEKPIMEMBER, CUBEMEMBER, CUBEMEMBERPROPERTY, CUBERANKEDMEMBER, CUBESET, CUBESETCOUNT, CUBEVALUE | 7 | An OLAP data model or connection. |
@@ -149,7 +149,7 @@ among them, which Excel too leaves out of Insert Function). The 24 missing:
 | | CALL, REGISTER.ID | 2 | Code in a Windows DLL; off by default in Excel too. |
 
 A formula using one of these keeps the value Excel saved (it isn't worked out again here, even when what it reads
-changes); one typed here shows #NAME? until Excel opens the file. Excel's saved results are kept for all 24.
+changes); one typed here shows #NAME? until Excel opens the file. Excel's saved results are kept for all 21.
 
 ## Data (`data`)
 

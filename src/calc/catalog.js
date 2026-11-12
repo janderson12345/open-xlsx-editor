@@ -35,10 +35,10 @@ const LIST = {
     MAKEARRAY(rows,cols,lambda) MAP(array1,lambda_or_array2,...) NOT(logical) OR(logical1,[logical2],...)
     REDUCE([initial_value],array,lambda) SCAN([initial_value],array,lambda) SWITCH(expression,value1,result1,[default_or_value2,result2],...)
     TRUE() XOR(logical1,[logical2],...)`,
-  Text: `ARRAYTOTEXT(array,[format]) ASC(text) CHAR(number) CLEAN(text) CODE(text) CONCAT(text1,[text2],...) CONCATENATE(text1,[text2],...)
+  Text: `ARRAYTOTEXT(array,[format]) ASC(text) BAHTTEXT(number) CHAR(number) CLEAN(text) CODE(text) CONCAT(text1,[text2],...) CONCATENATE(text1,[text2],...)
     DBCS(text) DOLLAR(number,[decimals]) EXACT(text1,text2) FIND(find_text,within_text,[start_num]) FINDB(find_text,within_text,[start_num]) FIXED(number,[decimals],[no_commas])
     LEFT(text,[num_chars]) LEFTB(text,[num_bytes]) LEN(text) LENB(text) LOWER(text) MID(text,start_num,num_chars) MIDB(text,start_num,num_bytes)
-    NUMBERVALUE(text,[decimal_separator],[group_separator]) PROPER(text) REGEXEXTRACT(text,pattern,[return_mode],[case_sensitivity])
+    NUMBERVALUE(text,[decimal_separator],[group_separator]) PHONETIC(reference) PROPER(text) REGEXEXTRACT(text,pattern,[return_mode],[case_sensitivity])
     REGEXREPLACE(text,pattern,replacement,[occurrence],[case_sensitivity]) REGEXTEST(text,pattern,[case_sensitivity])
     REPLACE(old_text,start_num,num_chars,new_text) REPLACEB(old_text,start_num,num_bytes,new_text) REPT(text,number_times)
     RIGHT(text,[num_chars]) RIGHTB(text,[num_bytes]) SEARCH(find_text,within_text,[start_num]) SEARCHB(find_text,within_text,[start_num])
@@ -151,10 +151,11 @@ const LIST = {
     RANK(number,ref,[order]) STDEV(number1,[number2],...) STDEVP(number1,[number2],...) TDIST(x,deg_freedom,tails)
     TINV(probability,deg_freedom) TTEST(array1,array2,tails,type) VAR(number1,[number2],...) VARP(number1,[number2],...)
     WEIBULL(x,alpha,beta,cumulative) ZTEST(array,x,[sigma])`,
+  Web: `ENCODEURL(text)`,
 };
 
 /** The categories in the order of Excel's Insert Function box. */
-export const CATEGORIES = ['Financial', 'Date & Time', 'Math & Trig', 'Statistical', 'Lookup & Reference', 'Database', 'Text', 'Logical', 'Information', 'Engineering', 'Compatibility'];
+export const CATEGORIES = ['Financial', 'Date & Time', 'Math & Trig', 'Statistical', 'Lookup & Reference', 'Database', 'Text', 'Logical', 'Information', 'Engineering', 'Compatibility', 'Web'];
 
 /** Excel's Most Recently Used list as it stands before anything is picked. */
 export const DEFAULT_RECENT = ['SUM', 'AVERAGE', 'IF', 'HYPERLINK', 'COUNT', 'MAX', 'SIN', 'SUMIF', 'PMT', 'STDEV'];

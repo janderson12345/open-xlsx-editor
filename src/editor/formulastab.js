@@ -17,7 +17,7 @@ export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'a
   const auto = (f) => () => act('autoSum', f);
   // (More Functions: its categories, each opening its functions in the same place.)
   let more = null;
-  const moreItems = () => ['Statistical', 'Engineering', 'Information', 'Compatibility'].map((c) =>
+  const moreItems = () => ['Statistical', 'Engineering', 'Information', 'Compatibility', 'Web'].map((c) =>
     item(`${c} ▸`, () => setTimeout(() => {
       openMenu(more, () => [...category(c)(), el('hr'), item('Insert Function...', () => act('insertFunction'))]);
       pop.querySelector('button')?.focus();

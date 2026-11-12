@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1822 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1870 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1822 of 1822 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1870 of 1870 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -424,6 +424,20 @@ test/cellinfo.test.js, 33 cases in the probe):
 - **INFO**: "numfile" the workbook's sheets, "origin" $A:$A$1, "osversion" Windows (64-bit) NT 10.00, "recalc"
   Automatic or Manual, "release" 16.0, "system" pcdos; "memavail", "memused" and "totmem" #N/A; another #VALUE!.
 
+## ENCODEURL, BAHTTEXT and PHONETIC
+
+Measured in Excel 365 in English, 51 cases (`src/calc/functions-words.js`; 48 in the probe):
+
+- **ENCODEURL**: the text as UTF-8, each byte but a letter, a digit, - _ and . as %XX in capitals; ~ is encoded too
+  (%7E), unlike JavaScript's encodeURIComponent. Written to the file as _xlfn.ENCODEURL.
+- **BAHTTEXT**: the number in Thai words, rounded to satang as ROUND does (1.005 is one baht one satang); บาทถ้วน when no
+  satang, only สตางค์ when no baht, ลบ before a negative. A 1 in the units place after a higher digit is เอ็ด (11, 101,
+  1,000,001), 2 in the tens ยี่สิบ, 1 in the tens สิบ; past a million the groups repeat with ล้าน (1E+15 is a thousand
+  million million).
+- **PHONETIC**: #N/A. Excel 365 in English gives #N/A for every cell, even one whose text has a phonetic reading saved
+  in the file (the reading is shown only with an East Asian editing language). Excel refuses =PHONETIC("abc") as typed;
+  here it is #VALUE!.
+
 ## Not yet
 
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
@@ -437,7 +451,7 @@ test/cellinfo.test.js, 33 cases in the probe):
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
 - **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
-  units) as 2 in a workbook such as this editor writes (the probe's, 1822 of 1822 as Excel), but as 1 in a workbook it
+  units) as 2 in a workbook such as this editor writes (the probe's, 1870 of 1870 as Excel), but as 1 in a workbook it
   made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
   fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;

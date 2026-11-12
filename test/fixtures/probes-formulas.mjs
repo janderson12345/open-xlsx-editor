@@ -504,6 +504,14 @@ export const PROBE_FORMULAS = [
   'CELL("format",Data!D2)', 'CELL("format",Data!E2)', 'CELL("color",Data!B2)', 'CELL("parentheses",Data!B2)', 'INDEX(CELL("width",Data!A1),1)',
   'INDEX(CELL("width",Data!A1),2)', 'INDEX(CELL("width",Data!Q1),1)', 'CELL("ADDRESS",B2)', 'CELL("bogus",B2)', 'CELL(1,B2)', 'INFO("release")',
   'INFO("system")', 'INFO("recalc")', 'INFO("numfile")', 'INFO("origin")', 'INFO("bogus")', 'INFO("memavail")',
+  'ENCODEURL("a b&c=d/e?f#g")', 'ENCODEURL("AZaz09-_.~")', 'ENCODEURL("!*\'();:@+$,[]")', 'ENCODEURL(UNICHAR(233))', 'ENCODEURL(UNICHAR(8364))',
+  'ENCODEURL(UNICHAR(128512))', 'ENCODEURL(12.5)', 'ENCODEURL(TRUE)', 'ENCODEURL("")', 'ENCODEURL("%")', 'ENCODEURL(CHAR(10))', 'ENCODEURL(1/0)',
+  'ENCODEURL("""<>\\^`{|}")', 'LEN(ENCODEURL(REPT("a",3000)))', 'BAHTTEXT(0)', 'BAHTTEXT(1)', 'BAHTTEXT(10)', 'BAHTTEXT(11)', 'BAHTTEXT(20)',
+  'BAHTTEXT(21)', 'BAHTTEXT(101)', 'BAHTTEXT(111)', 'BAHTTEXT(1000)', 'BAHTTEXT(1234)', 'BAHTTEXT(1000000)', 'BAHTTEXT(1000001)',
+  'BAHTTEXT(21000000)', 'BAHTTEXT(1234567.89)', 'BAHTTEXT(0.5)', 'BAHTTEXT(0.01)', 'BAHTTEXT(0.25)', 'BAHTTEXT(1.005)', 'BAHTTEXT(1.995)',
+  'BAHTTEXT(-5)', 'BAHTTEXT(-1.5)', 'BAHTTEXT(100000000)', 'BAHTTEXT(1E+15)', 'BAHTTEXT(11000011)', 'BAHTTEXT(201)', 'BAHTTEXT(1000000000000)',
+  'BAHTTEXT("12")', 'BAHTTEXT("x")', 'BAHTTEXT(0.001)', 'BAHTTEXT(2.5E-7)', 'BAHTTEXT(9.99)', 'PHONETIC(Data!A1)', 'PHONETIC(Data!A1:A3)',
+  'PHONETIC(Data!Z99)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
