@@ -69,3 +69,19 @@ test('View > Gridlines and Headings off as showGridLines="0" and showRowColHeade
   assert.doesNotMatch(viewTag(), /showGridLines|showRowColHeaders/);
   assert.deepEqual([wb.sheet(si).showGridLines, wb.sheet(si).showHeadings], [true, true]);
 });
+
+test('Page Layout > Sheet Options, Print: <printOptions headings="1" gridLines="1"/> before pageMargins, gone when neither, as Excel writes it', async () => {
+  // (Excel, PageSetup.PrintGridlines and PrintHeadings set true then false, saved: the element, then none.)
+  const { setPrintOptions } = await import('../src/ooxml/printopts.js');
+  const { wb, si } = fresh();
+  const xml = () => strFromU8(unzipSync(wb.toBytes())[wb.sheets[si].path]);
+  setPrintOptions(wb, si, { gridLines: true });
+  assert.match(xml(), /<printOptions gridLines="1"\/><pageMargins /);
+  setPrintOptions(wb, si, { headings: true });
+  assert.match(xml(), /<printOptions gridLines="1" headings="1"\/><pageMargins /);
+  const back = Workbook.fromBytes(wb.toBytes()).sheet(si).page;
+  assert.deepEqual([back.gridLines, back.headings], [true, true]);
+  setPrintOptions(wb, si, { gridLines: false, headings: false });
+  assert.doesNotMatch(xml(), /printOptions/);
+  assert.deepEqual([wb.sheet(si).page.gridLines, wb.sheet(si).page.headings], [false, false]);
+});

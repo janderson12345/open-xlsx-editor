@@ -1,10 +1,18 @@
-// The commands on the sheet's view (commands.js shares its state with them): Freeze Panes, Show Formulas, the zoom
-// and View > Show (Gridlines, Formula Bar, Headings). View changes, kept in the file (all but the Formula Bar, which
-// Excel keeps as its own setting, not the workbook's) and not in the undo history, as in Excel.
+// The commands on the sheet's view (commands.js shares its state with them): Freeze Panes, Show Formulas, the zoom,
+// View > Show (Gridlines, Formula Bar, Headings) and Page Layout > Sheet Options' Print boxes. Kept in the file (all but
+// the Formula Bar, which Excel keeps as its own setting, not the workbook's) and not in the undo history.
+import { setPrintOptions } from '../ooxml/printopts.js';
 
 /** The view commands: `env` is createCommands's shared state and helpers. */
 export function viewCommands(env) {
   const { commands, ctx, state, sheet } = env;
+  const printOption = (key, on, what) => {
+    const now = on ?? !sheet().page[key];
+    setPrintOptions(ctx.workbook(), ctx.sheetIndex(), { [key]: now });
+    ctx.changed?.();
+    ctx.announce(`${what} ${now ? '' : 'not '}printed`);
+    return true;
+  };
   return {
     /** Freeze Panes ('panes': above and left of the active cell; again when frozen, Unfreeze Panes, as Excel's menu
      *  turns), Freeze Top Row ('topRow'), Freeze First Column ('firstColumn') or Unfreeze ('none'). A view change, kept
@@ -87,6 +95,10 @@ export function viewCommands(env) {
       ctx.announce(now ? 'Headings shown' : 'Headings hidden');
       return true;
     },
+    /** Page Layout > Sheet Options > Gridlines: Print, and Headings: Print: on, off, or turned over (no argument), on
+     *  the sheet shown; saved as Excel saves them (printopts.js), used when printing. */
+    printGridlines(on) { return printOption('gridLines', on, 'Gridlines'); },
+    printHeadings(on) { return printOption('headings', on, 'Headings'); },
     /** View > Formula Bar: on, off, or turned over (no argument). The editor's, for every sheet; not in the file. */
     showFormulaBar(on) {
       const now = on ?? !ctx.formulaBar();

@@ -22,6 +22,7 @@ import { createFindBar } from './editor/findbar.js';
 import { createWatchWindow } from './editor/watchwindow.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
+import { pageLayoutTab } from './editor/pagelayouttab.js';
 import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
@@ -196,6 +197,7 @@ export function mountXlsxEditor(host, options = {}) {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
+        'Page Layout': (kit) => pageLayoutTab(kit, { act }),
         Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook) }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),

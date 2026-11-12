@@ -43,8 +43,9 @@ editor.setReadOnly(false);              // switch at any time
 editor.setFeatures({ number: true });
 ```
 
-Tab names: `home`, `view` (the other tabs come later). Group names are their labels in lower case with dashes: `undo`,
-`clipboard`, `font`, `alignment`, `number`, `cells`, `editing`; on View, `zoom` and `window`. A group turned off also turns off its keys (`font: false`:
+Tab names: `home`, `insert`, `page-layout`, `formulas`, `data`, `review`, `view`. Group names are their labels in lower
+case with dashes: `undo`, `clipboard`, `font`, `alignment`, `number`, `cells`, `editing`; on Page Layout,
+`sheet-options`; on View, `show`, `zoom` and `window`. A group turned off also turns off its keys (`font: false`:
 Ctrl+B does nothing; `clipboard: false`: Ctrl+C, X and V). F6 moves between the sheet and the ribbon, Esc goes back to the sheet; the ⌃ at the right switches to a
 one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
 

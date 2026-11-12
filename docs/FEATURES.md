@@ -40,7 +40,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Merged cells | Done | Navigation steps over them; merged and unmerged from the Home tab. |
 | Hidden rows and columns | Done | Hidden and shown from the headings' menu, Format, Ctrl+9 and Ctrl+0 (docs/SIZES.md). |
 | Row heights from fonts and wrapping | Done | As Excel works them out (docs/LAYOUT.md). |
-| Gridlines on or off | Shown | From the sheet's view settings. |
+| Gridlines on or off | Done | From the sheet's view settings; switched from View > Show or Page Layout > Sheet Options and saved as Excel saves them (docs/VIEW.md). |
 | Selecting: keys, mouse, Shift, Ctrl+arrow, Ctrl+End | Done | |
 | Selecting whole rows and columns | Done | Headings, Shift+Space, Ctrl+Space, Ctrl+A, the corner. |
 | Selecting several ranges (Ctrl+click) | Partly | Ctrl+click or drag adds a range; formatting, Clear and Data Validation go to each; Copy and Cut refuse, as Excel does when they don't line up (docs/GOTOSPECIAL.md). Other commands act on the last range. |
@@ -111,7 +111,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Comments (`comments`) | Comments and notes | Partly | Shown: Excel's marks, the note or thread beside the cell on hover, read to screen readers; notes written, edited and deleted as Excel writes them (Shift+F2, the cell's menu, Review > Notes; docs/NOTES.md). Threads written as Excel writes them: New Comment (Ctrl+Alt+M), reply, edit, delete a reply or the thread (docs/NOTES.md). |
 | Text (`text`) | Text box, header and footer, symbol | Kept | Headers and footers printed and exported as Excel prints them (docs/PRINT.md); not editable yet. |
 
-## Page Layout (`layout`)
+## Page Layout (`page-layout`)
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
@@ -119,7 +119,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Page Setup (`page-setup`) | Margins, orientation, paper size, page order | Shown | Used when printing. |
 | | Print area, print titles, page breaks | Shown | Used when printing and exporting, as Excel does (docs/PRINT.md); can't be set here yet. |
 | Scale to Fit (`scale-to-fit`) | Width, height, scale | Shown | Used when printing and exporting, rows and columns in whole printer dots as Excel prints them (docs/PRINT.md); can't be set here yet. |
-| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Partly | Gridlines and headings on screen follow the file and are switched from View > Show (saved as Excel saves them; docs/VIEW.md). There's no Page Layout tab yet, so its Print boxes are missing; printing follows the file's. |
+| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Done | Gridlines and Headings, View and Print, saved as Excel saves them (Excel reads them back the same; docs/VIEW.md); Print used when printing and exporting (docs/PRINT.md). |
 
 ## Formulas (`formulas`)
 

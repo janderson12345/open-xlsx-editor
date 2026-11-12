@@ -420,4 +420,14 @@ for (const l of ['Gridlines', 'Formula Bar', 'Headings']) await ribbon(l);
 check(shownBefore === 'true,true,true,true,true,true,true' && shownOff === 'false,false,false,false,false,false,false' && await showState() === shownBefore,
   'View > Show: Gridlines, Formula Bar and Headings off and on again', JSON.stringify({ shownBefore, shownOff }));
 
+// Page Layout > Sheet Options: Print ticked for gridlines and headings (kept for printing), View the same switch as
+// View > Show.
+await page.click('.oxe-rtab >> text="Page Layout"');
+await ribbon('Gridlines: Print'); await ribbon('Headings: Print'); await ribbon('Gridlines: View');
+const sheetOpts = await page.evaluate(() => { const s = window.oxe.workbook.sheet(window.oxe.sheetIndex); return [s.page.gridLines, s.page.headings, s.showGridLines].join(); });
+const printPressed = await page.getAttribute('.oxe-toolbar button[title="Gridlines: Print"]', 'aria-pressed');
+await ribbon('Gridlines: Print'); await ribbon('Headings: Print'); await ribbon('Gridlines: View');
+check(sheetOpts === 'true,true,false' && printPressed === 'true' && await page.evaluate(() => { const s = window.oxe.workbook.sheet(window.oxe.sheetIndex); return [s.page.gridLines, s.page.headings, s.showGridLines].join(); }) === 'false,false,true',
+  'Page Layout > Sheet Options: Print gridlines and headings ticked and unticked; View the gridlines switch', sheetOpts);
+
 await finish();
