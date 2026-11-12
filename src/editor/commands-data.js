@@ -29,8 +29,9 @@ export function dataCommands(env) {
     if (!copy || !area) return runSteps(steps);
     const before = wb.snapshot();
     if (!runSteps(steps)) return false;
-    const notes = parts.notes && clip.pasteNotes(wb, si, area, copy, opts);
-    const rules = parts.validation && !opts.transpose && clip.pasteValidation(wb, si, area, copy);
+    // (A cut: its notes and validation move, clipops.js moveCutParts.)
+    const notes = copy.cut ? clip.moveCutParts(wb, si, area, copy) : parts.notes && clip.pasteNotes(wb, si, area, copy, opts);
+    const rules = !copy.cut && parts.validation && !opts.transpose && clip.pasteValidation(wb, si, area, copy);
     if (!notes && !rules) return true;
     // (The steps' own entry gives way to one for the whole paste, notes and all.)
     state.undo.pop();
@@ -66,7 +67,7 @@ export function dataCommands(env) {
       const si = ctx.sheetIndex();
       const mine = state.clip && (text == null || text === state.clip.text || !text) && (!state.clip.cut || state.clip.wb === wb);
       const steps = mine ? (state.clip.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, state.clip) : text ? clip.pasteText(wb, si, state.sel, text) : null;
-      if (!steps || !withNotes(steps, mine && !state.clip.cut ? state.clip : null)) return false;
+      if (!steps || !withNotes(steps, mine ? state.clip : null)) return false;
       if (mine && state.clip.cut) commands.dropClip();
       const area = steps.find((x) => x.si === si)?.area;
       if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');

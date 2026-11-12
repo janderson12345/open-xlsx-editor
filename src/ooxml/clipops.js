@@ -76,6 +76,24 @@ export function pasteValidation(wb, si, area, clip) {
   return true;
 }
 
+/** A cut pasted at `area` of sheet si: its notes and validation move with its cells, as Excel's do (measured over
+ *  COM): the notes taken from the cells cut and put on the pasted ones (a note pasted over goes), the rules as
+ *  dvedit.js moveValidation moves them (to another sheet: taken off the cut cells and pasted there as a copy's are).
+ *  Changes the workbook; returns whether anything changed. */
+export function moveCutParts(wb, si, area, clip) {
+  let changed = false;
+  for (const x of clip.notes || []) { deleteNote(wb, clip.si, clip.rect.r0 + x.dr, clip.rect.c0 + x.dc); changed = true; }
+  changed = pasteNotes(wb, si, area, clip) || changed;
+  const had = (sheetOf) => (wb.sheet(sheetOf).validations || []).some((v) => v.type !== 'none');
+  if (clip.si === si) {
+    if (had(si)) { wb.moveValidation(si, clip.rect, area.r0 - clip.rect.r0, area.c0 - clip.rect.c0); changed = true; }
+  } else {
+    if (clip.validations?.length) { wb.setValidation(clip.si, [clip.rect], null); changed = true; }
+    changed = pasteValidation(wb, si, area, clip) || changed;
+  }
+  return changed;
+}
+
 /** A note's own text, without the bold author line Excel puts before it. */
 const noteBody = (n) => n.runs.filter((x, k) => !(k === 0 && x.bold)).map((x) => x.text).join('').replace(/^\n/, '');
 

@@ -20,7 +20,7 @@ import { applyAdvancedFilter } from './advfilter.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.js';
-import { setValidation as setValidationXml, addToRule } from './dvedit.js';
+import { setValidation as setValidationXml, addToRule, moveValidation } from './dvedit.js';
 import { addConditional, clearConditional } from './cfedit.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
@@ -321,13 +321,10 @@ export class Workbook {
   }
 
   /** Give cells `ranges` of sheet i the data validation `rule` (dvedit.js), or none (null: Clear All). */
+  /** A cut's validation moved with it on sheet i (dvedit.js moveValidation). */
+  moveValidation(i, rect, dr, dc) { moveValidation(this._part(i).doc, rect, dr, dc); this._reread(i, this._part(i)); }
   /** Cells added to the rule they were copied from (dvedit.js addToRule): false when it isn't there. */
-  addToValidation(i, match, ranges) {
-    const part = this._part(i);
-    if (!addToRule(part.doc, match, ranges)) return false;
-    this._reread(i, part);
-    return true;
-  }
+  addToValidation(i, match, ranges) { return addToRule(this._part(i).doc, match, ranges) && (this._reread(i, this._part(i)), true); }
   setValidation(i, ranges, rule) {
     const part = this._part(i);
     setValidationXml(part.doc, ranges, rule, this.date1904);

@@ -5,6 +5,7 @@
 import { parseInput } from './input.js';
 import { parseRange, rangeName, MAX_ROWS, MAX_COLS } from './refs.js';
 import { parseXml } from './xml.js';
+import { shiftFormula } from '../calc/tokens.js';
 
 /** Excel's names for the box's choices. */
 const TYPES = { any: null, whole: 'whole', decimal: 'decimal', list: 'list', date: 'date', time: 'time', length: 'textLength', custom: 'custom' };
@@ -65,6 +66,43 @@ export function subtract(a, b) {
   return out;
 }
 
+const sqrefOf = (el) => (el.getAttribute('sqref') || '').split(/\s+/).map(parseRange).filter(Boolean);
+
+/** A rule whose first cell moved from `was` to `now` (its sqref changed): its formulas, written for its first cell,
+ *  shifted so that each cell's still means the same, as Excel rewrote C2:C4's =C2>B2 as =C4>B4 when C2:C3 were cut. */
+function rebase(el, was, now) {
+  if (!was || !now || (was.r0 === now.r0 && was.c0 === now.c0)) return;
+  for (const f of [...el.childNodes].filter((n) => n.localName === 'formula1' || n.localName === 'formula2')) f.textContent = shiftFormula(f.textContent, now.r0 - was.r0, now.c0 - was.c0);
+}
+
+/** The rules' count written, the list gone once empty. */
+function recount(wrap) {
+  if (!wrap) return;
+  const n = [...wrap.childNodes].filter((x) => x.localName === 'dataValidation').length;
+  if (n) wrap.setAttribute('count', String(n)); else wrap.parentNode.removeChild(wrap);
+}
+
+/** A cut of `rect` moved `dr` rows and `dc` columns on its sheet, as Excel moves validation with it (measured over
+ *  COM): each rule's cells there go with them, after its other cells (C2:C4 with C2:C3 cut to F5: C4 F5:F6); the cells
+ *  pasted over leave the rules they were in; a rule left with none goes; formulas rebased. Edits `doc`. */
+export function moveValidation(doc, rect, dr, dc) {
+  const root = doc.documentElement;
+  const wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
+  if (!wrap) return;
+  const area = { r0: rect.r0 + dr, c0: rect.c0 + dc, r1: rect.r1 + dr, c1: rect.c1 + dc };
+  const meet = (a, b) => (a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1 ? { r0: Math.max(a.r0, b.r0), c0: Math.max(a.c0, b.c0), r1: Math.min(a.r1, b.r1), c1: Math.min(a.c1, b.c1) } : null);
+  for (const el of [...wrap.childNodes].filter((n) => n.localName === 'dataValidation')) {
+    const was = sqrefOf(el);
+    const stay = was.flatMap((p) => subtract(p, rect)).flatMap((p) => subtract(p, area));
+    const moved = coalesce(was.map((p) => meet(p, rect)).filter(Boolean).map((p) => ({ r0: p.r0 + dr, c0: p.c0 + dc, r1: p.r1 + dr, c1: p.c1 + dc })));
+    const now = [...stay, ...moved];
+    if (!now.length) { wrap.removeChild(el); continue; }
+    el.setAttribute('sqref', now.map(rangeName).join(' '));
+    rebase(el, was[0], now[0]);
+  }
+  recount(wrap);
+}
+
 /**
  * Give sheet si's cells `ranges` the validation `rule` (null: Clear All), as Excel's box does. Edits the sheet's XML
  * (`doc`); the caller reads the sheet again.
@@ -76,10 +114,11 @@ export function setValidation(doc, ranges, rule, date1904 = false) {
   let wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
   // The selection's cells out of the rules they were in; a rule left with none goes.
   for (const el of wrap ? [...wrap.childNodes].filter((n) => n.localName === 'dataValidation') : []) {
-    let parts = (el.getAttribute('sqref') || '').split(/\s+/).map(parseRange).filter(Boolean);
+    const was = sqrefOf(el);
+    let parts = was;
     for (const s of sel) parts = parts.flatMap((p) => subtract(p, s));
     if (!parts.length) wrap.removeChild(el);
-    else el.setAttribute('sqref', parts.map(rangeName).join(' '));
+    else { el.setAttribute('sqref', parts.map(rangeName).join(' ')); rebase(el, was[0], parts[0]); }
   }
   if (rule) {
     if (!wrap) {
@@ -93,10 +132,7 @@ export function setValidation(doc, ranges, rule, date1904 = false) {
     const frag = parseXml(`<w xmlns${root.prefix ? `:${root.prefix}` : ''}="${ns}">${xml}</w>`).documentElement.firstChild;
     wrap.appendChild(doc.importNode(frag, true));
   }
-  if (wrap) {
-    const n = [...wrap.childNodes].filter((x) => x.localName === 'dataValidation').length;
-    if (n) wrap.setAttribute('count', String(n)); else wrap.parentNode.removeChild(wrap);
-  }
+  recount(wrap);
 }
 
 /** Ranges joined where one carries on another, as Excel writes a rule's sqref after a paste: below it with the same

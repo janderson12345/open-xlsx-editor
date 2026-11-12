@@ -64,3 +64,27 @@ test("a paste's validation as Excel's: the copy's rules over the pasted cells, j
   const there = [...serializeXml(wb._part(other).doc).matchAll(/sqref="([^"]+)"[^>]*><formula1>([^<]*)/g)].map((m) => `${m[1]} | ${m[2]}`);
   assert.deepEqual(there, ['I5:I6 | I5&gt;H5', 'H5:H6 | $A$1:$A$3']);
 });
+
+test("a cut's notes and validation move with its cells, as Excel's (B2:C3 cut to E5: the note to E5, F6's gone; C2:C4's rule C4 F5:F6, =C4>B4; E5's rule gone)", async () => {
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const { moveCutParts } = await import('../src/ooxml/clipops.js');
+  const { wb, si } = book();
+  wb.setValidation(si, [{ r0: 1, c0: 2, r1: 3, c1: 2 }], { type: 'custom', f1: '=C2>B2' });
+  wb.setValidation(si, [{ r0: 4, c0: 4, r1: 4, c1: 4 }], { type: 'whole', op: 'between', f1: '0', f2: '9' });
+  // (E5's own note and value aside: Excel's case had F6's note and E5's rule.)
+  const cut = snapshot(wb, si, { ar: 1, ac: 1, r0: 1, c0: 1, r1: 2, c1: 2 }, true);
+  assert.equal(moveCutParts(wb, si, { r0: 4, c0: 4, r1: 5, c1: 5 }, cut), true);
+  const notes = notesOf(wb, si);
+  assert.deepEqual(Object.keys(notes).sort(), ['4,4']);
+  assert.match(notes['4,4'], /note on b2$/);
+  const rules = [...serializeXml(wb._part(si).doc).matchAll(/sqref="([^"]+)"[^>]*><formula1>([^<]*)/g)].map((m) => `${m[1]} | ${m[2]}`);
+  assert.deepEqual(rules, ['C4 F5:F6 | C4&gt;B4']);
+});
+
+test('cells taken out of a rule rebase its formulas when its first cell changes, as Excel does', () => {
+  const { wb, si } = book();
+  wb.setValidation(si, [{ r0: 1, c0: 2, r1: 3, c1: 2 }], { type: 'custom', f1: '=C2>B2' });
+  wb.setValidation(si, [{ r0: 1, c0: 2, r1: 2, c1: 2 }], null);
+  const v = wb.sheet(si).validations[0];
+  assert.deepEqual([v.ranges.map((a) => `${a.r0},${a.c0}`), v.formulas], [['3,2'], ['C4>B4']]);
+});

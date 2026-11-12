@@ -153,5 +153,20 @@ const hasValidation = await page.isVisible('dialog.oxe-dialog >> label:text-is("
 await page.keyboard.press('Escape');
 await page.keyboard.press('Escape');
 check(ruleRanges === '2' && hasValidation, 'a cell with validation copied: Ctrl+V adds the pasted cell to its rule; Paste Special has Validation', JSON.stringify({ ruleRanges, hasValidation }));
+// F4's note cut and pasted at H4 (Ctrl+X, Ctrl+V): the note moves with the cell, as Excel's does; Ctrl+Z puts it back.
+const noteRefs = () => page.evaluate(() => {
+  const wb = window.oxe.workbook;
+  const rel = wb.pkg.readRels(wb.sheets[window.oxe.sheetIndex].path).find((r) => /\/comments$/.test(r.type));
+  return rel ? [...wb.pkg.text(rel.target).matchAll(/<comment ref="([A-Z]+\d+)"/g)].map((m) => m[1]).sort().join() : '';
+});
+const refsBefore = await noteRefs();
+await page.evaluate(() => window.oxe.select('F4'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+x');
+await page.evaluate(() => window.oxe.select('H4'));
+await page.keyboard.press('Control+v');
+const refsMoved = await noteRefs();
+await page.keyboard.press('Control+z');
+check(refsBefore === 'B2,F4' && refsMoved === 'B2,H4' && await noteRefs() === 'B2,F4', 'a note cut and pasted moves with its cell; Ctrl+Z puts it back', JSON.stringify({ refsBefore, refsMoved }));
 
 await finish();
