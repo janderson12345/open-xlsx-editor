@@ -392,6 +392,8 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
+- **A function Excel doesn't know** (=foo(1), #NAME?) is written in capitals here, FOO(1); Excel keeps it as typed.
+  (Telling it from a function Excel has but this editor hasn't needs Excel's whole list.)
 - **The range operator and intersection in Evaluate Formula** are one step each, as a reference is (=SUM(A1:INDEX(A:A,3))
   goes straight to its sum); Excel's steps there aren't measured.
 - **Iterative calculation: what isn't yet as Excel.** No on-screen switch for it (Excel's File > Options > Formulas):

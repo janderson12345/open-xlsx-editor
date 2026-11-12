@@ -19,7 +19,8 @@ Excel 365's dynamic array formulas: a formula whose answer is an array spills it
 - A LAMBDA kept in a defined name (Excel saves it as `_xlfn.LAMBDA(_xlpm.x,_xlpm.x*2)`, measured), as Excel 365 calls
   it: =Twice(21) is 42, =WithRate(100) reads the names its LAMBDA reads, =Twice({1,2,3}) spills 2, 4, 6,
   =MAP({1,2},Twice) passes it on, the wrong number of arguments is #VALUE!, =Twice alone #CALC!; a function of the same
-  name comes first (=Fact(5) is FACT's). Ten such formulas in the probe, all as Excel's.
+  name comes first (=Fact(5) is FACT's); typed in another case it is written as the name is (=twice(5) is
+  Twice(5), measured). Ten such formulas in the probe, all as Excel's.
 - Formulas in workbooks saved by older versions of Excel keep their old meaning: `=A1:A3` there is one value, A1:A3
   cut to the formula's row (Excel 365 shows it as `=@A1:A3`, and so does the formula bar here).
 
@@ -94,8 +95,6 @@ formula probe:
 - The blue outline Excel draws round a spill when its cell is selected.
 - (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array functions, MAP, REDUCE, SCAN, BYROW, BYCOL,
   MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF, RANDARRAY and TRIMRANGE are here, in the formula probe.)
-- A defined LAMBDA called with a name typed in another case (=twice(5)) is saved as TWICE(5); Excel writes it as the
-  name is (Twice(5)). Both work out the same, in both programs.
 - `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an
   old formula's operator cuts to one value (`=@A1:A3*2`).
 - A LAMBDA called where it is written is saved as a plain formula when its answer is one value; Excel saves it as a

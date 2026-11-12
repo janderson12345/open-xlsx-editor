@@ -125,3 +125,13 @@ test('trim references as Excel 365 saves them (measured): _TRO_ in the file, the
   }
   assert.equal(normalizeFormula('trimrange(a1:e8)'), '_xlfn.TRIMRANGE(A1:E8)');
 });
+
+test('a defined LAMBDA called in another case is written as the name is, as Excel writes it (measured)', () => {
+  // (Excel: =twice(5) and =TWICE(5)+sum(1) are Twice(5) and Twice(5)+SUM(1); both work out 10 and 11.)
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/formulas.xlsx')));
+  const si = wb.sheetIndexOf('Calc');
+  const typed = (text) => entryChanges(wb, si, 3000, 1, text).content.formula;
+  assert.deepEqual([typed('=twice(5)'), typed('=TWICE(5)+sum(1)'), typed('=hyp(3,4)')], ['Twice(5)', 'Twice(5)+SUM(1)', 'Hyp(3,4)']);
+  wb.apply(si, [entryChanges(wb, si, 3000, 1, '=twice(5)').content]);
+  assert.equal(wb.sheet(si).cells.get(3000).get(1).v, 10);
+});
