@@ -126,14 +126,26 @@ function passwordFits(el, password, pre = '') {
   return true;
 }
 
-/** Whether cell (r, c) of sheet si is locked by its format (its own, else its row's or column's; Excel's default
- *  locked). */
-export function isLocked(wb, si, r, c) {
+/** Cell (r, c) of sheet si's protection by its format (its own, else its row's or column's): { locked (Excel's
+ *  default), hidden }. */
+function cellProtection(wb, si, r, c) {
   const sh = wb.sheet(si);
   const cell = sh.cells.get(r)?.get(c);
   let s = cell?.s;
   if (s == null) s = sh.rows.get(r)?.s ?? sh.cols.find((x) => c + 1 >= x.min && c + 1 <= x.max)?.style ?? 0;
-  return xfOf(wb.styles, s || 0).protection.locked;
+  return xfOf(wb.styles, s || 0).protection;
+}
+
+/** Whether cell (r, c) of sheet si is locked by its format. */
+export function isLocked(wb, si, r, c) {
+  return cellProtection(wb, si, r, c).locked;
+}
+
+/** Whether cell (r, c)'s contents are hidden: its format's Hidden (Format Cells > Protection) on a protected sheet.
+ *  Then Excel's formula bar shows nothing, Show Formulas shows a formula as nothing (a constant as itself), and
+ *  FORMULATEXT gives #N/A (measured). */
+export function contentsHidden(wb, si, r, c) {
+  return !!sheetProtection(wb, si) && cellProtection(wb, si, r, c).hidden;
 }
 
 /** Why a change to sheet si can't be made while it is protected (Excel's words), or null: `kind` is 'contents' (the

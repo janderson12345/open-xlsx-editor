@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { serializeXml } from '../src/ooxml/xml.js';
-import { protectSheet, unprotectSheet, sheetProtection, hashPassword, legacyHash, isLocked, protectionRefusal, ALLOWS, PROTECTED_MESSAGE } from '../src/ooxml/protection.js';
+import { protectSheet, unprotectSheet, sheetProtection, hashPassword, legacyHash, isLocked, contentsHidden, protectionRefusal, ALLOWS, PROTECTED_MESSAGE } from '../src/ooxml/protection.js';
 
 // (Excel 365 over COM, Worksheet.Protect, and the files it saved.)
 const book = () => {
@@ -74,4 +74,23 @@ test("Protect Workbook as Excel writes it: lockStructure after workbookPr, a pas
   assert.equal(bookXml(), '<workbookProtection workbookAlgorithmName="SHA-512" workbookHashValue="sUffArRvIURjtltfgW9wuWsC9Enu4hxFjTYvicGzBurOdgjJ0RsE7j8rKwOeZVm+ZmYHzSCi2MT98rcx/ycNZA==" workbookSaltValue="6W35o+lTpIfbd6JEUtRfEw==" workbookSpinCount="100000" lockStructure="1"/>');
   assert.equal(unprotectWorkbook(wb, 'wrong'), false);
   assert.equal(unprotectWorkbook(wb, 'Test-pass 1'), true);
+});
+
+test("a hidden cell of a protected sheet: FORMULATEXT gives #N/A, ISFORMULA still TRUE (Excel's, measured)", () => {
+  const { wb, si } = book();
+  wb.setFormula(si, 'A2', '1+2');
+  wb.setFormula(si, 'A3', '3*4');
+  const hidden = wb.styleWith(0, { protection: { hidden: true } });
+  wb.setStyles(si, [{ r: 1, c: 0, s: hidden }]);
+  const at = (f) => wb.calc.formulaAt(si, 40, 0, f);
+  assert.equal(at('FORMULATEXT(A2)'), '=1+2');
+  assert.equal(contentsHidden(wb, si, 1, 0), false);
+  protectSheet(wb, si);
+  assert.equal(contentsHidden(wb, si, 1, 0), true);
+  assert.equal(contentsHidden(wb, si, 2, 0), false);
+  assert.equal(at('FORMULATEXT(A2)').code, '#N/A');
+  assert.equal(at('ISFORMULA(A2)'), true);
+  assert.equal(at('FORMULATEXT(A3)'), '=3*4');
+  unprotectSheet(wb, si);
+  assert.equal(at('FORMULATEXT(A2)'), '=1+2');
 });

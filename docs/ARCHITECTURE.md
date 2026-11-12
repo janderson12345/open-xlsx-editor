@@ -155,7 +155,7 @@ insides:
 |---|---|
 | `test/fixtures/make-fixtures.mjs` | Generates the test workbooks (deterministic zips). CI checks the committed files match. |
 | `test/*.test.js` | Unit tests in Node (`npm test`): round trips byte for byte, edits, units, references, geometry, the checker, every formula of formulas.xlsx against Excel's results (`test/formulas-excel.json`). |
-| `test/e2e.mjs`, `test/editing.mjs` (with `editing-data.mjs`, `editing-more.mjs` and their shared `editing-kit.mjs`), `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; editing by keys and mouse, undo, read-only, the saved file read back; axe in light and dark at 1280 and 320px. All assert standards mode. |
+| `test/e2e.mjs`, `test/editing.mjs` (with `editing-data.mjs`, `editing-more.mjs`, `editing-protect.mjs` and their shared `editing-kit.mjs`), `test/a11y.mjs` | Browser suites (`npm run test:e2e`): each fixture opened, scrolled, saved; editing by keys and mouse, undo, read-only, the saved file read back; axe in light and dark at 1280 and 320px. All assert standards mode. |
 | `tools/check-ooxml.mjs` | Structural check of .xlsx files (what makes Excel offer a repair). |
 | `tools/excel-compare/` | Comparison with Excel's own PDFs and values: `excel-print.ps1` (Excel through COM, read-only), `excel-values.ps1` (Excel's results of a workbook's formulas, COM, read-only), `print-ours.mjs` (the editor in Edge), `cells.cjs` (cell text and positions), `shapes.cjs` (filled rectangles and lines), `compare.py`, `compare-shapes.py`, `diff.py`, `run.ps1`. See its README. |
 | `tools/scan-bytes.mjs` | Control characters and byte order marks in source text (part of `npm run lint`). |

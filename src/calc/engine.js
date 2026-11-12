@@ -10,6 +10,7 @@ import { runWithCircles } from './iterate.js';
 import { cellInfo } from './cellinfo.js';
 import { pivotData } from '../ooxml/pivotdata.js';
 import { calcMode } from '../ooxml/calcmode.js';
+import { contentsHidden } from '../ooxml/protection.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
 /** References wider than this many columns are checked against every change instead of being indexed by column. */
@@ -300,6 +301,8 @@ export class Calc {
       // (For SUBTOTAL: a cell's own formula, and whether its row is hidden.)
       formulaOf: (si, r, c) => book.sheet(si).cells.get(r)?.get(c)?.f || null,
       rowHidden: (si, r) => !!book.sheet(si).rows.get(r)?.hidden,
+      // (FORMULATEXT: none from a hidden cell of a protected sheet.)
+      formulaShown: (si, r, c) => (book._part && contentsHidden(book, si, r, c) ? null : book.sheet(si).cells.get(r)?.get(c)?.f || null),
       name: (name, mode) => {
         const t = this.nameTree(name, e.si);
         return t ? evaluate(t, ctx, mode) : E.name;

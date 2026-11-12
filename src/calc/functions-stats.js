@@ -251,7 +251,13 @@ def('MULTINOMIAL', (a, ctx) => {
 
 const cellOf = (v) => { if (!(v instanceof Area)) throw E.value; return v; };
 def('ISFORMULA', (a, ctx) => { const r = cellOf(a[0]); return !!ctx.formulaOf(r.si, r.r0, r.c0); });
-def('FORMULATEXT', (a, ctx) => { const r = cellOf(a[0]); const f = ctx.formulaOf(r.si, r.r0, r.c0); if (!f) throw E.na; return `=${displayFormula(f)}`; });
+// (Volatile, as Excel's ca="1" has it: protecting a sheet can hide the formula, as the next calculation shows.)
+def('FORMULATEXT', (a, ctx) => {
+  const r = cellOf(a[0]);
+  const f = (ctx.formulaShown || ctx.formulaOf)(r.si, r.r0, r.c0);
+  if (!f) throw E.na;
+  return `=${displayFormula(f)}`;
+}, { volatile: true });
 def('SHEET', (a, ctx) => {
   if (!given(a[0])) return ctx.here.si + 1;
   if (a[0] instanceof Area) return a[0].si + 1;

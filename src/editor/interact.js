@@ -15,6 +15,7 @@ import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
 import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
+import { contentsHidden } from '../ooxml/protection.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -141,8 +142,9 @@ export function attachEditing(root, ctx) {
   }
   /** A cell's text as Excel's formula bar has it (a date as a date, a percentage as one). */
   // (An old formula with the @s Excel 365 shows where it cuts a range to one value, at its cell: calc/legacyat.js.)
-  const barText = (cell, r, c) => editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
-    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown));
+  // (A hidden cell of a protected sheet shows nothing there, as in Excel: ooxml/protection.js contentsHidden.)
+  const barText = (cell, r, c) => (contentsHidden(ctx.workbook(), ctx.sheetIndex(), r, c) ? '' : editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
+    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown)));
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
     bar.show(refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac), s.ar, s.ac));

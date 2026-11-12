@@ -55,7 +55,8 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
   // (Show Formulas: what the cell holds, unformatted, as Excel shows it: =A1*2, 1234.5 for 1,234.50, 45292 for a date,
   // 0.25 for 25%, 007 for '007.)
-  const held = formulas ? editText(cell, 'General') : null;
+  // (A hidden formula of a protected sheet shows as nothing, a hidden constant as itself: st.hiddenAt, measured.)
+  const held = formulas ? (cell.f != null && st.hiddenAt?.(r, c) ? '' : editText(cell, 'General')) : null;
   const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, MDW), look ? look.code : 'General', st.date1904);
   // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
   const h = shown.hashes ? 'center' : (shown.textFormat || (formulas && cell.f != null)) && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);

@@ -13,7 +13,7 @@ import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, passwordBox } from './editor/dialogs.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { readNotes } from './ooxml/notes.js';
-import { sheetProtection, workbookProtection } from './ooxml/protection.js';
+import { sheetProtection, workbookProtection, contentsHidden } from './ooxml/protection.js';
 import { conditionalLooks } from './ooxml/condformat.js';
 import { errorFlags } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
@@ -181,9 +181,12 @@ export function mountXlsxEditor(host, options = {}) {
     if (needsCalculation(state.workbook)) parts.unshift('Calculate');
     state.tabs.status(parts.join('    '));
   };
+  /** The workbook's cell formats as the grid draws them (cellstyles.js), and which cells of the sheet shown are
+   *  hidden by its protection (ooxml/protection.js contentsHidden). */
+  const looksOf = (wb) => ({ ...applyCellStyles(root, wb), hiddenAt: (r, c) => contentsHidden(wb, state.sheetIndex, r, c) });
   /** The workbook has new cell formats: their CSS again, and the grid drawn with them. */
   const restyled = () => {
-    state.looks = applyCellStyles(root, state.workbook);
+    state.looks = looksOf(state.workbook);
     state.grid.setLooks(state.looks);
   };
   const placeRibbon = () => {
@@ -271,7 +274,7 @@ export function mountXlsxEditor(host, options = {}) {
       state.workbook = wb;
       state.sheetIndex = i;
       state.fileName = fileName;
-      state.looks = applyCellStyles(root, wb);
+      state.looks = looksOf(wb);
       if (state.grid) { state.grid.setSheet(sheet, wb.sheets[i].name, state.looks); state.grid.setNotes(readNotes(wb, i)); showConditional(); }
       else {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });

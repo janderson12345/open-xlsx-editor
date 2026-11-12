@@ -3,7 +3,7 @@
 Review > Protect Sheet and Unprotect Sheet (`src/ooxml/protection.js`, `src/editor/protectbox.js`), the changes a
 protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel was seen to do. Measured over COM:
 `Worksheet.Protect` with each of its options and a password, `Unprotect`, and the files Excel saved
-(test/protection.test.js). A file protected here opens in Excel protected the same way, its password working there.
+(test/protection.test.js; in the browser, test/editing-protect.mjs). A file protected here opens in Excel protected the same way, its password working there.
 
 ## In the editor
 
@@ -19,6 +19,11 @@ protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel 
 - Formatting cells, column widths and row heights (hiding too), inserting and deleting rows and columns (and cells),
   sorting and filtering are refused unless the box allowed them; turning the filter on or off is refused while the
   sheet is protected. Sorting also needs the cells unlocked, as in Excel.
+- A cell whose format has Hidden (Format Cells > Protection) shows nothing in the formula bar while the sheet is
+  protected, a formula or a constant. With Show Formulas its formula shows as nothing (a hidden constant still shows
+  itself), and FORMULATEXT of it gives #N/A while ISFORMULA still gives TRUE. Measured over COM: `Range.Formula` gives
+  "" for both, `Range.Text` with `DisplayFormulas` gives "" for the formula and the text for the constant, FORMULATEXT
+  #N/A after the next calculation (Excel writes it `ca="1"`, so it is volatile here). Unprotected, all shows again.
 - Protecting and unprotecting aren't steps of Undo.
 
 ## Protect Workbook
@@ -58,4 +63,6 @@ Files from before Excel 2013 keep a 16-bit hash in `password`; it is read (test:
 - Selecting: Select locked cells and Select unlocked cells are written and kept but not enforced (every cell can be
   selected). Insert hyperlinks, PivotTables, objects (notes, charts, pictures) and scenarios aren't enforced either.
 - Excel refuses as soon as a locked cell is typed into; here the entry is refused when it is entered.
-- Allow Edit Ranges (`protectedRanges`), and a cell's Hidden (its formula not shown in the formula bar while the sheet is protected).
+- Allow Edit Ranges (`protectedRanges`).
+- F2 on a hidden unlocked cell starts from nothing, as the formula bar shows; what Excel's own edit starts from wasn't
+  measurable over COM.
