@@ -299,6 +299,17 @@ const oneLeft = await threadNow();
 await page.click(`${box} >> button:text-is("Close")`);
 await page.keyboard.press('Control+z');
 check(oneLeft === 'Check these totals' && await threadNow() === 'Check these totals | Done, checked', 'the reply deleted; Ctrl+Z brings it back', `${oneLeft} / ${await threadNow()}`);
+// Resolve thread: done="1" on its first comment, as Excel writes it; the box then has Reopen and no reply; reopened.
+const doneNow = () => page.evaluate(() => { const wb = window.oxe.workbook; const rel = wb.pkg.readRels(wb.sheets[window.oxe.sheetIndex].path).find((r) => /threadedComment$/.test(r.type)); return (wb.pkg.text(rel.target).match(/done="1"/g) || []).length; });
+await page.keyboard.press('Control+Alt+m');
+await page.click(`${box} >> button:text-is("Resolve thread")`);
+await page.waitForSelector(`${box} >> button:text-is("Reopen")`);
+const resolved = { done: await doneNow(), title: await page.textContent(`${box} h2`), reply: await page.isVisible(`${box} > textarea`) };
+await page.click(`${box} >> button:text-is("Reopen")`);
+await page.waitForSelector(`${box} >> button:text-is("Resolve thread")`);
+const reopened = await doneNow();
+await page.click(`${box} >> button:text-is("Close")`);
+check(resolved.done === 1 && /\(Resolved\)/.test(resolved.title) && !resolved.reply && reopened === 0, 'Resolve thread: done="1" as Excel writes it, Reopen and no reply; reopened', JSON.stringify({ resolved, reopened }));
 
 // Conditional formatting on a new sheet's numbers 1 to 5: a blue data bar from the menu (drawn: the largest bar the
 // widest), an icon set (5's icon the top one), New Rule's formula rule, and the Rules Manager deleting the data bar.

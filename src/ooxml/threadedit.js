@@ -144,6 +144,8 @@ export function replyThread(wb, si, r, c, text, author = 'Author', { when = new 
   const path = relOf(pkg, wb.sheets[si].path, THREADED)?.target;
   const items = path ? threadAt(pkg.text(path), ref) : [];
   if (!items.length) throw new Error('No comment on this cell to reply to.');
+  // (A resolved thread takes no reply until it is reopened: Excel's AddReply on one left the file without it.)
+  if (/\sdone="1"/.test(items[0].el.slice(0, items[0].el.indexOf('>')))) return null;
   // (Excel orders replies of the same time by id, and numbers each reply after the first from the one before:
   // {EFE96F7A-5C52-4835-...} then {EFE96F7A-5C52-4836-...}.)
   const prev = items.length > 1 ? items.at(-1).id : null;
@@ -171,5 +173,20 @@ export function editThread(wb, si, r, c, k, text) {
   pkg.setText(path, pkg.text(path).replace(item.el, () => next));
   const left = text == null ? items.filter((_, i) => i !== k) : items.map((x, i) => (i === k ? { ...x, text } : x));
   writePlaceholder(wb, si, r, c, items[0], left);
+  wb.edited = true;
+}
+
+/** The thread on cell (r, c) of sheet si resolved (`on`) or reopened: done="1" on its first comment, after its id, as
+ *  Excel writes it (measured over COM: CommentThreaded.Resolved). */
+export function resolveThread(wb, si, r, c, on = true) {
+  const pkg = wb.pkg;
+  const ref = refName(r, c);
+  const path = relOf(pkg, wb.sheets[si].path, THREADED)?.target;
+  const items = path ? threadAt(pkg.text(path), ref) : [];
+  if (!items.length) throw new Error('No comment on this cell.');
+  const top = items[0].el;
+  const start = top.slice(0, top.indexOf('>')).replace(/\sdone="[^"]*"/, '');
+  const next = (on ? `${start} done="1"` : start) + top.slice(top.indexOf('>'));
+  pkg.setText(path, pkg.text(path).replace(top, () => next));
   wb.edited = true;
 }

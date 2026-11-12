@@ -1663,6 +1663,10 @@
 .oxe-note-mark.oxe-thread-mark {
   border-top-color: #9c27b0;
 }
+/* A resolved thread's mark: grey (threadbox.js Resolve thread). */
+.oxe-note-mark.oxe-thread-mark.oxe-thread-done {
+  border-top-color: #8a8a8a;
+}
 .oxe-note-box {
   position: absolute;
   left: var(--oxe-x);

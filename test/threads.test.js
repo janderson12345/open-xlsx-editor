@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { strFromU8, unzipSync } from 'fflate';
 import { spawnSync } from 'node:child_process';
 import { Workbook } from '../src/ooxml/workbook.js';
-import { addThread, replyThread, editThread } from '../src/ooxml/threadedit.js';
+import { addThread, replyThread, editThread, resolveThread } from '../src/ooxml/threadedit.js';
 import { deleteNote } from '../src/ooxml/noteedit.js';
 import { readNotes } from '../src/ooxml/notes.js';
 
@@ -79,4 +79,22 @@ test("Excel's reading of the threads written here: cells, authors, texts and rep
   ]);
   // (Excel 365 shows the threads, not their placeholder notes.)
   assert.equal(back.legacyComments, 0);
+});
+
+test('a thread resolved as Excel writes it: done="1" on its first comment, after its id; no reply until reopened (measured over COM)', () => {
+  const wb = open();
+  const when = new Date(Date.UTC(2026, 10, 12, 21, 14, 35));
+  addThread(wb, 0, 1, 1, 'first', AUTHOR, { when });
+  replyThread(wb, 0, 1, 1, 'a reply', AUTHOR, { when });
+  resolveThread(wb, 0, 1, 1, true);
+  const part = () => { const p = Object.keys(wb.pkg.files).find((k) => k.startsWith('xl/threadedComments/')); return wb.pkg.text(p); };
+  assert.match(part(), /<threadedComment ref="B2" dT="[^"]+" personId="[^"]+" id="\{[0-9A-F-]+\}" done="1"><text>first<\/text>/);
+  assert.doesNotMatch(part().replace(/^[\s\S]*?done="1"/, ''), /done=/);
+  assert.equal(readNotes(wb, 0).get('1,1').resolved, true);
+  assert.equal(replyThread(wb, 0, 1, 1, 'reply on resolved', AUTHOR, { when }), null);
+  assert.doesNotMatch(part(), /reply on resolved/);
+  resolveThread(wb, 0, 1, 1, false);
+  assert.doesNotMatch(part(), /done=/);
+  assert.equal(readNotes(wb, 0).get('1,1').resolved, false);
+  assert.ok(replyThread(wb, 0, 1, 1, 'after reopening', AUTHOR, { when }));
 });

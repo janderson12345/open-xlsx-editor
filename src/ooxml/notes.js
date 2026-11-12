@@ -31,14 +31,15 @@ export function readNotes(wb, i) {
   const threadDoc = threadPart && wb.pkg.xml(threadPart);
   if (threadDoc) {
     const all = kids(threadDoc.documentElement, 'threadedComment', TC_NS).map((el) => ({
-      ref: attr(el, 'ref', null), id: attr(el, 'id', null), parent: attr(el, 'parentId', null),
+      ref: attr(el, 'ref', null), id: attr(el, 'id', null), parent: attr(el, 'parentId', null), done: attr(el, 'done', null) === '1',
       author: people.get(attr(el, 'personId', null)) || '', date: attr(el, 'dT', null) || '', text: kid(el, 'text', TC_NS)?.textContent ?? '',
     }));
     for (const top of all.filter((x) => !x.parent)) {
       const at = parseRef(top.ref);
       if (!at) continue;
       const items = [top, ...all.filter((x) => x.parent === top.id)].map(({ author, text, date }) => ({ author, text, date }));
-      out.set(`${at.r},${at.c}`, { kind: 'thread', items, text: items.map((x) => `${x.author}: ${x.text}`).join('\n') });
+      // (Resolved: done="1" on the thread's first comment, as Excel writes it.)
+      out.set(`${at.r},${at.c}`, { kind: 'thread', items, resolved: top.done, text: items.map((x) => `${x.author}: ${x.text}`).join('\n') });
     }
   }
 

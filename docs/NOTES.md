@@ -52,7 +52,7 @@ thread left. `test/noteedit.test.js` covers the same in the unit tests.
 
 ## Not yet
 
-Resolving a thread and @mentions (threads are written, replied to, edited and deleted: below), Show All Notes, a
+@mentions (threads are written, resolved, replied to, edited and deleted: below), Show All Notes, a
 note's own size and position (from its VML shape), notes following their cells when rows are sorted, and marks in
 frozen panes' cells drawn twice. Notes do
 follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
@@ -62,6 +62,13 @@ follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md
 Review > New Comment (Ctrl+Alt+M, or New Comment on a cell's menu) opens the active cell's thread: post the first
 comment, reply, edit any comment, delete a reply or the whole thread. Each is one step of Undo. A cell has a note or a
 thread, not both. The author is the editor's `author` option.
+
+Resolve thread (in the thread's box) marks it resolved: measured over COM (`CommentThreaded.Resolved = True`, the
+file saved), Excel writes `done="1"` on the thread's first comment, after its id, and nothing on the replies; a reply
+added over COM to a resolved thread wasn't saved. Here a resolved thread's box has Reopen and no reply box (nor Edit),
+its mark is grey and a screen reader hears "Comment thread, resolved"; Reopen takes `done` away. Each is one step of
+Undo. A thread resolved here opens in Excel resolved, its reply kept (`CommentThreaded.Resolved`). The grey mark and
+the box's words weren't measured (COM can't show Excel's).
 
 Measured over COM (`tools/excel-compare/excel-threads.ps1`: `AddCommentThreaded`, `AddReply`, `CommentThreaded.Delete`
 on a new workbook, saved; the signed-in person Excel signs them with replaced by a made-up one before anything is

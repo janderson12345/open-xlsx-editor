@@ -6,7 +6,7 @@ import { div, setVars } from './dom.js';
 
 /** What a screen reader hears for a note or a thread. */
 export function describeNote(n) {
-  if (n.kind === 'thread') return `Comment thread. ${n.items.map((x) => `${x.author}: ${x.text}`).join('. ')}`;
+  if (n.kind === 'thread') return `Comment thread${n.resolved ? ', resolved' : ''}. ${n.items.map((x) => `${x.author}: ${x.text}`).join('. ')}`;
   return `Note. ${n.text.replace(/\s*\n\s*/g, ' ')}`;
 }
 
@@ -50,7 +50,7 @@ export function drawNoteMarks(st, win) {
   for (const [key, n] of st.notes || []) {
     const [r, c] = key.split(',').map(Number);
     if (!win || r < win.r0 || r > win.r1 || c < win.c0 || c > win.c1 || st.rows.size(r) < 1 || st.cols.size(c) < 1) continue;
-    const m = div(n.kind === 'thread' ? 'oxe-note-mark oxe-thread-mark' : 'oxe-note-mark');
+    const m = div(n.kind === 'thread' ? `oxe-note-mark oxe-thread-mark${n.resolved ? ' oxe-thread-done' : ''}` : 'oxe-note-mark');
     setVars(m, { '--oxe-x': st.cols.start(c + 1), '--oxe-y': st.rows.start(r) });
     marks.push(m);
     if (st.noteTexts && st.idBase) {
