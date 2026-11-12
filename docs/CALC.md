@@ -147,6 +147,8 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       leaves the span's other sheets, deleted or moved out, gives way to the next of them inward (Jan:Apr with Jan
       deleted, or moved after Apr, is Feb:Apr; Feb:Mar with Feb gone is Mar!); one moved but still among them, and any
       other sheet, leaves it as it was; a sheet moved or inserted between the ends is read. Renaming an end renames it.
+    - Rows or columns inserted or deleted, or cells cut and pasted, on one of its sheets leave a 3D reference as it
+      was: it reads what is there now (8 cases measured, all as Excel's).
   - `functions-amort.js`: AMORLINC and AMORDEGRC, the French depreciation. Microsoft's page gives other rules than
     Excel's; these are Excel's, from about 600 cases with cell values in a hidden Excel, then the probe's 48:
     - AMORDEGRC's coefficient by the life (1 / rate): up to 2 years #NUM!, to 4 years 1.5, to 6 years 2, past that 2.5.
@@ -385,8 +387,7 @@ Excel (and checked the same way by `test/calcmode.test.js`):
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
 - **3D references and intersection: what isn't yet as Excel.** `Jan:'My Mar'!A1` (a quote round one end only,
-  #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't read as formulas. Rows
-  inserted, or cells moved, on one of a 3D reference's sheets leave it as it was (not yet measured against Excel).
+  #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't read as formulas.
 - **Iterative calculation: what isn't yet as Excel.** No on-screen switch for it (Excel's File > Options > Formulas):
   it is read from the file and kept, and `setIteration` (calcmode.js) turns it on. A circle whose cells change only
   in text or errors isn't measured: here only numbers count toward Maximum Change. Array and dynamic formulas in a

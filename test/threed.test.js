@@ -95,3 +95,20 @@ test('a 3D reference as sheets go and move, as Excel changes it: an end that lea
   }
   assert.deepEqual([wb.sheet(o).cells.get(0).get(2).f, wb.sheet(o).cells.get(1).get(2).f], ['SUM(Jan:Apr!A1)', 'Jan!A1']);
 });
+
+test('rows inserted or deleted, or cells cut, on a sheet of a 3D reference leave it as it was, as in Excel', () => {
+  // (Measured: =SUM(Jan:Apr!B2:B4) keeps its text whatever one sheet's rows, columns or cut cells do; it reads what is
+  // there now. Each sheet's B1:B6 holds sheet*100 + row.)
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const base = wb.sheets.length;
+  ['Jan', 'Feb', 'Mar', 'Apr', 'Other'].forEach((n, k) => { wb.addSheet(base + k, n); for (let r = 0; r < 6; r++) wb.setCell(base + k, { r, c: 1 }, (k + 1) * 100 + r + 1); });
+  const o = wb.sheetIndexOf('Other');
+  wb.setFormula(o, 'D1', 'SUM(Jan:Apr!B2:B4)');
+  const d1 = () => { const x = wb.sheet(o).cells.get(0).get(3); return `${x.f}=${x.v}`; };
+  assert.equal(d1(), 'SUM(Jan:Apr!B2:B4)=3036');
+  wb.changeLines(wb.sheetIndexOf('Jan'), 'row', 0, 1);
+  assert.equal(d1(), 'SUM(Jan:Apr!B2:B4)=3033');
+  wb.changeLines(wb.sheetIndexOf('Feb'), 'col', 0, 1);
+  // (Then a column on Feb: its B2:B4 is empty now, 609 less.)
+  assert.equal(d1(), 'SUM(Jan:Apr!B2:B4)=2424');
+});
