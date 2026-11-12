@@ -498,6 +498,12 @@ export const PROBE_FORMULAS = [
   'UNICODE(CHAR(157))', 'UNICODE(CHAR(158))', 'UNICODE(CHAR(159))', 'UNICHAR(65535)', 'UNICHAR(55357)', 'UNICHAR(57344)', 'UNICHAR(1114110)',
   'UNICHAR(1114109)', 'UNICHAR(64976)', 'UNICHAR(65534)', 'UNICHAR(131071)', 'UNICHAR(1114112)', 'UNICHAR(0)', 'CHAR(0)', 'CHAR(256)',
   'UNICODE(UNICHAR(65533))', 'CODE("")',
+  'CELL("row",Data!B5)', 'CELL("col",Data!C2:D4)', 'CELL("address",B2)', 'CELL("address",B2:C5)', 'CELL("type",Data!A1)', 'CELL("type",Data!B2)',
+  'CELL("type",Data!Z99)', 'CELL("contents",Data!A2)', 'CELL("contents",Data!B3)', 'CELL("contents",Data!Z99)', 'CELL("prefix",Data!A1)',
+  'CELL("prefix",Data!B2)', 'CELL("protect",Data!A1)', 'CELL("format",Data!A1)', 'CELL("format",Data!B2)', 'CELL("format",Data!C2)',
+  'CELL("format",Data!D2)', 'CELL("format",Data!E2)', 'CELL("color",Data!B2)', 'CELL("parentheses",Data!B2)', 'INDEX(CELL("width",Data!A1),1)',
+  'INDEX(CELL("width",Data!A1),2)', 'INDEX(CELL("width",Data!Q1),1)', 'CELL("ADDRESS",B2)', 'CELL("bogus",B2)', 'CELL(1,B2)', 'INFO("release")',
+  'INFO("system")', 'INFO("recalc")', 'INFO("numfile")', 'INFO("origin")', 'INFO("bogus")', 'INFO("memavail")',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

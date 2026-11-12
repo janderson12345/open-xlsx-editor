@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1789 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1822 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1789 of 1789 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1822 of 1822 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -400,6 +400,30 @@ Measured in Excel 365 in English, 96 cases (`src/calc/charsets.js`):
   two code points of every plane (U+FFFE, U+FFFF, U+1FFFF ... U+10FFFF). Out of range is #VALUE!, as before.
 - **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it.
 
+## CELL and INFO
+
+Measured in Excel 365 in English (`src/calc/functions-info.js`, `src/calc/cellinfo.js`; 128 number formats in
+test/cellinfo.test.js, 33 cases in the probe):
+
+- **CELL("format")**: F and the decimals for fixed, `,` with a thousands separator, C for currency ($), P percent, S
+  scientific, G for General, text, fractions and what isn't one of the rest; `-` after it when the negative section has
+  a colour, `()` when the positive one has parentheses. A date or time by the order of its first parts, separators
+  aside: day-month-year D1, day-month D2, month-year D3, month-day-year D4, month-day D5; h:mm:ss AM/PM D6, h:mm AM/PM
+  D7, h:mm:ss D8, h:mm D9; one starting with the year, one part alone, or elapsed time ([h]) G. A locale prefix
+  ([$-409]) counts as a day part, so [$-409]m/d/yy is D2 (as Excel gives it).
+- **"color"** and **"parentheses"**: 1 or 0, as above.
+- **"prefix"**: for text typed into the cell, ' (General, left, justify), " (right), ^ (centre, centre across), \ (fill);
+  "" for numbers and for a formula's text.
+- **"type"**: b blank, l text (a formula's too), v anything else. **"contents"**: the value, 0 for a blank cell.
+- **"address"**: $B$2; on another sheet with the workbook's name, '[Book1]Other Sheet'!$C$3. **"row"**, **"col"**: the
+  first cell's. **"protect"**: 1 locked, 0 not. **"width"**: the column's width in whole characters and whether it is
+  the sheet's default, two values ({8,TRUE}).
+- **"filename"**: "", as Excel gives it for a workbook not yet saved; a page has no path to give.
+- The info type in any case, but not trimmed; another, or a number, is #VALUE!. Without a reference, the formula's own
+  cell (Excel takes the active cell).
+- **INFO**: "numfile" the workbook's sheets, "origin" $A:$A$1, "osversion" Windows (64-bit) NT 10.00, "recalc"
+  Automatic or Manual, "release" 16.0, "system" pcdos; "memavail", "memused" and "totmem" #N/A; another #VALUE!.
+
 ## Not yet
 
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
@@ -413,7 +437,7 @@ Measured in Excel 365 in English, 96 cases (`src/calc/charsets.js`):
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
 - **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
-  units) as 2 in a workbook such as this editor writes (the probe's, 1789 of 1789 as Excel), but as 1 in a workbook it
+  units) as 2 in a workbook such as this editor writes (the probe's, 1822 of 1822 as Excel), but as 1 in a workbook it
   made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
   fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;

@@ -261,6 +261,8 @@ export function mountXlsxEditor(host, options = {}) {
           }
         });
       }
+      // (Its name, for CELL("address") of another sheet: [name]Sheet!$A$1, as Excel gives it.)
+      wb.fileName = fileName;
       // (Formulas saved without a result, as some programs save them, worked out now, as Excel does on opening.)
       if (options.calculateOnOpen !== false) wb.calculateMissing();
       const i = wb.activeSheet;

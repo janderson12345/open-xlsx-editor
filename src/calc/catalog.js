@@ -136,7 +136,7 @@ const LIST = {
     IMLOG2(inumber) IMPOWER(inumber,number) IMPRODUCT(inumber1,[inumber2],...) IMREAL(inumber) IMSEC(inumber)
     IMSECH(inumber) IMSIN(inumber) IMSINH(inumber) IMSQRT(inumber) IMSUB(inumber1,inumber2)
     IMSUM(inumber1,[inumber2],...) IMTAN(inumber) OCT2BIN(number,[places]) OCT2DEC(number) OCT2HEX(number,[places])`,
-  Information: `ERROR.TYPE(error_val) ISBLANK(value) ISERR(value) ISERROR(value) ISEVEN(number) ISFORMULA(reference)
+  Information: `CELL(info_type,[reference]) ERROR.TYPE(error_val) INFO(type_text) ISBLANK(value) ISERR(value) ISERROR(value) ISEVEN(number) ISFORMULA(reference)
     ISLOGICAL(value) ISNA(value) ISNONTEXT(value) ISNUMBER(value) ISODD(number) ISOMITTED(argument) ISREF(value)
     ISTEXT(value) N(value) NA() SHEET([value]) SHEETS([reference]) TYPE(value)`,
   Compatibility: `BETADIST(x,alpha,beta,[A],[B]) BETAINV(probability,alpha,beta,[A],[B])

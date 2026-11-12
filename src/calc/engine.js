@@ -7,6 +7,8 @@ import { Unsupported, E, cellValue } from './values.js';
 import { FUNCTIONS } from './functions.js';
 import { readTables, tableArea } from '../ooxml/tables.js';
 import { runWithCircles } from './iterate.js';
+import { cellInfo } from './cellinfo.js';
+import { calcMode } from '../ooxml/calcmode.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
 /** References wider than this many columns are checked against every change instead of being indexed by column. */
@@ -287,6 +289,11 @@ export class Calc {
       extent: (si) => { const m = book.sheet(si); return { maxRow: m.maxRow, maxCol: m.maxCol }; },
       sheetIndex: (name) => book.sheetIndexOf(name),
       sheetCount: () => book.sheets.length,
+      sheetName: (si) => book.sheets[si]?.name,
+      // (CELL and INFO: functions-info.js.)
+      cellInfo: (si, r, c) => cellInfo(book, si, r, c),
+      bookName: () => book.fileName || null,
+      calcMode: () => calcMode(book),
       tableArea: (table, spec) => tableArea(this.tables, table, spec, ctx.here),
       // (For SUBTOTAL: a cell's own formula, and whether its row is hidden.)
       formulaOf: (si, r, c) => book.sheet(si).cells.get(r)?.get(c)?.f || null,
