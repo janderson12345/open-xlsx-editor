@@ -8,6 +8,7 @@ import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
 import { setCellXml, setFormulaXml, setResultXml, setStyleXml, setMergesXml, unshareXml } from './sheetedit.js';
 import { setDynamicXml, clearSpilledXml, RICH_ERRORS } from './spillxml.js';
+import { recalcAfter } from './calcmode.js';
 import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
@@ -233,7 +234,8 @@ export class Workbook {
     // holds a formula makes Excel repair the file. Without it Excel works the order out again.)
     if (formulas) this._dropCalcChain();
     const rects = changes.map(({ r, c }) => ({ si: i, r0: r, c0: c, r1: r, c1: c }));
-    return this.calc.recalc(rects, changes.filter((ch) => ch.formula != null).map(({ r, c }) => ({ si: i, r, c })));
+    // (In Manual calculation the entered formulas alone: calcmode.js.)
+    return recalcAfter(this, rects, changes.filter((ch) => ch.formula != null).map(({ r, c }) => ({ si: i, r, c })));
   }
 
   /** Cell format `s` with a change (stylesedit.js: font, fill, border, alignment, number format, cell style): the

@@ -344,4 +344,23 @@ await page.keyboard.type('2.567,1)');
 await page.keyboard.press('Enter');
 check(await value('J45') === 6 && await value('J46') === 2.6, 'entered: =1+SUM(2,3) is 6; Math & Trig > ROUND: =ROUND(2.567,1) is 2.6', JSON.stringify([await value('J45'), await value('J46')]));
 
+// Formulas > Calculation Options > Manual, as Excel's: a change waits (=J45*2 stays 12, the status bar says Calculate),
+// a formula entered is worked out; F9 works out the rest. Back to Automatic.
+const statusText = () => page.textContent('.oxe-status');
+await page.evaluate(() => window.oxe.select('J47'));
+await page.keyboard.type('=J45*2\n');
+await ribbon('Calculation Options', () => page.click('.oxe-pop button:has(span:text-is("Manual"))'));
+await page.evaluate(() => window.oxe.select('J45'));
+await page.keyboard.type('10\n');
+await page.keyboard.type('=J45*3\n');
+const waiting = [await value('J47'), await value('J46'), await statusText()];
+await page.keyboard.press('F9');
+const calculated = [await value('J47'), await statusText()];
+await ribbon('Calculation Options', () => page.click('.oxe-pop button:has(span:text-is("Automatic"))'));
+await page.evaluate(() => window.oxe.select('J45'));
+await page.keyboard.type('1\n');
+check(waiting[0] === 12 && waiting[1] === 30 && /^Calculate/.test(waiting[2]) && calculated[0] === 20 && !/Calculate/.test(calculated[1]) && await value('J47') === 2,
+  'Manual: J47 waits (12) and the status bar says Calculate; the formula entered in J46 is worked out (30); F9: 20; Automatic again: 2',
+  JSON.stringify({ waiting, calculated, after: await value('J47') }));
+
 await finish();

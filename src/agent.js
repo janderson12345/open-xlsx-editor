@@ -6,6 +6,7 @@
 // Workbook). Excel has no tracked changes for cells, so edits are made directly; in an editor (`api.agent()`) each is
 // one step of its undo history.
 import { Workbook } from './ooxml/workbook.js';
+import { calculateBeforeSave } from './ooxml/calcmode.js';
 import { goToTarget, goToNames } from './ooxml/goto.js';
 import { entryChanges } from './ooxml/entry.js';
 import { editText } from './ooxml/input.js';
@@ -422,8 +423,8 @@ export class AgentWorkbook {
   /** Work out every formula again (Excel's Ctrl+Alt+F9). */
   calculate() { this.wb.calculate(); }
 
-  /** The workbook's bytes, every part not changed as it was. */
-  save() { return this.wb.toBytes(); }
+  /** The workbook's bytes, every part not changed as it was (a manual workbook worked out first, as Excel saves it). */
+  save() { calculateBeforeSave(this.wb); return this.wb.toBytes(); }
 }
 
 /** Row "5" / 5, or column "C" / 3, as a 0-based index. */

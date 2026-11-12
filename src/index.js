@@ -24,6 +24,7 @@ import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
 import { formulasTab } from './editor/formulastab.js';
+import { calcMode, needsCalculation, calculateBeforeSave } from './ooxml/calcmode.js';
 import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { selectionStats } from './ooxml/stats.js';
@@ -169,6 +170,8 @@ export function mountXlsxEditor(host, options = {}) {
     if (options.statusBar === false) { state.tabs.status('', true); return; }
     const s = selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
     const parts = !s ? [] : s.text ? [`Average: ${s.text.average}`, `Count: ${s.count}`, `Sum: ${s.text.sum}`] : [`Count: ${s.count}`];
+    // (Manual calculation with formulas waiting: Excel's Calculate.)
+    if (needsCalculation(state.workbook)) parts.unshift('Calculate');
     state.tabs.status(parts.join('    '));
   };
   /** The workbook has new cell formats: their CSS again, and the grid drawn with them. */
@@ -188,7 +191,7 @@ export function mountXlsxEditor(host, options = {}) {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
-        Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions }),
+        Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook) }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
@@ -317,6 +320,8 @@ export function mountXlsxEditor(host, options = {}) {
     /** The workbook as .xlsx bytes (unchanged parts byte for byte, changed sheets rewritten in place). */
     save() {
       if (!state.workbook) throw new Error('no workbook open');
+      // (A manual workbook worked out first, unless Recalculate workbook before saving is off: calcmode.js.)
+      if (calculateBeforeSave(state.workbook)) { state.grid.refresh(); showStats(); }
       return state.workbook.toBytes();
     },
     /** Select a cell ("B2" or { r, c }, 0-based). */

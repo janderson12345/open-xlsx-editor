@@ -1,11 +1,13 @@
 // The Formulas tab, Excel's groups as far as they are here: Function Library (Insert Function, Shift+F3; AutoSum and
 // its choices; Recently Used and each category's functions, More Functions for the rest: functionbox.js and
-// calc/catalog.js) and Defined Names (Name Manager, Ctrl+F3, and Define Name: namesbox.js and names.js).
+// calc/catalog.js), Defined Names (Name Manager, Ctrl+F3, and Define Name: namesbox.js and names.js) and Calculation
+// (Calculation Options, Calculate Now, Calculate Sheet: ooxml/calcmode.js).
 import { el } from './ribbonkit.js';
 import { inCategory, functionInfo, syntaxOf, DEFAULT_RECENT } from '../calc/catalog.js';
 
-/** The Formulas tab. `act(name, ...args)` runs a command; `recent()` the Most Recently Used functions. */
-export function formulasTab(kit, { act, recent = () => null }) {
+/** The Formulas tab. `act(name, ...args)` runs a command; `recent()` the Most Recently Used functions; `calcMode()`
+ *  the workbook's calculation mode. */
+export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'auto' }) {
   const { grp, btn, col, menu, split, item, openMenu, pop } = kit;
   const fn = (name) => item(name, () => act('insertFunction', name));
   const titled = (b, name) => { b.title = syntaxOf(name); return b; };
@@ -30,6 +32,10 @@ export function formulasTab(kit, { act, recent = () => null }) {
       col(more)),
     grp('Defined Names', btn('🏷', 'Name Manager (Ctrl+F3)', () => act('nameManager'), { label: 'Name Manager', big: true }),
       col(btn('＋', 'Define Name', () => act('defineName'), { label: 'Define Name' }))),
+    grp('Calculation', menu('⚙', 'Calculation Options', () => [['auto', 'Automatic'], ['autoNoTable', 'Automatic Except for Data Tables'], ['manual', 'Manual']]
+      .map(([m, label]) => item(label, () => act('calcMode', m), { on: calcMode() === m, icon: calcMode() === m ? '✓' : ' ' })), { label: 'Calculation Options', big: true }),
+    col(btn('▦', 'Calculate Now (F9)', () => act('calculate', 'now'), { label: 'Calculate Now' }),
+      btn('▤', 'Calculate Sheet (Shift+F9)', () => act('calculate', 'sheet'), { label: 'Calculate Sheet' }))),
   ];
   return { groups, update() {} };
 }

@@ -197,6 +197,25 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     sheet's active cell. Enter puts the formula into its own cell, on its own sheet; Esc goes back without it.
   - **Merged cells.** A merged cell is pointed at by its top-left cell. Excel's behaviour here isn't measured.
 
+## Calculation options
+
+Formulas > Calculation (`src/ooxml/calcmode.js`): Calculation Options (Automatic, Automatic Except for Data Tables,
+Manual), Calculate Now (F9), Calculate Sheet (Shift+F9); Ctrl+Alt+F9 works out every formula. Measured in a hidden
+Excel (and checked the same way by `test/calcmode.test.js`):
+
+- **Saved** in workbook.xml's calcPr: Manual as `calcMode="manual"`, Automatic Except for Data Tables as
+  `calcMode="autoNoTable"`, Automatic as no calcMode; Recalculate workbook before saving off as `calcOnSave="0"`. A
+  workbook opened is in the mode its file says.
+- **Manual**: a change works out nothing that reads it (=A1*2 stays 10 when A1 goes from 5 to 7, and so does a formula
+  on another sheet), and the status bar says Calculate. A formula entered is worked out at once, from what the cells
+  hold then (=A2+1 is 11 while A2 still shows 10). Calculate Sheet works out the shown sheet's (A2 14), the other
+  sheets' wait; Calculate Now the rest. Back to Automatic, everything waiting is worked out.
+- **Saving** a manual workbook works it out first (`save()` in the editor and the agent), unless calcOnSave is off.
+- There are no data tables here (What-If Analysis), so Automatic Except for Data Tables works as Automatic.
+- **Not yet**: inserting or deleting rows and columns, and moving or copying sheets, still work out their formulas in
+  Manual (Excel leaves them waiting); the Options box's iteration and "Recalculate before saving" (calcOnSave can be
+  set through `setCalcOnSave`).
+
 ## The Function Library
 
 - **The list** (`calc/catalog.js`): every function the engine works out, in Excel's categories as Microsoft's "Excel

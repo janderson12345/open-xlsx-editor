@@ -129,7 +129,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Dynamic arrays (spilling), LAMBDA, LET | Partly | Formulas spill as Excel 365's do, #SPILL! when blocked; SEQUENCE, SORT, SORTBY, UNIQUE, FILTER, TRANSPOSE, LET, LAMBDA, `D1#` and `@`; 20 of 20 cases Excel's, and Excel reads the files the same (docs/DYNAMIC.md). TAKE, VSTACK, MAP and the other newer array functions too; RANDARRAY, GROUPBY and PIVOTBY missing, and a LAMBDA kept in a defined name. |
 | Defined Names (`defined-names`) | Name Manager, define, use in formula | Done | Name Manager (Ctrl+F3) and Define Name as Excel's, the Name Box naming the selection; Excel's rules for a name, 34 of 34 verdicts, and its saved order (docs/NAMES.md). Create from Selection and Use in Formula missing. |
 | Formula Auditing (`formula-auditing`) | Trace precedents and dependents, show formulas, evaluate | Missing | |
-| Calculation (`calculation`) | Automatic, manual, Calculate Now | Partly | Always automatic. |
+| Calculation (`calculation`) | Automatic, manual, Calculate Now | Done | Calculation Options (Automatic, Automatic Except for Data Tables, Manual), Calculate Now (F9), Calculate Sheet (Shift+F9), Ctrl+Alt+F9; in Manual a change waits and the status bar says Calculate, a formula entered is worked out, saving works it out first; saved as Excel saves it (docs/CALC.md). Inserted rows and moved sheets still work their formulas out in Manual. |
 
 ## Data (`data`)
 

@@ -182,6 +182,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
     else if (key === 'F5' && e.altKey && !e.shiftKey) cmd.run('refreshPivots', ctrl);
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
+    // (F9 Calculate Now, Shift+F9 Calculate Sheet, Ctrl+Alt+F9 every formula.)
+    else if (key === 'F9') cmd.run('calculate', ctrl && e.altKey ? 'all' : e.shiftKey ? 'sheet' : 'now');
     else if (key === 'F3' && ctrl && !e.shiftKey && !e.altKey) ctx.nameManager?.();
     else if (key === 'F3' && e.shiftKey && !ctrl && !e.altKey) ctx.insertFunction?.();
     // (Ctrl+Alt+M: New Comment, or the active cell's thread to reply to.)

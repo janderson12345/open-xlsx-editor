@@ -166,8 +166,9 @@ export class Calc {
   }
 
   /** Work out again every formula that the changed rectangles reach, and the volatile ones; `also`: formula cells
-   *  to work out in any case (just entered). Returns { circular: [entries] }. */
-  recalc(changed, also = []) {
+   *  to work out in any case (just entered). `only`: those alone (Manual calculation, calcmode.js); `sheet`: of what
+   *  the rest reach, sheet `sheet`'s formulas alone (Calculate Sheet). Returns { circular: [entries] }. */
+  recalc(changed, also = [], { only = false, sheet = null } = {}) {
     this.build();
     const dirty = new Set();
     const queue = [...changed];
@@ -177,9 +178,11 @@ export class Calc {
       queue.push({ si: e.si, ...spanOf(e) });
     };
     for (const a of also) { const e = this.entries.get(key(a.si, a.r, a.c)); if (e) take(e); }
+    if (only) return this._settle(this._run(dirty));
     for (const e of touched(this, changed)) take(e);
     for (const e of this.entries.values()) if (e.volatile) take(e);
     while (queue.length) for (const e of this.readers(queue.pop())) take(e);
+    if (sheet != null) for (const e of dirty) if (e.si !== sheet) dirty.delete(e);
     return this._settle(this._run(dirty));
   }
 
