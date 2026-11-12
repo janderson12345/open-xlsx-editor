@@ -225,3 +225,6 @@ def('YIELDMAT', (a, ctx) => {
   const paid = pr / 100 + t.a * rate;
   return ((1 + t.dim * rate - paid) / paid) / t.dsm;
 });
+
+// (For the odd-period bonds, functions-oddbonds.js.)
+export { daysBetween, addMonths, coupons, couponDays, day, basisOf, freqOf };

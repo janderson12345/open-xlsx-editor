@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1450 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1504 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1450 of 1450 as Excel** (to 15 digits; RATE, IRR and YIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1504 of 1504 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -97,6 +97,19 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
       is #N/A). "da" and "e" are both deka. The binary prefixes (ki, Mi, ... Yi) are for bit and byte only.
     - Names are exact: "M", "FT" and " m" are #N/A, as are units of different kinds. TRUE is #VALUE!, and "2" is 2.
     - Temperatures go through kelvin, with "K" and "kel" taking a prefix ("mK"), and C, F, Rank and Reau not.
+  - `functions-oddbonds.js`: ODDFPRICE, ODDFYIELD, ODDLPRICE and ODDLYIELD, by Microsoft's formulas with Excel's own
+    counting, measured on 360 cases with cell values (prices to 1e-15, ODDFYIELD's search to 1e-9), then the
+    probe's 54:
+    - The quasi-coupon dates of an odd period step from the first coupon back, or from the last interest date on, each
+      from the one before on the same day, not kept at the month's end: June 30, December 30, June 30; December 31,
+      September 30, June 30, March 30. The days to the next coupon (bases 2 and 3) and from the last (the others)
+      take COUPNCD's and COUPPCD's dates, which are.
+    - A short first period's N counts the first coupon. A long one's whole quasi-periods from settlement to the first
+      coupon are counted on from settlement, moved to its month's end when the first coupon is at one (which counts
+      one): settlement on February 10, 2020 and a first coupon on June 30 make 1 half-year, not 0.
+    - An odd last period's quasi-periods have their actual days for length with bases 1, 2 and 3, 360 over the
+      frequency with 0 and 4.
+    - Issue on settlement is #NUM!, as are dates out of order, a negative rate, a frequency other than 1, 2, 4.
   - `functions-bessel.js`: BESSELJ, BESSELY, BESSELI and BESSELK. Excel's are not the exact functions but Numerical
     Recipes' approximations, good to about 1e-8: =BESSELJ(0,0) is 1.00000000283141. The rational and polynomial
     forms for orders 0 and 1, then recurrences: up for Y, K, and J past its order; down (Miller's, 40 for the start)
@@ -231,7 +244,8 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
   (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
   rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
-- **Not written yet**: the odd-period bonds (ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD).
+- **ODDLPRICE and ODDLYIELD from a last interest date at a month's end into a February 29 settlement** (August 31,
+  2019 and February 29, 2020 measured): 1e-4 from Excel's for some frequencies and bases. Kept out of the probe.
 - **BESSELJ from 8 on** (where the order is below x): Excel's J0 and J1 there aren't the Numerical Recipes formulas the
   rest follows, and are further from the true values (J1(8) is 0.2346283865070744, 8e-6 off). A least-squares fit
   points at other coefficients in J1's far polynomial, not yet pinned down. Such a formula keeps the value Excel saved.

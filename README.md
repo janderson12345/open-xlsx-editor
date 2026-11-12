@@ -8,7 +8,7 @@ alignment and number formats, the sheet tabs underneath (in their tab colours; C
 move, colour, hide and delete sheets from the tab menu, with formulas and names kept pointing at the right sheets),
 prints a sheet as Excel lays it out (measured against Excel's own PDFs), and lets you edit cell values: select with the
 keyboard or mouse, type over a cell or press F2, Delete, undo and redo. Formulas are worked out as Excel works them
-out (477 functions, dynamic arrays that spill as Excel 365's do, and table references; 1450 of 1450 test formulas give Excel's results), again whenever what they read changes, and
+out (481 functions, dynamic arrays that spill as Excel 365's do, and table references; 1504 of 1504 test formulas give Excel's results), again whenever what they read changes, and
 can be typed, pointing at cells with the arrow keys or the mouse, on this sheet or another, as in Excel. Saving
 rewrites only the parts you changed; every other part goes back byte for byte.
 An AI assistant can read and edit workbooks too, through an MCP server (`open-xlsx-editor-mcp`) or the agent

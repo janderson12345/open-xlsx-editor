@@ -24,14 +24,14 @@ test('every formula of formulas.xlsx works out as Excel works it out (test/formu
   for (const [sheet, ref, formula, t, v] of excel.cells) {
     const { r, c } = parseRef(ref);
     const cell = wb.sheet(wb.sheetIndexOf(sheet)).cells.get(r)?.get(c);
-    // (RATE, IRR and YIELD are searches, RATE's and IRR's promised to 0.0000001, their last digits each search's own:
+    // (RATE, IRR, YIELD and ODDFYIELD are searches, RATE's and IRR's promised to 0.0000001, their last digits each search's own:
     // compared to 1e-9.)
     // (XIRR's Excel promises to 0.000001%: compared to 1e-8.)
     // (The t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and
     // VDB's running balance: incomplete gamma and beta functions by series and continued fractions, and searches, whose
     // last digits are each one's own; Excel's agree with these to 2e-14 at most: compared to 1e-13 of the value.)
     const series = /^=(_xlfn\.)?(T\.|TDIST|TTEST|CHI|F\.|FDIST|FINV|FTEST|GAMMA|BETA|WEIBULL|NEGBINOM|CONFIDENCE\.T|VDB)/.test(formula);
-    const near = /^=(_xlfn\.)?(RATE|IRR|YIELD)\(/.test(formula) ? 1e-9 : /^=XIRR\(/.test(formula) ? 1e-8
+    const near = /^=(_xlfn\.)?(RATE|IRR|YIELD|ODDFYIELD)\(/.test(formula) ? 1e-9 : /^=XIRR\(/.test(formula) ? 1e-8
       : (series ? 1e-13 : 1e-15) * Math.abs(Number(v));
     const ok = t === 'n' ? cell?.t === 'n' && Math.abs(cell.v - Number(v)) <= near
       : t === 's' ? cell?.t === 'str' && cell.v === v
