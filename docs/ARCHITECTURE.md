@@ -23,6 +23,7 @@ insides:
 | `src/ooxml/formatops.js` | What each Home button does to a selection, as Excel does it (toggles from the active cell, font sizes, indent, border presets and the neighbour's facing side, decimals): the cells' new formats, for the editor to apply and undo. |
 | `src/ooxml/mergeops.js` | Merge & Center, Merge Across, Merge Cells and Unmerge as Excel does them: the values, formats and merged ranges that change, for the editor to apply and undo as one step. |
 | `src/ooxml/clearops.js` | Home > Clear (All, Contents, Formats) as Excel does it, merged ranges unmerged, part of one refused. |
+| `src/ooxml/clearparts.js` | What Clear takes besides cells: notes, threaded comments and hyperlinks, as Excel does (docs/FORMATS.md). |
 | `src/ooxml/stats.js` | The status bar's Average, Count and Sum of the selection, by Excel's rules. |
 | `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
 | `src/ooxml/charts.js` | A sheet's charts read from its drawing and chart parts, their data from the cells, and Excel's automatic value axis; drawn by `src/editor/chartview.js` (docs/CHARTS.md). |

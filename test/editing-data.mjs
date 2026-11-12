@@ -4,7 +4,7 @@
 import { openFixture } from './browser.mjs';
 import { editingPage } from './editing-kit.mjs';
 
-const { page, check, finish, shown, sel, value, ribbon, menu } = await editingPage();
+const { page, check, finish, shown, sel, value, ribbon, menu, live } = await editingPage();
 const bar = () => page.evaluate(() => document.querySelector('.oxe-formula').value);
 
 await openFixture(page, 'basic.xlsx');
@@ -471,5 +471,19 @@ await page.keyboard.press('F2');
 const oldEdit = await page.evaluate(() => document.querySelector('.oxe-editor')?.value ?? document.querySelector('.oxe-editor')?.textContent);
 await page.keyboard.press('Escape');
 check(oldBar === '=@L50:L52*2' && oldEdit === '=@L50:L52*2', 'an old formula in the formula bar and F2 with Excel 365’s @: =@L50:L52*2', JSON.stringify({ oldBar, oldEdit }));
+
+// Home > Clear: Excel's six, in its order; Clear Hyperlinks on cells without any says so (clearparts.js is tested on
+// the cells it clears in test/clearparts.test.js).
+await page.click('.oxe-rtab >> text=Home');
+await page.evaluate(() => window.oxe.select('N70'));
+let clearItems = [];
+await ribbon('Clear', async () => {
+  clearItems = await page.evaluate(() => [...document.querySelectorAll('.oxe-pop button, .oxe-pop [role="menuitem"]')].map((b) => b.textContent.replace(/Delete$/, '').trim()).filter(Boolean));
+  await page.click('.oxe-pop >> text=Clear Hyperlinks');
+});
+await page.waitForFunction(() => /No hyperlinks to clear/.test(document.querySelector('.oxe-live')?.textContent || ''), null, { timeout: 3000 }).catch(() => {});
+const said = await live();
+check(clearItems.join('|') === 'Clear All|Clear Formats|Clear Contents|Clear Comments and Notes|Clear Hyperlinks|Remove Hyperlinks' && /No hyperlinks to clear/.test(said),
+  'Home > Clear: Excel’s six in order; Clear Hyperlinks with none says so', JSON.stringify({ clearItems, said }));
 
 await finish();

@@ -61,6 +61,22 @@ in each; cleared here and opened in Excel, the three that clear read back as Exc
 A click on a merged cell selects the whole merged range in Excel; here a selection of one of its cells clears the
 whole range in the same way.
 
+### Comments and Notes, Hyperlinks (`src/ooxml/clearparts.js`)
+
+Measured over COM: `Range.ClearComments`, `ClearHyperlinks`, `Hyperlinks.Delete` (Remove Hyperlinks), `Clear` and
+`ClearContents` on a sheet with a hyperlink to an address in A1 (bold), a note in B1, a threaded comment in C1 and one
+hyperlink over D1:E2, and the files Excel then saved. `test/clearparts.test.js` expects the same; cleared here and
+opened in Excel, its hyperlinks, notes and comments are those.
+
+| Rule | Seen |
+|---|---|
+| Clear Comments and Notes takes the notes and threaded comments (with their replies) of the cells, nothing else. | B1 alone: its note goes, C1's thread stays. A1:E2: the comments, drawing and threaded comments parts go. |
+| Clear Hyperlinks takes the hyperlinks meeting the cells, each whole, and leaves the formats (the Hyperlink style stays). | D1 alone: D1:E2's hyperlink goes; A1's stays. |
+| Remove Hyperlinks does that and takes the formats of the hyperlinks' cells away, theirs only. | A1 loses its bold, E2 its style; a bold F1 beside them stays bold. |
+| Clear All takes them all with the cells; Clear Contents takes the hyperlinks (their formats stay) and leaves the notes; Clear Formats leaves both. | |
+
+Excel drops a comments part it leaves empty; here it stays, empty, as after Delete Note.
+
 ## Format Cells (`src/editor/formatbox.js`, `formatops.js` formatCells)
 
 Ctrl+1 opens Excel's box on the active cell's format; only what is changed in it is given to the selection, each other

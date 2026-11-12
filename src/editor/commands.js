@@ -18,6 +18,7 @@ import { mergeChange } from '../ooxml/mergeops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
 import { clearChanges } from '../ooxml/clearops.js';
+import { partsClear, PARTS_ONLY } from '../ooxml/clearparts.js';
 import { traceLevel } from './tracing.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
 
@@ -225,14 +226,25 @@ export function createCommands(ctx) {
      *  the cells there are are looked at, so a whole column is quick. Refused, as Excel refuses, over part of a merged
      *  range. */
     clear() { return commands.clearAs('contents'); },
-    /** Home > Clear: Clear All ('all'), Clear Contents ('contents') or Clear Formats ('formats') of the selection
-     *  (clearops.js), as one step of the history. */
+    /** Home > Clear: Clear All ('all'), Clear Contents ('contents'), Clear Formats ('formats'), Clear Comments and
+     *  Notes ('comments'), Clear Hyperlinks ('hyperlinks') or Remove Hyperlinks ('removeHyperlinks') of the selection
+     *  (clearops.js, clearparts.js), as one step of the history. */
     clearAs(what) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const steps = eachArea().map((a) => clearChanges(ctx.workbook(), ctx.sheetIndex(), a, what));
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      // (Notes, comments and hyperlinks are parts of the sheet, not cells: a change of them goes back as a whole.)
+      if (PARTS_ONLY.includes(what)) {
+        const run = partsClear(wb, si, eachArea(), what);
+        if (!run) { ctx.announce(what === 'comments' ? 'No notes or comments to clear' : 'No hyperlinks to clear'); return false; }
+        return commands.sheetChange(run);
+      }
+      const steps = eachArea().map((a) => clearChanges(wb, si, a, what));
       const refused = steps.find((x) => x.error);
       if (refused) { ctx.alert(refused.error); return false; }
       const step = steps.length === 1 ? steps[0] : { ...steps[0], contents: steps.flatMap((x) => x.contents), styles: steps.flatMap((x) => x.styles), merges: steps[0].merges.filter((m) => steps.every((x) => x.merges.includes(m))) };
+      const run = partsClear(wb, si, eachArea(), what, step);
+      if (run) return commands.sheetChange(run);
       if (what === 'contents' && !step.contents.length) return false;
       if (what === 'contents') return apply(step.contents);
       return runSteps([step]);
