@@ -36,7 +36,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Formula results on open when the file has none | Done | Formulas saved without a result (as some programs save them) are worked out on opening, in the editor and the agent, as Excel does; the results saved with the others are kept, and a workbook saved unchanged still comes back byte for byte (`calculateMissing`, docs/CALC.md; `calculateOnOpen: false` turns it off). |
 | Virtualised grid | Done | 5,000 rows by 20 columns scroll smoothly. |
 | Fonts, fills, borders, alignment, number formats | Done | Shown as measured against Excel's PDFs (docs/LAYOUT.md); changed from the Home tab (below). |
-| Rich text in a cell (runs in several fonts) | Partly | The text is shown in the cell's own font; the runs' formatting isn't. |
+| Rich text in a cell (runs in several fonts) | Partly | Each run drawn in its own font, as Excel writes and shows them: bold, italic, underline, strikethrough, size, colour, font, super- and subscript (docs/FORMATS.md). Not yet: formatting part of a cell's text, copying runs, the row's height following a larger run. |
 | Merged cells | Done | Navigation steps over them; merged and unmerged from the Home tab. |
 | Hidden rows and columns | Done | Hidden and shown from the headings' menu, Format, Ctrl+9 and Ctrl+0 (docs/SIZES.md). |
 | Row heights from fonts and wrapping | Done | As Excel works them out (docs/LAYOUT.md). |

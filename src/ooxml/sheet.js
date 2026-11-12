@@ -4,7 +4,7 @@
 // where it was.
 import { kids, kid, attr } from './xml.js';
 import { parseRef, parseRange } from './refs.js';
-import { stringItemText } from './strings.js';
+import { stringItemText, stringItemRuns } from './strings.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { readColor } from './styles.js';
 import { readExtRules, readDataBar, readIconSet, extIdOf } from './cfext.js';
@@ -16,6 +16,8 @@ import { readFilterColumn } from './filtermore.js';
  *  own text, worked out from the group's first cell), `array` (an array formula's range, on its first cell) and
  *  `dataTable`. */
 const makeCell = (t, v, s, f) => ({ t, v, s, f });
+/** A text cell's rich-text runs (strings.js stringItemRuns), kept as `runs` for drawing it. */
+const withRuns = (cell, runs) => (runs ? Object.assign(cell, { runs }) : cell);
 
 /** Read one `c` element's value, resolving shared strings. */
 export function readCell(c, ns, sst) {
@@ -26,8 +28,8 @@ export function readCell(c, ns, sst) {
   const vEl = kid(c, 'v', ns);
   const v = vEl ? vEl.textContent : null;
   switch (t) {
-    case 's': return makeCell('s', v == null ? null : (sst[Number(v)] ?? ''), s, f);
-    case 'inlineStr': return makeCell('s', stringItemText(kid(c, 'is', ns), ns), s, f);
+    case 's': return withRuns(makeCell('s', v == null ? null : (sst[Number(v)] ?? ''), s, f), v == null ? null : sst.runs?.get(Number(v)));
+    case 'inlineStr': return withRuns(makeCell('s', stringItemText(kid(c, 'is', ns), ns), s, f), stringItemRuns(kid(c, 'is', ns), ns));
     case 'b': return makeCell('b', v == null ? null : v === '1' || v === 'true', s, f);
     case 'e': case 'str': case 'd': return makeCell(t, v, s, f);
     default: return makeCell('n', v == null || v === '' ? null : Number(v), s, f);

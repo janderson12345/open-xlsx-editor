@@ -1,5 +1,5 @@
 // Browser check of editing, continued: a workbook saved with a password, PivotTables (refreshed and made), the Data
-// tab, conditional formatting, several ranges selected, Go To Special, and sheets undone.
+// tab, conditional formatting, several ranges selected, Go To Special, sheets undone, and rich text drawn.
 // Run after `npm run build`: node test/editing-more.mjs [outDir]
 import fs from 'node:fs';
 import { encryptWorkbook } from '../src/ooxml/encryption.js';
@@ -450,5 +450,32 @@ const k60 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheet
 check(typedNow === 'the cat on monday' && k60 === 'the cat on Monday' && undone === 'adn ' && spelling === true && formulaSpelling === false,
   'AutoCorrect: teh to the as the word ends, monday to Monday on Enter, Ctrl+Z gives back what was typed; underlines for text only',
   JSON.stringify({ typedNow, k60, undone, spelling, formulaSpelling }));
+
+// Rich text (made here as Excel writes it: richtext.test.js): each run drawn in its own font over the cell's.
+{
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  wb.setCell(0, 'J12', 'x');
+  const { doc } = wb._part(0);
+  const ns = doc.documentElement.namespaceURI;
+  const c = [...doc.getElementsByTagNameNS(ns, 'c')].find((e) => e.getAttribute('r') === 'J12');
+  while (c.firstChild) c.removeChild(c.firstChild);
+  c.setAttribute('t', 'inlineStr');
+  const rPr = (inner) => `<rPr>${inner}<sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr>`;
+  const { parseXml } = await import('../src/ooxml/xml.js');
+  const is = parseXml(`<is xmlns="${ns}"><r><t xml:space="preserve">Plain </t></r><r>${rPr('<b/>')}<t>bold</t></r>`
+    + `<r><rPr><i/><sz val="16"/><color rgb="FFFF0000"/><rFont val="Courier New"/><family val="3"/></rPr><t xml:space="preserve"> red</t></r></is>`).documentElement;
+  c.appendChild(doc.importNode(is, true));
+  wb.dirty.add(wb.sheets[0].path);
+  fs.writeFileSync('test/out/rich.xlsx', wb.toBytes());
+}
+await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+await openFixtureFrom(page, 'test/out/rich.xlsx', 'rich.xlsx');
+const runs = await page.evaluate(() => {
+  const el = document.querySelector('.oxe-row[aria-rowindex="13"] .oxe-cell[aria-colindex="11"] .oxe-runs');
+  return el ? [...el.children].map((x) => { const st = getComputedStyle(x); return [x.textContent, st.fontWeight, st.fontStyle, st.fontSize, st.color, st.fontFamily.split(',')[0]]; }) : null;
+});
+check(runs?.length === 3 && runs[0][1] === '400' && runs[1][0] === 'bold' && runs[1][1] === '700' && runs[2][2] === 'italic' && runs[2][3] === '21.3333px' && runs[2][4] === 'rgb(255, 0, 0)' && /Courier New/.test(runs[2][5]),
+  'rich text: each run in its own font (bold; italic, 16pt, red, Courier New) over the cell’s', JSON.stringify(runs));
 
 await finish();

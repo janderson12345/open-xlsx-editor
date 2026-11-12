@@ -160,13 +160,13 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, chartLayer, noteLayer, filterLayer, errLayer, dvLayer, noteTexts);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, peerLayer, selLayer, markLayer, clipLayer, arrowLayer: traceLayer, filterLayer, errLayer, noteLayer, noteTexts, dvLayer, chartLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, peerLayer, selLayer, markLayer, clipLayer, arrowLayer: traceLayer, filterLayer, errLayer, noteLayer, noteTexts, dvLayer, chartLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
   const measure = (next, nextLooks) => {
     const auto = autoRowHeights(next, nextLooks.deco, sheetGeometry(next).cols);
-    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color, hiddenAt: nextLooks.hiddenAt, rowDesc: rowDescents(next, nextLooks.deco) }, sheetGeometry(next, { auto }));
+    Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color, hiddenAt: nextLooks.hiddenAt, runStyle: nextLooks.runStyle, rowDesc: rowDescents(next, nextLooks.deco) }, sheetGeometry(next, { auto }));
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));
     setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': st.colHeadH });
@@ -195,7 +195,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     if (y >= st.paneH) y += view.scrollTop / z;
     return { x, y };
   };
-  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt }) => {
+  const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt, runStyle: st.runStyle }) => {
     measure(next, nextLooks);
     view.setAttribute('aria-label', nextLabel);
     view.scrollTop = 0;
@@ -380,7 +380,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     rowsInView: () => { const z = st.zoom / 100; return Math.max(1, st.rows.indexAt(view.scrollTop / z + view.clientHeight / z - st.colHeadH) - st.rows.indexAt(view.scrollTop / z + st.paneH)); },
     /** After cells changed: sizes worked out again (row heights follow their fonts), drawn where the view is. */
     refresh() {
-      measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt });
+      measure(st.sheet, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt, runStyle: st.runStyle });
       draw(st, true);
       drawClip(st);
     },
@@ -437,7 +437,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     fitWidth(c) { return columnFitWidth(st, c); },
     /** The sheet read again (rows or columns inserted or deleted, or undone): drawn where the view is. */
     setModel(next) {
-      measure(next, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt });
+      measure(next, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt, runStyle: st.runStyle });
       draw(st, true);
       drawClip(st);
     },

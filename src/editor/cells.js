@@ -123,7 +123,9 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     el.classList.add(h === 'right' ? 'oxe-indent-r' : 'oxe-indent-l');
     vars['--oxe-indent'] = align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen);
   }
-  el.appendChild(textSpan(shown, clean));
+  // (Rich text: each run in its own font, over the cell's, when the cell shows its text as it is.)
+  const runs = !formulas && cell.runs && st.runStyle && shown.text === cell.v ? cell.runs : null;
+  el.appendChild(runs ? runsSpan(runs, clean, st.runStyle) : textSpan(shown, clean));
   if (cfIcon) el.appendChild(cfIcon);
   const color = shown.color && st.color ? st.color(shown.color) : null;
   if (color) {
@@ -142,6 +144,18 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
 
 /** The text span: plain text, or for formats with padding (_x: a space as wide as x, drawn as a hidden x) and fill
  *  (*x: x repeated across the room left in the cell) the pieces in a row. */
+function runsSpan(runs, clean, runStyle) {
+  const span = document.createElement('span');
+  span.className = 'oxe-tx oxe-runs';
+  for (const run of runs) {
+    const piece = document.createElement('span');
+    piece.textContent = clean(run.text);
+    if (run.font) piece.style.cssText = runStyle(run.font);
+    span.appendChild(piece);
+  }
+  return span;
+}
+
 function textSpan(shown, clean) {
   const span = document.createElement('span');
   span.className = 'oxe-tx';

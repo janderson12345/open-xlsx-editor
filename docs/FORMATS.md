@@ -106,6 +106,20 @@ beside F3's new right), where the ribbon's Borders measured earlier keeps a matc
 The degrees the box's own Fill Effects variants give, and the font sizes Excel steps through when shrinking, are not
 yet measured.
 
+## Rich text
+
+A cell's text in runs of several fonts (`src/ooxml/strings.js` stringItemRuns, drawn by `src/editor/cells.js`): each
+run in its own font over the cell's, bold, italic, underline, strikethrough, size, colour, font and super- or
+subscript. Measured over COM (`Characters(start, length).Font` set, the sharedStrings Excel saved,
+test/richtext.test.js): each run an `<r>` with an `<rPr>` giving every property (the font's name as `rFont`), the
+first run without one when it is the cell's own font; the cell's format takes the first run's font (a struck first
+word made the cell's font struck). Shown as Excel shows them; Show Formulas, and a number format that changes the
+text, show it plain.
+
+Not yet: editing a cell's runs (typing replaces them with plain text, as a new value), copying them, and a row's
+height following a larger run (Excel's file says the height, so a file from Excel shows right; a row grown here
+doesn't).
+
 ## Format Painter
 
 Format Painter copies the selection (outlined, as a copy is, the system clipboard left alone) and pastes its formats

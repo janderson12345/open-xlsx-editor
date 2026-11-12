@@ -52,6 +52,23 @@ function fontRules(font, theme, palette, normalFamily) {
   ].join('; ');
 }
 
+/** A rich-text run's font (ooxml/strings.js runFont) as inline CSS: what it gives over the cell's own font. */
+function runCss(font, theme, palette) {
+  const out = [];
+  if (font.name) out.push(`font-family: ${fontStack(fontFamily({ name: font.name, scheme: font.scheme }, theme))}`);
+  if (font.size != null) out.push(`font-size: ${(font.size * 4) / 3}px`);
+  out.push(`font-weight: ${font.b ? 'bold' : 'normal'}`, `font-style: ${font.i ? 'italic' : 'normal'}`);
+  const decoration = [font.u ? 'underline' : '', font.strike ? 'line-through' : ''].filter(Boolean).join(' ');
+  out.push(`text-decoration: ${decoration || 'none'}`);
+  if (font.u === 'double' || font.u === 'doubleAccounting') out.push('text-decoration-style: double');
+  const color = font.color ? resolveColor(font.color, theme, palette) : null;
+  if (color) out.push(`color: ${color}`);
+  // (Raised or lowered as a cell's superscript and subscript are: editor.css .oxe-sup.)
+  if (font.vertAlign === 'superscript') out.push('position: relative', 'top: -0.33em');
+  if (font.vertAlign === 'subscript') out.push('position: relative', 'top: 0.25em');
+  return out.join('; ');
+}
+
 /** Write a workbook's cell formats into `root` (replacing the last workbook's) and set the Normal style's font on it.
  *  Returns { classOf(s): the cell class, deco(s): { fill, fillClass, sides: [{ name, style, cls }], align, code },
  *  date1904, color(formatColour) }. */
@@ -105,6 +122,8 @@ export function applyCellStyles(root, workbook) {
     classOf: (s) => `oxe-s${valid(s)}`,
     deco: (s) => decos[valid(s)],
     date1904: workbook.date1904,
+    // (A rich-text run's font as an inline style, over its cell's: each property the run gives, cells.js.)
+    runStyle: (font) => runCss(font, theme, palette),
     // (A number format's colour: [Red] comes as '#FF0000', [ColorN] as an indexed colour of the workbook's palette.)
     color: (c) => (!c ? null : typeof c === 'string' ? c : resolveColor(c, theme, palette)),
   };
