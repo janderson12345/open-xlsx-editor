@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { parseRef } from '../src/ooxml/refs.js';
+import { entryChanges } from '../src/ooxml/entry.js';
 import { tokenize, renameSheetRefs } from '../src/calc/tokens.js';
 
 // (3D references and intersection, as a hidden Excel 365 worked them out: probe/i3d.ps1's 86 formulas, 84 the same
@@ -59,4 +60,38 @@ test('the intersection operator is a space between references, and only there', 
   wb.setFormula(base, 'E1', 'SUM(A1:C3 A1:A2)');
   wb.setFormula(base, 'E2', 'A1 C1');
   assert.deepEqual([value(wb, base, 'E1'), value(wb, base, 'E2'), wb.sheet(base).cells.get(0).get(4).f], [100, '#NULL!', 'SUM(A1:C3 A1:A2)']);
+});
+
+test('a 3D reference as sheets go and move, as Excel changes it: an end that leaves the span gives way inward', () => {
+  const made = () => {
+    const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+    const base = wb.sheets.length;
+    ['Jan', 'Feb', 'Mar', 'Apr', 'Other'].forEach((n, k) => { wb.addSheet(base + k, n); wb.setCell(base + k, 'A1', (k + 1) * 100); });
+    const o = wb.sheetIndexOf('Other');
+    wb.setFormula(o, 'B1', 'SUM(Jan:Apr!A1)');
+    wb.setFormula(o, 'B2', 'SUM(Feb:Mar!A1)');
+    return wb;
+  };
+  const shown = (wb) => { const o = wb.sheetIndexOf('Other'); return [0, 1].map((r) => { const x = wb.sheet(o).cells.get(r).get(1); return `${x.f}=${x.v}`; }); };
+  let wb = made();
+  wb.deleteSheet(wb.sheetIndexOf('Jan'));
+  assert.deepEqual(shown(wb), ['SUM(Feb:Apr!A1)=900', 'SUM(Feb:Mar!A1)=500']);
+  wb = made();
+  wb.deleteSheet(wb.sheetIndexOf('Feb'));
+  assert.deepEqual(shown(wb), ['SUM(Jan:Apr!A1)=800', 'SUM(Mar!A1)=300']);
+  // (Moved out past Apr: Feb:Apr. Moved after Feb, still among the others: as it was, now without Feb.)
+  wb = made();
+  wb.moveSheet(wb.sheetIndexOf('Jan'), wb.sheetIndexOf('Apr'));
+  assert.deepEqual(shown(wb), ['SUM(Feb:Apr!A1)=900', 'SUM(Feb:Mar!A1)=500']);
+  wb = made();
+  wb.moveSheet(wb.sheetIndexOf('Jan'), wb.sheetIndexOf('Feb'));
+  assert.deepEqual(shown(wb), ['SUM(Jan:Apr!A1)=800', 'SUM(Feb:Mar!A1)=600']);
+  // (Typed: the workbook's order, and one sheet's a plain reference.)
+  wb = made();
+  const o = wb.sheetIndexOf('Other');
+  for (const [ref, text] of [['C1', '=SUM(Apr:Jan!A1)'], ['C2', '=Jan:Jan!A1']]) {
+    const { r, c } = parseRef(ref);
+    wb.apply(o, [entryChanges(wb, o, r, c, text).content]);
+  }
+  assert.deepEqual([wb.sheet(o).cells.get(0).get(2).f, wb.sheet(o).cells.get(1).get(2).f], ['SUM(Jan:Apr!A1)', 'Jan!A1']);
 });

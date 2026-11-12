@@ -4,7 +4,7 @@
 // writes it) and takes away the names that belong to it. Names that belong to a sheet follow it (localSheetId), as do
 // the workbook's active and first tab. What Excel does here was measured over COM (docs/SHEETS.md).
 import { kid, kids, attr, serializeXml, REL_TYPES } from './xml.js';
-import { renameSheetRefs } from '../calc/tokens.js';
+import { renameSheetRefs, spanSheetRefs } from '../calc/tokens.js';
 
 /** Excel's own words when it refuses. */
 export const MESSAGES = {
@@ -89,6 +89,29 @@ const FORMULA_ELEMENTS = ['f', 'formula', 'formula1', 'formula2'];
  *  the formula cells whose text changed, [{ si, r, c }]. */
 function rewriteRefs(wb, from, to) {
   return mapFormulas(wb, (text) => renameSheetRefs(text, from, to), { name: from, renameTo: to });
+}
+
+/** 3D references after sheet `name` was deleted or moved (`before` and `after`: the sheets' names in order; `after`
+ *  null for a delete), as Excel changes them (measured): an end sheet that leaves the span's other sheets gives way to
+ *  the next of them inward (Jan:Apr with Jan deleted, or moved after Apr, is Feb:Apr; Feb:Mar with Feb gone is Mar!);
+ *  one that stays among them (Jan moved after Feb) leaves the reference as it was, as does any other sheet. */
+function shrinkSpans(wb, name, before, after) {
+  const low = before.map(lower);
+  const x = low.indexOf(lower(name));
+  mapFormulas(wb, (text) => spanSheetRefs(text, ([a, b]) => {
+    const ia = low.indexOf(lower(a));
+    const ib = low.indexOf(lower(b));
+    if (ia < 0 || ib < 0 || (x !== ia && x !== ib)) return null;
+    const rest = before.slice(Math.min(ia, ib), Math.max(ia, ib) + 1).filter((_, k) => k + Math.min(ia, ib) !== x);
+    if (!rest.length) return false;
+    if (after) {
+      const at = (n) => after.indexOf(n);
+      const lo = Math.min(at(rest[0]), at(rest[rest.length - 1]));
+      const hi = Math.max(at(rest[0]), at(rest[rest.length - 1]));
+      if (at(name) > lo && at(name) < hi) return null;
+    }
+    return rest.length === 1 ? rest[0] : [rest[0], rest[rest.length - 1]];
+  }), { name });
 }
 
 /**
@@ -237,6 +260,9 @@ export function moveSheet(wb, from, to) {
   container.removeChild(info.el);
   container.insertBefore(info.el, wb.sheets[to + 1]?.el || null);
   reindex(wb, (k) => wb.sheets.indexOf(before[k]));
+  shrinkSpans(wb, info.name, before.map((s) => s.name), wb.sheets.map((s) => s.name));
+  // (A 3D reference reads the sheets now between its ends: worked out again, as Excel does.)
+  wb.calculate();
 }
 
 /** Hide or show sheet i's tab. The last sheet shown can't be hidden. A hidden sheet loses its tab selection (a selected
@@ -287,10 +313,12 @@ export function setTabColor(wb, i, color) {
 export function deleteSheet(wb, i) {
   const info = wb.sheets[i];
   if (info.state === 'visible' && visibleCount(wb) <= 1) throw new SheetError(MESSAGES.lastVisible);
+  const names = wb.sheets.map((s) => s.name);
   wb.sheets.splice(i, 1);
   info.el.parentNode.removeChild(info.el);
   reindex(wb, (k) => (k === i ? -1 : k > i ? k - 1 : k));
   rewriteRefs(wb, info.name, null);
+  shrinkSpans(wb, info.name, names, null);
   if (info.path) {
     wb.pkg.removeTree(info.path);
     wb.dirty.delete(info.path);

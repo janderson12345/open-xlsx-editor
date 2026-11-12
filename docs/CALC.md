@@ -142,6 +142,11 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     - The first name reading as a cell makes it a range, as Excel reads it: S1:S4!A1 is S1 to S4!A1.
     - Intersection binds tighter than negation; no overlap is #NULL!; references on two sheets, or a 3D one, #VALUE!.
     - The file has them as typed: `SUM(Jan:Apr!A1)`, `'Feb:My Mar'!A1:B2`, `A1:C3 B2:D4`.
+    - Typed, a 3D reference is put in the workbook's order (`Apr:Jan!A1` is `Jan:Apr!A1`) and one of one sheet made
+      plain (`Jan:Jan!A1` is `Jan!A1`). As sheets go and move (16 cases measured, all as Excel's): an end sheet that
+      leaves the span's other sheets, deleted or moved out, gives way to the next of them inward (Jan:Apr with Jan
+      deleted, or moved after Apr, is Feb:Apr; Feb:Mar with Feb gone is Mar!); one moved but still among them, and any
+      other sheet, leaves it as it was; a sheet moved or inserted between the ends is read. Renaming an end renames it.
   - `functions-amort.js`: AMORLINC and AMORDEGRC, the French depreciation. Microsoft's page gives other rules than
     Excel's; these are Excel's, from about 600 cases with cell values in a hidden Excel, then the probe's 48:
     - AMORDEGRC's coefficient by the life (1 / rate): up to 2 years #NUM!, to 4 years 1.5, to 6 years 2, past that 2.5.
@@ -379,12 +384,9 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
-- **3D references and intersection: what isn't yet as Excel.** Read and worked out (`src/calc/threed.js`, below), but:
-  `Apr:Jan!A1` and `Jan:Jan!A1` are kept as typed, where Excel rewrites them `Jan:Apr!A1` and `Jan!A1` (both work out
-  the same); a sheet deleted at an end of one leaves it #REF!, where Excel moves the end in; `Jan:'My Mar'!A1` (a
-  quote round one end only, #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't
-  read as formulas. Rows inserted, or cells moved, on one of its sheets leave a 3D reference as it was (not yet
-  measured against Excel).
+- **3D references and intersection: what isn't yet as Excel.** `Jan:'My Mar'!A1` (a quote round one end only,
+  #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't read as formulas. Rows
+  inserted, or cells moved, on one of a 3D reference's sheets leave it as it was (not yet measured against Excel).
 - **Iterative calculation: what isn't yet as Excel.** No on-screen switch for it (Excel's File > Options > Formulas):
   it is read from the file and kept, and `setIteration` (calcmode.js) turns it on. A circle whose cells change only
   in text or errors isn't measured: here only numbers count toward Maximum Change. Array and dynamic formulas in a

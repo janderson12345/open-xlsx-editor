@@ -3,6 +3,21 @@
 // Typing, pasting text and Replace all go through here.
 import { parseInput, formatAfterEntry } from './input.js';
 import { formatCodeOf } from './styles.js';
+import { spanSheetRefs } from '../calc/tokens.js';
+
+/** A typed formula's 3D references as Excel takes them (measured): in the workbook's order, Apr:Jan!A1 as Jan:Apr!A1,
+ *  and one sheet's, Jan:Jan!A1, as Jan!A1; the sheets named as the workbook names them. */
+function inOrder(wb, formula) {
+  if (!formula.includes(':')) return formula;
+  return spanSheetRefs(formula, ([a, b]) => {
+    const ia = wb.sheetIndexOf(a);
+    const ib = wb.sheetIndexOf(b);
+    if (ia < 0 || ib < 0) return null;
+    const [first, last] = [wb.sheets[Math.min(ia, ib)].name, wb.sheets[Math.max(ia, ib)].name];
+    if (ia === ib) return first;
+    return first === a && last === b ? null : [first, last];
+  });
+}
 
 /**
  * The changes for `text` entered into cell (r, c) of sheet si: { content: { r, c, value } or { r, c, formula }, style:
@@ -14,7 +29,7 @@ export function entryChanges(wb, si, r, c, text, today = new Date()) {
   const code = formatCodeOf(wb.styles, s);
   const parsed = parseInput(text, { today, date1904: wb.date1904, asText: code === '@' });
   if (parsed.error) return { error: parsed.error };
-  const content = parsed.formula != null ? { r, c, formula: parsed.formula, ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
+  const content = parsed.formula != null ? { r, c, formula: inOrder(wb, parsed.formula), ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
   const format = formatAfterEntry(code, parsed);
   return { content, style: format ? { r, c, s: wb.styleWith(s, { numFmt: format }) } : null, parsed };
 }

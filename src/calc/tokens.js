@@ -397,6 +397,29 @@ export function sheetPrefix(name) {
   return plain ? `${name}!` : `'${name.replace(/'/g, "''")}'!`;
 }
 
+/** A 3D reference's sheets as a formula writes them: Jan:Apr!, quoted as one when either name needs it ('Feb:My Mar'!). */
+function spanPrefix(a, b) {
+  const plain = sheetPrefix(a) === `${a}!` && sheetPrefix(b) === `${b}!`;
+  return plain ? `${a}:${b}!` : `'${`${a}:${b}`.replace(/'/g, "''")}'!`;
+}
+
+/** A formula with each 3D reference's sheets ([first, last] as written) passed through `fn`, which gives a new pair,
+ *  one sheet's name (a plain reference), false (#REF!) or null (as it was). Text that isn't a formula is kept. */
+export function spanSheetRefs(text, fn) {
+  try {
+    return mapRefs(text, (t) => {
+      if (t.type !== 'ref' || t.book != null || !t.sheets) return null;
+      const next = fn(t.sheets);
+      if (next == null) return null;
+      if (next === false) return '#REF!';
+      const body = text.slice(t.start + t.prefix.length, t.end);
+      return (typeof next === 'string' ? sheetPrefix(next) : spanPrefix(next[0], next[1])) + body;
+    });
+  } catch {
+    return text;
+  }
+}
+
 /** A formula with its references to sheet `from` (case ignored, this workbook's only) pointing at sheet `to`, or, with
  *  `to` null, become #REF! (a deleted sheet: Excel writes the whole reference as #REF!). Text that doesn't read as a
  *  formula comes back as it was. */
@@ -408,9 +431,7 @@ export function renameSheetRefs(text, from, to) {
       if (t.type === 'ref' && t.book == null && t.sheets) {
         const ends = t.sheets.map((s) => (s.toLowerCase() === was ? to : s));
         if (to == null || ends.every((s, k) => s === t.sheets[k])) return null;
-        const [a, b] = ends;
-        const plain = sheetPrefix(a) === `${a}!` && sheetPrefix(b) === `${b}!`;
-        return (plain ? `${a}:${b}!` : `'${`${a}:${b}`.replace(/'/g, "''")}'!`) + text.slice(t.start + t.prefix.length, t.end);
+        return spanPrefix(ends[0], ends[1]) + text.slice(t.start + t.prefix.length, t.end);
       }
       if (t.type !== 'ref' || t.book != null || t.sheet == null || t.sheet.toLowerCase() !== was) return null;
       return to == null ? '#REF!' : sheetPrefix(to) + text.slice(t.start + t.prefix.length, t.end);
