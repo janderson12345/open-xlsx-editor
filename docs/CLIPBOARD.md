@@ -69,13 +69,24 @@ PasteSpecial xlPasteAll, xlPasteComments and xlPasteValues onto cells, some with
 Comments and Notes leave each pasted cell with the copy's note there, or none (a note there before is taken away, so
 F6's went when C3, which had none, was pasted over it); Values brings none. Here (`clipops.js` pasteNotes): Ctrl+V,
 Paste Special's All, All except borders and Comments and Notes do the same, over a repeated paste too,
-as one step of Undo with the cells (test/pastenotes.test.js, test/editing-more.mjs). A cut moves its cells, not its
+as one step of Undo with the cells (test/pastenotes.test.js, test/editing-formats.mjs). A cut moves its cells, not its
 notes, yet; a comment thread isn't copied.
+
+## Validation pasted
+
+A copy carries the validation rules over its cells. Measured over COM (C2:C3 a custom rule =C2>B2, B2:B3 a list
+=$A$1:$A$3, B2:C3 copied; Paste onto H5, PasteSpecial xlPasteValidation onto L5 and onto O5:R8, the file saved):
+on the sheet copied from, the pasted cells join the rule itself, its formula as it was (written for its first cell,
+so I5 reads I5>H5), and ranges that carry on one another are joined (`C2:C3 I5:I6 M5:M6 P5:P8 R5:R8`); a rule of
+the pasted-over cells loses them. Here (`clipops.js` pasteValidation, `dvedit.js` addToRule): Ctrl+V, Paste Special's
+All, All except borders and Validation do the same, Excel's file to the attribute (test/pastenotes.test.js); onto
+another sheet, a rule of its own, its formula moved as a copied formula is (`I5>H5`; not measured). Not with
+Transpose.
 
 ## Not yet
 
-Paste Special's Validation, All using Source theme and All merging conditional formats; validation with Paste and All
-(Excel brings it); notes moved with a cut; comment threads copied; Paste
+Paste Special's All using Source theme and All merging conditional formats; validation with Transpose; validation
+pasted onto another sheet measured against Excel; notes moved with a cut; comment threads copied; Paste
 Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
 program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was
 pasted onto (Excel shrinks it: `=SUM(A1:A3)` became `=SUM(A2:A3)` when A1 was moved onto A3).

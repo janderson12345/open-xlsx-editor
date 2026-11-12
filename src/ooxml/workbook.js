@@ -20,7 +20,7 @@ import { applyAdvancedFilter } from './advfilter.js';
 import { Calc } from '../calc/engine.js';
 import { parseFormula } from '../calc/parse.js';
 import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.js';
-import { setValidation as setValidationXml } from './dvedit.js';
+import { setValidation as setValidationXml, addToRule } from './dvedit.js';
 import { addConditional, clearConditional } from './cfedit.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
@@ -280,10 +280,15 @@ export class Workbook {
     const part = this._part(i);
     if (axis === 'col') setColumns(part.doc, a, b, change, part.model.format);
     else setRows(part.doc, a, b, change);
+    this._reread(i, part);
+    this.resetCalc();
+  }
+
+  /** Sheet i (its `part`) read again after its XML was changed, and marked changed. */
+  _reread(i, part) {
     this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
-    this.resetCalc();
   }
 
   /** Sheet i's rows' and columns' own formats: `cols` [{ c, s }], `rows` [{ r, s }] (sizes.js, as Excel writes a
@@ -291,9 +296,7 @@ export class Workbook {
   setLineStyles(i, { cols = [], rows = [] }) {
     const part = this._part(i);
     setLineStyles(part.doc, { cols, rows }, part.model.format);
-    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
-    this.dirty.add(this.sheets[i].path);
-    this.edited = true;
+    this._reread(i, part);
   }
 
   /**
@@ -307,27 +310,28 @@ export class Workbook {
   setConditional(i, ranges, rule) {
     const part = this._part(i);
     if (rule) addConditional(this, i, ranges, rule); else clearConditional(this, i, ranges);
-    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
-    this.dirty.add(this.sheets[i].path);
-    this.edited = true;
+    this._reread(i, part);
   }
 
   /** A change to sheet i's conditional formats made by `fn()` (cfmanage.js: the Rules Manager's), the sheet read again. */
   changeConditional(i, fn) {
     const part = this._part(i);
     fn();
-    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
-    this.dirty.add(this.sheets[i].path);
-    this.edited = true;
+    this._reread(i, part);
   }
 
   /** Give cells `ranges` of sheet i the data validation `rule` (dvedit.js), or none (null: Clear All). */
+  /** Cells added to the rule they were copied from (dvedit.js addToRule): false when it isn't there. */
+  addToValidation(i, match, ranges) {
+    const part = this._part(i);
+    if (!addToRule(part.doc, match, ranges)) return false;
+    this._reread(i, part);
+    return true;
+  }
   setValidation(i, ranges, rule) {
     const part = this._part(i);
     setValidationXml(part.doc, ranges, rule, this.date1904);
-    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
-    this.dirty.add(this.sheets[i].path);
-    this.edited = true;
+    this._reread(i, part);
   }
 
   /** Sheet i's AutoFilter on (`filter`: its area and columns' filters) or off (null), rows hidden or shown (filterops.js). */

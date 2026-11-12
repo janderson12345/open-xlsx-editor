@@ -99,6 +99,35 @@ export function setValidation(doc, ranges, rule, date1904 = false) {
   }
 }
 
+/** Ranges joined where one carries on another, as Excel writes a rule's sqref after a paste: below it with the same
+ *  columns (P5:P6 and P7:P8 as P5:P8), or beside it with the same rows. */
+export function coalesce(ranges) {
+  const out = [];
+  for (const a of ranges) {
+    const b = out.find((x) => (x.c0 === a.c0 && x.c1 === a.c1 && x.r1 + 1 === a.r0) || (x.r0 === a.r0 && x.r1 === a.r1 && x.c1 + 1 === a.c0));
+    if (b) { b.r1 = Math.max(b.r1, a.r1); b.c1 = Math.max(b.c1, a.c1); } else out.push({ ...a });
+  }
+  return out;
+}
+
+/** The cells `ranges` added to the sheet's rule whose first cell is `first` ({ r, c }) and whose type and first
+ *  formula are `type` and `formula1`, as Excel adds pasted cells to the rule they were copied from (its formulas, as
+ *  written for its first cell, cover them too). Edits `doc`; false when there is no such rule. */
+export function addToRule(doc, { first, type, formula1 }, ranges) {
+  const root = doc.documentElement;
+  const wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
+  const el = wrap && [...wrap.childNodes].find((n) => {
+    if (n.localName !== 'dataValidation' || (n.getAttribute('type') || 'none') !== type) return false;
+    const f = [...n.childNodes].find((x) => x.localName === 'formula1');
+    const a = parseRange((n.getAttribute('sqref') || '').split(/\s+/)[0]);
+    return (f ? f.textContent : null) === (formula1 ?? null) && a && a.r0 === first.r && a.c0 === first.c;
+  });
+  if (!el) return false;
+  const now = (el.getAttribute('sqref') || '').split(/\s+/).map(parseRange).filter(Boolean);
+  el.setAttribute('sqref', [...now.slice(0, 1), ...coalesce([...now.slice(1), ...ranges])].map(rangeName).join(' '));
+  return true;
+}
+
 /** A rule as the sheet holds it (sheet.js readValidations) in the box's terms, its formulas as Excel shows them in its
  *  box: a typed list unquoted, a reference or formula with "=", a date or time as one. null for none. */
 export function boxRule(v, date1904 = false) {

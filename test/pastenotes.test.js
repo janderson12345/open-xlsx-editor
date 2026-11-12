@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
-import { snapshot, pasteNotes } from '../src/ooxml/clipops.js';
+import { snapshot, pasteNotes, pasteValidation } from '../src/ooxml/clipops.js';
 import { setNote } from '../src/ooxml/noteedit.js';
 import { readNotes } from '../src/ooxml/notes.js';
 
@@ -41,4 +41,26 @@ test("a paste's notes as Excel's: each pasted cell ends with the copy's note the
   // (Repeated over a selection twice the copy's size.)
   pasteNotes(wb, si, { r0: 10, c0: 0, r1: 13, c1: 1 }, copy);
   assert.deepEqual(['10,0', '12,0', '10,1', '11,0'].map((k) => !!notesOf(wb, si)[k]), [true, true, false, false]);
+});
+
+test("a paste's validation as Excel's: the copy's rules over the pasted cells, joining the rule itself on its own sheet (Excel's file), moved as formulas are elsewhere", async () => {
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Rules');
+  for (const [ref, v] of [['B2', 1], ['C2', 2], ['B3', 3], ['C3', 4]]) wb.setCell(si, ref, v);
+  wb.setValidation(si, [{ r0: 1, c0: 2, r1: 2, c1: 2 }], { type: 'custom', f1: '=C2>B2' });
+  wb.setValidation(si, [{ r0: 1, c0: 1, r1: 2, c1: 1 }], { type: 'list', f1: '=$A$1:$A$3' });
+  wb.setValidation(si, [{ r0: 6, c0: 8, r1: 6, c1: 8 }], { type: 'whole', op: 'between', f1: '0', f2: '9' });
+  const copy = snapshot(wb, si, { ar: 1, ac: 1, r0: 1, c0: 1, r1: 2, c1: 2 });
+  pasteValidation(wb, si, { r0: 4, c0: 7, r1: 5, c1: 8 }, copy); // H5
+  pasteValidation(wb, si, { r0: 4, c0: 11, r1: 5, c1: 12 }, copy); // L5
+  pasteValidation(wb, si, { r0: 4, c0: 14, r1: 7, c1: 17 }, copy); // O5:R8
+  const sqrefs = [...serializeXml(wb._part(si).doc).matchAll(/<dataValidation [^>]*sqref="([^"]+)"[^>]*>(?:<formula1>([^<]*))?/g)].map((m) => `${m[1]} | ${m[2]}`);
+  // (Excel's own, after Paste on H5 and PasteSpecial(xlPasteValidation) on L5 and O5:R8; I7's rule, not pasted over, kept.)
+  assert.deepEqual(sqrefs, ['C2:C3 I5:I6 M5:M6 P5:P8 R5:R8 | C2&gt;B2', 'B2:B3 H5:H6 L5:L6 O5:O8 Q5:Q8 | $A$1:$A$3', 'I7 | 0']);
+  // (On another sheet: a rule of its own, its formula moved as a copied formula is.)
+  const other = wb.addSheet(wb.sheets.length, 'Other');
+  pasteValidation(wb, other, { r0: 4, c0: 7, r1: 5, c1: 8 }, copy);
+  const there = [...serializeXml(wb._part(other).doc).matchAll(/sqref="([^"]+)"[^>]*><formula1>([^<]*)/g)].map((m) => `${m[1]} | ${m[2]}`);
+  assert.deepEqual(there, ['I5:I6 | I5&gt;H5', 'H5:H6 | $A$1:$A$3']);
 });

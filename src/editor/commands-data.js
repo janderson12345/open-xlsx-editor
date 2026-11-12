@@ -19,16 +19,19 @@ export const MULTIPLE_MESSAGE = "This action won't work on multiple selections."
 
 export function dataCommands(env) {
   const { allowed, commands, ctx, state, sheet, show, runSteps, sizeStep, moved, idOf } = env;
-  /** Paste's steps run as one step of the history, the copy's notes put over the pasted cells too when `notes` is
-   *  the copy and has or meets any (clipops.js pasteNotes): then the step is the workbook before and after. */
-  function withNotes(steps, notes, opts = {}) {
+  /** Paste's steps run as one step of the history, the copy's notes and validation (`parts.notes`,
+   *  `parts.validation`: clipops.js pasteNotes, pasteValidation) put over the pasted cells too when `copy` is given
+   *  and has or meets any: then the step is the workbook before and after. */
+  function withNotes(steps, copy, opts = {}, parts = { notes: true, validation: true }) {
     const wb = ctx.workbook();
     const si = ctx.sheetIndex();
     const area = steps.find((x) => x.si === si)?.area;
-    if (!notes || !area) return runSteps(steps);
+    if (!copy || !area) return runSteps(steps);
     const before = wb.snapshot();
     if (!runSteps(steps)) return false;
-    if (!clip.pasteNotes(wb, si, area, notes, opts)) return true;
+    const notes = parts.notes && clip.pasteNotes(wb, si, area, copy, opts);
+    const rules = parts.validation && !opts.transpose && clip.pasteValidation(wb, si, area, copy);
+    if (!notes && !rules) return true;
     // (The steps' own entry gives way to one for the whole paste, notes and all.)
     state.undo.pop();
     state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
@@ -85,8 +88,10 @@ export function dataCommands(env) {
       }
       if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
       const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste, op, skip, transpose });
-      // (All, All except borders and Comments and Notes bring the copy's notes, as Excel's do.)
-      if (!withNotes(steps, !link && ['all', 'noBorders', 'comments'].includes(paste) && !op && !skip ? copy : null, { transpose })) return false;
+      // (All and All except borders bring the copy's notes and validation, Comments and Notes and Validation each its
+      // own, as Excel's do.)
+      const parts = { notes: ['all', 'noBorders', 'comments'].includes(paste), validation: ['all', 'noBorders', 'validation'].includes(paste) };
+      if (!withNotes(steps, !link && (parts.notes || parts.validation) && !op && !skip ? copy : null, { transpose }, parts)) return false;
       const area = steps[0].area;
       show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
       return true;

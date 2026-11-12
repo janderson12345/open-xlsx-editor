@@ -311,36 +311,6 @@ const reopened = await doneNow();
 await page.click(`${box} >> button:text-is("Close")`);
 check(resolved.done === 1 && /\(Resolved\)/.test(resolved.title) && !resolved.reply && reopened === 0, 'Resolve thread: done="1" as Excel writes it, Reopen and no reply; reopened', JSON.stringify({ resolved, reopened }));
 
-// A note copied with its cell: Ctrl+V brings it, as Excel's Paste does; Ctrl+Z takes it away; Paste Special's
-// Comments and Notes brings it alone.
-await page.evaluate(() => { window.oxe.command('insertSheet'); window.oxe.select('B2'); window.oxe.enter('B2', 'noted'); });
-await page.focus('.oxe-grid');
-await page.keyboard.press('Shift+F2');
-await page.waitForSelector('dialog.oxe-note-edit');
-await page.keyboard.type('copied note');
-await page.keyboard.press('Escape');
-const marks = () => page.evaluate(() => document.querySelectorAll('.oxe-note-mark').length);
-const oneMark = await marks();
-await page.evaluate(() => window.oxe.select('B2'));
-await page.focus('.oxe-grid');
-await page.keyboard.press('Control+c');
-await page.evaluate(() => window.oxe.select('D4'));
-await page.keyboard.press('Control+v');
-const pastedMarks = await marks();
-const d4 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(3)?.get(3)?.v);
-await page.keyboard.press('Control+z');
-const undoneMarks = await marks();
-await page.evaluate(() => window.oxe.select('F4'));
-await page.keyboard.press('Control+Alt+v');
-await page.waitForSelector('dialog.oxe-dialog >> text=Comments and Notes');
-await page.click('dialog.oxe-dialog >> label:text-is("Comments and Notes")');
-await page.click('dialog.oxe-dialog >> button:text-is("OK")');
-await page.waitForFunction(() => document.querySelectorAll('.oxe-note-mark').length === 2);
-const f4 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(3)?.get(5)?.v ?? null);
-await page.keyboard.press('Escape');
-check(oneMark === 1 && pastedMarks === 2 && d4 === 'noted' && undoneMarks === 1 && f4 === null,
-  'a note copied: Ctrl+V brings it with the cell, Ctrl+Z takes it away; Paste Special > Comments and Notes brings it alone', JSON.stringify({ oneMark, pastedMarks, d4, undoneMarks, f4 }));
-
 // Conditional formatting on a new sheet's numbers 1 to 5: a blue data bar from the menu (drawn: the largest bar the
 // widest), an icon set (5's icon the top one), New Rule's formula rule, and the Rules Manager deleting the data bar.
 await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for (let r = 1; r <= 5; r++) o.enter(`A${r}`, String(r)); o.select('A1'); o.command('extendTo', 4, 0); });

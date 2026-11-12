@@ -8,6 +8,7 @@ import { formatCodeOf } from './styles.js';
 import { refName, colName } from './refs.js';
 import { readNotes } from './notes.js';
 import { setNote, deleteNote } from './noteedit.js';
+import { boxRule, coalesce } from './dvedit.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
 const inside = (a, b) => a.r0 >= b.r0 && a.r1 <= b.r1 && a.c0 >= b.c0 && a.c1 <= b.c1;
@@ -32,7 +33,47 @@ export function snapshot(wb, si, sel, cut = false) {
     notes: [...readNotes(wb, si)].filter(([, n]) => n.kind === 'note').map(([key, n]) => { const [r, c] = key.split(',').map(Number); return { r, c, n }; })
       .filter(({ r, c }) => r >= rect.r0 && r <= rect.r1 && c >= rect.c0 && c <= rect.c1)
       .map(({ r, c, n }) => ({ dr: r - rect.r0, dc: c - rect.c0, author: n.author, text: noteBody(n) })),
+    // (The validation rules over the copied cells, each with the parts of it in the copy: a paste brings them.)
+    validations: (sheet.validations || []).filter((v) => v.type !== 'none').map((v) => ({ v, parts: v.ranges.map((a) => clipTo(a, rect)).filter(Boolean) })).filter((x) => x.parts.length),
   };
+}
+
+/** Range `a` cut to `b`, or null when they don't meet. */
+const clipTo = (a, b) => (overlaps(a, b) ? { r0: Math.max(a.r0, b.r0), c0: Math.max(a.c0, b.c0), r1: Math.min(a.r1, b.r1), c1: Math.min(a.c1, b.c1) } : null);
+
+/** What a paste does to validation, as Excel's Paste, Paste Special's All and Validation do (measured over COM): the
+ *  pasted cells end with the copy's rules, each over the cells it covered, moved with them; its formulas move as a
+ *  copied formula does (relative references follow); cells the copy had no rule for, none. `area` and the copy as
+ *  pasteNotes's. Not with Transpose. Changes the workbook; returns whether anything changed. */
+export function pasteValidation(wb, si, area, clip) {
+  const h = clip.rect.r1 - clip.rect.r0 + 1;
+  const w = clip.rect.c1 - clip.rect.c0 + 1;
+  const had = (wb.sheet(si).validations || []).some((v) => v.type !== 'none' && v.ranges.some((a) => overlaps(a, area)));
+  if (!had && !clip.validations?.length) return false;
+  if (had) wb.setValidation(si, [area], null);
+  const sameSheet = clip.wb === wb && clip.si === si;
+  for (const { v, parts } of clip.validations || []) {
+    const ranges = [];
+    for (let tr = area.r0; tr <= area.r1; tr += h) {
+      for (let tc = area.c0; tc <= area.c1; tc += w) {
+        for (const a of parts) {
+          const moved = clipTo({ r0: a.r0 + tr - clip.rect.r0, c0: a.c0 + tc - clip.rect.c0, r1: a.r1 + tr - clip.rect.r0, c1: a.c1 + tc - clip.rect.c0 }, area);
+          if (moved) ranges.push(moved);
+        }
+      }
+    }
+    if (!ranges.length) continue;
+    const base = v.ranges[0];
+    // (On the sheet copied from, the cells join the rule itself, as Excel's do; elsewhere a rule of their own, its
+    // formulas written for its first cell as a formula copied there is: shifted from the rule's first cell to the
+    // copied cell, and on as far as it was pasted.)
+    if (sameSheet && wb.addToValidation(si, { first: { r: base.r0, c: base.c0 }, type: v.type, formula1: v.formulas[0] }, coalesce(ranges))) continue;
+    const dr = area.r0 - clip.rect.r0;
+    const dc = area.c0 - clip.rect.c0;
+    const formulas = v.formulas.map((f) => (f == null ? f : shiftFormula(f, parts[0].r0 - base.r0 + dr, parts[0].c0 - base.c0 + dc)));
+    wb.setValidation(si, coalesce(ranges), boxRule({ ...v, formulas }, wb.date1904));
+  }
+  return true;
 }
 
 /** A note's own text, without the bold author line Excel puts before it. */
@@ -189,6 +230,7 @@ const PASTES = {
   values: { contents: 'values' },
   formats: { format: 'all' },
   comments: {},
+  validation: {},
   noBorders: { contents: 'formulas', format: 'noBorders' },
   formulasFormats: { contents: 'formulas', format: 'number' },
   valuesFormats: { contents: 'values', format: 'number' },

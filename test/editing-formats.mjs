@@ -1,5 +1,6 @@
 // Browser check of formats: rich text drawn, a row's and a column's own format (drawn, given by formatting whole
-// lines and the whole sheet), a row grown by its font, and a .csv opened as Excel opens one.
+// lines and the whole sheet), a row grown by its font, a .csv opened as Excel opens one, and notes and validation
+// pasted with their cells.
 // Run after `npm run build`: node test/editing-formats.mjs [outDir]
 import fs from 'node:fs';
 import { editingPage } from './editing-kit.mjs';
@@ -103,5 +104,54 @@ check(csv.sheets === 'csv-excel' && csv.b6 === '50%' && csv.b8 === '3/5/2024' &&
 const resaved = await page.evaluate(() => new TextDecoder('utf-8', { ignoreBOM: true }).decode(window.oxe.saveCsv()));
 check(resaved.startsWith('\uFEFFname,num,text\r\nplain,42,"quoted, comma"\r\n') && resaved.includes('pct,50%,FALSE\r\n') && resaved.includes(',"say ""hi"""\r\n'),
   'the CSV saved again as Excel’s CSV UTF-8 writes it', JSON.stringify(resaved.slice(0, 120)));
+
+// (On a new sheet of the CSV's workbook.)
+// A note copied with its cell: Ctrl+V brings it, as Excel's Paste does; Ctrl+Z takes it away; Paste Special's
+// Comments and Notes brings it alone.
+await page.evaluate(() => { window.oxe.command('insertSheet'); window.oxe.select('B2'); window.oxe.enter('B2', 'noted'); });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+F2');
+await page.waitForSelector('dialog.oxe-note-edit');
+await page.keyboard.type('copied note');
+await page.keyboard.press('Escape');
+const marks = () => page.evaluate(() => document.querySelectorAll('.oxe-note-mark').length);
+const oneMark = await marks();
+await page.evaluate(() => window.oxe.select('B2'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+c');
+await page.evaluate(() => window.oxe.select('D4'));
+await page.keyboard.press('Control+v');
+const pastedMarks = await marks();
+const d4 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(3)?.get(3)?.v);
+await page.keyboard.press('Control+z');
+const undoneMarks = await marks();
+await page.evaluate(() => window.oxe.select('F4'));
+await page.keyboard.press('Control+Alt+v');
+await page.waitForSelector('dialog.oxe-dialog >> text=Comments and Notes');
+await page.click('dialog.oxe-dialog >> label:text-is("Comments and Notes")');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.waitForFunction(() => document.querySelectorAll('.oxe-note-mark').length === 2);
+const f4 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(3)?.get(5)?.v ?? null);
+await page.keyboard.press('Escape');
+check(oneMark === 1 && pastedMarks === 2 && d4 === 'noted' && undoneMarks === 1 && f4 === null,
+  'a note copied: Ctrl+V brings it with the cell, Ctrl+Z takes it away; Paste Special > Comments and Notes brings it alone', JSON.stringify({ oneMark, pastedMarks, d4, undoneMarks, f4 }));
+
+// A cell's validation copied with it: Ctrl+V adds the pasted cell to the rule, as Excel's Paste does; Paste
+// Special's Validation is in the box.
+await page.evaluate(() => {
+  window.oxe.command('sheetChange', (wb, si) => wb.setValidation(si, [{ r0: 7, c0: 1, r1: 7, c1: 1 }], { type: 'whole', op: 'between', f1: '1', f2: '9' }));
+  window.oxe.select('B8');
+});
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+c');
+await page.evaluate(() => window.oxe.select('D8'));
+await page.keyboard.press('Control+v');
+const ruleRanges = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).validations.map((v) => v.ranges.length).join());
+await page.keyboard.press('Control+Alt+v');
+await page.waitForSelector('dialog.oxe-dialog >> text=Comments and Notes');
+const hasValidation = await page.isVisible('dialog.oxe-dialog >> label:text-is("Validation")');
+await page.keyboard.press('Escape');
+await page.keyboard.press('Escape');
+check(ruleRanges === '2' && hasValidation, 'a cell with validation copied: Ctrl+V adds the pasted cell to its rule; Paste Special has Validation', JSON.stringify({ ruleRanges, hasValidation }));
 
 await finish();
