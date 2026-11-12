@@ -10,6 +10,7 @@ import { position } from './functions-lookup.js';
 import { dateParts } from '../ooxml/format.js';
 import { colName } from '../ooxml/refs.js';
 import { sin, cos, tan, TRIG_LIMIT } from './trig.js';
+import { notACharacter } from './charsets.js';
 
 const sorted = (args, ctx) => numbers(args, ctx).sort((a, b) => a - b);
 
@@ -406,7 +407,7 @@ lifted('DOLLAR', (a, ctx) => {
   return x < 0 ? `($${s})` : `$${s}`;
 });
 lifted('UNICODE', (a, ctx) => { const s = text(a[0], ctx); if (!s) throw E.value; return s.codePointAt(0); });
-lifted('UNICHAR', (a, ctx) => { const n = Math.trunc(num(a[0], ctx)); if (n < 1 || n > 0x10ffff) throw E.value; return String.fromCodePoint(n); });
+lifted('UNICHAR', (a, ctx) => { const n = Math.trunc(num(a[0], ctx)); if (n < 1 || n > 0x10ffff) throw E.value; if (notACharacter(n)) throw E.na; return String.fromCodePoint(n); });
 
 // ---- Trigonometry, GCD and LCM, rounding to a multiple
 

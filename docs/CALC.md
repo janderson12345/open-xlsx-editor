@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1645 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1789 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1645 of 1645 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1789 of 1789 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -389,6 +389,17 @@ stands between, each result read a UTF-16 unit at a time:
   where a double-byte language is Excel's default.
 - Errors as LEFT, MID, FIND, SEARCH and REPLACE give them.
 
+## Characters: CHAR, CODE, UNICHAR, LEFT and RIGHT
+
+Measured in Excel 365 in English, 96 cases (`src/calc/charsets.js`):
+
+- **CHAR and CODE are code page 1252**, not Unicode: CHAR(128) is €, CODE("€") 128, CODE("Œ") 140, CODE of the curly
+  quotes 145 to 148. A character 1252 hasn't got is 63, "?": Ā, α, 日 and an emoji, with no nearest letter taken. The
+  control characters U+0080 to U+009F keep their own numbers.
+- **UNICHAR refuses what isn't a character** with #N/A: the surrogates (U+D800 to U+DFFF), U+FDD0 to U+FDEF and the last
+  two code points of every plane (U+FFFE, U+FFFF, U+1FFFF ... U+10FFFF). Out of range is #VALUE!, as before.
+- **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it.
+
 ## Not yet
 
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
@@ -401,8 +412,10 @@ stands between, each result read a UTF-16 unit at a time:
 - **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
-- **An emoji in LEN, LEFT, RIGHT, MID, FIND, SEARCH, REPLACE and CODE.** Excel 365 counts it as one character (LEN is 1;
-  CODE gives 63, a question mark); here it is two UTF-16 units.
+- **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
+  units) as 2 in a workbook such as this editor writes (the probe's, 1789 of 1789 as Excel), but as 1 in a workbook it
+  made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
+  fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.

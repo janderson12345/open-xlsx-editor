@@ -3,18 +3,19 @@
 import { Area, Arr, Union, XlError, E, matrix, toText, textToNumber, dateSerial } from './values.js';
 import { formatValue, dateParts } from '../ooxml/format.js';
 import { def, lifted, given, one, num, text, opt, values, bool } from './functions.js';
+import { pointsOf, unitAt, pointsBefore, ansiChar, ansiCode } from './charsets.js';
 
 // ---- Text
 
 /** A wildcard pattern (* any run, ? one character, ~ before either to mean itself) as a whole-text regular expression,
- *  case ignored. */
-export function wildcard(pattern) {
+ *  case ignored. `one` is what ? matches (SEARCH's doesn't match half of an emoji, nor a whole one: measured). */
+export function wildcard(pattern, one = '[\\s\\S]') {
   let re = '';
   for (let i = 0; i < pattern.length; i++) {
     const ch = pattern[i];
     if (ch === '~' && '*?~'.includes(pattern[i + 1] || '-')) re += escapeRe(pattern[++i]);
     else if (ch === '*') re += '[\\s\\S]*';
-    else if (ch === '?') re += '[\\s\\S]';
+    else if (ch === '?') re += one;
     else re += escapeRe(ch);
   }
   return new RegExp(`^${re}$`, 'i');
@@ -48,25 +49,30 @@ function clampArea(a, ctx) {
   const ext = ctx.extent(a.si);
   return new Area(a.si, a.r0, a.c0, Math.max(a.r0, Math.min(a.r1, ext.maxRow)), Math.max(a.c0, Math.min(a.c1, ext.maxCol)));
 }
-/** LEN, MID, FIND, SEARCH and REPLACE counting UTF-16 units (their byte versions use them). */
-const units = {};
-units.LEN = (a, ctx) => text(a[0], ctx).length;
-lifted('LEN', units.LEN);
-lifted('LEFT', (a, ctx) => { const n = opt(a, 1, ctx, 1); if (n < 0) throw E.value; return text(a[0], ctx).slice(0, Math.trunc(n)); });
-lifted('RIGHT', (a, ctx) => {
+// (How Excel 365 counts an emoji, two UTF-16 units: LEFT and RIGHT keep it whole; LEN, MID, FIND, SEARCH and REPLACE
+// count it as 2 in a workbook such as this editor writes, as their byte versions do, but as 1 in one Excel made itself,
+// for a reason not yet found (docs/CALC.md). The probe's: `byUnits`.)
+const seq = (s, byUnits) => (byUnits ? s : pointsOf(s) ?? s);
+const cut = (q, from, to) => (typeof q === 'string' ? q.slice(from, to) : q.slice(from, to).join(''));
+const len = (byUnits) => (a, ctx) => seq(text(a[0], ctx), byUnits).length;
+const left = (a, ctx) => { const n = opt(a, 1, ctx, 1); if (n < 0) throw E.value; return cut(seq(text(a[0], ctx)), 0, Math.trunc(n)); };
+const right = (a, ctx) => {
   const n = Math.trunc(opt(a, 1, ctx, 1));
   if (n < 0) throw E.value;
-  const s = text(a[0], ctx);
-  return n === 0 ? '' : s.slice(-n);
-});
-units.MID = (a, ctx) => {
-  const s = text(a[0], ctx);
+  const q = seq(text(a[0], ctx));
+  return n === 0 ? '' : cut(q, Math.max(0, q.length - n));
+};
+const mid = (byUnits) => (a, ctx) => {
+  const q = seq(text(a[0], ctx), byUnits);
   const start = Math.trunc(num(a[1], ctx));
   const n = Math.trunc(num(a[2], ctx));
   if (start < 1 || n < 0) throw E.value;
-  return s.substr(start - 1, n);
+  return cut(q, start - 1, start - 1 + n);
 };
-lifted('MID', units.MID);
+lifted('LEN', len(true));
+lifted('LEFT', left);
+lifted('RIGHT', right);
+lifted('MID', mid(true));
 lifted('UPPER', (a, ctx) => text(a[0], ctx).toUpperCase());
 lifted('LOWER', (a, ctx) => text(a[0], ctx).toLowerCase());
 lifted('PROPER', (a, ctx) => {
@@ -100,43 +106,42 @@ lifted('SUBSTITUTE', (a, ctx) => {
   for (let k = 0; k < nth; k++) { at = s.indexOf(from, at + 1); if (at < 0) return s; }
   return s.slice(0, at) + to + s.slice(at + from.length);
 });
-units.REPLACE = (a, ctx) => {
-  const s = text(a[0], ctx);
+const replace = (byUnits) => (a, ctx) => {
+  const q = seq(text(a[0], ctx), byUnits);
   const start = Math.trunc(num(a[1], ctx));
   const n = Math.trunc(num(a[2], ctx));
   if (start < 1 || n < 0) throw E.value;
-  return s.slice(0, start - 1) + text(a[3], ctx) + s.slice(start - 1 + n);
+  return cut(q, 0, start - 1) + text(a[3], ctx) + cut(q, start - 1 + n);
 };
-lifted('REPLACE', units.REPLACE);
-const finder = (insensitive) => (a, ctx) => {
+lifted('REPLACE', replace(true));
+const finder = (insensitive, byUnits) => (a, ctx) => {
   const what = text(a[0], ctx);
   const s = text(a[1], ctx);
   const start = Math.trunc(opt(a, 2, ctx, 1));
-  if (start < 1 || start > s.length + 1) throw E.value;
-  if (!insensitive) {
-    const i = s.indexOf(what, start - 1);
-    if (i < 0) throw E.value;
-    return i + 1;
+  if (start < 1 || start > seq(s, byUnits).length + 1) throw E.value;
+  const from = byUnits ? start - 1 : unitAt(s, start - 1);
+  let at;
+  if (!insensitive) at = s.indexOf(what, from);
+  else {
+    const re = new RegExp(wildcard(what, byUnits ? '[\\s\\S]' : '[^\\ud800-\\udfff]').source.slice(1, -1), 'i');
+    const m = re.exec(s.slice(from));
+    at = m ? from + m.index : -1;
   }
-  const re = new RegExp(wildcard(what).source.slice(1, -1), 'i');
-  const m = re.exec(s.slice(start - 1));
-  if (!m) throw E.value;
-  return m.index + start;
+  if (at < 0) throw E.value;
+  return (byUnits ? at : pointsBefore(s, at)) + 1;
 };
-units.FIND = finder(false);
-units.SEARCH = finder(true);
-lifted('FIND', units.FIND);
-lifted('SEARCH', units.SEARCH);
+lifted('FIND', finder(false, true));
+lifted('SEARCH', finder(true, true));
 // (The byte versions, as an English Excel 365 has them (measured, docs/CALC.md): LENB, MIDB, FINDB, SEARCHB and REPLACEB
-// count UTF-16 units, an emoji 2; LEFTB and RIGHTB keep a character whole, so LEFTB of an emoji and 1 is the emoji; ASC
-// and DBCS give the text as it is, full-width letters staying full-width.)
-for (const [b, f] of [['LENB', 'LEN'], ['MIDB', 'MID'], ['FINDB', 'FIND'], ['SEARCHB', 'SEARCH'], ['REPLACEB', 'REPLACE']]) lifted(b, units[f]);
-lifted('LEFTB', (a, ctx) => { const n = opt(a, 1, ctx, 1); if (n < 0) throw E.value; return [...text(a[0], ctx)].slice(0, Math.trunc(n)).join(''); });
-lifted('RIGHTB', (a, ctx) => {
-  const n = Math.trunc(opt(a, 1, ctx, 1));
-  if (n < 0) throw E.value;
-  return n === 0 ? '' : [...text(a[0], ctx)].slice(-n).join('');
-});
+// count UTF-16 units, an emoji 2; LEFTB and RIGHTB are LEFT and RIGHT, keeping a character whole; ASC and DBCS give the
+// text as it is, full-width letters staying full-width.)
+lifted('LENB', len(true));
+lifted('MIDB', mid(true));
+lifted('FINDB', finder(false, true));
+lifted('SEARCHB', finder(true, true));
+lifted('REPLACEB', replace(true));
+lifted('LEFTB', left);
+lifted('RIGHTB', right);
 lifted('ASC', (a, ctx) => text(a[0], ctx));
 lifted('DBCS', (a, ctx) => text(a[0], ctx));
 lifted('EXACT', (a, ctx) => text(a[0], ctx) === text(a[1], ctx));
@@ -161,8 +166,8 @@ lifted('TEXT', (a, ctx) => {
   if (typeof v === 'string') { const n = textToNumber(v, ctx.date1904); if (n != null) v = n; }
   return formatValue(v, text(a[1], ctx), { date1904: ctx.date1904 }).text;
 });
-lifted('CHAR', (a, ctx) => { const n = Math.trunc(num(a[0], ctx)); if (n < 1 || n > 255) throw E.value; return String.fromCharCode(n); });
-lifted('CODE', (a, ctx) => { const s = text(a[0], ctx); if (!s) throw E.value; return s.charCodeAt(0); });
+lifted('CHAR', (a, ctx) => { const n = Math.trunc(num(a[0], ctx)); if (n < 1 || n > 255) throw E.value; return ansiChar(n); });
+lifted('CODE', (a, ctx) => { const s = text(a[0], ctx); if (!s) throw E.value; return ansiCode(s); });
 
 // ---- Dates and times (serial numbers: days since 1900-01-00, or 1904-01-01 in the 1904 system)
 
