@@ -44,6 +44,23 @@ reproduced to the byte). Excel refused adding, renaming, deleting, moving, hidin
 protected here opens in Excel protected: a new sheet refused, a wrong password refused, the right one unprotecting it.
 Without a password any password unprotects it, in Excel and here.
 
+## Allow Edit Ranges
+
+`src/ooxml/editranges.js`: ranges of a sheet whose cells can be changed while it is protected, though they are locked.
+Measured over COM (`Protection.AllowEditRanges.Add` with and without a password, cells changed on the protected
+sheet, and the file Excel saved):
+
+- `<protectedRanges>` right after `<sheetProtection>`, a `<protectedRange sqref="B2:C3" name="Open"/>` for each,
+  several areas apart by spaces (`sqref="G1:G2 H4"`); a password as a sheet's (`algorithmName`, `hashValue`,
+  `saltValue`, `spinCount` before `sqref`), Excel's own hash reproduced to the byte.
+- A range without a password: its cells change at once. A change reaching past it (B2:D2 over B2:C3) is refused, in
+  the protected sheet's words.
+- A range with a password: refused until it is unlocked with its password; a wrong one is refused. Opened again,
+  it is locked again (Excel doesn't keep the unlocking, and neither does this editor).
+- Adding a range while the sheet is protected: refused by Excel.
+- A file with ranges written here opens in Excel with them: the open range changes, the password range is refused
+  until its password unlocks it.
+
 ## Excel's rules
 
 | Rule | Seen |
@@ -63,6 +80,7 @@ Files from before Excel 2013 keep a 16-bit hash in `password`; it is read (test:
 - Selecting: Select locked cells and Select unlocked cells are written and kept but not enforced (every cell can be
   selected). Insert hyperlinks, PivotTables, objects (notes, charts, pictures) and scenarios aren't enforced either.
 - Excel refuses as soon as a locked cell is typed into; here the entry is refused when it is entered.
-- Allow Edit Ranges (`protectedRanges`).
+- The Allow Edit Ranges box (Review > Allow Edit Ranges: New, Modify, Delete), and asking for a range's password
+  (Excel's Unlock Range) when one of its cells is changed: until then a range with a password stays refused.
 - F2 on a hidden unlocked cell starts from nothing, as the formula bar shows; what Excel's own edit starts from wasn't
   measurable over COM.
