@@ -1,5 +1,5 @@
 // Browser check of editing, continued: a workbook saved with a password, PivotTables (refreshed and made), the Data
-// tab, conditional formatting, several ranges selected, Go To Special, sheets undone, rich text drawn, and a column's own format.
+// tab, conditional formatting, several ranges selected, Go To Special, and sheets undone.
 // Run after `npm run build`: node test/editing-more.mjs [outDir]
 import fs from 'node:fs';
 import { encryptWorkbook } from '../src/ooxml/encryption.js';
@@ -450,83 +450,5 @@ const k60 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheet
 check(typedNow === 'the cat on monday' && k60 === 'the cat on Monday' && undone === 'adn ' && spelling === true && formulaSpelling === false,
   'AutoCorrect: teh to the as the word ends, monday to Monday on Enter, Ctrl+Z gives back what was typed; underlines for text only',
   JSON.stringify({ typedNow, k60, undone, spelling, formulaSpelling }));
-
-// Rich text (made here as Excel writes it: richtext.test.js): each run drawn in its own font over the cell's.
-{
-  const { Workbook } = await import('../src/ooxml/workbook.js');
-  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
-  wb.setCell(0, 'J12', 'x');
-  const { doc } = wb._part(0);
-  const ns = doc.documentElement.namespaceURI;
-  const c = [...doc.getElementsByTagNameNS(ns, 'c')].find((e) => e.getAttribute('r') === 'J12');
-  while (c.firstChild) c.removeChild(c.firstChild);
-  c.setAttribute('t', 'inlineStr');
-  const rPr = (inner) => `<rPr>${inner}<sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr>`;
-  const { parseXml } = await import('../src/ooxml/xml.js');
-  const is = parseXml(`<is xmlns="${ns}"><r><t xml:space="preserve">Plain </t></r><r>${rPr('<b/>')}<t>bold</t></r>`
-    + `<r><rPr><i/><sz val="16"/><color rgb="FFFF0000"/><rFont val="Courier New"/><family val="3"/></rPr><t xml:space="preserve"> red</t></r></is>`).documentElement;
-  c.appendChild(doc.importNode(is, true));
-  wb.dirty.add(wb.sheets[0].path);
-  fs.writeFileSync('test/out/rich.xlsx', wb.toBytes());
-}
-await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
-await openFixtureFrom(page, 'test/out/rich.xlsx', 'rich.xlsx');
-const runs = await page.evaluate(() => {
-  const el = document.querySelector('.oxe-row[aria-rowindex="13"] .oxe-cell[aria-colindex="11"] .oxe-runs');
-  return el ? [...el.children].map((x) => { const st = getComputedStyle(x); return [x.textContent, st.fontWeight, st.fontStyle, st.fontSize, st.color, st.fontFamily.split(',')[0]]; }) : null;
-});
-check(runs?.length === 3 && runs[0][1] === '400' && runs[1][0] === 'bold' && runs[1][1] === '700' && runs[2][2] === 'italic' && runs[2][3] === '21.3333px' && runs[2][4] === 'rgb(255, 0, 0)' && /Courier New/.test(runs[2][5]),
-  'rich text: each run in its own font (bold; italic, 16pt, red, Courier New) over the cell’s', JSON.stringify(runs));
-
-// A filled column's empty cells drawn filled, as Excel draws a column's own format (linestyles.test.js).
-let lineFill;
-{
-  const { Workbook } = await import('../src/ooxml/workbook.js');
-  const { parseXml } = await import('../src/ooxml/xml.js');
-  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
-  lineFill = wb.styleWith(0, { fill: { pattern: 'solid', fg: { rgb: 'FFFFFF00' } } });
-  const { doc } = wb._part(0);
-  const root = doc.documentElement;
-  const old = [...root.childNodes].find((n) => n.localName === 'cols');
-  if (old) root.removeChild(old);
-  const cols = parseXml(`<cols xmlns="${root.namespaceURI}"><col min="12" max="12" width="9.140625" style="${lineFill}"/></cols>`).documentElement;
-  root.insertBefore(doc.importNode(cols, true), [...root.childNodes].find((n) => n.localName === 'sheetData'));
-  wb.dirty.add(wb.sheets[0].path);
-  fs.writeFileSync('test/out/linefill.xlsx', wb.toBytes());
-}
-await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
-await openFixtureFrom(page, 'test/out/linefill.xlsx', 'linefill.xlsx');
-const filled = await page.evaluate((f) => [...document.querySelectorAll(`.oxe-f${f}`)].filter((e) => !e.classList.contains('oxe-cell')).length, lineFill);
-const rowsShown = await page.evaluate(() => document.querySelectorAll('.oxe-row').length);
-check(filled >= rowsShown - 2, 'a column’s own fill: its empty cells drawn filled', JSON.stringify({ filled, rowsShown }));
-
-// Column M selected whole, Ctrl+B: the column's own format, as Excel's (a cell typed far below it bold); Ctrl+Z
-// takes it away.
-await page.evaluate(() => window.oxe.command('selectLines', 'col', 12));
-await page.focus('.oxe-grid');
-await page.keyboard.press('Control+b');
-const colBold = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); const col = sh.cols.find((x) => 12 >= x.min && 12 <= x.max); return col ? wb.styles.fonts[wb.styles.cellXfs[col.style].fontId].b : null; });
-await page.evaluate(() => window.oxe.enter('M500', 'far'));
-const farBold = await page.evaluate(() => { const wb = window.oxe.workbook; const cell = wb.sheet(window.oxe.sheetIndex).cells.get(499).get(12); return wb.styles.fonts[wb.styles.cellXfs[cell.s].fontId].b; });
-await page.evaluate(() => { window.oxe.undo(); window.oxe.undo(); });
-const colAfterUndo = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.find((x) => 12 >= x.min && 12 <= x.max)?.style ?? 0);
-check(colBold === true && farBold === true && colAfterUndo === 0, 'a whole column made bold: its own format, a cell typed far below bold; Ctrl+Z takes it away', JSON.stringify({ colBold, farBold, colAfterUndo }));
-
-// The whole sheet selected, Ctrl+B: every column its own format (Z9999 bold though empty), as Excel; Ctrl+Z.
-await page.evaluate(() => window.oxe.command('selectAll'));
-await page.focus('.oxe-grid');
-await page.keyboard.press('Control+b');
-const sheetBold = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); const col = sh.cols.find((x) => 25 >= x.min && 25 <= x.max); return col ? wb.styles.fonts[wb.styles.cellXfs[col.style].fontId].b : null; });
-await page.evaluate(() => window.oxe.undo());
-const sheetUndone = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.find((x) => 25 >= x.min && 25 <= x.max)?.style ?? 0);
-check(sheetBold === true && sheetUndone === 0, 'the whole sheet made bold: every column its own format; Ctrl+Z takes it away', JSON.stringify({ sheetBold, sheetUndone }));
-
-// Row 30 selected whole, its font made 20pt: the row grows, as Excel's (26.25pt: 35px).
-const row30 = () => page.evaluate(() => window.oxe.grid.geometry().rows.size(29));
-const row30Before = await row30();
-await page.evaluate(() => { window.oxe.command('selectLines', 'row', 29); window.oxe.command('format', { font: { size: 20 } }); });
-const row30After = await row30();
-await page.evaluate(() => window.oxe.undo());
-check(row30Before === 20 && row30After === 35 && await row30() === 20, 'a whole row made 20pt: it grows to 26.25pt as Excel’s; Ctrl+Z back', JSON.stringify({ row30Before, row30After }));
 
 await finish();

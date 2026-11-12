@@ -9,6 +9,7 @@ import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
+import { csvWorkbook, isCsv } from './ooxml/csv.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
@@ -261,13 +262,16 @@ export function mountXlsxEditor(host, options = {}) {
   };
   const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink });
   const api = {
-    /** Open a workbook and show the sheet it opens on (its active tab, or the first visible worksheet). One saved
+    /** Open a workbook (or a .csv, by its `fileName`) and show the sheet it opens on (its active tab, or the first
+     *  visible worksheet). One saved
      *  with a password opens with `password`; without one, Excel's Password box asks for it and a promise is
      *  returned (the editor once open, or null: cancelled, or the password wrong, said in Excel's words). */
     open(bytes, fileName = null, { password = null } = {}) {
       let wb;
+      const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
       try {
-        wb = Workbook.fromBytes(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), { password });
+        // (A .csv: one sheet, each field as if typed, as Excel opens one; ooxml/csv.js.)
+        wb = isCsv(data, fileName) ? csvWorkbook(data, fileName) : Workbook.fromBytes(data, { password });
       } catch (e) {
         if (!(e instanceof PasswordError) || e.reason !== 'needed') throw e;
         return passwordBox(root, fileName).then((pw) => {

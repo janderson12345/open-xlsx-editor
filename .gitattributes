@@ -2,3 +2,4 @@
 *.xlsx binary
 *.png binary
 *.pdf binary
+test/csv-excel.csv binary

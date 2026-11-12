@@ -54,6 +54,7 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
   and the functions still missing. `docs/ARCHITECTURE.md`: the module map. Each of the others says how a part was
   matched to Excel, what was measured, and what isn't done yet:
   - Opening, saving, printing: `docs/FIDELITY.md` (what survives a save), `docs/ENCRYPTION.md` (password workbooks),
+    `docs/CSV.md` (a .csv opened),
     `docs/LAYOUT.md` (the grid as Excel lays it out), `docs/PRINT.md` and `docs/PDF.md`.
   - Calculation: `docs/CALC.md` (formulas and functions), `docs/DYNAMIC.md` (spilling, LET, LAMBDA), `docs/NAMES.md`
     (defined names), `docs/AUTOSUM.md`.
