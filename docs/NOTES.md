@@ -52,8 +52,9 @@ thread left. `test/noteedit.test.js` covers the same in the unit tests.
 
 ## Not yet
 
-Editing threads (new comments, replies, resolving), Show All Notes, a note's own size and position (from its VML
-shape), notes following their cells when rows are sorted, and marks in frozen panes' cells drawn twice. Notes do
+Resolving a thread and @mentions (threads are written, replied to, edited and deleted: below), Show All Notes, a
+note's own size and position (from its VML shape), notes following their cells when rows are sorted, and marks in
+frozen panes' cells drawn twice. Notes do
 follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
 
 ## Writing threaded comments (`src/ooxml/threadedit.js`, `src/editor/threadbox.js`)

@@ -86,7 +86,7 @@ figure after the sheet, its kind and title as the caption and its data as a tabl
 
 ## Not yet
 
-Scatter, bubble, radar, stock, surface, combo and the 2016 kinds (waterfall, histogram, treemap...); data labels,
-markers' own shapes, trendlines, error bars, secondary axes, a logarithmic or date axis, axis titles, a chart's own
-fonts, fills and layout; selecting, moving and resizing a chart; charts on chart sheets; and a title borrowed from
-the series drawn bold and smaller, as Excel draws it.
+Bubble, radar, stock, surface, combo and the 2016 kinds (waterfall, histogram, treemap...); changing a chart's data
+range; markers' own shapes, trendlines, error bars, secondary axes, a logarithmic or date axis, axis titles, a chart's
+own fonts, fills and layout; charts on chart sheets; and a title borrowed from the series drawn bold and smaller, as
+Excel draws it. (Scatter charts, data labels, and picking, moving, sizing and deleting a chart are done: above.)

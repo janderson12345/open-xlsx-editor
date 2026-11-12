@@ -50,13 +50,20 @@ Ctrl+B does nothing; `clipboard: false`: Ctrl+C, X and V). F6 moves between the 
 one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
 
 - `npm run dev`: the demo at http://localhost:8080 (drag an .xlsx onto it).
-- `CONTRIBUTING.md`: setup and tests. `docs/ARCHITECTURE.md`: the module map. `docs/LAYOUT.md`: matching Excel's
-  layout. `docs/CALC.md`: matching Excel's calculation. `docs/SHEETS.md`: matching Excel's sheet operations.
-  `docs/FORMATS.md`: matching Excel's Home tab. `docs/CLIPBOARD.md`: matching Excel's copy, cut, paste and Paste Special.
-  `docs/ROWCOL.md`: matching Excel's inserting and deleting of rows, columns and cells. `docs/SIZES.md`: widths, heights,
-  hiding. `docs/FIND.md`: Find and Replace. `docs/VIEW.md`: frozen panes, zoom, gridlines and headings. `docs/PROOFING.md`: AutoCorrect and spelling.
-  `docs/ENTRY.md`: how typed entries are read. `docs/FILL.md`: Fill and the fill handle. `docs/SORT.md`: Sort. `docs/AUTOSUM.md`: AutoSum. `docs/FILTER.md`: Filter. `docs/NOTES.md`: notes and comments. `docs/CONDFORMAT.md`: conditional formatting. `docs/VALIDATION.md`: data validation. `docs/FIDELITY.md`: what survives a save, checked by Excel. `docs/CHARTS.md`: charts.
-  `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab.
+- `CONTRIBUTING.md`: setup and tests. `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab,
+  and the functions still missing. `docs/ARCHITECTURE.md`: the module map. Each of the others says how a part was
+  matched to Excel, what was measured, and what isn't done yet:
+  - Opening, saving, printing: `docs/FIDELITY.md` (what survives a save), `docs/ENCRYPTION.md` (password workbooks),
+    `docs/LAYOUT.md` (the grid as Excel lays it out), `docs/PRINT.md` and `docs/PDF.md`.
+  - Calculation: `docs/CALC.md` (formulas and functions), `docs/DYNAMIC.md` (spilling, LET, LAMBDA), `docs/NAMES.md`
+    (defined names), `docs/AUTOSUM.md`.
+  - Editing: `docs/ENTRY.md` (typed entries), `docs/CLIPBOARD.md` (copy, cut, Paste Special), `docs/FILL.md`,
+    `docs/FIND.md`, `docs/GOTOSPECIAL.md` (and several ranges selected), `docs/PROOFING.md` (AutoCorrect, spelling).
+  - Cells, rows and sheets: `docs/FORMATS.md`, `docs/CONDFORMAT.md`, `docs/VALIDATION.md`, `docs/SIZES.md`,
+    `docs/ROWCOL.md`, `docs/SHEETS.md`, `docs/VIEW.md` (frozen panes, zoom, gridlines, headings).
+  - Data and objects: `docs/SORT.md`, `docs/FILTER.md`, `docs/DATATOOLS.md` (Flash Fill, Remove Duplicates, Text to
+    Columns...), `docs/PIVOT.md`, `docs/CHARTS.md`, `docs/NOTES.md` (notes and comments).
+  - Working with others: `docs/COLLAB.md` (co-editing), `docs/AGENT.md` (the agent interface).
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
   Word editor modules carry over.
 
