@@ -36,6 +36,11 @@ export function readCell(c, ns, sst) {
   }
 }
 
+/** The format an empty cell (r, c) of a sheet's model has: its row's own, else its column's (0, none). */
+export function lineStyle(sheet, r, c) {
+  return sheet.rows.get(r)?.s || sheet.cols.find((x) => c >= x.min && c <= x.max)?.style || 0;
+}
+
 /** The sheet's model from its parsed XML and the workbook's shared strings. */
 export function readSheet(doc, sst = []) {
   const root = doc.documentElement;
@@ -53,7 +58,9 @@ export function readSheet(doc, sst = []) {
     r = attr(rowEl, 'r') ? Number(attr(rowEl, 'r')) - 1 : r + 1;
     const ht = attr(rowEl, 'ht');
     const hidden = attr(rowEl, 'hidden') === '1' || attr(rowEl, 'hidden') === 'true';
-    if (ht != null || hidden) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1' });
+    // (A row's own format: `s` with customFormat, as Excel writes a formatted row.)
+    const own = attr(rowEl, 'customFormat') === '1' || attr(rowEl, 'customFormat') === 'true' ? Number(attr(rowEl, 's') || 0) : 0;
+    if (ht != null || hidden || own) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}) });
     let c = -1;
     let line = null;
     for (const cEl of kids(rowEl, 'c', ns)) {

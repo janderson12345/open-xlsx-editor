@@ -106,6 +106,19 @@ beside F3's new right), where the ribbon's Borders measured earlier keeps a matc
 The degrees the box's own Fill Effects variants give, and the font sizes Excel steps through when shrinking, are not
 yet measured.
 
+## A row's or a column's own format
+
+Measured over COM (`Columns(2).Font.Bold`, `Range("D:E").Interior.Color`, `Rows(5).Font.Italic`, `Rows(7).Font.Size`,
+and the sheet Excel saved; test/linestyles.test.js): a formatted column is `<col min max style="X">` (with the
+default width), a formatted row `<row s="X" customFormat="1">`; the cells already there get the change, and where a
+formatted row crosses a formatted column Excel makes an empty cell with both (B5: bold and italic). A row's font
+made larger grows it (ht="18.75" for 14pt).
+
+Here (`src/ooxml/sheet.js` lineStyle): an empty cell has its row's own format, else its column's; its fill and
+borders are drawn from it, a cell typed there takes it (`src/ooxml/sheetedit.js`), and Format Cells > Protection on
+a column counts for a protected sheet. Formatting whole rows or columns here still writes the used range's cells
+only (Not yet, below).
+
 ## Rich text
 
 A cell's text in runs of several fonts (`src/ooxml/strings.js` stringItemRuns, drawn by `src/editor/cells.js`): each

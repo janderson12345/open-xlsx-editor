@@ -3,6 +3,7 @@
 // classes; their geometry from here, on screen in whole pixels on the gridlines, in print as Excel's PDF has them.
 import { mergeAt } from './cells.js';
 import { setVars, div } from './dom.js';
+import { lineStyle } from '../ooxml/sheet.js';
 
 /** Border line widths in units of a thin line: thin and its dash patterns 1, medium and its patterns 2, thick and
  *  double 3; hair is thinner than a unit. */
@@ -61,8 +62,10 @@ export function decorations(st, win) {
       // (A data bar: from its start to its end across the cell, a pixel in from the gridlines, and the axis dashed.)
       if (cf?.bar) fills.push(...dataBar(st, r, c, cf.bar, ox, oy));
       const cell = line?.get(c);
-      if (!cell || !cell.s) continue;
-      const d = deco(cell.s);
+      // (An empty cell: its row's or column's own format, ooxml/sheet.js lineStyle.)
+      const s = cell ? cell.s : lineStyle(sheet, r, c);
+      if (!s) continue;
+      const d = deco(s);
       if (d.fill && !merge && !cf?.fill) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
       for (const side of d.sides) edges.push(...edge(st, r, c, side, ox, oy));
       if (d.diag) {

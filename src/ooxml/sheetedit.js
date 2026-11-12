@@ -51,12 +51,22 @@ const newRow = (doc, ns, r) => {
   return el;
 };
 
+/** Column c's own format in the sheet's <cols> (`style`), or null. */
+function colStyleXml(rowEl, c) {
+  const root = rowEl.parentNode?.parentNode;
+  if (!root) return null;
+  const ns = root.namespaceURI;
+  const col = kids(kid(root, 'cols', ns), 'col', ns).find((x) => c + 1 >= Number(attr(x, 'min')) && c + 1 <= Number(attr(x, 'max')));
+  return col ? attr(col, 'style') : null;
+}
+
 /** The `c` element for column c of a row, made (in order, with the row's style if it has one) if there isn't one. */
 function cellElement(doc, rowEl, ns, r, c) {
   const cell = () => {
     const el = make(doc, ns, 'c');
     el.setAttribute('r', refName(r, c));
-    if (isOn(attr(rowEl, 'customFormat')) && attr(rowEl, 's')) el.setAttribute('s', attr(rowEl, 's'));
+    const s = isOn(attr(rowEl, 'customFormat')) && attr(rowEl, 's') ? attr(rowEl, 's') : colStyleXml(rowEl, c);
+    if (s && s !== '0') el.setAttribute('s', s);
     // (`spans`, "1:6", is only a hint for loading; drop it rather than leave it wrong.)
     const spans = /^(\d+):(\d+)$/.exec(attr(rowEl, 'spans') || '');
     if (spans && (c + 1 < Number(spans[1]) || c + 1 > Number(spans[2]))) rowEl.removeAttribute('spans');

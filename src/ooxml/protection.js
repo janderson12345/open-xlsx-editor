@@ -8,6 +8,7 @@ import { kid, attr } from './xml.js';
 import { b64, hashPassword, passwordFits } from './passwords.js';
 import { inOpenRange, AFTER_PROTECTION as AFTER } from './editranges.js';
 import { xfOf } from './styles.js';
+import { lineStyle } from './sheet.js';
 
 export { hashPassword, legacyHash } from './passwords.js';
 
@@ -91,7 +92,7 @@ function cellProtection(wb, si, r, c) {
   const sh = wb.sheet(si);
   const cell = sh.cells.get(r)?.get(c);
   let s = cell?.s;
-  if (s == null) s = sh.rows.get(r)?.s ?? sh.cols.find((x) => c + 1 >= x.min && c + 1 <= x.max)?.style ?? 0;
+  if (s == null) s = lineStyle(sh, r, c);
   return xfOf(wb.styles, s || 0).protection;
 }
 

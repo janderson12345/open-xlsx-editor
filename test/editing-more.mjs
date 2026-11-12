@@ -1,5 +1,5 @@
 // Browser check of editing, continued: a workbook saved with a password, PivotTables (refreshed and made), the Data
-// tab, conditional formatting, several ranges selected, Go To Special, sheets undone, and rich text drawn.
+// tab, conditional formatting, several ranges selected, Go To Special, sheets undone, rich text drawn, and a column's own format.
 // Run after `npm run build`: node test/editing-more.mjs [outDir]
 import fs from 'node:fs';
 import { encryptWorkbook } from '../src/ooxml/encryption.js';
@@ -477,5 +477,27 @@ const runs = await page.evaluate(() => {
 });
 check(runs?.length === 3 && runs[0][1] === '400' && runs[1][0] === 'bold' && runs[1][1] === '700' && runs[2][2] === 'italic' && runs[2][3] === '21.3333px' && runs[2][4] === 'rgb(255, 0, 0)' && /Courier New/.test(runs[2][5]),
   'rich text: each run in its own font (bold; italic, 16pt, red, Courier New) over the cell’s', JSON.stringify(runs));
+
+// A filled column's empty cells drawn filled, as Excel draws a column's own format (linestyles.test.js).
+let lineFill;
+{
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  const { parseXml } = await import('../src/ooxml/xml.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  lineFill = wb.styleWith(0, { fill: { pattern: 'solid', fg: { rgb: 'FFFFFF00' } } });
+  const { doc } = wb._part(0);
+  const root = doc.documentElement;
+  const old = [...root.childNodes].find((n) => n.localName === 'cols');
+  if (old) root.removeChild(old);
+  const cols = parseXml(`<cols xmlns="${root.namespaceURI}"><col min="12" max="12" width="9.140625" style="${lineFill}"/></cols>`).documentElement;
+  root.insertBefore(doc.importNode(cols, true), [...root.childNodes].find((n) => n.localName === 'sheetData'));
+  wb.dirty.add(wb.sheets[0].path);
+  fs.writeFileSync('test/out/linefill.xlsx', wb.toBytes());
+}
+await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+await openFixtureFrom(page, 'test/out/linefill.xlsx', 'linefill.xlsx');
+const filled = await page.evaluate((f) => [...document.querySelectorAll(`.oxe-f${f}`)].filter((e) => !e.classList.contains('oxe-cell')).length, lineFill);
+const rowsShown = await page.evaluate(() => document.querySelectorAll('.oxe-row').length);
+check(filled >= rowsShown - 2, 'a column’s own fill: its empty cells drawn filled', JSON.stringify({ filled, rowsShown }));
 
 await finish();
