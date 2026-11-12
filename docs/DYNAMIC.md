@@ -47,8 +47,9 @@ spill blocked, `SUM(D1#)`, LET, LAMBDA called, `@` on a range, `SUM(SEQUENCE(4))
 ## Not yet
 
 - The blue outline Excel draws round a spill when its cell is selected.
-- RANDARRAY, CHOOSEROWS, TAKE, DROP, VSTACK, HSTACK and the other newer array functions; MAP, REDUCE, SCAN, BYROW and
-  BYCOL; ISOMITTED; a LAMBDA kept in a defined name (the Name Manager isn't there yet).
+- RANDARRAY, GROUPBY, PIVOTBY, TRIMRANGE and PERCENTOF. (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer
+  array functions, MAP, REDUCE, SCAN, BYROW, BYCOL, MAKEARRAY and ISOMITTED are here, in the formula probe.)
+- A LAMBDA kept in a defined name: =Twice(21) with Twice defined as =LAMBDA(x,x*2) is #NAME? here.
 - `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an
   old formula's operator cuts to one value (`=@A1:A3*2`).
 - A LAMBDA called where it is written is saved as a plain formula when its answer is one value; Excel saves it as a
