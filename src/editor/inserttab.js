@@ -1,5 +1,6 @@
 // The Insert tab, Excel's groups as far as they are here: Tables (PivotTable: its boxes, pivotbox.js, and the
-// PivotTable made, pivotnew.js) and Charts (a chart of the selection, chartnew.js, by Excel's menus of each kind).
+// PivotTable made, pivotnew.js), Charts (a chart of the selection, chartnew.js, by Excel's menus of each kind) and
+// Links (Insert Hyperlink, linkbox.js).
 
 /** Excel's Charts group: each menu's kinds, by the names Excel gives them (chartxml.js CHART_KINDS). */
 export const CHART_MENUS = [
@@ -16,6 +17,7 @@ export function insertTab(kit, { act }) {
   const groups = [
     grp('Tables', btn('▦', 'PivotTable', () => act('pivotBox'), { label: 'PivotTable', big: true })),
     grp('Charts', ...CHART_MENUS.map(([icon, title, label, kinds]) => menu(icon, title, () => kinds.map(([kind, name]) => item(name, () => act('insertChart', kind))), { label, big: true }))),
+    grp('Links', btn('🔗', 'Link (Ctrl+K)', () => act('linkBox'), { label: 'Link', big: true })),
   ];
   return { groups, update() {} };
 }

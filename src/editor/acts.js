@@ -374,11 +374,12 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
         const s = editing().selection;
         return pivotAt(state.workbook, state.sheetIndex, s.ar, s.ac) ? [{ label: 'Refresh', run: () => editing().run('refreshPivots', false), disabled: ro }, { label: 'Show Field List', run: run('pivotFieldList'), disabled: ro }, 'separator'] : [];
       })(),
-      // (A hyperlink's cell: Excel's Open Hyperlink and Remove Hyperlink.)
+      // (A hyperlink's cell: Excel's Edit Hyperlink..., Open Hyperlink and Remove Hyperlink; another, Link.)
       ...(() => {
         const s = editing().selection;
         const h = hyperlinkAt(state.workbook, state.sheetIndex, s.ar, s.ac);
-        return h ? [{ label: 'Open Hyperlink', run: () => followLink(h) }, { label: 'Remove Hyperlink', run: () => editing().run('clearAs', 'removeHyperlinks'), disabled: ro }, 'separator'] : [];
+        return h ? [{ label: 'Edit Hyperlink...', run: run('linkBox'), disabled: ro }, { label: 'Open Hyperlink', run: () => followLink(h) }, { label: 'Remove Hyperlink', run: () => editing().run('clearAs', 'removeHyperlinks'), disabled: ro }, 'separator']
+          : [{ label: 'Link', run: run('linkBox'), disabled: ro }, 'separator'];
       })(),
       // (Excel's: New Comment and New Note on a cell with neither; a thread's Reply to Comment and Delete Comment; a
       // note's Edit, Delete and Show/Hide Note.)

@@ -61,4 +61,47 @@ await page.click('.oxe-menu >> text=Open Hyperlink');
 check(ownTip.startsWith('Tip here - ') && /Cannot open the specified file\./.test(refusal || '') && /Open Hyperlink\|Remove Hyperlink/.test(items) && (await opened()).length === 2,
   'a file’s path: its own ScreenTip, refused in Excel’s words; the cell menu’s Open Hyperlink opens J3’s address', JSON.stringify({ ownTip, refusal, items }));
 
+// Ctrl+K on an empty cell: Excel's Insert Hyperlink box; a web address and text to display; then Edit Hyperlink... on
+// the cell's menu, to a place in the workbook; then its Remove Link.
+const linkOf = (r, c) => page.evaluate(([r, c]) => {
+  const wbk = window.oxe.workbook;
+  const { doc } = wbk._part(window.oxe.sheetIndex);
+  const el = [...doc.getElementsByTagNameNS(doc.documentElement.namespaceURI, 'hyperlink')].find((h) => h.getAttribute('ref') === String.fromCharCode(65 + c) + (r + 1));
+  if (!el) return null;
+  const id = el.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id');
+  return { location: el.getAttribute('location'), address: id ? wbk.pkg.readRels(wbk.sheets[window.oxe.sheetIndex].path).find((x) => x.id === id).rawTarget : null };
+}, [r, c]);
+await page.keyboard.press('Escape');
+await page.evaluate(() => window.oxe.select('J8'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+k');
+await page.waitForSelector('dialog.oxe-dialog >> text=Insert Hyperlink');
+const kinds = await page.$$eval('dialog.oxe-dialog fieldset label', (ls) => ls.map((l) => l.textContent).join('|'));
+await page.fill('dialog.oxe-dialog input[id$="-show"]', 'New link');
+await page.fill('dialog.oxe-dialog input[id$="-addr"]', 'www.example.com/new');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+const made = await linkOf(7, 9);
+const j8 = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(7)?.get(9)?.v);
+const j8Look = await page.evaluate(() => { const el = document.querySelector('.oxe-row[aria-rowindex="9"] .oxe-cell[aria-colindex="11"]'); return el ? getComputedStyle(el).textDecorationLine : null; });
+check(kinds === 'Existing File or Web Page|Place in This Document|E-mail Address' && made?.address === 'http://www.example.com/new' && j8 === 'New link' && /underline/.test(j8Look || ''),
+  'Ctrl+K: Excel’s Insert Hyperlink box; a web address (http:// before www.) and its text, underlined in the Hyperlink style', JSON.stringify({ kinds, made, j8, j8Look }));
+const j8p = await pointAt(7, 9);
+await page.mouse.click(j8p.x, j8p.y, { button: 'right' });
+await page.click('.oxe-menu >> text=Edit Hyperlink...');
+await page.waitForSelector('dialog.oxe-dialog >> text=Edit Hyperlink');
+const shownAddr = await page.inputValue('dialog.oxe-dialog input[id$="-addr"]');
+await page.click('dialog.oxe-dialog label:text-is("Place in This Document")');
+await page.fill('dialog.oxe-dialog input[id$="-ref"]', 'c5');
+await page.selectOption('dialog.oxe-dialog select', 's:Notes & more');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+const edited = await linkOf(7, 9);
+await page.keyboard.press('Control+k');
+await page.waitForSelector('dialog.oxe-dialog >> text=Edit Hyperlink');
+await page.click('dialog.oxe-dialog >> button:text-is("Remove Link")');
+const removed = await linkOf(7, 9);
+await page.keyboard.press('Control+z');
+const undone = await linkOf(7, 9);
+check(shownAddr === 'http://www.example.com/new' && edited?.location === "'Notes & more'!C5" && !edited.address && removed === null && undone?.location === "'Notes & more'!C5",
+  'Edit Hyperlink: the link shown, changed to a place in the workbook; Remove Link; Ctrl+Z brings it back', JSON.stringify({ shownAddr, edited, removed, undone }));
+
 await finish();

@@ -320,6 +320,7 @@ export function mountXlsxEditor(host, options = {}) {
           headerMenu,
           cellMenu,
           pasteSpecial: () => act('pasteSpecialBox'),
+          link: () => act('linkBox'),
           autoSum: (fn) => act('autoSum', fn),
           filterMenu: () => filterMenu() || listMenu(),
           askInvalid: (info) => askInvalid(info),

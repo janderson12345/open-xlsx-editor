@@ -2,6 +2,7 @@
 // cell, changes of several sheets at once, PivotTables refreshed, notes and rules changed, another editor's contents
 // and the agent's changes.
 import { readPivots, refreshPivot, pivotAt } from '../ooxml/pivot.js';
+import { addHyperlink } from '../ooxml/links.js';
 import { SheetError } from '../ooxml/sheetops.js';
 import { setCalcMode, calculateNow, calculateSheet, calculateFull } from '../ooxml/calcmode.js';
 
@@ -67,6 +68,21 @@ export function partCommands(env) {
     calculate(how = 'now') {
       const wb = ctx.workbook();
       return calculated(how === 'sheet' ? calculateSheet(wb, ctx.sheetIndex()) : how === 'all' ? calculateFull(wb) : calculateNow(wb));
+    },
+    /** Insert > Link's answer for cell (r, c) of the sheet shown (links.js addHyperlink's { address, location, tooltip,
+     *  text }), as one step of the history; `text` given replaces a text cell's value, as Excel's Text to display does.
+     *  A protected sheet takes it only with Insert hyperlinks allowed and the cell unlocked (measured). */
+    insertHyperlink(r, c, link) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (!allowed('insertHyperlinks') || !allowed('contents', [{ r, c }])) return false;
+      const done = commands.sheetChange((wb, si) => {
+        addHyperlink(wb, si, r, c, link);
+        const v = wb.sheet(si).cells.get(r)?.get(c);
+        if (link.text != null && v?.f == null && (v?.v == null || typeof v.v === 'string') && v?.v !== link.text) wb.setCell(si, { r, c }, link.text);
+      });
+      // (The Hyperlink style may be a new cell format: its CSS made.)
+      if (done) ctx.restyled?.();
+      return done;
     },
     /** A change to the sheet's notes or rules, `run(wb, si)` (noteedit.js setNote, deleteNote; Workbook
      *  setValidation), as one step of the history. `kind`, what a protected sheet must allow for it (commands.js

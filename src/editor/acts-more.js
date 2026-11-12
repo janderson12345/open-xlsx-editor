@@ -29,6 +29,9 @@ import { errorCheckingBox } from './errorbox.js';
 import { evaluateFormulaBox } from './evalbox.js';
 import { protectBox, passwordAsk, workbookProtectBox } from './protectbox.js';
 import { editRangesBox, refersOf } from './rangesbox.js';
+import { linkBox } from './linkbox.js';
+import { hyperlinkAt } from '../ooxml/links.js';
+import { listNames } from '../ooxml/names.js';
 import { sheetProtection, workbookProtection } from '../ooxml/protection.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
 
@@ -63,6 +66,21 @@ export function createMoreActs(env) {
         ed.typeFunction(fn);
         ed.holdEditor(false);
         return true;
+      });
+    }
+    if (name === 'linkBox') {
+      // (Insert > Link, Ctrl+K: Excel's Insert Hyperlink box, Edit Hyperlink on a cell with one.)
+      const s = editing().selection;
+      const cell = state.workbook.sheet(i).cells.get(s.ar)?.get(s.ac);
+      const text = cell == null || cell.v == null ? '' : cell.f == null && typeof cell.v === 'string' ? cell.v : null;
+      const link = hyperlinkAt(state.workbook, i, s.ar, s.ac);
+      const sheets = state.workbook.sheets.filter((x) => x.kind === 'worksheet').map((x) => x.name);
+      const names = listNames(state.workbook).filter((n) => n.sheet == null).map((n) => n.name);
+      return linkBox(root, { link, text, sheets, names, sheet: state.workbook.sheets[i].name }).then((answer) => {
+        state.grid.el.focus({ preventScroll: true });
+        if (!answer) return false;
+        if (answer.remove) return editing().run('clearAs', 'removeHyperlinks');
+        return editing().run('insertHyperlink', s.ar, s.ac, answer);
       });
     }
     if (name === 'editRangesBox') {

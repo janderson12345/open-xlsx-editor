@@ -16,7 +16,17 @@ ScreenTips and the Hyperlink style.
   follow. Click and hold to select this cell."
 - An address a page can't open (a file's path, relative or not, or any other scheme) is refused with Excel's words
   when it can't open a link: "Cannot open the specified file."
-- The cell's menu on a hyperlink: Open Hyperlink and Remove Hyperlink (as Home > Clear > Remove Hyperlinks).
+- The cell's menu on a hyperlink: Edit Hyperlink..., Open Hyperlink and Remove Hyperlink (as Home > Clear > Remove
+  Hyperlinks); on another cell, Link.
+- Insert > Link (Ctrl+K, `src/editor/linkbox.js`): Excel's Insert Hyperlink box, Edit Hyperlink on a cell with one.
+  Link to: Existing File or Web Page (Address), Place in This Document (Type the cell reference, and the sheet or
+  defined name under Cell Reference and Defined Names), E-mail Address (E-mail address, Subject: mailto:...?subject=);
+  Text to display (the cell's text; "<<Selection in Document>>", fixed, on a number or a formula, as in Excel) and
+  ScreenTip... (Set Hyperlink ScreenTip). Edit Hyperlink shows the link and adds Remove Link. A place in another
+  sheet is written as a formula names it ('Notes & more'!C5, Data!A1). An address starting www. gets http:// before
+  it; anything else stays as typed. Each is one step of Undo.
+- On a protected sheet, a hyperlink is inserted only with Insert hyperlinks allowed and its cell unlocked (measured:
+  docs/PROTECT.md).
 - Home > Clear's Clear Hyperlinks and Remove Hyperlinks (docs/FORMATS.md), and hyperlinks following a sheet rename and
   rows and columns inserted or deleted (docs/ROWCOL.md), were there before.
 
@@ -36,8 +46,9 @@ Excel also writes an `xr:uid` on each hyperlink; it is left out here (Excel does
 
 ## Not yet
 
-- Insert > Link (Ctrl+K): Excel's Insert Hyperlink box, and Edit Hyperlink. links.js `addHyperlink` writes what it
-  would; the box isn't built.
+- The Insert Hyperlink box's words and its http:// before www. were taken from Excel's box, not measured over COM
+  (it can't read them); so were its refusals ("You must type a valid cell reference or select a location in this
+  document."). Its Create New Document, Browse for File and Bookmark... aren't here.
 - The keyboard: the cell's menu opens with a right-click only (not Shift+F10 or the menu key), so Open Hyperlink
   needs the mouse.
 - Half a second for a held click is a guess; Excel's own time wasn't measured.

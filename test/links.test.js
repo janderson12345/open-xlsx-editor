@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { serializeXml } from '../src/ooxml/xml.js';
 import { addHyperlink, readHyperlinks, hyperlinkAt, screenTip, followOf } from '../src/ooxml/links.js';
+import { addressOf, mailtoOf, locationOf } from '../src/editor/linkbox.js';
 
 // (Excel 365 over COM: Hyperlinks.Add on A1:A7 of a new sheet, and the file it saved; the xr:uid Excel adds left out.)
 const book = () => {
@@ -53,4 +54,19 @@ test("following a hyperlink: http, https, mailto and ftp opened; a place in the 
   assert.deepEqual(followOf({ address: 'javascript:alert(1)', location: null }), { refused: 'Cannot open the specified file.' });
   assert.equal(screenTip({ address: 'https://example.com/page', location: null, tooltip: null }), 'https://example.com/page - Click once to follow. Click and hold to select this cell.');
   assert.equal(screenTip({ address: 'https://example.com/x', location: null, tooltip: 'Tip here' }), 'Tip here - Click once to follow. Click and hold to select this cell.');
+});
+
+test("Insert Hyperlink's fields as the address and place: http:// before an address starting www., mailto: with its subject, the sheet quoted as a formula quotes it", () => {
+  assert.equal(addressOf('example.com/page'), 'example.com/page');
+  assert.equal(addressOf('www.example.com'), 'http://www.example.com');
+  assert.equal(addressOf('https://example.com/'), 'https://example.com/');
+  assert.equal(addressOf('ftp://files.example.com/a'), 'ftp://files.example.com/a');
+  assert.equal(addressOf('C:\\Docs\\a.xlsx'), 'C:\\Docs\\a.xlsx');
+  assert.equal(addressOf('report.xlsx'), 'report.xlsx');
+  assert.equal(addressOf('notes'), 'notes');
+  assert.equal(mailtoOf('someone@example.com', 'Hi there'), 'mailto:someone@example.com?subject=Hi%20there');
+  assert.equal(mailtoOf('mailto:someone@example.com', ''), 'mailto:someone@example.com');
+  assert.equal(locationOf('Notes & more', 'C30'), "'Notes & more'!C30");
+  assert.equal(locationOf('Data', 'A1'), 'Data!A1');
+  assert.equal(locationOf(null, 'MyName'), 'MyName');
 });

@@ -39,7 +39,7 @@ protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel 
   | A PivotTable's fields moved | Use PivotTable & PivotChart allowed | Refused otherwise |
   | Advanced Filter in place | Never refused | Goes through |
 
-  A hyperlink inserted needed Insert hyperlinks allowed and its cell unlocked; the editor has no Insert Hyperlink yet.
+  A hyperlink inserted (Insert > Link) needs Insert hyperlinks allowed and its cell unlocked, as Excel's did.
   Clear All of locked cells with notes or hyperlinks is refused as typing there is.
 - Protecting and unprotecting aren't steps of Undo.
 

@@ -218,6 +218,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && (key === '+' || (key === '=' && e.shiftKey))) ctx.lines?.(1);
     else if (ctrl && key === '-') ctx.lines?.(-1);
     else if (ctrl && !e.shiftKey && (key === 'f' || key === 'h')) ctx.find?.(key === 'h');
+    else if (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'k') ctx.link?.();
     else if (ctrl && !e.shiftKey && !e.altKey && (key.toLowerCase() === 'd' || key.toLowerCase() === 'r')) { if (ctx.allowed?.('fill') !== false) cmd.run('fill', key.toLowerCase() === 'd' ? 'down' : 'right'); }
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'v') ctx.pasteSpecial?.();
     else if (e.altKey && !ctrl && key === '=') ctx.autoSum?.('sum');
