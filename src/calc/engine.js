@@ -6,6 +6,7 @@ import { place, release, spillOf, touched } from './spill.js';
 import { Unsupported, E, cellValue } from './values.js';
 import { FUNCTIONS } from './functions.js';
 import { readTables, tableArea } from '../ooxml/tables.js';
+import { runWithCircles } from './iterate.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
 /** References wider than this many columns are checked against every change instead of being indexed by column. */
@@ -192,6 +193,8 @@ export class Calc {
     if (only) return this._settle(this._run(dirty));
     for (const e of touched(this, changed)) take(e);
     for (const e of this.entries.values()) if (e.volatile) take(e);
+    // (With iterative calculation on, Excel goes round the circles again at every recalculation.)
+    for (const e of this.cyclic || []) if (this.entries.get(key(e.si, e.r, e.c)) === e) take(e);
     while (queue.length) for (const e of this.readers(queue.pop())) take(e);
     if (sheet != null) for (const e of dirty) if (e.si !== sheet) dirty.delete(e);
     return this._settle(this._run(dirty));
@@ -239,8 +242,10 @@ export class Calc {
         stack.push([p, this._precedents(p, dirty).values()]);
       }
     }
-    for (const e of order) if (!circular.has(e)) this._evaluate(e);
-    return { circular: [...circular] };
+    // (A formula reading its own cell, =A1+1 in A1 or =SUM(A:A) there, is a circle of one.)
+    for (const e of order) if (e.deps.some((d) => d.si === e.si && e.r >= d.r0 && e.r <= d.r1 && e.c >= d.c0 && e.c <= d.c1)) circular.add(e);
+    // (Circles: left out, or gone round with iterative calculation on: iterate.js.)
+    return { circular: runWithCircles(this, order, circular, dirty) };
   }
 
   /** A formula (its text as the file has it, without "=") worked out as if it were in cell (r, c) of sheet si, without

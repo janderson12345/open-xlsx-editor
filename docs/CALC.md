@@ -119,6 +119,17 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     than Y1's (so J1(8) is 0.2346283865070744, 8e-6 from the function). Found from 221 points from 8 to 30, to the
     last bit. Measured on about 970 cases with cell values, then the probe's 60; all as Excel's to the last bit or
     within 1e-15. n is made whole, below 0 #NUM!; Y and K need x above 0; J and Y are #NUM! from 2^27 on, as SIN is.
+  - `iterate.js`: circular references (a formula that reads itself, or a circle of them), measured with a hidden
+    Excel on 30 cases (each with iteration off, on with 100 and on with 10 iterations; entered, F9, Ctrl+Alt+F9) and
+    an 11-step sequence in one workbook, all the same here, to the last bit:
+    - Iteration off: a formula in a circle isn't worked out; it keeps its value, and the one that closes the circle
+      shows 0 (=A1+1 in A1 is 0). The editor says which formulas are circular.
+    - Iteration on (calcPr iterate="1"; iterateCount and iterateDelta written only when not 100 and 0.001): every
+      recalculation goes round, whatever changed (=A1+1 is 100, then 200 after any edit). Each pass works out the
+      formulas in circles and those reading them, row by row of each sheet in order (B1 before A2), reading the last
+      pass's values; one with no value yet reads as 0. The passes stop when no number changed by Maximum Change or
+      more, the whole workbook's (one circle still changing keeps every circle going), or after Maximum Iterations:
+      =1+A1/2 stops at 1.9990234375 after 11 passes.
   - `threed.js`: 3D references (=SUM(Jan:Apr!A1), 'Feb:My Mar'!A1:B2) and the intersection operator, a space
     between references (=A1:C3 B2:D4 is B2:C3, spilled; =SUM(B:B 2:2) is B2). Measured on 86 formulas over four sheets
     in a hidden Excel, 84 the same here (the two not read are in the gaps below), then the probe's 17:
@@ -374,6 +385,9 @@ Excel (and checked the same way by `test/calcmode.test.js`):
   quote round one end only, #NAME? in Excel) and a range from a cell to another sheet's (`S2:Apr!B2`, #VALUE!) aren't
   read as formulas. Rows inserted, or cells moved, on one of its sheets leave a 3D reference as it was (not yet
   measured against Excel).
-- **Iterative calculation.** Circular references are left as they were and announced.
+- **Iterative calculation: what isn't yet as Excel.** No on-screen switch for it (Excel's File > Options > Formulas):
+  it is read from the file and kept, and `setIteration` (calcmode.js) turns it on. A circle whose cells change only
+  in text or errors isn't measured: here only numbers count toward Maximum Change. Array and dynamic formulas in a
+  circle aren't measured either.
 - **Dates and times typed as entries** are read as dates and times (docs/ENTRY.md). Inside a formula, text such as
   "2024-01-02" or "1/2/2024" reads as a date.

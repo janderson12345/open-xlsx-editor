@@ -49,6 +49,28 @@ export function setCalcOnSave(wb, on) {
   wb.edited = true;
 }
 
+/** Iterative calculation (Excel's File > Options > Formulas): { on, count, delta }, from calcPr's iterate,
+ *  iterateCount (100 when left out) and iterateDelta (0.001). */
+export function iteration(wb) {
+  const pr = calcPr(wb, false);
+  const count = Number(attr(pr, 'iterateCount') ?? 100);
+  const delta = Number(attr(pr, 'iterateDelta') ?? 0.001);
+  return { on: ['1', 'true'].includes(attr(pr, 'iterate')), count: count > 0 ? count : 100, delta: delta >= 0 ? delta : 0.001 };
+}
+/** Iterative calculation on or off, with its Maximum Iterations and Maximum Change, written as Excel writes them
+ *  (measured: iterate="1", the other two only when not 100 and 0.001); the circular formulas worked out again. */
+export function setIteration(wb, { on, count = iteration(wb).count, delta = iteration(wb).delta }) {
+  if (!Number.isInteger(count) || count < 1 || count > 32767 || !(delta >= 0)) throw new Error('No such iteration settings');
+  const pr = calcPr(wb, true);
+  const put = (name, value, dflt) => (value === dflt ? pr.removeAttribute(name) : pr.setAttribute(name, String(value)));
+  put('iterate', on ? 1 : 0, 0);
+  put('iterateCount', count, 100);
+  put('iterateDelta', delta, 0.001);
+  wb.bookDirty = true;
+  wb.edited = true;
+  return calculateNow(wb);
+}
+
 /** After cells changed (`rects`) and formulas were entered (`also`): everything they reach worked out, or in Manual
  *  the entered formulas alone, the rest waiting. */
 export function recalcAfter(wb, rects, also) {

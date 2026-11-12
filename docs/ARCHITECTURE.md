@@ -75,6 +75,7 @@ insides:
 | `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
 | `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
 | `src/calc/evaluate.js` | Operators, references, names and function calls; implicit intersection outside array formulas, element by element inside. |
+| `src/calc/iterate.js` | Circular references: left out with iterative calculation off, gone round with it on, as Excel does (docs/CALC.md). |
 | `src/calc/threed.js` | 3D references (Jan:Apr!A1) and the intersection operator, and which functions take a 3D reference (docs/CALC.md). |
 | `src/calc/functions.js` | The worksheet functions, as Excel defines them: maths, statistics, logic, information, and the helpers the others share. |
 | `src/calc/functions-text.js` | Text, and dates and times. |
@@ -98,7 +99,7 @@ insides:
 | `src/ooxml/errorfix.js`, `src/editor/errormenu.js`, `errorbox.js` | The error button's menu and the Error Checking box: Ignore Error (ignoredErrors as Excel writes them) and the fixes (docs/CALC.md). |
 | `src/ooxml/errorcheck.js` | Excel's error indicators: which cells break its default error-checking rules (docs/CALC.md). |
 | `src/ooxml/trace.js`, `src/editor/tracing.js`, `arrows.js` | Trace Precedents and Trace Dependents: what a formula reads and what reads a cell, a level at a time, drawn as Excel's tracer arrows (docs/CALC.md). |
-| `src/ooxml/calcmode.js` | Calculation Options: Automatic or Manual (changes waiting for F9), Calculate Now and Calculate Sheet, saved in calcPr (docs/CALC.md). |
+| `src/ooxml/calcmode.js` | Calculation Options: Automatic or Manual (changes waiting for F9), Calculate Now and Calculate Sheet, iterative calculation (`iteration`, `setIteration`), saved in calcPr (docs/CALC.md). |
 | `src/calc/engine.js` | `Calc`: what each formula reads, what a change reaches, the order to work them out in, results written back. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |

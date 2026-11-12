@@ -56,7 +56,7 @@ test('the intersection operator is a space between references, and only there', 
   assert.ok(!tokenize('S1:S4!A1').some((t) => t.sheets));
   assert.deepEqual(tokenize('Jan:Apr!A1')[0].sheets, ['Jan', 'Apr']);
   const { wb, base } = book();
-  wb.setFormula(base, 'B1', 'SUM(A1:C3 A1:A2)');
-  wb.setFormula(base, 'B2', 'A1 C1');
-  assert.deepEqual([value(wb, base, 'B1'), value(wb, base, 'B2'), wb.sheet(base).cells.get(0).get(1).f], [100, '#NULL!', 'SUM(A1:C3 A1:A2)']);
+  wb.setFormula(base, 'E1', 'SUM(A1:C3 A1:A2)');
+  wb.setFormula(base, 'E2', 'A1 C1');
+  assert.deepEqual([value(wb, base, 'E1'), value(wb, base, 'E2'), wb.sheet(base).cells.get(0).get(4).f], [100, '#NULL!', 'SUM(A1:C3 A1:A2)']);
 });
