@@ -1,7 +1,7 @@
 // CELL and INFO as Excel 365 (English) gives them (measured over COM, docs/CALC.md). Both are worked out again at every
 // recalculation, as Excel's are.
 import { Area, Arr, E } from './values.js';
-import { def, given, text } from './functions.js';
+import { def, given, text, one } from './functions.js';
 import { formatLetters } from './cellinfo.js';
 import { colName } from '../ooxml/refs.js';
 
@@ -46,4 +46,18 @@ def('INFO', (a, ctx) => {
     case 'memavail': case 'memused': case 'totmem': throw E.na;
     default: throw E.value;
   }
+}, { volatile: true });
+
+// (GETPIVOTDATA: the pivot's data field for the pairs given, from its cache: ooxml/pivotdata.js.)
+def('GETPIVOTDATA', (a, ctx) => {
+  const name = text(a[0], ctx);
+  if (!(a[1] instanceof Area)) throw E.ref;
+  const pairs = [];
+  for (let i = 2; i < a.length; i += 2) {
+    if (i + 1 >= a.length) throw E.ref;
+    pairs.push([text(a[i], ctx), one(a[i + 1], ctx)]);
+  }
+  const v = ctx.pivotData(a[1], name, pairs);
+  if (typeof v === 'string') throw E.ref;
+  return v;
 }, { volatile: true });

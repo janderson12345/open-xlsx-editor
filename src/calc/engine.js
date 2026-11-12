@@ -8,6 +8,7 @@ import { FUNCTIONS } from './functions.js';
 import { readTables, tableArea } from '../ooxml/tables.js';
 import { runWithCircles } from './iterate.js';
 import { cellInfo } from './cellinfo.js';
+import { pivotData } from '../ooxml/pivotdata.js';
 import { calcMode } from '../ooxml/calcmode.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
@@ -292,6 +293,7 @@ export class Calc {
       sheetName: (si) => book.sheets[si]?.name,
       // (CELL and INFO: functions-info.js.)
       cellInfo: (si, r, c) => cellInfo(book, si, r, c),
+      pivotData: (area, name, pairs) => pivotData(book, area, name, pairs),
       bookName: () => book.fileName || null,
       calcMode: () => calcMode(book),
       tableArea: (table, spec) => tableArea(this.tables, table, spec, ctx.here),

@@ -112,6 +112,24 @@ The eight cases:
 | Refreshed after the change | 8 of 8: the same cells as Excel's refresh, and the same rewritten XML |
 | The editor's refreshed workbooks opened in Excel (`pivot-ours.mjs`, `excel-pivot-check.ps1`) | 8 of 8 opened, and Excel's own refresh of each changed nothing |
 
+## GETPIVOTDATA (measured)
+
+`src/ooxml/pivotdata.js`, test/pivotdata.test.js. Measured over COM on two PivotTables Excel made from the same data
+(Region and Item on rows with Year on columns; Item on rows with three values): 45 of 45 answers the same here.
+
+- The value comes from the pivot's cache, its data as of its last refresh, worked out with the data field's function.
+- The data field by its name ("Sum of Sales") or its source field's ("Sales"), case aside; with two values on one
+  field, the first. A leading space, or a name that isn't one of them ("Average"), is #REF!.
+- The pivot by any cell of it, or a range meeting it; outside it, or a reference given as text ("H1"), #REF!.
+- Only what the pivot shows: the row fields given must be the outer ones (Region, or Region and Item, not Item alone),
+  the column fields likewise, in any order. A field not on rows or columns, an item not there under the fields above
+  it (East and Plum), an item with a space added, TRUE, or a number for a text item: #REF!. A field given twice with
+  the same item is fine; with two, #REF!.
+- A number item matches as a number or as its text (2023, "2023", 2023.0).
+- Where a row and a column item cross with nothing there (the empty cell the pivot shows), 0. With nothing given, the
+  grand total.
+- A pivot saved without its cache records (Excel's "Save source data with file" off) isn't read: #REF!.
+
 ## Not refreshed yet
 
 These pivots are left as they are, and the editor says why:
