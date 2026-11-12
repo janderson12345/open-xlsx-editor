@@ -443,4 +443,19 @@ await page.click('dialog.oxe-evaluate-box >> button:text-is("Close")');
 check(evalSteps[0] === '=IF(<u>L45</u>&gt;5,L45*2,0)' && evalSteps.slice(1).join('|') === '=IF(7>5,L45*2,0)|=IF(TRUE,L45*2,0)|=IF(TRUE,7*2,0)|=IF(TRUE,14,0)|=14',
   'Evaluate Formula: L45 underlined, then 7, TRUE, 7, 14, IF\'s 14', JSON.stringify(evalSteps));
 
+// Formulas > Watch Window: L47 watched (its value 14 and formula); L45 changed to 9: 18 there at once; Delete Watch.
+const watchRows = () => page.evaluate(() => [...document.querySelectorAll('.oxe-watch-table tbody tr')].map((r) => [...r.cells].slice(1).map((c) => c.textContent).join('|')));
+await page.evaluate(() => window.oxe.select('L47'));
+await ribbon('Watch Window');
+await page.click('.oxe-watchbar button:text-is("Add Watch")');
+const watched = await watchRows();
+await page.evaluate(() => window.oxe.enter('L45', '9'));
+const updated = await watchRows();
+await page.click('.oxe-watch-table tbody tr');
+await page.click('.oxe-watchbar button:text-is("Delete Watch")');
+const left = await watchRows();
+await ribbon('Watch Window');
+check(watched.join() === 'Data||L47|14|=IF(L45>5,L45*2,0)' && updated.join() === 'Data||L47|18|=IF(L45>5,L45*2,0)' && left.length === 0,
+  'Watch Window: L47 watched, 14 then 18 as L45 changes; Delete Watch', JSON.stringify({ watched, updated, left }));
+
 await finish();

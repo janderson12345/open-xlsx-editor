@@ -43,6 +43,8 @@ export function createMoreActs(env) {
     if (name === 'errorChecking') return errorCheckingBox(env);
     // (Formulas > Evaluate Formula: evalbox.js.)
     if (name === 'evaluateFormula') return evaluateFormulaBox(env);
+    // (Formulas > Watch Window, shown or hidden: watchwindow.js.)
+    if (name === 'watchWindow') { state.watch?.toggle(); return true; }
     if (name === 'insertFunction') {
       // (Formulas > Insert Function, Shift+F3, or a function from the Function Library's lists (args[0]): typed at the
       // caret of the cell being edited, or the active cell opened with "=NAME(", and put first in Most Recently Used.)

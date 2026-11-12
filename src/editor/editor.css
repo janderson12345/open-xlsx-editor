@@ -1262,6 +1262,59 @@
 .oxe-pop .oxe-swatches-theme { row-gap: 0; }
 .oxe-pop .oxe-swatch { width: 24px; height: 24px; }
 /* Find and Replace (findbar.js): under the ribbon, in the headings' colours. */
+/* Formulas > Watch Window (watchwindow.js): docked under the Find bar, its table scrolling. */
+.oxe-watchbar {
+  flex: none;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--oxe-head-line);
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 13px var(--oxe-ui-font);
+}
+.oxe-watchbar[hidden] {
+  display: none;
+}
+.oxe-watch-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.oxe-watch-btn {
+  padding: 3px 12px;
+  border: 1px solid #a6a6a6;
+  border-radius: 4px;
+  background: var(--oxe-sheet-bg, #ffffff);
+  color: inherit;
+  font: inherit;
+}
+.oxe-watch-btn:disabled {
+  opacity: 0.5;
+}
+.oxe-watch-head .oxe-find-close {
+  margin-left: auto;
+  min-width: 0;
+  width: 28px;
+  flex: none;
+}
+.oxe-watch-scroll {
+  max-height: 140px;
+  overflow: auto;
+  background: var(--oxe-sheet-bg, #ffffff);
+  border: 1px solid var(--oxe-head-line);
+}
+.oxe-watch-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.oxe-watch-table th, .oxe-watch-table td {
+  padding: 2px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+.oxe-watch-table tr[aria-selected="true"] {
+  background: var(--oxe-sel-fill);
+}
 .oxe-findbar {
   display: flex;
   flex: none;

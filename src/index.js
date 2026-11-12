@@ -19,6 +19,7 @@ import { readCharts } from './ooxml/charts.js';
 import { chartFigure } from './editor/chartview.js';
 import { createRibbon } from './editor/ribbon.js';
 import { createFindBar } from './editor/findbar.js';
+import { createWatchWindow } from './editor/watchwindow.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
 import { dataTab } from './editor/datatab.js';
@@ -146,6 +147,7 @@ export function mountXlsxEditor(host, options = {}) {
   const showConditional = () => {
     if (!state.grid || !state.workbook) return;
     state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex));
+    state.watch?.refresh();
     // (Excel's error indicators, worked out again: errorcheck.js; `errorChecking: false` turns them off.)
     state.grid.setErrors(options.errorChecking === false ? null : errorFlags(state.workbook, state.sheetIndex));
     // (Notes too: written, deleted, or moved with rows and columns.)
@@ -213,6 +215,18 @@ export function mountXlsxEditor(host, options = {}) {
       readOnly: () => state.readOnly,
     });
     el.after(state.find.el);
+    // (Formulas > Watch Window: docked under the Find bar, kept up to date as the workbook changes.)
+    state.watch = createWatchWindow({
+      workbook: () => state.workbook,
+      bookName: () => state.fileName || '',
+      sheetIndex: () => state.sheetIndex,
+      selection: () => editing().selection,
+      go: (hit) => editing().run('goTo', hit),
+      readOnly: () => state.readOnly,
+      changed: () => {},
+      home: () => state.grid?.el.focus({ preventScroll: true }),
+    });
+    state.find.el.after(state.watch.el);
   };
 
   const openMenu = (i, point, byKeyboard) => {

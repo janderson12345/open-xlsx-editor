@@ -267,7 +267,16 @@ one handed to a function goes with it; a function or operator once its arguments
 condition, then only the argument it returns, IFERROR its value_if_error only after an error; brackets go with what
 is in them. Excel's box is a dialog COM can't drive, so the steps aren't measured beyond that example.
 
-- **Not yet**: Step In and Step Out (there, not working); a defined name's own steps; the Watch Window.
+- **Not yet**: Step In and Step Out (there, not working); a defined name's own steps.
+
+The Watch Window (`ooxml/watches.js`, `editor/watchwindow.js`; `test/watches.test.js`): the watched cells with their Book,
+Sheet, Name (a defined name for just that cell), Cell, Value (as the cell shows it) and Formula, kept up to date as
+the workbook changes; Add Watch watches the selected cells, each cell of a range on its own as Excel's does; Delete
+Watch; a double click or Enter goes to the cell. Saved as Excel saves them (measured: Application.Watches.Add, the
+file saved and opened again): a sheet's `<cellWatches><cellWatch r="B2"/>...`, in the order added, after pageMargins.
+
+- **Not yet**: Excel's Add Watch box (here the selection is watched at once); the window floating (it is docked under
+  the ribbon here); watches of other open workbooks. Adding or deleting a watch isn't a step of Undo, as in Excel.
 
 ## Calculation options
 
