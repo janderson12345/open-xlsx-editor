@@ -70,7 +70,8 @@ insides:
 | `src/ooxml/input.js` | A typed entry as Excel reads it (numbers with separators, currency, percentages, exponents, fractions; dates and times; 'text; =formulas), the format it gives the cell, and a cell's text as the formula bar shows it (docs/ENTRY.md). |
 | `src/ooxml/entry.js` | What typing text into a cell changes (its content, and its format when Excel would give one), for typing, pasting text and Replace. |
 | `src/ooxml/sheetedit.js` | Changing cells in the worksheet's XML in place: values, formulas, formula results (the formula kept), shared formulas written out cell by cell. Implied positions pinned first, rows indexed, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. |
-| `src/calc/tokens.js` | Formulas as tokens; moving a formula (`shiftFormula`), a sheet's references renamed or made #REF! (`renameSheetRefs`, `sheetPrefix`), references following cells cut and pasted (`moveRefs`) and rows or columns inserted or deleted (`shiftRefs`), the typed form to the file's (`normalizeFormula`, `_xlfn.` prefixes) and back (`displayFormula`). |
+| `src/calc/tokens.js` | Formulas as tokens; moving a formula (`shiftFormula`), a sheet's references renamed or made #REF! (`renameSheetRefs`, `sheetPrefix`), references following cells cut and pasted (`moveRefs`) and rows or columns inserted or deleted (`shiftRefs`). |
+| `src/calc/fileform.js` | The typed form of a formula to the file's (`normalizeFormula`: `_xlfn.` prefixes, Excel 365's dynamic-array and trim-reference forms) and back (`displayFormula`). |
 | `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
 | `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
 | `src/calc/evaluate.js` | Operators, references, names and function calls; implicit intersection outside array formulas, element by element inside. |

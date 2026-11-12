@@ -2,7 +2,7 @@
 // (docs/ENTRY.md). Numbers with thousands separators, currency, percentages, exponents and fractions; dates, times and
 // both; each with the number format Excel gives the cell when it was General. An entry starting with = is a formula, one
 // starting with an apostrophe text.
-import { normalizeFormula, displayFormula } from '../calc/tokens.js';
+import { normalizeFormula, displayFormula } from '../calc/fileform.js';
 import { parseFormula } from '../calc/parse.js';
 import { BUILTIN_FORMATS as B, formatValue, isDateFormat } from './format.js';
 

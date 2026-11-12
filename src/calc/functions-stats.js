@@ -5,7 +5,7 @@
 // Registered into functions.js's table; evaluate.js imports this file.
 import { Area, E, finite, scalar, toText, toBool, matrix } from './values.js';
 import { def, given, num, text, numbers } from './functions.js';
-import { displayFormula } from './tokens.js';
+import { displayFormula } from './fileform.js';
 import { sin, cos, TRIG_LIMIT } from './trig.js';
 
 // ---- Pairs of numbers

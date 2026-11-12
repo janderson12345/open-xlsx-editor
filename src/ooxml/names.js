@@ -7,7 +7,8 @@
 import { kids, kid } from './xml.js';
 import { colIndex, MAX_ROWS, MAX_COLS } from './refs.js';
 import { withEl } from './sheetops.js';
-import { normalizeFormula, tokenize } from '../calc/tokens.js';
+import { tokenize } from '../calc/tokens.js';
+import { normalizeFormula } from '../calc/fileform.js';
 import { parseFormula } from '../calc/parse.js';
 
 /** Excel's words (its dialogs', which COM doesn't reach: not measured). */

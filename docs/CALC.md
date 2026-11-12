@@ -11,7 +11,8 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
 ## How it works
 
 - **Reading formulas.**
-  - `tokens.js` reads a formula into tokens (`prefixed.js`: the newer functions the file names with `_xlfn.`).
+  - `tokens.js` reads a formula into tokens; `fileform.js` turns it between the typed form and the file's (`prefixed.js`:
+    the newer functions the file names with `_xlfn.`).
   - `parse.js` builds a tree by Excel's precedence. Negation binds tightest, so `=-2^2` is 4, and operators of one
     level work left to right, so `=2^3^2` is 64.
 - **Working them out.**

@@ -1,5 +1,5 @@
 // The formula probe: formulas without saved values, for Excel to work out (see make-fixtures.mjs).
-import { normalizeFormula } from '../../src/calc/tokens.js';
+import { normalizeFormula } from '../../src/calc/fileform.js';
 import { write, contentTypes, rels, RT, CT, DECL, X, R, ROOT_RELS, docProps, PROPS_CT, STYLES, esc, col } from './fixture-common.mjs';
 
 // A probe for the calculation engine: formulas without saved values, for Excel to work out when it opens the file, on

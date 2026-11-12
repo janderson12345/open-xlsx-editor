@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { entryChanges } from '../src/ooxml/entry.js';
 import { parseRef, refName, rangeName } from '../src/ooxml/refs.js';
-import { displayFormula, normalizeFormula } from '../src/calc/tokens.js';
+import { displayFormula, normalizeFormula } from '../src/calc/fileform.js';
 import { editText } from '../src/ooxml/input.js';
 
 // test/dynamic-excel.json (tools/excel-compare/excel-dynamic.ps1 on dynamic-cases.mjs): each formula typed in D1 of a

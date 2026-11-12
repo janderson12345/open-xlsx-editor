@@ -2,7 +2,7 @@
 
 Excel 365's dynamic array formulas: a formula whose answer is an array spills it into the cells below and to the right
 (`src/calc/spill.js`), with the functions that make arrays (`src/calc/functions-dynamic.js`), LET and LAMBDA
-(`src/calc/evaluate.js`), `D1#` and `@` (`src/calc/tokens.js`, `parse.js`), and the file's form of all of them
+(`src/calc/evaluate.js`), `D1#` and `@` (`src/calc/tokens.js`, `parse.js`, `fileform.js`), and the file's form of all of them
 (`src/ooxml/spillxml.js`, `dynamicmeta.js`).
 
 ## In the editor
@@ -77,7 +77,7 @@ GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY (`src/calc/functions-groupby.js`), mea
 - **RANDARRAY**: 0 rows or columns #CALC!, fewer #VALUE!, min above max #VALUE!, whole numbers between bounds that
   aren't whole #VALUE!.
 
-TRIMRANGE and the trim references (`src/calc/functions-groupby.js`, `tokens.js`), measured on 27 formulas in a hidden
+TRIMRANGE and the trim references (`src/calc/functions-groupby.js`, `tokens.js`, `fileform.js`), measured on 27 formulas in a hidden
 Excel on a sheet with B3 1, C4 2, B6 3 and D3 `=""` (every spilled cell read), all 27 as Excel's here, then 15 in the
 formula probe:
 

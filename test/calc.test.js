@@ -5,7 +5,8 @@ import fs from 'node:fs';
 import { strFromU8, unzipSync } from 'fflate';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { parseRef } from '../src/ooxml/refs.js';
-import { shiftFormula, normalizeFormula, displayFormula } from '../src/calc/tokens.js';
+import { shiftFormula } from '../src/calc/tokens.js';
+import { normalizeFormula, displayFormula } from '../src/calc/fileform.js';
 import { parseFormula } from '../src/calc/parse.js';
 import { numberText } from '../src/calc/values.js';
 
