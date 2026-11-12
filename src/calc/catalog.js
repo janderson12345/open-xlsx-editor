@@ -152,7 +152,7 @@ const LIST = {
     RANK(number,ref,[order]) STDEV(number1,[number2],...) STDEVP(number1,[number2],...) TDIST(x,deg_freedom,tails)
     TINV(probability,deg_freedom) TTEST(array1,array2,tails,type) VAR(number1,[number2],...) VARP(number1,[number2],...)
     WEIBULL(x,alpha,beta,cumulative) ZTEST(array,x,[sigma])`,
-  Web: `ENCODEURL(text)`,
+  Web: `ENCODEURL(text) FILTERXML(xml,xpath)`,
 };
 
 /** The categories in the order of Excel's Insert Function box. */

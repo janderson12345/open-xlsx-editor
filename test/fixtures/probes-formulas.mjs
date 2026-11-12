@@ -512,6 +512,42 @@ export const PROBE_FORMULAS = [
   'BAHTTEXT(-5)', 'BAHTTEXT(-1.5)', 'BAHTTEXT(100000000)', 'BAHTTEXT(1E+15)', 'BAHTTEXT(11000011)', 'BAHTTEXT(201)', 'BAHTTEXT(1000000000000)',
   'BAHTTEXT("12")', 'BAHTTEXT("x")', 'BAHTTEXT(0.001)', 'BAHTTEXT(2.5E-7)', 'BAHTTEXT(9.99)', 'PHONETIC(Data!A1)', 'PHONETIC(Data!A1:A3)',
   'PHONETIC(Data!Z99)',
+  
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","/r/i[1]")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[2]")',
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[@a=\'2\']")',
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//g/i")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//n")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//e")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//d")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//zz")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","count(//i)")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","sum(//i[@a=\'1\'])")',
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[position()>2]")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[.>5]")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[contains(.,\'x\')]")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","string(//i)")',
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","name(/r/*[1])")',
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[@a!=\'1\']")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//I")',
+  
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//g/..")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","/r/i[2]/@a")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","//i[starts-with(.,\'d\')]")',
+  'FILTERXML("<r><i a=""1"">10</i><i a=""2"">x</i><i>2.5</i><g><i>deep</i></g><n>TRUE</n><e/><d>2024-01-05</d></r>","concat(//i[1],\'-\',//i[2])")',
+  'FILTERXML("<a>x</a>","/a")', 'FILTERXML("<a>x","/a")', 'FILTERXML("<a>x</a>","/b")', 'FILTERXML("<a>x</a>","//")', 'FILTERXML("<a>x</a>","")',
+  'FILTERXML("","/a")', 'FILTERXML("<a> 12 </a>","/a")', 'FILTERXML("<a>1,234</a>","/a")', 'FILTERXML("<a>1e3</a>","/a")',
+  'FILTERXML("<a></a>","/a")', 'FILTERXML("<a>50%</a>","/a")', 'FILTERXML("<a>1/2/2024</a>","/a")',
+  'ROWS(FILTERXML("<a><b>1</b><b>2</b></a>","//b"))',
+  'COLUMNS(FILTERXML("<a><b>1</b><b>2</b></a>","//b"))', 'FILTERXML("<a>&amp;&lt;</a>","/a")', 'FILTERXML("<a><![CDATA[q]]></a>","/a")',
+  'FILTERXML("<a>x<b>y</b>z</a>","/a")', 'FILTERXML("<x:a xmlns:x=\'u\'>1</x:a>","//*")', 'FILTERXML("<a>TRUE</a>","/a")',
+  'FILTERXML("<a>#N/A</a>","/a")', 'FILTERXML(12,"/a")', 'FILTERXML("<a b=\'1\'/>","/a/@b")', 'FILTERXML("<a>x</a>","/a/text()")',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

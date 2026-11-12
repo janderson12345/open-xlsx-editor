@@ -1,5 +1,8 @@
-// ENCODEURL, BAHTTEXT and PHONETIC as Excel 365 (English) gives them (measured over COM, docs/CALC.md).
-import { Area, E } from './values.js';
+// ENCODEURL, BAHTTEXT, PHONETIC and FILTERXML as Excel 365 (English) gives them (measured over COM, docs/CALC.md).
+import { Area, Arr, E, XlError } from './values.js';
+import { parseXml } from '../ooxml/xml.js';
+import { parseInput } from '../ooxml/input.js';
+import { xpath } from './xpath.js';
 import { def, lifted, num, text, roundDec } from './functions.js';
 
 // ---- ENCODEURL: UTF-8, every byte but a letter, a digit, - _ and . as %XX (~ too, unlike encodeURIComponent).
@@ -60,3 +63,30 @@ lifted('BAHTTEXT', (a, ctx) => {
 // ---- PHONETIC: a cell's phonetic reading (furigana). Excel gives #N/A without an East Asian editing language, even for
 // a cell whose text has one saved (measured), so #N/A here.
 def('PHONETIC', (a) => { if (!(a[0] instanceof Area)) throw E.value; throw E.na; });
+
+// ---- FILTERXML: an XPath query over XML text (xpath.js). Each node found gives its value as a typed entry is read
+// (numbers, TRUE, 50%, dates; text that would be an error or a formula stays text), in a column: an element its own
+// text (not its children's: <a>x<b>y</b>z</a> is "xz"), an attribute its value. A text() node, an empty element, a
+// result that isn't nodes (count(), string()), no node found and XML that doesn't parse are #VALUE!, as measured.
+def('FILTERXML', (a, ctx) => {
+  let doc;
+  let found;
+  try {
+    doc = parseXml(text(a[0], ctx));
+    found = xpath(doc, text(a[1], ctx));
+  } catch (err) {
+    if (err instanceof XlError) throw err;
+    throw E.value;
+  }
+  if (!Array.isArray(found) || !found.length) throw E.value;
+  const values = found.map((n) => {
+    let s;
+    if (n.nodeType === 1) s = [...n.childNodes].filter((c) => c.nodeType === 3 || c.nodeType === 4).map((c) => c.data).join('');
+    else if (n.nodeType === 2) s = n.value;
+    else return E.value;
+    if (s === '') return E.value;
+    const read = parseInput(s);
+    return read.formula || read.error || read.kind === 'error' || read.value == null ? s : read.value;
+  });
+  return values.length === 1 ? values[0] : new Arr(values.map((v) => [v]));
+});

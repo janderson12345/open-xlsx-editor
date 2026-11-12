@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1870 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1914 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1870 of 1870 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1914 of 1914 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -438,6 +438,22 @@ Measured in Excel 365 in English, 51 cases (`src/calc/functions-words.js`; 48 in
   in the file (the reading is shown only with an East Asian editing language). Excel refuses =PHONETIC("abc") as typed;
   here it is #VALUE!.
 
+## FILTERXML
+
+Measured in Excel 365 in English, 55 queries (test/filterxml.test.js; 44 in the probe). `src/calc/xpath.js` is an
+XPath 1.0 reader: every axis but namespace, name, * and node-type tests, predicates, the operators and the core
+functions.
+
+- What a query finds comes back in a column, one value a node: an element's own text (`<a>x<b>y</b>z</a>` is "xz",
+  not its children's), an attribute's value. Each is read as a typed entry is (TRUE, 1,234, 50%, 1e3 and dates become
+  values; " 12 " is 12), but text that would be an error or a formula stays text ("#N/A").
+- #VALUE!: XML that doesn't parse (or a number given for it), no node found, a result that isn't nodes (count(),
+  string(), concat(), name()), a text() node, and an element with no text of its own (an empty one, or `//g/..`) in
+  its place in the column.
+- Names are matched as written, case and prefix included (`//I` finds nothing); `//*` finds prefixed elements.
+- In a formula of the old kind, Excel takes only the first value (as its `@` does with SEQUENCE: docs/DYNAMIC.md);
+  here all of them reach the function around it.
+
 ## Not yet
 
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
@@ -451,7 +467,7 @@ Measured in Excel 365 in English, 51 cases (`src/calc/functions-words.js`; 48 in
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
 - **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
-  units) as 2 in a workbook such as this editor writes (the probe's, 1870 of 1870 as Excel), but as 1 in a workbook it
+  units) as 2 in a workbook such as this editor writes (the probe's, 1914 of 1914 as Excel), but as 1 in a workbook it
   made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
   fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;

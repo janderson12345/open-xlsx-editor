@@ -123,7 +123,7 @@ insides:
 | `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo, showSheet, nextSheet, insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet, and the formatting ones: format, toggleFont, stepFont, toggleWrap, stepIndent, align, borders, stepDecimal, clearFormats), with the workbook's undo history of cell contents and formats (values and formulas; undoing a change on another sheet shows it; cleared by a rename or delete) and each sheet's selection and scroll position, both by sheetId. |
 | `src/calc/functions-info.js`, `cellinfo.js` | CELL and INFO; a cell's format as CELL's letters (G, F2, C0-, D4...), its prefix, protection and column width. |
 | `src/ooxml/pivotdata.js` | GETPIVOTDATA's lookup: a PivotTable's cache, only what the pivot shows. |
-| `src/calc/functions-words.js` | ENCODEURL, BAHTTEXT (Thai number words) and PHONETIC. |
+| `src/calc/functions-words.js`, `xpath.js` | ENCODEURL, BAHTTEXT (Thai number words), PHONETIC and FILTERXML, with an XPath 1.0 reader. |
 | `src/calc/charsets.js` | Characters as Excel counts and codes them: code points for LEFT and RIGHT, code page 1252 for CHAR and CODE, the code points UNICHAR refuses. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
 | `src/editor/autocorrect.js`, `autocorrect-list.js` | AutoCorrect as a cell or the formula bar is typed in (Excel's options and entries of its list), and the spelling underlines. |

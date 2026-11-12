@@ -107,4 +107,5 @@ formula probe:
 - (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array functions, MAP, REDUCE, SCAN, BYROW, BYCOL,
   MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF, RANDARRAY and TRIMRANGE are here, in the formula probe.)
 - An old formula's `@` is found by working the formula out at its cell, so where that gives an error before the array
-  comes out it isn't shown: `=SEQUENCE(A1:A3)` below row 3 is `=SEQUENCE(@A1:A3)` here, `=@SEQUENCE(@A1:A3)` in Excel.
+  comes out it isn't shown: `=SEQUENCE(A1:A3)` below row 3 is `=SEQUENCE(@A1:A3)` here, `=@SEQUENCE(@A1:A3)` in Excel. Likewise an old
+  formula giving FILTERXML's column to another function: Excel passes the first value only, this editor all of them.
