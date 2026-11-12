@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1601 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1645 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1601 of 1601 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1645 of 1645 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these).
@@ -377,6 +377,18 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 | Text compares without regard to case, in Excel's order. Numbers come before text, and text before FALSE and TRUE. A blank counts as 0, "" or FALSE, whichever the other value is. | `="a"="A"`, `=1<"a"`, `="a"<TRUE`, `=Data!F2=""` (blank) are all TRUE. |
 | Approximate lookups on a list sorted up (MATCH 1, VLOOKUP and HLOOKUP TRUE) are a binary search, which on a list that isn't sorted gives its own answer. From the middle: a blank or a value of another type is passed over to the right; an exact match is taken at once, then the last of the equal values after it. On a list sorted down (MATCH -1) it is a scan from the start, blanks and other types passed over, taking the first exact match and stopping at the first value below. | 400 unsorted lists, some with blanks and text, 1,200 answers (`test/lookup-excel.json`, from `tools/excel-compare/excel-lookups.ps1`): all as Excel's. `MATCH(8,{3,6,9,6,6,1,8,7},1)` is 7, not 2 or 8; `MATCH(6,{5,8,7,1},-1)` is #N/A. |
 
+## The byte functions, ASC and DBCS
+
+Measured in Excel 365 in English (language 1033, not a double-byte one), 62 cases built with UNICHAR so no encoding
+stands between, each result read a UTF-16 unit at a time:
+
+- **LENB, MIDB, FINDB, SEARCHB, REPLACEB** count UTF-16 units: LENB of an emoji is 2, of two CJK characters 2, and
+  MIDB and REPLACEB cut an emoji in two (test/bytes.test.js, as the probe's JSON can't carry half of one).
+- **LEFTB and RIGHTB** keep a character whole, as Excel 365's LEFT and RIGHT do: LEFTB of an emoji and 1 is the emoji.
+- **ASC and DBCS** give the text as it is: full-width ＡＢＣ stays full-width, ABC stays half-width. They convert only
+  where a double-byte language is Excel's default.
+- Errors as LEFT, MID, FIND, SEARCH and REPLACE give them.
+
 ## Not yet
 
 - **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
@@ -389,6 +401,8 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 - **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
+- **An emoji in LEN, LEFT, RIGHT, MID, FIND, SEARCH, REPLACE and CODE.** Excel 365 counts it as one character (LEN is 1;
+  CODE gives 63, a question mark); here it is two UTF-16 units.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.

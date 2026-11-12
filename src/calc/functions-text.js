@@ -48,7 +48,10 @@ function clampArea(a, ctx) {
   const ext = ctx.extent(a.si);
   return new Area(a.si, a.r0, a.c0, Math.max(a.r0, Math.min(a.r1, ext.maxRow)), Math.max(a.c0, Math.min(a.c1, ext.maxCol)));
 }
-lifted('LEN', (a, ctx) => text(a[0], ctx).length);
+/** LEN, MID, FIND, SEARCH and REPLACE counting UTF-16 units (their byte versions use them). */
+const units = {};
+units.LEN = (a, ctx) => text(a[0], ctx).length;
+lifted('LEN', units.LEN);
 lifted('LEFT', (a, ctx) => { const n = opt(a, 1, ctx, 1); if (n < 0) throw E.value; return text(a[0], ctx).slice(0, Math.trunc(n)); });
 lifted('RIGHT', (a, ctx) => {
   const n = Math.trunc(opt(a, 1, ctx, 1));
@@ -56,13 +59,14 @@ lifted('RIGHT', (a, ctx) => {
   const s = text(a[0], ctx);
   return n === 0 ? '' : s.slice(-n);
 });
-lifted('MID', (a, ctx) => {
+units.MID = (a, ctx) => {
   const s = text(a[0], ctx);
   const start = Math.trunc(num(a[1], ctx));
   const n = Math.trunc(num(a[2], ctx));
   if (start < 1 || n < 0) throw E.value;
   return s.substr(start - 1, n);
-});
+};
+lifted('MID', units.MID);
 lifted('UPPER', (a, ctx) => text(a[0], ctx).toUpperCase());
 lifted('LOWER', (a, ctx) => text(a[0], ctx).toLowerCase());
 lifted('PROPER', (a, ctx) => {
@@ -96,13 +100,14 @@ lifted('SUBSTITUTE', (a, ctx) => {
   for (let k = 0; k < nth; k++) { at = s.indexOf(from, at + 1); if (at < 0) return s; }
   return s.slice(0, at) + to + s.slice(at + from.length);
 });
-lifted('REPLACE', (a, ctx) => {
+units.REPLACE = (a, ctx) => {
   const s = text(a[0], ctx);
   const start = Math.trunc(num(a[1], ctx));
   const n = Math.trunc(num(a[2], ctx));
   if (start < 1 || n < 0) throw E.value;
   return s.slice(0, start - 1) + text(a[3], ctx) + s.slice(start - 1 + n);
-});
+};
+lifted('REPLACE', units.REPLACE);
 const finder = (insensitive) => (a, ctx) => {
   const what = text(a[0], ctx);
   const s = text(a[1], ctx);
@@ -118,8 +123,22 @@ const finder = (insensitive) => (a, ctx) => {
   if (!m) throw E.value;
   return m.index + start;
 };
-lifted('FIND', finder(false));
-lifted('SEARCH', finder(true));
+units.FIND = finder(false);
+units.SEARCH = finder(true);
+lifted('FIND', units.FIND);
+lifted('SEARCH', units.SEARCH);
+// (The byte versions, as an English Excel 365 has them (measured, docs/CALC.md): LENB, MIDB, FINDB, SEARCHB and REPLACEB
+// count UTF-16 units, an emoji 2; LEFTB and RIGHTB keep a character whole, so LEFTB of an emoji and 1 is the emoji; ASC
+// and DBCS give the text as it is, full-width letters staying full-width.)
+for (const [b, f] of [['LENB', 'LEN'], ['MIDB', 'MID'], ['FINDB', 'FIND'], ['SEARCHB', 'SEARCH'], ['REPLACEB', 'REPLACE']]) lifted(b, units[f]);
+lifted('LEFTB', (a, ctx) => { const n = opt(a, 1, ctx, 1); if (n < 0) throw E.value; return [...text(a[0], ctx)].slice(0, Math.trunc(n)).join(''); });
+lifted('RIGHTB', (a, ctx) => {
+  const n = Math.trunc(opt(a, 1, ctx, 1));
+  if (n < 0) throw E.value;
+  return n === 0 ? '' : [...text(a[0], ctx)].slice(-n).join('');
+});
+lifted('ASC', (a, ctx) => text(a[0], ctx));
+lifted('DBCS', (a, ctx) => text(a[0], ctx));
 lifted('EXACT', (a, ctx) => text(a[0], ctx) === text(a[1], ctx));
 lifted('VALUE', (a, ctx) => {
   const v = one(a[0], ctx);

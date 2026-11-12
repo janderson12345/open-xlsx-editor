@@ -456,6 +456,15 @@ export const PROBE_FORMULAS = [
   'SUM(Data!C2:INDEX(Data!C:C,5))', 'COUNTA(Data!A1:INDEX(Data!A:A,9))', 'SUM(OFFSET(Data!C2,1,0):Data!C5)',
   'ROWS(Data!A2:INDEX(Data!A2:A9,MATCH("Elder",Data!A2:A9,0)))', 'SUM(Data!B2:\'My Data\'!A1)', 'TEXTJOIN(",",TRUE,-Data!C2:C4)',
   'SUM(INDEX(Data!A1:E9,2,2):INDEX(Data!A1:E9,4,3))', 'SUM(Data!C2:C3:Data!C5)', 'SUM(Data!A1:C9 Data!B2:Data!E3)',
+  'LENB("abc")', 'LENB(UNICHAR(26085)&UNICHAR(26085))', 'LENB(UNICHAR(128512))', 'LENB("a"&UNICHAR(128512)&"b")', 'LENB(123)', 'LENB("")',
+  'LENB(TRUE)', 'LEFTB(UNICHAR(26085)&UNICHAR(26085)&UNICHAR(26085),2)', 'LEFTB("abc")', 'LEFTB("a"&UNICHAR(128512),2)', 'LEFTB(UNICHAR(128512),1)',
+  'LEFTB("abc",0)', 'LEFTB("abc",10)', 'LEFTB("abc",-1)', 'RIGHTB("abcdef",2)', 'RIGHTB("abc")', 'RIGHTB(UNICHAR(128512)&"b",2)',
+  'RIGHTB(UNICHAR(128512),1)', 'RIGHTB("abc",-1)', 'MIDB("abcdef",2,3)', 'MIDB("a"&UNICHAR(128512)&"b",2,2)',
+  'MIDB("abc",5,1)', 'MIDB("abc",0,1)', 'MIDB("abc",1,-1)', 'FINDB("c","abcabc",4)',
+  'FINDB("b",UNICHAR(128512)&"b")', 'FINDB("z","abc")', 'FINDB("","abc",2)', 'FINDB("a","abc",0)', 'SEARCHB("C","abcabc")',
+  'SEARCHB("B",UNICHAR(128512)&"b")', 'SEARCHB("?c","abc")', 'SEARCHB("b*","abc")', 'REPLACEB("abcdef",2,3,"X")',
+  'REPLACEB("abc",0,1,"x")', 'REPLACEB("abc",5,1,"x")', 'ASC(UNICHAR(65313)&UNICHAR(65297))',
+  'ASC("abc")', 'ASC(12)', 'ASC(UNICHAR(12354))', 'DBCS("ABC 123")', 'DBCS(UNICHAR(65398))', 'DBCS(TRUE)', 'ASC(1/0)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
