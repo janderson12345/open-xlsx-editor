@@ -247,9 +247,16 @@ Range.Errors on about 60 cells; `test/errorcheck.test.js` has them):
   Formula Bar, for the selected cells with that error, each one step of Undo. Ignore Error is written as Excel writes
   it (measured): one ignoredError a rule, its cells joined into ranges, `<ignoredError sqref="A1:A2 A4"
   numberStoredAsText="1"/>`, after pageMargins.
+- **Error Checking** (Formulas > Formula Auditing; `editor/errorbox.js`): Excel's box going through the sheet's cells
+  with an indicator in reading order (rows, then columns), from the active cell, each selected in turn: "Error in cell
+  G2", what it holds, the error's name and what it means, its fix, Ignore Error, Edit in Formula Bar, Previous, Next;
+  a fix or Ignore Error goes on to the next. Past the last it starts again at the top, and back where it started says
+  "The error check is complete for the entire sheet." The box is a dialog COM can't drive: its order and words are
+  Excel's as its documentation and the box itself show them, not measured; Excel's box lets the sheet be clicked
+  while it is open, this one doesn't.
 - **Not yet**: the two-digit year's Convert XX to 19XX and 20XX, Update Formula to Include Cells, Show Calculation Steps,
   Help and Error Checking Options; whether Convert to Number changes a Text number format (not measured: it is kept).
-  The Error Checking box, and the rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
+  The rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
   in M5 with a number in M4, when M7 held =M1+M2 (alone, Excel flags it). The triangle's green isn't measured. Evaluate
   Formula, the Watch Window.
 

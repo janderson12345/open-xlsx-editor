@@ -4,6 +4,7 @@ import { fontDescentPx } from './fonts.js';
 import { inSelection } from './selection.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
+import { ERROR_TEXT } from '../ooxml/errorcheck.js';
 import { colChars } from '../ooxml/units.js';
 import { MDW } from './geometry.js';
 import { setVars, div } from './dom.js';
@@ -11,16 +12,6 @@ import { iconElement } from './cficons.js';
 
 /** The merged range a cell is inside, if any. */
 export const mergeAt = (st, r, c) => st.sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1) || null;
-
-/** What each error indicator says, as Excel's error button does. */
-const ERROR_TEXT = {
-  evalError: "This cell's formula results in an error.",
-  twoDigitTextYear: 'This cell contains a date string represented with only 2 digits for the year.',
-  numberStoredAsText: 'The number in this cell is formatted as text or preceded by an apostrophe.',
-  formula: 'The formula in this cell differs from the formulas in this area of the spreadsheet.',
-  formulaRange: 'The formula in this cell refers to a range that has additional numbers adjacent to it.',
-  unlockedFormula: 'This cell contains a formula and is not locked to protect it from being changed inadvertently.',
-};
 
 const NO_ALIGN = { horizontal: 'general', vertical: 'bottom', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 };
 /** Excel's textRotation as degrees counter-clockwise: 1 to 90 up, 91 to 180 down (91 is -1); 255, stacked, is none. */

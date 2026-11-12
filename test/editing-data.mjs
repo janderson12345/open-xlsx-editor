@@ -410,4 +410,22 @@ await page.click('.oxe-menu button:text-is("Ignore Error")');
 check(menuItems === 'Number Stored as Text|Convert to Number|Ignore Error|Edit in Formula Bar' && converted === 123 && textAgain === '123' && await errMark() === null,
   'error button: Convert to Number, Ctrl+Z; Alt+Shift+F10 > Ignore Error', JSON.stringify({ menuItems, converted, textAgain }));
 
+// Formulas > Error Checking from L45 ('7): its cell first; Convert to Number, then on to L46 (=1/0, Divide by Zero
+// Error); Next until the whole sheet is checked.
+await page.evaluate(() => { window.oxe.enter('L45', "'7"); window.oxe.enter('L46', '=1/0'); window.oxe.select('L45'); });
+await ribbon('Error Checking');
+await page.waitForSelector('dialog.oxe-errcheck-box');
+const boxText = (sel) => page.textContent(`dialog.oxe-errcheck-box ${sel}`);
+const firstError = [await boxText('.oxe-errcheck-where'), await boxText('.oxe-errcheck-name')];
+await page.click('dialog.oxe-errcheck-box >> button:text-is("Convert to Number")');
+const secondError = [await boxText('.oxe-errcheck-where'), await boxText('.oxe-errcheck-name'), await value('L45')];
+let finalMessage = null;
+for (let k = 0; k < 30 && !finalMessage; k++) {
+  await page.click('dialog.oxe-errcheck-box >> button:text-is("Next")');
+  finalMessage = await page.evaluate(() => [...document.querySelectorAll('dialog')].find((d) => /complete for the entire sheet/.test(d.textContent))?.textContent ?? null);
+}
+await page.keyboard.press('Enter');
+check(firstError.join() === 'Error in cell L45,Number Stored as Text' && secondError.join() === 'Error in cell L46,Divide by Zero Error,7' && /complete/.test(finalMessage || ''),
+  'Error Checking: L45 first, Convert to Number, on to L46; Next until the error check is complete', JSON.stringify({ firstError, secondError, finalMessage }));
+
 await finish();

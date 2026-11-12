@@ -25,6 +25,7 @@ import { flashFill } from '../ooxml/flashfill.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
 import { insertFunctionBox } from './functionbox.js';
 import { openErrorMenu } from './errormenu.js';
+import { errorCheckingBox } from './errorbox.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
@@ -37,6 +38,8 @@ export function createMoreActs(env) {
   return (name, args, i) => {
     // (Excel's error button's menu, at a point: errormenu.js.)
     if (name === 'errorMenu') return openErrorMenu(env, args[0]);
+    // (Formulas > Error Checking: errorbox.js.)
+    if (name === 'errorChecking') return errorCheckingBox(env);
     if (name === 'insertFunction') {
       // (Formulas > Insert Function, Shift+F3, or a function from the Function Library's lists (args[0]): typed at the
       // caret of the cell being edited, or the active cell opened with "=NAME(", and put first in Most Recently Used.)

@@ -149,6 +149,23 @@
 }
 
 /* Cells: bottom-aligned (Excel's default), text left, numbers right, booleans and errors centred, never wrapped. */
+/* Formulas > Error Checking (errorbox.js): the cell and its error, the choices in a column beside. */
+.oxe-errcheck-box {
+  min-width: 360px;
+  /* (Out of the way of the cell it is showing, at the bottom right, as Excel's box stands aside.) */
+  inset: auto 24px 48px auto;
+  margin: 0;
+}
+.oxe-errcheck-name {
+  font-weight: 600;
+}
+.oxe-errcheck-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin: 8px 0;
+}
 /* A menu's heading (Excel's error menu): bold, not an item. */
 .oxe-menuhead {
   padding: 4px 10px;

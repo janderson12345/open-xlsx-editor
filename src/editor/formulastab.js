@@ -37,7 +37,7 @@ export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'a
       btn('⇠', 'Trace Dependents', () => act('trace', 'dependents'), { label: 'Trace Dependents' }),
       split('✕', 'Remove Arrows', () => act('removeArrows'), () => [item('Remove Arrows', () => act('removeArrows')),
         item('Remove Precedent Arrows', () => act('removeArrows', 'precedents')), item('Remove Dependent Arrows', () => act('removeArrows', 'dependents'))], { label: 'Remove Arrows' })),
-      col(showBtn)),
+      col(showBtn, btn('⚠', 'Error Checking', () => act('errorChecking'), { label: 'Error Checking' }))),
     grp('Calculation', menu('⚙', 'Calculation Options', () => [['auto', 'Automatic'], ['autoNoTable', 'Automatic Except for Data Tables'], ['manual', 'Manual']]
       .map(([m, label]) => item(label, () => act('calcMode', m), { on: calcMode() === m, icon: calcMode() === m ? '✓' : ' ' })), { label: 'Calculation Options', big: true }),
     col(btn('▦', 'Calculate Now (F9)', () => act('calculate', 'now'), { label: 'Calculate Now' }),

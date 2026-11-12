@@ -16,6 +16,16 @@ import { parseFormula } from '../calc/parse.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { parseRange } from './refs.js';
 
+/** What each error indicator says, as Excel's error button does. */
+export const ERROR_TEXT = {
+  evalError: "This cell's formula results in an error.",
+  twoDigitTextYear: 'This cell contains a date string represented with only 2 digits for the year.',
+  numberStoredAsText: 'The number in this cell is formatted as text or preceded by an apostrophe.',
+  formula: 'The formula in this cell differs from the formulas in this area of the spreadsheet.',
+  formulaRange: 'The formula in this cell refers to a range that has additional numbers adjacent to it.',
+  unlockedFormula: 'This cell contains a formula and is not locked to protect it from being changed inadvertently.',
+};
+
 export const ERROR_RULES = ['evalError', 'twoDigitTextYear', 'numberStoredAsText', 'formula', 'formulaRange', 'unlockedFormula'];
 
 const MONTH = '(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?';
