@@ -172,6 +172,8 @@ function readView(view, ns) {
   return {
     freeze: { rows: frozen ? Math.trunc(Number(attr(pane, 'ySplit') || 0)) : 0, cols: frozen ? Math.trunc(Number(attr(pane, 'xSplit') || 0)) : 0 },
     zoom: Math.min(400, Math.max(10, zoom)),
+    /** Formulas > Show Formulas (Ctrl+`): the sheet shows what its cells hold, not their values. */
+    showFormulas: attr(view, 'showFormulas') === '1',
   };
 }
 

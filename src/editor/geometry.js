@@ -35,8 +35,10 @@ export function sheetGeometry(sheet, { print = false, normalFamily, auto = null,
       else if (col.width != null) colSizes.set(c, colPx(colWidthToPx(col.width, MDW)));
     }
   }
+  // (Show Formulas draws every column twice as wide, its width as saved unchanged: Excel's 54.75 points to 109.5.)
+  if (sheet.showFormulas) for (const [c, px] of colSizes) colSizes.set(c, px * 2);
   const rows = new Axis(rowCount, rowPx(sheet.format.defaultRowHeight), rowSizes);
-  const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, MDW)), colSizes);
+  const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, MDW)) * (sheet.showFormulas ? 2 : 1), colSizes);
   return { rows, cols, rowHeadW: Math.max(3, String(rowCount).length) * MDW + 12 };
 }
 

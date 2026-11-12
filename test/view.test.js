@@ -41,3 +41,14 @@ test('zoom as zoomScale and zoomScaleNormal; 100 writes neither', () => {
   wb.setView(si, { zoom: 100 });
   assert.doesNotMatch(strFromU8(unzipSync(wb.toBytes())[wb.sheets[si].path]), /zoomScale/);
 });
+
+test('Show Formulas as showFormulas="1" on the sheet view, as Excel writes it; off takes it away; read back', () => {
+  const { wb, si } = fresh();
+  const viewTag = () => strFromU8(unzipSync(wb.toBytes())[wb.sheets[si].path]).match(/<sheetView\b[^>]*>/)[0];
+  wb.setView(si, { showFormulas: true });
+  assert.match(viewTag(), / showFormulas="1"/);
+  assert.equal(Workbook.fromBytes(wb.toBytes()).sheet(si).showFormulas, true);
+  wb.setView(si, { showFormulas: false });
+  assert.doesNotMatch(viewTag(), /showFormulas/);
+  assert.equal(wb.sheet(si).showFormulas, false);
+});

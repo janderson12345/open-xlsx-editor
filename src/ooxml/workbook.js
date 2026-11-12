@@ -14,7 +14,7 @@ import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { changeLines } from './rowcol.js';
 import { setColumns, setRows } from './sizes.js';
-import { setFreeze, setZoom } from './view.js';
+import { setFreeze, setZoom, setShowFormulas } from './view.js';
 import { setAutoFilterXml, hiddenRows } from './filterops.js';
 import { applyAdvancedFilter } from './advfilter.js';
 import { sheetPrefix } from '../calc/tokens.js';
@@ -380,13 +380,15 @@ export class Workbook {
     this.bookDirty = true;
   }
 
-  /** Sheet i's view changed (view.js): { freeze: { rows, cols }, active: { r, c }, topLeft } or { zoom } (percent). */
-  setView(i, { freeze, active, topLeft, zoom }) {
+  /** Sheet i's view changed (view.js): { freeze: { rows, cols }, active: { r, c }, topLeft }, { zoom } (percent) or
+   *  { showFormulas }. */
+  setView(i, { freeze, active, topLeft, zoom, showFormulas }) {
     const part = this._part(i);
     if (freeze) setFreeze(part.doc, freeze, active, topLeft);
     if (zoom != null) setZoom(part.doc, zoom);
     part.model.freeze = freeze ? { rows: freeze.rows, cols: freeze.cols } : part.model.freeze;
     if (zoom != null) part.model.zoom = Math.round(Math.min(400, Math.max(10, zoom)));
+    if (showFormulas != null) { setShowFormulas(part.doc, showFormulas); part.model.showFormulas = !!showFormulas; }
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
   }

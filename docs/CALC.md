@@ -197,6 +197,19 @@ the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions,
     sheet's active cell. Enter puts the formula into its own cell, on its own sheet; Esc goes back without it.
   - **Merged cells.** A merged cell is pointed at by its top-left cell. Excel's behaviour here isn't measured.
 
+## Formula Auditing
+
+Show Formulas (Formulas > Formula Auditing, Ctrl+`), as Excel does it (measured with a hidden Excel's
+Window.DisplayFormulas, its Range.Text and the file it saved):
+
+- Saved as `showFormulas="1"` on the sheet's view; a sheet opened shows formulas when its file says so.
+- Each column is drawn twice as wide (Excel's 54.75 points to 109.5), the width saved unchanged.
+- Each cell shows what it holds, unformatted, as the formula bar has it: =A1*2, 1234.5 for 1,234.50, 45292 for a
+  date, 0.25 for 25%, 007 for '007, 100000000000000000000 for 1E+20; an array formula without its braces. Formulas sit
+  left, as text does, unless the cell is aligned otherwise.
+- **Not yet**: Trace Precedents and Trace Dependents, Remove Arrows, Error Checking, Evaluate Formula, the Watch Window.
+  How Excel aligns numbers in Show Formulas isn't measured (Range.Text can't say); here General's right.
+
 ## Calculation options
 
 Formulas > Calculation (`src/ooxml/calcmode.js`): Calculation Options (Automatic, Automatic Except for Data Tables,

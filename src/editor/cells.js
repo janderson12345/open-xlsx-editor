@@ -3,6 +3,7 @@
 import { fontDescentPx } from './fonts.js';
 import { inSelection } from './selection.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
+import { editText } from '../ooxml/input.js';
 import { colChars } from '../ooxml/units.js';
 import { MDW } from './geometry.js';
 import { setVars, div } from './dom.js';
@@ -44,14 +45,19 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const merge = mergeAt(st, r, c);
   const look = st.deco ? st.deco(cell.s || 0) : null;
   const align = (look && look.align) || NO_ALIGN;
-  const isText = cell.t === 's' || cell.t === 'str';
+  // (Show Formulas: a formula is shown as text, and runs on as text does.)
+  const formulas = st.sheet.showFormulas;
+  const isText = cell.t === 's' || cell.t === 'str' || (formulas && cell.f != null);
   const wrap = align.wrap && isText;
   // (A General number gets the characters that fit its cell on screen, in print too: st.screenCols when printing.)
   const screen = st.screenCols || st.cols;
   const screenW = merge ? screen.start(merge.c1 + 1) - screen.start(c) : screen.size(c);
-  const shown = cellDisplay(cell, colChars(screenW, MDW), look ? look.code : 'General', st.date1904);
+  // (Show Formulas: what the cell holds, unformatted, as Excel shows it: =A1*2, 1234.5 for 1,234.50, 45292 for a date,
+  // 0.25 for 25%, 007 for '007.)
+  const held = formulas ? editText(cell, 'General') : null;
+  const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, MDW), look ? look.code : 'General', st.date1904);
   // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
-  const h = shown.hashes ? 'center' : shown.textFormat && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
+  const h = shown.hashes ? 'center' : (shown.textFormat || (formulas && cell.f != null)) && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
   // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)
   const clean = (t) => (wrap ? t.replace(/\r/g, '') : t.replace(/[\r\n]/g, ''));
   // (Rotated, stacked or shrunk text stays in its own cell, as wrapped text does.)

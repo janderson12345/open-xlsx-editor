@@ -325,6 +325,18 @@ export function createCommands(ctx) {
       ctx.announce(freeze.rows || freeze.cols ? `Frozen: ${freeze.rows} row${freeze.rows === 1 ? '' : 's'} and ${freeze.cols} column${freeze.cols === 1 ? '' : 's'}` : 'Panes unfrozen');
       return true;
     },
+    /** Formulas > Show Formulas (Ctrl+`): on, off, or turned over (no argument); a view change, not undone. */
+    showFormulas(on) {
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const now = on ?? !wb.sheet(si).showFormulas;
+      wb.setView(si, { showFormulas: now });
+      ctx.reloaded?.();
+      ctx.grid.scrollIntoView(state.focus.r, state.focus.c);
+      ctx.changed?.();
+      ctx.announce(now ? 'Showing formulas' : 'Showing values');
+      return true;
+    },
     /** The sheet's zoom in percent (10 to 400, as Excel allows); a view change, not undone. */
     zoom(percent) {
       const z = Math.round(Math.min(400, Math.max(10, percent)));

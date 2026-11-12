@@ -224,7 +224,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** The view as shown: { freeze, zoom, topLeft } (topLeft: the first cell of the scrolled part). */
     view: () => {
       const z = st.zoom / 100;
-      return { freeze: { ...st.freeze }, zoom: st.zoom, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
+      return { freeze: { ...st.freeze }, zoom: st.zoom, showFormulas: !!st.sheet?.showFormulas, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
     },
     /** Outline the cells copied or cut, dashed, until they are pasted or let go ({ r0, c0, r1, c1 }; null for none). */
     setClip(rect) {

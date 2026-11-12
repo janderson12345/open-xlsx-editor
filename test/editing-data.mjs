@@ -363,4 +363,14 @@ check(waiting[0] === 12 && waiting[1] === 30 && /^Calculate/.test(waiting[2]) &&
   'Manual: J47 waits (12) and the status bar says Calculate; the formula entered in J46 is worked out (30); F9: 20; Automatic again: 2',
   JSON.stringify({ waiting, calculated, after: await value('J47') }));
 
+// Formulas > Show Formulas (Ctrl+`): J47 shows =J45*2, its column drawn twice as wide; the button pressed. Again: 2.
+const colWidth = () => page.evaluate(() => document.querySelector('[role="columnheader"][aria-colindex="11"]')?.getBoundingClientRect().width ?? null);
+const widthBefore = await colWidth();
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+Backquote');
+const showing = [await shown(46, 9), await colWidth(), await page.getAttribute('button[title="Show Formulas (Ctrl+`)"]', 'aria-pressed')];
+await page.keyboard.press('Control+Backquote');
+check(showing[0] === '=J45*2' && Math.abs(showing[1] - 2 * widthBefore) < 1 && showing[2] === 'true' && await shown(46, 9) === '2',
+  'Ctrl+`: =J45*2 shown, the column twice as wide, Show Formulas pressed; again: the value', JSON.stringify({ showing, widthBefore, after: await shown(46, 9) }));
+
 await finish();

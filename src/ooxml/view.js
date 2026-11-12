@@ -1,6 +1,6 @@
 // The sheet view as Excel writes it (measured over COM and on its ribbon's commands, docs/VIEW.md): frozen panes as
 // a pane element (xSplit and ySplit, the scrolled pane's top-left cell, the active pane, state frozen) with a
-// selection for each pane, and the zoom as zoomScale and zoomScaleNormal.
+// selection for each pane, the zoom as zoomScale and zoomScaleNormal, and Show Formulas as showFormulas="1".
 import { kids, kid, attr } from './xml.js';
 import { refName } from './refs.js';
 
@@ -68,6 +68,12 @@ export function setFreeze(doc, { rows, cols }, active = { r: 0, c: 0 }, topLeft 
     select('bottomLeft', rows, 0);
   }
   select(activePane, active.r, active.c, sqref);
+}
+
+/** Show Formulas on (showFormulas="1", as Excel writes it) or off (no attribute). */
+export function setShowFormulas(doc, on) {
+  const { view } = sheetView(doc);
+  if (on) view.setAttribute('showFormulas', '1'); else view.removeAttribute('showFormulas');
 }
 
 /** The zoom in percent (Excel's 10 to 400; 100 takes the attributes away). */
