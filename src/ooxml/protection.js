@@ -112,14 +112,16 @@ export function unprotectSheet(wb, si, password = '') {
   return true;
 }
 
-/** Whether `password` opens a <sheetProtection>: none set, Excel 2013's SHA hash, or the old 16-bit one. */
-function passwordFits(el, password) {
-  const hash = attr(el, 'hashValue');
+/** Whether `password` opens a <sheetProtection> (or with `pre` 'workbook', a <workbookProtection>): none set, Excel
+ *  2013's SHA hash, or the old 16-bit one. */
+function passwordFits(el, password, pre = '') {
+  const a = (name) => attr(el, pre ? pre + name[0].toUpperCase() + name.slice(1) : name);
+  const hash = a('hashValue');
   if (hash) {
-    if ((attr(el, 'algorithmName') || '').toUpperCase() !== 'SHA-512') return false;
-    return hashPassword(password, unb64(attr(el, 'saltValue') || ''), Number(attr(el, 'spinCount') || 100000)) === hash;
+    if ((a('algorithmName') || '').toUpperCase() !== 'SHA-512') return false;
+    return hashPassword(password, unb64(a('saltValue') || ''), Number(a('spinCount') || 100000)) === hash;
   }
-  const legacy = attr(el, 'password');
+  const legacy = a('password');
   if (legacy) return legacyHash(password) === legacy.toUpperCase().padStart(4, '0');
   return true;
 }
@@ -142,3 +144,54 @@ export function protectionRefusal(wb, si, kind, cells = []) {
   if (kind === 'contents') return cells.some(({ r, c }) => isLocked(wb, si, r, c)) ? PROTECTED_MESSAGE : null;
   return p.allow[kind] ? null : PROTECTED_MESSAGE;
 }
+
+// ---- Protect Workbook (its structure): <workbookProtection lockStructure="1"/> after workbookPr, a password as a
+// sheet's with "workbook" before each name (workbookAlgorithmName ...), as Excel writes it (measured).
+const AFTER_BOOK = ['bookViews', 'sheets', 'functionGroups', 'externalReferences', 'definedNames', 'calcPr', 'oleSize', 'customWorkbookViews',
+  'pivotCaches', 'smartTagPr', 'smartTagTypes', 'webPublishing', 'fileRecoveryPr', 'webPublishObjects', 'extLst'];
+
+/** The workbook's protection: null, or { structure, windows, password: whether one is set }. */
+export function workbookProtection(wb) {
+  const root = wb.doc.documentElement;
+  const el = kid(root, 'workbookProtection', root.namespaceURI);
+  if (!el || !(on(attr(el, 'lockStructure')) || on(attr(el, 'lockWindows')))) return null;
+  return { structure: on(attr(el, 'lockStructure')), windows: on(attr(el, 'lockWindows')), password: !!(attr(el, 'workbookHashValue') || attr(el, 'workbookPassword')) };
+}
+
+/** Protect the workbook's structure (sheets added, deleted, renamed, moved, hidden, coloured), with a `password` ('' for
+ *  none); `salt` for the tests. */
+export function protectWorkbook(wb, { password = '', salt = null } = {}) {
+  const doc = wb.doc;
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const old = kid(root, 'workbookProtection', ns);
+  const el = doc.createElementNS(ns, root.prefix ? `${root.prefix}:workbookProtection` : 'workbookProtection');
+  if (password) {
+    const s = salt || globalThis.crypto.getRandomValues(new Uint8Array(16));
+    el.setAttribute('workbookAlgorithmName', 'SHA-512');
+    el.setAttribute('workbookHashValue', hashPassword(password, s));
+    el.setAttribute('workbookSaltValue', b64(s));
+    el.setAttribute('workbookSpinCount', '100000');
+  }
+  el.setAttribute('lockStructure', '1');
+  if (old) root.replaceChild(el, old);
+  else root.insertBefore(el, [...root.childNodes].find((n) => n.nodeType === 1 && AFTER_BOOK.includes(n.localName)) || null);
+  wb.bookDirty = true;
+  wb.edited = true;
+}
+
+/** Unprotect the workbook with `password`: true, or false when it is wrong. */
+export function unprotectWorkbook(wb, password = '') {
+  const root = wb.doc.documentElement;
+  const el = kid(root, 'workbookProtection', root.namespaceURI);
+  if (!el) return true;
+  if (!passwordFits(el, password, 'workbook')) return false;
+  root.removeChild(el);
+  wb.bookDirty = true;
+  wb.edited = true;
+  return true;
+}
+
+/** Said when a change to a protected workbook's sheets is refused. (Excel greys those commands out; its words for
+ *  the refusal couldn't be read over COM, which gives only a general error.) */
+export const WORKBOOK_PROTECTED = 'Workbook is protected and cannot be changed.';

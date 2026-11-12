@@ -1,4 +1,4 @@
-# Protect Sheet
+# Protect Sheet and Protect Workbook
 
 Review > Protect Sheet and Unprotect Sheet (`src/ooxml/protection.js`, `src/editor/protectbox.js`), the changes a
 protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel was seen to do. Measured over COM:
@@ -21,6 +21,24 @@ protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel 
   sheet is protected. Sorting also needs the cells unlocked, as in Excel.
 - Protecting and unprotecting aren't steps of Undo.
 
+## Protect Workbook
+
+Review > Protect Workbook opens Excel's Protect Structure and Windows box (Structure ticked; Windows can't be, as in
+Excel 365; Password (optional)), and Confirm Password with a password. The button stays pressed while the workbook is
+protected; pressed again, it unprotects it (asking for the password if there is one).
+
+While the structure is protected, the sheets can't be inserted, copied, deleted, renamed, moved, hidden, shown or
+coloured, and a PivotTable can't be put on a new sheet: refused with "Workbook is protected and cannot be changed."
+(Excel greys those commands out; its words for the refusal couldn't be read over COM, which gives a general error.)
+Cells can still be changed, as in Excel.
+
+Measured over COM (`Workbook.Protect`, `Unprotect`, and the files Excel saved): `<workbookProtection
+lockStructure="1"/>` after `workbookPr`; with a password, `workbookAlgorithmName="SHA-512"`, `workbookHashValue`,
+`workbookSaltValue` and `workbookSpinCount="100000"` before it, hashed as a sheet's password is (Excel's own hash
+reproduced to the byte). Excel refused adding, renaming, deleting, moving, hiding and colouring a sheet. A workbook
+protected here opens in Excel protected: a new sheet refused, a wrong password refused, the right one unprotecting it.
+Without a password any password unprotects it, in Excel and here.
+
 ## Excel's rules
 
 | Rule | Seen |
@@ -40,5 +58,4 @@ Files from before Excel 2013 keep a 16-bit hash in `password`; it is read (test:
 - Selecting: Select locked cells and Select unlocked cells are written and kept but not enforced (every cell can be
   selected). Insert hyperlinks, PivotTables, objects (notes, charts, pictures) and scenarios aren't enforced either.
 - Excel refuses as soon as a locked cell is typed into; here the entry is refused when it is entered.
-- Protect Workbook (structure: sheets added, deleted, renamed, moved), Allow Edit Ranges (`protectedRanges`), and a
-  cell's Hidden (its formula not shown in the formula bar while the sheet is protected).
+- Allow Edit Ranges (`protectedRanges`), and a cell's Hidden (its formula not shown in the formula bar while the sheet is protected).

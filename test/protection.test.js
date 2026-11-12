@@ -58,3 +58,20 @@ test('a protected sheet refuses changes to locked cells in Excel\'s words; unloc
   assert.equal(protectionRefusal(wb, si, 'formatCells'), PROTECTED_MESSAGE);
   assert.equal(protectionRefusal(wb, si, 'formatColumns'), null);
 });
+
+test("Protect Workbook as Excel writes it: lockStructure after workbookPr, a password with Excel's own salt and hash", async () => {
+  const { protectWorkbook, unprotectWorkbook, workbookProtection } = await import('../src/ooxml/protection.js');
+  const { wb } = book();
+  const bookXml = () => serializeXml(wb.doc).match(/<workbookProtection[^>]*\/>/)?.[0] ?? null;
+  protectWorkbook(wb);
+  assert.equal(bookXml(), '<workbookProtection lockStructure="1"/>');
+  assert.match(serializeXml(wb.doc), /<workbookProtection lockStructure="1"\/>(<bookViews|<sheets)/);
+  assert.deepEqual(workbookProtection(Workbook.fromBytes(wb.toBytes())), { structure: true, windows: false, password: false });
+  assert.equal(unprotectWorkbook(wb, 'anything'), true);
+  assert.equal(bookXml(), null);
+  const salt = Uint8Array.from(atob('6W35o+lTpIfbd6JEUtRfEw=='), (c) => c.charCodeAt(0));
+  protectWorkbook(wb, { password: 'Test-pass 1', salt });
+  assert.equal(bookXml(), '<workbookProtection workbookAlgorithmName="SHA-512" workbookHashValue="sUffArRvIURjtltfgW9wuWsC9Enu4hxFjTYvicGzBurOdgjJ0RsE7j8rKwOeZVm+ZmYHzSCi2MT98rcx/ycNZA==" workbookSaltValue="6W35o+lTpIfbd6JEUtRfEw==" workbookSpinCount="100000" lockStructure="1"/>');
+  assert.equal(unprotectWorkbook(wb, 'wrong'), false);
+  assert.equal(unprotectWorkbook(wb, 'Test-pass 1'), true);
+});

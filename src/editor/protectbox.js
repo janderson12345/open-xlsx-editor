@@ -1,4 +1,5 @@
-// Excel's Protect Sheet box (Review > Protect Sheet), its Confirm Password box, and Unprotect Sheet's password box,
+// Excel's Protect Sheet box (Review > Protect Sheet), its Confirm Password box, Unprotect Sheet's password box, and
+// Protect Workbook's Protect Structure and Windows box,
 // in Excel's words and order (ooxml/protection.js writes what they say).
 import { modal, button } from './dialogs.js';
 
@@ -73,5 +74,32 @@ export function passwordAsk(root, { title, label }) {
     const row = el('div', { className: 'oxe-dialog-buttons' });
     row.append(button('OK', ok), button('Cancel', () => done(null)));
     dlg.append(h, lab, field, row);
+  });
+}
+
+/** Protect Workbook: Excel's "Protect Structure and Windows" box (Windows can't be ticked, as in Excel 365). Resolves to
+ *  the password ('' for none), or null. */
+export function workbookProtectBox(root) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    const h = el('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Protect Structure and Windows' });
+    const set = el('fieldset', { className: 'oxe-dialog-group' });
+    set.append(el('legend', { textContent: 'Protect workbook for' }));
+    const structure = el('input', { type: 'checkbox', id: `${id}-s`, checked: true });
+    const windows = el('input', { type: 'checkbox', id: `${id}-w`, checked: false, disabled: true });
+    for (const [input, label] of [[structure, 'Structure'], [windows, 'Windows']]) {
+      const line = el('div', { className: 'oxe-dialog-option' });
+      line.append(input, el('label', { htmlFor: input.id, textContent: label }));
+      set.append(line);
+    }
+    const pwLabel = el('label', { className: 'oxe-dialog-text oxe-dialog-label', htmlFor: `${id}-pw`, textContent: 'Password (optional):' });
+    const pw = passwordField(`${id}-pw`);
+    pw.dataset.first = '';
+    const okButton = button('OK', () => done(pw.value));
+    structure.addEventListener('change', () => { okButton.disabled = !structure.checked; });
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && !okButton.disabled) { e.preventDefault(); okButton.click(); } });
+    const row = el('div', { className: 'oxe-dialog-buttons' });
+    row.append(okButton, button('Cancel', () => done(null)));
+    dlg.append(h, pwLabel, pw, set, row);
   });
 }

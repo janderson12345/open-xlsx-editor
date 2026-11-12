@@ -3,7 +3,7 @@
 import { cellSelection } from './selection.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import { copySheet } from '../ooxml/sheetcopy.js';
-import { protectSheet, unprotectSheet, WRONG_PASSWORD } from '../ooxml/protection.js';
+import { protectSheet, unprotectSheet, WRONG_PASSWORD, workbookProtection, protectWorkbook, unprotectWorkbook, WORKBOOK_PROTECTED } from '../ooxml/protection.js';
 
 /** The sheet commands, and sheetOp (for the others): `env` is createCommands's shared state and helpers. */
 export function sheetCommands(env) {
@@ -24,6 +24,8 @@ export function sheetCommands(env) {
   function sheetOp(run, show = null, quiet = false) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
     const wb = ctx.workbook();
+    // (Protect Workbook: its sheets can't be added, deleted, renamed, moved, hidden or coloured.)
+    if (workbookProtection(wb)?.structure) { ctx.alert(WORKBOOK_PROTECTED); return false; }
     const was = ctx.sheetIndex();
     const shownId = idOf(was);
     const before = wb.snapshot();
@@ -107,6 +109,24 @@ export function sheetCommands(env) {
       ctx.edited?.({ book: true });
       ctx.changed?.();
       ctx.announce('Sheet protected');
+      return true;
+    },
+    /** Review > Protect Workbook (its structure), with a `password` ('' for none); not a step of the history. */
+    protectWorkbook(password = '') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      protectWorkbook(ctx.workbook(), { password });
+      ctx.edited?.({ book: true });
+      ctx.changed?.();
+      ctx.announce('Workbook protected');
+      return true;
+    },
+    /** Review > Protect Workbook again: unprotected with its password; a wrong one refused in Excel's words. */
+    unprotectWorkbook(password = '') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (!unprotectWorkbook(ctx.workbook(), password)) { (ctx.alert || ctx.announce)(WRONG_PASSWORD); return false; }
+      ctx.edited?.({ book: true });
+      ctx.changed?.();
+      ctx.announce('Workbook unprotected');
       return true;
     },
     /** Review > Unprotect Sheet, with its password if it has one; a wrong one refused in Excel's words. */

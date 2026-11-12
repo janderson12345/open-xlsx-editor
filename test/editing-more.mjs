@@ -478,4 +478,22 @@ check(protectItems.startsWith('Select locked cells|Select unlocked cells|Format 
   && k70After === k70Before && unprotectLabel === 'Unprotect Sheet' && k70Unprotected === 9,
   'Review > Protect Sheet: Excel’s box; a locked cell refused in Excel’s words; Unprotect Sheet lets it change', JSON.stringify({ protectItems, refusal, k70Before, k70After, unprotectLabel, k70Unprotected }));
 
+
+// Review > Protect Workbook: the structure protected, a new sheet refused, the button pressed; again, unprotected.
+await ribbon('Protect Workbook');
+await page.waitForSelector('dialog.oxe-dialog >> text=Protect Structure and Windows');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+const sheetCount = () => page.evaluate(() => window.oxe.workbook.sheets.length);
+const sheetsBefore = await sheetCount();
+await page.click('.oxe-tab-add');
+await page.waitForSelector('dialog.oxe-dialog[role="alertdialog"]');
+const bookRefusal = await page.textContent('dialog.oxe-dialog[role="alertdialog"]');
+await page.keyboard.press('Enter');
+const pressed = await page.getAttribute('.oxe-toolbar button[title="Protect Workbook"]', 'aria-pressed');
+const afterRefusal = await sheetCount();
+await ribbon('Protect Workbook');
+await page.click('.oxe-tab-add');
+check(/protected/.test(bookRefusal || '') && pressed === 'true' && afterRefusal === sheetsBefore && await sheetCount() === sheetsBefore + 1,
+  'Review > Protect Workbook: a new sheet refused while protected; unprotected, it is added', JSON.stringify({ bookRefusal, pressed, sheetsBefore, afterRefusal }));
+
 await finish();
