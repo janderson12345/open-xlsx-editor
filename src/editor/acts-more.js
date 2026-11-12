@@ -26,6 +26,7 @@ import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfm
 import { insertFunctionBox } from './functionbox.js';
 import { openErrorMenu } from './errormenu.js';
 import { errorCheckingBox } from './errorbox.js';
+import { evaluateFormulaBox } from './evalbox.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
@@ -40,6 +41,8 @@ export function createMoreActs(env) {
     if (name === 'errorMenu') return openErrorMenu(env, args[0]);
     // (Formulas > Error Checking: errorbox.js.)
     if (name === 'errorChecking') return errorCheckingBox(env);
+    // (Formulas > Evaluate Formula: evalbox.js.)
+    if (name === 'evaluateFormula') return evaluateFormulaBox(env);
     if (name === 'insertFunction') {
       // (Formulas > Insert Function, Shift+F3, or a function from the Function Library's lists (args[0]): typed at the
       // caret of the cell being edited, or the active cell opened with "=NAME(", and put first in Most Recently Used.)

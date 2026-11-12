@@ -166,6 +166,22 @@
   gap: 6px;
   margin: 8px 0;
 }
+/* Formulas > Evaluate Formula (evalbox.js): the formula as it is worked out, in a box of its own. */
+.oxe-evaluate-box {
+  width: min(560px, 90vw);
+}
+.oxe-evaluate-text {
+  min-height: 72px;
+  padding: 6px 8px;
+  border: 1px solid #a6a6a6;
+  background: #ffffff;
+  font-family: var(--oxe-ui-font);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.oxe-evaluate-note {
+  font-size: 0.9em;
+}
 /* A menu's heading (Excel's error menu): bold, not an item. */
 .oxe-menuhead {
   padding: 4px 10px;

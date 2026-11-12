@@ -257,8 +257,17 @@ Range.Errors on about 60 cells; `test/errorcheck.test.js` has them):
 - **Not yet**: the two-digit year's Convert XX to 19XX and 20XX, Update Formula to Include Cells, Show Calculation Steps,
   Help and Error Checking Options; whether Convert to Number changes a Text number format (not measured: it is kept).
   The rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
-  in M5 with a number in M4, when M7 held =M1+M2 (alone, Excel flags it). The triangle's green isn't measured. Evaluate
-  Formula, the Watch Window.
+  in M5 with a number in M4, when M7 held =M1+M2 (alone, Excel flags it). The triangle's green isn't measured.
+
+Evaluate Formula (`calc/stepper.js`, `editor/evalbox.js`; `test/stepper.test.js`): the active cell's formula worked out
+a step at a time, the next part underlined and the value just worked out in italics; Evaluate, Restart at the end.
+The steps go as Microsoft's own example shows them (=IF(AVERAGE(D2:D5)>50,SUM(E2:E5),0) to =IF(40>50,...), to
+=IF(FALSE,...), to 0): a reference on its own or as an operand is a step of its own (its value; a range's as an array);
+one handed to a function goes with it; a function or operator once its arguments are values; IF works out its
+condition, then only the argument it returns, IFERROR its value_if_error only after an error; brackets go with what
+is in them. Excel's box is a dialog COM can't drive, so the steps aren't measured beyond that example.
+
+- **Not yet**: Step In and Step Out (there, not working); a defined name's own steps; the Watch Window.
 
 ## Calculation options
 

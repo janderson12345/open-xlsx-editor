@@ -193,6 +193,8 @@ export function evaluate(node, ctx, mode = 'scalar') {
     case 'num': case 'str': case 'bool': return node.v;
     case 'err': return errorOf(node.v);
     case 'missing': return MISSING;
+    // (A value put in a part's place: Evaluate Formula, stepper.js.)
+    case 'val': return node.v;
     case 'paren': return evaluate(node.a, ctx, mode);
     case 'ref': {
       if (node.book != null) throw new Unsupported('a link to another workbook');

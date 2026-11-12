@@ -428,4 +428,19 @@ await page.keyboard.press('Enter');
 check(firstError.join() === 'Error in cell L45,Number Stored as Text' && secondError.join() === 'Error in cell L46,Divide by Zero Error,7' && /complete/.test(finalMessage || ''),
   'Error Checking: L45 first, Convert to Number, on to L46; Next until the error check is complete', JSON.stringify({ firstError, secondError, finalMessage }));
 
+// Formulas > Evaluate Formula on L47 (=IF(L45>5,L45*2,0)): L45 underlined first; Evaluate to 7, TRUE, 7*2's 14, then
+// IF's 14; Restart at the end.
+await page.evaluate(() => { window.oxe.enter('L47', '=IF(L45>5,L45*2,0)'); window.oxe.select('L47'); });
+await ribbon('Evaluate Formula');
+await page.waitForSelector('dialog.oxe-evaluate-box');
+const evalSteps = [await page.evaluate(() => document.querySelector('.oxe-evaluate-text').innerHTML)];
+for (let k = 0; k < 6; k++) {
+  if (await page.textContent('dialog.oxe-evaluate-box .oxe-dialog-buttons button') === 'Restart') break;
+  await page.click('dialog.oxe-evaluate-box >> button:text-is("Evaluate")');
+  evalSteps.push(await page.evaluate(() => document.querySelector('.oxe-evaluate-text').textContent));
+}
+await page.click('dialog.oxe-evaluate-box >> button:text-is("Close")');
+check(evalSteps[0] === '=IF(<u>L45</u>&gt;5,L45*2,0)' && evalSteps.slice(1).join('|') === '=IF(7>5,L45*2,0)|=IF(TRUE,L45*2,0)|=IF(TRUE,7*2,0)|=IF(TRUE,14,0)|=14',
+  'Evaluate Formula: L45 underlined, then 7, TRUE, 7, 14, IF\'s 14', JSON.stringify(evalSteps));
+
 await finish();

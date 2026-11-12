@@ -67,15 +67,17 @@ export function parseFormula(text) {
     const t = toks[i++];
     if (!t) { i--; return fail('The formula ends too soon'); }
     switch (t.type) {
-      case 'num': case 'str': case 'bool': return { k: t.type, v: t.value };
+      // (`src`: a number and a reference as typed, for Evaluate Formula to show: stepper.js.)
+      case 'num': return { k: 'num', v: t.value, src: t.text };
+      case 'str': case 'bool': return { k: t.type, v: t.value };
       case 'err': return { k: 'err', v: t.value };
       case 'ref': {
         if (!t.area) return { k: 'err', v: '#REF!' };
-        const ref = { k: 'ref', sheet: t.sheet, book: t.book, area: t.area };
+        const ref = { k: 'ref', sheet: t.sheet, book: t.book, area: t.area, src: t.text };
         return t.spill ? { k: 'fn', name: 'ANCHORARRAY', args: [ref] } : ref;
       }
       case 'name': return { k: 'name', name: t.text };
-      case 'struct': return { k: 'struct', table: t.table, spec: t.spec };
+      case 'struct': return { k: 'struct', table: t.table, spec: t.spec, src: t.text };
       case 'func': return { k: 'fn', name: functionName(t.text), args: argList() };
       case 'punct':
         if (t.text === '(') {
