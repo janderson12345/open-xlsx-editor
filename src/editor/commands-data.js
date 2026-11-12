@@ -18,7 +18,7 @@ import { filterArea } from '../ooxml/filterops.js';
 export const MULTIPLE_MESSAGE = "This action won't work on multiple selections.";
 
 export function dataCommands(env) {
-  const { commands, ctx, state, sheet, show, runSteps, sizeStep, moved } = env;
+  const { allowed, commands, ctx, state, sheet, show, runSteps, sizeStep, moved } = env;
   return {
     /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
      *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
@@ -111,6 +111,7 @@ export function dataCommands(env) {
      *  Excel's buttons sort, the data beside a selection taken in too when `expand`. Excel's refusals in its words. */
     sort(how = 'asc', { expand = false } = {}) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (!allowed('sort')) return false;
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
       const plan = typeof how === 'string' ? quickSort(wb, si, state.sel, how === 'desc', { expand }) : how;
@@ -176,7 +177,7 @@ export function dataCommands(env) {
       // (A list of values, or filtermore.js's other filters as they come.)
       if (show) columns.set(c, show.values ? { values: show.values, blank: !!show.blank, other: false } : { ...show, other: false });
       else columns.delete(c);
-      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns })) === true;
+      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns }), 'autoFilter') === true;
     },
     /** Home > Sort & Filter > Clear (every column's filter taken off, the buttons kept), and Reapply (the rows
      *  filtered again, after edits). */
@@ -195,7 +196,7 @@ export function dataCommands(env) {
     filterAll(columns) {
       const f = sheet().autoFilter;
       if (!f || ctx.readOnly()) return false;
-      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns: new Map(columns) })) === true;
+      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns: new Map(columns) }), 'autoFilter') === true;
     },
     /** A filter button's Sort A to Z (or Z to A, `desc`): the filter's range by column c, its heading row kept. Not
      *  yet while rows are filtered out (Excel then sorts only the rows shown). */

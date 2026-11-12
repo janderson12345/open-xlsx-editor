@@ -1,8 +1,9 @@
 // Commands on the workbook's sheets (commands.js shares its state with them): show, next, insert, rename, move,
-// hide, colour and delete, through sheetOp.
+// hide, colour and delete, through sheetOp; and Review > Protect Sheet and Unprotect Sheet.
 import { cellSelection } from './selection.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import { copySheet } from '../ooxml/sheetcopy.js';
+import { protectSheet, unprotectSheet, WRONG_PASSWORD } from '../ooxml/protection.js';
 
 /** The sheet commands, and sheetOp (for the others): `env` is createCommands's shared state and helpers. */
 export function sheetCommands(env) {
@@ -98,5 +99,24 @@ export function sheetCommands(env) {
     tabColor(i, color) { return sheetOp((wb) => wb.setTabColor(i, color)); },
     /** Delete sheet i (no question asked here: the tab menu asks first, as Excel does). */
     deleteSheet(i) { return sheetOp((wb) => wb.deleteSheet(i)); },
+    /** Review > Protect Sheet on the sheet shown: `options` as protection.js's protectSheet takes them (a password
+     *  among them). Not a step of the history: Excel's isn't either. */
+    protectSheet(options = {}) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      protectSheet(ctx.workbook(), ctx.sheetIndex(), options);
+      ctx.edited?.({ book: true });
+      ctx.changed?.();
+      ctx.announce('Sheet protected');
+      return true;
+    },
+    /** Review > Unprotect Sheet, with its password if it has one; a wrong one refused in Excel's words. */
+    unprotectSheet(password = '') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (!unprotectSheet(ctx.workbook(), ctx.sheetIndex(), password)) { (ctx.alert || ctx.announce)(WRONG_PASSWORD); return false; }
+      ctx.edited?.({ book: true });
+      ctx.changed?.();
+      ctx.announce('Sheet unprotected');
+      return true;
+    },
   };
 }

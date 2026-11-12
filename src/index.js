@@ -13,6 +13,7 @@ import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, passwordBox } from './editor/dialogs.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { readNotes } from './ooxml/notes.js';
+import { sheetProtection } from './ooxml/protection.js';
 import { conditionalLooks } from './ooxml/condformat.js';
 import { errorFlags } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
@@ -167,7 +168,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (!state.ribbon || !state.workbook || !state.editing) return;
     const wb = state.workbook;
     const look = state.editing.commands.look();
-    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: { ...state.grid.view(), formulaBar: !root.querySelector('.oxe-bar')?.hidden } });
+    state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: { ...state.grid.view(), formulaBar: !root.querySelector('.oxe-bar')?.hidden }, sheetProtected: !!sheetProtection(wb, state.sheetIndex) });
     showStats();
   };
   /** The status bar: Excel's Average, Count and Sum of the selection (stats.js), or Count alone. */

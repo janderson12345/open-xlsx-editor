@@ -27,6 +27,8 @@ import { insertFunctionBox } from './functionbox.js';
 import { openErrorMenu } from './errormenu.js';
 import { errorCheckingBox } from './errorbox.js';
 import { evaluateFormulaBox } from './evalbox.js';
+import { protectBox, passwordAsk } from './protectbox.js';
+import { sheetProtection } from '../ooxml/protection.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
@@ -60,6 +62,23 @@ export function createMoreActs(env) {
         ed.typeFunction(fn);
         ed.holdEditor(false);
         return true;
+      });
+    }
+    if (name === 'protectBox') {
+      // (Protect Sheet, or Unprotect Sheet once it is: Excel's boxes, a password asked for twice.)
+      const p = sheetProtection(state.workbook, i);
+      if (p) {
+        if (!p.password) return editing().run('unprotectSheet', '');
+        return passwordAsk(root, { title: 'Unprotect Sheet', label: 'Password:' }).then((pw) => pw != null && editing().run('unprotectSheet', pw));
+      }
+      return protectBox(root).then(async (answer) => {
+        if (!answer) return false;
+        if (answer.password) {
+          const again = await passwordAsk(root, { title: 'Confirm Password', label: 'Reenter password to proceed.' });
+          if (again == null) return false;
+          if (again !== answer.password) { await messageBox(root, 'Confirmation password is not identical.'); return false; }
+        }
+        return editing().run('protectSheet', { ...answer.options, password: answer.password });
       });
     }
     if (name === 'commentBox') {

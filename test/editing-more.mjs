@@ -451,4 +451,31 @@ check(typedNow === 'the cat on monday' && k60 === 'the cat on Monday' && undone 
   'AutoCorrect: teh to the as the word ends, monday to Monday on Enter, Ctrl+Z gives back what was typed; underlines for text only',
   JSON.stringify({ typedNow, k60, undone, spelling, formulaSpelling }));
 
+
+// Review > Protect Sheet: Excel's box; a locked cell typed into is refused in Excel's words and keeps its value; the
+// button becomes Unprotect Sheet, and unprotecting lets the cell change.
+await page.click('.oxe-rtab >> text="Review"');
+await ribbon('Protect Sheet');
+await page.waitForSelector('dialog.oxe-dialog >> text=Allow all users of this worksheet to:');
+const protectItems = await page.$$eval('dialog.oxe-dialog .oxe-protect-list label', (ls) => ls.map((l) => l.textContent).join('|'));
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.evaluate(() => window.oxe.select('K70'));
+const k70Before = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(69)?.get(10)?.v ?? null);
+await page.keyboard.type('9');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog[role="alertdialog"]');
+const refusal = await page.textContent('dialog.oxe-dialog[role="alertdialog"]');
+await page.keyboard.press('Enter');
+const k70After = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(69)?.get(10)?.v ?? null);
+const unprotectLabel = await page.getAttribute('.oxe-toolbar button[title="Unprotect Sheet"]', 'aria-label');
+await ribbon('Unprotect Sheet');
+await page.evaluate(() => window.oxe.select('K70'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('9');
+await page.keyboard.press('Enter');
+const k70Unprotected = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(69)?.get(10)?.v ?? null);
+check(protectItems.startsWith('Select locked cells|Select unlocked cells|Format cells') && protectItems.endsWith('Edit objects|Edit scenarios') && /on a protected sheet/.test(refusal || '')
+  && k70After === k70Before && unprotectLabel === 'Unprotect Sheet' && k70Unprotected === 9,
+  'Review > Protect Sheet: Excel’s box; a locked cell refused in Excel’s words; Unprotect Sheet lets it change', JSON.stringify({ protectItems, refusal, k70Before, k70After, unprotectLabel, k70Unprotected }));
+
 await finish();

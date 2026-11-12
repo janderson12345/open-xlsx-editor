@@ -22,6 +22,7 @@ import { clearChanges } from '../ooxml/clearops.js';
 import { partsClear, PARTS_ONLY } from '../ooxml/clearparts.js';
 import { traceLevel } from './tracing.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
+import { protectionRefusal } from '../ooxml/protection.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
  *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
@@ -50,10 +51,20 @@ export function createCommands(ctx) {
   const traceOf = (i) => { const id = idOf(i); if (!state.traces.has(id)) state.traces.set(id, { arrows: [], precedents: null, dependents: null }); return state.traces.get(id); };
   const indexOf = (id) => ctx.workbook().sheets.findIndex((s) => s.sheetId === id);
 
+  /** Whether a change of `kind` (protection.js: 'contents' with its `cells`, 'formatCells', 'insertRows'...; 'always'
+   *  for one a protected sheet never allows) may be made to sheet si (the one shown); if not, Excel's refusal said. */
+  function allowed(kind, cells = [], si = ctx.sheetIndex()) {
+    const why = protectionRefusal(ctx.workbook(), si, kind === 'always' ? 'never' : kind, cells);
+    if (!why) return true;
+    (ctx.alert || ctx.announce)(why);
+    return false;
+  }
+
   /** Apply changes [{ r, c, value } or { r, c, formula }] as one step of the history; refused, whole, if a cell is part
-   *  of an array formula. */
+   *  of an array formula or locked on a protected sheet. */
   function apply(changes, record = true) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    if (!allowed('contents', changes)) return false;
     if (changes.some((ch) => inArray(ch.r, ch.c))) { ctx.announce("You can't change part of an array"); return false; }
     const before = changes.map((ch) => contents(ch.r, ch.c));
     const { circular } = ctx.workbook().apply(ctx.sheetIndex(), changes);
@@ -68,6 +79,7 @@ export function createCommands(ctx) {
   /** Give cells new formats [{ r, c, s }] as one step of the history (formatops.js works them out). */
   function restyle(cells, record = true) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    if (!allowed('formatCells')) return false;
     const sh = sheet();
     const now = cells.filter(({ r, c, s }) => (sh.cells.get(r)?.get(c)?.s || 0) !== s);
     if (!now.length) return false;
@@ -95,6 +107,8 @@ export function createCommands(ctx) {
     for (const st of list) {
       const sh = wb.sheet(indexOf(st.sheet));
       if (st.contents.some(({ r, c }) => sh.arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1))) { ctx.announce("You can't change part of an array"); return false; }
+      if (!allowed('contents', st.contents, indexOf(st.sheet))) return false;
+      if ((st.styles.length || st.merges) && !allowed('formatCells', [], indexOf(st.sheet))) return false;
     }
     const circular = [];
     const mergesOf = (st) => JSON.stringify(wb.sheet(indexOf(st.sheet)).merges);
@@ -139,9 +153,11 @@ export function createCommands(ctx) {
     const last = rows ? (b - a > 10000 ? Math.max(a, Math.min(b, sh.maxRow)) : b) : (b - a > 1000 ? Math.max(a, Math.min(b, sh.maxCol)) : b);
     return [a, last];
   }
-  /** Sizes changed by `apply(wb, si)`, as one step of the history (a snapshot of the workbook before and after). */
-  function sizeStep(apply, note) {
+  /** Sizes changed by `apply(wb, si)`, as one step of the history (a snapshot of the workbook before and after);
+   *  `kind`, what a protected sheet must allow ('formatColumns' or 'formatRows'). */
+  function sizeStep(apply, note, kind = 'formatColumns') {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    if (!allowed(kind)) return false;
     const wb = ctx.workbook();
     const before = wb.snapshot();
     apply(wb, ctx.sheetIndex());
@@ -155,7 +171,8 @@ export function createCommands(ctx) {
   }
   /** Rows, columns or cells moved by `change(wb, si)`, as one step of the history (a snapshot before and after).
    *  Excel's refusals said in its words (false); 'unmerge' for its question about merged cells. */
-  function moved(change) {
+  function moved(change, kind = 'always') {
+    if (!allowed(kind)) return false;
     const wb = ctx.workbook();
     const before = wb.snapshot();
     try {
@@ -275,7 +292,7 @@ export function createCommands(ctx) {
       const rows = axis === 'row';
       const count = rows ? s.r1 - s.r0 + 1 : s.c1 - s.c0 + 1;
       if (count >= (rows ? MAX_ROWS : MAX_COLS)) return false;
-      const done = moved((wb, si) => wb.changeLines(si, axis, rows ? s.r0 : s.c0, dir * count));
+      const done = moved((wb, si) => wb.changeLines(si, axis, rows ? s.r0 : s.c0, dir * count), `${dir > 0 ? 'insert' : 'delete'}${rows ? 'Rows' : 'Columns'}`);
       if (done === true) show(state.sel, state.focus, `${dir > 0 ? 'Inserted' : 'Deleted'} ${count} ${rows ? 'row' : 'column'}${count > 1 ? 's' : ''}, `);
       return done;
     },
@@ -285,7 +302,7 @@ export function createCommands(ctx) {
     cells(dir, axis, { unmerge = false } = {}) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const s = state.sel;
-      const done = moved((wb, si) => shiftCells(wb, si, s, dir, axis, { unmerge }));
+      const done = moved((wb, si) => shiftCells(wb, si, s, dir, axis, { unmerge }), `${dir > 0 ? 'insert' : 'delete'}${axis === 'row' ? 'Rows' : 'Columns'}`);
       if (done !== true) return done;
       // (Excel keeps the inserted cells selected; after a delete, the cells that took their place.)
       const way = dir > 0 ? (axis === 'row' ? 'shifted down' : 'shifted right') : (axis === 'row' ? 'shifted up' : 'shifted left');
@@ -340,7 +357,7 @@ export function createCommands(ctx) {
       const [a, b] = linesOf(axis, index);
       const size = Math.max(0, Math.round(px));
       const change = axis === 'col' ? { width: size ? pxWidth(size) : 0 } : { height: size ? size * 0.75 : 0 };
-      return sizeStep((wb, si) => wb.setLines(si, axis, a, b, change), `${axis === 'col' ? 'Column width' : 'Row height'} changed`);
+      return sizeStep((wb, si) => wb.setLines(si, axis, a, b, change), `${axis === 'col' ? 'Column width' : 'Row height'} changed`, axis === 'col' ? 'formatColumns' : 'formatRows');
     },
     /** Column Width (characters) and Row Height (points) of the selection's columns or rows; 0 hides. */
     columnWidth(chars) {
@@ -349,13 +366,13 @@ export function createCommands(ctx) {
     },
     rowHeight(points) {
       const [a, b] = linesOf('row');
-      return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: points }), 'Row height changed');
+      return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: points }), 'Row height changed', 'formatRows');
     },
     /** AutoFit: columns as wide as their widest text (an empty one left as it is); rows back to the height their text
      *  needs. A heading edge's double click fits line `index` (or the selected lines it is one of). */
     fitLines(axis, index = null) {
       const [a, b] = linesOf(axis, index);
-      if (axis === 'row') return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: null }), 'Row height fitted');
+      if (axis === 'row') return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: null }), 'Row height fitted', 'formatRows');
       const widths = [];
       for (let c = a; c <= b; c++) { const px = ctx.fitWidth?.(c); if (px) widths.push([c, px]); }
       if (!widths.length) return false;
@@ -364,7 +381,7 @@ export function createCommands(ctx) {
     /** Hide (Ctrl+9 rows, Ctrl+0 columns) or show again (Ctrl+Shift+9, Ctrl+Shift+0) the selection's rows or columns. */
     hideLines(axis, hidden = true) {
       const [a, b] = linesOf(axis);
-      return sizeStep((wb, si) => wb.setLines(si, axis, a, b, { hidden }), `${axis === 'col' ? 'Columns' : 'Rows'} ${hidden ? 'hidden' : 'shown'}`);
+      return sizeStep((wb, si) => wb.setLines(si, axis, a, b, { hidden }), `${axis === 'col' ? 'Columns' : 'Rows'} ${hidden ? 'hidden' : 'shown'}`, axis === 'col' ? 'formatColumns' : 'formatRows');
     },
     /** Clear Formats: the selected cells back to the Normal style's format. */
     clearFormats() { return commands.clearAs('formats'); },
@@ -413,7 +430,7 @@ export function createCommands(ctx) {
 
   // (The other commands, from modules sharing this state and these helpers: sheets first, whose sheetOp the parts
   // use.)
-  const env = { commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
+  const env = { allowed, commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
   Object.assign(commands, sheetCommands(env));
   Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env));
 
