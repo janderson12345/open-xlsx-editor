@@ -135,3 +135,16 @@ test('a defined LAMBDA called in another case is written as the name is, as Exce
   wb.apply(si, [entryChanges(wb, si, 3000, 1, '=twice(5)').content]);
   assert.equal(wb.sheet(si).cells.get(3000).get(1).v, 10);
 });
+
+test("a LAMBDA kept in a LET name and called is written with _xlpm. there too, as Excel's file has it", () => {
+  // (Excel saved =LET(f,LAMBDA(x,x*2),f(3)) as _xlfn.LET(_xlpm.f,_xlfn.LAMBDA(_xlpm.x,_xlpm.x*2),_xlpm.f(3)); this
+  // editor wrote F(3), which Excel reads as a function it doesn't know.)
+  const file = '_xlfn.LET(_xlpm.f,_xlfn.LAMBDA(_xlpm.x,_xlpm.x*2),_xlpm.f(3))';
+  assert.equal(normalizeFormula('LET(f,LAMBDA(x,x*2),f(3))'), file);
+  assert.equal(displayFormula(file), 'LET(f,LAMBDA(x,x*2),f(3))');
+  assert.equal(normalizeFormula('LAMBDA(g,g(4))(LAMBDA(y,y+1))'), '_xlfn.LAMBDA(_xlpm.g,_xlpm.g(4))(_xlfn.LAMBDA(_xlpm.y,_xlpm.y+1))');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'L');
+  wb.setFormula(si, 'A1', file);
+  assert.equal(wb.sheet(si).cells.get(0).get(0).v, 6);
+});

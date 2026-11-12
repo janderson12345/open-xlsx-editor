@@ -47,7 +47,8 @@ function dynamicFileForm(typed) {
     }
     const names = args.slice(0, -1).filter((_, a) => name === 'LAMBDA' || a % 2 === 0)
       .map((a) => (a.length === 1 && toks[a[0]].type === 'name' ? toks[a[0]].text.replace(/^_xlpm\./i, '').toLowerCase() : null)).filter(Boolean);
-    for (let j = k + 2; j < end; j++) if (toks[j].type === 'name' && names.includes(toks[j].text.replace(/^_xlpm\./i, '').toLowerCase())) params.set(j, `_xlpm.${toks[j].text.replace(/^_xlpm\./i, '')}`);
+    // (A name called, a LAMBDA kept in a LET name, =LET(f,LAMBDA(x,x*2),f(3)): _xlpm.f(3) in the file too.)
+    for (let j = k + 2; j < end; j++) if ((toks[j].type === 'name' || toks[j].type === 'func') && names.includes(toks[j].text.replace(/^_xlpm\./i, '').toLowerCase())) params.set(j, `_xlpm.${toks[j].text.replace(/^_xlpm\./i, '')}`);
   });
   for (const [k, text] of params) edits.push({ from: k, to: k, text });
   // (A function named on its own where a LAMBDA goes, an eta LAMBDA, =MAP(A1:A3,SQRT): _xleta.SQRT in the file, as
@@ -101,7 +102,7 @@ function dynamicShownForm(text) {
     else if (name === 'SINGLE') {
       const end = closing(toks, k + 1);
       edits.push({ from: k, to: end, text: `@${dynamicShownForm(text.slice(toks[k + 2].start, toks[end - 1].end))}` });
-    } else if (t.type === 'name' && /^_xl(pm|eta)\./i.test(t.text)) edits.push({ from: k, to: k, text: t.text.replace(/^_xl(pm|eta)\./i, '') });
+    } else if ((t.type === 'name' || t.type === 'func') && /^_xl(pm|eta)\./i.test(t.text)) edits.push({ from: k, to: k, text: t.text.replace(/^_xl(pm|eta)\./i, '') });
   });
   const kept = edits.filter((e) => !edits.some((o) => o !== e && o.from <= e.from && o.to >= e.to && (o.from !== e.from || o.to !== e.to)));
   return kept.length ? splice(text, toks, kept) : text;
@@ -155,7 +156,7 @@ export function normalizeFormula(entry) {
   // (A function token doesn't include its "(", which comes as its own token: count it once.)
   depth -= toks.filter((t) => t.type === 'func').length;
   let text = mapRefs(typed, (t) => {
-    if (t.type === 'func') return fileName(t.text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, ''));
+    if (t.type === 'func') return /^_xlpm\./i.test(t.text) ? null : fileName(t.text.toUpperCase().replace(/^(_XL(FN|WS)\.)+/, ''));
     if (t.type === 'bool') return t.text.toUpperCase();
     if (t.type === 'ref' && t.area) return t.prefix + areaText(t.area);
     if (t.type === 'err') return t.value;
