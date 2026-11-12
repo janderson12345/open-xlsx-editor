@@ -116,8 +116,19 @@ made larger grows it (ht="18.75" for 14pt).
 
 Here (`src/ooxml/sheet.js` lineStyle): an empty cell has its row's own format, else its column's; its fill and
 borders are drawn from it, a cell typed there takes it (`src/ooxml/sheetedit.js`), and Format Cells > Protection on
-a column counts for a protected sheet. Formatting whole rows or columns here still writes the used range's cells
-only (Not yet, below).
+a column counts for a protected sheet.
+
+Formatting whole rows or columns here (any of the Home tab's formats, Format Cells, the borders) does as Excel does
+(`src/ooxml/formatops.js` probeOf, `src/editor/commands.js` lineFormats): the columns' or rows' own formats are
+written, the cells already there changed, and a cell made where a formatted row crosses a formatted column; empty
+cells aren't made. The new format of each line is worked out on a row (column) past the used range that stands for
+the rest of it, so the toggles and borders follow it as they follow a cell (an outline's left and right on the
+first and last columns; top on row 1). One step of Undo. Excel's own run of Rows(5) italic, Columns(2) bold and
+D:E filled was made here the same way, and Excel read it with the same formats, cell for cell (B100 bold, D5 italic
+and filled, E900 filled).
+
+Not yet: the whole sheet selected (Ctrl+A) still formats the used range's cells; an outline's bottom on row
+1,048,576 isn't drawn; a row made taller by a larger font (Excel grows it) isn't.
 
 ## Rich text
 

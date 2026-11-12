@@ -12,9 +12,9 @@ import { protectSheet, isLocked } from '../src/ooxml/protection.js';
 function book() {
   const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
   const si = wb.addSheet(wb.sheets.length, 'Lines');
-  const bold = wb.styleWith(0, { font: { bold: true } });
+  const bold = wb.styleWith(0, { font: { b: true } });
   const fill = wb.styleWith(0, { fill: { pattern: 'solid', fg: { rgb: 'FFFFFF00' } } });
-  const italic = wb.styleWith(0, { font: { italic: true } });
+  const italic = wb.styleWith(0, { font: { i: true } });
   const open = wb.styleWith(0, { protection: { locked: false } });
   const { doc } = wb._part(si);
   const root = doc.documentElement;
@@ -52,4 +52,40 @@ test("a cell typed into a formatted column or row gets that format, as Excel's d
   protectSheet(wb, si);
   assert.equal(isLocked(wb, si, 0, 6), false); // G1, its column unlocked
   assert.equal(isLocked(wb, si, 0, 7), true); // H1
+});
+
+test("formatting whole rows and columns as Excel does: the lines' own formats, the cells there, a cell where they cross (Excel's sheet)", async () => {
+  const fmt = await import('../src/ooxml/formatops.js');
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Fmt');
+  wb.setCell(si, 'B1', 1); wb.setCell(si, 'B3', 3); wb.setCell(si, 'D2', 4); wb.setCell(si, 'F5', 'f');
+  const MAXR = 1048575;
+  const MAXC = 16383;
+  // (What commands.js formatting does with a selection: the probe's formats the lines', the rest the cells'.)
+  const format = (sel, change) => {
+    const probe = fmt.probeOf(wb.sheet(si), sel);
+    const out = fmt.formatEach(wb, si, { ...sel, ar: sel.r0, ac: sel.c0 }, change);
+    const cells = out.filter((x) => x.r !== probe.row && x.c !== probe.col);
+    wb.setStyles(si, cells);
+    wb.setLineStyles(si, { cols: out.filter((x) => x.r === probe.row).map(({ c, s }) => ({ c, s })), rows: out.filter((x) => x.c === probe.col).map(({ r, s }) => ({ r, s })) });
+  };
+  format({ r0: 4, c0: 0, r1: 4, c1: MAXC }, { font: { i: true } });
+  format({ r0: 0, c0: 1, r1: MAXR, c1: 1 }, { font: { b: true } });
+  format({ r0: 0, c0: 3, r1: MAXR, c1: 4 }, { fill: { pattern: 'solid', fg: { rgb: 'FFFFFF00' } } });
+  const xml = serializeXml(wb._part(si).doc);
+  const sh = wb.sheet(si);
+  const s = (ref) => sh.cells.get(Number(ref.slice(1)) - 1)?.get(ref.charCodeAt(0) - 65)?.s ?? null;
+  const look = (x) => { const xf = wb.styles.cellXfs[x]; const f = wb.styles.fonts[xf.fontId]; return `${f.b ? 'b' : ''}${f.i ? 'i' : ''}${xf.fillId ? 'f' : ''}`; };
+  assert.match(xml, /<col min="2" max="2" width="[\d.]+" style="\d+"\/><col min="4" max="5" width="[\d.]+" style="\d+"\/>/);
+  assert.match(xml, /<row r="5"[^>]* s="\d+" customFormat="1"/);
+  assert.equal(look(sh.cols.find((x) => x.min === 1).style), 'b');
+  assert.equal(look(sh.cols.find((x) => x.min === 3).style), 'f');
+  assert.equal(look(sh.rows.get(4).s), 'i');
+  // (Excel's cells: B1 and B3 bold, D2 filled, F5 italic, and B5, D5, E5 made where row 5 crosses the columns.)
+  assert.deepEqual(['B1', 'B3', 'D2', 'F5', 'B5', 'D5', 'E5'].map((ref) => look(s(ref))), ['b', 'b', 'f', 'i', 'bi', 'if', 'if']);
+  assert.equal(s('B2'), null);
+  assert.equal(lineStyle(sh, 99, 1), sh.cols.find((x) => x.min === 1).style);
+  wb.setCell(si, 'E40', 'e');
+  assert.equal(look(s('E40')), 'f');
 });

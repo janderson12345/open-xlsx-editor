@@ -208,7 +208,37 @@ export function createCommands(ctx) {
    *  do: borders outline each range, a font toggled goes by the active cell). */
   const eachArea = () => areasOf(state.sel).map((a) => ({ ...a, ar: state.sel.ar, ac: state.sel.ac }));
   /** A format command: formatops.js's function over each range of the selection on the sheet shown. */
-  const formatting = (fn, ...args) => (ctx.readOnly() ? (ctx.announce('The workbook is read-only'), false) : restyle(eachArea().flatMap((a) => fn(ctx.workbook(), ctx.sheetIndex(), a, ...args))));
+  const formatting = (fn, ...args) => {
+    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    const wb = ctx.workbook();
+    const si = ctx.sheetIndex();
+    const areas = eachArea();
+    const probes = areas.map((a) => fmt.probeOf(sheet(), a));
+    const out = areas.flatMap((a) => fn(wb, si, a, ...args));
+    if (!probes.some((p) => p.row != null || p.col != null)) return restyle(out);
+    // (Whole columns or rows: the probe's formats are theirs, the rest the cells', formatops.js probeOf.)
+    const rows = new Set(probes.map((p) => p.row).filter((x) => x != null));
+    const cols = new Set(probes.map((p) => p.col).filter((x) => x != null));
+    const lines = { cols: out.filter((x) => rows.has(x.r)).map(({ c, s }) => ({ c, s })), rows: out.filter((x) => cols.has(x.c)).map(({ r, s }) => ({ r, s })) };
+    return lineFormats(out.filter((x) => !rows.has(x.r) && !cols.has(x.c)), lines);
+  };
+  /** Whole rows or columns formatted, as Excel formats them: the cells there and where they cross a formatted row or
+   *  column ([{ r, c, s }]), and the lines' own formats (Workbook setLineStyles), as one step of the history. */
+  function lineFormats(cells, lines) {
+    if (!allowed('formatCells')) return false;
+    const wb = ctx.workbook();
+    const si = ctx.sheetIndex();
+    const before = wb.snapshot();
+    wb.setStyles(si, cells);
+    wb.setLineStyles(si, lines);
+    state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+    state.redo = [];
+    ctx.edited?.({ book: true });
+    ctx.restyled?.();
+    ctx.reloaded?.();
+    ctx.changed?.();
+    return true;
+  }
 
   const commands = {
     /** Select one cell. */

@@ -21,7 +21,8 @@ export const pxWidth = (px) => pxToColWidth(px, MDW);
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
 /**
- * Columns c0 to c1 (0-based) changed: { width } (stored units; 0 hides), { bestFit: true }, { hidden: true/false }.
+ * Columns c0 to c1 (0-based) changed: { width } (stored units; 0 hides), { bestFit: true }, { hidden: true/false },
+ * { style } (the columns' own format).
  * Existing col elements are split where the range cuts them; a column without one gets one (a hidden one width 0, a
  * shown one the sheet's default width).
  */
@@ -75,6 +76,8 @@ export function setColumns(doc, c0, c1, change, format = {}) {
       if (change.width === 0) el.setAttribute('hidden', '1'); else el.removeAttribute('hidden');
       if (change.bestFit) el.setAttribute('bestFit', '1'); else el.removeAttribute('bestFit');
     }
+    // (A column's own format: `style`, as Excel writes a formatted column; 0 takes it away.)
+    if ('style' in change) { if (change.style) el.setAttribute('style', String(change.style)); else el.removeAttribute('style'); }
     if (change.hidden === true) {
       // (A column hidden without a width of its own is written with width 0, as Excel writes it.)
       if (el.oxeNew) el.setAttribute('width', '0');
@@ -93,7 +96,7 @@ export function setColumns(doc, c0, c1, change, format = {}) {
 
 /**
  * Rows r0 to r1 (0-based) changed: { height } (points; 0 hides), { height: null } (AutoFit: the fixed height taken
- * away), { hidden: true/false }. Rows without an element get one when something must be written.
+ * away), { hidden: true/false }, { style } (the rows' own format). Rows without an element get one when something must be written.
  */
 export function setRows(doc, r0, r1, change) {
   const root = doc.documentElement;
@@ -102,7 +105,7 @@ export function setRows(doc, r0, r1, change) {
   pinRefs(sheetData, ns);
   forgetRows(doc);
   const byRow = new Map(kids(sheetData, 'row', ns).map((el) => [Number(attr(el, 'r')) - 1, el]));
-  const writes = change.height != null || change.hidden === true;
+  const writes = change.height != null || change.hidden === true || !!change.style;
   for (let r = r0; r <= r1; r++) {
     let el = byRow.get(r);
     if (!el) {
@@ -112,6 +115,10 @@ export function setRows(doc, r0, r1, change) {
       const after = kids(sheetData, 'row', ns).find((x) => Number(attr(x, 'r')) - 1 > r);
       sheetData.insertBefore(el, after || null);
       byRow.set(r, el);
+    }
+    // (A row's own format: `s` with customFormat, as Excel writes a formatted row; 0 takes it away.)
+    if ('style' in change) {
+      if (change.style) { el.setAttribute('s', String(change.style)); el.setAttribute('customFormat', '1'); } else { el.removeAttribute('s'); el.removeAttribute('customFormat'); }
     }
     if (change.height === 0 || change.hidden === true) el.setAttribute('hidden', '1');
     else if (change.hidden === false || change.height != null) el.removeAttribute('hidden');
@@ -123,4 +130,20 @@ export function setRows(doc, r0, r1, change) {
       el.removeAttribute('customHeight');
     }
   }
+}
+
+/** Columns' and rows' own formats, `cols` [{ c, s }] and `rows` [{ r, s }]: neighbours with one format written as one
+ *  element (Workbook setLineStyles). */
+export function setLineStyles(doc, { cols = [], rows = [] }, format = {}) {
+  const runs = (list, key) => {
+    const out = [];
+    for (const x of [...list].sort((a, b) => a[key] - b[key])) {
+      const last = out[out.length - 1];
+      if (last && last.s === x.s && last.b === x[key] - 1) last.b = x[key];
+      else out.push({ a: x[key], b: x[key], s: x.s });
+    }
+    return out;
+  };
+  for (const { a, b, s } of runs(cols, 'c')) setColumns(doc, a, b, { style: s }, format);
+  for (const { a, b, s } of runs(rows, 'r')) setRows(doc, a, b, { style: s });
 }

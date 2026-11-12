@@ -4,6 +4,7 @@
 // off there, for every cell. Grow and Shrink Font step from the active cell's size through Excel's list.
 import { xfOf, formatCodeOf } from './styles.js';
 import { isDateFormat } from './format.js';
+import { lineStyle } from './sheet.js';
 
 /** Excel's font sizes, which Grow and Shrink Font step through (no further than 8 and 72). */
 export const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
@@ -14,22 +15,57 @@ const DOUBLE = { style: 'double' };
 /** At most this many cells are formatted at once; a selection of whole rows or columns is cut to the used range. */
 export const MAX_CELLS = 1 << 20;
 
-/** The cells of a selection, cut to the sheet's used range when it runs past it (whole rows or columns). */
-export function cellsOf(sheet, sel) {
-  const r1 = sel.r1 - sel.r0 > 10000 ? Math.max(sel.r0, Math.min(sel.r1, sheet.maxRow)) : sel.r1;
-  const c1 = sel.c1 - sel.c0 > 1000 ? Math.max(sel.c0, Math.min(sel.c1, sheet.maxCol)) : sel.c1;
+const wholeRows = (sel) => sel.r1 - sel.r0 > 10000;
+const wholeCols = (sel) => sel.c1 - sel.c0 > 1000;
+
+/** Whole columns (or rows, not both) selected: the row (column) past the used range that stands for the rest of
+ *  them, its new formats the columns' (rows') own, as Excel gives a formatted column one (commands.js lineFormats);
+ *  { row, col }, null where there is none. A row (column) with a format of its own isn't one: it gets a cell. */
+export function probeOf(sheet, sel) {
+  if (wholeRows(sel) === wholeCols(sel)) return { row: null, col: null };
+  if (wholeRows(sel)) {
+    let row = Math.max(sel.r0, sheet.maxRow + 1);
+    while (sheet.rows.get(row)?.s) row++;
+    return { row: row < sel.r1 ? row : null, col: null };
+  }
+  let col = Math.max(sel.c0, sheet.maxCol + 1);
+  while (sheet.cols.some((x) => col >= x.min && col <= x.max && x.style)) col++;
+  return { row: null, col: col < sel.c1 ? col : null };
+}
+
+/** The cells of a selection, cut to the sheet's used range when it runs past it (whole rows or columns); then, for
+ *  whole columns and `lines` (formatting), the probe row (probeOf) and the rows past the used range with a format of their own, which Excel
+ *  gives a cell where they cross (and so for whole rows, the probe column and the formatted columns). */
+export function cellsOf(sheet, sel, lines = false) {
+  const r1 = wholeRows(sel) ? Math.max(sel.r0, Math.min(sel.r1, sheet.maxRow)) : sel.r1;
+  const c1 = wholeCols(sel) ? Math.max(sel.c0, Math.min(sel.c1, sheet.maxCol)) : sel.c1;
+  const probe = lines ? probeOf(sheet, sel) : { row: null, col: null };
+  // (Whole lines formatted: the cells there are, and empty ones only where a formatted row or column crosses, as
+  // Excel makes them; the rest have the line's own format.)
+  const lineCell = probe.row != null ? (r, c) => sheet.cells.get(r)?.has(c) || !!sheet.rows.get(r)?.s
+    : probe.col != null ? (r, c) => sheet.cells.get(r)?.has(c) || sheet.cols.some((x) => c >= x.min && c <= x.max && x.style) : null;
   const out = [];
-  for (let r = sel.r0; r <= r1; r++) for (let c = sel.c0; c <= c1 && out.length < MAX_CELLS; c++) out.push({ r, c });
+  for (let r = sel.r0; r <= r1; r++) for (let c = sel.c0; c <= c1 && out.length < MAX_CELLS; c++) if (!lineCell || lineCell(r, c)) out.push({ r, c });
+  if (probe.row != null) {
+    const more = [...sheet.rows.entries()].filter(([r, x]) => x.s && r > r1 && r <= sel.r1).map(([r]) => r);
+    for (const r of [probe.row, ...more]) for (let c = sel.c0; c <= c1; c++) out.push({ r, c });
+  }
+  if (probe.col != null) {
+    const more = new Set();
+    for (const x of sheet.cols) if (x.style && x.max - x.min < 1000) for (let c = Math.max(x.min, c1 + 1); c <= Math.min(x.max, sel.c1); c++) more.add(c);
+    for (const c of [probe.col, ...more]) for (let r = sel.r0; r <= r1; r++) out.push({ r, c });
+  }
   return out;
 }
 
-const styleAt = (sheet, r, c) => sheet.cells.get(r)?.get(c)?.s || 0;
+/** A cell's format: its own, or an empty cell's row's or column's (sheet.js lineStyle). */
+const styleAt = (sheet, r, c) => { const cell = sheet.cells.get(r)?.get(c); return cell ? cell.s || 0 : lineStyle(sheet, r, c); };
 
 /** Every cell of the selection with the same change (stylesedit.js's form). */
 export function formatEach(wb, si, sel, change) {
   const sheet = wb.sheet(si);
   const memo = new Map(); // (cells sharing a format share the result)
-  return cellsOf(sheet, sel).map(({ r, c }) => {
+  return cellsOf(sheet, sel, true).map(({ r, c }) => {
     const s = styleAt(sheet, r, c);
     if (!memo.has(s)) memo.set(s, wb.styleWith(s, typeof change === 'function' ? change(s) : change));
     return { r, c, s: memo.get(s) };
@@ -114,9 +150,10 @@ function drawBorders(wb, si, sel, sidesAt, out = new Map()) {
     const s = out.get(`${r}:${c}`)?.s ?? styleAt(sheet, r, c);
     out.set(`${r}:${c}`, { r, c, s: wb.styleWith(s, { border: sides }) });
   };
-  const cells = cellsOf(sheet, sel);
-  const r1 = Math.max(...cells.map((x) => x.r));
-  const c1 = Math.max(...cells.map((x) => x.c));
+  const cells = cellsOf(sheet, sel, true);
+  // (Whole columns or rows: their far edge is the sheet's, not the used range's or the probe's.)
+  const r1 = wholeRows(sel) ? sel.r1 : Math.max(...cells.map((x) => x.r));
+  const c1 = wholeCols(sel) ? sel.c1 : Math.max(...cells.map((x) => x.c));
   for (const { r, c } of cells) {
     const at = { top: r === sel.r0, bottom: r === r1, left: c === sel.c0, right: c === c1 };
     const sides = Object.fromEntries(Object.entries(sidesAt(at)).filter(([, v]) => v !== undefined));

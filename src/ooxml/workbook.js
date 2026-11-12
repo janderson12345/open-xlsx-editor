@@ -13,7 +13,7 @@ import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { changeLines } from './rowcol.js';
-import { setColumns, setRows } from './sizes.js';
+import { setColumns, setRows, setLineStyles } from './sizes.js';
 import { setFreeze, setZoom, setShowFormulas, setShown } from './view.js';
 import { applyAutoFilter, filterName } from './filterops.js';
 import { applyAdvancedFilter } from './advfilter.js';
@@ -284,6 +284,16 @@ export class Workbook {
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
     this.resetCalc();
+  }
+
+  /** Sheet i's rows' and columns' own formats: `cols` [{ c, s }], `rows` [{ r, s }] (sizes.js, as Excel writes a
+   *  formatted column and row); neighbours with one format written as one element; the sheet read again once. */
+  setLineStyles(i, { cols = [], rows = [] }) {
+    const part = this._part(i);
+    setLineStyles(part.doc, { cols, rows }, part.model.format);
+    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
+    this.dirty.add(this.sheets[i].path);
+    this.edited = true;
   }
 
   /**

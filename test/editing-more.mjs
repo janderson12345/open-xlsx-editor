@@ -500,4 +500,16 @@ const filled = await page.evaluate((f) => [...document.querySelectorAll(`.oxe-f$
 const rowsShown = await page.evaluate(() => document.querySelectorAll('.oxe-row').length);
 check(filled >= rowsShown - 2, 'a column’s own fill: its empty cells drawn filled', JSON.stringify({ filled, rowsShown }));
 
+// Column M selected whole, Ctrl+B: the column's own format, as Excel's (a cell typed far below it bold); Ctrl+Z
+// takes it away.
+await page.evaluate(() => window.oxe.command('selectLines', 'col', 12));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+b');
+const colBold = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); const col = sh.cols.find((x) => 12 >= x.min && 12 <= x.max); return col ? wb.styles.fonts[wb.styles.cellXfs[col.style].fontId].b : null; });
+await page.evaluate(() => window.oxe.enter('M500', 'far'));
+const farBold = await page.evaluate(() => { const wb = window.oxe.workbook; const cell = wb.sheet(window.oxe.sheetIndex).cells.get(499).get(12); return wb.styles.fonts[wb.styles.cellXfs[cell.s].fontId].b; });
+await page.evaluate(() => { window.oxe.undo(); window.oxe.undo(); });
+const colAfterUndo = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.find((x) => 12 >= x.min && 12 <= x.max)?.style ?? 0);
+check(colBold === true && farBold === true && colAfterUndo === 0, 'a whole column made bold: its own format, a cell typed far below bold; Ctrl+Z takes it away', JSON.stringify({ colBold, farBold, colAfterUndo }));
+
 await finish();
