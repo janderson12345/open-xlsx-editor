@@ -434,6 +434,18 @@ export const PROBE_FORMULAS = [
   'COUNTA(Data!A.:.E)', 'ROWS(\'My Data\'!A1.:.D20)&"x"&COLUMNS(\'My Data\'!A1.:.D20)', 'INDEX(Data!A1:.E40,2,1)',
   'ROWS(TRIMRANGE(Data!A1:H40))&"x"&COLUMNS(TRIMRANGE(Data!A1:H40))', 'ROWS(TRIMRANGE(Data!A1:H40,0,1))&"x"&COLUMNS(TRIMRANGE(Data!A1:H40,0,1))',
   'ROWS(TRIMRANGE(Data!A1:H40,2))', 'TRIMRANGE(Data!A1:H40,4)', 'TRIMRANGE(Data!J1:K5)', 'TRIMRANGE({1,2;3,4})', 'SUM(TRIMRANGE(Data!B1:B40))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!B2:B9>3,Data!C2:C9,SUM))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!B2:B9>3,Data!C2:C9,SUM,,2))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!B2:B9>3,Data!C2:C9,SUM,,-2,{-1,2}))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,HSTACK(Data!E2:E9,Data!B2:B9>3),Data!C2:C9,SUM,,,,2))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,HSTACK(Data!E2:E9,Data!B2:B9>3),Data!C2:C9,SUM,,,,,3))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!B2:B9>3,Data!C2:C9,PERCENTOF,,2,,,,,4))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!B2:B9>3,Data!C2:C9,SUM,2,2))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!B2:B9>3,Data!C2:C9,SUM,,1,{1,1}))',
+  'TEXTJOIN("|",FALSE,GROUPBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!C2:C9,SUM,,,3))',
+  'TEXTJOIN("|",FALSE,GROUPBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!C2:C9,SUM,,,{-1,2}))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,PERCENTOF,,,,,,,1))',
+  'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,SUM,,,,,,,5))',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;

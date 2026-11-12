@@ -4,27 +4,66 @@
 // formula probe: headers found when the first value is text over a number, shown with 3, made up with 2 ("Row Field
 // 1", "Value 1"); totals at the end, at the start when negative, "Grand Total" with subtotals; sorted by the fields,
 // or by a value column; an empty cell of the answer is "" (not a blank). Registered into functions.js's table.
-import { Area, Arr, E, XlError, MISSING, Lambda, Lambdas, Builtin, Unsupported, matrix, scalar, toBool, compare } from './values.js';
+import { Area, Arr, E, XlError, MISSING, Lambda, Lambdas, Builtin, matrix, scalar, toBool, compare } from './values.js';
 import { def, given, num, numbers, cellsIn } from './functions.js';
 
-const ARRAY = { array: true };
-const whole = (v, ctx) => Math.trunc(num(v, ctx));
-const column = (rows, c) => rows.map((row) => row[c]);
+export const ARRAY = { array: true };
+export const whole = (v, ctx) => Math.trunc(num(v, ctx));
 const vec = (values) => new Arr(values.map((v) => [v]));
 /** Field values in Excel's order for them: numbers, text, TRUE and FALSE, then a blank last (its own group, not FALSE). */
 const RANK = (v) => (v == null ? 4 : typeof v === 'number' ? 0 : typeof v === 'string' ? 1 : typeof v === 'boolean' ? 2 : 3);
-const order = (x, y) => RANK(x) - RANK(y) || (x == null || y == null ? 0 : compare(x, y));
+export const order = (x, y) => RANK(x) - RANK(y) || (x == null || y == null ? 0 : compare(x, y));
 /** A field value as a group's key: text case aside, a blank its own. */
-const keyOf = (v) => (v == null ? 'blank' : typeof v === 'string' ? `s${v.toUpperCase()}` : `${typeof v}${v}`);
+export const keyOf = (v) => (v == null ? 'blank' : typeof v === 'string' ? `s${v.toUpperCase()}` : `${typeof v}${v}`);
+
+/** sort_order (measured): a field's number sorts by it (negative: descending), the others' fields ascending; an array
+ *  of them for several fields ({1,-2}, in any order); a number past the fields sorts by that value column's answers
+ *  (one only: in an array with others, #VALUE!, as a field twice is). 0 or past the value columns, #VALUE!. */
+export function sortKeys(a, i, k, nv, ctx) {
+  const spec = { fields: new Map(), value: null };
+  if (!given(a[i])) return spec;
+  const list = matrix(a[i], ctx).flat();
+  for (const x of list) {
+    if (x instanceof XlError) throw x;
+    if (typeof x !== 'number' || !Number.isInteger(x) || x === 0 || Math.abs(x) > k + nv) throw E.value;
+    const n = Math.abs(x);
+    if (n > k) {
+      if (list.length > 1) throw E.value;
+      spec.value = { index: n - k - 1, sign: Math.sign(x) };
+    } else {
+      if (spec.fields.has(n - 1)) throw E.value;
+      spec.fields.set(n - 1, Math.sign(x));
+    }
+  }
+  return spec;
+}
+/** total_depth: 0 none, 1 a total, 2 and on subtotals for the levels above too (negative: before their rows), past
+ *  the fields #VALUE!. Left out, a total; with subtotals for every level when sorted by a value column (measured). */
+export function depthOf(a, i, k, spec, ctx) {
+  if (!given(a[i])) return spec.value ? Math.max(1, k) : 1;
+  const d = whole(a[i], ctx);
+  if (Math.abs(d) > Math.max(1, k)) throw E.value;
+  return d;
+}
+/** Groups compared at a level: by a value column's answers where that sort reaches the level, else by the field. */
+export const sorter = (spec, answer, reaches) => (x, y, d) => {
+  if (spec.value && reaches(d)) {
+    const r = compare(answer(x.rows, spec.value.index), answer(y.rows, spec.value.index));
+    return spec.value.sign * r || order(x.value, y.value);
+  }
+  // (A blank stays last when the field sorts descending too: TRUE, FALSE, "yes", blank.)
+  if (x.value == null || y.value == null) return order(x.value, y.value);
+  return (spec.fields.get(d) ?? 1) * order(x.value, y.value);
+};
 
 /** The function argument as a list: one LAMBDA, or HSTACK's; with the name each column's header row shows. */
-function functionsOf(v) {
+export function functionsOf(v) {
   const list = v instanceof Lambdas ? v.list : [v];
   if (!list.every((f) => f instanceof Lambda)) throw E.value;
   return { list, names: list.map((f) => (f instanceof Builtin ? f.name : 'LAMBDA')), many: list.length > 1 };
 }
 /** A group's values given to a function (PERCENTOF and a two-argument LAMBDA also get all the values). */
-function aggregate(fn, group, all, ctx) {
+export function aggregate(fn, group, all, ctx) {
   const two = fn instanceof Builtin ? fn.name === 'PERCENTOF' : fn.params?.length === 2;
   let v = ctx.callLambda(fn, two ? [vec(group), vec(all)] : [vec(group)]);
   if (v instanceof Arr || (v && typeof v === 'object' && 'si' in v)) {
@@ -36,7 +75,7 @@ function aggregate(fn, group, all, ctx) {
 
 /** field_headers: 0 none, 1 there but not shown, 2 none but made up, 3 there and shown; left out: there when the
  *  first value is text and the one below a number. */
-function headersOf(a, k, valueRows, ctx) {
+export function headersOf(a, k, valueRows, ctx) {
   if (!given(a[k])) return typeof valueRows[0]?.[0] === 'string' && typeof valueRows[1]?.[0] === 'number' ? 1 : 0;
   const h = whole(a[k], ctx);
   if (h < 0 || h > 3) throw E.value;
@@ -44,7 +83,7 @@ function headersOf(a, k, valueRows, ctx) {
 }
 
 /** The rows kept: filter_array's TRUE ones (as long as the rows), all when it is left out. */
-function kept(a, k, n, ctx) {
+export function kept(a, k, n, ctx) {
   if (!given(a[k])) return Array(n).fill(true);
   const f = matrix(a[k], ctx).flat();
   if (f.length !== n) throw E.value;
@@ -52,7 +91,7 @@ function kept(a, k, n, ctx) {
 }
 
 /** Groups of rows by their field values, in a tree: { key, value, rows, kids } at each level, sorted. */
-function tree(fields, rows, depth, sortBy) {
+export function tree(fields, rows, depth, sortBy) {
   const level = (list, d) => {
     if (d === depth) return [];
     const byKey = new Map();
@@ -83,15 +122,12 @@ function groupBy(a, ctx) {
   let heads = null;
   if (h === 1 || h === 3) { heads = [...fields[0], ...valueRows[0]]; fields = fields.slice(1); valueRows = valueRows.slice(1); }
   if (h === 2) heads = [...Array.from({ length: k }, (_, i) => `Row Field ${i + 1}`), ...Array.from({ length: m }, (_, i) => `Value ${i + 1}`)];
-  const total = given(a[4]) ? whole(a[4], ctx) : 1;
-  if (Math.abs(total) > Math.max(1, k)) throw E.value;
-  // (One column to sort by; an array of them, {-1,3}, is #VALUE! here as it was in Excel.)
-  if (given(a[5]) && matrix(a[5], ctx).flat().length > 1) throw E.value;
-  const sort = given(a[5]) ? scalar(a[5], ctx) : 1;
-  if (typeof sort !== 'number' || !Number.isInteger(sort) || sort === 0 || Math.abs(sort) > k + m * fns.list.length) throw E.value;
+  const spec = sortKeys(a, 5, k, m * fns.list.length, ctx);
   const keep = kept(a, 6, fields.length, ctx);
   const relation = given(a[7]) ? whole(a[7], ctx) : 0;
   if (relation !== 0 && relation !== 1) throw E.value;
+  // (field_relationship 1 has no subtotals: left out, total_depth is 1 there even sorted by a value column.)
+  const total = relation === 1 && !given(a[4]) ? 1 : depthOf(a, 4, k, spec, ctx);
   if (relation === 1 && Math.abs(total) > 1) throw E.value;
   const rows = fields.map((_, i) => i).filter((i) => keep[i]);
   const all = (c) => rows.map((i) => valueRows[i][c]);
@@ -101,15 +137,7 @@ function groupBy(a, ctx) {
     for (let c = 0; c < m; c++) for (const fn of fns.list) out.push(aggregate(fn, list.map((i) => valueRows[i][c]), all(c), ctx));
     return out;
   };
-  const sortBy = (x, y, d) => {
-    if (Math.abs(sort) <= k) {
-      const sign = Math.abs(sort) === d + 1 && sort < 0 ? -1 : 1;
-      return sign * order(x.value, y.value);
-    }
-    const col = Math.abs(sort) - k - 1;
-    const r = compare(answers(x.rows)[col], answers(y.rows)[col]);
-    return (sort < 0 ? -r : r) || order(x.value, y.value);
-  };
+  const sortBy = sorter(spec, (list, j) => answers(list)[j], () => true);
   const groups = tree(fields, rows, k, sortBy);
   const out = [];
   if (fns.many) out.push([...Array(k).fill(''), ...Array.from({ length: m }, () => fns.names).flat()]);
@@ -136,68 +164,6 @@ function groupBy(a, ctx) {
   return new Arr(out);
 }
 def('GROUPBY', (a, ctx) => groupBy(a, ctx), ARRAY);
-
-/** PIVOTBY(row_fields, col_fields, values, function, [field_headers], [row_total_depth], [row_sort_order],
- *  [col_total_depth], [col_sort_order], [filter_array], [relative_to]): one row field and one column field here. */
-function pivotBy(a, ctx) {
-  const rowFields = matrix(a[0], ctx);
-  const colFields = matrix(a[1], ctx);
-  let valueRows = matrix(a[2], ctx);
-  if (rowFields.length !== valueRows.length || colFields.length !== valueRows.length) throw E.value;
-  if (rowFields[0].length !== 1 || colFields[0].length !== 1) throw new Unsupported('PIVOTBY of more than one field');
-  const fns = functionsOf(a[3]);
-  const m = valueRows[0].length;
-  const h = headersOf(a, 4, valueRows, ctx);
-  let rf = column(rowFields, 0);
-  let cf = column(colFields, 0);
-  let heads = null;
-  if (h === 1 || h === 3) { heads = { row: rf[0], col: cf[0], values: valueRows[0] }; rf = rf.slice(1); cf = cf.slice(1); valueRows = valueRows.slice(1); }
-  if (h === 2) heads = { row: 'Row Field 1', col: 'Col Field 1', values: valueRows[0].map((_, i) => `Value ${i + 1}`) };
-  const depth = (k) => { const d = given(a[k]) ? whole(a[k], ctx) : 1; if (Math.abs(d) > 1) throw E.value; return d; };
-  const rowTotal = depth(5);
-  const colTotal = depth(7);
-  const sortArg = (k) => { const s = given(a[k]) ? whole(a[k], ctx) : 1; if (Math.abs(s) !== 1) throw E.value; return s; };
-  const rowSort = sortArg(6);
-  const colSort = sortArg(8);
-  const keep = kept(a, 9, rf.length, ctx);
-  const rows = rf.map((_, i) => i).filter((i) => keep[i]);
-  const distinct = (vals, sign) => {
-    const seen = new Map();
-    for (const i of rows) { const v = vals[i]; if (!seen.has(keyOf(v))) seen.set(keyOf(v), v); }
-    return [...seen.values()].sort((x, y) => sign * order(x, y));
-  };
-  const same = (x, y) => keyOf(x) === keyOf(y);
-  const rowKeys = distinct(rf, rowSort);
-  const colKeys = distinct(cf, colSort);
-  // (Several value columns: the row totals are left empty, as Excel leaves them.)
-  const rowTotalsEmpty = m > 1 && !fns.many;
-  const cell = (rk, ck, c, fn) => {
-    const inRow = rows.filter((i) => (rk === undefined || same(rf[i], rk)));
-    const inCol = rows.filter((i) => (ck === undefined || same(cf[i], ck)));
-    const group = inRow.filter((i) => inCol.includes(i));
-    if (!group.length) return '';
-    // (PERCENTOF: of the column's total, as relative_to's default has it.)
-    return aggregate(fn, group.map((i) => valueRows[i][c]), inCol.map((i) => valueRows[i][c]), ctx);
-  };
-  const colsOut = [];
-  for (const ck of colKeys) for (let c = 0; c < m; c++) for (const fn of fns.list) colsOut.push({ ck, c, fn, total: false });
-  const totals = [];
-  if (colTotal !== 0) for (let c = 0; c < m; c++) for (const fn of fns.list) totals.push({ ck: undefined, c, fn, total: true });
-  const cols = colTotal < 0 ? [...totals, ...colsOut] : [...colsOut, ...totals];
-  const out = [];
-  if (heads && h !== 1) out.push(['', heads.col, ...Array(cols.length - 1).fill('')]);
-  out.push(['', ...cols.map((x) => (x.total ? 'Total' : x.ck))]);
-  if (fns.many) out.push(['', ...cols.map((x) => fns.names[fns.list.indexOf(x.fn)])]);
-  if (heads && h !== 1) out.push([heads.row, ...cols.map((x) => heads.values[x.c])]);
-  const line = (rk, label) => [label, ...cols.map((x) => (x.total && rowTotalsEmpty ? '' : cell(rk, x.ck, x.c, x.fn)))];
-  const body = rowKeys.map((rk) => line(rk, rk));
-  const grand = line(undefined, 'Total');
-  if (rowTotal < 0) out.push(grand);
-  out.push(...body);
-  if (rowTotal > 0) out.push(grand);
-  return new Arr(out);
-}
-def('PIVOTBY', (a, ctx) => pivotBy(a, ctx), ARRAY);
 
 /** PERCENTOF(data_subset, data_all): the subset's sum over the whole's. */
 def('PERCENTOF', (a, ctx) => {

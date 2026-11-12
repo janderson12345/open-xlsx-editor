@@ -59,11 +59,21 @@ GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY (`src/calc/functions-groupby.js`), mea
   add a row of their names (SUM, COUNT) above.
 - **Totals**: "Total" at the end; with subtotals (total_depth 2) a row for each group after its rows, and "Grand Total";
   negative depths put them before. field_relationship 1 with subtotals is #VALUE!.
-- **Sorting**: by the fields; sort_order a field (negative: descending) or a value column (by the groups' answers).
-  Field values go numbers, text, TRUE and FALSE, then a blank, which is a group of its own.
-- **PIVOTBY**: the column field's values across, "Total" after (or before); a missing group "" (an empty cell of the
-  answer is "", not a blank, in both); with several value columns the row totals are left "", as Excel leaves them;
-  PERCENTOF of the column's total.
+- **Sorting**: by the fields; sort_order a field (negative: descending) or a value column (by the groups' answers);
+  an array of fields, {1,-2} (in any order; a field twice, or a field with a value column, #VALUE!). Field values go
+  numbers, text, TRUE and FALSE, then a blank, which is a group of its own and stays last sorted descending too.
+  Sorted by a value column with total_depth left out, every level gets its subtotal.
+- **PIVOTBY**: the column fields' values across, one header row for each field, "Total" after (or before); a missing
+  group "" (an empty cell of the answer is "", not a blank, in both); with several value columns the total and
+  subtotal columns are left "", as Excel leaves them. Several row or column fields (`src/calc/functions-pivotby.js`):
+  subtotal rows and columns for the levels the depths reach; the column fields' header in one cell ("Item, Size",
+  made up "Column Field 1, Column Field 2"). Sorted by a value column, rows go by their totals at every level,
+  columns only at the last level and where they have subtotals (the others by the field), as Excel sorts them.
+  PERCENTOF (and a LAMBDA of two arguments) of relative_to's total: 0 the column's, 1 the row's, 2 the grand total,
+  3 the parent column's, 4 the parent row's; 5 #VALUE!.
+  Measured on 104 formulas in a hidden Excel (two row fields, two column fields, three, with subtotals, headers 1 to
+  3, sort arrays, several functions and value columns, filters, every relative_to), all as Excel's, then 12 more in
+  the formula probe.
 - **RANDARRAY**: 0 rows or columns #CALC!, fewer #VALUE!, min above max #VALUE!, whole numbers between bounds that
   aren't whole #VALUE!.
 
@@ -84,8 +94,6 @@ formula probe:
 - The blue outline Excel draws round a spill when its cell is selected.
 - (TAKE, DROP, VSTACK, HSTACK, CHOOSEROWS and the other newer array functions, MAP, REDUCE, SCAN, BYROW, BYCOL,
   MAKEARRAY, ISOMITTED, GROUPBY, PIVOTBY, PERCENTOF, RANDARRAY and TRIMRANGE are here, in the formula probe.)
-- PIVOTBY of more than one row or column field (the formula keeps Excel's value), and sorted by a value column;
-  GROUPBY's sort_order as an array of columns (#VALUE! here, as Excel gave it for {-1,3}).
 - A defined LAMBDA called with a name typed in another case (=twice(5)) is saved as TWICE(5); Excel writes it as the
   name is (Twice(5)). Both work out the same, in both programs.
 - `@` shown by the formula bar only where an old formula is a whole range; Excel 365 also shows it before a range an

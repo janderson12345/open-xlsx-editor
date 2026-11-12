@@ -81,7 +81,8 @@ insides:
 | `src/calc/functions-arrays.js`, `functions-finance.js`, `functions-stats.js` | Excel 365's array shaping and LAMBDA helpers; loans, depreciation, rates and working days; statistics, distributions, numerals and a cell's formula and sheet (docs/CALC.md). |
 | `src/calc/functions-db.js`, `functions-bonds.js`, `criteria.js` | The database functions and their criteria (shared with Advanced Filter); coupons, bond prices and yields, and the discounted securities (docs/CALC.md). |
 | `src/calc/functions-oddbonds.js` | ODDFPRICE, ODDFYIELD, ODDLPRICE, ODDLYIELD: securities with an odd first or last period (docs/CALC.md). |
-| `src/calc/functions-groupby.js` | GROUPBY, PIVOTBY, PERCENTOF and RANDARRAY, as Excel 365 works them out (docs/DYNAMIC.md). |
+| `src/calc/functions-groupby.js` | GROUPBY, PERCENTOF, RANDARRAY and TRIMRANGE, as Excel 365 works them out, and what GROUPBY and PIVOTBY share (docs/DYNAMIC.md). |
+| `src/calc/functions-pivotby.js` | PIVOTBY: several row and column fields, subtotals, sorting, relative_to (docs/DYNAMIC.md). |
 | `src/calc/functions-bessel.js` | BESSELJ, BESSELY, BESSELI, BESSELK by the approximations Excel uses (docs/CALC.md). |
 | `src/calc/functions-amort.js` | AMORLINC and AMORDEGRC, the French depreciation, as Excel works them out (docs/CALC.md). |
 | `src/calc/functions-regex.js`, `regex.js` | REGEXTEST, REGEXEXTRACT, REGEXREPLACE: Excel's PCRE2 patterns and replacement text turned into JavaScript's (docs/CALC.md). |
