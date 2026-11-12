@@ -16,7 +16,7 @@ export const PIVOT_REPLACE = 'There\'s already data in the destination. Do you w
 
 /** These commands: `env` is createCommands's shared state and helpers (commands.js). */
 export function pivotCommands(env) {
-  const { commands, ctx, state, idOf, sheetOp } = env;
+  const { allowed, commands, ctx, state, idOf, sheetOp } = env;
 
   /** The cells and look of a new pivot: its cells made, its row labels aligned left, its columns fitted. */
   function finish(wb, out) {
@@ -50,6 +50,8 @@ export function pivotCommands(env) {
      *  of the history; Excel's words when it can't be. */
     movePivot(layout) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      // (A protected sheet: only with Use PivotTable & PivotChart allowed, as Excel's field moved.)
+      if (!allowed('pivotTables')) return false;
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
       const p = pivotAt(wb, si, state.sel.ar, state.sel.ac);

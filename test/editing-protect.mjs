@@ -114,4 +114,16 @@ check(offered.join() === 'Range1,=$K$80,' && listed === 'Range1=$K$80|Range2=$K$
   'Allow Edit Ranges: Range1 of the selection; protected, it changes though locked; one with a password asks Unlock Range, then changes; the box locked',
   JSON.stringify({ offered, listed, k80, unlockText, lockedButtons }));
 
+// Still protected: a new note refused before its box (Edit objects not allowed).
+await page.evaluate(() => window.oxe.select('M80'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Shift+F2');
+await page.waitForSelector('dialog.oxe-dialog[role="alertdialog"]');
+const noteRefusal = await page.textContent('dialog.oxe-dialog[role="alertdialog"]');
+const noteBoxShown = await page.isVisible('dialog.oxe-note-edit');
+await page.keyboard.press('Enter');
+const notes = await page.evaluate(() => window.oxe.workbook._part(window.oxe.sheetIndex).doc.documentElement.getElementsByTagName('legacyDrawing').length);
+check(/on a protected sheet/.test(noteRefusal || '') && !noteBoxShown && notes === 0,
+  'a protected sheet: New Note refused in Excel’s words before its box', JSON.stringify({ noteRefusal, noteBoxShown, notes }));
+
 await finish();

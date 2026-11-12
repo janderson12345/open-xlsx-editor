@@ -47,7 +47,7 @@ export function errorChoices(env, rule, cells, at) {
     heading,
     text,
     fixes,
-    ignore: { label: 'Ignore Error', run: () => editing().run('sheetChange', (book, i) => ignoreErrors(book, i, cells, rule)), disabled: ro },
+    ignore: { label: 'Ignore Error', run: () => editing().run('sheetChange', (book, i) => ignoreErrors(book, i, cells, rule), 'always'), disabled: ro },
     edit: { label: 'Edit in Formula Bar', run: () => env.root.querySelector('.oxe-formula')?.focus(), disabled: ro },
   };
 }

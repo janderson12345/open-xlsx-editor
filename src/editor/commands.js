@@ -19,7 +19,7 @@ import { mergeChange } from '../ooxml/mergeops.js';
 import { typedWidth, pxWidth } from '../ooxml/sizes.js';
 import { shiftCells } from '../ooxml/rowcol.js';
 import { clearChanges } from '../ooxml/clearops.js';
-import { partsClear, PARTS_ONLY } from '../ooxml/clearparts.js';
+import { partsClear, PARTS_ONLY, hyperlinksIn } from '../ooxml/clearparts.js';
 import { traceLevel } from './tracing.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
 import { protectionRefusal, isLocked } from '../ooxml/protection.js';
@@ -264,6 +264,9 @@ export function createCommands(ctx) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
+      // (A protected sheet: a hyperlink's cell locked refuses it, as Excel's Delete of one.)
+      const linked = what === 'comments' || what === 'formats' ? [] : eachArea().flatMap((a) => hyperlinksIn(wb, si, a).map((h) => ({ r: h.range.r0, c: h.range.c0 })));
+      if (linked.length && !allowed('contents', linked)) return false;
       // (Notes, comments and hyperlinks are parts of the sheet, not cells: a change of them goes back as a whole.)
       if (PARTS_ONLY.includes(what)) {
         const run = partsClear(wb, si, eachArea(), what);
@@ -275,6 +278,7 @@ export function createCommands(ctx) {
       if (refused) { ctx.alert(refused.error); return false; }
       const step = steps.length === 1 ? steps[0] : { ...steps[0], contents: steps.flatMap((x) => x.contents), styles: steps.flatMap((x) => x.styles), merges: steps[0].merges.filter((m) => steps.every((x) => x.merges.includes(m))) };
       const run = partsClear(wb, si, eachArea(), what, step);
+      if (run && (!allowed('contents', step.contents) || (what === 'all' && step.styles.length && !allowed('formatCells')))) return false;
       if (run) return commands.sheetChange(run);
       if (what === 'contents' && !step.contents.length) return false;
       if (what === 'contents') return apply(step.contents);

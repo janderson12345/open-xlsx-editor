@@ -108,12 +108,14 @@ export function contentsHidden(wb, si, r, c) {
 }
 
 /** Why a change to sheet si can't be made while it is protected (Excel's words), or null: `kind` is 'contents' (the
- *  `cells` [{ r, c }] changed), or one of ALLOWS. */
+ *  `cells` [{ r, c }] changed), 'objects' (a new note; a chart moved, sized, changed or deleted: Edit objects), or one
+ *  of ALLOWS; anything else is refused while the sheet is protected. */
 export function protectionRefusal(wb, si, kind, cells = []) {
   const p = sheetProtection(wb, si);
   if (!p) return null;
   // (A locked cell changes in an Allow Edit Range without a password, or one unlocked: editranges.js.)
   if (kind === 'contents') return cells.some(({ r, c }) => isLocked(wb, si, r, c) && !inOpenRange(wb, si, r, c)) ? PROTECTED_MESSAGE : null;
+  if (kind === 'objects') return p.objects ? PROTECTED_MESSAGE : null;
   return p.allow[kind] ? null : PROTECTED_MESSAGE;
 }
 

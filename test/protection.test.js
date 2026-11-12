@@ -94,3 +94,16 @@ test("a hidden cell of a protected sheet: FORMULATEXT gives #N/A, ISFORMULA stil
   unprotectSheet(wb, si);
   assert.equal(at('FORMULATEXT(A2)'), '=1+2');
 });
+
+test("Edit objects and the rest: a new note or a chart moved needs objects unprotected; anything else unnamed is refused (Excel's, measured)", () => {
+  const { wb, si } = book();
+  assert.equal(protectionRefusal(wb, si, 'objects'), null);
+  protectSheet(wb, si);
+  assert.equal(protectionRefusal(wb, si, 'objects'), PROTECTED_MESSAGE);
+  assert.equal(protectionRefusal(wb, si, 'always'), PROTECTED_MESSAGE);
+  assert.equal(protectionRefusal(wb, si, 'pivotTables'), PROTECTED_MESSAGE);
+  protectSheet(wb, si, { objects: false, allow: { pivotTables: true } });
+  assert.equal(protectionRefusal(wb, si, 'objects'), null);
+  assert.equal(protectionRefusal(wb, si, 'pivotTables'), null);
+  assert.equal(protectionRefusal(wb, si, 'always'), PROTECTED_MESSAGE);
+});

@@ -134,7 +134,7 @@ export function createMoreActs(env) {
       // (Excel's Conditional Formatting menu: the rule's box, then the rule for the selection.)
       const s = editing().selection;
       const sel = [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }];
-      const add = (rule) => editing().run('sheetChange', (wb, si) => wb.setConditional(si, sel, rule));
+      const add = (rule) => editing().run('sheetChange', (wb, si) => wb.setConditional(si, sel, rule), 'formatCells');
       const presets = Object.entries(CF_PRESETS).map(([value, p]) => ({ value, label: p.label }));
       const kind = args[0];
       if (kind === 'scale3' || kind === 'scale2') return add({ kind: 'colorScale', points: kind === 'scale2' ? 2 : 3 });
@@ -159,19 +159,20 @@ export function createMoreActs(env) {
     }
     if (name === 'cfClear') {
       const s = editing().selection;
-      return editing().run('sheetChange', (wb, si) => wb.setConditional(si, args[0] === 'sheet' ? null : [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], null));
+      return editing().run('sheetChange', (wb, si) => wb.setConditional(si, args[0] === 'sheet' ? null : [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], null), 'formatCells');
     }
     if (name === 'insertChart') {
       // (Insert > Charts: the selection charted; one cell selected, the table round it, as Excel takes it.)
       const s = editing().selection;
       const sel = s.r0 === s.r1 && s.c0 === s.c1 ? currentRegion(state.workbook.sheet(i), s.r0, s.c0) : s;
       let made = null;
-      const done = editing().run('sheetChange', (wb, si) => { made = insertChart(wb, si, sel, args[0]); return !!made; });
+      // (Excel refused a new chart on a protected sheet, Edit objects allowed or not.)
+      const done = editing().run('sheetChange', (wb, si) => { made = insertChart(wb, si, sel, args[0]); return !!made; }, 'always');
       if (!done && !made && !state.readOnly) return messageBox(root, 'Select the cells to chart first: a table with numbers in it.').then(() => false);
       return done;
     }
-    if (name === 'chartAnchor') return editing().run('sheetChange', (wb, si) => { setChartAnchor(wb, si, args[0], args[1], args[2]); });
-    if (name === 'chartDelete') return editing().run('sheetChange', (wb, si) => { deleteChart(wb, si, args[0]); });
+    if (name === 'chartAnchor') return editing().run('sheetChange', (wb, si) => { setChartAnchor(wb, si, args[0], args[1], args[2]); }, 'objects');
+    if (name === 'chartDelete') return editing().run('sheetChange', (wb, si) => { deleteChart(wb, si, args[0]); }, 'objects');
     if (name === 'chartEdit') {
       // (Edit Chart's answer: each change as Excel writes it, chartedit.js; refused for a chart written otherwise.)
       const [k, change] = args;
@@ -184,7 +185,7 @@ export function createMoreActs(env) {
           if ('labels' in change) setChartLabels(wb, si, k, change.labels);
         } catch (e) { refused = e.message; return false; }
         return true;
-      });
+      }, 'objects');
       if (refused) return messageBox(root, refused).then(() => false);
       state.picker?.pick(k, false);
       return done;
@@ -287,7 +288,7 @@ export function createMoreActs(env) {
       const s = editing().selection;
       return newRuleBox(root).then((rule) => {
         state.grid.el.focus({ preventScroll: true });
-        return rule ? editing().run('sheetChange', (wb, si) => wb.setConditional(si, areasOf(s).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 })), rule)) : false;
+        return rule ? editing().run('sheetChange', (wb, si) => wb.setConditional(si, areasOf(s).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 })), rule), 'formatCells') : false;
       });
     }
     if (name === 'cfManager') {
@@ -305,7 +306,7 @@ export function createMoreActs(env) {
             });
           } catch (e) { refused = e.message; return false; }
           return true;
-        });
+        }, 'formatCells');
         return refused;
       };
       const rules = () => state.workbook.sheet(state.sheetIndex).condFormats.flatMap((cf) => cf.rules.map((rule) => ({ rule, ranges: cf.ranges })));

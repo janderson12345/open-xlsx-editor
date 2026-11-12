@@ -2,6 +2,7 @@
 // one object): the act dispatcher, Insert and Delete, Paste Special, Sort and its warning, the validation question and
 // message, a list's choices, a filter's list, the cell's and the headings' menus, Row Height and Column Width.
 import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
+import { protectionRefusal } from '../ooxml/protection.js';
 import { createMoreActs } from './acts-more.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
@@ -104,12 +105,16 @@ export function createActs(env) {
       const s = editing().selection;
       const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
       if (n?.kind === 'thread') return act('commentBox');
+      // (A new note on a protected sheet without Edit objects: refused before the box, as Excel's measured.)
+      const barred = !n && protectionRefusal(state.workbook, i, 'objects');
+      if (barred) return messageBox(root, barred).then(() => false);
       const body = n ? n.runs.filter((x, k) => !(k === 0 && x.bold)).map((x) => x.text).join('').replace(/^\n/, '') : '';
       const author = n ? n.author || (n.runs[0]?.bold ? n.runs[0].text.replace(/:$/, '') : '') : options.author || 'Author';
       const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
       const ref = `${colName(s.ac)}${s.ar + 1}`;
       return noteBox(root, { title: n ? `Edit Note for ${ref}` : `New Note for ${ref}`, author, text: body, at: { x: box.right + 8, y: box.top } }).then((text) => {
-        if (text != null && (n || text !== '')) editing().run('sheetChange', (wb, si) => setNote(wb, si, s.ar, s.ac, text, options.author || 'Author'));
+        // (A new note on a protected sheet: Edit objects allowed; one there already changes, as Excel's did.)
+        if (text != null && (n || text !== '')) editing().run('sheetChange', (wb, si) => setNote(wb, si, s.ar, s.ac, text, options.author || 'Author'), n ? null : 'objects');
         state.grid.el.focus({ preventScroll: true });
       });
     }
@@ -122,7 +127,7 @@ export function createActs(env) {
       // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
       const s = editing().selection;
       return validationBox(root, boxRule(ruleAt(state.workbook.sheet(i), s.ar, s.ac), state.workbook.date1904)).then((rule) => {
-        if (rule) editing().run('sheetChange', (wb, si) => wb.setValidation(si, areasOf(s), rule === 'clear' ? null : rule));
+        if (rule) editing().run('sheetChange', (wb, si) => wb.setValidation(si, areasOf(s), rule === 'clear' ? null : rule), 'always');
         state.grid.el.focus({ preventScroll: true });
       });
     }

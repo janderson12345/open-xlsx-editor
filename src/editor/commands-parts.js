@@ -7,7 +7,7 @@ import { setCalcMode, calculateNow, calculateSheet, calculateFull } from '../oox
 
 /** These commands: `env` is createCommands's shared state and helpers (commands.js). */
 export function partCommands(env) {
-  const { commands, ctx, state, idOf, runSteps, sheetOp } = env;
+  const { allowed, commands, ctx, state, idOf, runSteps, sheetOp } = env;
   /** After a calculation: the grid and the status bar drawn again, circular references said. */
   const calculated = (out) => {
     ctx.grid.refresh();
@@ -29,6 +29,8 @@ export function partCommands(env) {
      *  leaves everything as it was, and says so. */
     refreshPivots(all = false) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      // (Excel refused a refresh on a protected sheet, Use PivotTable allowed or not: its cells are locked.)
+      if (!allowed('always')) return false;
       const wb = ctx.workbook();
       const here = pivotAt(wb, ctx.sheetIndex(), state.sel.ar, state.sel.ac);
       const list = all ? readPivots(wb).filter((p, k, a) => a.findIndex((q) => q.cachePath === p.cachePath) === k) : here ? [here] : [];
@@ -67,9 +69,11 @@ export function partCommands(env) {
       return calculated(how === 'sheet' ? calculateSheet(wb, ctx.sheetIndex()) : how === 'all' ? calculateFull(wb) : calculateNow(wb));
     },
     /** A change to the sheet's notes or rules, `run(wb, si)` (noteedit.js setNote, deleteNote; Workbook
-     *  setValidation), as one step of the history. */
-    sheetChange(run) {
+     *  setValidation), as one step of the history. `kind`, what a protected sheet must allow for it (commands.js
+     *  allowed: 'objects', 'formatCells', 'always' for never; none for a change it doesn't stop). */
+    sheetChange(run, kind = null) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (kind && !allowed(kind)) return false;
       const wb = ctx.workbook();
       const before = wb.snapshot();
       if (run(wb, ctx.sheetIndex()) === false) return false;

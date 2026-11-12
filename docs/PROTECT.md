@@ -24,6 +24,23 @@ protected sheet refuses (`allowed` in `src/editor/commands.js`), and what Excel 
   itself), and FORMULATEXT of it gives #N/A while ISFORMULA still gives TRUE. Measured over COM: `Range.Formula` gives
   "" for both, `Range.Text` with `DisplayFormulas` gives "" for the formula and the text for the constant, FORMULATEXT
   #N/A after the next calculation (Excel writes it `ca="1"`, so it is volatile here). Unprotected, all shows again.
+- The rest of the sheet, as Excel was seen to refuse it over COM on a protected sheet:
+
+  | Change | Refused unless | Here |
+  |---|---|---|
+  | New note | Edit objects allowed (locked cell or not) | Refused before its box opens |
+  | A note edited or deleted | Never refused | Goes through |
+  | New chart | Always refused, Edit objects allowed or not | Refused |
+  | A chart moved, sized, changed or deleted | Edit objects allowed | Refused otherwise |
+  | Conditional formatting | Format cells allowed | Refused otherwise (new rules, Clear Rules, the Rules Manager) |
+  | Data Validation, Ignore Error | Always refused | Refused |
+  | Hyperlink removed (Clear or Remove Hyperlinks) | Its cell unlocked | Refused on a locked cell |
+  | A PivotTable refreshed | Always refused (its cells locked), Use PivotTable allowed or not | Refused |
+  | A PivotTable's fields moved | Use PivotTable & PivotChart allowed | Refused otherwise |
+  | Advanced Filter in place | Never refused | Goes through |
+
+  A hyperlink inserted needed Insert hyperlinks allowed and its cell unlocked; the editor has no Insert Hyperlink yet.
+  Clear All of locked cells with notes or hyperlinks is refused as typing there is.
 - Protecting and unprotecting aren't steps of Undo.
 
 ## Protect Workbook
@@ -87,7 +104,9 @@ Files from before Excel 2013 keep a 16-bit hash in `password`; it is read (test:
 ## Not yet
 
 - Selecting: Select locked cells and Select unlocked cells are written and kept but not enforced (every cell can be
-  selected). Insert hyperlinks, PivotTables, objects (notes, charts, pictures) and scenarios aren't enforced either.
+  selected); measuring them needs keys and clicks in Excel's window. Scenarios aren't enforced (there are none here).
+- Comments (threads) on a protected sheet aren't stopped; Excel's rule for them wasn't measured. Nor is a new
+  PivotTable put on a protected sheet's cells.
 - Excel refuses as soon as a locked cell is typed into; here the entry is refused when it is entered.
 - The Allow Users to Edit Ranges box's Permissions..., "Paste permissions information into a new workbook", Protect
   Sheet... and Apply; its words were taken from Excel's box, not measured over COM (it can't read them), and so were
