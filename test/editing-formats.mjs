@@ -99,4 +99,9 @@ const csv = await page.evaluate(() => {
 check(csv.sheets === 'csv-excel' && csv.b6 === '50%' && csv.b8 === '3/5/2024' && csv.c7 === '3' && csv.c4 === 'say "hi"',
   'a .csv opened as Excel opens it: one sheet named after the file, 50%, a date, a formula worked out, quotes', JSON.stringify(csv));
 
+// Saved as a CSV again (CSV UTF-8): Excel's bytes for these cells, the byte order mark first.
+const resaved = await page.evaluate(() => new TextDecoder('utf-8', { ignoreBOM: true }).decode(window.oxe.saveCsv()));
+check(resaved.startsWith('\uFEFFname,num,text\r\nplain,42,"quoted, comma"\r\n') && resaved.includes('pct,50%,FALSE\r\n') && resaved.includes(',"say ""hi"""\r\n'),
+  'the CSV saved again as Excel’s CSV UTF-8 writes it', JSON.stringify(resaved.slice(0, 120)));
+
 await finish();

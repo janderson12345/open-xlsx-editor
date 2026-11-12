@@ -9,7 +9,7 @@ import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
-import { csvWorkbook, isCsv } from './ooxml/csv.js';
+import { csvWorkbook, isCsv, csvBytes } from './ooxml/csv.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
@@ -371,6 +371,13 @@ export function mountXlsxEditor(host, options = {}) {
       // (A manual workbook worked out first, unless Recalculate workbook before saving is off: calcmode.js.)
       if (calculateBeforeSave(state.workbook)) { state.grid.refresh(); showStats(); }
       return state.workbook.toBytes();
+    },
+    /** The sheet shown as a CSV, as Excel's Save As CSV UTF-8 writes one (`utf8: false`: as CSV, code page 1252):
+     *  ooxml/csv.js csvBytes. */
+    saveCsv({ utf8 = true } = {}) {
+      if (!state.workbook) throw new Error('no workbook open');
+      if (calculateBeforeSave(state.workbook)) { state.grid.refresh(); showStats(); }
+      return csvBytes(state.workbook, state.sheetIndex, { utf8 });
     },
     /** Select a cell ("B2" or { r, c }, 0-based). */
     select(ref) { const p = at(ref); editing().run('select', p.r, p.c); },

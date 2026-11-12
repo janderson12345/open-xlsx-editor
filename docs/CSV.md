@@ -1,4 +1,4 @@
-# Opening a .csv
+# Opening and saving a .csv
 
 A .csv opens as Excel opens one (`src/ooxml/csv.js`): one sheet named after the file, each field taken as if it were
 typed into its cell. Measured over COM: Workbooks.Open of test/csv-excel.csv (made-up fields), each cell's value,
@@ -22,9 +22,26 @@ number format and formula read back; 32 of 32 cells the same here (test/csv.test
 
 A field Excel wouldn't take as a formula is the text itself.
 
+## Saving a sheet as a CSV
+
+`saveCsv({ utf8 })` gives the sheet shown as Excel's Save As writes it (`csvBytes` in `src/ooxml/csv.js`), byte for
+byte: test/csv-excel-utf8.csv (CSV UTF-8) and test/csv-excel-ansi.csv (CSV) are Excel's own saves of a sheet made
+the same way in test/csv.test.js.
+
+| Rule | Seen |
+|---|---|
+| Each cell as it shows, formatted. | `"1,234.50"`, `25%`, `3/5/2024`, `(5.00)`, `TRUE`, `#N/A`; a formula its value |
+| A General number in 11 characters, whatever its column's width (no #s). | `0.333333333`, `1.23457E+12`, `0.000001`; 12345 in a column 3 wide |
+| Text as it is; a typed apostrophe isn't written. | `'007`: `007`; `  lead` keeps its spaces |
+| In quotes only with a comma, a quote or a line break; quotes doubled. | `"has, comma"`, `"say ""hi"""`, `"quote""mid"`; `semi;colon` bare |
+| Rows end in CR LF; a line break in a cell is written as it is (LF). | `"two` LF `lines"` CR LF |
+| The used range: each row as wide as it, empty cells empty fields. | `,x,,` |
+| CSV UTF-8: a byte order mark, then UTF-8. CSV: code page 1252. | `café ü €`: `EF BB BF ... C3 A9`; `E9 FC 80` |
+
 ## Not yet
 
 - The file is read as UTF-8 (a byte order mark left out); Excel reads a CSV without one in the system's code page, so
   text beyond ASCII can differ.
 - Only commas separate fields (Excel uses the system's list separator); Text Import (Data > From Text/CSV) isn't here.
-- Saving writes an .xlsx; Save As CSV isn't here.
+- `save()` still writes an .xlsx (a file opened from a CSV too); `saveCsv()` is the host's to call, and there is no
+  File > Save As box. A character code page 1252 hasn't is written as ?, as Excel's CSV does (not measured).

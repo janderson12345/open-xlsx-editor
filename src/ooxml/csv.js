@@ -1,10 +1,14 @@
 // A .csv file opened as Excel opens one (measured over COM, Workbooks.Open of a CSV, each cell's value, format and
 // formula read back: docs/CSV.md): one sheet named after the file, each field taken as if it were typed into its
 // cell (entry.js: 007 a number, 50% a percentage, $1,234.50 currency, 1/2 a date, =1+2 a formula, TRUE a boolean,
-// #N/A an error), quotes letting a field hold commas, line breaks and "" for a quote.
+// #N/A an error), quotes letting a field hold commas, line breaks and "" for a quote. And a sheet saved as a CSV as
+// Excel's Save As CSV (UTF-8) and CSV write one.
 import { zipSync, strToU8 } from 'fflate';
 import { Workbook } from './workbook.js';
 import { entryChanges } from './entry.js';
+import { cellText } from './numfmt.js';
+import { formatCodeOf } from './styles.js';
+import { ansiCode } from '../calc/charsets.js';
 
 const X = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
 const R = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
@@ -90,3 +94,34 @@ export function csvWorkbook(bytes, fileName, today = new Date()) {
 
 /** Whether bytes are a CSV rather than a workbook: not a zip (PK) or an encrypted workbook's compound file. */
 export const isCsv = (bytes, fileName) => /\.csv$/i.test(fileName || '') && !(bytes[0] === 0x50 && bytes[1] === 0x4b) && !(bytes[0] === 0xd0 && bytes[1] === 0xcf);
+
+/** A field as Excel writes it: in quotes when it holds a comma, a quote or a line break, its quotes doubled. */
+const field = (text) => (/[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text);
+
+/** Sheet si as Excel's Save As writes a CSV (measured over COM, SaveAs CSV and CSV UTF-8): each cell as it shows
+ *  ("1,234.50", "25%", "3/5/2024", "(5.00)"; a General number in 11 characters, 1/3 as 0.333333333, whatever its
+ *  column's width; '007 as 007), the used range's rows from its first column, each as wide as the used range, rows
+ *  ending in CR LF (a line break in a cell kept as it is). `utf8`: UTF-8 with a byte order mark, as CSV UTF-8; else
+ *  code page 1252, ? for what it hasn't, as CSV. */
+export function csvBytes(wb, si, { utf8 = true } = {}) {
+  const sh = wb.sheet(si);
+  let c0 = Infinity;
+  for (const line of sh.cells.values()) for (const [c, cell] of line) if (cell.v != null && c < c0) c0 = c;
+  const lines = [];
+  if (Number.isFinite(c0)) {
+    let r0 = Infinity;
+    for (const [r, line] of sh.cells) if ([...line.values()].some((x) => x.v != null)) r0 = Math.min(r0, r);
+    for (let r = r0; r <= sh.maxRow; r++) {
+      const out = [];
+      for (let c = c0; c <= sh.maxCol; c++) {
+        const cell = sh.cells.get(r)?.get(c);
+        const code = formatCodeOf(wb.styles, cell?.s || 0);
+        out.push(field(cell ? cellText(cell, !code || code === 'General' ? 11 : Infinity, code, wb.date1904) : ''));
+      }
+      lines.push(out.join(','));
+    }
+  }
+  const text = lines.map((x) => `${x}\r\n`).join('');
+  if (utf8) return new Uint8Array([0xef, 0xbb, 0xbf, ...new TextEncoder().encode(text)]);
+  return Uint8Array.from([...text].map((ch) => ansiCode(ch)));
+}

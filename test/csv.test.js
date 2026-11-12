@@ -45,3 +45,24 @@ test('CSV fields and names: quotes, empty fields, line ends; the sheet named aft
   assert.equal(isCsv(new Uint8Array([0x50, 0x4b]), 'a.csv'), false);
   assert.equal(isCsv(new Uint8Array([0x61, 0x2c]), 'a.xlsx'), false);
 });
+
+test("a sheet saved as a CSV as Excel's Save As writes one, byte for byte: CSV UTF-8 and CSV (code page 1252)", async () => {
+  const { csvBytes } = await import('../src/ooxml/csv.js');
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  // (The sheet Excel saved as test/csv-excel-utf8.csv and test/csv-excel-ansi.csv, made the same way here.)
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Save');
+  const put = (ref, v, numFmt) => {
+    if (typeof v === 'string' && v.startsWith('=')) wb.setFormula(si, ref, v.slice(1)); else wb.setCell(si, ref, v);
+    if (numFmt) { const r = Number(ref.slice(1)) - 1; const c = ref.charCodeAt(0) - 65; wb.setStyles(si, [{ r, c, s: wb.styleWith(0, { numFmt }) }]); }
+  };
+  put('A1', 'plain'); put('B1', 'has, comma'); put('C1', 'say "hi"'); put('D1', 'two\nlines');
+  put('A2', 1234.5, '#,##0.00'); put('B2', 0.25, '0%'); put('C2', 45356, 'm/d/yyyy'); put('D2', '=1/3');
+  put('A3', true); put('B3', '=NA()'); put('D3', '  lead');
+  put('A4', 1234567890123); put('B4', 12345678901234568); put('C4', 0.000001); put('D4', '007');
+  put('B5', 'x');
+  put('A6', 'café ü €'); put('C6', 12345); put('D6', -5, '0.00_);(0.00)');
+  put('A7', 'semi;colon'); put('B7', 'quote"mid');
+  assert.deepEqual([...csvBytes(wb, si)], [...fs.readFileSync('test/csv-excel-utf8.csv')]);
+  assert.deepEqual([...csvBytes(wb, si, { utf8: false })], [...fs.readFileSync('test/csv-excel-ansi.csv')]);
+});
