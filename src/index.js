@@ -257,6 +257,7 @@ export function mountXlsxEditor(host, options = {}) {
       else {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
         state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
+        state.grid.onErrorButton((point) => act('errorMenu', point));
         state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
         state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], act, menu: (point, k) => chartMenu(point, k), readOnly: () => state.readOnly });
         state.grid.onChartsDrawn(() => state.picker?.redrawn());
@@ -288,6 +289,7 @@ export function mountXlsxEditor(host, options = {}) {
           goToBox: () => act('goToBox'),
           nameManager: () => act('nameManager'),
           insertFunction: () => act('insertFunction'),
+          errorMenu: () => { const at = state.grid.errorButtonAt(); return at ? act('errorMenu', at) : false; },
           painting: () => act('painting'),
           commentBox: () => act('commentBox'),
           flashFill: () => act('flashFill'),

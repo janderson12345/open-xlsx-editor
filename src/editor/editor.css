@@ -149,6 +149,28 @@
 }
 
 /* Cells: bottom-aligned (Excel's default), text left, numbers right, booleans and errors centred, never wrapped. */
+/* A menu's heading (Excel's error menu): bold, not an item. */
+.oxe-menuhead {
+  padding: 4px 10px;
+  font-weight: 600;
+}
+/* Excel's error button beside the active cell when it has an error indicator (errormenu.js). */
+.oxe-err-btn {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid #a6a6a6;
+  border-radius: 2px;
+  background: #ffffff;
+  color: #c38b00;
+  font: bold 12px/16px var(--oxe-ui-font);
+  text-align: center;
+  pointer-events: auto;
+  cursor: default;
+}
 /* Excel's error indicator (ooxml/errorcheck.js): a green triangle in the cell's top-left corner. */
 .oxe-errmark::before {
   content: '';

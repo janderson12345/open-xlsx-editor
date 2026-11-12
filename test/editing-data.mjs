@@ -395,4 +395,19 @@ const flagged = await errMark();
 await page.evaluate(() => window.oxe.enter('K45', '123'));
 check(/formatted as text/.test(flagged || '') && await errMark() === null, "'123: the number-stored-as-text indicator; 123: none", JSON.stringify(flagged));
 
+// The error button beside it: its menu headed Number Stored as Text; Convert to Number makes it 123 (Ctrl+Z: the text
+// again); Alt+Shift+F10 opens the menu, Ignore Error takes the indicator away.
+await page.evaluate(() => { window.oxe.enter('K45', "'123"); window.oxe.select('K45'); });
+await page.focus('.oxe-grid');
+await page.click('.oxe-err-btn');
+const menuItems = await page.evaluate(() => [...document.querySelectorAll('.oxe-menu .oxe-menuhead, .oxe-menu .oxe-menuitem')].map((e) => e.textContent).join('|'));
+await page.click('.oxe-menu button:text-is("Convert to Number")');
+const converted = await value('K45');
+await page.keyboard.press('Control+z');
+const textAgain = await value('K45');
+await page.keyboard.press('Alt+Shift+F10');
+await page.click('.oxe-menu button:text-is("Ignore Error")');
+check(menuItems === 'Number Stored as Text|Convert to Number|Ignore Error|Edit in Formula Bar' && converted === 123 && textAgain === '123' && await errMark() === null,
+  'error button: Convert to Number, Ctrl+Z; Alt+Shift+F10 > Ignore Error', JSON.stringify({ menuItems, converted, textAgain }));
+
 await finish();

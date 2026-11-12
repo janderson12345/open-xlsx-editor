@@ -84,3 +84,19 @@ test('an unlocked formula cell; and a sheet\'s ignoredErrors turn a rule off for
   const at = flagsAt(wb, si);
   assert.deepEqual([at('A1'), at('A2'), at('S1')], ['', 'numberStoredAsText', '']);
 });
+
+test('Ignore Error written as Excel writes it: one ignoredError a rule, its cells joined (A1:A2 A4), after pageMargins', async () => {
+  const { ignoreErrors } = await import('../src/ooxml/errorfix.js');
+  const { strFromU8, unzipSync } = await import('fflate');
+  const { wb, si } = fresh();
+  for (let r = 1; r <= 4; r++) wb.setCell(si, `A${r}`, String(r));
+  ignoreErrors(wb, si, [{ r: 0, c: 0 }], 'numberStoredAsText');
+  ignoreErrors(wb, si, [{ r: 1, c: 0 }], 'numberStoredAsText');
+  ignoreErrors(wb, si, [{ r: 3, c: 0 }], 'numberStoredAsText');
+  ignoreErrors(wb, si, [{ r: 0, c: 2 }], 'evalError');
+  ignoreErrors(wb, si, [{ r: 2, c: 6 }], 'formula');
+  ignoreErrors(wb, si, [{ r: 0, c: 7 }], 'twoDigitTextYear');
+  const xml = strFromU8(unzipSync(wb.toBytes())[wb.sheets[si].path]);
+  assert.match(xml, /<ignoredErrors><ignoredError sqref="A1:A2 A4" numberStoredAsText="1"\/><ignoredError sqref="C1" evalError="1"\/><ignoredError sqref="G3" formula="1"\/><ignoredError sqref="H1" twoDigitTextYear="1"\/><\/ignoredErrors>/);
+  assert.deepEqual([flagsAt(wb, si)('A1'), flagsAt(wb, si)('A3')], ['', 'numberStoredAsText']);
+});

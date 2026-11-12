@@ -46,6 +46,8 @@ export function createMenu(root) {
     if (grid) grid.className = 'oxe-swatches';
     for (const entry of entries) {
       if (entry === 'separator') { const hr = document.createElement('hr'); hr.setAttribute('role', 'separator'); el.append(hr); continue; }
+      // (A heading, as Excel's error menu has: its name in bold, not an item.)
+      if (entry.heading) { const h = document.createElement('div'); h.className = 'oxe-menuhead'; h.setAttribute('role', 'presentation'); h.textContent = entry.label; el.append(h); continue; }
       const b = document.createElement('button');
       b.type = 'button';
       b.setAttribute('role', 'menuitem');

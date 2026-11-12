@@ -54,6 +54,7 @@ function draw(st, force = false) {
   drawMarks(st);
   drawArrows(st);
   drawFilterButtons(st, win);
+  drawErrorButton(st);
   drawNoteMarks(st, win);
   drawCharts(st, win);
   drawValidation(st);
@@ -61,6 +62,26 @@ function draw(st, force = false) {
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
   if (active) st.view.setAttribute('aria-activedescendant', active.id);
   else st.view.removeAttribute('aria-activedescendant');
+}
+
+/** Excel's error button, beside the active cell when it has an error indicator: left of it, or right in column A. */
+function drawErrorButton(st) {
+  const layer = st.errLayer;
+  if (!layer) return;
+  const s = st.sel;
+  if (!s || !st.errors?.has(`${s.ar},${s.ac}`) || !st.rows.size(s.ar)) { layer.replaceChildren(); return; }
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.tabIndex = -1;
+  b.className = 'oxe-err-btn';
+  b.textContent = '!';
+  b.title = 'Error options (Alt+Shift+F10)';
+  b.setAttribute('aria-label', 'Error options');
+  const x = s.ac > 0 ? st.cols.start(s.ac) - 20 : st.cols.start(s.ac + 1) + 2;
+  setVars(b, { '--oxe-x': st.rowHeadW + x, '--oxe-y': st.rows.start(s.ar) });
+  b.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); });
+  b.addEventListener('click', (e) => { e.stopPropagation(); const box = b.getBoundingClientRect(); st.onErrorButton?.({ x: box.left, y: box.bottom }); });
+  layer.replaceChildren(b);
 }
 
 let gridCount = 0;
@@ -121,6 +142,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   pinHeads.append(div('oxe-colheads-pin-inner'));
   // (The AutoFilter's buttons: over the cells, clickable, out of the tab order and hidden from assistive technology.)
   const filterLayer = div('oxe-filters');
+  // (Excel's error button beside the active cell: errormenu.js.)
+  const errLayer = div('oxe-filters');
   filterLayer.setAttribute('aria-hidden', 'true');
   // (Notes: their marks and boxes in a layer hidden from assistive technology, which hears each note as its cell's
   // description from the hidden texts.)
@@ -134,10 +157,10 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   dvLayer.setAttribute('aria-hidden', 'true');
   const noteTexts = div('oxe-note-texts');
   noteTexts.hidden = true;
-  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, chartLayer, noteLayer, filterLayer, dvLayer, noteTexts);
+  canvas.append(colheads, panes.top.wrap, panes.left.wrap, lines, fills, body, edges, overlay, chartLayer, noteLayer, filterLayer, errLayer, dvLayer, noteTexts);
   view.appendChild(canvas);
   host.appendChild(view);
-  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, peerLayer, selLayer, markLayer, clipLayer, arrowLayer: traceLayer, filterLayer, noteLayer, noteTexts, dvLayer, chartLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
+  const st = { view, canvas, colheads, corner, lines, fills, body, edges, overlay, peerLayer, selLayer, markLayer, clipLayer, arrowLayer: traceLayer, filterLayer, errLayer, noteLayer, noteTexts, dvLayer, chartLayer, panes, pinHeads, freeze: { rows: 0, cols: 0 }, zoom: 100, paneW: 0, paneH: 0, idBase: `oxe-g${++gridCount}`, sel: null, sheet: null, win: null, frame: 0, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color };
   view.id = st.idBase; // (the sheet tabs' aria-controls; cell ids add to it)
 
   /** Show another sheet (`nextLooks`: its workbook's cell format classes and decorations, from cellstyles.js). */
@@ -297,6 +320,10 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     onDropdown(fn) { st.onDropdown = fn; },
     /** What a click on a filter button does: `fn(c, button)`. */
     onFilterButton(fn) { st.onFilter = fn; },
+    /** Excel's error button clicked: fn({ x, y }) opens its menu there. */
+    onErrorButton(fn) { st.onErrorButton = fn; },
+    /** Where the error button is, if it is shown (Alt+Shift+F10 opens its menu there). */
+    errorButtonAt() { const b = st.errLayer?.firstChild; if (!b) return null; const box = b.getBoundingClientRect(); return { x: box.left, y: box.bottom }; },
     /** Show the fill handle on the selection (not on a read-only workbook, or with filling turned off). */
     setFillHandle(on) {
       st.fillHandle = !!on;

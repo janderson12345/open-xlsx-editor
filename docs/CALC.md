@@ -241,8 +241,15 @@ Range.Errors on about 60 cells; `test/errorcheck.test.js` has them):
   range of two rows and columns isn't checked, nor a number past a gap.
 - **Unlocked formula**: a formula in a cell whose format isn't locked.
 - A sheet's ignoredErrors (Excel's Ignore Error, saved in the file) turn a rule off for their cells.
-- **Not yet**: Excel's error button and its menu (Ignore Error, Convert to Number...), the Error Checking box, and the
-  rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
+- **The error button** beside the active cell when it has an indicator (`editor/errormenu.js`, `ooxml/errorfix.js`;
+  Alt+Shift+F10 too): Excel's menu, headed by the error (Number Stored as Text, Divide by Zero Error...), with its fixes
+  (Convert to Number; Copy Formula from Above or Left for an inconsistent formula; Lock Cell), Ignore Error and Edit in
+  Formula Bar, for the selected cells with that error, each one step of Undo. Ignore Error is written as Excel writes
+  it (measured): one ignoredError a rule, its cells joined into ranges, `<ignoredError sqref="A1:A2 A4"
+  numberStoredAsText="1"/>`, after pageMargins.
+- **Not yet**: the two-digit year's Convert XX to 19XX and 20XX, Update Formula to Include Cells, Show Calculation Steps,
+  Help and Error Checking Options; whether Convert to Number changes a Text number format (not measured: it is kept).
+  The Error Checking box, and the rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
   in M5 with a number in M4, when M7 held =M1+M2 (alone, Excel flags it). The triangle's green isn't measured. Evaluate
   Formula, the Watch Window.
 

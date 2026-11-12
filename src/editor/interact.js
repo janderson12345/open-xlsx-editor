@@ -182,6 +182,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'PageDown' || key === 'PageUp') cmd.run('page', key === 'PageDown' ? 1 : -1, { extend: e.shiftKey });
     else if (key === 'F5' && e.altKey && !e.shiftKey) cmd.run('refreshPivots', ctrl);
     else if ((key === 'F5' && !ctrl && !e.shiftKey && !e.altKey) || (ctrl && !e.shiftKey && !e.altKey && key.toLowerCase() === 'g')) ctx.goToBox?.();
+    // (Alt+Shift+F10: the error button's menu, on a cell with an error indicator.)
+    else if (key === 'F10' && e.altKey && e.shiftKey) ctx.errorMenu?.();
     // (Ctrl+`: Show Formulas, on or off.)
     else if (ctrl && !e.altKey && !e.shiftKey && e.code === 'Backquote') cmd.run('showFormulas');
     // (F9 Calculate Now, Shift+F9 Calculate Sheet, Ctrl+Alt+F9 every formula.)
