@@ -3,7 +3,7 @@
 // recurrences for higher orders: up from orders 0 and 1 (J where x is past n, Y, K), down by Miller's method (J, I).
 // Measured against Excel with cell values in a hidden Excel and the formula probe. Registered into functions.js's
 // table; evaluate.js imports this file.
-import { E, Unsupported } from './values.js';
+import { E } from './values.js';
 import { lifted, num, one } from './functions.js';
 import { sin, cos, TRIG_LIMIT } from './trig.js';
 
@@ -17,26 +17,30 @@ function j0(x) {
     const b = 57568490411.0 + y * (1029532985.0 + y * (9494680.718 + y * (59272.64853 + y * (267.8532712 + y))));
     return a / b;
   }
-  const { p, q, z, xx } = far0(ax);
+  const { p, q, z, xx } = far0(ax, true);
   return Math.sqrt(TWO_OVER_PI / ax) * (cos(xx) * p - z * sin(xx) * q);
 }
-/** The asymptotic parts for order 0 past 8 (the last coefficient as Excel has it: 0.934945152e-7, which Y0 shows). */
-function far0(ax) {
+/** The asymptotic parts for order 0 past 8. Excel's J0 and Y0 have them from two printings (measured, to the last bit
+ *  on 221 points from 8 to 30): J0's p has -0.1098628267e-2 where Y0's has -0.1098628627e-2, and J0's q ends
+ *  -0.934935152e-7 where Y0's ends -0.934945152e-7. */
+function far0(ax, forJ) {
   const z = 8 / ax;
   const y = z * z;
   return {
     z, xx: ax - 0.785398164,
-    p: 1.0 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6))),
-    q: -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 - y * 0.934945152e-7))),
+    p: 1.0 + y * ((forJ ? -0.1098628267e-2 : -0.1098628627e-2) + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6))),
+    q: -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 - y * (forJ ? 0.934935152e-7 : 0.934945152e-7)))),
   };
 }
-/** The asymptotic parts for order 1 past 8. */
-function far1(ax) {
+/** The asymptotic parts for order 1 past 8. Excel's J1 has -0.3516396496e-4 twice in p, a term more than Y1's
+ *  (measured, to the last bit on 221 points from 8 to 30: J1(8) is 0.2346283865070744, 8e-6 from the function). */
+function far1(ax, forJ) {
   const z = 8 / ax;
   const y = z * z;
+  const tail = 0.2457520174e-5 + y * -0.240337019e-6;
   return {
     z, xx: ax - 2.356194491,
-    p: 1.0 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (0.2457520174e-5 + y * -0.240337019e-6))),
+    p: 1.0 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (forJ ? -0.3516396496e-4 + y * tail : tail))),
     q: 0.04687499995 + y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6))),
   };
 }
@@ -48,7 +52,7 @@ function j1(x) {
     const b = 144725228442.0 + y * (2300535178.0 + y * (18583304.74 + y * (99447.43394 + y * (376.9991397 + y))));
     return a / b;
   }
-  const { p, q, z, xx } = far1(ax);
+  const { p, q, z, xx } = far1(ax, true);
   const v = Math.sqrt(TWO_OVER_PI / ax) * (cos(xx) * p - z * sin(xx) * q);
   return x < 0 ? -v : v;
 }
@@ -180,9 +184,6 @@ const finite = (v) => { if (!Number.isFinite(v)) throw E.num; return v; };
 lifted('BESSELJ', (a, ctx) => {
   const { x, n } = xn(a, ctx);
   if (Math.abs(x) >= TRIG_LIMIT) throw E.num;
-  // (From 8 on, Excel's J0 and J1 aren't Numerical Recipes': J1(8) is 0.2346283865070744, 8e-6 from the function's
-  // value. Not yet found; the cell keeps Excel's value.)
-  if (Math.abs(x) >= 8 && !(n >= 2 && Math.abs(x) <= n)) throw new Unsupported('BESSELJ from 8 on');
   return finite(n === 0 ? j0(x) : n === 1 ? j1(x) : jn(n, x));
 });
 lifted('BESSELY', (a, ctx) => {

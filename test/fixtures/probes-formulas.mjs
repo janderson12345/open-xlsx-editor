@@ -446,6 +446,8 @@ export const PROBE_FORMULAS = [
   'TEXTJOIN("|",FALSE,GROUPBY(HSTACK(Data!E2:E9,Data!A2:A9),Data!C2:C9,SUM,,,{-1,2}))',
   'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,PERCENTOF,,,,,,,1))',
   'TEXTJOIN("|",FALSE,PIVOTBY(Data!A2:A9,Data!E2:E9,Data!C2:C9,SUM,,,,,,,5))',
+  'BESSELJ(8,0)', 'BESSELJ(8,1)', 'BESSELJ(-9.5,1)', 'BESSELJ(10,2)', 'BESSELJ(13,5)', 'BESSELJ(25.5,0)', 'BESSELJ(25.5,1)', 'BESSELJ(100,3)',
+  'BESSELJ(12345.6,1)', 'BESSELJ(-50.5,7)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
