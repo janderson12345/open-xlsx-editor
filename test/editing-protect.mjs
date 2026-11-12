@@ -63,4 +63,55 @@ await page.click('.oxe-tab-add');
 check(/protected/.test(bookRefusal || '') && pressed === 'true' && afterRefusal === sheetsBefore && await sheetCount() === sheetsBefore + 1,
   'Review > Protect Workbook: a new sheet refused while protected; unprotected, it is added', JSON.stringify({ bookRefusal, pressed, sheetsBefore, afterRefusal }));
 
+// Review > Allow Edit Ranges: a range of the selection's cells (Range1), one with a password; protected, the first
+// changes though locked, the second asks for its password (Unlock Range), then changes; the box can't change them.
+const cellV = (r, c) => page.evaluate(([r, c]) => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(r)?.get(c)?.v ?? null, [r, c]);
+const newRange = async (password) => {
+  await page.click('dialog.oxe-dialog >> button:text-is("New...")');
+  await page.waitForSelector('dialog.oxe-dialog >> text=Refers to cells:');
+  const offered = await page.$$eval('dialog.oxe-dialog[open] input', (xs) => xs.slice(-3).map((x) => x.value));
+  if (password) {
+    await page.fill('dialog.oxe-dialog[open]:last-of-type input[type=password]', password);
+    await page.fill('dialog.oxe-dialog[open]:last-of-type input >> nth=1', '=$K$82');
+  }
+  await page.click('dialog.oxe-dialog[open]:last-of-type >> button:text-is("OK")');
+  if (password) {
+    await page.waitForSelector('dialog.oxe-dialog >> text=Reenter password to proceed.');
+    await page.keyboard.type(password);
+    await page.keyboard.press('Enter');
+  }
+  return offered;
+};
+await page.evaluate(() => window.oxe.select('K80'));
+await ribbon('Allow Edit Ranges');
+await page.waitForSelector('dialog.oxe-dialog >> text=Allow Users to Edit Ranges');
+const offered = await newRange('');
+await newRange('Range-pass 2');
+const listed = await page.$$eval('dialog.oxe-dialog .oxe-names-row', (rs) => rs.map((r) => r.textContent).join('|'));
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await ribbon('Protect Sheet');
+await page.waitForSelector('dialog.oxe-dialog >> text=Allow all users of this worksheet to:');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.evaluate(() => window.oxe.select('K80'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('5');
+await page.keyboard.press('Enter');
+const k80 = await cellV(79, 10);
+await page.evaluate(() => window.oxe.select('K82'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('6');
+await page.keyboard.press('Enter');
+await page.waitForSelector('dialog.oxe-dialog >> text=Unlock Range');
+const unlockText = await page.textContent('dialog.oxe-dialog[open]');
+await page.keyboard.type('Range-pass 2');
+await page.keyboard.press('Enter');
+await page.waitForFunction(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(81)?.get(10)?.v === 6);
+await ribbon('Allow Edit Ranges');
+await page.waitForSelector('dialog.oxe-dialog >> text=Allow Users to Edit Ranges');
+const lockedButtons = await page.$$eval('dialog.oxe-dialog button', (bs) => bs.filter((b) => b.disabled).map((b) => b.textContent).join('|'));
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+check(offered.join() === 'Range1,=$K$80,' && listed === 'Range1=$K$80|Range2=$K$82' && k80 === 5 && /password protected/.test(unlockText) && await cellV(81, 10) === 6 && lockedButtons === 'New...|Modify...|Delete',
+  'Allow Edit Ranges: Range1 of the selection; protected, it changes though locked; one with a password asks Unlock Range, then changes; the box locked',
+  JSON.stringify({ offered, listed, k80, unlockText, lockedButtons }));
+
 await finish();

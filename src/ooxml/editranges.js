@@ -64,6 +64,29 @@ export function addEditRange(wb, si, { name, sqref, password = '', salt = null }
   touched(wb, si);
 }
 
+/** Modify sheet si's range `name`: its new `name` and `sqref`, and a `password` ('' for none; null keeps the one it
+ *  had), in its place in the list. */
+export function modifyEditRange(wb, si, name, { name: next, sqref, password = null, salt = null }) {
+  const list = listOf(wb, si);
+  const old = list && kids(list, 'protectedRange', list.namespaceURI).find((x) => attr(x, 'name') === name);
+  if (!old) return false;
+  const spot = old.nextSibling;
+  list.removeChild(old);
+  addEditRange(wb, si, { name: next, sqref, password: password || '', salt });
+  const el = kids(list, 'protectedRange', list.namespaceURI).find((x) => attr(x, 'name') === next);
+  if (password == null) {
+    for (const a of ['algorithmName', 'hashValue', 'saltValue', 'spinCount', 'password']) {
+      const v = old.getAttribute(a);
+      if (v != null) el.setAttribute(a, v);
+    }
+    // (Its attributes in Excel's order: the password's before sqref and name.)
+    for (const a of ['sqref', 'name']) { const v = el.getAttribute(a); el.removeAttribute(a); el.setAttribute(a, v); }
+  }
+  list.insertBefore(el, spot);
+  unlockedOf(wb, si).delete(name);
+  return true;
+}
+
 /** Delete sheet si's range `name` (the list too, once empty). */
 export function deleteEditRange(wb, si, name) {
   const list = listOf(wb, si);

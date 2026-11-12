@@ -28,6 +28,7 @@ import { openErrorMenu } from './errormenu.js';
 import { errorCheckingBox } from './errorbox.js';
 import { evaluateFormulaBox } from './evalbox.js';
 import { protectBox, passwordAsk, workbookProtectBox } from './protectbox.js';
+import { editRangesBox, refersOf } from './rangesbox.js';
 import { sheetProtection, workbookProtection } from '../ooxml/protection.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
 
@@ -63,6 +64,11 @@ export function createMoreActs(env) {
         ed.holdEditor(false);
         return true;
       });
+    }
+    if (name === 'editRangesBox') {
+      // (Allow Edit Ranges: Excel's box, a new range offered the selection's cells.)
+      const refers = refersOf(areasOf(editing().selection));
+      return editRangesBox(root, { workbook: () => state.workbook, si: i, run: (cmd, ...a) => editing().run(cmd, ...a), refers, locked: !!sheetProtection(state.workbook, i) });
     }
     if (name === 'protectWorkbookBox') {
       // (Protect Workbook: Excel's box, a password asked for twice; on a protected workbook, unprotected.)

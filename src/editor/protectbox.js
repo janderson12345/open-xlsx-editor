@@ -60,9 +60,9 @@ export function protectBox(root) {
   });
 }
 
-/** A box asking for a password: Confirm Password ("Reenter password to proceed.") or Unprotect Sheet ("Password:").
- *  Resolves to what was typed, or null. */
-export function passwordAsk(root, { title, label }) {
+/** A box asking for a password: Confirm Password ("Reenter password to proceed.") or Unprotect Sheet ("Password:"),
+ *  with a line of `text` above when given. Resolves to what was typed, or null. */
+export function passwordAsk(root, { title, label, text = '' }) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     const h = el('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: title });
@@ -73,7 +73,7 @@ export function passwordAsk(root, { title, label }) {
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
     const row = el('div', { className: 'oxe-dialog-buttons' });
     row.append(button('OK', ok), button('Cancel', () => done(null)));
-    dlg.append(h, lab, field, row);
+    dlg.append(h, ...(text ? [el('p', { className: 'oxe-dialog-text', textContent: text })] : []), lab, field, row);
   });
 }
 

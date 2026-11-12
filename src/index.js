@@ -7,6 +7,7 @@ import { createActs } from './editor/acts.js';
 import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
+import { unlockRangeBox } from './editor/rangesbox.js';
 import { attachEditing } from './editor/interact.js';
 import { createSheetTabs } from './editor/tabs.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
@@ -291,6 +292,8 @@ export function mountXlsxEditor(host, options = {}) {
           showSheet,
           sheetsChanged,
           alert,
+          // (Excel's Unlock Range, for a change to an Allow Edit Range with a password: rangesbox.js.)
+          unlockRange: (name) => unlockRangeBox(root).then((pw) => pw != null && editing().run('unlockEditRange', name, pw)),
           grid: state.grid,
           looks: () => state.looks,
           readOnly: () => state.readOnly,

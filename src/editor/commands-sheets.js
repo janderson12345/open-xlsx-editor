@@ -3,7 +3,8 @@
 import { cellSelection } from './selection.js';
 import { SheetError, nearest } from '../ooxml/sheetops.js';
 import { copySheet } from '../ooxml/sheetcopy.js';
-import { protectSheet, unprotectSheet, WRONG_PASSWORD, workbookProtection, protectWorkbook, unprotectWorkbook, WORKBOOK_PROTECTED } from '../ooxml/protection.js';
+import { addEditRange, modifyEditRange, deleteEditRange, unlockEditRange } from '../ooxml/editranges.js';
+import { protectSheet, unprotectSheet, sheetProtection, WRONG_PASSWORD, workbookProtection, protectWorkbook, unprotectWorkbook, WORKBOOK_PROTECTED } from '../ooxml/protection.js';
 
 /** The sheet commands, and sheetOp (for the others): `env` is createCommands's shared state and helpers. */
 export function sheetCommands(env) {
@@ -21,6 +22,14 @@ export function sheetCommands(env) {
   /** Run a change to the workbook's sheets, as one step of the history (the workbook before and after, its sheets
    *  with it, and the sheet shown each side). Afterwards the sheet shown is `show()` if given, else the same sheet
    *  wherever it went, else (gone or hidden) its nearest neighbour. */
+  function rangeChange(run) {
+    if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+    if (sheetProtection(ctx.workbook(), ctx.sheetIndex())) return false;
+    if (run(ctx.workbook(), ctx.sheetIndex()) === false) return false;
+    ctx.edited?.({ book: true });
+    ctx.changed?.();
+    return true;
+  }
   function sheetOp(run, show = null, quiet = false) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
     const wb = ctx.workbook();
@@ -109,6 +118,19 @@ export function sheetCommands(env) {
       ctx.edited?.({ book: true });
       ctx.changed?.();
       ctx.announce('Sheet protected');
+      return true;
+    },
+    /** Review > Allow Edit Ranges on the sheet shown: a range added ({ name, sqref, password }), modified (its name and
+     *  the new one) or deleted (its name). Refused while the sheet is protected, as Excel's box is; not a step of the
+     *  history. */
+    addEditRange(range) { return rangeChange((wb, si) => addEditRange(wb, si, range)); },
+    modifyEditRange(name, range) { return rangeChange((wb, si) => modifyEditRange(wb, si, name, range)); },
+    deleteEditRange(name) { return rangeChange((wb, si) => deleteEditRange(wb, si, name)); },
+    /** Excel's Unlock Range: range `name` of the sheet shown unlocked with its password until the workbook is opened
+     *  again; a wrong one refused in Excel's words. */
+    unlockEditRange(name, password) {
+      if (!unlockEditRange(ctx.workbook(), ctx.sheetIndex(), name, password)) { (ctx.alert || ctx.announce)(WRONG_PASSWORD); return false; }
+      ctx.announce('Range unlocked');
       return true;
     },
     /** Review > Protect Workbook (its structure), with a `password` ('' for none); not a step of the history. */

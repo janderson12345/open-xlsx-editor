@@ -61,6 +61,15 @@ sheet, and the file Excel saved):
 - A file with ranges written here opens in Excel with them: the open range changes, the password range is refused
   until its password unlocks it.
 
+In the editor, Review > Allow Edit Ranges opens Excel's Allow Users to Edit Ranges box: "Ranges unlocked by a
+password when sheet is protected:", each range's Title and Refers to cells (=$B$2:$C$3,$H$4), and New..., Modify...,
+Delete, which can't be pressed while the sheet is protected (Excel greys them out). New Range offers Range1 (the first
+RangeN not taken) and the selection's cells; Range password, with Confirm Password; Modify Range keeps the password
+when it is left blank. Changes there aren't steps of Undo, as protecting isn't. On the protected sheet, typing or
+pasting into a range with a password asks for it in Excel's Unlock Range box ("A cell you are trying to change is
+password protected." / "Enter the password to change this cell:"), and the change is made once it is right; a wrong
+one gets Excel's words. test/editranges.test.js; in the browser, test/editing-protect.mjs.
+
 ## Excel's rules
 
 | Rule | Seen |
@@ -80,7 +89,8 @@ Files from before Excel 2013 keep a 16-bit hash in `password`; it is read (test:
 - Selecting: Select locked cells and Select unlocked cells are written and kept but not enforced (every cell can be
   selected). Insert hyperlinks, PivotTables, objects (notes, charts, pictures) and scenarios aren't enforced either.
 - Excel refuses as soon as a locked cell is typed into; here the entry is refused when it is entered.
-- The Allow Edit Ranges box (Review > Allow Edit Ranges: New, Modify, Delete), and asking for a range's password
-  (Excel's Unlock Range) when one of its cells is changed: until then a range with a password stays refused.
+- The Allow Users to Edit Ranges box's Permissions..., "Paste permissions information into a new workbook", Protect
+  Sheet... and Apply; its words were taken from Excel's box, not measured over COM (it can't read them), and so were
+  Unlock Range's and the New Range box's refusals (a title missing or taken, cells not of this sheet).
 - F2 on a hidden unlocked cell starts from nothing, as the formula bar shows; what Excel's own edit starts from wasn't
   measurable over COM.

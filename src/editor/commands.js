@@ -22,10 +22,12 @@ import { clearChanges } from '../ooxml/clearops.js';
 import { partsClear, PARTS_ONLY } from '../ooxml/clearparts.js';
 import { traceLevel } from './tracing.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
-import { protectionRefusal } from '../ooxml/protection.js';
+import { protectionRefusal, isLocked } from '../ooxml/protection.js';
+import { inOpenRange, lockedRangeAt } from '../ooxml/editranges.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
- *  announce(msg), alert(msg) (a refusal Excel shows in a message box), changed(), selected(sel, note), restyled() (the
+ *  announce(msg), alert(msg) (a refusal Excel shows in a message box), unlockRange(name) (Excel's Unlock Range: resolves
+ *  true once the range is unlocked), changed(), selected(sel, note), restyled() (the
  *  workbook has new cell formats), shownText(r, c) (a cell's text as the grid shows it) }. */
 export function createCommands(ctx) {
   // (`views`: each sheet's selection and scroll position while another is shown.)
@@ -52,10 +54,21 @@ export function createCommands(ctx) {
   const indexOf = (id) => ctx.workbook().sheets.findIndex((s) => s.sheetId === id);
 
   /** Whether a change of `kind` (protection.js: 'contents' with its `cells`, 'formatCells', 'insertRows'...; 'always'
-   *  for one a protected sheet never allows) may be made to sheet si (the one shown); if not, Excel's refusal said. */
-  function allowed(kind, cells = [], si = ctx.sheetIndex()) {
-    const why = protectionRefusal(ctx.workbook(), si, kind === 'always' ? 'never' : kind, cells);
+   *  for one a protected sheet never allows) may be made to sheet si (the one shown); if not, Excel's refusal said. Cells
+   *  refused only for being in Allow Edit Ranges with a password: their password asked for (ctx.unlockRange, Excel's
+   *  Unlock Range), and `retry` run once it is given. */
+  function allowed(kind, cells = [], si = ctx.sheetIndex(), retry = null) {
+    const wb = ctx.workbook();
+    const why = protectionRefusal(wb, si, kind === 'always' ? 'never' : kind, cells);
     if (!why) return true;
+    if (kind === 'contents' && retry && ctx.unlockRange) {
+      const barred = cells.filter(({ r, c }) => isLocked(wb, si, r, c) && !inOpenRange(wb, si, r, c));
+      const range = lockedRangeAt(wb, si, barred[0].r, barred[0].c);
+      if (range && barred.every(({ r, c }) => lockedRangeAt(wb, si, r, c))) {
+        ctx.unlockRange(range).then((ok) => ok && retry());
+        return false;
+      }
+    }
     (ctx.alert || ctx.announce)(why);
     return false;
   }
@@ -64,7 +77,7 @@ export function createCommands(ctx) {
    *  of an array formula or locked on a protected sheet. */
   function apply(changes, record = true) {
     if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-    if (!allowed('contents', changes)) return false;
+    if (!allowed('contents', changes, ctx.sheetIndex(), () => apply(changes, record))) return false;
     if (changes.some((ch) => inArray(ch.r, ch.c))) { ctx.announce("You can't change part of an array"); return false; }
     const before = changes.map((ch) => contents(ch.r, ch.c));
     const { circular } = ctx.workbook().apply(ctx.sheetIndex(), changes);
@@ -107,7 +120,7 @@ export function createCommands(ctx) {
     for (const st of list) {
       const sh = wb.sheet(indexOf(st.sheet));
       if (st.contents.some(({ r, c }) => sh.arrays.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1))) { ctx.announce("You can't change part of an array"); return false; }
-      if (!allowed('contents', st.contents, indexOf(st.sheet))) return false;
+      if (!allowed('contents', st.contents, indexOf(st.sheet), () => applySteps(list))) return false;
       if ((st.styles.length || st.merges) && !allowed('formatCells', [], indexOf(st.sheet))) return false;
     }
     const circular = [];
