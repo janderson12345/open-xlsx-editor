@@ -13,7 +13,7 @@ import { goToNames } from '../ooxml/goto.js';
 import { specialBox } from './specialbox.js';
 import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
-import { nameManager, defineNameFor } from './namesbox.js';
+import { nameManager, defineNameFor, createNamesFor } from './namesbox.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
@@ -141,7 +141,7 @@ export function createActs(env) {
         state.grid.el.focus({ preventScroll: true });
       });
     }
-    if (name === 'nameManager' || name === 'defineName') {
+    if (name === 'nameManager' || name === 'defineName' || name === 'createNames') {
       // (Formulas > Defined Names: each change one step of the history, Excel's words when it refuses.)
       const run = (fn) => {
         let refused = null;
@@ -150,7 +150,7 @@ export function createActs(env) {
       };
       const s = editing().selection;
       const newName = () => defineNameFor(root, state.workbook, i, s, run);
-      const opened = name === 'nameManager' ? nameManager(root, { workbook: () => state.workbook, run, newName }) : newName();
+      const opened = name === 'nameManager' ? nameManager(root, { workbook: () => state.workbook, run, newName }) : name === 'createNames' ? createNamesFor(root, state.workbook, i, s, run) : newName();
       return opened.then((x) => { state.grid.el.focus({ preventScroll: true }); return x; });
     }
     if (name === 'pivotFieldList') {

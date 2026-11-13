@@ -11,6 +11,9 @@ Names made, changed and deleted as Excel's Formulas > Defined Names does it (`sr
 - **Formulas > Define Name**, or New... in the Name Manager: Excel's New Name box, the selection as what the name
   refers to, the workbook as its scope (or a sheet), a comment.
 - **The Name Box:** a new name typed there names the selection, workbook-wide, as Excel's does.
+- **Formulas > Create from Selection** (Ctrl+Shift+F3): Excel's Create Names from Selection box (Top row, Left column,
+  Bottom row, Right column) names the cells beside each label, as Excel's does (below). A name there already is asked
+  about first (Yes replaces it, No keeps it, Cancel makes none); all the names made are one step of the history.
 - A name Excel wouldn't take, or one there already is in that scope, gets Excel's words in the box, which stays open.
 - Formulas that use a name are worked out again when it is defined, changed or deleted (`#NAME?` until it exists, and
   again after it is deleted). Renamed, the formulas that use it follow, except on a sheet with a name of its own the
@@ -37,12 +40,38 @@ saved names added out of order (`test/names-excel.json`).
 `test/names.test.js` checks every verdict (all 39 the same), the saved order, and Define, Edit and Delete with the
 formulas that use them.
 
+## Create from Selection (measured)
+
+Three probes in a hidden Excel gave 86 labels to `Range.CreateNames` and saved the result (`src/ooxml/createnames.js`;
+`test/createnames.test.js` has 81 text labels and the name Excel made of each, all 81 the same here).
+
+| Rule | Seen |
+|---|---|
+| Text labels only | A number (2020, 3.5, -4, =1+1), TRUE typed as a value and an empty cell named nothing; the text '2020 named `_2020`. |
+| Characters a name can't have: dropped at the ends, _ between | `  padded  ` padded, `Total!` Total, `Price ($)` Price, `(x)` x, `Unit Price` Unit_Price, `A B  C` A_B__C, `a!-!b` a___b, `$A$1` A_1, a line break _. |
+| _ before a digit, . or ? first | `1st` _1st, `.dot` _.dot, `?q` _?q, ` 1x` _1x. |
+| _ before R or C and a digit, or RC and a digit | `R1C1` _R1C1, `R1` _R1, `C3` _C3, `R2D2` _R2D2, `rc2x` _rc2x; `RCx`, `Rx` and `RCC` as they are. |
+| _ after R, C, RC, a cell's address, TRUE and FALSE | `R` R_, `rc` rc_, `A1` A1_, `XFD1` XFD1_, `CR1` CR1_, the text TRUE TRUE_; `XFE1`, `A0` and `XFD1048577` as they are. |
+| Still no name: none | `\x`, `\\`, `_` alone, `-`, `!!`. |
+| At most 255 characters | 300 Ls named with 255. |
+| The cells | Top row: those under each label; Left column: right of it; Bottom row: above; Right column: left of it; where two meet, the corner's label names all the cells inside (a grid's top-left `Grid` named C3:D5). Workbook-wide, absolute, with the sheet. |
+| A name there already | Replaced, its capitals too (`RC_` then `rc_` left `rc_`). |
+| No cells left to name | A single cell with Top row: refused. |
+
+Excel's file opened the names made here the same way (8 of 8, each summing the same cells).
+
+Left out here: a label `Print_Area` or `Print_Titles`, of which Excel makes a workbook-wide built-in name
+(`_xlnm.Print_Area` with no sheet). Not measured, because COM doesn't reach the box: which sides it starts with
+checked (here, Top row and Left column when they hold a label past the first cell, as Excel's Help describes), its
+question before replacing a name ("Do you want to replace the existing definition of 'Qty'?"), and its words for a
+selection with nothing to name.
+
 The messages ("The syntax of this name isn't correct...", "The name entered already exists. Enter a unique name.")
 are Excel's dialogs', which COM doesn't reach: not measured.
 
 ## Not yet
 
 - The Name Manager's Value column and its filter; a name's scope changed (Excel doesn't either: it is fixed once made).
-- Create from Selection, Use in Formula, and Apply Names.
+- Use in Formula, and Apply Names.
 - Names that refer to another workbook.
 - A LAMBDA kept in a name and called by it.

@@ -201,7 +201,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && !e.altKey && !e.shiftKey && e.code === 'Backquote') cmd.run('showFormulas');
     // (F9 Calculate Now, Shift+F9 Calculate Sheet, Ctrl+Alt+F9 every formula.)
     else if (key === 'F9') cmd.run('calculate', ctrl && e.altKey ? 'all' : e.shiftKey ? 'sheet' : 'now');
-    else if (key === 'F3' && ctrl && !e.shiftKey && !e.altKey) ctx.nameManager?.();
+    else if (key === 'F3' && ctrl && !e.altKey) (e.shiftKey ? ctx.createNames : ctx.nameManager)?.();
     else if (key === 'F3' && e.shiftKey && !ctrl && !e.altKey) ctx.insertFunction?.();
     // (Ctrl+Alt+M: New Comment, or the active cell's thread to reply to.)
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'm') ctx.commentBox?.();

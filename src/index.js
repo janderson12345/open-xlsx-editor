@@ -331,6 +331,7 @@ export function mountXlsxEditor(host, options = {}) {
           selectionShown: () => { for (const f of [...state.onSelect]) f(); return showValidation(); },
           goToBox: () => act('goToBox'),
           nameManager: () => act('nameManager'),
+          createNames: () => act('createNames'),
           insertFunction: () => act('insertFunction'),
           errorMenu: () => { const at = state.grid.errorButtonAt(); return at ? act('errorMenu', at) : false; },
           painting: () => act('painting'),

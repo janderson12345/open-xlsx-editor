@@ -1,6 +1,7 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink. Run after `npm run build`: node test/editing-links.mjs [outDir]
+// Hyperlink; and names made by Formulas > Create from Selection. Run after `npm run build`:
+// node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { addHyperlink } from '../src/ooxml/links.js';
@@ -125,5 +126,29 @@ await clickCell(9, 9);
 const fnOpened = (await opened()).at(-1);
 check(j10Look?.[0] === 'Function link' && /underline/.test(j10Look[1]) && fnOpened === 'https://example.com/fn',
   'a HYPERLINK formula typed: the Hyperlink style; a click opens its link_location', JSON.stringify({ j10Look, fnOpened }));
+
+// Create from Selection (Ctrl+Shift+F3) on a grid with labels on top and left: the box starts with both checked; OK
+// names each column, each row and the whole (createnames.test.js has Excel's); a formula uses one; Ctrl+Z takes them
+// all back.
+await page.evaluate(() => {
+  for (const [ref, v] of [['L20', 'Grid'], ['M20', 'Jan'], ['N20', 'Feb'], ['L21', 'North'], ['L22', 'South'], ['M21', 1], ['N21', 2], ['M22', 3], ['N22', 4]]) window.oxe.enter(ref, v);
+  window.oxe.enter('P20', '=SUM(Feb)');
+  window.oxe.select('L20');
+  window.oxe.command('extendTo', 21, 13);
+});
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+Shift+F3');
+await page.waitForSelector('dialog.oxe-dialog >> text=Create Names from Selection');
+const boxChecks = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-dialog input[type="checkbox"]')].map((x) => `${x.nextSibling.textContent}:${x.checked}`));
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+const named = await page.evaluate(() => ['Jan', 'Feb', 'North', 'South', 'Grid'].map((n) => window.oxe.workbook.definedName(n, null)?.text?.replace(/^[^!]*!/, '')));
+const sumFeb = await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(19).get(15).v);
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const gone = await page.evaluate(() => ['Jan', 'Grid'].every((n) => !window.oxe.workbook.definedName(n, null)));
+check(boxChecks.join() === 'Top row:true,Left column:true,Bottom row:false,Right column:false'
+  && named.join() === '$M$21:$M$22,$N$21:$N$22,$M$21:$N$21,$M$22:$N$22,$M$21:$N$22' && sumFeb === 6 && gone,
+'Ctrl+Shift+F3: Top row and Left column checked; OK names Jan, Feb, North, South and Grid as Excel would; =SUM(Feb) 6; Ctrl+Z takes them back',
+JSON.stringify({ boxChecks, named, sumFeb, gone }));
 
 await finish();

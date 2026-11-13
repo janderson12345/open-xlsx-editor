@@ -1,8 +1,10 @@
 // Formulas > Defined Names: Excel's Name Manager (Ctrl+F3: the names with what each refers to, its scope and comment;
 // New..., Edit..., Delete, Close) and its New Name / Edit Name box (Name, Scope, Comment, Refers to). Each change is
 // one step of the history (names.js through the sheetChange command); a name Excel wouldn't take gets its words.
-import { modal, button, messageBox } from './dialogs.js';
-import { defineName, editName, deleteName, listNames } from '../ooxml/names.js';
+// Create from Selection's box too (createnames.js).
+import { modal, button, messageBox, optionsBox } from './dialogs.js';
+import { defineName, editName, deleteName, listNames, findName } from '../ooxml/names.js';
+import { namesFromSelection, createNames, guessSides } from '../ooxml/createnames.js';
 import { sheetPrefix } from '../calc/tokens.js';
 import { colName } from '../ooxml/refs.js';
 
@@ -99,4 +101,30 @@ export function defineNameFor(root, wb, si, sel, run) {
   const ref = `=${sheetPrefix(wb.sheets[si].name)}${abs(sel.r0, sel.c0)}${sel.r0 === sel.r1 && sel.c0 === sel.c1 ? '' : `:${abs(sel.r1, sel.c1)}`}`;
   const scopes = [{ label: 'Workbook', value: null }, ...wb.sheets.map((s, i) => ({ label: s.name, value: i, kind: s.kind })).filter((s) => s.kind === 'worksheet')];
   return nameBox(root, { title: 'New Name', refersTo: ref, scopes, check: (a) => run((book) => defineName(book, a)) });
+}
+
+/** Create from Selection (Ctrl+Shift+F3) for the selection `sel` of sheet si: Excel's Create Names from Selection box,
+ *  its sides checked as guessSides guesses; a name there already asked about first (Excel's question, its words not
+ *  measured: COM's CreateNames replaced it without one), Cancel stopping it all. The names made as one step of the
+ *  history through `run`. Resolves to how many were made, or null. */
+export async function createNamesFor(root, wb, si, sel, run) {
+  const area = { r0: Math.min(sel.r0, sel.r1), c0: Math.min(sel.c0, sel.c1), r1: Math.max(sel.r0, sel.r1), c1: Math.max(sel.c0, sel.c1) };
+  const start = guessSides(wb, si, area);
+  const got = await optionsBox(root, { title: 'Create Names from Selection', text: 'Create names from values in the:',
+    checks: [['top', 'Top row'], ['left', 'Left column'], ['bottom', 'Bottom row'], ['right', 'Right column']].map(([key, label]) => ({ key, label, value: start[key] })) });
+  if (!got) return null;
+  const list = namesFromSelection(wb, si, area, got.checks);
+  if (!list) { await messageBox(root, "This selection isn't valid."); return null; }
+  const keep = [];
+  for (const x of list) {
+    const had = findName(wb, x.name, null) && !keep.some((k) => k.name.toLowerCase() === x.name.toLowerCase());
+    if (had) {
+      const answer = await messageBox(root, `Do you want to replace the existing definition of '${x.name}'?`, ['Yes', 'No', 'Cancel']);
+      if (answer !== 'Yes' && answer !== 'No') return null;
+      if (answer === 'No') continue;
+    }
+    keep.push(x);
+  }
+  if (keep.length) run((book) => createNames(book, keep));
+  return keep.length;
 }
