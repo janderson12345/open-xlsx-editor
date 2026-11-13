@@ -10,7 +10,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 New-Item -ItemType Directory -Force $Books | Out-Null
 $Books = (Resolve-Path $Books).Path
 $CANDIDATES = @('Rate', 'rate2', 'my rate', '1abc', '_x', '\x', 'Tax.Rate', 'A1', 'a1', 'XFD1', 'XFE1', 'AB12C', 'R1C1', 'R', 'C', 'r', 'c', 'RC',
-  'R2', 'C3', 'RC1', 'R1C', 'Rate?', 'Q1-Q2', 'Total!', 'Sales%', ('n' * 255), ('n' * 256), 'TRUE', 'Print_Area', 'abc d', 'é', 'Ünits', 'x$', '_', '\')
+  'R2', 'C3', 'RC1', 'R1C', 'Rate?', 'Q1-Q2', 'Total!', 'Sales%', ('n' * 255), ('n' * 256), 'TRUE', 'Print_Area', 'abc d', 'é', 'Ünits', 'x$', '_', '\', 'a\b', 'x\', 'x\y\')
 $x = New-Object -ComObject Excel.Application
 $x.Visible = $false; $x.DisplayAlerts = $false
 $verdicts = @()

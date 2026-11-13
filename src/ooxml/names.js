@@ -1,6 +1,6 @@
 // Defined names made, changed and deleted, as Excel's Name Manager and Define Name do (Formulas > Defined Names), and
 // as the Name Box names a selection. Which names Excel takes, and how it saves them, were measured
-// (tools/excel-compare/excel-names.ps1, test/names-excel.json): a letter, _ or \ first, then letters, digits, _ . and ?;
+// (tools/excel-compare/excel-names.ps1, test/names-excel.json): a letter, _ or \ first, then letters, digits, _ . ? and \ (\ alone, but not \ and more);
 // not a cell reference (A1 to XFD1048576) nor anything R1C1 reads (R, C, R2, C3, RC1, R1C1), nor TRUE or FALSE; 255
 // characters at most; one name per scope (the workbook, or a sheet). In the file they are sorted, capitals aside, a
 // built-in name (_xlnm.Print_Area) by its own name, and a sheet's name before the workbook's of the same name.
@@ -23,7 +23,7 @@ export function validName(name) {
   const n = String(name ?? '');
   if (!n || n.length > 255) return false;
   if (n[0] === '\\') return n.length === 1;
-  if (!/^[A-Za-z_\u00C0-\uFFFF][A-Za-z0-9_.?\u00C0-\uFFFF]*$/.test(n)) return false;
+  if (!/^[A-Za-z_\u00C0-\uFFFF][A-Za-z0-9_.?\\\u00C0-\uFFFF]*$/.test(n)) return false;
   if (/^(TRUE|FALSE)$/i.test(n)) return false;
   // (Excel's own names, which it keeps for itself: Print_Area measured, Print_Titles its pair.)
   if (/^(Print_Area|Print_Titles)$/i.test(n)) return false;
