@@ -6,7 +6,7 @@ import { fillCopy, autoFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
-import { validName, defineName } from '../ooxml/names.js';
+import { validName, defineName, namesOnSheet } from '../ooxml/names.js';
 import { sheetPrefix } from '../calc/tokens.js';
 import { specialCells, firstShown } from '../ooxml/special.js';
 import { areasOf, areasSelection } from './selection.js';
@@ -173,6 +173,16 @@ export function dataCommands(env) {
       if (to.si !== ctx.sheetIndex() && !commands.showSheet(to.si)) return false;
       show(to.sel, null, 'Went to ');
       return true;
+    },
+    /** Paste Names' Paste List, as Excel's Range.ListNames writes it (measured over COM): from the active cell down,
+     *  each name the sheet sees (names.js namesOnSheet) and beside it, as text, what it refers to ("=Sheet1!$A$1"). */
+    pasteNameList() {
+      const si = ctx.sheetIndex();
+      const { ar, ac } = state.sel;
+      const list = namesOnSheet(ctx.workbook(), si);
+      if (!list.length) return false;
+      const contents = list.flatMap((n, k) => [{ r: ar + k, c: ac, value: n.name }, { r: ar + k, c: ac + 1, value: `=${n.text}` }]);
+      return runSteps([{ si, contents, styles: [], area: { r0: ar, c0: ac, r1: ar + list.length - 1, c1: ac + 1 } }]);
     },
     /** Go To Special: the cells of a kind (special.js; `choice` as it takes it) selected, the first of them in sight
      *  active (special.js firstShown); Excel's "No cells were found." when there are none. */

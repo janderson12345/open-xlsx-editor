@@ -151,4 +151,31 @@ check(boxChecks.join() === 'Top row:true,Left column:true,Bottom row:false,Right
 'Ctrl+Shift+F3: Top row and Left column checked; OK names Jan, Feb, North, South and Grid as Excel would; =SUM(Feb) 6; Ctrl+Z takes them back',
 JSON.stringify({ boxChecks, named, sumFeb, gone }));
 
+// Paste Names (F3): Paste List writes the names and, as text, what each refers to, from the active cell down (as
+// Excel's ListNames; createnames.test.js); F3 while a formula is typed puts the chosen name at the caret.
+await page.keyboard.press('Control+y');
+await page.evaluate(() => window.oxe.select('R30'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('F3');
+await page.waitForSelector('dialog.oxe-dialog >> text=Paste Name');
+const offered = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-dialog option')].map((o) => o.value));
+await page.click('dialog.oxe-dialog >> button:text-is("Paste List")');
+const listed = await page.evaluate(() => [29, 30].map((r) => [17, 18].map((c) => { const x = window.oxe.workbook.sheet(0).cells.get(r)?.get(c); return `${x?.t}:${x?.v}`; }).join('|')));
+await page.evaluate(() => window.oxe.select('T30'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('=SUM(');
+await page.keyboard.press('F3');
+await page.waitForSelector('dialog.oxe-dialog >> text=Paste Name');
+const listWhileEditing = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-dialog button')].some((b) => b.textContent === 'Paste List'));
+await page.selectOption('dialog.oxe-dialog select', 'Feb');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+await page.keyboard.type(')');
+await page.keyboard.press('Enter');
+const used = await page.evaluate(() => { const x = window.oxe.workbook.sheet(0).cells.get(29).get(19); return `${x.f}=${x.v}`; });
+// (basic.xlsx's own Amounts first.)
+check(offered.join() === 'Amounts,Feb,Grid,Jan,North,South' && listed[0] === 's:Amounts|s:=Data!$B$2:$B$10' && listed[1] === 's:Feb|s:=Data!$N$21:$N$22'
+  && !listWhileEditing && used === 'SUM(Feb)=6',
+'F3: Paste Name lists the names; Paste List writes them and their references as text; while typing =SUM( F3 and Feb gives =SUM(Feb) 6',
+JSON.stringify({ offered, listed, listWhileEditing, used }));
+
 await finish();

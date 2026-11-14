@@ -11,6 +11,10 @@ Names made, changed and deleted as Excel's Formulas > Defined Names does it (`sr
 - **Formulas > Define Name**, or New... in the Name Manager: Excel's New Name box, the selection as what the name
   refers to, the workbook as its scope (or a sheet), a comment.
 - **The Name Box:** a new name typed there names the selection, workbook-wide, as Excel's does.
+- **Formulas > Use in Formula** and **Paste Names** (F3): the names the sheet sees (below), the one chosen typed at
+  the caret of the cell being edited, or the active cell opened with "=Name". Paste Names' box has Paste List, which
+  writes them from the active cell down as Excel's does (below); not while a cell is being edited, as Excel's is then
+  dimmed. With no names, F3 opens nothing.
 - **Formulas > Create from Selection** (Ctrl+Shift+F3): Excel's Create Names from Selection box (Top row, Left column,
   Bottom row, Right column) names the cells beside each label, as Excel's does (below). A name there already is asked
   about first (Yes replaces it, No keeps it, Cancel makes none); all the names made are one step of the history.
@@ -39,6 +43,18 @@ saved names added out of order (`test/names-excel.json`).
 
 `test/names.test.js` checks every verdict (all 39 the same), the saved order, and Define, Edit and Delete with the
 formulas that use them.
+
+## Paste List (measured)
+
+`Range.ListNames` in a hidden Excel, on two sheets of a workbook with names of the workbook's and of each sheet's own,
+one hidden, a print area and a constant (`test/createnames.test.js`, the same lists here):
+
+- Listed: the workbook's names and the sheet's own, one of its own hiding the workbook's of the same name; not hidden
+  names, nor other sheets' own; the sheet's print area as `Print_Area`. Sorted by name, capitals aside.
+- Written from the cell down: the name, and beside it what it refers to, as text (`=0.07`, `='My Data'!$C$4`, a
+  shared string with no quote prefix), over what was there.
+
+Use in Formula and Paste Names list the same names here (their lists aren't reachable over COM: not measured).
 
 ## Create from Selection (measured)
 
@@ -72,6 +88,6 @@ are Excel's dialogs', which COM doesn't reach: not measured.
 ## Not yet
 
 - The Name Manager's Value column and its filter; a name's scope changed (Excel doesn't either: it is fixed once made).
-- Use in Formula, and Apply Names.
+- Apply Names.
 - Names that refer to another workbook.
 - A LAMBDA kept in a name and called by it.

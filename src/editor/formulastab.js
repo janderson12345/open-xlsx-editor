@@ -1,13 +1,14 @@
 // The Formulas tab, Excel's groups as far as they are here: Function Library (Insert Function, Shift+F3; AutoSum and
 // its choices; Recently Used and each category's functions, More Functions for the rest: functionbox.js and
-// calc/catalog.js), Defined Names (Name Manager, Ctrl+F3, and Define Name: namesbox.js and names.js), Formula Auditing
+// calc/catalog.js), Defined Names (Name Manager, Ctrl+F3, Define Name, Use in Formula, Create from Selection: namesbox.js
+// and names.js), Formula Auditing
 // (Trace Precedents, Trace Dependents, Remove Arrows: tracing.js; Show Formulas, Ctrl+`) and Calculation (Calculation Options, Calculate Now, Calculate Sheet: ooxml/calcmode.js).
 import { el } from './ribbonkit.js';
 import { inCategory, functionInfo, syntaxOf, DEFAULT_RECENT } from '../calc/catalog.js';
 
 /** The Formulas tab. `act(name, ...args)` runs a command; `recent()` the Most Recently Used functions; `calcMode()`
- *  the workbook's calculation mode. */
-export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'auto' }) {
+ *  the workbook's calculation mode; `names()` those the sheet sees, for Use in Formula. */
+export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'auto', names = () => [] }) {
   const { grp, btn, toggle, col, menu, split, item, openMenu, pop } = kit;
   const fn = (name) => item(name, () => act('insertFunction', name));
   const titled = (b, name) => { b.title = syntaxOf(name); return b; };
@@ -33,6 +34,7 @@ export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'a
       col(more)),
     grp('Defined Names', btn('🏷', 'Name Manager (Ctrl+F3)', () => act('nameManager'), { label: 'Name Manager', big: true }),
       col(btn('＋', 'Define Name', () => act('defineName'), { label: 'Define Name' }),
+        menu('⇥', 'Use in Formula', () => [...names().map((n) => item(n, () => act('useName', n))), ...(names().length ? [el('hr')] : []), item('Paste Names...', () => act('pasteNames'), { hint: 'F3' })], { label: 'Use in Formula' }),
         btn('⊞', 'Create from Selection (Ctrl+Shift+F3)', () => act('createNames'), { label: 'Create from Selection' }))),
     grp('Formula Auditing', col(btn('⇢', 'Trace Precedents', () => act('trace', 'precedents'), { label: 'Trace Precedents' }),
       btn('⇠', 'Trace Dependents', () => act('trace', 'dependents'), { label: 'Trace Dependents' }),

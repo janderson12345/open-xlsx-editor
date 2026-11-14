@@ -54,8 +54,8 @@ export function attachEditing(root, ctx) {
     grid,
     onKey: (e) => {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'PageDown' || e.key === 'PageUp') && pointing.ready) { cmd.run('nextSheet', e.key === 'PageDown' ? 1 : -1); return true; }
-      // (Shift+F3: Insert Function, its choice typed at the caret.)
-      if (e.key === 'F3' && e.shiftKey && !e.ctrlKey && !e.altKey && ctx.insertFunction) { ctx.insertFunction(); return true; }
+      // (Shift+F3: Insert Function; F3: Paste Names; the choice typed at the caret.)
+      if (e.key === 'F3' && !e.ctrlKey && !e.altKey && (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)) { (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)(); return true; }
       return pointing.key(e);
     },
     onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
@@ -202,7 +202,7 @@ export function attachEditing(root, ctx) {
     // (F9 Calculate Now, Shift+F9 Calculate Sheet, Ctrl+Alt+F9 every formula.)
     else if (key === 'F9') cmd.run('calculate', ctrl && e.altKey ? 'all' : e.shiftKey ? 'sheet' : 'now');
     else if (key === 'F3' && ctrl && !e.altKey) (e.shiftKey ? ctx.createNames : ctx.nameManager)?.();
-    else if (key === 'F3' && e.shiftKey && !ctrl && !e.altKey) ctx.insertFunction?.();
+    else if (key === 'F3' && !ctrl && !e.altKey) (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)?.();
     // (Ctrl+Alt+M: New Comment, or the active cell's thread to reply to.)
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'm') ctx.commentBox?.();
     // (Ctrl+E: Flash Fill.)
@@ -455,12 +455,12 @@ export function attachEditing(root, ctx) {
     /** The active cell opened for editing with `text` (AutoSum's proposal, waiting for Enter as in Excel). */
     editWith(text) { startEdit('enter', text); },
     /** Insert Function's choice: typed at the caret of the cell being edited, or the active cell opened with
-     *  "=NAME(". `hold` keeps the editor open while the box is up. */
+     *  "=NAME(" (`open` after it: '' for a defined name). `hold` keeps the editor open while the box is up. */
     get editorOpen() { return editor.isOpen; },
     holdEditor(on) { editor.hold(on); },
-    typeFunction(name) {
-      if (!editor.isOpen) { startEdit('enter', `=${name}(`); return; }
-      editor.insert(editor.el.value === '' ? `=${name}(` : `${name}(`);
+    typeFunction(name, open = '(') {
+      if (!editor.isOpen) { startEdit('enter', `=${name}${open}`); return; }
+      editor.insert(editor.el.value === '' ? `=${name}${open}` : `${name}${open}`);
     },
     /** The ribbon's Copy and Cut: the clipboard written through the async API (a button has no clipboard event). */
     copyOut(cut = false) {

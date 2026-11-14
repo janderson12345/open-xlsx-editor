@@ -185,3 +185,14 @@ export function listNames(wb) {
     comment: d.el?.getAttribute('comment') || '',
   }));
 }
+
+/** The names sheet si sees, as Excel's Paste Names (F3), Use in Formula and Paste List list them (measured over COM:
+ *  ListNames): the workbook's and the sheet's own (one of its own hiding the workbook's of the same name), not hidden
+ *  ones, a built-in one by its own name (Print_Area); sorted by name, capitals aside: [{ name, text }]. */
+export function namesOnSheet(wb, si) {
+  const seen = wb.definedNames.filter((d) => d.el?.getAttribute('hidden') !== '1' && (d.sheet == null || d.sheet === si));
+  const own = (d) => d.sheet == null && seen.some((x) => x.sheet === si && x.name.toLowerCase() === d.name.toLowerCase());
+  const key = (n) => n.toLowerCase();
+  return seen.filter((d) => !own(d)).map((d) => ({ name: d.name.replace(/^_xlnm\./i, ''), text: d.text }))
+    .sort((a, b) => (key(a.name) < key(b.name) ? -1 : key(a.name) > key(b.name) ? 1 : 0));
+}

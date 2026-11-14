@@ -36,6 +36,7 @@ import { fontFamily } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { selectionStats } from './ooxml/stats.js';
 import { parseRef } from './ooxml/refs.js';
+import { namesOnSheet } from './ooxml/names.js';
 import { AgentWorkbook } from './agent.js';
 
 export { Workbook };
@@ -207,7 +208,7 @@ export function mountXlsxEditor(host, options = {}) {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
         'Page Layout': (kit) => pageLayoutTab(kit, { act }),
-        Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook) }),
+        Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook), names: () => (state.workbook ? namesOnSheet(state.workbook, state.sheetIndex).map((n) => n.name) : []) }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
@@ -333,6 +334,7 @@ export function mountXlsxEditor(host, options = {}) {
           nameManager: () => act('nameManager'),
           createNames: () => act('createNames'),
           insertFunction: () => act('insertFunction'),
+          pasteNames: () => act('pasteNames'),
           errorMenu: () => { const at = state.grid.errorButtonAt(); return at ? act('errorMenu', at) : false; },
           painting: () => act('painting'),
           commentBox: () => act('commentBox'),

@@ -128,3 +128,20 @@ export async function createNamesFor(root, wb, si, sel, run) {
   if (keep.length) run((book) => createNames(book, keep));
   return keep.length;
 }
+
+/** Excel's Paste Name box (F3, Use in Formula's Paste Names...): `names` in a list, OK, Cancel and, unless a cell is
+ *  being edited (`list: false`, as Excel's is then dimmed), Paste List. Resolves to { name }, { list: true }, or null. */
+export function pasteNameBox(root, names, { list = true } = {}) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    const label = make('label', { className: 'oxe-dialog-text oxe-dialog-label', htmlFor: `${id}-names`, textContent: 'Paste name' });
+    const pick = make('select', { id: `${id}-names`, className: 'oxe-dialog-select oxe-paste-names', size: Math.min(10, Math.max(2, names.length)) });
+    pick.append(...names.map((n, k) => make('option', { value: n, textContent: n, selected: k === 0 })));
+    pick.dataset.first = '';
+    const ok = () => (pick.value ? done({ name: pick.value }) : done(null));
+    pick.addEventListener('dblclick', ok);
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
+    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Paste Name' }), label, pick,
+      make('div', { className: 'oxe-dialog-buttons' }, ...[button('OK', ok), button('Cancel', () => done(null)), list ? button('Paste List', () => done({ list: true })) : null].filter(Boolean)));
+  });
+}

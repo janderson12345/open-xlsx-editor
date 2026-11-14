@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { labelName, namesFromSelection, createNames, guessSides } from '../src/ooxml/createnames.js';
-import { findName, deleteName } from '../src/ooxml/names.js';
+import { findName, deleteName, defineName, namesOnSheet } from '../src/ooxml/names.js';
 
 const B = String.fromCharCode(92);
 
@@ -89,4 +89,26 @@ test('the sides the box starts with', () => {
   assert.deepEqual(guessSides(wb, 0, { r0: 39, c0: 1, r1: 40, c1: 2 }), { top: true, left: true, bottom: false, right: false });
   put(wb, 0, { E40: 'Head', E41: 2, E42: 3 });
   assert.deepEqual(guessSides(wb, 0, { r0: 39, c0: 4, r1: 41, c1: 4 }), { top: true, left: false, bottom: false, right: false });
+});
+
+test('the names a sheet sees, as Excel\'s Paste List (ListNames) lists them', () => {
+  const wb = book();
+  wb.addSheet?.('My Data');
+  const two = wb.sheets.length > 1 ? 1 : 0;
+  const name = (n, refersTo, sheet = null, hidden = false) => defineName(wb, { name: n, refersTo, sheet, hidden });
+  name('zeta', '=Data!$A$1:$B$3');
+  name('Alpha', '=0.07');
+  name('beta', '=SUM(Data!$A$1:$A$3)*2');
+  name('Txt', '="hello"');
+  name('Hid', '=Data!$E$5', null, true);
+  name('LocalOne', '=Data!$D$1', 0);
+  name('LocalTwo', '=Data!$D$2', two);
+  name('zeta', '=Data!$A$9', two);
+  name('_xlnm.Print_Area', '=Data!$A$1:$C$5', 0);
+  // (Excel's, on the first sheet and the second: the workbook's and the sheet's own, its own hiding the workbook's of
+  // the same name, not the hidden one, the print area by its own name, capitals aside.)
+  assert.deepEqual(namesOnSheet(wb, 0).map((n) => `${n.name}=${n.text}`),
+    ['Alpha=0.07', 'beta=SUM(Data!$A$1:$A$3)*2', 'LocalOne=Data!$D$1', 'Print_Area=Data!$A$1:$C$5', 'Txt="hello"', 'zeta=Data!$A$1:$B$3']);
+  assert.deepEqual(namesOnSheet(wb, two).map((n) => n.name), ['Alpha', 'beta', 'LocalTwo', 'Txt', 'zeta']);
+  assert.equal(namesOnSheet(wb, two).find((n) => n.name === 'zeta').text, 'Data!$A$9');
 });

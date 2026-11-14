@@ -24,6 +24,7 @@ import { fillSeries, removeDuplicates, textToColumns } from '../ooxml/datatools.
 import { flashFill } from '../ooxml/flashfill.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
 import { insertFunctionBox } from './functionbox.js';
+import { pasteNameBox } from './namesbox.js';
 import { openErrorMenu } from './errormenu.js';
 import { errorCheckingBox } from './errorbox.js';
 import { evaluateFormulaBox } from './evalbox.js';
@@ -31,7 +32,7 @@ import { protectBox, passwordAsk, workbookProtectBox } from './protectbox.js';
 import { editRangesBox, refersOf } from './rangesbox.js';
 import { linkBox } from './linkbox.js';
 import { hyperlinkAt } from '../ooxml/links.js';
-import { listNames } from '../ooxml/names.js';
+import { listNames, namesOnSheet } from '../ooxml/names.js';
 import { sheetProtection, workbookProtection } from '../ooxml/protection.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
 
@@ -66,6 +67,24 @@ export function createMoreActs(env) {
         ed.typeFunction(fn);
         ed.holdEditor(false);
         return true;
+      });
+    }
+    if (name === 'useName' || name === 'pasteNames') {
+      // (Use in Formula's names (args[0]) and Paste Names (F3): the name typed at the caret of the cell being edited,
+      // or the active cell opened with "=Name"; Paste List writes them all (pasteNameList). No names, no box.)
+      const ed = state.editing;
+      const names = namesOnSheet(state.workbook, i);
+      if (state.readOnly || !ed || !names.length) return false;
+      const editingNow = ed.editorOpen;
+      ed.holdEditor(true);
+      const chosen = name === 'useName' ? Promise.resolve({ name: args[0] }) : pasteNameBox(root, names.map((n) => n.name), { list: !editingNow });
+      return chosen.then((got) => {
+        // (Typed before the editor is let go: it keeps the caret only while held.)
+        if (got?.name) ed.typeFunction(got.name, '');
+        ed.holdEditor(false);
+        if (!got || got.list) state.grid.el.focus({ preventScroll: true });
+        if (!got) return false;
+        return got.list ? editing().run('pasteNameList') : true;
       });
     }
     if (name === 'linkBox') {
