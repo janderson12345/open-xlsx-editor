@@ -96,7 +96,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Hide and unhide rows, columns | Done | |
 | | Rename, hide and unhide sheet | Done | Cells > Format; moving, tab colour and Move or Copy (a copy as Excel copies it, docs/DATATOOLS.md) on the tab menu. |
 | Editing (`editing`) | AutoSum | Done | Sum, Average, Count Numbers, Max, Min and Alt+= as Excel places and fills them (docs/AUTOSUM.md). More Functions... missing. |
-| | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md); Series... and Flash Fill (Ctrl+E) as Excel (docs/DATATOOLS.md). Justify, Across Worksheets missing. |
+| | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md); Series... and Flash Fill (Ctrl+E) as Excel (docs/DATATOOLS.md); Justify as Excel's (docs/FILL.md: lines broken as Excel's in 32 of 36 measured paragraphs). Across Worksheets missing. |
 | | Clear (all, formats, contents) | Done | Clear All, Clear Formats, Clear Contents, Clear Comments and Notes, Clear Hyperlinks and Remove Hyperlinks as Excel, notes, comments and hyperlinks taken by Clear All and Clear Contents as Excel takes them (docs/FORMATS.md). |
 | | Sort & Filter | Done | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right) as Excel sorts (docs/SORT.md); Filter (Ctrl+Shift+L), its buttons and lists, Clear and Reapply as Excel filters (docs/FILTER.md). Text, Number and Date Filters, Top 10, averages and Filter by Color as Excel (31 of 31). |
 | | Find & Select | Partly | Find and Replace; Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special (Excel's box and Find & Select's shortcuts; every choice but Objects; docs/GOTOSPECIAL.md). |

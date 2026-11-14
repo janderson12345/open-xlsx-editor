@@ -1,13 +1,13 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, and Home > Fill > Justify. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { addHyperlink } from '../src/ooxml/links.js';
 import { editingPage } from './editing-kit.mjs';
 
-const { page, check, finish, openFixtureFrom, sel, clickCell, pointAt } = await editingPage();
+const { page, check, finish, openFixtureFrom, sel, clickCell, pointAt, menu } = await editingPage();
 
 // (Made here, as Excel's Hyperlinks.Add writes them: links.test.js.)
 const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
@@ -177,5 +177,40 @@ check(offered.join() === 'Amounts,Feb,Grid,Jan,North,South' && listed[0] === 's:
   && !listWhileEditing && used === 'SUM(Feb)=6',
 'F3: Paste Name lists the names; Paste List writes them and their references as text; while typing =SUM( F3 and Feb gives =SUM(Feb) 6',
 JSON.stringify({ offered, listed, listWhileEditing, used }));
+
+// Fill > Justify: Excel's own lines for 24 paragraphs in Calibri and Arial (test/justify-excel.json, Range.Justify in
+// a hidden Excel; Aptos Narrow's are left out, the test browser having no twin of it), each on a sheet of its own at
+// its width; then Excel's refusal of a number, and its question when the text goes on below.
+const excelLines = JSON.parse(fs.readFileSync('test/justify-excel.json', 'utf8')).filter((x) => x.font !== 'Aptos Narrow');
+const justifyCase = async (cells, range, chars, font) => {
+  await page.evaluate(({ cells, range, chars, font }) => {
+    const o = window.oxe;
+    o.command('insertSheet');
+    o.select('A1');
+    if (chars) o.command('columnWidth', chars);
+    if (font) o.command('format', { font: { name: font } });
+    cells.forEach((v, r) => { if (v !== '') o.enter(`A${r + 1}`, String(v)); });
+    o.select('A1'); o.command('extendTo', range[0], range[1]);
+  }, { cells, range, chars, font });
+  await page.click('.oxe-rtab >> text=Home');
+  await menu('Fill', 'Justify');
+};
+const columnA = () => page.evaluate(() => { const out = []; const s = window.oxe.workbook.sheet(window.oxe.sheetIndex); for (let r = 0; r < 40; r++) { const x = s.cells.get(r)?.get(0); out.push(x?.v == null ? '' : String(x.v)); } while (out.length && out[out.length - 1] === '') out.pop(); return out; });
+let same = 0;
+for (const x of excelLines) {
+  await justifyCase([x.text], [39, 0], (x.px - 5) / 7, x.font);
+  if ((await columnA()).join('|') === x.lines.join('|')) same++;
+}
+check(same >= 20, `Fill > Justify: ${same} of ${excelLines.length} Calibri and Arial paragraphs broken into lines exactly as Excel's (fitted: 20 here, docs/FILL.md)`);
+await justifyCase(['alpha', 42, 'beta'], [2, 0]);
+await page.waitForSelector('dialog.oxe-dialog >> text=Cannot justify cells containing numbers or formulas.');
+await page.keyboard.press('Enter');
+const refusedLeft = await columnA();
+await justifyCase(['one two three four five six seven eight nine ten', '', '', 'below'], [1, 0]);
+await page.waitForSelector('dialog.oxe-dialog >> text=Text will extend below range.');
+await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+const extended = await columnA();
+check(refusedLeft.join('|') === 'alpha|42|beta' && extended.length > 4 && !extended.includes('below') && extended.join(' ') === 'one two three four five six seven eight nine ten',
+  'Fill > Justify: a number refused in Excel\'s words; text going on below asked first, then written over the cells there', JSON.stringify({ refusedLeft, extended }));
 
 await finish();

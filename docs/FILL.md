@@ -31,8 +31,33 @@ hidden instance (`tools/excel-compare/excel-steps.ps1` on `fill-cases.json`, fro
 | Each column (row) of the selection is filled on its own; filling upwards or leftwards runs the series backwards. | `1`, `3` beside `Item 7`, `Item 8`: 5, 7, 9 beside `Item 9` ... 5, 6 filled up: 1 to 4. |
 | The copied cells' formats repeat over the new cells. Copy Cells repeats the values too; Formatting Only the formats; Without Formatting the series alone. | 1 bold, 2: bold every other cell. |
 
+## Fill > Justify (measured)
+
+Home > Editing > Fill > Justify rewraps the text of the selection's first column to the selection's width
+(`ooxml/justifyops.js`, `editor/textwidth.js`). Measured with Excel's Range.Justify in a hidden Excel: 15 cases of
+how it treats cells, then 36 paragraphs (Aptos Narrow, Calibri and Arial at 64, 89, 145 and 215px) for where lines
+break (`test/justify-excel.json`).
+
+| Excel's rule | Excel's example |
+|---|---|
+| Each run of filled cells is a paragraph: their text joined with a space, spaces at its start dropped, broken at spaces into lines as wide as the selection allows. A word wider than that has a line of its own. | `one`, `two`, `three`, `four` in a 64px column: `one two`, `three four`. |
+| Spaces beyond the one a break takes stay at the end of the line. | `  lead and   inner  `, `next`: `lead and  `, `inner  `, `next`. |
+| The blank rows after each paragraph stay as many; paragraphs below move with the lines above. Rows no longer needed, to the selection's end, are cleared. | `one`, blank, blank, `two`, `three`: `one`, blank, blank, `two three`. |
+| The selection's width is all its columns'. | A:C, 192px: 4 lines where A alone gave 16. |
+| Only the first column's values move; the other columns and every cell's format stay where they were. | A1 bold, A2 italic, `one`...`four` joined: A1 bold `one two`, A2 italic `three`. |
+| Text needing more rows than selected goes on below, over the cells there, numbers too; Excel asks first, "Text will extend below range." | A1:A2 of a sentence: 9 rows, `below1` in A4 and 7 in A6 written over. |
+| A number, TRUE or FALSE, an error or a formula in the first column: "Cannot justify cells containing numbers or formulas.", and nothing changes. A number typed as text (`'123`) is text. | `alpha`, 42, `beta`: refused. |
+
+Where lines break depends on the font, and Excel measures text its own way, not as a browser draws it: each
+character's advance at the font's size in whole pixels (15 for 11pt), rounded to a whole pixel, without kerning, a
+line kept while at most the width less 4px. Fitted on the 36 paragraphs, this broke 32 exactly as Excel did (Aptos
+Narrow 12 of 12, measured in its twin Morrow Sans Narrow, Calibri 8 of 12, Arial 12 of 12); the browser's own widths
+times a factor did no better than 28. Excel's advances are its fonts' hinted ones, which this follows only roughly
+(Aptos Narrow's digits are 7px at 15, not 8): a long paragraph can break a word differently. The browser check runs
+the Calibri and Arial paragraphs through the Fill menu: 20 of 24, as fitted.
+
 ## Not yet
 
 The Auto Fill Options button after a fill, a double click on the handle (filling down beside the next column's
-data), Flash Fill, Fill > Series... (its box: linear, growth, date unit, stop value), Fill > Justify and Across
-Worksheets, custom lists, and a drag back into the selection (Excel clears those cells).
+data), Fill > Across Worksheets, custom lists, and a drag back into the selection (Excel clears those cells).
+Justify's 255-character limit on a line is not checked.

@@ -22,6 +22,9 @@ import { advancedFilterBox } from './advfilterbox.js';
 import { seriesBox, removeDuplicatesBox, textToColumnsBox, moveCopyBox } from './datatoolboxes.js';
 import { fillSeries, removeDuplicates, textToColumns } from '../ooxml/datatools.js';
 import { flashFill } from '../ooxml/flashfill.js';
+import { justifySteps, JUSTIFY_EXTENDS } from '../ooxml/justifyops.js';
+import { excelTextWidth, JUSTIFY_MARGIN } from './textwidth.js';
+import { sheetGeometry } from './geometry.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
 import { insertFunctionBox } from './functionbox.js';
 import { pasteNameBox } from './namesbox.js';
@@ -270,6 +273,23 @@ export function createMoreActs(env) {
       return seriesBox(root, { across: s.c1 - s.c0 > s.r1 - s.r0 }).then((o) => {
         state.grid.el.focus({ preventScroll: true });
         return o ? editing().run('runTool', fillSeries(state.workbook, i, s, o), 'Filled ') : false;
+      });
+    }
+    if (name === 'fillJustify') {
+      // (Home > Fill > Justify: the first column's text rewrapped to the selection's width, measured in its first
+      // cell's font as Excel measures it; Excel's refusal, or its question when the text goes on below.)
+      if (state.readOnly) return false;
+      const s = editing().selection;
+      const wb = state.workbook;
+      const cols = sheetGeometry(wb.sheet(i)).cols;
+      const room = cols.start(s.c1 + 1) - cols.start(s.c0) - JUSTIFY_MARGIN;
+      const font = state.looks.deco(wb.sheet(i).cells.get(s.r0)?.get(s.c0)?.s || 0).font;
+      const got = justifySteps(wb, i, s, (line) => excelTextWidth(line, font.css, font.sizePx) <= room);
+      if (got.error) return messageBox(root, got.error).then(() => false);
+      const go = got.extends ? messageBox(root, JUSTIFY_EXTENDS, ['OK', 'Cancel']).then((b) => b === 'OK') : Promise.resolve(true);
+      return go.then((ok) => {
+        state.grid.el.focus({ preventScroll: true });
+        return ok ? editing().run('runTool', got.steps, 'Justified ') : false;
       });
     }
     if (name === 'flashFill') {
