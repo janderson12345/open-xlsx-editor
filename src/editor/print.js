@@ -9,6 +9,7 @@ import { setVars, div } from './dom.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontStack } from './fonts.js';
+import { setSheet } from './sheets.js';
 import { parseHeaderFooter, fillFields } from '../ooxml/headerfooter.js';
 
 const DPI = 96;
@@ -222,12 +223,6 @@ export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, p
   el.replaceChildren(...layout.pages.map((b, k) => drawPage(st, b, layout, k, hf)));
   fitNumbers(el);
   // (The paper size can only be given to the browser in an @page rule.)
-  let style = document.getElementById('oxe-page-style');
-  if (!style) {
-    style = document.createElement('style');
-    style.id = 'oxe-page-style';
-    document.head.appendChild(style);
-  }
-  style.textContent = `@page { size: ${layout.paper.w / DPI}in ${layout.paper.h / DPI}in; margin: 0; }`;
+  setSheet(document, `@page { size: ${layout.paper.w / DPI}in ${layout.paper.h / DPI}in; margin: 0; }`);
   return layout.pages.length;
 }

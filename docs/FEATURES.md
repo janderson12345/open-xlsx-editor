@@ -22,6 +22,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | `readOnly` | Done | `setReadOnly()` at any time. No ribbon, nothing editable; the tab menu shows only what doesn't change the workbook. |
 | `toolbar: false` | Done | Hides the ribbon but keeps editing. |
 | `features: { tab or group: false }` | Done | Hides a tab or group; `setFeatures()` at any time. A formatting group turned off also turns off its keys (Ctrl+B with `font: false`). |
+| Strict Content-Security-Policy | Done | Runs with only `'self'` allowed, no `'unsafe-inline'`: its styles are made through the CSSOM, and it fetches nothing (README, Self-hosting). |
 
 ## Outside the ribbon
 

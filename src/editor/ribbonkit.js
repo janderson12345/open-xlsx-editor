@@ -38,7 +38,7 @@ export function iconize(root) {
   root.querySelectorAll('.oxe-ico, .oxe-ctxico').forEach((e) => {
     const d = ICON_PATHS[e.textContent.trim()];
     if (!d) return;
-    e.innerHTML = `<svg viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-0.15em"><path d="${d}"/></svg>`;
+    e.innerHTML = `<svg viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
   });
 }
 

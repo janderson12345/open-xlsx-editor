@@ -7,6 +7,7 @@ import { createActs } from './editor/acts.js';
 import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
+import { dropSheet } from './editor/sheets.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
 import { csvWorkbook, isCsv, csvBytes } from './ooxml/csv.js';
@@ -470,6 +471,7 @@ export function mountXlsxEditor(host, options = {}) {
       state.ribbon?.destroy();
       state.editing?.destroy();
       state.grid?.destroy();
+      dropSheet(root);
       root.remove();
     },
   };

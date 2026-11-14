@@ -94,7 +94,7 @@ const printView = await page.evaluate(() => ({
   grid: getComputedStyle(document.querySelector('.oxe-grid')).display,
   pages: document.querySelectorAll('.oxe-page').length,
   first: document.querySelector('.oxe-page .oxe-cell')?.textContent,
-  size: document.getElementById('oxe-page-style')?.textContent,
+  size: [...document.adoptedStyleSheets].flatMap((s) => [...s.cssRules]).find((r) => r instanceof CSSPageRule)?.cssText,
 }));
 check(printView.grid === 'none' && printView.pages === 342 && printView.first === 'Column A' && /size: 8.5in 11in/.test(printView.size), 'large: print media shows the pages, not the grid', JSON.stringify(printView));
 await page.emulateMedia({ media: 'screen' });

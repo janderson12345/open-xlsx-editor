@@ -69,4 +69,24 @@ one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
 - `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
   Word editor modules carry over.
 
+## Self-hosting: no CDN, a strict Content-Security-Policy
+
+The editor is one script and one stylesheet, served from your own site. It fetches nothing while it runs (no CDN, no
+font service, nothing sent anywhere), and writes its own styles through the CSSOM rather than as `<style>` elements
+or `style=""` attributes. So it runs under a policy that allows nothing but your own origin, with no `'unsafe-inline'`
+and no outside hosts:
+
+```http
+Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+```
+
+`frame-ancestors 'none'` refuses all framing; to show the editor in a frame of your own site, make it `'self'`.
+
+This was measured in Edge with exactly this policy on every response. A host page with nothing inline opened
+basic.xlsx, anchors.xlsx, charts.xlsx, notes.xlsx, print-headers.xlsx and formulas.xlsx, then edited, opened Format
+Cells and Find, printed and saved. There were no blocked requests and none to another host. The page itself must also have
+nothing inline (this repository's demo has an inline `<style>`, so it is not that page). Chromium logs one report
+that blocks nothing: a `style-src-attr` report when the editor reads a workbook's own XML (a note's VML has `style=""`
+attributes), whose values still come through.
+
 MIT licence.

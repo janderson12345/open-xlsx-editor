@@ -1214,6 +1214,7 @@
   padding: 2px 6px;
 }
 .oxe-big .oxe-ico { font-size: 20px; line-height: 1; }
+.oxe-ico > svg, .oxe-ctxico > svg { vertical-align: -0.15em; }
 .oxe-lbl { margin-left: 4px; font-size: 12px; white-space: nowrap; }
 .oxe-big .oxe-lbl { margin-left: 0; }
 .oxe-caret { margin-left: 2px; font-size: 9px; opacity: 0.7; }
