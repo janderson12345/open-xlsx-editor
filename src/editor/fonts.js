@@ -4,11 +4,13 @@
 import metrics from '../engine/metrics.js';
 
 /** Free fonts drawn to the same metrics as Office's. Aptos Narrow (the body font of Excel 365's default theme since
- *  2023) has no metric-compatible twin and isn't installed with Windows (Office keeps it in its own cloud-font cache,
- *  out of browsers' reach); Calibri is the closest stand-in measured: as wide within a pixel in Excel's PDFs of
- *  test/fixtures/basic.xlsx ("Amount" 47.7px in Aptos Narrow, 48 in Calibri), with its baseline within half a pixel. */
+ *  2023) isn't installed with Windows (Office keeps it in its own cloud-font cache, out of browsers' reach); its
+ *  metric-compatible twin is Open Metric Fonts' Morrow Sans Narrow, which a page can serve itself (README: Fonts),
+ *  and Aptos's is Morrow Sans. Without them, Calibri is the closest measured: as wide within a pixel in Excel's PDFs
+ *  of test/fixtures/basic.xlsx ("Amount" 47.7px in Aptos Narrow, 48 in Calibri), its baseline within half a pixel. */
 const STAND_INS = {
-  'aptos narrow': ['Calibri', 'Carlito'],
+  'aptos narrow': ['Morrow Sans Narrow', 'Calibri', 'Carlito'],
+  aptos: ['Morrow Sans'],
   calibri: ['Carlito'],
   cambria: ['Caladea'],
   arial: ['Liberation Sans', 'Arimo'],
@@ -47,8 +49,54 @@ const GRID_ORIGIN_Y = 0.7;
  *  isn't in the table (it is the stand-in that the browser draws), Calibri's when neither is: Windows ascent and
  *  descent (`wa`, `wd`: where Excel places text) and the same rounded to whole pixels (`ar`, `dr`: where Chromium
  *  does). */
+/** Open Metric Fonts' vertical metrics, read from the fonts (numbers only): Windows ascent and descent, the same as
+ *  the Office font each matches, and hhea ascent and descent, by which Chromium places a web font (an installed one
+ *  by the Windows ones). Measured with Morrow Sans Narrow served as a web font, Edge, Excel's PDFs of basic.xlsx and
+ *  large.xlsx (Aptos Narrow): 100,049 of 100,049 cells within 1px across, down and in width (Calibri drawn: the same
+ *  across and down, 99,028 in width); placed by the Windows metrics instead, 0.95px high. */
+const MORROW = { win: [1.0098, 0.2749], hhea: [0.939, 0.2817] };
+const OPEN = { 'morrow sans narrow': MORROW, 'morrow sans': MORROW };
+
+/** What each family's check found (hasFont): a web font can arrive after the first look. */
+const found = new Map();
+const probe = (family) => {
+  const ctx = document.createElement('canvas').getContext('2d');
+  const w = (f) => { ctx.font = `40px ${f}`; return ctx.measureText('mmmmmmmmmmlli1WQ').width; };
+  const has = w(`'${family}', monospace`) !== w('monospace') || w(`'${family}', serif`) !== w('serif');
+  const name = family.toLowerCase();
+  const web = has && [...document.fonts].some((f) => f.status === 'loaded' && f.family.replace(/["']/g, '').toLowerCase() === name);
+  return has ? (web ? 'web' : 'installed') : '';
+};
+/** How the browser has `family` to draw: 'installed', 'web' (an @font-face already loaded) or '' (not at all): canvas
+ *  text in it measures differently from both generic fallbacks. */
+function hasFont(family) {
+  if (typeof document === 'undefined' || !document.fonts) return '';
+  if (!found.has(family)) found.set(family, probe(family));
+  return found.get(family);
+}
+
+/** Checks again the families looked at (after web fonts load): whether any is now drawn otherwise, so that text must
+ *  be placed and measured again. */
+export function fontsChanged() {
+  let changed = false;
+  for (const [family, was] of found) {
+    const now = probe(family);
+    if (now !== was) { found.set(family, now); changed = true; }
+  }
+  return changed;
+}
 function fontMetrics(name, sizePx) {
   const key = name.toLowerCase();
+  // (A metric twin drawn: the Office font's own metrics for where Excel puts the text, those the browser places the
+  // twin by for where it goes.)
+  const twin = !metrics[key] && (STAND_INS[key] || []).find((s) => OPEN[s.toLowerCase()] && hasFont(s));
+  if (twin) {
+    const o = OPEN[twin.toLowerCase()];
+    const wa = o.win[0] * sizePx;
+    const wd = o.win[1] * sizePx;
+    const [ca, cd] = hasFont(twin) === 'web' ? o.hhea.map((v) => v * sizePx) : [wa, wd];
+    return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: BASELINE_ABOVE_DESCENT };
+  }
   const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   const wa = m.win[0] * sizePx;
   const wd = m.win[1] * sizePx;

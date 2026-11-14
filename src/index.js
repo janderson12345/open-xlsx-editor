@@ -7,6 +7,7 @@ import { createActs } from './editor/acts.js';
 import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
+import { fontsChanged } from './editor/fonts.js';
 import { dropSheet } from './editor/sheets.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
@@ -467,6 +468,7 @@ export function mountXlsxEditor(host, options = {}) {
     find: (replace = false) => state.find?.open(replace),
     destroy() {
       window.removeEventListener('beforeprint', beforePrint);
+      document.fonts?.removeEventListener('loadingdone', fontsLoaded);
       menu.close();
       state.ribbon?.destroy();
       state.editing?.destroy();
@@ -477,6 +479,10 @@ export function mountXlsxEditor(host, options = {}) {
   };
   const beforePrint = () => api.preparePrint();
   window.addEventListener('beforeprint', beforePrint);
+  // (A web font the page serves, a metric twin among them (fonts.js), arrives after the first drawing: the cells are
+  // placed and measured again when it does.)
+  const fontsLoaded = () => { if (state.workbook && fontsChanged()) restyled(); };
+  document.fonts?.addEventListener('loadingdone', fontsLoaded);
   if (options.bytes) api.open(options.bytes, options.fileName || null);
   return api;
 }

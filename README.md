@@ -89,4 +89,60 @@ nothing inline (this repository's demo has an inline `<style>`, so it is not tha
 that blocks nothing: a `style-src-attr` report when the editor reads a workbook's own XML (a note's VML has `style=""`
 attributes), whose values still come through.
 
+### Fonts
+
+Workbooks name Office fonts, and a browser draws only the fonts installed on the computer or served by the page.
+Aptos Narrow, the body font of Excel 365's default theme, isn't installed with Windows, macOS or Linux, so without
+help it is drawn in Calibri (or Carlito), which is close but not the same width. [Open Metric Fonts](https://github.com/open-metric-fonts/open-metric-fonts)
+makes Morrow Sans Narrow and Morrow Sans: open (SIL OFL) fonts with exactly Aptos Narrow's and Aptos's character
+widths and line metrics. Serve them from your own site:
+
+1. Get the `morrow-sans` package, either way:
+   - From the project's [Releases page](https://github.com/open-metric-fonts/open-metric-fonts/releases):
+     `morrow-sans-<version>.zip`. Check it before use:
+
+     ```bash
+     sha256sum -c SHA256SUMS.txt --ignore-missing
+     ```
+
+     ```bash
+     gh attestation verify morrow-sans-1.0.0.zip --repo open-metric-fonts/open-metric-fonts
+     ```
+
+     Its `web/` folder is what you serve.
+   - Or from npm, with your other dependencies, pinned to an exact version:
+
+     ```bash
+     npm install --save-exact @open-metric-fonts/morrow-sans
+     ```
+
+     Copy `node_modules/@open-metric-fonts/morrow-sans/` (its `index.css` and `files/`) to your static files as part of
+     your build.
+2. Put that folder anywhere on your own site, keeping `index.css` next to `files/`: the CSS loads its `.woff2` files by
+   relative URLs (`./files/...`). Serve `.woff2` as `font/woff2`.
+3. Link the CSS on the page that hosts the editor, before or after the editor's own:
+
+   ```html
+   <link rel="stylesheet" href="/fonts/morrow-sans/index.css">
+   ```
+
+   `morrow-sans-narrow.css` alone is enough for Aptos Narrow (Excel 365's default); `index.css` adds Aptos's twin and
+   all the weights.
+
+Nothing else is needed: the editor lists Morrow Sans Narrow after Aptos Narrow (and Morrow Sans after Aptos) in its font
+stacks. The browser downloads a font only when a cell uses it. When the font arrives, the editor places and measures
+the text again, using the font's own metrics. With it, Excel's PDFs of basic.xlsx and large.xlsx (Aptos Narrow) and the
+editor's print of them agree within 1px across, down and in text width for 100,049 of 100,049 cells. With Calibri in
+its place, 99,028 are within 1px in width. Text widths decide where wrapped text breaks, where a number shows `####`
+and what AutoFit picks, so these match too.
+
+Not yet:
+- Only the Aptos family is wired to its twin. The project's other families (Tahoma's, Verdana's, Century Gothic's,
+  Garamond's and more) aren't yet in the editor's font stacks.
+- `exportPdf` (`open-xlsx-editor/pdf`) embeds installed fonts only, so a served font is drawn there in a PDF standard
+  font at the same widths. The browser's own Print uses the served font.
+
+The demo serves them when `demo/fonts/morrow-sans/` holds the package (not in this repository) and the page is opened
+with `?fonts`.
+
 MIT licence.

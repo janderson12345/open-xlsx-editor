@@ -29,12 +29,14 @@ test('a scheme font is the theme\'s whatever its name says; without a theme part
   assert.equal(fontFamily(fontOfXf(fonts.styles, 6), fonts.theme), 'Cambria');
 });
 
-test('font stacks: metric-compatible stand-ins, Calibri for Aptos Narrow, a generic family last', () => {
+test('font stacks: metric-compatible stand-ins, Morrow Sans Narrow then Calibri for Aptos Narrow, a generic family last', () => {
   assert.equal(fontStack('Calibri'), 'Calibri, Carlito, sans-serif');
-  assert.equal(fontStack('Aptos Narrow'), "'Aptos Narrow', Calibri, Carlito, sans-serif");
+  assert.equal(fontStack('Aptos Narrow'), "'Aptos Narrow', 'Morrow Sans Narrow', Calibri, Carlito, sans-serif");
+  assert.equal(fontStack('Aptos'), "Aptos, 'Morrow Sans', sans-serif");
   assert.equal(fontStack('Times New Roman'), "'Times New Roman', 'Liberation Serif', Tinos, serif");
   assert.equal(fontStack('Courier New'), "'Courier New', 'Liberation Mono', Cousine, monospace");
-  // A font not in the metrics table is laid out by its stand-in's metrics (the font the browser draws); Aptos Narrow's
+  // A font not in the metrics table is laid out by its stand-in's metrics (the font the browser draws: here, with no
+  // Morrow Sans Narrow, Calibri); Aptos Narrow's
   // baseline is aimed 0.15px higher than Calibri's (fonts.js BASELINE_STAND_IN), so its line is that much taller.
   assert.ok(Math.abs(cellLineHeight('Aptos Narrow', 14.667) - cellLineHeight('Calibri', 14.667) - 0.15) < 1e-9);
 });

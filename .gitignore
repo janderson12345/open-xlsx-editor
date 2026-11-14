@@ -1,5 +1,6 @@
 node_modules/
 dist/
 demo/dist/
+demo/fonts/
 test/out/
 test/_*.mjs

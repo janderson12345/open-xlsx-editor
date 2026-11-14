@@ -5,6 +5,11 @@ import { mountXlsxEditor } from '../src/index.js';
 const host = document.getElementById('host');
 const status = document.getElementById('status');
 const input = document.querySelector('input[type=file]');
+// (?fonts: Open Metric Fonts' Morrow Sans served from demo/fonts/morrow-sans, which isn't in the repository: README,
+// Fonts.)
+if (new URLSearchParams(location.search).has('fonts')) {
+  document.head.append(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: './fonts/morrow-sans/index.css' }));
+}
 const editor = mountXlsxEditor(host);
 window.oxe = editor;
 

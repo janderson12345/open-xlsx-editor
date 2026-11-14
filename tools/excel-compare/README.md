@@ -5,7 +5,8 @@ of the two PDFs is matched in order, and a cell counts when it's on the same pag
 Excel's across (x) and down (baseline y). See `docs/LAYOUT.md` for what the numbers mean and where they stand.
 
 Windows, with Excel and Microsoft Edge installed (Edge's fonts and font rendering are part of what's measured).
-Node 20 for the repository's Playwright, Python 3, PowerShell 7.
+Node 20 for the repository's Playwright, Python 3, PowerShell 7. With `OXE_FONTS=1` the demo serves Open Metric Fonts'
+Morrow Sans from `demo/fonts/morrow-sans` (the README's Fonts section), as a page would for Aptos Narrow.
 
 ## Once: Excel's PDFs
 
