@@ -1,0 +1,650 @@
+{
+ "groups": {
+  "line": {
+   "type": 1,
+   "location": "O2",
+   "source": "B2:M2",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "lineMarked": {
+   "type": 1,
+   "location": "O3",
+   "source": "B3:M3",
+   "dateRange": null,
+   "lineWeight": 2.25,
+   "series": 9127187,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    true,
+    255
+   ],
+   "markers": [
+    true,
+    42495
+   ],
+   "high": [
+    true,
+    65280
+   ],
+   "low": [
+    true,
+    16711935
+   ],
+   "first": [
+    true,
+    16776960
+   ],
+   "last": [
+    true,
+    8421504
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "column": {
+   "type": 2,
+   "location": "O4",
+   "source": "B4:M4",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    true,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "columnPoints": {
+   "type": 2,
+   "location": "O5",
+   "source": "B5:M5",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    true,
+    208
+   ],
+   "low": [
+    true,
+    208
+   ],
+   "first": [
+    true,
+    208
+   ],
+   "last": [
+    true,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "winloss": {
+   "type": 3,
+   "location": "O6",
+   "source": "B6:M6",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    true,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "lineAxis": {
+   "type": 1,
+   "location": "O7",
+   "source": "B7:M7",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    true,
+    192
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "emptyGaps": {
+   "type": 1,
+   "location": "O8",
+   "source": "B8:M8",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "emptyZero": {
+   "type": 1,
+   "location": "O9",
+   "source": "B9:M9",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 2,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "emptyConnect": {
+   "type": 1,
+   "location": "O10",
+   "source": "B10:M10",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 3,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "groupScale": {
+   "type": 2,
+   "location": "O11:O12",
+   "source": "B11:M12",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 1,
+   "maxType": 1,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "customScale": {
+   "type": 1,
+   "location": "O13",
+   "source": "B13:M13",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 3,
+   "maxType": 3,
+   "min": 0.0,
+   "max": 20.0
+  },
+  "dateAxis": {
+   "type": 1,
+   "location": "O14",
+   "source": "B14:M14",
+   "dateRange": "B20:M20",
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    true,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "rightToLeft": {
+   "type": 1,
+   "location": "O15",
+   "source": "B15:M15",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    true,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": true,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "hiddenOff": {
+   "type": 1,
+   "location": "O16",
+   "source": "B16:N16",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": false,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  },
+  "hiddenOn": {
+   "type": 1,
+   "location": "O17",
+   "source": "B17:N17",
+   "dateRange": null,
+   "lineWeight": 0.75,
+   "series": 9592887,
+   "blanks": 1,
+   "hidden": true,
+   "negative": [
+    false,
+    208
+   ],
+   "markers": [
+    false,
+    208
+   ],
+   "high": [
+    false,
+    208
+   ],
+   "low": [
+    false,
+    208
+   ],
+   "first": [
+    false,
+    208
+   ],
+   "last": [
+    false,
+    208
+   ],
+   "axis": [
+    false,
+    0
+   ],
+   "rtl": false,
+   "minType": 2,
+   "maxType": 2,
+   "min": 0.0,
+   "max": 0.0
+  }
+ },
+ "ext": "<ext uri=\"{05C60535-1F16-4fd2-B633-F4F36F0B64E0}\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\"><x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup displayEmptyCellsAs=\"gap\" displayHidden=\"1\" xr2:uid=\"{13D07FA2-B4B0-4A99-ACA0-0DD4EFFF7AA5}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B17:N17</xm:f><xm:sqref>O17</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{D759FFA4-BE31-48F3-A883-0DD28D2FA66C}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B16:N16</xm:f><xm:sqref>O16</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" markers=\"1\" rightToLeft=\"1\" xr2:uid=\"{76EC703B-AA91-4F0C-9DBC-00FDCDF9F1E2}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B15:M15</xm:f><xm:sqref>O15</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup dateAxis=\"1\" displayEmptyCellsAs=\"gap\" markers=\"1\" xr2:uid=\"{FBD6E06B-736C-4154-862D-007A3C2F7040}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><xm:f>Sheet1!B20:M20</xm:f><x14:sparklines><x14:sparkline><xm:f>Sheet1!B14:M14</xm:f><xm:sqref>O14</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup manualMax=\"20\" manualMin=\"0\" displayEmptyCellsAs=\"gap\" minAxisType=\"custom\" maxAxisType=\"custom\" xr2:uid=\"{72CD3E0D-84EA-4DE2-AC0B-B3F8E4B84D59}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B13:M13</xm:f><xm:sqref>O13</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" minAxisType=\"group\" maxAxisType=\"group\" xr2:uid=\"{8E71C2D6-5712-4C7B-A79D-82FDB4A91A3B}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B11:M11</xm:f><xm:sqref>O11</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B12:M12</xm:f><xm:sqref>O12</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"span\" xr2:uid=\"{DFF515DA-BB8D-43FE-B797-DFC3BB3B50EB}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B10:M10</xm:f><xm:sqref>O10</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup xr2:uid=\"{974A0CA4-7408-4775-A0C6-F41730AB0641}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B9:M9</xm:f><xm:sqref>O9</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{9B1A63EE-24CC-4E6F-9C7C-94C67D8737BE}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B8:M8</xm:f><xm:sqref>O8</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" displayXAxis=\"1\" xr2:uid=\"{35CEDE0E-8693-4FFB-A978-381228BB0D90}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FFC00000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B7:M7</xm:f><xm:sqref>O7</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"stacked\" displayEmptyCellsAs=\"gap\" negative=\"1\" xr2:uid=\"{DF19B83D-4EC9-4558-BC4F-58E396607516}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" high=\"1\" low=\"1\" first=\"1\" last=\"1\" xr2:uid=\"{45020D47-6992-4261-9473-70A3F3FACBC2}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B5:M5</xm:f><xm:sqref>O5</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" negative=\"1\" xr2:uid=\"{1D19C374-EE7A-4C9C-AF2A-8DCDDDF70288}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup lineWeight=\"2.25\" displayEmptyCellsAs=\"gap\" markers=\"1\" high=\"1\" low=\"1\" first=\"1\" last=\"1\" negative=\"1\" xr2:uid=\"{CD99AD49-297A-4A1C-9BC5-3035E6211EA8}\"><x14:colorSeries rgb=\"FF13458B\"/><x14:colorNegative rgb=\"FFFF0000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFFFA500\"/><x14:colorFirst rgb=\"FF00FFFF\"/><x14:colorLast rgb=\"FF808080\"/><x14:colorHigh rgb=\"FF00FF00\"/><x14:colorLow rgb=\"FFFF00FF\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{3F685697-B4D6-42F8-AB44-BC0CA2D0BD2A}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups></ext>"
+}

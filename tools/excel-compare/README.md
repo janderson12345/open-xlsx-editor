@@ -85,6 +85,13 @@ Go To Special: `special-cases.mjs` makes the cases, `excel-special.ps1 <cases.js
 test/special-excel.json` has Excel find each (the selection made, the choice asked as the box asks it, the result
 selected and read; nothing saved) (docs/GOTOSPECIAL.md).
 
+Sparklines: `excel-sparklines.ps1 <out.json> <books folder>` builds sparkline groups with each option in an invisible
+Excel, saves them and keeps the saved extension and COM's view of each (`test/sparklines-xml-excel.json`), and has
+Excel print them and sheets of other cell sizes and line weights to PDF. Excel prints each sparkline as a picture:
+`node sparkimages.cjs <file.pdf> <outDir>` takes the pictures out of a PDF, and `python spark-features.py <outDir>
+<out.json>` measures them (bars, coloured blobs, the line's trace). Run on Excel's PDF of
+`test/fixtures/sparklines.xlsx` (`excel-print.ps1`), that gives `test/sparklines-excel.json` (docs/SPARKLINES.md).
+
 PDF export (src/pdf.js) is measured the same way: `OXE_EXPORT=1 node tools/excel-compare/print-ours.mjs <books> <out>` makes
 the PDFs through `exportPdf` instead of the browser's print (docs/PDF.md).
 
