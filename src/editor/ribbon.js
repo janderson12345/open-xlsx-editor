@@ -119,6 +119,8 @@ export function createRibbon(container, { tabs, home, mode = null, onMode = null
     update(look) { for (const tab of Object.values(built)) tab.update?.(look); },
     /** Format Painter on (waiting for cells) or off: its button pressed or not. */
     painting(on) { for (const tab of Object.values(built)) tab.painting?.(on); },
+    /** Draw Borders' mode ('draw', 'grid', 'erase' or null): the Borders button pressed while one is on. */
+    drawing(mode) { for (const tab of Object.values(built)) tab.drawing?.(mode); },
     setFeatures(f) { features = { ...features, ...f }; applyFeatures(); },
     get features() { return { ...features }; },
     setMode(m) { setSimple(m === 'simple'); },

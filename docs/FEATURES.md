@@ -77,8 +77,8 @@ which is dropped when formulas change (Excel rebuilds it).
 | Undo (`undo`) | Undo, Redo | Done | |
 | Font (`font`) | Font, size, grow and shrink | Done | Grow and Shrink step through Excel's sizes. The font list is a fixed one with the theme's fonts first. |
 | | Bold, italic, underline, strikethrough | Done | Ctrl+B, I, U, 5 (and 2, 3, 4). Double underline is shown, not offered. |
-| | Borders | Done | Excel's 13 presets; any line style and colour, inside lines and diagonals in Format Cells. Draw Borders missing. |
-| | Fill colour, font colour | Done | Excel's palette: the theme's colours and tints, the standard ones. More Colors missing. |
+| | Borders | Done | Excel's 13 presets; any line style and colour, inside lines and diagonals in Format Cells. Draw Borders: Draw Border, Draw Border Grid and Erase Border as Excel's modes (one at a time, pressed again or Esc or a cell selected ends it), a drag drawing the range's outline, every line or none, a click on a gridline that line; Line Color (with More Colors) and Line Style's 13 lines; each drag one Undo step. The lines and modes measured against Excel over COM (the ribbon's presets on the same cells, 7 scenes; docs/FORMATS.md). |
+| | Fill colour, font colour | Done | Excel's palette: the theme's colours and tints, the standard ones. More Colors... (also on Line Color): a box with Red, Green, Blue and Hex (Excel's Custom tab; the Standard hexagon not offered), written `rgb="FFRRGGBB"` as Excel writes a custom colour (measured), and put in the menus' Recent Colors, kept in the workbook's `mruColors` as Excel keeps them (docs/FORMATS.md). |
 | | Pattern and gradient fills | Done | Format Cells > Fill: pattern style and colour, two-colour gradients (Fill Effects), written as Excel writes them; gradients drawn, patterns drawn as their blend of colours. |
 | Alignment (`alignment`) | Horizontal and vertical | Done | Left, center, right; top, middle, bottom on the ribbon; justify, distributed, fill and center across selection in Format Cells. |
 | | Wrap text | Done | |

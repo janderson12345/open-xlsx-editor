@@ -4,6 +4,7 @@ import { CF_GALLERY } from '../ooxml/cfedit.js';
 import { el } from './ribbonkit.js';
 import { STANDARD_COLORS, THEME_COLORS } from './sheetmenu.js';
 import { FONT_SIZES, BORDER_PRESETS } from '../ooxml/formatops.js';
+import { LINES } from './formatbox-kit.js';
 
 const FONTS = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Consolas', 'Courier New', 'Georgia', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'];
 /** The Number Format list: its names and the codes Excel gives (en-US). */
@@ -25,6 +26,8 @@ const BORDERS = [['bottom', 'Bottom Border'], ['top', 'Top Border'], ['left', 'L
   ['none', 'No Border'], ['all', 'All Borders'], ['outside', 'Outside Borders'], ['thickOutside', 'Thick Outside Borders'], null,
   ['doubleBottom', 'Bottom Double Border'], ['thickBottom', 'Thick Bottom Border'], ['topBottom', 'Top and Bottom Border'],
   ['topThickBottom', 'Top and Thick Bottom Border'], ['topDoubleBottom', 'Top and Double Bottom Border']];
+/** The Borders menu's Draw Borders section: its three modes (drawborders.js). */
+const DRAW = [['draw', 'Draw Border'], ['grid', 'Draw Border Grid'], ['erase', 'Erase Border']];
 /** The tints of each theme colour's column in Excel's palette (rows 2 to 6), as Excel writes them. */
 const LIGHTER = [0.7999816888943144, 0.5999938962981048, 0.3999755851924192, -0.249977111117893, -0.499984740745262];
 const TINTS = {
@@ -37,11 +40,13 @@ const pct = (t) => `${t > 0 ? 'Lighter' : 'Darker'} ${Math.round(Math.abs(t) * 1
 
 /** The Home tab. `act(name, ...args)` runs a command; `color(c)` resolves a colour for a swatch. */
 export function homeTab(kit, { act, color }) {
-  const { btn, toggle, grp, col, line, item, menu, split, pick, closeMenu, run } = kit;
+  const { btn, toggle, grp, col, line, item, menu, split, pick, closeMenu, openMenu, run } = kit;
   const f = (name, ...args) => () => act(name, ...args);
 
-  // A colour palette: the theme's ten in six rows, Excel's ten standard ones, and `none` (Automatic or No Fill).
-  const palette = (onPick, none) => () => {
+  // A colour palette: the theme's ten in six rows, Excel's ten standard ones, the workbook's Recent Colors (those
+  // picked in More Colors, recentcolors.js), `none` (Automatic or No Fill) and More Colors... (`more()`: the colour
+  // the box gave, or false).
+  const palette = (onPick, none, more) => () => {
     const sw = (c, title) => el('button', { type: 'button', class: 'oxe-swatch', title, 'aria-label': title, style: `background:${color(c) || '#000'}`, onmousedown: run(() => onPick(c)) });
     const theme = el('div', { class: 'oxe-swatches oxe-swatches-theme' });
     for (let row = 0; row < 6; row++) {
@@ -51,22 +56,33 @@ export function homeTab(kit, { act, color }) {
       }
     }
     const std = el('div', { class: 'oxe-swatches' }, ...STANDARD_COLORS.map(([n, hex]) => sw({ rgb: `FF${hex}` }, n)));
-    return [item(none, () => onPick(null)), el('div', { class: 'oxe-cap' }, 'Theme Colors'), theme, el('div', { class: 'oxe-cap' }, 'Standard Colors'), std];
+    const recent = act('recentColors') || [];
+    const mru = recent.length ? [el('div', { class: 'oxe-cap' }, 'Recent Colors'), el('div', { class: 'oxe-swatches' }, ...recent.map((c) => sw(c, `#${c.rgb.slice(-6)}`)))] : [];
+    return [item(none, () => onPick(null)), el('div', { class: 'oxe-cap' }, 'Theme Colors'), theme, el('div', { class: 'oxe-cap' }, 'Standard Colors'), std, ...mru,
+      el('hr'), item('More Colors...', () => Promise.resolve(more()).catch(() => false))];
   };
   // (The buttons apply the last colour chosen: red and yellow to start with, as in Excel.)
   let fontColor = { rgb: 'FFFF0000' };
   let fillColor = { rgb: 'FFFFFF00' };
   let border = 'bottom';
   const fontColorBtn = split('A', 'Font Color', () => act('format', { font: { color: fontColor } }),
-    palette((c) => { fontColor = c; paintBars(); act('format', { font: { color: c } }); }, 'Automatic'), { cls: 'oxe-colorbtn oxe-fontcolor' });
+    palette((c) => { fontColor = c; paintBars(); act('format', { font: { color: c } }); }, 'Automatic',
+      () => Promise.resolve(act('moreColorsBox', 'font', fontColor)).then((c) => { if (c) { fontColor = c; paintBars(); } })), { cls: 'oxe-colorbtn oxe-fontcolor' });
   const fillBtn = split('🪣', 'Fill Color', () => act('format', { fill: fillColor }),
-    palette((c) => { fillColor = c; paintBars(); act('format', { fill: c }); }, 'No Fill'), { cls: 'oxe-colorbtn oxe-fillcolor' });
+    palette((c) => { fillColor = c; paintBars(); act('format', { fill: c }); }, 'No Fill',
+      () => Promise.resolve(act('moreColorsBox', 'fill', fillColor)).then((c) => { if (c) { fillColor = c; paintBars(); } })), { cls: 'oxe-colorbtn oxe-fillcolor' });
   const paintBars = () => {
     fontColorBtn.main.style.setProperty('--oxe-swatch', fontColor ? color(fontColor) : '#000000');
     fillBtn.main.style.setProperty('--oxe-swatch', fillColor ? color(fillColor) : 'transparent');
   };
+  // (Line Color and Line Style open in the menu's place, as their own menus under the Borders button.)
+  const sub = (build) => () => setTimeout(() => openMenu(bordersBtn.more, build));
+  const lineColors = palette((c) => act('borderLineColor', c), 'Automatic', () => act('moreColorsBox', 'line'));
+  const lineStyles = () => LINES.map(([v, l]) => item(l, f('borderLineStyle', v), { on: act('borderLine')?.style === v, icon: el('span', { class: `oxe-linestyle oxe-ls-${v}` }) }));
   const bordersBtn = split('⊞', 'Bottom Border', () => act('borders', border),
-    () => BORDERS.map((b) => (b ? item(b[1], () => { border = b[0]; bordersBtn.main.title = b[1]; bordersBtn.main.setAttribute('aria-label', b[1]); act('borders', b[0]); }) : el('hr'))));
+    () => [...BORDERS.map((b) => (b ? item(b[1], () => { border = b[0]; bordersBtn.main.title = b[1]; bordersBtn.main.setAttribute('aria-label', b[1]); act('borders', b[0]); }) : el('hr'))),
+      el('hr'), el('div', { class: 'oxe-cap' }, 'Draw Borders'), ...DRAW.map(([mode, label]) => item(label, f('drawBorderMode', mode), { on: act('drawing') === mode })),
+      item('Line Color ▸', sub(lineColors)), item('Line Style ▸', sub(lineStyles))]);
   if (BORDERS.filter(Boolean).some(([k]) => !BORDER_PRESETS.includes(k))) throw new Error('a border preset without a rule');
 
   const fontSel = pick('Font', 'oxe-font', [], (v) => act('format', { font: { name: v } }));
@@ -159,6 +175,8 @@ export function homeTab(kit, { act, color }) {
     groups,
     /** Format Painter's button pressed while it waits for cells. */
     painting(on) { b.painter.setOn(on); },
+    /** Draw Borders on ('draw', 'grid', 'erase') or off: the Borders button pressed meanwhile. */
+    drawing(mode) { bordersBtn.main.classList.toggle('on', !!mode); bordersBtn.main.setAttribute('aria-pressed', String(!!mode)); },
     /** The controls from the active cell's look: { font, fontName, xf, code, fonts: { minor, major }, canUndo, canRedo }. */
     update(look) {
       closeMenu();

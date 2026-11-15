@@ -156,10 +156,30 @@ const sameLine = (a, b) => !!a && !!b && a.style === b.style && isAuto(a.color) 
  *  neighbour's facing side away, unless it is the same line (Excel keeps one line between two cells). */
 export const setBorders = (wb, si, sel, preset) => drawBorders(wb, si, sel, PRESETS[preset]);
 
+/** Draw Borders over a range dragged (or a cell clicked): 'draw' its outline, 'grid' every line in it, 'erase' them
+ *  all, diagonals too, as Outside Borders, All Borders and No Border do (ExecuteMso, excel-drawborders.ps1; No Border
+ *  took a diagonal off). `side` ('left', 'right', 'top', 'bottom') draws or erases just that edge of a one-cell
+ *  `range`, a gridline clicked. `line` is { style, color } (no colour: automatic, indexed 64), thin to start with as
+ *  Excel's Line Style. The neighbours' facing sides go as the presets' do. */
+export function drawLines(wb, si, range, mode, { side = null, line = THIN } = {}) {
+  const sel = { r0: range.r0, r1: range.r1, c0: range.c0, c1: range.c1 };
+  // (A neighbour's line the same as the one drawn stayed beside one cell, and went beside a range of several: Outside
+  // Borders on H24 kept G24's thin right; on H2:J4 it took G3's, All Borders on H8:J10 H7's thin bottom, Top Border on
+  // H20:I20 H19's.)
+  const keep = { keepSame: sel.r0 === sel.r1 && sel.c0 === sel.c1 };
+  const draw = (sidesAt) => drawBorders(wb, si, sel, sidesAt, new Map(), keep);
+  if (side) return draw(() => ({ [side]: mode === 'erase' ? null : line }));
+  if (mode === 'erase') return draw(() => ({ left: null, right: null, top: null, bottom: null, diagonal: null, diagonalUp: false, diagonalDown: false }));
+  if (mode === 'grid') return draw(() => ({ left: line, right: line, top: line, bottom: line }));
+  return draw((at) => edges(at, line));
+}
+/** The Draw Borders modes. */
+export const DRAW_MODES = ['draw', 'grid', 'erase'];
+
 /** Borders over the selection: `sidesAt(at)` gives each cell's sides from where it is ({ top, bottom, left, right }:
  *  on the selection's edge), undefined to leave one. `out` holds cells already changed ({ r, c, s } by "r:c"), whose
- *  new formats the borders go on. */
-function drawBorders(wb, si, sel, sidesAt, out = new Map()) {
+ *  new formats the borders go on. `keepSame` false: a neighbour's facing line goes even when it is the same line. */
+function drawBorders(wb, si, sel, sidesAt, out = new Map(), { keepSame = true } = {}) {
   const sheet = wb.sheet(si);
   const put = (r, c, sides) => {
     const s = out.get(`${r}:${c}`)?.s ?? styleAt(sheet, r, c);
@@ -181,7 +201,7 @@ function drawBorders(wb, si, sel, sidesAt, out = new Map()) {
       if (nr < 0 || nc < 0) continue;
       const ns = styleAt(sheet, nr, nc);
       const facing = wb.styles.borders[xfOf(wb.styles, ns).borderId][OPPOSITE[side]];
-      if (facing.style && !sameLine(facing, line)) {
+      if (facing.style && !(keepSame && sameLine(facing, line))) {
         put(nr, nc, { [OPPOSITE[side]]: null });
       }
     }

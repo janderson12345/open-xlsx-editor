@@ -8,6 +8,7 @@ import { cellSelection, extendSelection, addArea, areasOf } from './selection.js
 import { sheetCommands } from './commands-sheets.js';
 import { dataCommands } from './commands-data.js';
 import { partCommands } from './commands-parts.js';
+import { borderCommands } from './commands-borders.js';
 import { pivotCommands } from './commands-pivot.js';
 import { viewCommands } from './commands-view.js';
 import { step, jump, lastCell } from './navigate.js';
@@ -499,7 +500,7 @@ export function createCommands(ctx) {
   // use.)
   const env = { allowed, commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
   Object.assign(commands, sheetCommands(env));
-  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env));
+  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env), borderCommands(env));
 
   return {
     commands,

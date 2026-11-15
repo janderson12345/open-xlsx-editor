@@ -17,6 +17,7 @@ import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { contentsHidden } from '../ooxml/protection.js';
 import { linkFollower } from './linkfollow.js';
+import { attachBorderDrag } from './drawdrag.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -25,6 +26,8 @@ const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowR
 export function attachEditing(root, ctx) {
   const { grid } = ctx;
   const view = grid.el;
+  // (Draw Borders' drag, before the grid's own mouse: drawdrag.js.)
+  const detachDrawing = attachBorderDrag(view, grid, ctx);
   let cmd = null;
   const cellAt = (r, c) => ctx.workbook().sheet(ctx.sheetIndex()).cells.get(r)?.get(c) || null;
   // (A formula carried to the bar while another sheet is shown: { si, r, c }, the cell it is for.)
@@ -493,6 +496,7 @@ export function attachEditing(root, ctx) {
     setReadOnly(flag) { bar.setReadOnly(flag); grid.setReadOnly(flag); grid.setFillHandle(!flag && ctx.allowed?.('autoFill') !== false); if (flag) editor.close(); },
     reset() { editor.close(); cmd.reset(); },
     destroy() {
+      detachDrawing();
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
       document.removeEventListener('copy', onCopy);

@@ -6,6 +6,7 @@ import { protectionRefusal } from '../ooxml/protection.js';
 import { hyperlinkAt } from '../ooxml/links.js';
 import { formulaLink } from '../calc/hyperlinkcell.js';
 import { createMoreActs } from './acts-more.js';
+import { borderDrawing, DRAW_ACTS } from './drawborders.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
 import { setNote, deleteNote } from '../ooxml/noteedit.js';
@@ -71,11 +72,13 @@ export function createActs(env) {
       return done;
     },
   };
+  const drawing = borderDrawing(env);
   let more = null;
   const moreAct = (name, args, i) => (more ??= createMoreActs({ ...env, act }))(name, args, i);
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
     if (name === 'painting') return painter.active();
+    if (DRAW_ACTS.has(name)) return drawing.act(name, ...args);
     if (!state.workbook) return false;
     // (Bold, Italic, Underline or Strikethrough while part of a cell's text is selected in the editor: that part.)
     if (name === 'toggleFont' && state.editing?.editorOpen && state.editing.markEditor?.(args[0])) return true;

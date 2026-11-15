@@ -116,7 +116,9 @@ export interface XlsxEditor {
   /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo, showSheet, nextSheet,
    *  insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet; on the selection, as the Home tab does:
    *  format(change), toggleFont('b' | 'i' | 'u' | 'strike'), stepFont(1 | -1), toggleWrap, stepIndent(1 | -1),
-   *  align('horizontal' | 'vertical', value), borders(preset), stepDecimal(1 | -1), clearFormats. */
+   *  align('horizontal' | 'vertical', value), borders(preset), stepDecimal(1 | -1), clearFormats,
+   *  moreColor('font' | 'fill', 'RRGGBB'); Draw Borders over a range: drawBorders('draw' | 'grid' | 'erase',
+   *  { r0, c0, r1, c1 }, { side?, line?: { style, color? } }); recentColor('RRGGBB'). */
   command(name: string, ...args: unknown[]): unknown;
   /** The workbook open here for an agent: each edit one step of the undo history, drawn as it is made. */
   agent(): AgentWorkbook;

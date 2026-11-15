@@ -150,6 +150,7 @@ export function ribbonKit(container, home) {
     const more = el('button', { type: 'button', title: `${title} options`, 'aria-label': `${title} options`, 'aria-haspopup': 'menu', 'aria-expanded': 'false', class: 'oxe-split-more', onmousedown: (e) => { e.preventDefault(); openMenu(more, items); } }, el('span', { class: 'oxe-caret' }, '▾'));
     const wrap = el('span', { class: 'oxe-split' }, main, more);
     wrap.main = main;
+    wrap.more = more;
     return wrap;
   };
   /** A select whose choice goes to `onPick(value)`, then back to the sheet. */
