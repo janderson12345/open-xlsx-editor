@@ -75,6 +75,7 @@ export function attachEditing(root, ctx) {
       }, runs);
     },
     onCancel: () => view.focus({ preventScroll: true }),
+    runStyle: () => ctx.looks().runStyle,
   });
   // (Inside a function's parentheses, its syntax under the cell, as Excel shows it.)
   attachFunctionTip(editor.el, grid.overlay);

@@ -154,14 +154,41 @@ A run's larger font grows its row as Excel's does (a 16pt run beside Aptos Narro
 
 Part of a cell's text is formatted while it is edited, as in Excel: select some of the text in the cell editor and press
 Ctrl+B, Ctrl+I, Ctrl+U or Ctrl+5 (or the Font group's Bold, Italic, Underline, Strikethrough); that part takes it when
-the edit is entered (`src/editor/richmarks.js`). The marks follow the text as it is edited around them, and a cell of
-rich text keeps its runs while edited (bold, italic, underline and strikethrough). They are written as Excel writes rich
-text (`strings.js` richRunsXml, `test/richtext.test.js`): a run in the cell's own font bare, another with an rPr of what
-it changes and then the cell's size, colour, rFont, family and scheme; in the cell's inline string. (Excel adds a
-family number for a run in another font, `family val="3"` for Courier New, which the editor can't know and leaves out.)
+the edit is entered (`src/editor/richmarks.js`, one font per character). A cell of rich text keeps all of its runs'
+fonts while edited (bold, italic, underline, strikethrough, size, colour, font, super- and subscript). They are written
+as Excel writes rich text (`strings.js` richRunsXml, `test/richtext.test.js`): a run in the cell's own font bare,
+another with an rPr of what it changes and then the cell's size, colour, rFont, family and scheme; in the cell's inline
+string. A run read from a file keeps its own colour (rgb, theme and tint, or indexed) and, in a font of its own, its
+family. (Excel adds a family number for a run in another font, `family val="3"` for Courier New, which the editor can't
+know for a font chosen in it and leaves out.)
 
-Not yet: the formatting shown while it is edited (the editor is a plain text box: it shows once entered), a size,
-colour or font for part of the text, and copying runs.
+While the cell is edited the text is drawn as it will be (`src/editor/richview.js`), as Excel's in-cell editor shows
+it: each run in its font, updated as marks are toggled and as text is typed. The text box stays the one typed in (its
+caret, selection, IME, undo and keys are the browser's own); while part of the text is formatted its own text is
+hidden and the runs are drawn under it, with the caret and the selection placed by the drawn text, and a click or drag
+placed by the drawn characters. A formula, a number, and text with nothing formatted are the text box's own plain
+text, as before. The formula bar shows the text plain, as Excel's does.
+
+Typed text takes a font as Excel's own insert gives it: `Characters(start, length).Insert(text)` over COM on a cell of
+runs, each character's font read back (`tools/excel-compare/excel-richtype.ps1`, `test/richtype-excel.json`, checked by
+`test/richmarks.test.js`):
+
+| Where the text goes | Its font (measured) |
+| --- | --- |
+| Inside a run | the run's |
+| Just after a bold run, or a red 16pt one | bold; red 16pt (the font before the caret) |
+| Just before a bold run, or a red 16pt one | plain (the font before the caret) |
+| At the very start, the first run bold | bold (the first character's) |
+| In place of a selection | the selection's first character's (plain then bold: plain; bold then plain: bold) |
+| At the very end, the last run bold | plain (the cell's own) in the object model |
+
+The last row isn't followed: typing at the end goes on in the font before the caret like everywhere else, which isn't
+measured (keystrokes can't be sent to Excel over COM, and the object model's insert past the last character may not be
+what typing does). Undo inside the editor (Ctrl+Z, the text box's own) brings the fonts back with the text.
+
+Not yet: a size, colour or font for part of the text (Format Cells' Font tab for a selection inside the cell), Ctrl+B
+with nothing selected to type on in bold, the drawn view's up and down arrows across lines of different heights (the
+caret moves by the text box's own lines), and copying runs.
 
 ## Format Painter
 

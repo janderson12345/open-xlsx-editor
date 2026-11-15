@@ -130,6 +130,10 @@ Workbooks made by Excel (or any folder of them) opened, edited and saved by the 
 counted, then Excel compares every cell and the count of each feature in the original and the saved copy
 (docs/FIDELITY.md).
 
+Rich text typed into: `excel-richtype.ps1 test/richtype-excel.json` starts its own hidden Excel, gives a cell runs
+(`Characters(start, length).Font`), adds or replaces text with `Characters(start, length).Insert`, and reads each
+character's font back: which run's font the new text takes (docs/FORMATS.md, Rich text). Nothing saved.
+
 ## The workbooks
 
 Real workbooks are kept out of the repository (`..\samples`), and referred to by label (`sample X014`), never by

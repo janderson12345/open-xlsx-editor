@@ -1,0 +1,978 @@
+[
+    {
+        "name":  "inside a bold run",
+        "text":  "plainBOLDplain",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   8,
+                   0
+               ],
+        "add":  "x",
+        "result":  "plainBOxLDplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "B",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "O",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "L",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "just after a bold run (bold before the caret)",
+        "text":  "plainBOLDplain",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   10,
+                   0
+               ],
+        "add":  "x",
+        "result":  "plainBOLDxplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "B",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "O",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "L",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "just before a bold run (plain before the caret)",
+        "text":  "plainBOLDplain",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   6,
+                   0
+               ],
+        "add":  "x",
+        "result":  "plainxBOLDplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "B",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "O",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "L",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "at the start, the first run bold",
+        "text":  "BOLDplain",
+        "runs":  [
+                     [
+                         1,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   1,
+                   0
+               ],
+        "add":  "x",
+        "result":  "xBOLDplain",
+        "chars":  [
+                      {
+                          "ch":  "x",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "B",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "O",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "L",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "at the end, the last run bold",
+        "text":  "plainBOLD",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   10,
+                   0
+               ],
+        "add":  "x",
+        "result":  "plainBOLDx",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "B",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "O",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "L",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "after a red 16pt run",
+        "text":  "plainREDplain",
+        "runs":  [
+                     [
+                         6,
+                         3,
+                         "red16"
+                     ]
+                 ],
+        "at":  [
+                   9,
+                   0
+               ],
+        "add":  "xy",
+        "result":  "plainREDxyplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "R",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "E",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "y",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "before a red 16pt run",
+        "text":  "plainREDplain",
+        "runs":  [
+                     [
+                         6,
+                         3,
+                         "red16"
+                     ]
+                 ],
+        "at":  [
+                   6,
+                   0
+               ],
+        "add":  "xy",
+        "result":  "plainxyREDplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "y",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "R",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "E",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  false,
+                          "size":  16,
+                          "color":  255
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "replacing plain and bold (selection starts plain)",
+        "text":  "plainBOLDplain",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   4,
+                   4
+               ],
+        "add":  "xy",
+        "result":  "plaxyLDplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "y",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "L",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "D",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "replacing bold and plain (selection starts bold)",
+        "text":  "plainBOLDplain",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   8,
+                   4
+               ],
+        "add":  "xy",
+        "result":  "plainBOxyain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "B",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "O",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "y",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    },
+    {
+        "name":  "replacing all of a bold run",
+        "text":  "plainBOLDplain",
+        "runs":  [
+                     [
+                         6,
+                         4,
+                         "b"
+                     ]
+                 ],
+        "at":  [
+                   6,
+                   4
+               ],
+        "add":  "xy",
+        "result":  "plainxyplain",
+        "chars":  [
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "x",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "y",
+                          "b":  true,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "p",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "l",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "a",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "i",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      },
+                      {
+                          "ch":  "n",
+                          "b":  false,
+                          "size":  11,
+                          "color":  0
+                      }
+                  ]
+    }
+]

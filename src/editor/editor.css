@@ -1009,6 +1009,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .oxe-clip { animation: none; }
+  .oxe-edit-caret { animation: none; }
 }
 
 /* Frozen panes (grid.js drawPanes): the rows above the freeze stick under the column headings, the columns left of it
@@ -1133,6 +1134,56 @@
   font-family: var(--oxe-font);
   font-size: var(--oxe-cell-fs);
   line-height: var(--oxe-cell-lh);
+}
+
+/* Part of the text being edited formatted (celleditor.js, richview.js): the text box's own text and caret hidden and
+   its runs drawn in a view under it, with the caret and selection placed by the drawn text. */
+/* (Over a cell format's own colour, .oxe-root[data-oxe-id] .oxe-sN.) */
+.oxe-root textarea.oxe-editor.oxe-editor-rich {
+  color: transparent;
+  caret-color: transparent;
+  background: transparent;
+}
+
+.oxe-root textarea.oxe-editor.oxe-editor-rich::selection {
+  background: transparent;
+}
+
+.oxe-editor.oxe-edit-view {
+  pointer-events: none;
+}
+
+.oxe-edit-runs {
+  position: relative;
+}
+
+.oxe-edit-marks {
+  position: absolute;
+  inset: 0;
+}
+
+.oxe-edit-sel,
+.oxe-edit-caret {
+  position: absolute;
+  left: var(--oxe-mark-x);
+  top: var(--oxe-mark-y);
+  width: var(--oxe-mark-w);
+  height: var(--oxe-mark-h);
+}
+
+.oxe-edit-sel {
+  background: rgb(0 120 215 / 30%);
+}
+
+.oxe-edit-caret {
+  background: #000000;
+  animation: oxe-caret-blink 1.06s steps(1) infinite;
+}
+
+@keyframes oxe-caret-blink {
+  50% {
+    visibility: hidden;
+  }
 }
 
 /* Read by screen readers only (live.js announcements). */

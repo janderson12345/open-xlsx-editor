@@ -76,7 +76,8 @@ const colorXml = (c) => {
  * a run in the cell's own font without rPr; another with an rPr of what it changes (bold, italic, strikethrough,
  * underline, super- or subscript) and then the font it is in: size, colour, name (rFont), family and scheme as the
  * cell's (`base`: { name, size, color, family, scheme }), or a size, colour or font of its own. `runs`: [{ text, font:
- * { b, i, strike, u, vertAlign, size, color: 'FFRRGGBB', name } or null }].
+ * { b, i, strike, u, vertAlign, size, color, name, family } or null }], the colour 'FFRRGGBB' or, as a run read from
+ * a file has it (runFont), { rgb } or { theme, tint } or { indexed }; a font of its own keeps its family.
  */
 export function richRunsXml(runs, base) {
   return runs.filter((r) => r.text).map((r) => {
@@ -85,7 +86,8 @@ export function richRunsXml(runs, base) {
     if (!f || !Object.values(f).some((v) => v != null && v !== false)) return `<r>${t}</r>`;
     const own = f.name && f.name !== base.name;
     const props = [f.b && '<b/>', f.i && '<i/>', f.strike && '<strike/>', f.u && (f.u === 'single' || f.u === true ? '<u/>' : `<u val="${escAttr(f.u)}"/>`), f.vertAlign && `<vertAlign val="${escAttr(f.vertAlign)}"/>`,
-      `<sz val="${escAttr(f.size ?? base.size)}"/>`, f.color ? `<color rgb="${escAttr(f.color)}"/>` : colorXml(base.color), `<rFont val="${escAttr(own ? f.name : base.name)}"/>`,
+      `<sz val="${escAttr(f.size ?? base.size)}"/>`, (f.color && (typeof f.color === 'string' ? `<color rgb="${escAttr(f.color)}"/>` : colorXml(f.color))) || colorXml(base.color),
+      `<rFont val="${escAttr(own ? f.name : base.name)}"/>`, own && f.family != null ? `<family val="${escAttr(f.family)}"/>` : '',
       !own && base.family != null ? `<family val="${escAttr(base.family)}"/>` : '', !own && base.scheme ? `<scheme val="${escAttr(base.scheme)}"/>` : ''].filter(Boolean).join('');
     return `<r><rPr>${props}</rPr>${t}</r>`;
   }).join('');

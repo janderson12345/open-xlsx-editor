@@ -40,3 +40,14 @@ test("rich text written as Excel writes it: the cell's own font's run bare, the 
   // (And read back as runs.)
   assert.deepEqual(wb.sheet(si).cells.get(1).get(0).runs.map((r) => [r.text, !!r.font?.b, r.font?.size ?? null]), [['Plain ', false, null], ['bold', true, base.size], ['big', false, 16]]);
 });
+
+test('a run read from a file written back with its own colour and family, as the file had them', async () => {
+  const { richRunsXml } = await import('../src/ooxml/strings.js');
+  const base = { name: 'Calibri', size: 11, color: { theme: 1 }, family: 2, scheme: 'minor' };
+  // (runFont's colour is an element's attributes, not an 'FFRRGGBB' string.)
+  const red = { name: 'Courier New', size: 16, i: true, family: 3, color: { rgb: 'FFFF0000', theme: null, indexed: null, auto: false, tint: 0 } };
+  const themed = { name: 'Calibri', b: true, color: { rgb: null, theme: 4, indexed: null, auto: false, tint: 0.4 } };
+  assert.equal(richRunsXml([{ text: 'red', font: red }, { text: 'blue', font: themed }], base),
+    '<r><rPr><i/><sz val="16"/><color rgb="FFFF0000"/><rFont val="Courier New"/><family val="3"/></rPr><t>red</t></r>'
+    + '<r><rPr><b/><sz val="11"/><color theme="4" tint="0.4"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>blue</t></r>');
+});
