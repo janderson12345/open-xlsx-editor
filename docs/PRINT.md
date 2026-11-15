@@ -65,7 +65,9 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   above the footer margin and the lines before it above; each line centred in a centre section, right-aligned in a
   right one; a left or right section of several lines starts at the margin itself, not 1.25px in (workbooks made in
   code, one to three lines, `..\runs\hf2`: 198 of 198 text pieces within 1px both ways, single-line headers as
-  they were).
+  they were). The same at a scale, the row and the em scaled with the sheet: at 40, 50, 60, 75 and 90%, and 14pt at
+  50% (`..\runs\hfscale2`: 279 of 279 text pieces within 1px both ways; two more present in both PDFs left unpaired by
+  the comparison's reading order).
 - **Different first page and different odd and even pages** (headerFooter differentFirst, differentOddEven): the
   first page takes firstHeader and firstFooter, even pages evenHeader and evenFooter, placed as any page's (workbooks
   made in code, three pages each way and both, `..\runs\hf3`: 1,187 of 1,187 text pieces within 1px both ways).
