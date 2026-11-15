@@ -1,0 +1,3283 @@
+{
+ "source": "tools/excel-compare/excel-chart-format-check.ps1 on test/out/charts/chartformat-all.xlsx (ours, chartformat.test.js) and on the workbook excel-chart-format.ps1 saved (excel): Excel 365",
+ "ours": {
+  "catTitle": {
+   "titles": [
+    "Region",
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "valTitle": {
+   "titles": [
+    null,
+    "Amount",
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catTitleAuto": {
+   "titles": [
+    "Axis Title",
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titlesOff": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "seriesFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "C00000",
+      "line": "none"
+     },
+     "point2": "C00000"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "seriesLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "7030A0"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "pointFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "00B050"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "chartFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFF2CC",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "chartLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "1F4E79"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "plotFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "DDEBF7",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "plotLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "808080"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleFont1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 18,
+    "bold": true,
+    "color": "C00000"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleFontName1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catFontSize1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 12,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catFont": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Arial",
+    "size": 11,
+    "bold": true,
+    "color": "1F4E79"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "valFont": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "legendFont1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Arial",
+    "size": 11,
+    "bold": true,
+    "color": "1F4E79"
+   }
+  },
+  "labelFont1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catTitleFont1": {
+   "titles": [
+    "Region",
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "lineColor": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "C00000"
+     },
+     "point2": "000000"
+    },
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "pieSlice": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 5,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "00B050"
+    },
+    {
+     "type": 5,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": null,
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboLineMarkers": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 65,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboOwnColor": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "secondaryTitle": {
+   "titles": [
+    null,
+    null,
+    "Cost"
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 2,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboArea": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 1,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "secondary": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 2,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboSecondary": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 4,
+     "group": 2,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "secondaryBack": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboBack": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboSecondaryBack": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  }
+ },
+ "excel": {
+  "catTitle": {
+   "titles": [
+    "Region",
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "valTitle": {
+   "titles": [
+    null,
+    "Amount",
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catTitleAuto": {
+   "titles": [
+    "Axis Title",
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titlesOff": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "seriesFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "C00000",
+      "line": "000000"
+     },
+     "point2": "C00000"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "seriesLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "7030A0"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "pointFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "00B050"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "chartFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFF2CC",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "chartLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "1F4E79"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "plotFill": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "DDEBF7",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "plotLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "808080"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleFont1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 18,
+    "bold": true,
+    "color": "C00000"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleFontName1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catFontSize1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 12,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catFont": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Arial",
+    "size": 11,
+    "bold": true,
+    "color": "1F4E79"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "valFont": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "legendFont1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Arial",
+    "size": 11,
+    "bold": true,
+    "color": "1F4E79"
+   }
+  },
+  "labelFont1": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "catTitleFont1": {
+   "titles": [
+    "Region",
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "lineColor": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "C00000"
+     },
+     "point2": "000000"
+    },
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "pieSlice": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 5,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "00B050"
+    },
+    {
+     "type": 5,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": null,
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboLine": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboLineMarkers": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 65,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboOwnColor": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 4,
+     "group": 1,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "secondaryTitle": {
+   "titles": [
+    null,
+    null,
+    "Cost"
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 2,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboArea": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 1,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "secondary": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 2,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboSecondary": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 4,
+     "group": 2,
+     "look": {
+      "fill": "000000",
+      "line": "E97132"
+     },
+     "point2": "000000"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "secondaryBack": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboBack": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "comboSecondaryBack": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Aptos Narrow",
+    "size": 14,
+    "bold": false,
+    "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  }
+ }
+}
