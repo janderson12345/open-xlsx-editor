@@ -85,9 +85,34 @@ selection with nothing to name.
 The messages ("The syntax of this name isn't correct...", "The name entered already exists. Enter a unique name.")
 are Excel's dialogs', which COM doesn't reach: not measured.
 
+## Apply Names (measured)
+
+Formulas > Define Name ▾ > Apply Names... puts names in place of the references to them (`applynames.js`). Measured
+with Range.ApplyNames in a hidden Excel, each formula on its own: 29 formulas with Ignore Relative/Absolute on and 10
+with it off, 16 on a grid of row and column names under three settings of the options; all 87 the same here
+(`test/applynames.test.js`).
+
+| Excel's rule | Excel's example |
+|---|---|
+| One cell selected: the whole sheet's formulas; more: the selection's. | Applied from H3, every formula on the sheet. |
+| Names that refer to one area of this sheet, all $, are applied; a relative name, a constant, a formula name are not. | Rel (=Sheet1!B3): =B3 stays. Tax (=0.07): 0.07 stays. |
+| Only references without a sheet's name. | =Sheet1!B2*2 and =Data!$A$1+1 stay, with names for both. |
+| Ignore Relative/Absolute on: any of B2, $B$2, B$2, $C2; off: only the name's own $B$2. | =B$2*$C2: Qty*Price; off: stays. |
+| A range that is a name's becomes it. In one that isn't, an end with a relative column and a cell's name becomes the name; a $ column's stays (on only). | B2:B5 Amounts; B2:B4 Qty:B4; A1:B2 A1:Qty; $B$2:$B$4 stays. |
+| Use row and column names: a cell where a named column and a named row cross becomes the two, row first (Column row order: column first). From the cell's own row, the column's name alone; from its own column, the row's (the two Omit options). | =C3 in H9: South Jan; in C6: South; =C2 in H2: Jan. |
+| That comes before the cell's own name; without a row and a column, the cell's own name. | =B2 in H2 with Qty and Amounts: Amounts; in H8: Qty. |
+| Text in quotes and names already there stay. | =B2&"B2": Qty&"B2". |
+
+What Excel does to a formula's value comes with it: =B2*C2 in H2 becoming Amounts*Price, it spills and shows
+#SPILL! with something below, in Excel as here (Excel saves that one as an array formula; here it stays a plain one,
+which Excel reads back as one cell, 20). In a formula entered as a dynamic array, Excel's row and column names left
+B2 as Qty (implicit intersection doesn't apply there); here every formula is read as an opened file's are.
+
+Not measured: which names Excel's box starts with chosen (all here); its messages when nothing can be applied (the
+editor's own words); a one-cell range (C2:C2, which Excel made @Price, saved as SINGLE(Price)) is left as it is here.
+
 ## Not yet
 
 - The Name Manager's Value column and its filter; a name's scope changed (Excel doesn't either: it is fixed once made).
-- Apply Names.
 - Names that refer to another workbook.
 - A LAMBDA kept in a name and called by it.

@@ -28,7 +28,8 @@ import { excelTextWidth, JUSTIFY_MARGIN } from './textwidth.js';
 import { sheetGeometry } from './geometry.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
 import { insertFunctionBox } from './functionbox.js';
-import { pasteNameBox } from './namesbox.js';
+import { pasteNameBox, applyNamesBox } from './namesbox.js';
+import { applicableNames, applyNamesSteps } from '../ooxml/applynames.js';
 import { openErrorMenu } from './errormenu.js';
 import { errorCheckingBox } from './errorbox.js';
 import { evaluateFormulaBox } from './evalbox.js';
@@ -274,6 +275,22 @@ export function createMoreActs(env) {
       return seriesBox(root, { across: s.c1 - s.c0 > s.r1 - s.r0 }).then((o) => {
         state.grid.el.focus({ preventScroll: true });
         return o ? editing().run('runTool', fillSeries(state.workbook, i, s, o), 'Filled ') : false;
+      });
+    }
+    if (name === 'applyNames') {
+      // (Formulas > Define Name > Apply Names...: the names chosen put in place of the references to them in the
+      // selection's formulas, the whole sheet's for one cell (applynames.js). The two messages are the editor's own:
+      // Excel's weren't measured.)
+      if (state.readOnly) return false;
+      const wb = state.workbook;
+      const usable = applicableNames(wb, i);
+      if (!usable.length) return messageBox(root, 'There are no names here that refer to cells of this sheet.').then(() => false);
+      return applyNamesBox(root, usable.map((n) => n.name)).then((o) => {
+        state.grid.el.focus({ preventScroll: true });
+        if (!o) return false;
+        const got = applyNamesSteps(wb, i, editing().selection, usable.filter((n) => o.names.includes(n.name)), o);
+        if (got.none) return messageBox(root, 'No references were found to replace with these names.').then(() => false);
+        return editing().run('runTool', got.steps, `Names applied in ${got.count} cell${got.count === 1 ? '' : 's'}, `);
       });
     }
     if (name === 'circleInvalid' || name === 'clearCircles') {

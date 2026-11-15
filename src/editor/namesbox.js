@@ -1,7 +1,7 @@
 // Formulas > Defined Names: Excel's Name Manager (Ctrl+F3: the names with what each refers to, its scope and comment;
 // New..., Edit..., Delete, Close) and its New Name / Edit Name box (Name, Scope, Comment, Refers to). Each change is
 // one step of the history (names.js through the sheetChange command); a name Excel wouldn't take gets its words.
-// Create from Selection's box too (createnames.js).
+// Create from Selection's box too (createnames.js), Paste Name's and Apply Names' (applynames.js).
 import { modal, button, messageBox, optionsBox } from './dialogs.js';
 import { defineName, editName, deleteName, listNames, findName } from '../ooxml/names.js';
 import { namesFromSelection, createNames, guessSides } from '../ooxml/createnames.js';
@@ -143,5 +143,45 @@ export function pasteNameBox(root, names, { list = true } = {}) {
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
     dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Paste Name' }), label, pick,
       make('div', { className: 'oxe-dialog-buttons' }, ...[button('OK', ok), button('Cancel', () => done(null)), list ? button('Paste List', () => done({ list: true })) : null].filter(Boolean)));
+  });
+}
+
+/** Excel's Apply Names box (Formulas > Define Name > Apply Names...): the names in a list to choose from (all chosen
+ *  here; Excel's first choice not measured), Ignore Relative/Absolute and Use row and column names (both on, as
+ *  Excel's), Omit column name if same column, Omit row name if same row (on) and the name order (Row column).
+ *  Resolves to { names, ignore, rowCol, omitCol, omitRow, colFirst } or null. */
+export function applyNamesBox(root, names) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.classList.add('oxe-apply-names');
+    const pick = make('select', { id: `${id}-names`, className: 'oxe-dialog-select', multiple: true, size: Math.min(10, Math.max(3, names.length)) });
+    pick.append(...names.map((n) => make('option', { value: n, textContent: n, selected: true })));
+    pick.dataset.first = '';
+    const check = (key, label, on = true) => {
+      const input = make('input', { type: 'checkbox', id: `${id}-${key}`, checked: on });
+      return { input, line: make('div', { className: 'oxe-dialog-option' }, input, make('label', { htmlFor: input.id, textContent: label })) };
+    };
+    const ignore = check('ignore', 'Ignore Relative/Absolute');
+    const rowCol = check('rowcol', 'Use row and column names');
+    const omitCol = check('omitcol', 'Omit column name if same column');
+    const omitRow = check('omitrow', 'Omit row name if same row');
+    const order = ['Row column', 'Column row'].map((label, k) => {
+      const input = make('input', { type: 'radio', name: `${id}-order`, id: `${id}-order${k}`, checked: k === 0 });
+      return { input, line: make('div', { className: 'oxe-dialog-option' }, input, make('label', { htmlFor: input.id, textContent: label })) };
+    });
+    // (Excel dims the row and column options while Use row and column names is off.)
+    const dim = () => [omitCol, omitRow, ...order].forEach((x) => { x.input.disabled = !rowCol.input.checked; });
+    rowCol.input.addEventListener('change', dim);
+    const ok = () => {
+      const chosen = [...pick.selectedOptions].map((o) => o.value);
+      done({ names: chosen, ignore: ignore.input.checked, rowCol: rowCol.input.checked, omitCol: omitCol.input.checked, omitRow: omitRow.input.checked, colFirst: order[1].input.checked });
+    };
+    dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); ok(); } });
+    const orderSet = make('fieldset', { className: 'oxe-dialog-group' }, make('legend', { textContent: 'Name order' }), ...order.map((x) => x.line));
+    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Apply Names' }),
+      make('label', { className: 'oxe-dialog-text oxe-dialog-label', htmlFor: pick.id, textContent: 'Apply names:' }), pick,
+      make('div', { className: 'oxe-dialog-checks' }, ignore.line, rowCol.line, omitCol.line, omitRow.line), orderSet,
+      make('div', { className: 'oxe-dialog-buttons' }, button('OK', ok), button('Cancel', () => done(null))));
+    dim();
   });
 }

@@ -1,13 +1,13 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, and Circle Invalid Data. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, and Apply Names. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { addHyperlink } from '../src/ooxml/links.js';
 import { editingPage } from './editing-kit.mjs';
 
-const { page, check, finish, openFixtureFrom, sel, clickCell, pointAt, menu } = await editingPage();
+const { page, check, finish, openFixtureFrom, sel, clickCell, pointAt, menu, ribbon } = await editingPage();
 
 // (Made here, as Excel's Hyperlinks.Add writes them: links.test.js.)
 const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
@@ -255,5 +255,35 @@ await page.click('.oxe-pop >> text=Clear Validation Circles');
 const cleared = await circlesNow();
 check(circled.length === 2 && circled.includes(want) && afterFix.length === 1 && back.join() === afterFix.join() && !cleared.length,
   'Circle Invalid Data: B3 and B4 circled, B3 put right loses its oval, kept with its sheet, Clear Validation Circles takes them', JSON.stringify({ circled, want, afterFix, back, cleared }));
+
+// Formulas > Define Name > Apply Names...: on a new sheet with Qty (=$B$2), Price (=$C$2) and Pair (=$B$2:$C$2) defined,
+// OK from one cell applies them over the whole sheet as Excel's ApplyNames: H8's =B2*C2 Qty*Price, H9's
+// =SUM($B$2:$C$2)&"B2" SUM(Pair)&"B2" (the text left), H10's =Sheet!B2 as it was; Ctrl+Z takes them back.
+await page.evaluate(() => {
+  const o = window.oxe;
+  o.command('insertSheet');
+  const name = o.workbook.sheets[o.sheetIndex].name;
+  o.enter('B2', '4'); o.enter('C2', '5'); o.enter('H8', '=B2*C2'); o.enter('H9', '=SUM($B$2:$C$2)&"B2"'); o.enter('H10', `='${name}'!B2`);
+});
+// (Named from the Name Box, as typing a name there over a selection does.)
+await page.evaluate(() => {
+  const o = window.oxe;
+  for (const [n, r0, c0, c1] of [['Qty', 1, 1, 1], ['Price', 1, 2, 2], ['Pair', 1, 1, 2]]) { o.select(`${String.fromCharCode(65 + c0)}${r0 + 1}`); if (c1 > c0) o.command('extendTo', r0, c1); o.command('nameBox', n); }
+  o.select('A1');
+});
+const formulasH = () => page.evaluate(() => [7, 8, 9].map((r) => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(r)?.get(7)?.f));
+const beforeApply = await formulasH();
+await page.click('.oxe-rtab >> text=Formulas');
+await ribbon('Define Name options', () => page.click('.oxe-pop >> text=Apply Names...'));
+await page.waitForSelector('dialog.oxe-apply-names');
+const offeredNames = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-apply-names option')].map((o) => `${o.value}${o.selected ? '*' : ''}`));
+await page.click('dialog.oxe-apply-names >> button:text-is("OK")');
+const applied = await formulasH();
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const unapplied = await formulasH();
+check(offeredNames.join() === 'Pair*,Price*,Qty*' && applied.join('|') === `Qty*Price|SUM(Pair)&"B2"|${beforeApply[2]}` && unapplied.join('|') === beforeApply.join('|'),
+  'Apply Names: the names offered, all chosen; OK applies them over the sheet as Excel\'s ApplyNames (text and sheet-named references left); Ctrl+Z takes it back',
+  JSON.stringify({ offeredNames, beforeApply, applied, unapplied }));
 
 await finish();

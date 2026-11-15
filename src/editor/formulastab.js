@@ -1,6 +1,6 @@
 // The Formulas tab, Excel's groups as far as they are here: Function Library (Insert Function, Shift+F3; AutoSum and
 // its choices; Recently Used and each category's functions, More Functions for the rest: functionbox.js and
-// calc/catalog.js), Defined Names (Name Manager, Ctrl+F3, Define Name, Use in Formula, Create from Selection: namesbox.js
+// calc/catalog.js), Defined Names (Name Manager, Ctrl+F3, Define Name, Apply Names, Use in Formula, Create from Selection: namesbox.js
 // and names.js), Formula Auditing
 // (Trace Precedents, Trace Dependents, Remove Arrows: tracing.js; Show Formulas, Ctrl+`) and Calculation (Calculation Options, Calculate Now, Calculate Sheet: ooxml/calcmode.js).
 import { el } from './ribbonkit.js';
@@ -33,7 +33,7 @@ export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'a
       ...lists.map(([icon, c]) => menu(icon, c, () => [...category(c)(), el('hr'), item('Insert Function...', () => act('insertFunction'))], { label: c, big: true })),
       col(more)),
     grp('Defined Names', btn('🏷', 'Name Manager (Ctrl+F3)', () => act('nameManager'), { label: 'Name Manager', big: true }),
-      col(btn('＋', 'Define Name', () => act('defineName'), { label: 'Define Name' }),
+      col(split('＋', 'Define Name', () => act('defineName'), () => [item('Define Name...', () => act('defineName')), item('Apply Names...', () => act('applyNames'))], { label: 'Define Name' }),
         menu('⇥', 'Use in Formula', () => [...names().map((n) => item(n, () => act('useName', n))), ...(names().length ? [el('hr')] : []), item('Paste Names...', () => act('pasteNames'), { hint: 'F3' })], { label: 'Use in Formula' }),
         btn('⊞', 'Create from Selection (Ctrl+Shift+F3)', () => act('createNames'), { label: 'Create from Selection' }))),
     grp('Formula Auditing', col(btn('⇢', 'Trace Precedents', () => act('trace', 'precedents'), { label: 'Trace Precedents' }),
