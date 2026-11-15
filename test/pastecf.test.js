@@ -86,3 +86,48 @@ test('a rule left without its first cell by a paste, written for its new one, as
   pasteConditionals(pasted.wb, pasted.si, area('E1:E2'), snapshot(pasted.wb, pasted.si, area('A1:A2')));
   assert.deepEqual(blocks(pasted.wb, pasted.si), ['E3:E4: p1 E3>F3']);
 });
+
+/** The extLst's rules: "sqref: type p<priority or -> id" sorted, and each base data bar's id with its sqref. */
+function extRules(wb, si) {
+  const doc = wb._part(si).doc;
+  const X14 = 'http://schemas.microsoft.com/office/spreadsheetml/2009/9/main';
+  const x14 = [...doc.getElementsByTagNameNS(X14, 'cfRule')].map((r) => ({ sq: r.parentNode.getElementsByTagNameNS('*', 'sqref')[0].textContent, type: r.getAttribute('type'), p: r.getAttribute('priority'), id: r.getAttribute('id') }));
+  const base = [...doc.getElementsByTagNameNS(doc.documentElement.namespaceURI, 'cfRule')].filter((r) => r.getAttribute('type') === 'dataBar')
+    .map((r) => ({ sq: r.parentNode.getAttribute('sqref'), id: r.getElementsByTagNameNS(X14, 'id')[0]?.textContent }));
+  return { x14, base };
+}
+
+test('data bars and Excel 2010 icon sets pasted with their extLst half, new ids, as Excel\'s', () => {
+  // (Excel: a data bar over A1:A3 copied to C1: C1:C3 in both halves, a new id; at A4, both become A1:A6; three stars
+  // over A1:A3 copied to C1: a new x14 rule over C1:C3, priority 1, the old one 2.)
+  const bars = sheetWith([['A1:A3', { kind: 'dataBar', color: 'FF638EC6' }]]);
+  pasteConditionals(bars.wb, bars.si, area('C1:C3'), snapshot(bars.wb, bars.si, area('A1:A3')));
+  const b = extRules(bars.wb, bars.si);
+  assert.deepEqual(b.x14.map((x) => x.sq).sort(), ['A1:A3', 'C1:C3']);
+  assert.deepEqual(b.base.map((x) => x.sq).sort(), ['A1:A3', 'C1:C3']);
+  for (const x of b.base) assert.equal(b.x14.find((y) => y.id === x.id)?.sq, x.sq, 'a base rule and its extLst half name each other');
+  assert.equal(new Set(b.x14.map((x) => x.id)).size, 2);
+  const line = sheetWith([['A1:A3', { kind: 'dataBar', color: 'FF638EC6' }]]);
+  pasteConditionals(line.wb, line.si, area('A4:A6'), snapshot(line.wb, line.si, area('A1:A3')));
+  assert.deepEqual(extRules(line.wb, line.si).x14.map((x) => x.sq), ['A1:A6']);
+  assert.deepEqual(extRules(line.wb, line.si).base.map((x) => x.sq), ['A1:A6']);
+  const stars = sheetWith([['A1:A3', { kind: 'iconSet', set: '3Stars' }]]);
+  pasteConditionals(stars.wb, stars.si, area('C1:C3'), snapshot(stars.wb, stars.si, area('A1:A3')));
+  const s = extRules(stars.wb, stars.si).x14.map((x) => `${x.sq} ${x.type} p${x.p}`).sort();
+  assert.deepEqual(s, ['A1:A3 iconSet p2', 'C1:C3 iconSet p1']);
+});
+
+test('a data bar cut moves both halves; a rule partly cut keeps its cells left and the moved ones get their own, as Excel\'s', () => {
+  // (Excel: a data bar over A1:A3 cut to C1: C1:C3 in both halves. =A1>B1 over A1:A3, A1:A2 cut to C1: =A3>B3 over A3
+  // and, after it in priority, =C1>B1 over C1:C2; A1:A2 cut to A2: =A2>B1 over A2:A3.)
+  const bars = sheetWith([['A1:A3', { kind: 'dataBar', color: 'FF638EC6' }]]);
+  moveCutParts(bars.wb, bars.si, area('C1:C3'), snapshot(bars.wb, bars.si, area('A1:A3'), true));
+  assert.deepEqual(extRules(bars.wb, bars.si).x14.map((x) => x.sq), ['C1:C3']);
+  assert.deepEqual(extRules(bars.wb, bars.si).base.map((x) => x.sq), ['C1:C3']);
+  const part = sheetWith([['A1:A3', expr('A1>B1')]]);
+  moveCutParts(part.wb, part.si, area('C1:C2'), snapshot(part.wb, part.si, area('A1:A2'), true));
+  assert.deepEqual(blocks(part.wb, part.si), ['A3: p1 A3>B3', 'C1:C2: p2 C1>B1']);
+  const down = sheetWith([['A1:A3', expr('A1>B1')]]);
+  moveCutParts(down.wb, down.si, area('A2:A3'), snapshot(down.wb, down.si, area('A1:A2'), true));
+  assert.deepEqual(blocks(down.wb, down.si), ['A2:A3: p1 A2>B1']);
+});

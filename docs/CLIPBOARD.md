@@ -121,7 +121,7 @@ its first cell changes, as Excel's cut did.
 ## Conditional formats (measured)
 
 Conditional formats come with their cells (`ooxml/clipcf.js`). Measured over COM in a hidden Excel: a copy and
-PasteSpecial (or a cut) in each case, then the conditionalFormatting in the file Excel saved; 22 cases, all the same
+PasteSpecial (or a cut) in each case, then the conditionalFormatting in the file Excel saved; 28 cases, all the same
 here (`test/pastecf.test.js`).
 
 | Excel's rule | Excel's example |
@@ -134,12 +134,13 @@ here (`test/pastecf.test.js`).
 | With Transpose, the turned cells, the formulas moved by the corner only. | A1:A3 at C1: C1:E1, =C1>D1. |
 | To another sheet: a copy there; the sheet copied from as it was. | Sheet2!C1:C3, =C1>D1. |
 | A cut moves the rules over the cells cut, their formulas as a cut formula's. | =A1>B1 over A1:A3, cut to C1: C1:C3, =C1>B1. |
+| A rule only partly cut keeps its cells left, written for its new first cell; the moved cells get a rule of their own after it. With none left (the rest pasted over), the rule moves. | A1:A2 of A1:A3 cut to C1: =A3>B3 over A3, then =C1>B1 over C1:C2 (Excel numbers it 3, here 2: the same order). Cut to A2: =A2>B1 over A2:A3. |
+| Data bars and Excel 2010's icon sets come with their extLst half: a new id in both, the same cells; extended or cut, both halves together. | A data bar over A1:A3 copied to C1: C1:C3 in both, a new id; at A4: A1:A6. Three stars copied to C1: a new x14 rule over C1:C3, priority 1. |
 
 Paste Special's box now has Excel's twelve choices, All using Source theme and All merging conditional formats
 among them; within one workbook the first pastes as All does (its theme is the same).
 
-Not yet: rules with Excel 2010's settings in the extLst (data bars, its icon sets) aren't brought; a cut of part of
-a rule leaves the rule where it was (not measured).
+Not yet: a data bar only partly cut stays as it was (not measured); a 2010 icon set partly cut too.
 
 ## Not yet
 
