@@ -29,3 +29,17 @@ jobs:
       - run: npm run test:e2e
       # Fixtures and saved workbooks: well-formed parts, relationships, content types, indexes in range.
       - run: node tools/check-ooxml.mjs test/fixtures test/out
+
+  # Lint and unit tests on Node 24 too, the Node the publish job runs them on (publish.yml): a difference there shows
+  # here, not at release time.
+  unit-node24:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test

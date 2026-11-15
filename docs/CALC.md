@@ -6,7 +6,9 @@ worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `Calcul
 `test/formulas-excel.json`. `npm test` checks every one: **1914 of 1914 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
-2e-14 of these).
+2e-14 of these; the IM functions' complex results, each part to 2e-15, since a part falling on a rounding boundary in
+the 15th digit takes its last digit from the JavaScript engine's Math.pow: IMPOWER("1.5-2i",2.5) is Excel's
+-6.7175144212722-7.24784450716211i in Node 20 and ...212i in Node 24 and Chrome 156).
 
 ## How it works
 

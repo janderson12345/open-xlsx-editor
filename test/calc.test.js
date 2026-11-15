@@ -11,6 +11,21 @@ import { parseFormula } from '../src/calc/parse.js';
 import { numberText } from '../src/calc/values.js';
 
 const book = (name) => Workbook.fromBytes(new Uint8Array(fs.readFileSync(`test/fixtures/${name}`)));
+// A complex number's text ("-6.7175144212722-7.24784450716211i") as its two parts, or null.
+const complexParts = (text) => {
+  const m = /^([+-]?[\d.]+(?:E[+-]?\d+)?)?(?:([+-](?:[\d.]+(?:E[+-]?\d+)?)?)([ij]))?$/.exec(text);
+  if (!m || (!m[1] && !m[3])) return null;
+  const im = m[3] ? (m[2] === '+' || m[2] === '-' ? Number(`${m[2]}1`) : Number(m[2] ?? 1)) : 0;
+  return [Number(m[1] ?? 0), im, m[3] || ''];
+};
+// (The IM functions' results are text, each part to 15 digits; a part whose value falls on a rounding boundary there
+// takes its last digit from the JavaScript engine's Math.pow, which differs by one bit between versions: Node 20 and
+// Excel agree on IMPOWER("1.5-2i",2.5)'s ...211i, Node 24 and Chrome 156 give ...212i. Compared to 2e-15 of each part.)
+const sameComplex = (a, b) => {
+  const x = complexParts(a);
+  const y = complexParts(b);
+  return !!x && !!y && x[2] === y[2] && [0, 1].every((i) => Math.abs(x[i] - y[i]) <= 2e-15 * Math.max(Math.abs(x[i]), Math.abs(y[i])));
+};
 const value = (wb, si, ref) => {
   const { r, c } = parseRef(ref);
   const cell = wb.sheet(si).cells.get(r)?.get(c);
@@ -35,7 +50,7 @@ test('every formula of formulas.xlsx works out as Excel works it out (test/formu
     const near = /^=(_xlfn\.)?(RATE|IRR|YIELD|ODDFYIELD)\(/.test(formula) ? 1e-9 : /^=XIRR\(/.test(formula) ? 1e-8
       : (series ? 1e-13 : 1e-15) * Math.abs(Number(v));
     const ok = t === 'n' ? cell?.t === 'n' && Math.abs(cell.v - Number(v)) <= near
-      : t === 's' ? cell?.t === 'str' && cell.v === v
+      : t === 's' ? cell?.t === 'str' && (cell.v === v || (/^=(_xlfn\.)?IM/.test(formula) && sameComplex(cell.v, v)))
         : t === 'b' ? cell?.t === 'b' && cell.v === v
           : cell?.t === 'e' && cell.v === v;
     if (!ok) wrong.push(`${ref} ${formula}: Excel ${t} ${v}, here ${cell?.t} ${cell?.v}`);
