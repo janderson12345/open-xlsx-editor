@@ -7,6 +7,8 @@ export class Axis {
    *  @param {Map<number, number>} sizes  indexes with a size of their own (0 for hidden) */
   constructor(count, size, sizes = new Map()) {
     this.count = count;
+    /** The default size (a line without one of its own). */
+    this.base = size;
     this.offsets = new Float64Array(count + 1);
     for (let i = 0; i < count; i++) this.offsets[i + 1] = this.offsets[i] + (sizes.has(i) ? sizes.get(i) : size);
   }

@@ -511,6 +511,17 @@
 .oxe-page-zoom .oxe-cell:not(.oxe-h-right) > .oxe-tx {
   translate: var(--oxe-pshift-x, 0px) var(--oxe-pshift, 0px);
 }
+/* Printed headings (print.js drawHeadings): the row numbers and column letters, their rules. */
+.oxe-print-heads { position: absolute; left: 0; top: 0; }
+.oxe-print-head-rule {
+  position: absolute;
+  left: var(--oxe-rx);
+  top: var(--oxe-ry);
+  width: max(var(--oxe-rw), var(--oxe-rt));
+  height: max(var(--oxe-rh), var(--oxe-rt));
+  background: #000000;
+}
+.oxe-print-head-rule.oxe-heavy { --oxe-rt: 1.28px; }
 /* Printed gridlines (print.js drawBlock): hairlines at the cells' edges, as Excel prints them. */
 .oxe-print-grid {
   position: absolute;

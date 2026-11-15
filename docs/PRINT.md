@@ -32,16 +32,21 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
 - **Text in scaled cells** sits further in and lower than the scale alone puts it: 1.4px × (1 − scale) across (the
   3.2px left padding becomes 1.4 + 1.8 × scale px) and 1.2px × (1 − scale) down. In the zoomed box the browser draws
   baselines up to a pixel higher than placed, half a pixel on average, so half a pixel more is added.
-- **Center on page.** Each page's cells (its print titles with them) sit in the middle of the room between its margins,
-  a point short of it each way: centered horizontally, 1, 3 and 8 columns, portrait and landscape, every cell 1.2 to
-  1.3px left of the middle; vertically the same above it (workbooks made in code, printed by Excel; `..
-uns\center`
-  and `center2`: 252 of 252 cells within 1px across and down). Read from printOptions' horizontalCentered and verticalCentered.
+- **Center on page.** Each page's cells (its print titles with them) sit in the middle of the room between its
+  margins, a point short of it each way: centered horizontally, 1, 3 and 8 columns, portrait and landscape, every cell
+  1.2 to 1.3px left of the middle; vertically the same above it (workbooks made in code, printed by Excel;
+  `..\runs\center` and `center2`: 252 of 252 cells within 1px across and down). Read from printOptions'
+  horizontalCentered and verticalCentered.
 - **Printed gridlines** (Sheet Options > Gridlines: Print, printOptions gridLines) are hairlines (0.19px in Excel's
   PDF) at every row and column edge of each printed block of cells, print titles included; Excel draws an outline
-  round the printed range too, over the same edges (a workbook made in code, `..
-uns\gridprint`: all 13 of its
+  round the printed range too, over the same edges (a workbook made in code, `..\runs\gridprint`: all 13 of its
   gridlines within 1px, the text where it was).
+- **Printed headings** (Sheet Options > Headings: Print, printOptions headings): the column letters in a row of the
+  default height above the cells, the row numbers in a column 4.96px plus 7.52px a digit wide (three digits at least:
+  27.52px to row 999, 35.04px past it) left of them, both taken from every page's room; each label centred, 1.4px
+  right of and 1.1px below the middle of its box, in the Normal style; rules of 1.28px round them and an outline
+  round it all (workbooks made in code, 9 to 1,200 rows, `..\runs\heads`: 864 of 864 text pieces within 1px both
+  ways, 299 of 299 rules, the same page counts).
 - **Print titles** print only for the page's own columns. With a print area of B3:H70, rows 1:2 print as B1:E2 above
   the B:E pages.
 - **Headers and footers.** They use the Normal style's font and size, scaled with the sheet unless `scaleWithDoc` is
@@ -85,6 +90,6 @@ there.
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
 
-Not yet: a print area of several ranges (only the first prints), row and column headings in print, pictures in headers
+Not yet: a print area of several ranges (only the first prints), pictures in headers
 (`&G`), headers of more than one line, and the first-page and even-page options beyond choosing their text (measured
 only with odd pages).

@@ -11,6 +11,7 @@ import { autoRowHeights, rowDescents } from './rowheights.js';
 import { fontStack } from './fonts.js';
 import { setSheet } from './sheets.js';
 import { parseHeaderFooter, fillFields } from '../ooxml/headerfooter.js';
+import { colName } from '../ooxml/refs.js';
 
 const DPI = 96;
 /** The room Excel paginates into: the printable height, or width, less a point (measured: Calibri rows of 121 dots at
@@ -61,16 +62,29 @@ export function paginate(sheet, geometry = sheetGeometry(sheet, { print: true })
   const titleRows = titles.rows ? span(rows, titles.rows[0], titles.rows[1]) : 0;
   const titleCols = titles.cols ? span(cols, titles.cols[0], titles.cols[1]) : 0;
   const breaks = page.breaks || { rows: [], cols: [] };
-  const roomDown = (area.h - ROOM_LESS) / scale;
-  const roomAcross = (area.w - ROOM_LESS) / scale;
+  // (Headings: Print takes the row numbers' column and the column letters' row from every page's room.)
+  const heads = page.headings ? { w: headingWidth(range.r1), h: rows.base } : null;
+  const roomDown = (area.h - ROOM_LESS) / scale - (heads ? heads.h : 0);
+  const roomAcross = (area.w - ROOM_LESS) / scale - (heads ? heads.w : 0);
   const rowRuns = breakAxis(rows, range.r1, roomDown, { from: range.r0, breaks: breaks.rows, roomAt: (start) => roomDown - (titles.rows && start > titles.rows[1] ? titleRows : 0) });
   const colRuns = breakAxis(cols, range.c1, roomAcross, { from: range.c0, breaks: breaks.cols, roomAt: (start) => roomAcross - (titles.cols && start > titles.cols[1] ? titleCols : 0) });
   const pages = [];
   const add = ([r0, r1], [c0, c1]) => pages.push({ r0, r1, c0, c1 });
   if (page.pageOrder === 'overThenDown') for (const rr of rowRuns) for (const cr of colRuns) add(rr, cr);
   else for (const cr of colRuns) for (const rr of rowRuns) add(rr, cr);
-  return { pages, paper: { w: pw * DPI, h: ph * DPI }, area, scale, titles, center: { h: !!page.centerH, v: !!page.centerV }, gridLines: !!page.gridLines };
+  return { pages, paper: { w: pw * DPI, h: ph * DPI }, area, scale, titles, center: { h: !!page.centerH, v: !!page.centerV }, gridLines: !!page.gridLines, heads };
 }
+
+/** Where Excel's printed headings sit against the cells (its PDFs): every rule 1.28px (a hairline drawn over it), the
+ *  row numbers' ones and the one under the letters 1.31px in from their start, the letters' separators from 1.15px
+ *  down, the vertical one from just under the rule below the letters to the foot of the last; every label 1.4px
+ *  right of and 1.1px below the middle of its box. */
+const HEAVY_IN = 1.31;
+const LABEL_SHIFT = { x: 1.4, y: 1.1 };
+
+/** The printed row numbers' column, as wide as Excel's (its PDFs of workbooks made in code: rows to 999 27.52px, rows
+ *  past 999 35.04): 4.96px and a printed digit's 7.52 for each digit of the last row's number, three at least. */
+export const headingWidth = (lastRow) => 4.96 + 7.52 * Math.max(3, String(lastRow + 1).length);
 
 /**
  * The scale a sheet prints at: its own (`scale`%), or with fit to page the largest whole percentage (10 to 100) at
@@ -179,6 +193,55 @@ function drawHeaderFooter(pageEl, which, k, layout, hf) {
 
 /** One page: its title rows and columns (when the page starts after them), then its cells, in the zoomed box; its
  *  header and footer. */
+/** Headings: Print's row numbers and column letters for a page, as Excel prints them (its PDFs of workbooks made in
+ *  code): the letters in a row of the default height above the columns `colRuns` ([c0, c1] each, in order), the
+ *  numbers in a column `heads.w` wide left of the rows `rowRuns`, each centred and on the cells' baseline (drawn as cells
+ *  of the Normal style); rules round them, heavier in the numbers' column, and an outline round it all. */
+function drawHeadings(st, heads, colRuns, rowRuns) {
+  const out = div('oxe-print-heads');
+  const label = (text, x, y, w, h) => {
+    const el = div(`oxe-cell oxe-h-center oxe-v-bottom ${st.classOf ? st.classOf(0) : ''}`);
+    setVars(el, { '--oxe-x': x + LABEL_SHIFT.x, '--oxe-y': y + LABEL_SHIFT.y, '--oxe-w': w, '--oxe-h': h });
+    const t = document.createElement('span');
+    t.className = 'oxe-tx';
+    t.textContent = text;
+    el.appendChild(t);
+    out.appendChild(el);
+  };
+  const rule = (cls, x, y, w, h) => { const e = div(`oxe-print-head-rule ${cls}`); setVars(e, { '--oxe-rx': x, '--oxe-ry': y, '--oxe-rw': w, '--oxe-rh': h }); out.appendChild(e); };
+  let x = heads.w;
+  for (const [c0, c1] of colRuns) {
+    for (let c = c0; c <= c1; c++) {
+      const w = st.cols.size(c);
+      if (!w) continue;
+      label(colName(c), x, 0, w, heads.h);
+      rule('oxe-heavy', x, 1.15, 0, heads.h);
+      x += w;
+    }
+  }
+  rule('oxe-heavy', x, 1.15, 0, heads.h);
+  let y = heads.h;
+  for (const [r0, r1] of rowRuns) {
+    for (let r = r0; r <= r1; r++) {
+      const h = st.rows.size(r);
+      if (!h) continue;
+      label(String(r + 1), 0, y, heads.w, h);
+      rule('oxe-heavy', HEAVY_IN, y, heads.w, 0);
+      y += h;
+    }
+  }
+  rule('oxe-heavy', HEAVY_IN, y, heads.w, 0);
+  rule('oxe-heavy', heads.w, heads.h + 1.15, 0, y - heads.h + 1.28 - 1.15);
+  rule('oxe-heavy', heads.w + HEAVY_IN, heads.h, x - heads.w, 0);
+  // (The outline round headings and cells.)
+  // (Its sides run on by a rule's thickness, so that the corners close.)
+  rule('oxe-heavy', 0, 0, x + 1.28, 0);
+  rule('oxe-heavy', 0, 0, 0, y + 1.28);
+  rule('oxe-heavy', x, 0, 0, y + 1.28);
+  rule('oxe-heavy', 0, y, x + 1.28, 0);
+  return out;
+}
+
 function drawPage(st, block, layout, k = 0, hf = {}) {
   const pageEl = div('oxe-page');
   setVars(pageEl, { '--oxe-page-w': layout.paper.w, '--oxe-page-h': layout.paper.h });
@@ -187,8 +250,8 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
   // point short of it, as Excel's PDFs have them: 1, 3 and 8 columns, portrait and landscape, each 1.2 to 1.3px left of
   // the middle, and as much above it.)
   const { rows: tr0, cols: tc0 } = layout.titles;
-  const wide = ((tc0 && block.c0 > tc0[1] ? span(st.cols, tc0[0], tc0[1]) : 0) + span(st.cols, block.c0, block.c1)) * layout.scale;
-  const tall = ((tr0 && block.r0 > tr0[1] ? span(st.rows, tr0[0], tr0[1]) : 0) + span(st.rows, block.r0, block.r1)) * layout.scale;
+  const wide = ((tc0 && block.c0 > tc0[1] ? span(st.cols, tc0[0], tc0[1]) : 0) + span(st.cols, block.c0, block.c1) + (layout.heads ? layout.heads.w : 0)) * layout.scale;
+  const tall = ((tr0 && block.r0 > tr0[1] ? span(st.rows, tr0[0], tr0[1]) : 0) + span(st.rows, block.r0, block.r1) + (layout.heads ? layout.heads.h : 0)) * layout.scale;
   const dx = layout.center?.h ? Math.max(0, (layout.area.w - wide) / 2 - ROOM_LESS) : 0;
   const dy = layout.center?.v ? Math.max(0, (layout.area.h - tall) / 2 - ROOM_LESS) : 0;
   setVars(area, { '--oxe-ml': layout.area.x + dx, '--oxe-mt': layout.area.y + dy, '--oxe-aw': layout.area.w - dx, '--oxe-ah': layout.area.h - dy });
@@ -203,12 +266,15 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
   const { rows: tr, cols: tc } = layout.titles;
   const withRows = tr && block.r0 > tr[1];
   const withCols = tc && block.c0 > tc[1];
-  const th = withRows ? span(st.rows, tr[0], tr[1]) : 0;
-  const tw = withCols ? span(st.cols, tc[0], tc[1]) : 0;
-  if (withRows && withCols) box.appendChild(drawBlock(st, { r0: tr[0], r1: tr[1], c0: tc[0], c1: tc[1] }, 0, 0, layout));
-  if (withRows) box.appendChild(drawBlock(st, { r0: tr[0], r1: tr[1], c0: block.c0, c1: block.c1 }, tw, 0, layout));
-  if (withCols) box.appendChild(drawBlock(st, { r0: block.r0, r1: block.r1, c0: tc[0], c1: tc[1] }, 0, th, layout));
+  const hw = layout.heads ? layout.heads.w : 0;
+  const hh = layout.heads ? layout.heads.h : 0;
+  const th = (withRows ? span(st.rows, tr[0], tr[1]) : 0) + hh;
+  const tw = (withCols ? span(st.cols, tc[0], tc[1]) : 0) + hw;
+  if (withRows && withCols) box.appendChild(drawBlock(st, { r0: tr[0], r1: tr[1], c0: tc[0], c1: tc[1] }, hw, hh, layout));
+  if (withRows) box.appendChild(drawBlock(st, { r0: tr[0], r1: tr[1], c0: block.c0, c1: block.c1 }, tw, hh, layout));
+  if (withCols) box.appendChild(drawBlock(st, { r0: block.r0, r1: block.r1, c0: tc[0], c1: tc[1] }, hw, th, layout));
   box.appendChild(drawBlock(st, block, tw, th, layout, true));
+  if (layout.heads) box.appendChild(drawHeadings(st, layout.heads, [...(withCols ? [[tc[0], tc[1]]] : []), [block.c0, block.c1]], [...(withRows ? [[tr[0], tr[1]]] : []), [block.r0, block.r1]]));
   area.appendChild(box);
   pageEl.appendChild(area);
   drawHeaderFooter(pageEl, 'header', k, layout, hf);

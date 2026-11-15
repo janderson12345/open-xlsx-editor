@@ -389,5 +389,9 @@ const gridOff = await gridCount();
 await page.evaluate(() => window.oxe.command('printGridlines', true));
 const gridOn = await gridCount();
 check(gridOff.join() === '0,0' && gridOn.join() === '9,4', 'Gridlines: Print draws a hairline at each row and column edge of the printed cells', JSON.stringify({ gridOff, gridOn }));
+// Headings: Print: the letters A to C above, the numbers 1 to 8 beside, in a column for three digits.
+await page.evaluate(() => window.oxe.command('printHeadings', true));
+const heads = await page.evaluate(() => { window.oxe.preparePrint(); const labels = [...document.querySelectorAll('.oxe-page .oxe-print-heads .oxe-cell')].map((e) => e.textContent); return labels.join(','); });
+check(heads === 'A,B,C,1,2,3,4,5,6,7,8', 'Headings: Print puts the column letters and row numbers on the printed page', heads);
 
 await finish();
