@@ -2057,11 +2057,18 @@
   gap: 8px 16px;
   align-items: start;
 }
-.oxe-format-box fieldset {
+.oxe-format-box fieldset,
+.oxe-chart-format-box fieldset {
   margin: 0;
   padding: 6px 10px 8px;
   border: 1px solid var(--oxe-head-line);
   border-radius: 4px;
+}
+.oxe-chart-format-box fieldset {
+  margin-bottom: 8px;
+}
+.oxe-chart-format-box fieldset[hidden] {
+  display: none;
 }
 .oxe-fc-field {
   display: flex;
