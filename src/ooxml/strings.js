@@ -57,3 +57,35 @@ export function readSharedStrings(doc) {
   });
   return Object.assign(list, { runs });
 }
+
+const escText = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** A font colour (styles.js readColor) as its element. */
+const colorXml = (c) => {
+  if (!c) return '';
+  if (c.auto) return '<color auto="1"/>';
+  if (c.rgb) return `<color rgb="${c.rgb}"/>`;
+  if (c.theme != null) return `<color theme="${c.theme}"${c.tint ? ` tint="${c.tint}"` : ''}/>`;
+  if (c.indexed != null) return `<color indexed="${c.indexed}"/>`;
+  return '';
+};
+
+/**
+ * A cell's runs as the `r` elements of its string, as Excel writes rich text (test/richtext.test.js, measured over COM):
+ * a run in the cell's own font without rPr; another with an rPr of what it changes (bold, italic, strikethrough,
+ * underline, super- or subscript) and then the font it is in: size, colour, name (rFont), family and scheme as the
+ * cell's (`base`: { name, size, color, family, scheme }), or a size, colour or font of its own. `runs`: [{ text, font:
+ * { b, i, strike, u, vertAlign, size, color: 'FFRRGGBB', name } or null }].
+ */
+export function richRunsXml(runs, base) {
+  return runs.filter((r) => r.text).map((r) => {
+    const f = r.font;
+    const t = `<t${/^\s|\s$|[\t\n]/.test(r.text) ? ' xml:space="preserve"' : ''}>${escText(r.text)}</t>`;
+    if (!f || !Object.values(f).some((v) => v != null && v !== false)) return `<r>${t}</r>`;
+    const own = f.name && f.name !== base.name;
+    const props = [f.b && '<b/>', f.i && '<i/>', f.strike && '<strike/>', f.u && (f.u === 'single' || f.u === true ? '<u/>' : `<u val="${f.u}"/>`), f.vertAlign && `<vertAlign val="${f.vertAlign}"/>`,
+      `<sz val="${f.size ?? base.size}"/>`, f.color ? `<color rgb="${f.color}"/>` : colorXml(base.color), `<rFont val="${escText(own ? f.name : base.name)}"/>`,
+      !own && base.family != null ? `<family val="${base.family}"/>` : '', !own && base.scheme ? `<scheme val="${base.scheme}"/>` : ''].filter(Boolean).join('');
+    return `<r><rPr>${props}</rPr>${t}</r>`;
+  }).join('');
+}
+

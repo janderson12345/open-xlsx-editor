@@ -24,3 +24,19 @@ test("rich text as Excel writes it: each run's text and font, the first one the 
   const h2o = list.runs.get(1);
   assert.deepEqual(h2o.map((r) => [r.text, r.font?.vertAlign ?? null, r.font?.u ?? null]), [['H', null, null], ['2', 'subscript', null], ['O', null, 'single']]);
 });
+
+test("rich text written as Excel writes it: the cell's own font's run bare, the others with every property", async () => {
+  const { build } = await import('./steps.js');
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const { wb, si } = build({ cells: { A1: 'x' } });
+  wb.apply(si, [{ r: 1, c: 0, value: 'Plain boldbig', runs: [{ text: 'Plain ', font: null }, { text: 'bold', font: { b: true } }, { text: 'big', font: { size: 16, color: 'FFFF0000', name: 'Courier New' } }] }]);
+  const el = [...wb._part(si).doc.documentElement.getElementsByTagNameNS(NS, 'c')].find((c) => c.getAttribute('r') === 'A2');
+  const runs = [...el.getElementsByTagNameNS(NS, 'r')].map((r) => serializeXml(r).replace(/ xmlns="[^"]*"/g, ''));
+  // (Excel's own, from the sharedStrings it saved (SST above): the base font here is the fixture's, Calibri 11.)
+  const base = wb._runBase(0);
+  assert.equal(runs[0], '<r><t xml:space="preserve">Plain </t></r>');
+  assert.equal(runs[1], `<r><rPr><b/><sz val="${base.size}"/>${base.color?.theme != null ? `<color theme="${base.color.theme}"/>` : ''}<rFont val="${base.name}"/>${base.family != null ? `<family val="${base.family}"/>` : ''}${base.scheme ? `<scheme val="${base.scheme}"/>` : ''}</rPr><t>bold</t></r>`);
+  assert.equal(runs[2], '<r><rPr><sz val="16"/><color rgb="FFFF0000"/><rFont val="Courier New"/></rPr><t>big</t></r>');
+  // (And read back as runs.)
+  assert.deepEqual(wb.sheet(si).cells.get(1).get(0).runs.map((r) => [r.text, !!r.font?.b, r.font?.size ?? null]), [['Plain ', false, null], ['bold', true, base.size], ['big', false, 16]]);
+});

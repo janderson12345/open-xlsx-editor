@@ -1,6 +1,6 @@
 // Changing cells in a worksheet part's XML in place. Only the `row` and `c` elements an edit needs are touched;
 // everything else in the part (and the other cells' markup) stays as it came.
-import { kids, kid, attr } from './xml.js';
+import { kids, kid, attr, parseXml } from './xml.js';
 import { parseRef, refName, parseRange, rangeName } from './refs.js';
 
 const isOn = (v) => v === '1' || v === 'true';
@@ -106,7 +106,7 @@ const adder = (doc, ns) => (parent, name, text) => {
 /** Set a cell to a number, a boolean, a string (written inline, so the shared string table isn't rewritten), an error
  *  ({ code }) or null (emptied; its style stays). A formula the cell held goes (the caller takes it out of a shared
  *  formula's group first, and out of calcChain.xml). Returns the cell's element. */
-export function setCellXml(doc, r, c, value) {
+export function setCellXml(doc, r, c, value, runsXml = null) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const cEl = cellEl(doc, r, c);
@@ -123,6 +123,12 @@ export function setCellXml(doc, r, c, value) {
     // (An error value, { code: '#DIV/0!' }, as Excel writes a constant one.)
     cEl.setAttribute('t', 'e');
     add(cEl, 'v', value.code);
+  } else if (value != null && runsXml) {
+    // (Rich text: the runs, strings.js richRunsXml, in the inline string.)
+    cEl.setAttribute('t', 'inlineStr');
+    const is = add(cEl, 'is');
+    const parsed = parseXml(`<w xmlns="${ns}">${runsXml}</w>`).documentElement;
+    for (const run of [...parsed.childNodes]) is.appendChild(doc.importNode(run, true));
   } else if (value != null) {
     cEl.setAttribute('t', 'inlineStr');
     const t = add(add(cEl, 'is'), 't', String(value));

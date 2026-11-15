@@ -59,12 +59,12 @@ export function attachEditing(root, ctx) {
       return pointing.key(e);
     },
     onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
-    onFinish: (text, move) => {
+    onFinish: (text, move, runs) => {
       // (An entry refused, a formula with a mistake in it, goes back into the editor to be put right, as in Excel.)
       commit(text, null, () => {
         if (move) cmd.run('move', move[0], move[1]);
         view.focus({ preventScroll: true });
-      });
+      }, runs);
     },
     onCancel: () => view.focus({ preventScroll: true }),
   });
@@ -129,11 +129,11 @@ export function attachEditing(root, ctx) {
   /** Enter `text` (into `at`, or the active cell), then `after()`. Refused (a formula with a mistake), it goes back into
    *  the editor; refused by the cell's data validation, Excel's question first (`ctx.askInvalid`): Retry (or No) back
    *  into the editor, Yes or OK entered anyway, Cancel dropped. */
-  async function commit(text, at, after) {
-    const done = cmd.run('enter', text, at);
+  async function commit(text, at, after, runs = null) {
+    const done = cmd.run('enter', text, at, { runs });
     if (done && done.invalid) {
       const how = (await ctx.askInvalid?.(done.invalid)) || 'cancel';
-      if (how === 'force') { cmd.run('enter', text, at, { force: true }); after(); }
+      if (how === 'force') { cmd.run('enter', text, at, { force: true, runs }); after(); }
       else if (how === 'retry') reopen(text);
       else { refreshBar(); view.focus({ preventScroll: true }); }
       return;
@@ -166,7 +166,7 @@ export function attachEditing(root, ctx) {
       return;
     }
     const cls = ctx.looks().classOf ? ctx.looks().classOf(cell?.s || 0) : '';
-    editor.open(s.ar, s.ac, seed != null ? seed : barText(cell, s.ar, s.ac), mode, cls);
+    editor.open(s.ar, s.ac, seed != null ? seed : barText(cell, s.ar, s.ac), mode, cls, seed == null && mode === 'edit' ? cell?.runs : null);
     pointing.attach(editor.el);
   };
 
@@ -460,6 +460,8 @@ export function attachEditing(root, ctx) {
     /** Insert Function's choice: typed at the caret of the cell being edited, or the active cell opened with
      *  "=NAME(" (`open` after it: '' for a defined name). `hold` keeps the editor open while the box is up. */
     get editorOpen() { return editor.isOpen; },
+    /** The Font group's Bold, Italic, Underline or Strikethrough on part of the text being edited (richmarks.js). */
+    markEditor(key) { return editor.mark(key); },
     holdEditor(on) { editor.hold(on); },
     typeFunction(name, open = '(') {
       if (!editor.isOpen) { startEdit('enter', `=${name}${open}`); return; }

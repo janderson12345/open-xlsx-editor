@@ -5,6 +5,7 @@
 // while a formula is pointing).
 import { setVars } from './dom.js';
 import { autoCorrect } from './autocorrect.js';
+import { marksFromRuns, shiftMarks, toggleMark, runsOf } from './richmarks.js';
 
 const MOVES = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
 
@@ -19,6 +20,9 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   const corrector = autoCorrect(box);
   let open = null; // { r, c, mode }
   let held = null; // (a box over it, Insert Function's: losing focus doesn't finish; the caret kept: [start, end])
+  // (Part of the text formatted: richmarks.js; `seen` the text the marks were last placed in.)
+  let marks = [];
+  let seen = '';
 
   const size = () => {
     // (As wide as the text needs, never narrower than the cell; as tall as its lines.)
@@ -28,14 +32,27 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   const finish = (move) => {
     if (!open) return;
     const text = corrector.finish();
+    // (Its runs, when part of it is formatted and it isn't a formula.)
+    const runs = text.startsWith('=') ? null : runsOf(text, shiftMarks(marks, seen, text));
     close();
-    onFinish(text, move);
+    onFinish(text, move, runs);
+  };
+  /** The selection's part of the text given bold ('b'), italic ('i'), underline ('u') or strikethrough ('strike'),
+   *  or not; true when there was a selection to format. */
+  const mark = (key) => {
+    if (!open || box.selectionEnd <= box.selectionStart || box.value.startsWith('=')) return false;
+    marks = toggleMark(shiftMarks(marks, seen, box.value), box.selectionStart, box.selectionEnd, key);
+    seen = box.value;
+    return true;
   };
 
   box.addEventListener('keydown', (e) => {
     if (!open) return;
     if (onKey?.(e)) { e.preventDefault(); return; }
     if (e.key === 'F2') { e.preventDefault(); open.mode = open.mode === 'enter' ? 'edit' : 'enter'; return; }
+    // (Ctrl+B, I, U and 5 on part of the text: that part formatted, as Excel's.)
+    const fmtKey = (e.ctrlKey || e.metaKey) && !e.altKey && { b: 'b', i: 'i', u: 'u', 5: 'strike' }[e.key.toLowerCase()];
+    if (fmtKey && mark(fmtKey)) { e.preventDefault(); return; }
     if (e.key === 'Escape') { e.preventDefault(); close(); onCancel(); return; }
     if (e.key === 'Enter' && e.altKey) {
       e.preventDefault();
@@ -47,7 +64,12 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     if (e.key === 'Tab') { e.preventDefault(); finish(e.shiftKey ? [0, -1] : [0, 1]); return; }
     if (open.mode === 'enter' && MOVES[e.key]) { e.preventDefault(); finish(MOVES[e.key]); }
   });
-  box.addEventListener('input', () => open && size());
+  box.addEventListener('input', () => {
+    if (!open) return;
+    marks = shiftMarks(marks, seen, box.value);
+    seen = box.value;
+    size();
+  });
   box.addEventListener('blur', () => { if (!held) finish(null); });
 
   function close() {
@@ -60,8 +82,11 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   return {
     /** Open over cell (r, c) with `text`, in `mode` ('enter' replaces the cell, 'edit' keeps it), in class `cls` (the
      *  cell format's, for its font). */
-    open(r, c, text, mode, cls) {
+    open(r, c, text, mode, cls, runs = null) {
       close();
+      // (A cell of rich text keeps its formatting while edited: its runs as marks.)
+      marks = runs && runs.map((x) => x.text).join('') === text ? marksFromRuns(runs) : [];
+      seen = text;
       const rect = grid.cellRect(r, c);
       open = { r, c, mode, w: rect.w, h: rect.h };
       box.className = `oxe-editor ${cls || ''}`;
@@ -77,6 +102,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     /** Enter what is typed, without moving (another sheet is about to be shown). */
     commit: () => finish(null),
     get isOpen() { return !!open; },
+    mark,
     /** Kept open while a box is over it (`on`), or no longer. */
     hold(on) { held = on && open ? [box.selectionStart, box.selectionEnd] : null; },
     /** `text` typed at the caret (in place of what is selected), as edit mode. */

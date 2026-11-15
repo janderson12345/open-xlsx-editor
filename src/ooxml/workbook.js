@@ -3,7 +3,7 @@
 import { OpcPackage } from './package.js';
 import { fileType, setFileType } from './filetype.js';
 import { kids, kid, attr, serializeXml, parseXml, NS } from './xml.js';
-import { readSharedStrings } from './strings.js';
+import { readSharedStrings, richRunsXml } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
@@ -213,11 +213,13 @@ export class Workbook {
     let formulas = false;
     // (The formulas known before any is changed: one replaced here may have spilled into cells the file filled.)
     this.calc.build();
-    for (const { r, c, value, formula, legacy } of changes) {
+    for (const { r, c, value, formula, legacy, runs } of changes) {
       const old = model.cells.get(r)?.get(c);
       if (old && old.shared != null) this._unshare(i, old.shared);
       if (old && old.f != null) { this.calc.remove(i, r, c); formulas = true; }
-      const el = formula != null ? setFormulaXml(part.doc, r, c, formula) : setCellXml(part.doc, r, c, value);
+      // (Rich text, `runs`: written in the cell's own font's terms, strings.js richRunsXml.)
+      const runsXml = runs && typeof value === 'string' ? richRunsXml(runs, this._runBase(old?.s || 0)) : null;
+      const el = formula != null ? setFormulaXml(part.doc, r, c, formula) : setCellXml(part.doc, r, c, value, runsXml);
       // Only this cell of the model changes (re-reading the sheet would cost a pass over all its cells per keystroke).
       if (!model.cells.has(r)) model.cells.set(r, new Map());
       const cell = readCell(el, ns, this.sharedStrings);
@@ -292,6 +294,16 @@ export class Workbook {
     if (rowHeight != null) setSheetRowHeight(part.doc, rowHeight);
     this._reread(i, part);
     this.resetCalc();
+  }
+
+  /** A cell format's font as rich text's runs take it: { name, size, color, family, scheme }. */
+  _runBase(s) {
+    const xf = this.styles.cellXfs[s] || this.styles.cellXfs[0];
+    const font = this.styles.fonts[xf.fontId];
+    const sroot = this.stylesDoc.documentElement;
+    const fontEl = [...(sroot.getElementsByTagNameNS(sroot.namespaceURI, 'fonts')[0]?.childNodes || [])].filter((n) => n.nodeType === 1)[xf.fontId];
+    const family = fontEl ? [...fontEl.childNodes].find((n) => n.localName === 'family')?.getAttribute('val') : null;
+    return { name: font.name, size: font.size, color: font.color, scheme: font.scheme, family: family != null ? Number(family) : null };
   }
 
   /** Sheet i (its `part`) read again after its XML was changed, and marked changed. */

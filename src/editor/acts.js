@@ -77,6 +77,8 @@ export function createActs(env) {
   const act = (name, ...args) => {
     if (name === 'painting') return painter.active();
     if (!state.workbook) return false;
+    // (Bold, Italic, Underline or Strikethrough while part of a cell's text is selected in the editor: that part.)
+    if (name === 'toggleFont' && state.editing?.editorOpen && state.editing.markEditor?.(args[0])) return true;
     if (!allowed(name, args[0])) return false;
     const i = state.sheetIndex;
     // (Charts, comments, Format Cells and conditional formatting: acts-more.js.)

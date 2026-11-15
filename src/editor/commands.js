@@ -262,7 +262,7 @@ export function createCommands(ctx) {
     end() { const { r, c } = lastCell(sheet()); commands.select(r, c); },
     /** Enter what was typed into the active cell (or `at`): parsed as Excel reads an entry (input.js), a formula if
      *  it starts with =. */
-    enter(text, at = null, { force = false } = {}) {
+    enter(text, at = null, { force = false, runs = null } = {}) {
       const { r, c } = at || { r: state.sel.ar, c: state.sel.ac };
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       if (inArray(r, c)) { ctx.announce("You can't change part of an array"); return false; }
@@ -270,6 +270,8 @@ export function createCommands(ctx) {
       const si = ctx.sheetIndex();
       const ch = entryChanges(wb, si, r, c, text);
       if (ch.error) { ctx.announce(ch.error); return false; }
+      // (Part of the text formatted while it was edited: the entry as rich text, when it is entered as that text.)
+      if (runs && ch.content.value === text) ch.content.runs = runs;
       // (A cell's data validation judges what is typed, a formula by its result (validation.js): refused, Excel's
       // question comes back as { invalid } for the caller to ask; `force` enters it anyway, as Yes and OK do.)
       const rule = !force && ruleAt(sheet(), r, c);

@@ -152,7 +152,16 @@ text, show it plain.
 
 A run's larger font grows its row as Excel's does (a 16pt run beside Aptos Narrow 11: 21pt, measured).
 
-Not yet: editing a cell's runs (typing replaces them with plain text, as a new value), and copying them.
+Part of a cell's text is formatted while it is edited, as in Excel: select some of the text in the cell editor and press
+Ctrl+B, Ctrl+I, Ctrl+U or Ctrl+5 (or the Font group's Bold, Italic, Underline, Strikethrough); that part takes it when
+the edit is entered (`src/editor/richmarks.js`). The marks follow the text as it is edited around them, and a cell of
+rich text keeps its runs while edited (bold, italic, underline and strikethrough). They are written as Excel writes rich
+text (`strings.js` richRunsXml, `test/richtext.test.js`): a run in the cell's own font bare, another with an rPr of what
+it changes and then the cell's size, colour, rFont, family and scheme; in the cell's inline string. (Excel adds a
+family number for a run in another font, `family val="3"` for Courier New, which the editor can't know and leaves out.)
+
+Not yet: the formatting shown while it is edited (the editor is a plain text box: it shows once entered), a size,
+colour or font for part of the text, and copying runs.
 
 ## Format Painter
 
