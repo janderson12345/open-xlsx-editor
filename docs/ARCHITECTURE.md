@@ -28,6 +28,7 @@ insides:
 | `src/ooxml/stats.js` | The status bar's Average, Count and Sum of the selection, by Excel's rules. |
 | `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
 | `src/ooxml/charts.js` | A sheet's charts read from its drawing and chart parts, their data from the cells, and Excel's automatic value axis; drawn by `src/editor/chartview.js` (docs/CHARTS.md). |
+| `src/ooxml/chartdata.js` | A chart's data as Excel's Select Data changes it: the data range, Switch Row/Column, series added, edited, removed and moved, hidden and empty cells; the box is `src/editor/chartdatabox.js`, its reference fields `src/editor/refpick.js`, its commands `src/editor/acts-chartdata.js` (docs/CHARTS.md). |
 | `src/ooxml/tables.js` | The workbook's tables, and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
 | `src/ooxml/cfb.js` | Compound files (MS-CFB): every stream read by its path; written as version 3, small streams in the mini stream. |
 | `src/ooxml/encryption.js` | Workbooks saved with a password (MS-OFFCRYPTO agile): decrypted and encrypted with @noble/hashes and @noble/ciphers; PasswordError; docs/ENCRYPTION.md. |
