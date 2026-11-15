@@ -2,8 +2,8 @@
 
 ## 0.5.1
 
-The first release on npm. (0.5.0 was tagged on GitHub but never published: its publish job stopped on a test, a
-complex number's 15th digit that differs between Node versions.)
+The first release published from GitHub, with npm provenance. It has the security fixes below; 0.5.0, published by
+hand from an earlier commit before them, should not be used.
 
 An editor for Excel workbooks that runs in the browser, matched to Excel by measuring Excel's own
 output. `docs/FEATURES.md` has the details, ribbon tab by ribbon tab.
