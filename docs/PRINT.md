@@ -47,6 +47,10 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   right of and 1.1px below the middle of its box, in the Normal style; rules of 1.28px round them and an outline
   round it all (workbooks made in code, 9 to 1,200 rows, `..\runs\heads`: 864 of 864 text pieces within 1px both
   ways, 299 of 299 rules, the same page counts).
+- **A print area of several ranges** prints each on pages of its own, in the order the name lists them, each from
+  the top-left of its page, print titles over each (workbooks made in code: two ranges down, two across, three out of
+  order, two with a title row; `..\runs\areas`: 116 of 116 text pieces within 1px both ways, the same page
+  counts). With fit to page, the scale is the first range's here (not measured).
 - **Print titles** print only for the page's own columns. With a print area of B3:H70, rows 1:2 print as B1:E2 above
   the B:E pages.
 - **Headers and footers.** They use the Normal style's font and size, scaled with the sheet unless `scaleWithDoc` is
@@ -75,7 +79,7 @@ sets the same name), then the file saved (`test/pagesetupedit.test.js`).
 
 Excel also writes its printer's own horizontalDpi, verticalDpi and a printerSettings part when page setup is touched;
 the editor leaves those to the printer. Each is one step of the undo history. Not measured: Excel's joining of neighbouring ranges in Add to Print Area (here
-they are listed as given); the print layout prints a print area of several ranges by its first, as above. The Page
+they are listed as given). The Page
 Setup box's messages for what it won't take are the editor's own, and only its Sheet tab's print area and titles are
 there.
 
@@ -90,6 +94,6 @@ there.
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
 
-Not yet: a print area of several ranges (only the first prints), pictures in headers
+Not yet: pictures in headers
 (`&G`), headers of more than one line, and the first-page and even-page options beyond choosing their text (measured
 only with odd pages).

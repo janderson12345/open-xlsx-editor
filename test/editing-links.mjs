@@ -394,4 +394,10 @@ await page.evaluate(() => window.oxe.command('printHeadings', true));
 const heads = await page.evaluate(() => { window.oxe.preparePrint(); const labels = [...document.querySelectorAll('.oxe-page .oxe-print-heads .oxe-cell')].map((e) => e.textContent); return labels.join(','); });
 check(heads === 'A,B,C,1,2,3,4,5,6,7,8', 'Headings: Print puts the column letters and row numbers on the printed page', heads);
 
+// A print area of two ranges, Set Print Area on A1:C3 then Add to Print Area on A30:C32: two printed pages, the second
+// starting at A30, as Excel prints them.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for (let r = 1; r <= 40; r++) o.enter(`A${r}`, `a${r}`); o.select('A1'); o.command('extendTo', 2, 2); o.command('printArea', 'set'); o.select('A30'); o.command('extendTo', 31, 2); o.command('printArea', 'add'); });
+const twoAreas = await page.evaluate(() => { const n = window.oxe.preparePrint(); const firsts = [...document.querySelectorAll('.oxe-page')].map((p) => p.querySelector('.oxe-cell')?.textContent); return { n, firsts }; });
+check(twoAreas.n === 2 && twoAreas.firsts.join() === 'a1,a30', 'A print area of two ranges prints each on a page of its own', JSON.stringify(twoAreas));
+
 await finish();

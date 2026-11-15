@@ -39,7 +39,7 @@ test('print area, titles and manual breaks (print-area.xlsx): pages as Excel pri
   const { sheetGeometry } = await import('../src/editor/geometry.js');
   const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/print-area.xlsx')));
   const setup = printSetup(wb, 0);
-  assert.deepEqual(setup, { area: { r0: 2, c0: 1, r1: 69, c1: 7 }, titles: { rows: [0, 1], cols: null } });
+  assert.deepEqual(setup, { area: { r0: 2, c0: 1, r1: 69, c1: 7 }, areas: [{ r0: 2, c0: 1, r1: 69, c1: 7 }], titles: { rows: [0, 1], cols: null } });
   const sheet = wb.sheet(0);
   assert.deepEqual(sheet.page.breaks, { rows: [29], cols: [5] });
   const { pages } = paginate(sheet, sheetGeometry(sheet, { print: true, normalFamily: 'Calibri' }), setup);

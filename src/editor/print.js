@@ -294,6 +294,9 @@ export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, p
   const scale = printScale(sheet, full, range);
   const geometry = scale === 1 ? full : sheetGeometry(sheet, { print: true, normalFamily, auto, scale });
   const layout = { ...paginate(sheet, geometry, { ...print, scale }), sheet };
+  // (A print area of several ranges: each on pages of its own, in the order listed, as Excel prints them (its PDFs:
+  // two ranges down or across, three out of order, with print titles over each); the scale is the first range's.)
+  if (print.areas?.length > 1) layout.pages = print.areas.flatMap((a) => paginate(sheet, geometry, { ...print, area: a, scale }).pages);
   const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {

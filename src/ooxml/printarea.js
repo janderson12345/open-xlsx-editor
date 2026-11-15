@@ -1,7 +1,7 @@
 // What a sheet prints, from the workbook's defined names (Excel's Page Setup > Sheet): its print area
 // (_xlnm.Print_Area, the used range without one) and the rows and columns printed at the top and left of every page
-// (_xlnm.Print_Titles: "Sheet1!$1:$2", "Sheet1!$A:$A", or both, comma-separated). A print area of several ranges is
-// printed by its first for now.
+// (_xlnm.Print_Titles: "Sheet1!$1:$2", "Sheet1!$A:$A", or both, comma-separated). A print area of several ranges
+// prints each on pages of its own, in the order listed (measured: print.js renderPrint).
 import { parseRange, colIndex, MAX_ROWS, MAX_COLS } from './refs.js';
 
 /** The ranges a defined name's text holds on its sheet ("Probe!$B$3:$H$70,Probe!$1:$2"): [{ r0, c0, r1, c1 }], whole
@@ -20,15 +20,16 @@ export function rangesOf(text) {
   return out;
 }
 
-/** Sheet si's print area ({ r0, c0, r1, c1 } or null: its used range) and print titles ({ rows: [r0, r1] or null,
- *  cols: [c0, c1] or null }). */
+/** Sheet si's print area ({ r0, c0, r1, c1 } or null: its used range), all its ranges (`areas`, [] for none) and
+ *  print titles ({ rows: [r0, r1] or null, cols: [c0, c1] or null }). */
 export function printSetup(wb, si) {
   const name = (n) => wb.definedNames.find((d) => d.name.toLowerCase() === n && d.sheet === si);
-  const area = rangesOf(name('_xlnm.print_area')?.text)[0] || null;
+  const areas = rangesOf(name('_xlnm.print_area')?.text).filter((a) => !a.rows && !a.cols);
+  const area = areas[0] || null;
   const titles = { rows: null, cols: null };
   for (const r of rangesOf(name('_xlnm.print_titles')?.text)) {
     if (r.rows) titles.rows = [r.r0, r.r1];
     if (r.cols) titles.cols = [r.c0, r.c1];
   }
-  return { area, titles };
+  return { area, areas, titles };
 }
