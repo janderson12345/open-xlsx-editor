@@ -95,6 +95,9 @@ Excel print them and sheets of other cell sizes and line weights to PDF. Excel p
 Sparkline tab's edits through COM, each saved (`test/sparkedit-excel.json`); `excel-sparkedit-check.ps1 <folder>
 <out.json>` has Excel read back the editor's files (`test/out/sparklines`, from `npm test` and `test/sparkline-tab.mjs`)
 into `test/sparkedit-readback-excel.json`.
+`excel-sparkstyles.ps1 <out.json> <books folder>` is the one script that shows an Excel window: a style can only be
+applied from the ribbon's gallery, so it makes its own Excel visible and invokes each of the 36 gallery items through
+UI Automation (no keys or mouse), saving a copy after each (`test/sparkstyles-excel.json`).
 
 PDF export (src/pdf.js) is measured the same way: `OXE_EXPORT=1 node tools/excel-compare/print-ours.mjs <books> <out>` makes
 the PDFs through `exportPdf` instead of the browser's print (docs/PDF.md).

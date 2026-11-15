@@ -30,6 +30,7 @@ insides:
 | `src/ooxml/charts.js` | A sheet's charts read from its drawing and chart parts, their data from the cells, and Excel's automatic value axis; drawn by `src/editor/chartview.js` (docs/CHARTS.md). |
 | `src/ooxml/sparklines.js` | A sheet's sparkline groups read from its extLst (sheet.sparklines), and what each sparkline shows: its values from the cells, the axis's ends, its colours (docs/SPARKLINES.md). |
 | `src/ooxml/sparkedit.js` | Sparklines inserted and edited as Excel writes them: the data cut into sparklines, a group's settings and colours, Group, Ungroup, Clear, Edit Data (docs/SPARKLINES.md). |
+| `src/ooxml/sparklinestyles.js` | Excel's 36 sparkline styles (the style gallery), each one's eight colours as Excel writes them, measured. |
 | `src/ooxml/tables.js` | The workbook's tables, and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
 | `src/ooxml/cfb.js` | Compound files (MS-CFB): every stream read by its path; written as version 3, small streams in the mini stream. |
 | `src/ooxml/encryption.js` | Workbooks saved with a password (MS-OFFCRYPTO agile): decrypted and encrypted with @noble/hashes and @noble/ciphers; PasswordError; docs/ENCRYPTION.md. |

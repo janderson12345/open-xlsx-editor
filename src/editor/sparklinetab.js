@@ -1,9 +1,11 @@
 // The Sparkline tab, Excel's contextual tab, shown while the active cell holds a sparkline: Sparkline (Edit Data),
 // Type (Line, Column, Win/Loss), Show (the points marked), Style (Sparkline Color with its Weight, Marker Color),
-// Group (Axis, Group, Ungroup, Clear). Its actions are acts-sparklines.js's. Not here: Excel's style gallery.
+// Group (Axis, Group, Ungroup, Clear), and Excel's 36 styles in a gallery (sparklinestyles.js). Its actions are
+// acts-sparklines.js's.
 import { el } from './ribbonkit.js';
 import { STANDARD_COLORS, THEME_COLORS } from './sheetmenu.js';
 import { LIGHTER, TINTS } from './hometab.js';
+import { SPARKLINE_STYLES, styleColors } from '../ooxml/sparklinestyles.js';
 
 const SHOW = [['high', 'High Point'], ['low', 'Low Point'], ['negative', 'Negative Points'], ['first', 'First Point'], ['last', 'Last Point'], ['markers', 'Markers']];
 const MARKERS = [['negative', 'Negative Points'], ['markers', 'Markers'], ['high', 'High Point'], ['low', 'Low Point'], ['first', 'First Point'], ['last', 'Last Point']];
@@ -37,6 +39,19 @@ export function sparklineTab(kit, { act, color }) {
   const showBtns = Object.fromEntries(SHOW.map(([k, label]) => [k, toggle('☐', label, () => act('sparklineSet', { [k]: !g?.[k] }), { label })]));
   const colorBtn = menu('🖌', 'Sparkline Color', () => [...palette((c) => act('sparklineColor', 'series', c)), el('hr'),
     item('Weight', sub(() => colorBtn, () => WEIGHTS.map(([w, l]) => item(l, f('sparklineSet', { lineWeight: w }), { on: g?.lineWeight === w }))))], { label: 'Sparkline Color' });
+  // The style gallery: each style shown by its series colour with its high and low points' colours, named as Excel names it.
+  const stylesBtn = menu('▤', 'Sparkline Styles', () => {
+    const swatch = (k) => {
+      const c = styleColors(k);
+      const tone = (x) => color({ ...x, tint: x.tint ? Number(x.tint) : 0 }) || '#000';
+      const title = `Sparkline Style ${SPARKLINE_STYLES[k][0]}`;
+      return el('button', { type: 'button', class: 'oxe-spark-style', title, 'aria-label': title, onmousedown: run(() => act('sparklineStyle', k)) },
+        el('span', { class: 'oxe-spark-style-line', style: `background:${tone(c.series)}` }),
+        el('span', { class: 'oxe-spark-style-dot oxe-spark-style-high', style: `background:${tone(c.high)}` }),
+        el('span', { class: 'oxe-spark-style-dot oxe-spark-style-low', style: `background:${tone(c.low)}` }));
+    };
+    return [el('div', { class: 'oxe-spark-styles' }, ...SPARKLINE_STYLES.map((x, k) => swatch(k)))];
+  }, { label: 'Style', big: true });
   const markerBtn = menu('◆', 'Marker Color', () => MARKERS.map(([k, label]) => item(label, sub(() => markerBtn, () => palette((c) => act('sparklineColor', k, c))))), { label: 'Marker Color' });
   const axisBtn = menu('↔', 'Sparkline Axis', () => {
     const minT = g?.minType || 'individual';
@@ -60,7 +75,7 @@ export function sparklineTab(kit, { act, color }) {
       el('hr'), item('Hidden & Empty Cells...', f('sparklineEmpty'))], { label: 'Edit Data', big: true })),
     grp('Type', typeBtns.line, typeBtns.column, typeBtns.stacked),
     grp('Show', col(showBtns.high, showBtns.low, showBtns.negative), col(showBtns.first, showBtns.last, showBtns.markers)),
-    grp('Style', col(colorBtn, markerBtn)),
+    grp('Style', stylesBtn, col(colorBtn, markerBtn)),
     grp('Group', axisBtn, col(btn('⊞', 'Group Selected Sparklines', f('sparklineGroup'), { label: 'Group' }), btn('⊟', 'Ungroup Selected Sparklines', f('sparklineUngroup'), { label: 'Ungroup' }),
       menu('✕', 'Clear Sparklines', () => [item('Clear Selected Sparklines', f('sparklineClear', false)), item('Clear Selected Sparkline Groups', f('sparklineClear', true))], { label: 'Clear' }))),
   ];

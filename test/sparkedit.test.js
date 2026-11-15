@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { parseXml, serializeXml } from '../src/ooxml/xml.js';
 import { readSparklines } from '../src/ooxml/sparklines.js';
-import { sparkPieces, addSparklines, setGroupOptions, setGroupColor, clearSparklines, groupSparklines, ungroupSparklines, setGroupData, setSparklineData, SparklineError } from '../src/ooxml/sparkedit.js';
+import { sparkPieces, addSparklines, setGroupOptions, setGroupColor, clearSparklines, groupSparklines, ungroupSparklines, setGroupData, setSparklineData, SparklineError, applyStyle } from '../src/ooxml/sparkedit.js';
 import { parseRange } from '../src/ooxml/refs.js';
 import { Workbook } from '../src/ooxml/workbook.js';
 
@@ -124,4 +124,19 @@ test('sparklines written here, as Excel reads them back (test/sparkedit-readback
   // (The Sparkline tab's own edits, in the browser suite's saved file: Win/Loss, High Point, red, the axis, -3.)
   const tab = back.find((f) => f.file === 'sparkline-edits.xlsx').groups.find((g) => g.cells.join() === 'Q2 <- B2:M2');
   assert.deepEqual([tab.type, tab.high, tab.seriesColor, tab.axis, tab.minType, tab.min], [3, true, 255, true, 3, -3]);
+});
+
+test('each of the 36 gallery styles writes the colours Excel wrote (test/sparkstyles-excel.json)', () => {
+  const styles = JSON.parse(fs.readFileSync('test/sparkstyles-excel.json', 'utf8'));
+  assert.equal(styles.length, 36);
+  styles.forEach((st, k) => {
+    const doc = start();
+    applyStyle(doc, [R('O3')], 2, 14, k);
+    const got = Object.fromEntries([...groupsXml(doc).split('<x14:sparklineGroup ')[2].matchAll(/<x14:color(\w+) ([^/]*)\/>/g)].map((m) => [m[1].toLowerCase(), m[2]]));
+    assert.deepEqual(got, st.colors, st.name);
+  });
+  // (Only the groups with a sparkline selected: O6's keeps its red.)
+  const doc = start();
+  applyStyle(doc, [R('O3')], 2, 14, 0);
+  assert.match(groupsXml(doc), /<x14:colorSeries rgb="FFFF0000"\/>/);
 });

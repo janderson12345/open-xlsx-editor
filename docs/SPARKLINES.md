@@ -91,11 +91,33 @@ Show Axis, right to left, each end automatic, the same for all, or custom), Grou
 step of the history.
 
 Not measured, where COM can't reach (the boxes are modal): the boxes' own words and what they fill in, and the
-colours a sparkline inserted from Excel's ribbon gets (its style gallery); the editor gives a new group the colours
-Excel's object model gives (above). Changes are refused on a protected sheet.
+colours a sparkline inserted from Excel's ribbon gets; the editor gives a new group the colours Excel's object model
+gives (above), which are the gallery's Dark #5. Changes are refused on a protected sheet.
+
+## The style gallery
+
+Excel's 36 sparkline styles can only be applied from its ribbon: a sparkline group has no Style property in COM and
+the gallery isn't a command ExecuteMso runs. So `tools/excel-compare/excel-sparkstyles.ps1` makes one Excel of its own
+visible (with the owner's agreement) and invokes each gallery item through Windows UI Automation (no keys, no mouse),
+saving a copy after each (`test/sparkstyles-excel.json`). What was found:
+
+- A style sets the group's eight colours and nothing else (its attributes were unchanged).
+- The 24 accent styles are four rows of six accents: Darker 50% (series accent darkened 50%, negative the next
+  accent, markers as the series, first and last lightened 40%, high and low the accent), Darker 25% (series darkened
+  25%, negative the next accent, markers and points the next accent darkened 25%), plain (series the accent, markers
+  and points it darkened 25%), Lighter 40% (series lightened 40%, negative Background 1 darkened 50%, markers lightened 80%,
+  first and last darkened 25%, high and low darkened 50%). Accent 6's "next accent" is accent 1. The axis is always
+  black.
+- Dark #1 and #2 are theme colours; Dark #3 to #6 and Colorful #1 to #4 fixed colours; Colorful #5 and #6 a different
+  theme colour for each part. Theme colours are written with Excel's tints as text (0.39997558519241921).
+
+The Sparkline tab's Style gallery shows the 36 by their series colour and high and low points' colours, named as
+Excel names them ("Sparkline Style Accent 1, Darker 50%"), and gives the chosen style to the active cell's group and
+every group with a sparkline selected (which groups Excel's gallery takes when several are selected wasn't measured).
+`test/sparkedit.test.js` applies each of the 36 and gets the colours Excel wrote.
 
 ## Not yet
 
-The Sparkline tab's style gallery; sparklines don't follow rows and columns
+Sparklines don't follow rows and columns
 inserted or deleted, and a group's source on another sheet isn't renamed with it. Not measured: an axis when the least
 value is exactly 0, a column sparkline of one value repeated, error values in the data (treated as empty).
