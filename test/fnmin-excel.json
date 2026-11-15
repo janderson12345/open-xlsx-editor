@@ -1,0 +1,3495 @@
+[
+  {
+    "name": "ABS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ACCRINT",
+    "named": 8,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ACCRINTM",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ACOS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ACOSH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ACOT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ACOTH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ADDRESS",
+    "named": 5,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "AGGREGATE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "AMORDEGRC",
+    "named": 7,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "AMORLINC",
+    "named": 7,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "AND",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "ARABIC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "AREAS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ARRAYTOTEXT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ASC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ASIN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ASINH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ATAN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ATAN2",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ATANH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "AVEDEV",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "AVERAGE",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "AVERAGEA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "AVERAGEIF",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "AVERAGEIFS",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BAHTTEXT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BASE",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BESSELI",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BESSELJ",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BESSELK",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BESSELY",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BETA.DIST",
+    "named": 6,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BETA.INV",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BETADIST",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BETAINV",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BIN2DEC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BIN2HEX",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BIN2OCT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BINOM.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BINOM.DIST.RANGE",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BINOM.INV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BINOMDIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BITAND",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BITLSHIFT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BITOR",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BITRSHIFT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BITXOR",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BYCOL",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "BYROW",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CEILING",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CEILING.MATH",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CEILING.PRECISE",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CELL",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHAR",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHIDIST",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHIINV",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHISQ.DIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHISQ.DIST.RT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHISQ.INV",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHISQ.INV.RT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHISQ.TEST",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHITEST",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CHOOSE",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "CHOOSECOLS",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "CHOOSEROWS",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "CLEAN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CODE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COLUMN",
+    "named": 1,
+    "min": 0,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COLUMNS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COMBIN",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COMBINA",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COMPLEX",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CONCAT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "CONCATENATE",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "CONFIDENCE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CONFIDENCE.NORM",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CONFIDENCE.T",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CONVERT",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CORREL",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COSH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COTH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUNT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "COUNTA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "COUNTBLANK",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUNTIF",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUNTIFS",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUPDAYBS",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUPDAYS",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUPDAYSNC",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUPNCD",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUPNUM",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COUPPCD",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COVAR",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COVARIANCE.P",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "COVARIANCE.S",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CRITBINOM",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CSC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CSCH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CUMIPMT",
+    "named": 6,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "CUMPRINC",
+    "named": 6,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DATE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DATEVALUE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DAVERAGE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DAY",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DAYS",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DAYS360",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DB",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DBCS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DCOUNT",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DCOUNTA",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DDB",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DEC2BIN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DEC2HEX",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DEC2OCT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DECIMAL",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DEGREES",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DELTA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DEVSQ",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "DGET",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DISC",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DMAX",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DMIN",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DOLLAR",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DOLLARDE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DOLLARFR",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DPRODUCT",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DROP",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DSTDEV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DSTDEVP",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DSUM",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DURATION",
+    "named": 6,
+    "min": 5,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DVAR",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "DVARP",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EDATE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EFFECT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ENCODEURL",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EOMONTH",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ERF",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ERF.PRECISE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ERFC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ERFC.PRECISE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ERROR.TYPE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EVEN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EXACT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EXP",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EXPAND",
+    "named": 4,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EXPON.DIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "EXPONDIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "F.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "F.DIST.RT",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "F.INV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "F.INV.RT",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "F.TEST",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FACT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FACTDOUBLE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FALSE",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "FDIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FILTER",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FILTERXML",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FIND",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FINDB",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FINV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FISHER",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FISHERINV",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FIXED",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FLOOR",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FLOOR.MATH",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FLOOR.PRECISE",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FORECAST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FORECAST.LINEAR",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FORMULATEXT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FREQUENCY",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FTEST",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FV",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "FVSCHEDULE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMA",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMA.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMA.INV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMADIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMAINV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMALN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAMMALN.PRECISE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GAUSS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GCD",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "GEOMEAN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "GESTEP",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GETPIVOTDATA",
+    "named": 4,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GROUPBY",
+    "named": 8,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "GROWTH",
+    "named": 4,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HARMEAN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "HEX2BIN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HEX2DEC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HEX2OCT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HLOOKUP",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HOUR",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HSTACK",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "HYPERLINK",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HYPGEOM.DIST",
+    "named": 5,
+    "min": 5,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "HYPGEOMDIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IF",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IFERROR",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IFNA",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IFS",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMABS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMAGINARY",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMARGUMENT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMCONJUGATE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMCOS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMCOSH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMCOT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMCSC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMCSCH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMDIV",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMEXP",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMLN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMLOG10",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMLOG2",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMPOWER",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMPRODUCT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "IMREAL",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSEC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSECH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSIN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSINH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSQRT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSUB",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IMSUM",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "IMTAN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "INDEX",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "INDIRECT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "INFO",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "INT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "INTERCEPT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "INTRATE",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IPMT",
+    "named": 6,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "IRR",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISBLANK",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISERR",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISERROR",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISEVEN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISFORMULA",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISLOGICAL",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISNA",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISNONTEXT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISNUMBER",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISO.CEILING",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISODD",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISOMITTED",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISOWEEKNUM",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISPMT",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISREF",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ISTEXT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "KURT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "LAMBDA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LARGE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LCM",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "LEFT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LEFTB",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LEN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LENB",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LET",
+    "named": 3,
+    "min": 3,
+    "known": false,
+    "takesMore": false
+  },
+  {
+    "name": "LINEST",
+    "named": 4,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOG",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOG10",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOGEST",
+    "named": 4,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOGINV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOGNORM.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOGNORM.INV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOGNORMDIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOOKUP",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "LOWER",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MAKEARRAY",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MAP",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MATCH",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MAX",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MAXA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MAXIFS",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MDETERM",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MDURATION",
+    "named": 6,
+    "min": 5,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MEDIAN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MID",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MIDB",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MIN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MINA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MINIFS",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MINUTE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MINVERSE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MIRR",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MMULT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MOD",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MODE",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MODE.MULT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MODE.SNGL",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MONTH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MROUND",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "MULTINOMIAL",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "MUNIT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "N",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NA",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "NEGBINOM.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NEGBINOMDIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NETWORKDAYS",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NETWORKDAYS.INTL",
+    "named": 4,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NOMINAL",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORM.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORM.INV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORM.S.DIST",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORM.S.INV",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORMDIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORMINV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORMSDIST",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NORMSINV",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NOT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NOW",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "NPER",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "NPV",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "NUMBERVALUE",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "OCT2BIN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "OCT2DEC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "OCT2HEX",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ODD",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ODDFPRICE",
+    "named": 9,
+    "min": 8,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ODDFYIELD",
+    "named": 9,
+    "min": 8,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ODDLPRICE",
+    "named": 8,
+    "min": 7,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ODDLYIELD",
+    "named": 8,
+    "min": 7,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "OFFSET",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "OR",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "PDURATION",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PEARSON",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTILE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTILE.EXC",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTILE.INC",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTOF",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTRANK",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTRANK.EXC",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERCENTRANK.INC",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERMUT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PERMUTATIONA",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PHI",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PHONETIC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PI",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "PIVOTBY",
+    "named": 11,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PMT",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "POISSON",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "POISSON.DIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "POWER",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PPMT",
+    "named": 6,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PRICE",
+    "named": 7,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PRICEDISC",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PRICEMAT",
+    "named": 6,
+    "min": 5,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PROB",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PRODUCT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "PROPER",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "PV",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "QUARTILE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "QUARTILE.EXC",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "QUARTILE.INC",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "QUOTIENT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RADIANS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RAND",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "RANDARRAY",
+    "named": 5,
+    "min": 0,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RANDBETWEEN",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RANK",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RANK.AVG",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RANK.EQ",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RATE",
+    "named": 6,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RECEIVED",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REDUCE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REGEXEXTRACT",
+    "named": 4,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REGEXREPLACE",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REGEXTEST",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REPLACE",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REPLACEB",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "REPT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RIGHT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RIGHTB",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ROMAN",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ROUND",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ROUNDDOWN",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ROUNDUP",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ROW",
+    "named": 1,
+    "min": 0,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ROWS",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RRI",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "RSQ",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SCAN",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SEARCH",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SEARCHB",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SEC",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SECH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SECOND",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SEQUENCE",
+    "named": 4,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SERIESSUM",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SHEET",
+    "named": 1,
+    "min": 0,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SHEETS",
+    "named": 1,
+    "min": 0,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SIGN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SIN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SINH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SKEW",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SKEW.P",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SLN",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SLOPE",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SMALL",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SORT",
+    "named": 4,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SORTBY",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SQRT",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SQRTPI",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "STANDARDIZE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "STDEV",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "STDEV.P",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "STDEV.S",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "STDEVA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "STDEVP",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "STDEVPA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "STEYX",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SUBSTITUTE",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SUBTOTAL",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SUM",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SUMIF",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SUMIFS",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SUMPRODUCT",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SUMSQ",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SUMX2MY2",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SUMX2PY2",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SUMXMY2",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "SWITCH",
+    "named": 5,
+    "min": 3,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "SYD",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T.DIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T.DIST.2T",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T.DIST.RT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T.INV",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T.INV.2T",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "T.TEST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TAKE",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TAN",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TANH",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TBILLEQ",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TBILLPRICE",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TBILLYIELD",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TDIST",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TEXT",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TEXTAFTER",
+    "named": 6,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TEXTBEFORE",
+    "named": 6,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TEXTJOIN",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "TEXTSPLIT",
+    "named": 6,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TIME",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TIMEVALUE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TINV",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TOCOL",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TODAY",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "TOROW",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TRANSPOSE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TREND",
+    "named": 4,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TRIM",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TRIMMEAN",
+    "named": 2,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TRIMRANGE",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TRUE",
+    "named": 0,
+    "min": 0,
+    "known": true,
+    "takesMore": null
+  },
+  {
+    "name": "TRUNC",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TTEST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "TYPE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "UNICHAR",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "UNICODE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "UNIQUE",
+    "named": 3,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "UPPER",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "VALUE",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "VALUETOTEXT",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "VAR",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "VAR.P",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "VAR.S",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "VARA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "VARP",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "VARPA",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "VDB",
+    "named": 7,
+    "min": 5,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "VLOOKUP",
+    "named": 4,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "VSTACK",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "WEEKDAY",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WEEKNUM",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WEIBULL",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WEIBULL.DIST",
+    "named": 4,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WORKDAY",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WORKDAY.INTL",
+    "named": 4,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WRAPCOLS",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "WRAPROWS",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "XIRR",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "XLOOKUP",
+    "named": 6,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "XMATCH",
+    "named": 4,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "XNPV",
+    "named": 3,
+    "min": 3,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "XOR",
+    "named": 2,
+    "min": 1,
+    "known": true,
+    "takesMore": true
+  },
+  {
+    "name": "YEAR",
+    "named": 1,
+    "min": 1,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "YEARFRAC",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "YIELD",
+    "named": 7,
+    "min": 6,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "YIELDDISC",
+    "named": 5,
+    "min": 4,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "YIELDMAT",
+    "named": 6,
+    "min": 5,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "Z.TEST",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  },
+  {
+    "name": "ZTEST",
+    "named": 3,
+    "min": 2,
+    "known": true,
+    "takesMore": false
+  }
+]
