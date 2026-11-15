@@ -41,10 +41,10 @@ await ribbon('Sort & Filter', async () => {
   await page.waitForSelector('dialog.oxe-sort-box');
   headed = await page.isChecked('dialog.oxe-sort-box >> input[type=checkbox]');
   await page.selectOption('.oxe-sort-level >> nth=0 >> select >> nth=0', { label: 'Choice' });
-  await page.selectOption('.oxe-sort-level >> nth=0 >> select >> nth=1', { label: 'Z to A' });
+  await page.selectOption('.oxe-sort-level >> nth=0 >> select[aria-label$="order"]', { label: 'Z to A' });
   await page.click('dialog.oxe-sort-box >> button:text-is("Add Level")');
   await page.selectOption('.oxe-sort-level >> nth=1 >> select >> nth=0', { label: 'Amount' });
-  await page.selectOption('.oxe-sort-level >> nth=1 >> select >> nth=1', { label: 'Largest to Smallest' });
+  await page.selectOption('.oxe-sort-level >> nth=1 >> select[aria-label$="order"]', { label: 'Largest to Smallest' });
   await page.click('dialog.oxe-sort-box >> button:text-is("OK")');
 });
 rowsNow = await rowsOf();
@@ -407,7 +407,7 @@ await page.keyboard.press('Control+z');
 const textAgain = await value('K45');
 await page.keyboard.press('Alt+Shift+F10');
 await page.click('.oxe-menu button:text-is("Ignore Error")');
-check(menuItems === 'Number Stored as Text|Convert to Number|Ignore Error|Edit in Formula Bar' && converted === 123 && textAgain === '123' && await errMark() === null,
+check(menuItems === 'Number Stored as Text|Convert to Number|Ignore Error|Edit in Formula Bar|Error Checking Options...' && converted === 123 && textAgain === '123' && await errMark() === null,
   'error button: Convert to Number, Ctrl+Z; Alt+Shift+F10 > Ignore Error', JSON.stringify({ menuItems, converted, textAgain }));
 
 // Formulas > Error Checking from L45 ('7): its cell first; Convert to Number, then on to L46 (=1/0, Divide by Zero
@@ -433,7 +433,7 @@ check(firstError.join() === 'Error in cell L45,Number Stored as Text' && secondE
 await page.evaluate(() => { window.oxe.enter('L47', '=IF(L45>5,L45*2,0)'); window.oxe.select('L47'); });
 await ribbon('Evaluate Formula');
 await page.waitForSelector('dialog.oxe-evaluate-box');
-const evalSteps = [await page.evaluate(() => document.querySelector('.oxe-evaluate-text').innerHTML)];
+const evalSteps = [await page.evaluate(() => document.querySelector('.oxe-evaluate-text .oxe-evaluate-level').innerHTML)];
 for (let k = 0; k < 6; k++) {
   if (await page.textContent('dialog.oxe-evaluate-box .oxe-dialog-buttons button') === 'Restart') break;
   await page.click('dialog.oxe-evaluate-box >> button:text-is("Evaluate")');
