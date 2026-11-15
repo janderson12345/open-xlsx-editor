@@ -149,7 +149,9 @@ export function homeTab(kit, { act, color }) {
         item('Format Cells...', f('formatCellsBox'), { hint: 'Ctrl+1' })]))),
     grp('Editing', col(
       split('∑', 'AutoSum (Alt+=)', f('autoSum', 'sum'), () => [item('Sum', f('autoSum', 'sum'), { hint: 'Alt+=' }), item('Average', f('autoSum', 'average')),
-        item('Count Numbers', f('autoSum', 'count')), item('Max', f('autoSum', 'max')), item('Min', f('autoSum', 'min'))], { label: 'AutoSum' }),
+        item('Count Numbers', f('autoSum', 'count')), item('Max', f('autoSum', 'max')), item('Min', f('autoSum', 'min')),
+        // (More Functions...: Insert Function, then Function Arguments, as Excel's AutoSum menu opens them.)
+        el('hr'), item('More Functions...', f('insertFunction'))], { label: 'AutoSum' }),
       sheetMenu('⬇', 'Fill', 'Fill', () => [item('Down', f('fill', 'down'), { hint: 'Ctrl+D' }), item('Right', f('fill', 'right'), { hint: 'Ctrl+R' }),
         item('Up', f('fill', 'up')), item('Left', f('fill', 'left')), el('hr'), item('Series...', f('seriesBox')), item('Justify', f('fillJustify')), item('Flash Fill', f('flashFill'), { hint: 'Ctrl+E' })]),
       sheetMenu('⌫', 'Clear', 'Clear', () => [item('Clear All', f('clearAs', 'all')), item('Clear Formats', f('clearFormats')), item('Clear Contents', f('clear'), { hint: 'Delete' }),

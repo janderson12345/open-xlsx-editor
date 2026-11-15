@@ -32,6 +32,8 @@ import { excelTextWidth, JUSTIFY_MARGIN } from './textwidth.js';
 import { sheetGeometry } from './geometry.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges, editRule } from '../ooxml/cfmanage.js';
 import { insertFunctionBox } from './functionbox.js';
+import { functionArgumentsBox } from './fnargsbox.js';
+import { callForCaret } from '../calc/fnargs.js';
 import { pasteNameBox, applyNamesBox } from './namesbox.js';
 import { applicableNames, applyNamesSteps } from '../ooxml/applynames.js';
 import { openErrorMenu } from './errormenu.js';
@@ -104,21 +106,38 @@ export function createMoreActs(env) {
     }
     // (Formulas > Watch Window, shown or hidden: watchwindow.js.)
     if (name === 'watchWindow') { state.watch?.toggle(); return true; }
-    if (name === 'insertFunction') {
-      // (Formulas > Insert Function, Shift+F3, or a function from the Function Library's lists (args[0]): typed at the
-      // caret of the cell being edited, or the active cell opened with "=NAME(", and put first in Most Recently Used.)
+    if (name === 'insertFunction' || name === 'functionArguments') {
+      // (Formulas > Insert Function, Shift+F3, AutoSum's More Functions, or a function from the Function Library's
+      // lists (args[0]): put first in Most Recently Used, then Function Arguments for it, as Excel goes on. Function
+      // Arguments alone (Ctrl+A after a function's name in a cell being edited): for that call, its arguments in the
+      // boxes. args[1], the boxes' values for the API.)
       const ed = state.editing;
       if (state.readOnly || !ed) return false;
       const editingNow = ed.editorOpen;
+      const text = editingNow ? ed.editor.el.value : '';
+      const caret = editingNow ? [ed.editor.el.selectionStart, ed.editor.el.selectionEnd] : [0, 0];
+      const call = name === 'functionArguments' && !args[0] ? callForCaret(text, caret[0], { inside: false }) : null;
+      if (name === 'functionArguments' && !args[0] && !call) return false;
       ed.holdEditor(true);
       const recent = state.recentFunctions || DEFAULT_RECENT;
-      const chosen = args[0] ? Promise.resolve(args[0]) : insertFunctionBox(root, { recent });
+      const back = () => { ed.holdEditor(false); if (!editingNow) state.grid.el.focus({ preventScroll: true }); return false; };
+      const chosen = call ? Promise.resolve(call.name) : args[0] ? Promise.resolve(args[0]) : insertFunctionBox(root, { recent });
       return chosen.then((fn) => {
-        if (!fn) { ed.holdEditor(false); if (!editingNow) state.grid.el.focus({ preventScroll: true }); return false; }
-        state.recentFunctions = [fn, ...recent.filter((n) => n !== fn)].slice(0, 10);
-        ed.typeFunction(fn);
-        ed.holdEditor(false);
-        return true;
+        if (!fn) return back();
+        if (name === 'insertFunction') state.recentFunctions = [fn, ...recent.filter((n) => n !== fn)].slice(0, 10);
+        const at = { si: state.sheetIndex, r: editing().selection.ar, c: editing().selection.ac };
+        state.workbook.calc.build();
+        const values = call ? call.args : (args[1] || []);
+        return functionArgumentsBox(root, { name: fn, values, calc: state.workbook.calc, at }).then((got) => {
+          if (!got) return back();
+          // (The call in place of the name and arguments it opened on, or at the caret; "=" first in an empty cell.)
+          const [from, to] = call ? [call.start, call.end] : caret;
+          const formula = editingNow ? `${text.slice(0, from)}${text === '' ? '=' : ''}${got.text}${text.slice(to)}` : `=${got.text}`;
+          ed.holdEditor(false);
+          // (Entered as one step; one Excel would refuse, =SUM() with nothing in it, left being edited.)
+          ed.putFormula(formula, got.refused);
+          return !got.refused;
+        });
       });
     }
     if (name === 'useName' || name === 'pasteNames') {

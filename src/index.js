@@ -424,6 +424,7 @@ export function mountXlsxEditor(host, options = {}) {
           nameManager: () => act('nameManager'),
           createNames: () => act('createNames'),
           insertFunction: () => act('insertFunction'),
+          functionArguments: () => act('functionArguments'),
           pasteNames: () => act('pasteNames'),
           errorMenu: () => { const at = state.grid.errorButtonAt(); return at ? act('errorMenu', at) : false; },
           painting: () => act('painting'),

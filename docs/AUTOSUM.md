@@ -15,7 +15,9 @@ column of dates: `=AVERAGE()` left open in the cell.
 
 ## In the editor
 
-- Home > Editing > AutoSum (∑), and its menu: Sum, Average, Count Numbers, Max, Min. Alt+= is AutoSum.
+- Home > Editing > AutoSum (∑), and its menu: Sum, Average, Count Numbers, Max, Min, and More Functions..., which
+  opens Insert Function and then Function Arguments for the function picked, as Excel does (docs/CALC.md, The Function
+  Library). Formulas > AutoSum has the same menu. Alt+= is AutoSum.
 - Several cells: the formulas entered as one step of the undo history, the totals selected with what they sum.
 - One cell, or nothing found to sum: the cell opens for editing with Excel's proposal (`=SUM(B2:B5)`, or `=SUM()`),
   for Enter to enter it, as Excel leaves it.
@@ -36,6 +38,6 @@ column of dates: `=AVERAGE()` left open in the cell.
 
 ## Not yet
 
-More Functions... (the Insert Function box), AutoSum in a filtered list (SUBTOTAL), the proposed range shown on the
+AutoSum in a filtered list (SUBTOTAL), the proposed range shown on the
 sheet while the cell is being edited, a selection of several areas, and the cases not measured: several blank rows
 selected, and blank cells with nothing above or to the left.

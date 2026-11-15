@@ -59,6 +59,8 @@ export function attachEditing(root, ctx) {
       if ((e.ctrlKey || e.metaKey) && (e.key === 'PageDown' || e.key === 'PageUp') && pointing.ready) { cmd.run('nextSheet', e.key === 'PageDown' ? 1 : -1); return true; }
       // (Shift+F3: Insert Function; F3: Paste Names; the choice typed at the caret.)
       if (e.key === 'F3' && !e.ctrlKey && !e.altKey && (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)) { (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)(); return true; }
+      // (Ctrl+A after a function's name: Function Arguments for it, as in Excel; anywhere else it selects the text.)
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'a' && ctx.functionArguments?.()) return true;
       return pointing.key(e);
     },
     onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
@@ -468,6 +470,14 @@ export function attachEditing(root, ctx) {
     /** The Font group's Bold, Italic, Underline or Strikethrough on part of the text being edited (richmarks.js). */
     markEditor(key) { return editor.mark(key); },
     holdEditor(on) { editor.hold(on); },
+    /** Function Arguments' formula for the cell being edited, or the active cell: entered (refused, back into the
+     *  editor), or with `wait` (one Excel refuses as it stands) left being edited with it. */
+    putFormula(text, wait = false) {
+      if (wait) { reopen(text); return; }
+      const at = editor.at;
+      editor.close();
+      commit(text, at, () => view.focus({ preventScroll: true }));
+    },
     typeFunction(name, open = '(') {
       if (!editor.isOpen) { startEdit('enter', `=${name}${open}`); return; }
       editor.insert(editor.el.value === '' ? `=${name}${open}` : `${name}${open}`);

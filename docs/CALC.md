@@ -359,16 +359,47 @@ Excel (and checked the same way by `test/calcmode.test.js`):
 - **Insert Function** (Shift+F3, or fx on the Formulas tab; `editor/functionbox.js`): Excel's box. Search for a
   function and Go lists the functions whose names hold the words, under Recommended. A category shows its functions:
   Most Recently Used (Excel's list to start with: SUM, AVERAGE, IF, HYPERLINK, COUNT, MAX, SIN, SUMIF, PMT, STDEV,
-  then the ones picked, newest first), All, or one of Excel's. The syntax of the one picked is under the list. OK opens
-  the active cell with `=NAME(`. In a cell being edited, Shift+F3 keeps it open and types `NAME(` at the caret.
+  then the ones picked, newest first), All, or one of Excel's. The syntax and description of the one picked are under
+  the list. OK goes on to Function Arguments, as in Excel. In a cell being edited, Shift+F3 keeps it open.
+- **Function Arguments** (`editor/fnargsbox.js`, `calc/fnargs.js`): after Insert Function, a function picked from the
+  Formulas tab's lists, Home or Formulas > AutoSum > More Functions..., or Ctrl+A right after a function's name typed in
+  a cell being edited (`=VLOOKUP`, `=VLOOKUP(`, its arguments read into the boxes). A box per argument, named as Excel
+  labels them (Lookup_value), the required ones in bold; a repeated argument gets its next box once the last is filled
+  (Number3 after Number2; SUMIFS's Criteria_range2 and Criteria2 together), up to Excel's 255. Beside each, its value at
+  the cell (`= {1;2;3}`, `= "abc"`, `= TRUE`); under them the function's description, the description of the argument
+  with focus, and `Formula result =` for the whole call. OK writes the call (at the caret, or in place of the name and
+  arguments it opened on; `=` first in an empty cell) and enters the cell as one step of the history; Cancel leaves the
+  cell as it was. The command is `functionArguments` (`insertFunction` leads into it).
+- **Descriptions** (`calc/describe.js`): one sentence for every one of the 499 functions listed, and for each argument
+  (by its name, or the function's own where the name means something else: PMT's type against T.TEST's), written for
+  this project in its own words, not Microsoft's.
 - **The Formulas tab's lists**: Recently Used, Financial, Logical, Text, Date & Time, Lookup & Reference, Math & Trig,
   and More Functions (Statistical, Engineering, Information, Compatibility). Database is in Insert Function only, as
   in Excel. A function picked is typed as Insert Function types it. Each one's syntax is its tooltip.
 - **The screen tip** (`editor/fntip.js`): inside a function's parentheses in a cell being edited, its syntax under the
   cell, the argument the caret is in in bold. Repeated arguments go on with the last one named (SUMIFS's pairs two by
   two). Text in quotes, sheet names and array constants are passed over.
-- **Not yet**: Excel's description of each function, and its Function Arguments box (Excel opens it after Insert
-  Function; here the arguments are typed).
+- **What the box writes, measured** over COM in a hidden Excel, each formula set as a cell's formula
+  (`tools/excel-compare/excel-fnargs.ps1`, 47 formulas, `test/fnargs-excel.json`; `excel-fnmin.ps1`, every listed
+  function, `test/fnmin-excel.json`; checked by `test/fnargs.test.js`):
+
+  | Rule | Seen |
+  |---|---|
+  | An argument left empty stays an empty place, kept as written. | `=SUM(A1:A3,,5)` is 11, `=IF(A1>1,,"no")`, `=PMT(0.01,12,1000,,)`, `=VLOOKUP(,,)` all taken as typed. |
+  | Too few arguments are refused, empty places counting as arguments. | `=VLOOKUP(2,A1:A3)`, `=MID(B1,2)`, `=ROUND(1.25)` refused; `=VLOOKUP(,,)`, `=MID(B1,2,)`, `=ROUND(1.25,)` taken. |
+  | The fewest arguments are the syntax's unbracketed ones, for 491 of the 499. | IF needs 2 (`=IF(A1>1)` refused, `=IF(A1>1,)` taken); DCOUNT, DCOUNTA, PROB, REDUCE and SCAN 3; BYCOL and BYROW 1. |
+  | Nothing in a function that needs one argument can't be written. | `=SUM()`, `=LEFT()`, `=AVERAGE()`, `=COUNT()`, `=IF()` refused. |
+
+  So the box writes the arguments up to the last one filled, and at least the fewest Excel takes, the empty ones as
+  empty places: VLOOKUP with nothing filled is `=VLOOKUP(,,)`, IF with only a test `=IF(A1>1,)`. OK on a function
+  needing one argument with nothing in it (`=MAX()`) leaves the cell being edited with that, as AutoSum leaves
+  `=AVERAGE()` (docs/AUTOSUM.md), since Excel would refuse it. The box itself is drawn as Excel's is laid out; what
+  Excel's own box writes was not driven over COM (it would need keys sent to a dialog), only the formulas it can write.
+  The engine took too few arguments without a word; it still does when typed (Not yet).
+- **Not yet**: Function Arguments' collapse button and picking an argument's range on the sheet with the mouse (type
+  the reference), the type hints Excel shows beside an empty box (`= number`), quotes added round text typed in a box
+  (`>1` for `">1"`), opening it from the formula bar on a cell's formula, and refusing a typed formula with too few
+  arguments as Excel does.
 
 ## What Excel does (measured)
 
