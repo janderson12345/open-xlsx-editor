@@ -109,7 +109,7 @@ export function homeTab(kit, { act, color }) {
     grp('Styles', menu('▦', 'Conditional Formatting', () => [
       el('div', { class: 'oxe-cap' }, 'Highlight Cells Rules'), item('Greater Than...', f('cfAdd', 'greaterThan')), item('Less Than...', f('cfAdd', 'lessThan')),
       item('Between...', f('cfAdd', 'between')), item('Equal To...', f('cfAdd', 'equal')), item('Text that Contains...', f('cfAdd', 'containsText')),
-      item('Duplicate Values...', f('cfAdd', 'duplicate')), el('hr'),
+      item('A Date Occurring...', f('cfAdd', 'timePeriod')), item('Duplicate Values...', f('cfAdd', 'duplicate')), el('hr'),
       el('div', { class: 'oxe-cap' }, 'Top/Bottom Rules'), item('Top 10 Items...', f('cfAdd', 'top')), item('Top 10%...', f('cfAdd', 'topPercent')),
       item('Bottom 10 Items...', f('cfAdd', 'bottom')), item('Bottom 10%...', f('cfAdd', 'bottomPercent')), item('Above Average...', f('cfAdd', 'above')),
       item('Below Average...', f('cfAdd', 'below')), el('hr'),

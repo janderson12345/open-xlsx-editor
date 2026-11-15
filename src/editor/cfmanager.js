@@ -4,7 +4,7 @@
 // change is one step of the history (cfmanage.js, cfedit.js through acts-more.js).
 import { modal, button } from './dialogs.js';
 import { make, select, labelled, check } from './formatbox-kit.js';
-import { CF_PRESETS } from '../ooxml/cfedit.js';
+import { CF_PRESETS, CF_PERIODS } from '../ooxml/cfedit.js';
 import { BAR_COLORS } from '../ooxml/cfbarsedit.js';
 import { rangeName, parseRange } from '../ooxml/refs.js';
 
@@ -23,6 +23,7 @@ export function describeRule(rule) {
     case 'containsText': return `Cell value contains "${rule.text ?? ''}"`;
     case 'top10': return `${rule.bottom ? 'Bottom' : 'Top'} ${rule.rank}${rule.percent ? '%' : ''}`;
     case 'aboveAverage': return rule.aboveAverage ? 'Above Average' : 'Below Average';
+    case 'timePeriod': return CF_PERIODS[rule.timePeriod]?.[0] || 'A Date Occurring';
     case 'duplicateValues': return 'Duplicate Values';
     case 'uniqueValues': return 'Unique Values';
     case 'colorScale': return 'Graded Color Scale';

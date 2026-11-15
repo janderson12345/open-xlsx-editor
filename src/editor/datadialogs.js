@@ -265,9 +265,9 @@ export function validationBox(root, rule = null) {
 }
 
 /** One of Excel's Conditional Formatting menu boxes: `text` ("Format cells that are GREATER THAN:"), its `inputs`
- *  ([{ label, value }]), a `choice` ([{ value, label }], Duplicate or Unique) and the format to apply from `presets`
+ *  ([{ label, value }]), a `choice` ([{ value, label }], Duplicate or Unique, a date's period; `choiceLabel` its label) and the format to apply from `presets`
  *  ([{ value, label }]). Resolves to { values, choice, preset }, or null. */
-export function cfRuleBox(root, { title, text, inputs = [], choice = null, presets, preset }) {
+export function cfRuleBox(root, { title, text, inputs = [], choice = null, choiceLabel = 'Format cells that contain:', presets, preset }) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     dlg.classList.add('oxe-cf-box');
@@ -286,7 +286,7 @@ export function cfRuleBox(root, { title, text, inputs = [], choice = null, prese
       if (first) s.dataset.first = '';
       return [Object.assign(document.createElement('label'), { htmlFor: s.id, className: 'oxe-dialog-text', textContent: label }), s];
     };
-    const pick = choice ? select(choice, choice[0].value, 'Format cells that contain:', !inputs.length) : null;
+    const pick = choice ? select(choice, choice[0].value, choiceLabel, !inputs.length) : null;
     const fmt = select(presets, preset, 'with', !inputs.length && !choice);
     const ok = () => done({ values: fields.map(([, i]) => i.value), choice: pick?.[1].value ?? null, preset: fmt[1].value });
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); ok(); } });

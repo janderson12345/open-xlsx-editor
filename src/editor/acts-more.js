@@ -11,7 +11,7 @@ import { readNotes } from '../ooxml/notes.js';
 import { deleteNote } from '../ooxml/noteedit.js';
 import { colName, rangeName } from '../ooxml/refs.js';
 import { areasOf } from './selection.js';
-import { CF_PRESETS } from '../ooxml/cfedit.js';
+import { CF_PRESETS, CF_PERIODS } from '../ooxml/cfedit.js';
 import { formatCellsBox } from './formatbox.js';
 import { threadBox } from './threadbox.js';
 import { addThread, replyThread, editThread, resolveThread } from '../ooxml/threadedit.js';
@@ -224,14 +224,15 @@ export function createMoreActs(env) {
       if (kind === 'dataBar') return add({ kind: 'dataBar', color: BAR_COLORS[args[1]], solid: args[2] === 'solid' });
       if (kind === 'iconSet') return add({ kind: 'iconSet', set: args[1] });
       const WORDS = { greaterThan: 'GREATER THAN', lessThan: 'LESS THAN', between: 'BETWEEN', equal: 'EQUAL TO', containsText: 'CONTAIN THE TEXT' };
-      const TITLES = { greaterThan: 'Greater Than', lessThan: 'Less Than', between: 'Between', equal: 'Equal To', containsText: 'Text That Contains', duplicate: 'Duplicate Values', top: 'Top 10 Items', topPercent: 'Top 10%', bottom: 'Bottom 10 Items', bottomPercent: 'Bottom 10%', above: 'Above Average', below: 'Below Average' };
+      const TITLES = { greaterThan: 'Greater Than', lessThan: 'Less Than', between: 'Between', equal: 'Equal To', containsText: 'Text That Contains', timePeriod: 'A Date Occurring', duplicate: 'Duplicate Values', top: 'Top 10 Items', topPercent: 'Top 10%', bottom: 'Bottom 10 Items', bottomPercent: 'Bottom 10%', above: 'Above Average', below: 'Below Average' };
       const ranked = ['top', 'topPercent', 'bottom', 'bottomPercent'].includes(kind);
-      const text = WORDS[kind] ? `Format cells that are ${WORDS[kind]}:` : ranked ? `Format cells that rank in the ${kind.startsWith('top') ? 'TOP' : 'BOTTOM'}:` : kind === 'duplicate' ? '' : `Format cells that are ${kind === 'above' ? 'ABOVE' : 'BELOW'} AVERAGE for the selected range`;
+      const text = WORDS[kind] ? `Format cells that are ${WORDS[kind]}:` : ranked ? `Format cells that rank in the ${kind.startsWith('top') ? 'TOP' : 'BOTTOM'}:` : kind === 'duplicate' || kind === 'timePeriod' ? '' : `Format cells that are ${kind === 'above' ? 'ABOVE' : 'BELOW'} AVERAGE for the selected range`;
       const inputs = kind === 'between' ? [{ label: 'From', value: '' }, { label: 'and', value: '' }] : WORDS[kind] ? [{ label: 'Value', value: '' }] : ranked ? [{ label: kind.endsWith('Percent') ? 'Percent' : 'Items', value: '10' }] : [];
-      return cfRuleBox(root, { title: TITLES[kind], text, inputs, choice: kind === 'duplicate' ? [{ value: 'duplicate', label: 'Duplicate' }, { value: 'unique', label: 'Unique' }] : null, presets, preset: kind === 'below' ? 'yellow' : 'lightRed' }).then((a) => {
+      return cfRuleBox(root, { title: TITLES[kind], text, inputs, choice: kind === 'duplicate' ? [{ value: 'duplicate', label: 'Duplicate' }, { value: 'unique', label: 'Unique' }] : kind === 'timePeriod' ? Object.entries(CF_PERIODS).map(([value, [label]]) => ({ value, label })) : null, choiceLabel: kind === 'timePeriod' ? 'Format cells that contain a date occurring:' : undefined, presets, preset: kind === 'below' ? 'yellow' : 'lightRed' }).then((a) => {
         if (a) {
           if (WORDS[kind] && kind !== 'containsText') add({ kind: 'cellIs', operator: kind, f1: a.values[0], f2: a.values[1], preset: a.preset });
           else if (kind === 'containsText') add({ kind: 'containsText', text: a.values[0], preset: a.preset });
+          else if (kind === 'timePeriod') add({ kind: 'timePeriod', period: a.choice, preset: a.preset });
           else if (kind === 'duplicate') add({ kind: 'duplicate', unique: a.choice === 'unique', preset: a.preset });
           else if (ranked) add({ kind: 'top10', rank: Math.max(1, Math.round(Number(a.values[0]) || 10)), percent: kind.endsWith('Percent'), bottom: kind.startsWith('bottom'), preset: a.preset });
           else add({ kind: 'average', below: kind === 'below', preset: a.preset });

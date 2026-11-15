@@ -29,6 +29,20 @@ export const CF_SCALES = {
 };
 const OPS = { greaterThan: 'greaterThan', lessThan: 'lessThan', between: 'between', equal: 'equal', notBetween: 'notBetween', notEqual: 'notEqual',
   greaterThanOrEqual: 'greaterThanOrEqual', lessThanOrEqual: 'lessThanOrEqual' };
+/** A Date Occurring's periods, in the menu's order, with their labels and the formulas Excel writes for them (`@` the
+ *  range's first cell; measured: tools/excel-compare/excel-cf-dates.ps1, test/cf-dates-excel.json). */
+export const CF_PERIODS = {
+  yesterday: ['Yesterday', 'FLOOR(@,1)=TODAY()-1'],
+  today: ['Today', 'FLOOR(@,1)=TODAY()'],
+  tomorrow: ['Tomorrow', 'FLOOR(@,1)=TODAY()+1'],
+  last7Days: ['In the last 7 days', 'AND(TODAY()-FLOOR(@,1)<=6,FLOOR(@,1)<=TODAY())'],
+  lastWeek: ['Last week', 'AND(TODAY()-ROUNDDOWN(@,0)>=(WEEKDAY(TODAY())),TODAY()-ROUNDDOWN(@,0)<(WEEKDAY(TODAY())+7))'],
+  thisWeek: ['This week', 'AND(TODAY()-ROUNDDOWN(@,0)<=WEEKDAY(TODAY())-1,ROUNDDOWN(@,0)-TODAY()<=7-WEEKDAY(TODAY()))'],
+  nextWeek: ['Next week', 'AND(ROUNDDOWN(@,0)-TODAY()>(7-WEEKDAY(TODAY())),ROUNDDOWN(@,0)-TODAY()<(15-WEEKDAY(TODAY())))'],
+  lastMonth: ['Last month', 'AND(MONTH(@)=MONTH(EDATE(TODAY(),0-1)),YEAR(@)=YEAR(EDATE(TODAY(),0-1)))'],
+  thisMonth: ['This month', 'AND(MONTH(@)=MONTH(TODAY()),YEAR(@)=YEAR(TODAY()))'],
+  nextMonth: ['Next month', 'AND(MONTH(@)=MONTH(EDATE(TODAY(),0+1)),YEAR(@)=YEAR(EDATE(TODAY(),0+1)))'],
+};
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** A dxf for a preset, as Excel writes it. */
@@ -48,12 +62,12 @@ export function cfFormula(typed) {
 /**
  * The cfRule for `rule` (dxfId the preset's format, priority as given, `at` the range's first cell for formulas that
  * read it), as Excel writes it. `rule`: { kind: 'cellIs', operator, f1, f2 } | { kind: 'containsText', text } |
- * { kind: 'duplicate', unique } | { kind: 'top10', rank, percent, bottom } | { kind: 'average', below } |
+ * { kind: 'timePeriod', period } (CF_PERIODS) | { kind: 'duplicate', unique } | { kind: 'top10', rank, percent, bottom } | { kind: 'average', below } |
  * { kind: 'expression', formula } | { kind: 'colorScale', points } (each with `preset`, but the colour scale), or
  * cfbarsedit.js's data bars and icon sets.
  */
 export function cfRuleXml(rule, dxfId, priority, at) {
-  const a = [`type="${{ cellIs: 'cellIs', containsText: 'containsText', duplicate: rule.unique ? 'uniqueValues' : 'duplicateValues', top10: 'top10', average: 'aboveAverage', colorScale: 'colorScale', expression: 'expression' }[rule.kind]}"`];
+  const a = [`type="${{ cellIs: 'cellIs', containsText: 'containsText', duplicate: rule.unique ? 'uniqueValues' : 'duplicateValues', top10: 'top10', timePeriod: 'timePeriod', average: 'aboveAverage', colorScale: 'colorScale', expression: 'expression' }[rule.kind]}"`];
   if (rule.kind !== 'colorScale') a.push(`dxfId="${dxfId}"`);
   a.push(`priority="${priority}"`);
   if (rule.kind === 'average' && rule.below) a.push('aboveAverage="0"');
@@ -62,10 +76,13 @@ export function cfRuleXml(rule, dxfId, priority, at) {
   if (rule.kind === 'cellIs') a.push(`operator="${OPS[rule.operator] || 'greaterThan'}"`);
   if (rule.kind === 'containsText') a.push('operator="containsText"', `text="${esc(rule.text)}"`);
   if (rule.kind === 'top10') a.push(`rank="${rule.rank}"`);
+  const period = CF_PERIODS[rule.period] ? rule.period : 'yesterday';
+  if (rule.kind === 'timePeriod') a.push(`timePeriod="${period}"`);
   let body = '';
   if (rule.kind === 'cellIs') body = `<formula>${esc(cfFormula(rule.f1))}</formula>${rule.operator === 'between' || rule.operator === 'notBetween' ? `<formula>${esc(cfFormula(rule.f2))}</formula>` : ''}`;
   // (Use a formula: the formula as typed, without its =, as Excel's New Rule writes it.)
   if (rule.kind === 'expression') body = `<formula>${esc(String(rule.formula || '').trim().replace(/^=/, ''))}</formula>`;
+  if (rule.kind === 'timePeriod') body = `<formula>${esc(CF_PERIODS[period][1].replaceAll('@', at))}</formula>`;
   if (rule.kind === 'containsText') body = `<formula>${esc(`NOT(ISERROR(SEARCH("${String(rule.text).replace(/"/g, '""')}",${at})))`)}</formula>`;
   if (rule.kind === 'colorScale') {
     const colors = CF_SCALES[rule.points === 2 ? 2 : 3];

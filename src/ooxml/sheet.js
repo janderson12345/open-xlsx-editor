@@ -146,7 +146,7 @@ function readCondFormats(root, ns) {
       return {
         type: attr(r, 'type'), priority: Number(attr(r, 'priority') || 0), dxfId: attr(r, 'dxfId') == null ? null : Number(attr(r, 'dxfId')),
         stopIfTrue: flag(r, 'stopIfTrue'), operator: attr(r, 'operator'), formulas: kids(r, 'formula', ns).map((f) => f.textContent),
-        text: attr(r, 'text'), rank: Number(attr(r, 'rank') || 10), percent: flag(r, 'percent'), bottom: flag(r, 'bottom'),
+        text: attr(r, 'text'), timePeriod: attr(r, 'timePeriod'), rank: Number(attr(r, 'rank') || 10), percent: flag(r, 'percent'), bottom: flag(r, 'bottom'),
         aboveAverage: flag(r, 'aboveAverage', true), equalAverage: flag(r, 'equalAverage'),
         colorScale: scale ? { cfvo: kids(scale, 'cfvo', ns).map((v) => ({ type: attr(v, 'type'), val: attr(v, 'val') })), colors: kids(scale, 'color', ns).map(readColor) } : null,
         dataBar: kid(r, 'dataBar', ns) ? { ...readDataBar(kid(r, 'dataBar', ns), ns), ...(ext.bars.get(extIdOf(r, ns)) || {}), fill: readDataBar(kid(r, 'dataBar', ns), ns).fill, showValue: readDataBar(kid(r, 'dataBar', ns), ns).showValue } : null,

@@ -31,8 +31,8 @@ rules and their formats are saved as they were.
 
 Home > Styles > Conditional Formatting has the menu's rules, each added for the selection:
 
-- **Highlight Cells Rules:** Greater Than, Less Than, Between, Equal To, Text that Contains, Duplicate Values (or
-  Unique).
+- **Highlight Cells Rules:** Greater Than, Less Than, Between, Equal To, Text that Contains, A Date Occurring,
+  Duplicate Values (or Unique).
 - **Top/Bottom Rules:** Top 10 Items, Top 10%, Bottom 10 Items, Bottom 10%, Above Average, Below Average.
 - **Color Scales:** Excel's default three-colour and two-colour scales.
 - **Clear Rules** from Selected Cells (their cells taken out of every rule's range) or from Entire Sheet. A rule left
@@ -48,6 +48,11 @@ A rule is written as Excel writes it:
 - **Its attributes** in Excel's order.
 - **Values:** a number as it is, text quoted, "=" a formula.
 - **Text that Contains** as `NOT(ISERROR(SEARCH("an",B1)))` from the range's first cell.
+- **A Date Occurring** as `type="timePeriod"` with its period (yesterday, today, tomorrow, last7Days, lastWeek,
+  thisWeek, nextWeek, lastMonth, thisMonth, nextMonth) and Excel's formula for it from the range's first cell:
+  `FLOOR(A1,1)=TODAY()-1` for Yesterday, `AND(MONTH(A1)=MONTH(EDATE(TODAY(),0-1)),YEAR(A1)=YEAR(EDATE(TODAY(),0-1)))`
+  for Last month, weeks from Sunday by WEEKDAY (`cfedit.js` CF_PERIODS). It's drawn by that formula, so against
+  today's date, as Excel draws it.
 - **Its format** as a dxf: the preset's font colour, and its fill as the pattern's background.
 - **Placement:** in the conditionalFormatting of the same range, or a new one in its place among the sheet's elements.
 
@@ -55,6 +60,12 @@ Measured: `excel-cf-write.ps1` had Excel add each of 14 rules (`cf-write-cases.m
 the XML it saved (`test/cf-write-excel.json`). The same rules written here give the same rules, ranges and formats
 (`test/cfedit.test.js`). Opened in Excel beside Excel's own (`cf-write-ours.mjs`, `excel-cf-look.ps1`), all 14 are
 drawn the same: every cell's displayed fill and font colour.
+
+A Date Occurring, measured apart (`excel-cf-dates.ps1`, `test/cf-dates-excel.json`): Excel added each of the ten
+periods to a column of the dates from 45 days before today to 45 after, saved them, and gave each cell's displayed fill.
+Written here, the ten rules are Excel's, and with the clock at Excel's day (15 November 2026, a Sunday) they highlight
+the same 91 by 10 cells (`test/cfdates.test.js`). Not measured: other weekdays and month ends (the formulas are
+Excel's own, worked out by the calculation engine).
 
 Two things the measurement could not settle, because Excel's COM is not its menu. COM's rules Stop If True, and COM
 gives a later rule the lower priority. The editor follows the menu: a new rule doesn't stop, and it comes first
@@ -107,5 +118,5 @@ aside, which COM always sets).
 
 ## Not yet
 
-Date rules ("a date occurring") checked against today's date, a rule's number format and borders, editing a rule's
+A rule's number format and borders, editing a rule's
 settings (Edit Rule), custom thresholds and colours in New Rule, and the other presets of Color Scales.
