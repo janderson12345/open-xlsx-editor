@@ -109,7 +109,9 @@ export function sortBox(root, { lines, start }) {
  * A filter button's list, as Excel's: Sort A to Z and Z to A (Smallest to Largest for numbers), Clear Filter From the
  * column, a search box, and the column's values to tick, with (Select All) and (Blanks); OK keeps the rows ticked.
  * `at`: { x, y } where it opens (the button's bottom left, in the window). `choices`: filterops.js filterChoices.
- * Resolves to { do: 'asc' | 'desc' | 'clear' } or { do: 'apply', values, blank, all }, or null for Cancel and Esc.
+ * A column of dates lists them by year, month and day, as Excel's list does, each year and month a tick box over the
+ * dates under it. Resolves to { do: 'asc' | 'desc' | 'clear' } or { do: 'apply', values, blank, all, dates (the date
+ * groups ticked: a whole year, a whole month, else days) }, or null for Cancel and Esc.
  */
 export function filterBox(root, { title, at, choices, numbers = false, filtered = false, kind = numbers ? 'Number' : 'Text' }) {
   return modal(root, (dlg, done, id) => {
@@ -135,13 +137,40 @@ export function filterBox(root, { title, at, choices, numbers = false, filtered 
     const entries = choices.values.map((v) => ({ label: v.text === '' ? ' ' : v.text, value: v.text, checked: v.checked }));
     if (choices.blanks != null) entries.push({ label: '(Blanks)', blank: true, checked: choices.blanks });
     const all = make('input', { type: 'checkbox', id: `${id}-all` });
+    const dated = choices.values.length > 0 && choices.values.every((v) => v.date);
+    const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    choices.values.forEach((v, i) => { if (dated) { entries[i].date = v.date; entries[i].label = String(v.date.d); } });
     const boxes = entries.map((e, i) => {
       const input = make('input', { type: 'checkbox', id: `${id}-v${i}`, checked: e.checked });
       input.addEventListener('change', () => { sync(); });
-      return { e, input, line: make('div', { className: 'oxe-dialog-option' }, input, make('label', { htmlFor: `${id}-v${i}`, textContent: e.label })) };
+      return { e, input, line: make('div', { className: `oxe-dialog-option${e.date ? ' oxe-filter-day' : ''}` }, input, make('label', { htmlFor: `${id}-v${i}`, textContent: e.label })) };
     });
+    // (Dates: a year's and a month's tick boxes, each over the days under it.)
+    const groups = [];
+    if (dated) {
+      let n = 0;
+      const group = (label, members, cls) => {
+        const input = make('input', { type: 'checkbox', id: `${id}-g${n++}` });
+        input.addEventListener('change', () => { for (const b of members) if (!b.line.hidden) b.input.checked = input.checked; sync(); });
+        const g = { input, members, line: make('div', { className: `oxe-dialog-option ${cls}` }, input, make('label', { htmlFor: input.id, textContent: label })) };
+        groups.push(g);
+        return g;
+      };
+      const days = boxes.filter((b) => b.e.date);
+      for (const y of [...new Set(days.map((b) => b.e.date.y))].sort((a, b) => a - b)) {
+        const inYear = days.filter((b) => b.e.date.y === y);
+        const yearGroup = group(String(y), inYear, 'oxe-filter-year');
+        yearGroup.months = [...new Set(inYear.map((b) => b.e.date.m))].sort((a, b) => a - b).map((m) => group(MONTH_NAMES[m - 1], inYear.filter((b) => b.e.date.m === m).sort((a, b) => a.e.date.d - b.e.date.d), 'oxe-filter-month'));
+      }
+    }
     const okBtn = button('OK', () => apply());
     const sync = () => {
+      for (const g of groups) {
+        const on = g.members.filter((b) => b.input.checked).length;
+        g.input.checked = on === g.members.length;
+        g.input.indeterminate = on > 0 && on < g.members.length;
+        g.line.hidden = g.members.every((b) => b.line.hidden);
+      }
       const shown = boxes.filter((b) => !b.line.hidden);
       const on = shown.filter((b) => b.input.checked).length;
       all.checked = on === shown.length && on > 0;
@@ -154,13 +183,29 @@ export function filterBox(root, { title, at, choices, numbers = false, filtered 
       for (const b of boxes) b.line.hidden = !!q && !b.e.label.toLowerCase().includes(q);
       sync();
     });
-    list.append(make('div', { className: 'oxe-dialog-option' }, all, make('label', { htmlFor: all.id, textContent: '(Select All)' })), ...boxes.map((b) => b.line));
+    // (Dates: each year, its months, each month's days; then the rest, blanks last.)
+    const ordered = dated
+      ? [...groups.filter((g) => g.months).flatMap((y) => [y.line, ...y.months.flatMap((m) => [m.line, ...m.members.map((b) => b.line)])]), ...boxes.filter((b) => !b.e.date).map((b) => b.line)]
+      : boxes.map((b) => b.line);
+    list.append(make('div', { className: 'oxe-dialog-option' }, all, make('label', { htmlFor: all.id, textContent: '(Select All)' })), ...ordered);
     const apply = () => {
       if (okBtn.disabled) return;
       // (With a search typed, only the values it found count, as in Excel.)
       const picked = boxes.filter((b) => !b.line.hidden && b.input.checked);
       const every = picked.length === boxes.length;
-      done({ do: 'apply', all: every, values: picked.filter((b) => !b.e.blank).map((b) => b.e.value), blank: picked.some((b) => b.e.blank) });
+      // (Dates as Excel writes them: a year whose dates are all ticked, else a month, else the days.)
+      const dates = [];
+      if (dated) {
+        for (const y of groups.filter((g) => g.months)) {
+          if (y.members.every((b) => picked.includes(b))) { dates.push({ year: y.members[0].e.date.y }); continue; }
+          for (const m of y.months) {
+            const on = m.members.filter((b) => picked.includes(b));
+            if (on.length && on.length === m.members.length) dates.push({ year: on[0].e.date.y, month: on[0].e.date.m });
+            else for (const b of on) dates.push({ year: b.e.date.y, month: b.e.date.m, day: b.e.date.d });
+          }
+        }
+      }
+      done({ do: 'apply', all: every, values: picked.filter((b) => !b.e.blank && !b.e.date).map((b) => b.e.value), blank: picked.some((b) => b.e.blank), ...(dated ? { dates } : {}) });
     };
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') { e.preventDefault(); apply(); } });
     const row = make('div', { className: 'oxe-dialog-buttons' }, okBtn, button('Cancel', () => done(null)));

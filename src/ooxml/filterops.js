@@ -14,7 +14,8 @@ import { cellText } from './numfmt.js';
 import { sortArea, compareText, SORT_MESSAGES } from './sortops.js';
 import { AFTER_MERGES } from './sheetedit.js';
 import { kid as kidOf, parseXml } from './xml.js';
-import { columnTest, filterColumnXml, dxfFillColor, colorDxfXml, todaySerial } from './filtermore.js';
+import { columnTest, filterColumnXml, dxfFillColor, colorDxfXml, todaySerial, inDateGroups, dateFiltersXml } from './filtermore.js';
+import { isDateFormat, dateParts } from './format.js';
 import { xfOf } from './styles.js';
 import { resolveColor } from './theme.js';
 
@@ -40,10 +41,11 @@ export function shownText(wb, cell) {
   return String(cell.v);
 }
 
-/** Whether row r passes column c's list of values. */
+/** Whether row r passes column c's list of values (and date groups: a date in one of them passes, as Excel's). */
 function passes(wb, sheet, r, c, col) {
   const cell = sheet.cells.get(r)?.get(c);
   if (blank(cell)) return col.blank;
+  if (col.dates?.length && typeof cell.v === 'number' && isDateFormat(formatCodeOf(wb.styles, cell.s || 0)) && inDateGroups(dateParts(cell.v, wb.date1904), col.dates)) return true;
   const text = shownText(wb, cell).toLowerCase();
   return col.values.some((v) => v.toLowerCase() === text);
 }
@@ -110,10 +112,13 @@ export function filterChoices(wb, si, filter, c) {
     if (blank(cell)) { blanks = true; continue; }
     const text = shownText(wb, cell);
     const key = text.toLowerCase();
-    if (!seen.has(key)) seen.set(key, { text, number: typeof cell.v === 'number' ? cell.v : null });
+    const date = typeof cell.v === 'number' && isDateFormat(formatCodeOf(wb.styles, cell.s || 0)) ? dateParts(cell.v, wb.date1904) : null;
+    if (!seen.has(key)) seen.set(key, { text, number: typeof cell.v === 'number' ? cell.v : null, date: date && { y: date.y, m: date.m, d: date.d } });
   }
-  const values = [...seen.values()].sort(listOrder).map(({ text }) => ({
-    text, checked: !listed || mine.values.some((v) => v.toLowerCase() === text.toLowerCase()),
+  // (A date's entry carries its parts, for the list's years, months and days, ticked by the date groups too.)
+  const values = [...seen.values()].sort(listOrder).map(({ text, date }) => ({
+    text, ...(date ? { date } : {}),
+    checked: !listed || mine.values.some((v) => v.toLowerCase() === text.toLowerCase()) || !!(date && mine.dates && inDateGroups(date, mine.dates)),
   }));
   return { values, blanks: blanks ? !listed || mine.blank : null };
 }
@@ -147,6 +152,12 @@ export function setAutoFilterXml(doc, filter, wb = null, si = null, today = toda
       if (col.color && col.color.rgb && col.color.dxfId == null) col.color.dxfId = addDxf(wb, colorDxfXml(col.color.rgb));
       const inner = filterColumnXml(col, { values, average, today, dxfId: col.color?.dxfId ?? 0 });
       const fc = doc.importNode(parseXml(`<w xmlns="${ns}"><filterColumn colId="${id}">${inner}</filterColumn></w>`).documentElement.firstChild, true);
+      el.insertBefore(fc, after);
+      continue;
+    }
+    // (Dates by year, month or day: as Excel 365 writes them, in the filterColumn's extLst: filtermore.js.)
+    if (col.dates?.length) {
+      const fc = doc.importNode(parseXml(`<w xmlns="${ns}"><filterColumn colId="${id}">${dateFiltersXml(col)}</filterColumn></w>`).documentElement.firstChild, true);
       el.insertBefore(fc, after);
       continue;
     }

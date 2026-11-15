@@ -1,7 +1,9 @@
 # Has Excel filter a small sheet (AutoFilter) and says what came of it (cases: [{ name, setup: { cells, formats },
 # steps: [{ do: "on", cell } (Range.AutoFilter with no arguments: the filter turned on, or off when it is on) or
 # { do: "filter", range, field (1-based), values: [shown texts, "=" for blanks] } (xlFilterValues) or { do: "clear",
-# range, field } (that column's filter taken off)], read }]): the
+# range, field } (that column's filter taken off) or { do: "sort", key, order } (AutoFilter.Sort, by the column of
+# cell key, while filtered) or { do: "dates", range, field, groups: [[level, "m/d/yyyy"]] } (xlFilterValues with
+# Criteria2: level 0 a year, 1 a month, 2 a day)], read }]): the cells' values (`values`, when the case asks), the
 # rows hidden, the filter's range, and, from the workbook Excel then saves, the sheet's autoFilter element and the
 # _xlnm._FilterDatabase name as Excel writes them. An invisible instance, macros disabled for it only; each workbook
 # saved to a temporary folder, read, and deleted; no Excel setting is changed and no keys are sent.
@@ -31,6 +33,16 @@ try {
       foreach ($st in $case.steps) {
         if ($st.do -eq 'on') { [void]$ws.Range($st.cell).AutoFilter() }
         elseif ($st.do -eq 'clear') { [void]$ws.Range($st.range).AutoFilter([int]$st.field) }
+        elseif ($st.do -eq 'sort') {
+          $so = $ws.AutoFilter.Sort; $so.SortFields.Clear()
+          [void]$so.SortFields.Add($ws.Range([string]$st.key), 0, $(if ($st.order -eq 'desc') { 2 } else { 1 }))
+          $so.Header = 1; $so.Apply()
+        }
+        elseif ($st.do -eq 'dates') {
+          $crit = New-Object 'object[]' ($st.groups.Count * 2)
+          for ($g = 0; $g -lt $st.groups.Count; $g++) { $crit[2 * $g] = [int]$st.groups[$g][0]; $crit[2 * $g + 1] = [string]$st.groups[$g][1] }
+          [void]$ws.Range($st.range).AutoFilter([int]$st.field, [Type]::Missing, 7, $crit)
+        }
         else { [void]$ws.Range($st.range).AutoFilter([int]$st.field, [string[]]@($st.values), 7) }
       }
     } catch { $a.refused = $true; $a.error = [string]$_.Exception.Message }
@@ -39,6 +51,7 @@ try {
     $hidden = New-Object System.Collections.Generic.List[int]
     foreach ($row in $ws.Range($case.read).Rows) { if ($row.EntireRow.Hidden) { $hidden.Add([int]$row.Row) } }
     $a.hidden = $hidden
+    if ($case.values) { $vals = [ordered]@{}; foreach ($c in $ws.Range($case.read).Cells) { if ($null -ne $c.Value2) { $vals[$c.Address($false, $false)] = [string]$c.Value2 } }; $a.values = $vals }
     $file = Join-Path $tmp "$i.xlsx"
     $wb.SaveAs($file, 51)
     $wb.Close($false)

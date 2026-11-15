@@ -12,6 +12,19 @@ const OPS = ['equal', 'notEqual', 'greaterThan', 'greaterThanOrEqual', 'lessThan
  *  as Excel's: excel-filter-more.ps1 saw this week as 46334 to 46341 for Wednesday 46337). */
 const day = (serial) => { const d = new Date(Date.UTC(1899, 11, 30) + serial * 86400000); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), w: d.getUTCDay() }; };
 const serialOf = (y, m, dd = 1) => Math.round((Date.UTC(y, m, dd) - Date.UTC(1899, 11, 30)) / 86400000);
+/** Excel 365's namespace for a filterColumn's date groups in its extLst, and the ext's uri. */
+export const XLRD2 = 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2';
+export const DATE_EXT = '{1AD28BCE-077C-4C59-8B6E-1921CE8616D4}';
+/** Whether a date's parts ({ y, m, d }) fall in one of `dates` ([{ year, month?, day? }]). */
+export const inDateGroups = (p, dates) => dates.some((g) => g.year === p.y && (g.month == null || g.month === p.m) && (g.day == null || g.day === p.d));
+/** A filterColumn's date groups (and values) as Excel 365 writes them: in its extLst, xlrd2's filters. */
+export function dateFiltersXml(col) {
+  const level = (g) => (g.day != null ? 'day' : g.month != null ? 'month' : 'year');
+  const items = col.dates.map((g) => `<xlrd2:dateGroupItem year="${g.year}"${g.month != null ? ` month="${g.month}"` : ''}${g.day != null ? ` day="${g.day}"` : ''} dateTimeGrouping="${level(g)}"/>`).join('');
+  const values = (col.values || []).map((v) => `<xlrd2:filter val="${esc(v)}"/>`).join('');
+  return `<extLst><ext uri="${DATE_EXT}" xmlns:xlrd2="${XLRD2}"><xlrd2:filterColumn><xlrd2:filters${col.blank ? ' blank="1"' : ''}>${values}${items}</xlrd2:filters></xlrd2:filterColumn></ext></extLst>`;
+}
+
 export const DATE_SPANS = {
   today: (t) => [t, t + 1],
   yesterday: (t) => [t - 1, t],
@@ -37,9 +50,13 @@ export const todaySerial = () => { const d = new Date(); return serialOf(d.getFu
  *  val }] } }, { top10: { top, percent, val } }, { dynamic: { type } }, { color: { dxfId, font } }; `other` for a kind
  *  not read here (icons). */
 export function readFilterColumn(fc, ns) {
-  const filters = kid(fc, 'filters', ns);
-  if (filters && [...filters.childNodes].every((n) => n.nodeType !== 1 || n.localName === 'filter')) {
-    return { values: kids(filters, 'filter', ns).map((f) => attr(f, 'val') ?? ''), blank: ['1', 'true'].includes(attr(filters, 'blank')), other: false };
+  // (Dates by year, month or day: dateGroupItems, in filters or, as Excel 365 writes them, in the filterColumn's extLst.)
+  const rich = [...fc.getElementsByTagNameNS(XLRD2, 'filters')][0];
+  const filters = rich || kid(fc, 'filters', ns);
+  const fns = rich ? XLRD2 : ns;
+  if (filters && [...filters.childNodes].every((n) => n.nodeType !== 1 || n.localName === 'filter' || n.localName === 'dateGroupItem')) {
+    const dates = kids(filters, 'dateGroupItem', fns).map((d) => ({ year: Number(attr(d, 'year')), ...(attr(d, 'month') ? { month: Number(attr(d, 'month')) } : {}), ...(attr(d, 'day') ? { day: Number(attr(d, 'day')) } : {}) }));
+    return { values: kids(filters, 'filter', fns).map((f) => attr(f, 'val') ?? ''), blank: ['1', 'true'].includes(attr(filters, 'blank')), ...(dates.length ? { dates } : {}), other: false };
   }
   const custom = kid(fc, 'customFilters', ns);
   if (custom) return { custom: { and: ['1', 'true'].includes(attr(custom, 'and')), items: kids(custom, 'customFilter', ns).map((f) => ({ op: attr(f, 'operator') || 'equal', val: attr(f, 'val') ?? '' })) }, other: false };

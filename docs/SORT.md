@@ -52,6 +52,6 @@ Low" (Excel's box picks from its own lists).
 ## Not yet
 
 Sorting by a conditional format's icon, Excel's question about numbers stored as text
-(sorted as text here, as without it), sorting a table (ListObject) or within a filter, the cells' menu's Sort, and the
-sort state Excel saves with the sheet. Notes, hyperlinks, conditional formats and data validation stay where they are.
+(sorted as text here, as without it), sorting a table (ListObject), the cells' menu's Sort, and the sort state Excel
+saves with the sheet. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Notes, hyperlinks, conditional formats and data validation stay where they are.
 (Filter, and the Data tab's Sort & Filter group, are done: docs/FILTER.md.)

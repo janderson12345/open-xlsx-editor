@@ -220,7 +220,11 @@ export function sortChanges(wb, si, area, { keys, header = false, matchCase = fa
   const start = first + (header ? size : 0);
   const at = (line, across) => (leftToRight ? sheet.cells.get(across)?.get(line) : sheet.cells.get(line)?.get(across));
   const units = [];
-  for (let line = start; line + size - 1 <= last; line += size) units.push({ line, values: keys.map((k) => keyValue(wb, k, at(line, k.at), textAsNumbers)) });
+  // (Rows filtered out stay where they are, as Excel sorts a filtered range (excel-filter.ps1, filter2-cases.json): only
+  // the rows shown are sorted among themselves.)
+  const filter = sheet.autoFilter;
+  const filtered = !leftToRight && filter && area.r0 >= filter.r0 && area.r1 <= filter.r1 && area.c0 >= filter.c0 && area.c1 <= filter.c1;
+  for (let line = start; line + size - 1 <= last; line += size) if (!(filtered && sheet.rows.get(line)?.hidden)) units.push({ line, values: keys.map((k) => keyValue(wb, k, at(line, k.at), textAsNumbers)) });
   const order = units.map((u, i) => ({ ...u, i }));
   order.sort((p, q) => {
     for (let k = 0; k < keys.length; k++) {

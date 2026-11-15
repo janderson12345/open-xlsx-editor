@@ -363,7 +363,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     if (got && !state.readOnly) {
       if (got.do === 'asc' || got.do === 'desc') editing().run('filterSort', c, got.do === 'desc');
       else if (got.do === 'clear') editing().run('filterBy', c, null);
-      else editing().run('filterBy', c, got.all ? null : { values: got.values, blank: got.blank });
+      else editing().run('filterBy', c, got.all ? null : { values: got.values, blank: got.blank, ...(got.dates ? { dates: got.dates } : {}) });
     }
     state.grid.el.focus({ preventScroll: true });
     return true;

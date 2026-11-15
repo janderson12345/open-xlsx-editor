@@ -223,7 +223,7 @@ export function dataCommands(env) {
       if (!f || ctx.readOnly()) return false;
       const columns = new Map(f.columns);
       // (A list of values, or filtermore.js's other filters as they come.)
-      if (show) columns.set(c, show.values ? { values: show.values, blank: !!show.blank, other: false } : { ...show, other: false });
+      if (show) columns.set(c, show.values ? { values: show.values, blank: !!show.blank, ...(show.dates?.length ? { dates: show.dates } : {}), other: false } : { ...show, other: false });
       else columns.delete(c);
       return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns }), 'autoFilter') === true;
     },

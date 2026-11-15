@@ -1,0 +1,136 @@
+{
+  "excel": "Excel.Application: Range.AutoFilter, then the saved sheet and workbook XML",
+  "cases": [
+    {
+      "name": "red rows sorted A to Z while filtered",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        5,
+        7
+      ],
+      "values": {
+        "A1": "Name",
+        "B1": "Qty",
+        "C1": "Team",
+        "A2": "kiwi",
+        "B2": "9",
+        "C2": "red",
+        "A3": "fig",
+        "B3": "2",
+        "C3": "blue",
+        "A4": "pear",
+        "B4": "5",
+        "C4": "red",
+        "A5": "apple",
+        "B5": "1",
+        "C5": "blue",
+        "A6": "plum",
+        "B6": "7",
+        "C6": "red",
+        "A7": "date",
+        "B7": "3",
+        "C7": "green"
+      },
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{EDE59532-CF5D-4D75-AFB3-E748036C950A}\"><filterColumn colId=\"2\"><filters><filter val=\"red\"/></filters></filterColumn><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"A1\"/></sortState></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "red rows sorted by Qty, largest first, while filtered",
+      "filtering": true,
+      "range": "A1:C7",
+      "hidden": [
+        3,
+        5,
+        7
+      ],
+      "values": {
+        "A1": "Name",
+        "B1": "Qty",
+        "C1": "Team",
+        "A2": "kiwi",
+        "B2": "9",
+        "C2": "red",
+        "A3": "fig",
+        "B3": "2",
+        "C3": "blue",
+        "A4": "plum",
+        "B4": "7",
+        "C4": "red",
+        "A5": "apple",
+        "B5": "1",
+        "C5": "blue",
+        "A6": "pear",
+        "B6": "5",
+        "C6": "red",
+        "A7": "date",
+        "B7": "3",
+        "C7": "green"
+      },
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{C2C8CBB4-D0E3-4738-B13B-7A5D48476F16}\"><filterColumn colId=\"2\"><filters><filter val=\"red\"/></filters></filterColumn><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/></sortState></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"3\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:3\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "dates: the year 2024",
+      "filtering": true,
+      "range": "A1:B7",
+      "hidden": [
+        5,
+        6
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:B7\" xr:uid=\"{9741A2AA-98AC-4976-866E-C8C2C77FB543}\"><filterColumn colId=\"0\"><extLst><ext uri=\"{1AD28BCE-077C-4C59-8B6E-1921CE8616D4}\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><xlrd2:filterColumn><xlrd2:filters><xlrd2:dateGroupItem year=\"2024\" dateTimeGrouping=\"year\"/></xlrd2:filters></xlrd2:filterColumn></ext></extLst></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$B$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"5\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "dates: February 2024",
+      "filtering": true,
+      "range": "A1:B7",
+      "hidden": [
+        2,
+        5,
+        6,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:B7\" xr:uid=\"{A0F61C53-5035-4C71-A624-CA26543CB06B}\"><filterColumn colId=\"0\"><extLst><ext uri=\"{1AD28BCE-077C-4C59-8B6E-1921CE8616D4}\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><xlrd2:filterColumn><xlrd2:filters><xlrd2:dateGroupItem year=\"2024\" month=\"2\" dateTimeGrouping=\"month\"/></xlrd2:filters></xlrd2:filterColumn></ext></extLst></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$B$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"2\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"5\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"6\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    },
+    {
+      "name": "dates: a day, and the year 2023",
+      "filtering": true,
+      "range": "A1:B7",
+      "hidden": [
+        2,
+        4,
+        7
+      ],
+      "autoFilter": "<autoFilter ref=\"A1:B7\" xr:uid=\"{AF12AB3F-AC79-45CB-9923-93523F463666}\"><filterColumn colId=\"0\"><extLst><ext uri=\"{1AD28BCE-077C-4C59-8B6E-1921CE8616D4}\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><xlrd2:filterColumn><xlrd2:filters><xlrd2:dateGroupItem year=\"2024\" month=\"2\" day=\"10\" dateTimeGrouping=\"day\"/><xlrd2:dateGroupItem year=\"2023\" dateTimeGrouping=\"year\"/></xlrd2:filters></xlrd2:filterColumn></ext></extLst></filterColumn></autoFilter>",
+      "filterName": "<definedName name=\"_xlnm._FilterDatabase\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$B$7</definedName>",
+      "hiddenRows": [
+        "<row r=\"2\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"4\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">",
+        "<row r=\"7\" spans=\"1:2\" hidden=\"1\" x14ac:dyDescent=\"0.25\">"
+      ]
+    }
+  ]
+}

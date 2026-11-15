@@ -1,0 +1,220 @@
+[
+ {
+  "name": "red rows sorted A to Z while filtered",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "pear",
+    "B2": "5",
+    "C2": "red",
+    "A3": "fig",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "kiwi",
+    "B4": "9",
+    "C4": "red",
+    "A5": "apple",
+    "B5": "1",
+    "C5": "blue",
+    "A6": "plum",
+    "B6": "7",
+    "C6": "red",
+    "A7": "date",
+    "B7": "3",
+    "C7": "green"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "A1"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red"
+    ]
+   },
+   {
+    "do": "sort",
+    "key": "A1"
+   }
+  ],
+  "read": "A1:C10",
+  "values": true
+ },
+ {
+  "name": "red rows sorted by Qty, largest first, while filtered",
+  "setup": {
+   "cells": {
+    "A1": "Name",
+    "B1": "Qty",
+    "C1": "Team",
+    "A2": "pear",
+    "B2": "5",
+    "C2": "red",
+    "A3": "fig",
+    "B3": "2",
+    "C3": "blue",
+    "A4": "kiwi",
+    "B4": "9",
+    "C4": "red",
+    "A5": "apple",
+    "B5": "1",
+    "C5": "blue",
+    "A6": "plum",
+    "B6": "7",
+    "C6": "red",
+    "A7": "date",
+    "B7": "3",
+    "C7": "green"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "A1"
+   },
+   {
+    "do": "filter",
+    "range": "A1",
+    "field": 3,
+    "values": [
+     "red"
+    ]
+   },
+   {
+    "do": "sort",
+    "key": "B1",
+    "order": "desc"
+   }
+  ],
+  "read": "A1:C10",
+  "values": true
+ },
+ {
+  "name": "dates: the year 2024",
+  "setup": {
+   "cells": {
+    "A1": "When",
+    "B1": "Row",
+    "A2": "1/5/2024",
+    "A3": "2/10/2024",
+    "A4": "2/20/2024",
+    "A5": "3/1/2023",
+    "A6": "2/10/2023",
+    "A7": "12/31/2024",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "A1"
+   },
+   {
+    "do": "dates",
+    "range": "A1",
+    "field": 1,
+    "groups": [
+     [
+      0,
+      "1/1/2024"
+     ]
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "dates: February 2024",
+  "setup": {
+   "cells": {
+    "A1": "When",
+    "B1": "Row",
+    "A2": "1/5/2024",
+    "A3": "2/10/2024",
+    "A4": "2/20/2024",
+    "A5": "3/1/2023",
+    "A6": "2/10/2023",
+    "A7": "12/31/2024",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "A1"
+   },
+   {
+    "do": "dates",
+    "range": "A1",
+    "field": 1,
+    "groups": [
+     [
+      1,
+      "2/1/2024"
+     ]
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ },
+ {
+  "name": "dates: a day, and the year 2023",
+  "setup": {
+   "cells": {
+    "A1": "When",
+    "B1": "Row",
+    "A2": "1/5/2024",
+    "A3": "2/10/2024",
+    "A4": "2/20/2024",
+    "A5": "3/1/2023",
+    "A6": "2/10/2023",
+    "A7": "12/31/2024",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   }
+  },
+  "steps": [
+   {
+    "do": "on",
+    "cell": "A1"
+   },
+   {
+    "do": "dates",
+    "range": "A1",
+    "field": 1,
+    "groups": [
+     [
+      2,
+      "2/10/2024"
+     ],
+     [
+      0,
+      "1/1/2023"
+     ]
+    ]
+   }
+  ],
+  "read": "A1:C10"
+ }
+]

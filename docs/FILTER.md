@@ -71,7 +71,18 @@ Measured over COM (`tools/excel-compare/excel-advfilter.ps1`: 7 cases of `Range.
 | Copied: the heading and the rows passing, at the cell given; nothing hidden. | |
 | Names: `_xlnm._FilterDatabase` (hidden) for the list, `_xlnm.Criteria` for the criteria, `_xlnm.Extract` for the copy's heading row. | Extract: `Sheet1!$I$1:$K$1`. |
 
+## Dates by year, month and day; sorting while filtered
+
+A column of dates is listed by year, month and day, as Excel's list is: each year and month a tick box over the dates
+under it. Measured over COM (`excel-filter.ps1` on `filter2-cases.json`, `test/filter2-excel.json`), 5 of 5:
+
+| Rule | Seen |
+|---|---|
+| Dates are filtered as date groups: a year whose dates are all ticked, else a month, else the days, a date passing when it is in one. | The year 2024: 3/1/2023 and 2/10/2023 hidden. February 2024: four hidden. 2/10/2024 and the year 2023: 1/5, 2/20 and 12/31/2024 hidden. |
+| Excel 365 writes them in the filterColumn's extLst, xlrd2's filters, not in its filters. | `<filterColumn colId="0"><extLst><ext uri="{1AD28BCE-...}"><xlrd2:filterColumn><xlrd2:filters><xlrd2:dateGroupItem year="2024" month="2" dateTimeGrouping="month"/>...`: written so here, Excel's to the byte but its random uid; read either way. |
+| A sort of the filtered range (from a filter button or the Sort box) sorts only the rows shown; those filtered out stay where they are. | red rows A to Z: kiwi, pear, plum in rows 2, 4 and 6, fig, apple and date where they were. |
+
 ## Not yet
 
-Date grouping in the list, sorting while rows are filtered out (Excel sorts only the rows shown), the filter growing as
-rows are added below, tables' own filters, and filtering by an icon.
+Excel's `sortState` saved in the autoFilter after a sort, the filter growing as rows are added below, tables' own
+filters, and filtering by an icon.
