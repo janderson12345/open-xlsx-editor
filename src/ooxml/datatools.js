@@ -7,7 +7,7 @@
 // split at its delimiters (quotes keeping a piece whole), each piece read as typed (numbers, dates, TRUE, 5%). Each
 // returns steps ({ si, contents, styles, area }) for the editor's history, as fillops.js's do.
 import { shiftFormula } from '../calc/tokens.js';
-import { parseInput } from './input.js';
+import { parseInput, dateSerial, fullYear } from './input.js';
 import { formatCodeOf } from './styles.js';
 import { cellText } from './numfmt.js';
 
@@ -146,14 +146,29 @@ export function splitLine(text, set, { consecutive = false, quote = '"' } = {}) 
   return out;
 }
 
+const DATE_ORDERS = ['mdy', 'dmy', 'ymd', 'myd', 'dym', 'ydm'];
+
+/** A piece of a Date column (`order`, as 'dmy'), as Excel reads it (excel-datatools.ps1): its three numbers, apart by
+ *  / - or ., taken in that order, a two-digit year as typed ones are (03 is 2003, 99 is 1999); null when they aren't
+ *  a date, the piece then read as typed (2026-03-04 in an MDY column: 4 March). */
+function orderedDate(text, order, date1904) {
+  const m = /^(\d{1,4})[/.-](\d{1,4})[/.-](\d{1,4})$/.exec(text.trim());
+  if (!m) return null;
+  const v = Object.fromEntries([...order].map((k, i) => [k, m[i + 1]]));
+  return dateSerial(fullYear(v.y), Number(v.m), Number(v.d), date1904);
+}
+
 /**
  * Data > Text to Columns on the one-column `range` of sheet si: each cell split (`delimiters` { tab, semicolon,
  * comma, space, other }, `consecutive`, `quote`), the pieces written across from `dest` ({ r, c }: the range's own
  * first cell by default), each read as typed; an empty piece leaves its cell. Fixed width (`breaks`: the character
  * places columns start at, after the first's at 0), as Excel splits (excel-datatools.ps1): the characters between
- * two breaks, spaces at either end trimmed; a number's cell split from the text it shows.
+ * two breaks, spaces at either end trimmed; a number's cell split from the text it shows. `formats`, one a column (the
+ * wizard's Column data format): 'general' (as typed), 'text' (kept as text, in the @ format), 'skip' (Do not import
+ * column: left out, the columns after it moved left) or a date's order ('mdy', 'dmy', 'ymd', 'myd', 'dym', 'ydm':
+ * see orderedDate).
  */
-export function textToColumns(wb, si, range, { delimiters = {}, consecutive = false, quote = '"', dest = null, breaks = null } = {}) {
+export function textToColumns(wb, si, range, { delimiters = {}, consecutive = false, quote = '"', dest = null, breaks = null, formats = [] } = {}) {
   const sheet = wb.sheet(si);
   const set = [delimiters.tab ? '\t' : '', delimiters.semicolon ? ';' : '', delimiters.comma ? ',' : '', delimiters.space ? ' ' : '', delimiters.other || ''].join('');
   const to = dest || { r: range.r0, c: range.c0 };
@@ -167,10 +182,11 @@ export function textToColumns(wb, si, range, { delimiters = {}, consecutive = fa
       const at = [0, ...[...new Set(breaks)].filter((b) => b > 0).sort((a, b) => a - b)];
       pieces = at.map((b, k) => text.slice(b, at[k + 1]).replace(/^ +| +$/g, ''));
     } else pieces = set ? splitLine(cell.v, set, { consecutive, quote }) : [cell.v];
-    pieces.forEach((p, k) => {
+    pieces.map((p, k) => [p, formats[k] || 'general']).filter(([, f]) => f !== 'skip').forEach(([p, f], k) => {
       const at = { r: to.r + r - range.r0, c: to.c + k };
       if (p === '') { if (k === 0 && at.r === r && at.c === range.c0) out.contents.push({ ...at, value: null }); return; }
-      const read = parseInput(p, { date1904: wb.date1904 });
+      const serial = DATE_ORDERS.includes(f) ? orderedDate(p, f, wb.date1904) : null;
+      const read = f === 'text' ? { value: p, format: '@' } : serial != null ? { value: serial, format: 'm/d/yyyy' } : parseInput(p, { date1904: wb.date1904 });
       out.contents.push({ ...at, value: read.value ?? p });
       out.styles.push({ ...at, s: read.format ? wb.styleWith(cell.s || 0, { numFmt: read.format }) : cell.s || 0 });
       out.area.c1 = Math.max(out.area.c1, at.c);

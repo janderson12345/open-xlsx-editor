@@ -4,6 +4,7 @@
 import { modal, button } from './dialogs.js';
 import { make, check, select, labelled } from './formatbox-kit.js';
 import { parseRef } from '../ooxml/refs.js';
+import { splitLine } from '../ooxml/datatools.js';
 
 const radios = (id, name, pairs, value) => {
   const inputs = {};
@@ -66,8 +67,8 @@ export function removeDuplicatesBox(root, { columns, headers }) {
 }
 
 /** Text to Columns: Delimited (the delimiters, Treat consecutive delimiters as one, the text qualifier) or Fixed width
- *  (the column breaks, character places, over a preview of the first of `lines`, a | at each break), and Destination.
- *  Resolves to textToColumns's options. */
+ *  (the column breaks, character places, over a preview of the first of `lines`, a | at each break), each column's
+ *  data format (as many as the first lines split into), and Destination. Resolves to textToColumns's options. */
 export function textToColumnsBox(root, { dest, lines = [] }) {
   return shell(root, 'Convert Text to Columns', 'oxe-ttc-box', (id, done, say) => {
     const kind = radios(id, 'kind', [['delimited', 'Delimited'], ['fixed', 'Fixed width']], 'delimited');
@@ -92,9 +93,31 @@ export function textToColumnsBox(root, { dest, lines = [] }) {
     breaks.addEventListener('input', draw);
     draw();
     const fixed = make('div', {}, labelled('Column breaks (characters from the left):', breaks), preview);
-    const show = () => { const f = kind.value() === 'fixed'; delimited.hidden = f; fixed.hidden = !f; };
+    // (Column data format: a list for each column the first lines split into, its choice kept as the columns change.)
+    const FORMATS = [['general', 'General'], ['text', 'Text'], ['mdy', 'Date: MDY'], ['dmy', 'Date: DMY'], ['ymd', 'Date: YMD'], ['myd', 'Date: MYD'],
+      ['dym', 'Date: DYM'], ['ydm', 'Date: YDM'], ['skip', 'Do not import column (skip)']];
+    const formatLists = [];
+    const formatsEl = make('fieldset', {}, make('legend', { textContent: 'Column data format' }));
+    const set = () => [tab.input.checked ? '\t' : '', semicolon.input.checked ? ';' : '', comma.input.checked ? ',' : '', space.input.checked ? ' ' : '', other.value].join('');
+    const columns = () => {
+      if (kind.value() === 'fixed') return new Set(places().filter((n) => Number.isInteger(n) && n > 0)).size + 1;
+      const s = set();
+      return Math.max(1, ...lines.slice(0, 5).map((t) => (s ? splitLine(t, s, { consecutive: consecutive.input.checked, quote: quote.value }).length : 1)));
+    };
+    const relist = () => {
+      const n = Math.min(columns(), 50);
+      while (formatLists.length < n) {
+        const list = select(FORMATS, 'general');
+        formatLists.push({ list, row: labelled(`Column ${formatLists.length + 1}:`, list) });
+      }
+      formatLists.forEach((f, k) => { f.row.hidden = k >= n; });
+      formatsEl.replaceChildren(formatsEl.firstChild, ...formatLists.map((f) => f.row));
+    };
+    const show = () => { const f = kind.value() === 'fixed'; delimited.hidden = f; fixed.hidden = !f; relist(); };
     for (const input of Object.values(kind.inputs)) input.addEventListener('change', show);
+    for (const x of [tab.input, semicolon.input, comma.input, space.input, consecutive.input, other, quote, breaks]) x.addEventListener(x.tagName === 'INPUT' && x.type === 'text' ? 'input' : 'change', relist);
     show();
+    const formats = () => formatLists.filter((f) => !f.row.hidden).map((f) => f.list.value);
     const to = make('input', { type: 'text', className: 'oxe-dialog-field', value: dest, spellcheck: false });
     const ok = () => {
       const at = parseRef(to.value.replace(/^=/, '').replace(/^.*!/, '').replace(/\$/g, '').trim());
@@ -102,12 +125,12 @@ export function textToColumnsBox(root, { dest, lines = [] }) {
       if (kind.value() === 'fixed') {
         const p = places();
         if (!p.length || p.some((n) => !Number.isInteger(n) || n < 1)) { say('Type where the columns break, in characters from the left, like 10, 20.'); return; }
-        done({ breaks: p, dest: at });
+        done({ breaks: p, formats: formats(), dest: at });
         return;
       }
-      done({ delimiters: { tab: tab.input.checked, semicolon: semicolon.input.checked, comma: comma.input.checked, space: space.input.checked, other: other.value }, consecutive: consecutive.input.checked, quote: quote.value, dest: at });
+      done({ delimiters: { tab: tab.input.checked, semicolon: semicolon.input.checked, comma: comma.input.checked, space: space.input.checked, other: other.value }, consecutive: consecutive.input.checked, quote: quote.value, formats: formats(), dest: at });
     };
-    return { body: [make('fieldset', {}, make('legend', { textContent: 'Original data type' }), kind.el), delimited, fixed, labelled('Destination:', to)], ok };
+    return { body: [make('fieldset', {}, make('legend', { textContent: 'Original data type' }), kind.el), delimited, fixed, formatsEl, labelled('Destination:', to)], ok };
   });
 }
 

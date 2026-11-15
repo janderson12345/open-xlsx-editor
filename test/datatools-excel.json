@@ -920,6 +920,102 @@
    }
   },
   {
+   "name": "text to columns column formats",
+   "error": null,
+   "cells": {
+    "A1": [
+     "007",
+     "String",
+     "@",
+     "007"
+    ],
+    "B1": [
+     "4/3/2026",
+     "Double",
+     "m/d/yyyy",
+     "46115"
+    ],
+    "C1": [
+     "12.5",
+     "Double",
+     "General",
+     "12.5"
+    ],
+    "D1": [
+     "4/3/2026",
+     "Double",
+     "m/d/yyyy",
+     "46115"
+    ],
+    "A2": [
+     "0042",
+     "String",
+     "@",
+     "0042"
+    ],
+    "B2": [
+     "4/13/2026",
+     "Double",
+     "m/d/yyyy",
+     "46125"
+    ],
+    "C2": [
+     "1.00E+03",
+     "Double",
+     "0.00E+00",
+     "1000"
+    ],
+    "D2": [
+     "3/4/2026",
+     "Double",
+     "m/d/yyyy",
+     "46085"
+    ]
+   }
+  },
+  {
+   "name": "text to columns fixed width formats",
+   "error": null,
+   "cells": {
+    "A1": [
+     "007",
+     "String",
+     "@",
+     "007"
+    ],
+    "B1": [
+     "3/4/2026",
+     "Double",
+     "m/d/yyyy",
+     "46085"
+    ],
+    "C1": [
+     "1/2/2003",
+     "Double",
+     "m/d/yyyy",
+     "37623"
+    ],
+    "A2": [
+     "12",
+     "String",
+     "@",
+     "12"
+    ],
+    "B2": [
+     "3/4/2026",
+     "Double",
+     "m/d/yyyy",
+     "46085"
+    ],
+    "C2": [
+     "########",
+     "Double",
+     "m/d/yyyy",
+     "36525"
+    ]
+   }
+  },
+  {
    "name": "flash fill first names",
    "error": null,
    "cells": {

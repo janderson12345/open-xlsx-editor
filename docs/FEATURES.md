@@ -159,7 +159,7 @@ changes); one typed here shows #NAME? until Excel opens the file. Excel's saved 
 | Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
 | Queries & Connections (`queries-and-connections`) | Refresh All | Partly | Refreshes the workbook's PivotTables (Ctrl+Alt+F5); Refresh, the one at the active cell (Alt+F5). Data connections aren't refreshed. |
 | Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Done | Sort A to Z, Z to A, Sort..., Filter, Clear and Reapply on the Data tab, as in Home > Editing (docs/SORT.md, docs/FILTER.md). Text, Number and Date Filters, Top 10, averages and Filter by Color (31 of 31 as Excel), and Advanced Filter in place or copied (7 of 7). |
-| Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Done | Text to Columns (delimited and fixed width), Flash Fill, Remove Duplicates as Excel (27 of 27 with Series; docs/DATATOOLS.md). |
+| Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Done | Text to Columns (delimited and fixed width, each column General, Text, a date's order or skipped), Flash Fill, Remove Duplicates as Excel (29 of 29 with Series; docs/DATATOOLS.md). |
 | | Data Validation (lists, rules) | Done | Typed values checked as Excel checks them, its Stop, Warning and Information boxes; a list's dropdown; the input message; Excel's Data Validation box to add, change and clear rules, written as Excel writes them (15 of 15; docs/VALIDATION.md). Circle Invalid Data and Clear Validation Circles as Excel's: the same 14 of 14 cells, at most 255, each oval where Excel puts its own. |
 | Outline (`outline`) | Group, ungroup, subtotal | Kept | Grouped rows and columns shown expanded or hidden as saved, no outline buttons. |
 

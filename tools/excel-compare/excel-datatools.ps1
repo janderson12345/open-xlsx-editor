@@ -40,6 +40,10 @@ $CASES = [ordered]@{
     { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('A1'), 2, 1, $m, $m, $m, $m, $m, $m, $m, [object[]]@([object[]]@(0, 1), [object[]]@(10, 1), [object[]]@(16, 1))) })
   'text to columns fixed width elsewhere' = @(@{ A1 = 'abc'; A2 = 'abcdefghij' },
     { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('C1'), 2, 1, $m, $m, $m, $m, $m, $m, $m, [object[]]@([object[]]@(0, 1), [object[]]@(2, 1), [object[]]@(5, 1), [object[]]@(8, 1))) })
+  'text to columns column formats' = @(@{ A1 = '007,3/4/2026,gone,12.50,4/3/26'; A2 = '0042,13/4/2026,x,1e3,2026-03-04' },
+    { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('A1'), 1, 1, $false, $false, $false, $true, $false, $false, $m, [object[]]@([object[]]@(1, 2), [object[]]@(2, 4), [object[]]@(3, 9), [object[]]@(4, 1), [object[]]@(5, 3))) })
+  'text to columns fixed width formats' = @(@{ A1 = '007 2026/03/04 x  1/2/03'; A2 = '12  26-3-4     y  12/31/99' },
+    { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('A1'), 2, 1, $m, $m, $m, $m, $m, $m, $m, [object[]]@([object[]]@(0, 2), [object[]]@(4, 5), [object[]]@(15, 9), [object[]]@(18, 3))) })
   'flash fill first names' = @(@{ A1 = 'Full'; B1 = 'First'; A2 = 'Avery Chen'; B2 = 'Avery'; A3 = 'Sam Lee'; A4 = 'Jo Park'; A5 = 'Rin Ito' }, { param($ws) [void]$ws.Range('B2:B5').FlashFill() })
   'flash fill initials' = @(@{ A1 = 'Full'; B1 = 'Short'; A2 = 'Avery Chen'; B2 = 'A. Chen'; A3 = 'Sam Lee'; A4 = 'Jo Park' }, { param($ws) [void]$ws.Range('B2:B4').FlashFill() })
   'flash fill upper' = @(@{ A1 = 'Code'; B1 = 'Up'; A2 = 'ab-12'; B2 = 'AB-12'; A3 = 'cd-34'; A4 = 'ef-56' }, { param($ws) [void]$ws.Range('B2:B4').FlashFill() })

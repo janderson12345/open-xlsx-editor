@@ -20,7 +20,7 @@ function monthOf(word) {
 /** Days in a month (1900 is a leap year in Excel's calendar, its old Lotus mistake). */
 const daysIn = (y, m) => (m === 2 && y === 1900 ? 29 : new Date(Date.UTC(y, m, 0)).getUTCDate());
 /** A two-digit year as Excel reads it: 00 to 29 are 2000 to 2029, 30 to 99 are 1930 to 1999. */
-const fullYear = (text) => (text.length <= 2 ? (Number(text) < 30 ? 2000 : 1900) + Number(text) : text.length === 4 ? Number(text) : NaN);
+export const fullYear = (text) => (text.length <= 2 ? (Number(text) < 30 ? 2000 : 1900) + Number(text) : text.length === 4 ? Number(text) : NaN);
 
 /** A date's serial number (1900 system: 1 is 1/1/1900, and the 29th of February 1900 that never was is 60; 1904
  *  system: 0 is 1/1/1904). Null when it isn't a date Excel has (1900 or 1904 to 9999). */

@@ -4,9 +4,9 @@ Fill > Series, Flash Fill, Remove Duplicates, Text to Columns (`src/ooxml/datato
 Copy > Create a copy (`src/ooxml/sheetcopy.js`); their boxes in `src/editor/datatoolboxes.js`. Each is one step of
 Undo.
 
-Measured over COM (`tools/excel-compare/excel-datatools.ps1`: 27 cases of `Range.DataSeries`, `RemoveDuplicates`,
+Measured over COM (`tools/excel-compare/excel-datatools.ps1`: 29 cases of `Range.DataSeries`, `RemoveDuplicates`,
 `TextToColumns` and `FlashFill`, each on a new workbook of made-up cells, and a sheet copied with `Worksheet.Copy`;
-`test/datatools-excel.json`). The same cells here and the same tool: every cell of A1:H12 as Excel left it, 27 of 27.
+`test/datatools-excel.json`). The same cells here and the same tool: every cell of A1:H12 as Excel left it, 29 of 29.
 
 ## Fill > Series (Home > Editing > Fill)
 
@@ -54,10 +54,15 @@ Excel's Flash Fill learns from more than these five patterns; others here may di
 | The destination may be elsewhere; the source then stays. | |
 | Fixed width: each cell cut at the column breaks (character places from the left), each piece the characters between two breaks with the spaces at either end trimmed; an empty piece leaves its cell; a break past a cell's end gives it nothing there. | `ab   cd  e` at 3 and 8: ab, cd, e. `XYZ0000999Y`: XYZ, 9, 99Y. |
 | Fixed width splits a number's cell too, from the text it shows; each piece read as typed, as Delimited's. | 1234567 at 3: 123 and 4567. `2026-01-05`: a date, m/d/yyyy. |
+| Column data format Text: the piece kept as text, in the @ format. | 007 and 0042 stay as typed; 12 too. |
+| Column data format Do not import column: left out, the columns after it moved left. | a,3/4/2026,gone,12.50 with the third skipped: four pieces in three columns. |
+| Column data format Date (MDY, DMY, YMD, MYD, DYM, YDM): the piece's three numbers taken in that order, apart by / - or ., a two-digit year as a typed one (00 to 29 the 2000s); the m/d/yyyy format. A piece that isn't a date that way is read as typed. | DMY: 3/4/2026 is 3 April, 13/4/2026 13 April. YMD: 26-3-4 is 4 March 2026. MDY: 12/31/99 is 1999; 2026-03-04 is 4 March. |
 
 The box asks for the Original data type (Delimited or Fixed width), as Excel's wizard does. Fixed width takes the
 column breaks typed as character places (Excel's wizard has a ruler to click), over a preview of the first five cells
-with a | at each break. Not here: Excel's own guess at the breaks, and the column data formats (Text, Do not import).
+with a | at each break. Column data format is a list for each column the first five cells split into (Excel's wizard
+picks a column in its preview). Not here: Excel's own guess at the breaks, and Advanced's decimal and thousands
+separators.
 
 ## Move or Copy > Create a copy (a sheet tab's menu)
 

@@ -19,7 +19,7 @@ import { isDateFormat } from '../src/ooxml/format.js';
 import { defineName } from '../src/ooxml/names.js';
 import { formatCodeOf } from '../src/ooxml/styles.js';
 
-// Excel's data tools: test/datatools-excel.json holds 27 cases of Fill > Series, Remove Duplicates, Text to Columns and
+// Excel's data tools: test/datatools-excel.json holds 29 cases of Fill > Series, Remove Duplicates, Text to Columns and
 // Flash Fill (tools/excel-compare/excel-datatools.ps1: each on a new workbook of made-up cells), and a sheet copied
 // (Worksheet.Copy). The same cells here, the same tool, and every cell of A1:H12 compared with Excel's: its value
 // (numbers to 1e-9), and whether it is a date.
@@ -67,6 +67,8 @@ const SETUP = {
   'text to columns elsewhere': [{ A1: 'a-b', A2: 'c-d' }, (wb) => textToColumns(wb, 0, area('A1:A2'), { delimiters: { other: '-' }, dest: { r: 0, c: 2 } })],
   'text to columns fixed width': [{ A1: 'ABC12345 x', A2: 'DE 678', A3: 'XYZ0000999Y', A4: 'ab   cd  e', A5: '1234567' }, (wb) => textToColumns(wb, 0, area('A1:A5'), { breaks: [3, 8] })],
   'text to columns fixed width types': [{ A1: '2026-01-05 12.5  TRUE', A2: '3/4/2026  007   -5%' }, (wb) => textToColumns(wb, 0, area('A1:A2'), { breaks: [10, 16] })],
+  'text to columns column formats': [{ A1: '007,3/4/2026,gone,12.50,4/3/26', A2: '0042,13/4/2026,x,1e3,2026-03-04' }, (wb) => textToColumns(wb, 0, area('A1:A2'), { delimiters: { comma: true }, formats: ['text', 'dmy', 'skip', 'general', 'mdy'] })],
+  'text to columns fixed width formats': [{ A1: '007 2026/03/04 x  1/2/03', A2: '12  26-3-4     y  12/31/99' }, (wb) => textToColumns(wb, 0, area('A1:A2'), { breaks: [4, 15, 18], formats: ['text', 'ymd', 'skip', 'mdy'] })],
   'text to columns fixed width elsewhere': [{ A1: 'abc', A2: 'abcdefghij' }, (wb) => textToColumns(wb, 0, area('A1:A2'), { breaks: [2, 5, 8], dest: { r: 0, c: 2 } })],
   'flash fill first names': [{ A1: 'Full', B1: 'First', A2: 'Avery Chen', B2: 'Avery', A3: 'Sam Lee', A4: 'Jo Park', A5: 'Rin Ito' }, (wb) => flashFill(wb, 0, { col: 1, r0: 1, r1: 4, sourceCols: [0] }).steps],
   'flash fill initials': [{ A1: 'Full', B1: 'Short', A2: 'Avery Chen', B2: 'A. Chen', A3: 'Sam Lee', A4: 'Jo Park' }, (wb) => flashFill(wb, 0, { col: 1, r0: 1, r1: 3, sourceCols: [0] }).steps],
@@ -75,7 +77,7 @@ const SETUP = {
   'flash fill digits': [{ A1: 'Ref', B1: 'No', A2: 'INV-0042-X', B2: '0042', A3: 'INV-0107-Y', A4: 'INV-2300-Z' }, (wb) => flashFill(wb, 0, { col: 1, r0: 1, r1: 3, sourceCols: [0] }).steps],
 };
 
-test("each data tool's cells as Excel leaves them (27 cases)", () => {
+test("each data tool's cells as Excel leaves them (29 cases)", () => {
   const wrong = [];
   for (const c of excel.cases) {
     const [cells, tool] = SETUP[c.name];
@@ -95,7 +97,7 @@ test("each data tool's cells as Excel leaves them (27 cases)", () => {
       if (!ok || dated !== here) wrong.push(`${c.name} ${ref}: Excel ${raw} (${fmt}), here ${cell.v} (${here ? 'a date' : 'not a date'})`);
     }
   }
-  assert.equal(excel.cases.length, 27);
+  assert.equal(excel.cases.length, 29);
   assert.deepEqual(wrong, []);
 });
 
