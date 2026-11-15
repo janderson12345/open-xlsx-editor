@@ -38,7 +38,7 @@ const editor = mountXlsxEditor(el, {
   features: { number: false },          // hide a tab by name, or a group by its label on any tab
   toolbar: true,                        // false hides the ribbon but keeps editing
   ribbon: 'simple',                     // start with the one-line ribbon ('classic': the full one); setRibbon() later
-  statusBar: true,                      // false hides Average, Count and Sum of the selection
+  statusBar: true,                      // false hides Average, Count and Sum; { minimum: true, maximum: true } adds those
 });
 editor.setReadOnly(false);              // switch at any time
 editor.setFeatures({ number: true });

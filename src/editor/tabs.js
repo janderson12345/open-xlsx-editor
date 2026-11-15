@@ -32,6 +32,8 @@ export function createSheetTabs(root, { controls, on }) {
   // (Not a live region: Excel's status bar isn't read out as the selection changes; it is there to be read.)
   const status = div('oxe-status');
   status.setAttribute('aria-label', 'Selection summary');
+  // (Right-clicked: Excel's Customize Status Bar, which figures it shows.)
+  status.addEventListener('contextmenu', (e) => { e.preventDefault(); on.statusMenu?.({ x: e.clientX, y: e.clientY }); });
   bar.append(strip, add, status);
   root.append(bar);
   let tabs = []; // [{ index, el }]

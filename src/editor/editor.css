@@ -694,6 +694,10 @@
   text-align: left;
   cursor: pointer;
 }
+/* Customize Status Bar: a tick before an item that's on, its value at the right. */
+.oxe-menuitem-check { padding-left: 26px; position: relative; }
+.oxe-menuitem-check[aria-checked="true"]::before { content: '\2713'; position: absolute; left: 9px; }
+.oxe-menuitem-value { float: right; margin-left: 24px; opacity: 0.75; }
 .oxe-menuitem-sub::after {
   content: '\25B8';
   float: right;

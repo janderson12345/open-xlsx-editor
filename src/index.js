@@ -75,14 +75,16 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  * - `ribbon`: 'simple' starts with the one-line simplified ribbon, 'classic' with the full one (without it, the one
  *   the user last chose in this browser); the user can still switch with the ribbon's own button. `setRibbon()`
  *   changes it.
- * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs.
+ * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs; an object
+ *   ({ minimum: true, maximum: true, numericalCount: true, average, count, sum }) chooses which figures it shows, as
+ *   Excel's Customize Status Bar (the status bar right-clicked) does, over the user's own last choice.
  * - `onLink(url)`: a hyperlink clicked that goes outside the workbook (http, https, mailto, ftp); without it, the
  *   browser opens it in a new tab.
  * - `fonts: { omf }`: the URL of an open-metric-fonts web bundle folder the site serves (each package as
  *   <package>/files/, release OMF_VERSION), for Aptos Narrow's and Aptos's metric twins (README, Fonts).
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
- *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean, calculateOnOpen?: boolean,
+ *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean | Record<string, boolean>, calculateOnOpen?: boolean,
  *   onChange?: () => void, onLink?: (url: string) => void, fonts?: { omf?: string } }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
@@ -197,12 +199,23 @@ export function mountXlsxEditor(host, options = {}) {
     state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: { ...state.grid.view(), formulaBar: !root.querySelector('.oxe-bar')?.hidden }, sheetProtected: !!sheetProtection(wb, state.sheetIndex), bookProtected: !!workbookProtection(wb)?.structure });
     showStats();
   };
-  /** The status bar: Excel's Average, Count and Sum of the selection (stats.js), or Count alone. */
+  /** The status bar's figures in Excel's order: [key, menu label, the bar's label, the value from stats.js]. */
+  const STATUS_ITEMS = [['average', 'Average', 'Average', (s) => s.text?.average], ['count', 'Count', 'Count', (s) => String(s.count)],
+    ['numericalCount', 'Numerical Count', 'Numerical Count', (s) => (s.text ? String(s.numbers) : null)], ['minimum', 'Minimum', 'Min', (s) => s.text?.min],
+    ['maximum', 'Maximum', 'Max', (s) => s.text?.max], ['sum', 'Sum', 'Sum', (s) => s.text?.sum]];
+  /** Which of them are on: `statusBar` ({ minimum: true, ... }) over the user's last choice in this browser over
+   *  Excel's default three (Average, Count, Sum). */
+  const statusOn = (() => {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('oxe-status') || '{}') || {}; } catch { /* storage blocked */ }
+    return { average: true, count: true, numericalCount: false, minimum: false, maximum: false, sum: true, ...saved, ...(typeof options.statusBar === 'object' ? options.statusBar : {}) };
+  })();
+  /** The status bar: the figures on (STATUS_ITEMS) for the selection (stats.js); Count alone for text or an error. */
   const showStats = () => {
     if (!state.tabs || !state.editing) return;
     if (options.statusBar === false) { state.tabs.status('', true); return; }
     const s = selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
-    const parts = !s ? [] : s.text ? [`Average: ${s.text.average}`, `Count: ${s.count}`, `Sum: ${s.text.sum}`] : [`Count: ${s.count}`];
+    const parts = !s ? [] : STATUS_ITEMS.filter(([k]) => statusOn[k]).map(([, , label, value]) => [label, value(s)]).filter(([, v]) => v != null).map(([l, v]) => `${l}: ${v}`);
     // (Manual calculation with formulas waiting: Excel's Calculate.)
     if (needsCalculation(state.workbook)) parts.unshift('Calculate');
     state.tabs.status(parts.join('    '));
@@ -264,6 +277,15 @@ export function mountXlsxEditor(host, options = {}) {
     state.find.el.after(state.watch.el);
   };
 
+  /** Customize Status Bar (the status bar right-clicked): each figure ticked or not, its value now beside it. */
+  const statusMenu = (point) => {
+    const s = state.editing && selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
+    menu.open(STATUS_ITEMS.map(([k, label, , value]) => ({ label, checked: statusOn[k], value: s ? value(s) ?? '' : '', run: () => {
+      statusOn[k] = !statusOn[k];
+      try { localStorage.setItem('oxe-status', JSON.stringify(statusOn)); } catch { /* storage blocked */ }
+      showStats();
+    } })), point, { label: 'Customize Status Bar' });
+  };
   const openMenu = (i, point, byKeyboard) => {
     // (As in Excel, the tab right-clicked becomes the sheet shown.)
     if (state.workbook.canShow(i)) editing().run('showSheet', i);
@@ -378,6 +400,7 @@ export function mountXlsxEditor(host, options = {}) {
           on: {
             select: (k) => editing().run('showSheet', k),
             menu: openMenu,
+            statusMenu,
             rename: sheetActs.rename,
             move: (from, to) => editing().run('moveSheet', from, to),
             add: () => editing().run('insertSheet', { after: true }),

@@ -62,6 +62,13 @@ export function createMenu(root) {
       } else {
         b.className = 'oxe-menuitem';
         b.textContent = entry.label;
+        // (A setting on or off, as Excel's Customize Status Bar: a tick, and the value it shows at the right.)
+        if (entry.checked !== undefined) {
+          b.setAttribute('role', 'menuitemcheckbox');
+          b.setAttribute('aria-checked', String(!!entry.checked));
+          b.classList.add('oxe-menuitem-check');
+          if (entry.value) b.append(Object.assign(document.createElement('span'), { className: 'oxe-menuitem-value', textContent: entry.value }));
+        }
         el.append(b);
       }
       if (entry.colors) {

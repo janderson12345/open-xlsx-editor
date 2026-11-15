@@ -155,6 +155,9 @@ export declare function mountXlsxEditor(
     /** 'simple' starts with the one-line simplified ribbon, 'classic' with the full one; without it, the user's last
      *  choice in this browser. The ribbon's own button still switches. */
     ribbon?: 'simple' | 'classic';
+    /** false hides the status bar's figures for the selection; an object ({ minimum: true, maximum: true,
+     *  numericalCount: true, average, count, sum }) chooses them, as Excel's Customize Status Bar does. */
+    statusBar?: boolean | Record<string, boolean>;
     /** false leaves formulas saved without a result empty on opening (by default they are worked out, as Excel does). */
     calculateOnOpen?: boolean;
     onChange?: () => void;
