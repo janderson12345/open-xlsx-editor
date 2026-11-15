@@ -35,7 +35,9 @@ Home > Styles > Conditional Formatting has the menu's rules, each added for the 
   Unique).
 - **Top/Bottom Rules:** Top 10 Items, Top 10%, Bottom 10 Items, Bottom 10%, Above Average, Below Average.
 - **Color Scales:** Excel's default three-colour and two-colour scales.
-- **Clear Rules** from Selected Cells (their cells taken out of every rule's range) or from Entire Sheet.
+- **Clear Rules** from Selected Cells (their cells taken out of every rule's range) or from Entire Sheet. A rule left
+  without its first cell has its formulas written for its new first cell, as Excel's (*measured*: =E1>F1 over E1:E4,
+  E1:E2's rules deleted, is =E3>F3 over E3:E4); before, the formula kept its text and so meant other cells.
 
 Each opens Excel's small box: "Format cells that are GREATER THAN:", the values, and "with" one of the menu's preset
 formats (Light Red Fill with Dark Red Text, Yellow Fill with Dark Yellow Text, Green Fill with Dark Green Text, Light

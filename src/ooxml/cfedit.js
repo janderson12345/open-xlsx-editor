@@ -12,6 +12,7 @@ import { parseInput } from './input.js';
 import { subtract } from './dvedit.js';
 import { barRuleXml, addX14Rule, x14Rules } from './cfbarsedit.js';
 import { X14, XM } from './cfext.js';
+import { shiftFormula } from '../calc/tokens.js';
 
 /** The menu's preset formats: [font colour, fill colour] (ARGB, null for none). */
 export const CF_PRESETS = {
@@ -128,7 +129,8 @@ export function addConditional(wb, si, ranges, rule) {
 }
 
 /** Clear Rules: from the cells `ranges` of sheet si (their cells taken out of every rule's ranges), or from the whole
- *  sheet (`ranges` null). */
+ *  sheet (`ranges` null). A rule left without its first cell has its formulas written for its new first cell, as
+ *  Excel's do (measured: =E1>F1 over E1:E4, E1:E2 cleared or pasted over, is =E3>F3 over E3:E4). */
 export function clearConditional(wb, si, ranges = null) {
   const doc = wb._part(si).doc;
   const root = doc.documentElement;
@@ -140,7 +142,13 @@ export function clearConditional(wb, si, ranges = null) {
   };
   for (const cf of kids(root, 'conditionalFormatting', ns)) {
     const left = ranges ? trim(cf.getAttribute('sqref')) : '';
-    if (left) cf.setAttribute('sqref', left); else root.removeChild(cf);
+    if (!left) { root.removeChild(cf); continue; }
+    const was = parseRange((cf.getAttribute('sqref') || '').split(/\s+/)[0]);
+    const now = parseRange(left.split(/\s+/)[0]);
+    cf.setAttribute('sqref', left);
+    if (was && now && (was.r0 !== now.r0 || was.c0 !== now.c0)) {
+      for (const f of cf.getElementsByTagNameNS(ns, 'formula')) f.textContent = shiftFormula(f.textContent, now.r0 - was.r0, now.c0 - was.c0);
+    }
   }
   // (The extLst's rules, data bars' settings and Excel 2010's icon sets, likewise.)
   for (const cf of [...doc.getElementsByTagNameNS(X14, 'conditionalFormatting')]) {

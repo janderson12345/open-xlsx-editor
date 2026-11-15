@@ -47,3 +47,13 @@ test('Clear Rules from selected cells splits a range; from the entire sheet remo
   wb.setConditional(si, null, null);
   assert.deepEqual(sq(), []);
 });
+
+test("a rule left without its first cell by Clear Rules, its formulas written for the new one, as Excel's", () => {
+  // (Excel: =E1>F1 over E1:E4, E1:E2's rules deleted: =E3>F3 over E3:E4.)
+  const { wb, si } = build({ cells: { E1: '1', F1: '1' } });
+  wb.setConditional(si, [area('E1:E4')], { kind: 'expression', formula: 'E1>F1', preset: 'bold' });
+  wb.setConditional(si, [area('E1:E2')], null);
+  const cf = [...wb._part(si).doc.documentElement.childNodes].find((n) => n.localName === 'conditionalFormatting');
+  assert.equal(cf.getAttribute('sqref'), 'E3:E4');
+  assert.equal(cf.getElementsByTagNameNS('*', 'formula')[0].textContent, 'E3>F3');
+});
