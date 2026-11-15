@@ -66,7 +66,7 @@ test('filter: the list of a column, as the dropdown shows it', () => {
 test('sorting while rows are filtered out: only the rows shown are sorted, as Excel (filter2-excel.json)', async () => {
   const fs = await import('node:fs');
   const { sortChanges } = await import('../src/ooxml/sortops.js');
-  const EXCEL = JSON.parse(fs.readFileSync('test/filter2-excel.json', 'utf8').replace(/^﻿/, '')).cases;
+  const EXCEL = JSON.parse(fs.readFileSync('test/filter2-excel.json', 'utf8').trim()).cases;
   const CASES = JSON.parse(fs.readFileSync('tools/excel-compare/filter2-cases.json', 'utf8'));
   for (const name of ['red rows sorted A to Z while filtered', 'red rows sorted by Qty, largest first, while filtered']) {
     const c = CASES.find((x) => x.name === name);
@@ -83,7 +83,7 @@ test('sorting while rows are filtered out: only the rows shown are sorted, as Ex
 
 test('dates filtered by year, month or day, written and applied as Excel 365 does (filter2-excel.json)', async () => {
   const fs = await import('node:fs');
-  const EXCEL = JSON.parse(fs.readFileSync('test/filter2-excel.json', 'utf8').replace(/^﻿/, '')).cases;
+  const EXCEL = JSON.parse(fs.readFileSync('test/filter2-excel.json', 'utf8').trim()).cases;
   const CASES = JSON.parse(fs.readFileSync('tools/excel-compare/filter2-cases.json', 'utf8'));
   for (const c of CASES.filter((x) => x.name.startsWith('dates'))) {
     const { wb, si } = build({ cells: c.setup.cells });
