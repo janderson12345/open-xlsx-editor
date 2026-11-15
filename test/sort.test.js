@@ -14,6 +14,9 @@ import { entryChanges } from '../src/ooxml/entry.js';
 // value, format), the merged ranges, the other sheet's formula and the defined name compared with Excel's, or
 // Excel's refusal in its words.
 const cases = readCases('tools/excel-compare/sort-cases.json', 'test/sort-excel.json');
+// (Sort On Cell Color and Font Color, and a custom list as the order: sort2-cases.json, test/sort2-excel.json.)
+cases.push(...readCases('tools/excel-compare/sort2-cases.json', 'test/sort2-excel.json'));
+const argbOf = (n) => `FF${[n & 255, (n >> 8) & 255, (n >> 16) & 255].map((x) => x.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
 // (Cells left out: the array's second cell, whose result the sheets built here keep only in its first.)
 const KNOWN = { 'part of an array': ['B3'] };
 
@@ -26,7 +29,10 @@ function run(c, built) {
     assert.equal(rangeName(a), c.excel.region, 'the range sorted');
     // (The Sort object's own guess was seen never to take headers; Range.Sort's is the A to Z button's.)
     const header = st.header === 'yes' || (st.header !== 'no' && st.legacy && guessHeader(wb, si, a));
-    const keys = st.keys.map((k) => { const p = parseRef(k.key); return { at: st.leftToRight ? p.r : p.c, desc: k.order === 'desc' }; });
+    const keys = st.keys.map((k) => {
+      const p = parseRef(k.key);
+      return { at: st.leftToRight ? p.r : p.c, desc: k.order === 'desc', ...(k.on ? { on: k.on, color: argbOf(k.color) } : {}), ...(k.customOrder ? { customOrder: k.customOrder.split(',') } : {}) };
+    });
     const step = sortChanges(wb, si, a, { keys, header, matchCase: !!st.matchCase, leftToRight: !!st.leftToRight, textAsNumbers: st.keys.some((k) => k.textAsNumbers) });
     if (step.error) return step.error;
     if (step.contents.length) wb.apply(si, step.contents);

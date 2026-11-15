@@ -76,6 +76,28 @@ function sortValue(cell, textAsNumbers) {
   if (textAsNumbers && NUMBER_TEXT.test(text)) return { rank: 0, n: Number(text) };
   return { rank: 1, text };
 }
+/** A cell's colour for Sort On Cell Color (its fill) or Font Color, as ARGB in capitals, or null. */
+function colourOf(wb, cell, on) {
+  const xf = wb.styles.cellXfs[cell?.s || 0];
+  if (!xf) return null;
+  if (on === 'fontColor') return wb.styles.fonts[xf.fontId]?.color?.rgb?.toUpperCase() || null;
+  const fill = wb.styles.fills[xf.fillId];
+  return fill?.pattern === 'solid' ? fill.fg?.rgb?.toUpperCase() || null : null;
+}
+/**
+ * A cell's value for one level of a sort (`key`): Sort On Cell Color or Font Color ({ on, color }), the cells of that
+ * colour first ({ place: 0 }, the others 1, blank or not); a custom list as the order ({ customOrder: [...] }), its
+ * place in the list whatever the capitals, values not in it after (blanks still last); else the cell's value. As Excel
+ * sorts (excel-steps.ps1 on sort2-cases.json): a level's ties keep their order.
+ */
+function keyValue(wb, key, cell, textAsNumbers) {
+  if (key.on === 'cellColor' || key.on === 'fontColor') return { place: colourOf(wb, cell, key.on) === String(key.color || '').toUpperCase() ? 0 : 1 };
+  const value = sortValue(cell, textAsNumbers);
+  if (!value || !Array.isArray(key.customOrder)) return value;
+  const text = String(cell.v ?? '').toLowerCase();
+  const i = key.customOrder.findIndex((x) => String(x).toLowerCase() === text);
+  return { place: i < 0 ? key.customOrder.length : i };
+}
 /** Two sort values, ascending (blanks are put last by the caller, whichever way). */
 function compareValues(a, b, matchCase) {
   if (a.rank !== b.rank) return a.rank - b.rank;
@@ -198,14 +220,14 @@ export function sortChanges(wb, si, area, { keys, header = false, matchCase = fa
   const start = first + (header ? size : 0);
   const at = (line, across) => (leftToRight ? sheet.cells.get(across)?.get(line) : sheet.cells.get(line)?.get(across));
   const units = [];
-  for (let line = start; line + size - 1 <= last; line += size) units.push({ line, values: keys.map((k) => sortValue(at(line, k.at), textAsNumbers)) });
+  for (let line = start; line + size - 1 <= last; line += size) units.push({ line, values: keys.map((k) => keyValue(wb, k, at(line, k.at), textAsNumbers)) });
   const order = units.map((u, i) => ({ ...u, i }));
   order.sort((p, q) => {
     for (let k = 0; k < keys.length; k++) {
       const a = p.values[k];
       const b = q.values[k];
       if (!a || !b) { if (a !== b) return a ? -1 : 1; continue; }
-      const d = compareValues(a, b, matchCase);
+      const d = a.place != null ? a.place - b.place : compareValues(a, b, matchCase);
       if (d) return keys[k].desc ? -d : d;
     }
     return p.i - q.i;

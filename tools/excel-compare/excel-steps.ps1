@@ -9,7 +9,7 @@
 # border, with the merged ranges, column widths and defined names, or the refusal when Excel refused a step.
 #
 # setup: { cells: { "B1": "1", "E1": "=B5" }, arrays: { "E20:E21": "=B1:B2*2" }, sheet2: { "A1": "=Sheet1!B5" },
-#   formats: [{ range, bold, color (RGB as Excel's number), numFmt, border (true: a thin bottom border) }],
+#   formats: [{ range, bold, color (RGB as Excel's number), fontColor (the same), numFmt, border (true: a thin bottom border) }],
 #   merges: ["B6:C6"], widths: { "B": 20 }, names: { "Four": "=Sheet1!$B$4" } }
 # steps: [{ do: "insert" | "delete", range, shift: "down" | "right" | "up" | "left" (omitted: Excel decides) },
 #   { do: "paste", from, to, paste: "all" | "formulas" | "values" | "formats" | "widths" | "formulasFormats" |
@@ -19,7 +19,8 @@
 #   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" | "days" | "weekdays" | "months" | "years" } (the fill handle: AutoFill),
 #   { do: "clear", range, what: "all" | "contents" | "formats" } (Range.Clear, ClearContents, ClearFormats),
 #   { do: "sort", range, region: bool (range's CurrentRegion, as Sort on one cell takes it), keys: [{ key (a cell of
-#     the column, or row, to sort by), order: "asc" | "desc", textAsNumbers: bool }], header: "guess" | "yes" | "no",
+#     the column, or row, to sort by), order: "asc" | "desc", textAsNumbers: bool, on: "cellColor" | "fontColor",
+#     color, customOrder: "High,Medium,Low" }], header: "guess" | "yes" | "no",
 #     matchCase: bool, leftToRight: bool } (Worksheet.Sort, as Excel's Sort box applies it; the range sorted is
 #     written out as `region`)]
 # usage: pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
@@ -45,6 +46,7 @@ function CellOf($c) {
   if ($c.NumberFormat -ne 'General') { $a.fmt = [string]$c.NumberFormat }
   if ($c.Font.Bold) { $a.bold = $true }
   if ($c.Interior.ColorIndex -ne -4142) { $a.color = [int]$c.Interior.Color }
+  if ($c.Font.Color -ne 0) { $a.fontColor = [int]$c.Font.Color }
   if ($c.Borders.Item(9).LineStyle -ne -4142) { $a.border = $true }
   $a
 }
@@ -62,6 +64,7 @@ try {
       $r = $ws.Range($f.range)
       if ($f.bold) { $r.Font.Bold = $true }
       if ($null -ne $f.color) { $r.Interior.Color = [int]$f.color }
+      if ($null -ne $f.fontColor) { $r.Font.Color = [int]$f.fontColor }
       if ($f.numFmt) { $r.NumberFormat = [string]$f.numFmt }
       if ($f.border) { $r.Borders.Item(9).LineStyle = 1 }
     }
@@ -115,7 +118,11 @@ try {
               foreach ($k in $keys) {
                 $order = if ($k.order -eq 'desc') { 2 } else { 1 }
                 $data = if ($k.textAsNumbers) { 1 } else { 0 }
-                [void]$so.SortFields.Add($ws.Range($k.key), 0, $order, $missing, $data)
+                # (Sort On Cell Color or Font Color: the colour on top (asc) or on bottom (desc); Order a custom list.)
+                $on = @{ cellColor = 1; fontColor = 2 }[[string]$k.on]
+                $custom = if ($k.customOrder) { [string]$k.customOrder } else { $missing }
+                $sf = $so.SortFields.Add($ws.Range($k.key), $(if ($on) { $on } else { 0 }), $order, $custom, $data)
+                if ($on) { $sf.SortOnValue.Color = [int]$k.color }
               }
               $so.SetRange($r)
               $so.Header = $hdr

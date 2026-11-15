@@ -1,0 +1,310 @@
+{
+  "excel": "Excel.Application: Range.Insert, Range.Delete, Range.Copy and PasteSpecial, Worksheet.Paste with Link, Range.Fill and AutoFill, Range.Clear, Worksheet.Sort and Range.Sort",
+  "cases": [
+    {
+      "name": "cell colour yellow on top",
+      "region": "A1:B7",
+      "cells": {
+        "A1": {
+          "v": "Item"
+        },
+        "B1": {
+          "v": "Row"
+        },
+        "A2": {
+          "v": "fig",
+          "color": 65535
+        },
+        "B2": {
+          "v": "r3"
+        },
+        "A3": {
+          "v": "plum",
+          "color": 65535
+        },
+        "B3": {
+          "v": "r6"
+        },
+        "A4": {
+          "v": "pear"
+        },
+        "B4": {
+          "v": "r2"
+        },
+        "A5": {
+          "v": "kiwi"
+        },
+        "B5": {
+          "v": "r4"
+        },
+        "A6": {
+          "v": "apple",
+          "color": 5296274
+        },
+        "B6": {
+          "v": "r5"
+        },
+        "A7": {
+          "v": "date"
+        },
+        "B7": {
+          "v": "r7"
+        }
+      }
+    },
+    {
+      "name": "cell colour yellow on bottom",
+      "region": "A1:B7",
+      "cells": {
+        "A1": {
+          "v": "Item"
+        },
+        "B1": {
+          "v": "Row"
+        },
+        "A2": {
+          "v": "pear"
+        },
+        "B2": {
+          "v": "r2"
+        },
+        "A3": {
+          "v": "kiwi"
+        },
+        "B3": {
+          "v": "r4"
+        },
+        "A4": {
+          "v": "apple",
+          "color": 5296274
+        },
+        "B4": {
+          "v": "r5"
+        },
+        "A5": {
+          "v": "date"
+        },
+        "B5": {
+          "v": "r7"
+        },
+        "A6": {
+          "v": "fig",
+          "color": 65535
+        },
+        "B6": {
+          "v": "r3"
+        },
+        "A7": {
+          "v": "plum",
+          "color": 65535
+        },
+        "B7": {
+          "v": "r6"
+        }
+      }
+    },
+    {
+      "name": "font colour red on top",
+      "region": "A1:B7",
+      "cells": {
+        "A1": {
+          "v": "Item"
+        },
+        "B1": {
+          "v": "Row"
+        },
+        "A2": {
+          "v": "kiwi",
+          "fontColor": 255
+        },
+        "B2": {
+          "v": "r4"
+        },
+        "A3": {
+          "v": "date",
+          "fontColor": 255
+        },
+        "B3": {
+          "v": "r7"
+        },
+        "A4": {
+          "v": "pear"
+        },
+        "B4": {
+          "v": "r2"
+        },
+        "A5": {
+          "v": "fig"
+        },
+        "B5": {
+          "v": "r3"
+        },
+        "A6": {
+          "v": "apple"
+        },
+        "B6": {
+          "v": "r5"
+        },
+        "A7": {
+          "v": "plum"
+        },
+        "B7": {
+          "v": "r6"
+        }
+      }
+    },
+    {
+      "name": "yellow on top, then green on top, then A to Z",
+      "region": "A1:B7",
+      "cells": {
+        "A1": {
+          "v": "Item"
+        },
+        "B1": {
+          "v": "Row"
+        },
+        "A2": {
+          "v": "fig",
+          "color": 65535
+        },
+        "B2": {
+          "v": "r3"
+        },
+        "A3": {
+          "v": "plum",
+          "color": 65535
+        },
+        "B3": {
+          "v": "r6"
+        },
+        "A4": {
+          "v": "apple",
+          "color": 5296274
+        },
+        "B4": {
+          "v": "r5"
+        },
+        "A5": {
+          "v": "date"
+        },
+        "B5": {
+          "v": "r7"
+        },
+        "A6": {
+          "v": "kiwi"
+        },
+        "B6": {
+          "v": "r4"
+        },
+        "A7": {
+          "v": "pear"
+        },
+        "B7": {
+          "v": "r2"
+        }
+      }
+    },
+    {
+      "name": "custom list High, Medium, Low",
+      "region": "A1:B8",
+      "cells": {
+        "A1": {
+          "v": "Level"
+        },
+        "B1": {
+          "v": "Row"
+        },
+        "A2": {
+          "v": "High"
+        },
+        "B2": {
+          "v": "r3"
+        },
+        "A3": {
+          "v": "high"
+        },
+        "B3": {
+          "v": "r6"
+        },
+        "A4": {
+          "v": "Medium"
+        },
+        "B4": {
+          "v": "r5"
+        },
+        "A5": {
+          "v": "Low"
+        },
+        "B5": {
+          "v": "r2"
+        },
+        "A6": {
+          "v": "Low"
+        },
+        "B6": {
+          "v": "r8"
+        },
+        "A7": {
+          "v": "None"
+        },
+        "B7": {
+          "v": "r4"
+        },
+        "B8": {
+          "v": "r7"
+        }
+      }
+    },
+    {
+      "name": "custom list High, Medium, Low, descending",
+      "region": "A1:B8",
+      "cells": {
+        "A1": {
+          "v": "Level"
+        },
+        "B1": {
+          "v": "Row"
+        },
+        "A2": {
+          "v": "None"
+        },
+        "B2": {
+          "v": "r4"
+        },
+        "A3": {
+          "v": "Low"
+        },
+        "B3": {
+          "v": "r2"
+        },
+        "A4": {
+          "v": "Low"
+        },
+        "B4": {
+          "v": "r8"
+        },
+        "A5": {
+          "v": "Medium"
+        },
+        "B5": {
+          "v": "r5"
+        },
+        "A6": {
+          "v": "High"
+        },
+        "B6": {
+          "v": "r3"
+        },
+        "A7": {
+          "v": "high"
+        },
+        "B7": {
+          "v": "r6"
+        },
+        "B8": {
+          "v": "r7"
+        }
+      }
+    }
+  ]
+}

@@ -266,12 +266,26 @@ export function createActs(env) {
       return isDateFormat(formatCodeOf(wb.styles, cell.s || 0)) ? 'date' : 'number';
     };
     const span = (a, b) => Array.from({ length: Math.min(b - a + 1, 500) }, (_, k) => a + k);
+    // (The cell and font colours a column's cells have, for Sort On Cell Color and Font Color.)
+    const coloursOf = (cells) => {
+      const out = { cellColor: new Set(), fontColor: new Set() };
+      for (const cell of cells) {
+        const xf = wb.styles.cellXfs[cell?.s || 0];
+        if (!xf) continue;
+        const fill = wb.styles.fills[xf.fillId];
+        if (fill?.pattern === 'solid' && fill.fg?.rgb) out.cellColor.add(fill.fg.rgb.toUpperCase());
+        const ink = wb.styles.fonts[xf.fontId]?.color?.rgb;
+        if (ink) out.fontColor.add(ink.toUpperCase());
+      }
+      return { cellColor: [...out.cellColor], fontColor: [...out.fontColor] };
+    };
     const lines = (leftToRight, header) => (leftToRight
-      ? span(area.r0, area.r1).map((r) => ({ at: r, label: `Row ${r + 1}`, kind: kindOf(span(area.c0, area.c1).map((c) => at(r, c))) }))
+      ? span(area.r0, area.r1).map((r) => ({ at: r, label: `Row ${r + 1}`, kind: kindOf(span(area.c0, area.c1).map((c) => at(r, c))), colors: coloursOf(span(area.c0, area.c1).map((c) => at(r, c))) }))
       : span(area.c0, area.c1).map((c) => {
         const top = at(area.r0, c)?.v;
         const label = header && top != null && top !== '' ? String(top) : `Column ${colName(c)}`;
-        return { at: c, label, kind: kindOf(span(area.r0 + (header ? 1 : 0), area.r1).map((r) => at(r, c))) };
+        const cells = span(area.r0 + (header ? 1 : 0), area.r1).map((r) => at(r, c));
+        return { at: c, label, kind: kindOf(cells), colors: coloursOf(cells) };
       }));
     const start = { keys: [{ at: Math.min(Math.max(sel.ac, area.c0), area.c1), desc: false }], header: guessHeader(wb, si, area), matchCase: false, leftToRight: false };
     const got = await sortBox(root, { lines, start });

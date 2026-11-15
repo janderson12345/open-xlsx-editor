@@ -59,6 +59,7 @@ export function build(setup) {
     const change = {};
     if (fmt.bold) change.font = { b: true };
     if (fmt.color != null) change.fill = { rgb: argb(fmt.color) };
+    if (fmt.fontColor != null) change.font = { ...change.font, color: { rgb: argb(fmt.fontColor) } };
     if (fmt.numFmt) change.numFmt = fmt.numFmt;
     if (fmt.border) change.border = { bottom: { style: 'thin' } };
     wb.setStyles(si, formatEach(wb, si, area(fmt.range), change));
@@ -102,6 +103,8 @@ export function look(wb, si, r, c, { results = false } = {}) {
   if (wb.styles.fonts[xf.fontId].b) out.bold = true;
   const fill = wb.styles.fills[xf.fillId];
   if (fill.pattern === 'solid' && fill.fg?.rgb) out.color = fill.fg.rgb.toUpperCase();
+  const fc = wb.styles.fonts[xf.fontId].color?.rgb;
+  if (fc && fc.toUpperCase() !== 'FF000000') out.fontColor = fc.toUpperCase();
   if (wb.styles.borders[xf.borderId].bottom?.style) out.border = true;
   return out;
 }
@@ -113,6 +116,7 @@ export function theirs(one, { results = false } = {}) {
   if (one.fmt) out.fmt = one.fmt;
   if (one.bold) out.bold = true;
   if (one.color != null) out.color = argb(one.color);
+  if (one.fontColor != null) out.fontColor = argb(one.fontColor);
   if (one.border) out.border = true;
   return out;
 }

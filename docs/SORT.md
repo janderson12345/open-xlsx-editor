@@ -41,10 +41,17 @@ defined name, or Excel's refusal in its words: 60 of 60. Sorted by the editor, s
 | Merged cells: refused unless every cell of the range is in a merged range of one size; then each sorts whole. | "To do this, all the merged cells need to be the same size." A2:B2, A3:B3, A4:B4 sorted. |
 | An array formula in the range: refused. | "You can't change part of an array." |
 | One empty cell with nothing around it: refused. | "This can't be applied to the selected range. Select a single cell in a range and try again." |
+| Sort On Cell Color (Font Color): the rows whose cell has that fill (font colour) On Top, or On Bottom, each group keeping its order; further levels within. | Yellow on top: fig, plum (yellow), then pear, kiwi, apple, date. Yellow, then green, then A to Z: fig, plum, apple, date, kiwi, pear. |
+| A custom list as the order: its words first, in its order whatever their capitals, the values not in it after (before, descending), blanks last. | High, Medium, Low over Low, High, None, Medium, high, blank, Low: High, high, Medium, Low, Low, None. Descending: None, Low, Low, Medium, High, high. |
+
+Sort On and custom lists were measured apart (`sort2-cases.mjs`, `test/sort2-excel.json`, SortFields.Add's SortOn,
+SortOnValue.Color and CustomOrder: 6 of 6 cases). In the Sort box, each level's Sort On is Cell Values, Cell Color or
+Font Color (a colour that column has, On Top or On Bottom); Order's Custom List... takes the list typed, "High, Medium,
+Low" (Excel's box picks from its own lists).
 
 ## Not yet
 
-Sorting by cell colour, font colour or icon, custom lists as an order, Excel's question about numbers stored as text
+Sorting by a conditional format's icon, Excel's question about numbers stored as text
 (sorted as text here, as without it), sorting a table (ListObject) or within a filter, the cells' menu's Sort, and the
 sort state Excel saves with the sheet. Notes, hyperlinks, conditional formats and data validation stay where they are.
 (Filter, and the Data tab's Sort & Filter group, are done: docs/FILTER.md.)

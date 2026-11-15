@@ -8,8 +8,10 @@ export const SORT_ORDERS = { text: ['A to Z', 'Z to A'], number: ['Smallest to L
 /**
  * Excel's Sort box (Custom Sort...): its levels, each a column (a row, sorting left to right) and an order, with Add
  * Level, Delete Level, Copy Level, Move Up and Move Down; My data has headers; Options... (Case sensitive, the
- * orientation). `lines(leftToRight, header)` gives the columns (rows) to choose from: [{ at, label, kind: 'text' |
- * 'number' | 'date' }]. `start`: { keys: [{ at, desc }], header, matchCase, leftToRight }. Resolves to the same shape
+ * orientation). Each level's Sort On: Cell Values (an order, or Custom List... typed as "High, Medium, Low"), Cell
+ * Color or Font Color (a colour the column has, On Top or On Bottom). `lines(leftToRight, header)` gives the columns
+ * (rows) to choose from: [{ at, label, kind: 'text' | 'number' | 'date', colors: { cellColor: [argb], fontColor: [argb] } }].
+ * `start`: { keys: [{ at, desc, on, color, customOrder }], header, matchCase, leftToRight }. Resolves to the same shape
  * as chosen, or null for Cancel and Esc.
  */
 export function sortBox(root, { lines, start }) {
@@ -38,13 +40,40 @@ export function sortBox(root, { lines, start }) {
           ...list.map((x) => make('option', { value: String(x.at), textContent: x.label })));
         if (!list.some((x) => x.at === k.at)) k.at = list[0]?.at ?? k.at;
         col.value = String(k.at);
-        const kind = () => list.find((x) => x.at === k.at)?.kind || 'text';
+        const line = () => list.find((x) => x.at === k.at) || {};
+        const kind = () => line().kind || 'text';
+        const on = make('select', { className: 'oxe-sort-select', 'aria-label': `${word}: sort on` },
+          ...[['values', 'Cell Values'], ['cellColor', 'Cell Color'], ['fontColor', 'Font Color']].map(([v, t]) => make('option', { value: v, textContent: t })));
+        on.value = k.on || 'values';
+        const colour = make('select', { className: 'oxe-sort-select oxe-sort-colour', 'aria-label': `${word}: colour` });
         const order = make('select', { className: 'oxe-sort-select', 'aria-label': `${word}: order` });
-        const fill = () => { order.replaceChildren(...SORT_ORDERS[kind()].map((label, d) => make('option', { value: String(d), textContent: label }))); order.value = k.desc ? '1' : '0'; };
+        const custom = make('input', { type: 'text', className: 'oxe-dialog-field oxe-sort-custom', placeholder: 'High, Medium, Low', 'aria-label': `${word}: custom list`, value: (k.customOrder || []).join(', ') });
+        const fill = () => {
+          const byColour = on.value !== 'values';
+          colour.hidden = !byColour;
+          if (byColour) {
+            const have = line().colors?.[on.value] || [];
+            colour.replaceChildren(...have.map((c) => { const o = make('option', { value: c, textContent: `#${c.slice(2)}` }); o.style.background = `#${c.slice(2)}`; return o; }));
+            if (!have.includes(k.color)) k.color = have[0] || null;
+            if (k.color) colour.value = k.color;
+            order.replaceChildren(...['On Top', 'On Bottom'].map((label, d) => make('option', { value: String(d), textContent: label })));
+            order.value = k.desc ? '1' : '0';
+          } else {
+            order.replaceChildren(...[...SORT_ORDERS[kind()], 'Custom List...'].map((label, d) => make('option', { value: d === 2 ? 'custom' : String(d), textContent: label })));
+            order.value = k.customOrder ? 'custom' : k.desc ? '1' : '0';
+          }
+          custom.hidden = byColour || !k.customOrder;
+        };
         fill();
         col.addEventListener('change', () => { k.at = Number(col.value); fill(); });
-        order.addEventListener('change', () => { k.desc = order.value === '1'; });
-        const row = make('div', { className: `oxe-sort-level${i === current ? ' oxe-on' : ''}`, role: 'listitem' }, make('span', { className: 'oxe-sort-word', textContent: word }), col, order);
+        on.addEventListener('change', () => { k.on = on.value === 'values' ? undefined : on.value; k.customOrder = undefined; fill(); });
+        colour.addEventListener('change', () => { k.color = colour.value; });
+        order.addEventListener('change', () => {
+          if (order.value === 'custom') { k.customOrder = custom.value.split(',').map((x) => x.trim()).filter(Boolean); k.desc = false; custom.hidden = false; custom.focus(); return; }
+          k.customOrder = undefined; k.desc = order.value === '1'; custom.hidden = true;
+        });
+        custom.addEventListener('input', () => { k.customOrder = custom.value.split(',').map((x) => x.trim()).filter(Boolean); });
+        const row = make('div', { className: `oxe-sort-level${i === current ? ' oxe-on' : ''}`, role: 'listitem' }, make('span', { className: 'oxe-sort-word', textContent: word }), col, on, colour, order, custom);
         row.addEventListener('focusin', () => { if (current !== i) { current = i; levels.querySelectorAll('.oxe-sort-level').forEach((x, j) => x.classList.toggle('oxe-on', j === i)); } });
         return row;
       }));

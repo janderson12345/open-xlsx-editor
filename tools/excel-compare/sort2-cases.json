@@ -1,0 +1,282 @@
+[
+ {
+  "name": "cell colour yellow on top",
+  "setup": {
+   "cells": {
+    "A1": "Item",
+    "B1": "Row",
+    "A2": "pear",
+    "A3": "fig",
+    "A4": "kiwi",
+    "A5": "apple",
+    "A6": "plum",
+    "A7": "date",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   },
+   "formats": [
+    {
+     "range": "A3",
+     "color": 65535
+    },
+    {
+     "range": "A5",
+     "color": 5296274
+    },
+    {
+     "range": "A6",
+     "color": 65535
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B7",
+    "keys": [
+     {
+      "key": "A1",
+      "on": "cellColor",
+      "color": 65535
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H12"
+ },
+ {
+  "name": "cell colour yellow on bottom",
+  "setup": {
+   "cells": {
+    "A1": "Item",
+    "B1": "Row",
+    "A2": "pear",
+    "A3": "fig",
+    "A4": "kiwi",
+    "A5": "apple",
+    "A6": "plum",
+    "A7": "date",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   },
+   "formats": [
+    {
+     "range": "A3",
+     "color": 65535
+    },
+    {
+     "range": "A5",
+     "color": 5296274
+    },
+    {
+     "range": "A6",
+     "color": 65535
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B7",
+    "keys": [
+     {
+      "key": "A1",
+      "on": "cellColor",
+      "color": 65535,
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H12"
+ },
+ {
+  "name": "font colour red on top",
+  "setup": {
+   "cells": {
+    "A1": "Item",
+    "B1": "Row",
+    "A2": "pear",
+    "A3": "fig",
+    "A4": "kiwi",
+    "A5": "apple",
+    "A6": "plum",
+    "A7": "date",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   },
+   "formats": [
+    {
+     "range": "A4",
+     "fontColor": 255
+    },
+    {
+     "range": "A7",
+     "fontColor": 255
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B7",
+    "keys": [
+     {
+      "key": "A1",
+      "on": "fontColor",
+      "color": 255
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H12"
+ },
+ {
+  "name": "yellow on top, then green on top, then A to Z",
+  "setup": {
+   "cells": {
+    "A1": "Item",
+    "B1": "Row",
+    "A2": "pear",
+    "A3": "fig",
+    "A4": "kiwi",
+    "A5": "apple",
+    "A6": "plum",
+    "A7": "date",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7"
+   },
+   "formats": [
+    {
+     "range": "A3",
+     "color": 65535
+    },
+    {
+     "range": "A5",
+     "color": 5296274
+    },
+    {
+     "range": "A6",
+     "color": 65535
+    }
+   ]
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B7",
+    "keys": [
+     {
+      "key": "A1",
+      "on": "cellColor",
+      "color": 65535
+     },
+     {
+      "key": "A1",
+      "on": "cellColor",
+      "color": 5296274
+     },
+     {
+      "key": "A1"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H12"
+ },
+ {
+  "name": "custom list High, Medium, Low",
+  "setup": {
+   "cells": {
+    "A1": "Level",
+    "B1": "Row",
+    "A2": "Low",
+    "A3": "High",
+    "A4": "None",
+    "A5": "Medium",
+    "A6": "high",
+    "A7": "",
+    "A8": "Low",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B8",
+    "keys": [
+     {
+      "key": "A1",
+      "customOrder": "High,Medium,Low"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H12"
+ },
+ {
+  "name": "custom list High, Medium, Low, descending",
+  "setup": {
+   "cells": {
+    "A1": "Level",
+    "B1": "Row",
+    "A2": "Low",
+    "A3": "High",
+    "A4": "None",
+    "A5": "Medium",
+    "A6": "high",
+    "A7": "",
+    "A8": "Low",
+    "B2": "r2",
+    "B3": "r3",
+    "B4": "r4",
+    "B5": "r5",
+    "B6": "r6",
+    "B7": "r7",
+    "B8": "r8"
+   }
+  },
+  "steps": [
+   {
+    "do": "sort",
+    "range": "A1:B8",
+    "keys": [
+     {
+      "key": "A1",
+      "customOrder": "High,Medium,Low",
+      "order": "desc"
+     }
+    ],
+    "header": "yes"
+   }
+  ],
+  "read": "A1:H12"
+ }
+]
