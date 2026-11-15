@@ -1,36 +1,94 @@
 # open-xlsx-editor
 
-Open and edit .xlsx files in the browser. Plain JavaScript, no server, no Office.
+Open, edit and save Excel workbooks (.xlsx) in the browser. Plain JavaScript, no server, no Office.
 
-It opens a workbook with Excel's Home tab over it (font, borders, fill and font colour, alignment, number formats,
-written to the file as Excel writes them), shows its sheets in a virtualised grid with their fonts, fills, borders,
-alignment and number formats, the sheet tabs underneath (in their tab colours; Ctrl+Page Up and Page Down change sheet; insert, rename,
-move, colour, hide and delete sheets from the tab menu, with formulas and names kept pointing at the right sheets),
-prints a sheet as Excel lays it out (measured against Excel's own PDFs), and lets you edit cell values: select with the
-keyboard or mouse, type over a cell or press F2, Delete, undo and redo. Formulas are worked out as Excel works them
-out (500 of Excel's 519 functions, dynamic arrays that spill as Excel 365's do, and table references; 1914 of 1914 test formulas give Excel's results), again whenever what they read changes, and
-can be typed, pointing at cells with the arrow keys or the mouse, on this sheet or another, as in Excel. Saving
-rewrites only the parts you changed; every other part goes back byte for byte.
-An AI assistant can read and edit workbooks too, through an MCP server (`open-xlsx-editor-mcp`) or the agent
-interface, and every change it makes can be reviewed cell by cell and taken back before saving (docs/AGENT.md).
-Sister project of open-docx-editor, built the same way.
+**[Live demo](https://janderson12345.github.io/open-xlsx-editor/)**: a sample workbook opens; drop your own .xlsx on
+the page (it stays in your browser, nothing is uploaded).
+
+- **Looks like Excel.** The grid is laid out as Excel lays it out. Column widths, row heights, fonts, fills, borders,
+  number formats and conditional formatting are drawn as Excel draws them, and printing and PDF export follow Excel's
+  page setup. All of this is measured against Excel's own PDFs.
+- **Calculates like Excel.** 500 of Excel's 519 functions, dynamic arrays that spill as Excel 365's do, LET and
+  LAMBDA, table references and 3D references. 1914 of 1914 test formulas give Excel's results.
+- **Edits like Excel.** Excel's ribbon (classic or simplified), its keys and its dialog boxes: Format Cells, Find and
+  Replace, Sort, Filter, Fill, Paste Special, Conditional Formatting, Data Validation, PivotTables, charts, notes and
+  comments, hyperlinks, sheet and workbook protection, password-protected workbooks.
+- **Keeps your file.** Saving rewrites only the parts you changed. Every other part, including what the editor doesn't
+  understand (macros, add-in data, newer features), goes back byte for byte, and the result opens in Excel without
+  repair.
+- **Works with AI assistants.** An MCP server (`open-xlsx-editor-mcp`) and an agent interface read and edit workbooks.
+  Every change an assistant makes can be reviewed cell by cell and taken back before saving (docs/AGENT.md).
+- **Runs anywhere.** One script and one stylesheet, served from your own site. It fetches nothing while it runs, and
+  works under a strict Content-Security-Policy. Light and dark themes; keyboard and screen reader support, checked
+  with axe.
+
+This is version 0.x: the API may still change between minor versions. `docs/FEATURES.md` lists, ribbon tab by ribbon
+tab, what Excel does and what this editor does yet. The main things missing are:
+
+- opening .xlsb and .xls files;
+- running macros;
+- PivotTable filters, grouping and calculated fields;
+- the Spelling box;
+- Check Accessibility;
+- split windows;
+- 19 functions, including FORECAST.ETS.
+
+## Install
+
+```sh
+npm install open-xlsx-editor
+```
+
+## Quick start
 
 ```js
 import { mountXlsxEditor } from 'open-xlsx-editor';
 import 'open-xlsx-editor/style.css';
 
+const bytes = new Uint8Array(await (await fetch('book.xlsx')).arrayBuffer());
 const editor = mountXlsxEditor(document.getElementById('host'), { bytes, fileName: 'book.xlsx' });
+
+const saved = editor.save(); // a Uint8Array: the .xlsx with your changes
+```
+
+The host element needs a height; the editor fills it. Without a bundler, use the prebuilt files in `dist/`
+(`open-xlsx-editor.js`, an ES module, and `open-xlsx-editor.css`):
+
+```html
+<link rel="stylesheet" href="open-xlsx-editor.css">
+<div id="host" style="height: 100vh"></div>
+<script type="module">
+  import { mountXlsxEditor } from './open-xlsx-editor.js';
+  const editor = mountXlsxEditor(document.getElementById('host'));
+</script>
+```
+
+Without `bytes`, `editor.open(bytes, fileName)` opens a workbook later. A workbook saved with a password asks for
+it.
+
+## The API
+
+Everything the ribbon and the keys do is a named command, so a page can drive the editor too. The full API, with
+types, is in `src/index.d.ts`.
+
+```js
 editor.enter('B2', '42');      // as if typed; editor.setCell('C3', 'text'), editor.undo(), editor.select('A1')
 editor.enter('B3', '=B2*2');   // a formula; the cells that read B2 or B3 are worked out again
 editor.showSheet('Notes');     // another sheet, by name or index, with the selection it had
 editor.renameSheet('Notes', 'Q1 notes'); // formulas that read it follow; also insertSheet, moveSheet, hideSheet...
 editor.command('toggleFont', 'b'); // what the ribbon's buttons do, on the selection; Ctrl+B does the same
-const saved = editor.save(); // Uint8Array; save({ as: 'xltx' }) as a template, or a template as 'xlsx'
+editor.save({ as: 'xltx' });   // as a template, or a template as 'xlsx'
 ```
 
-## Read-only mode and turning features off
+Without a page, in Node or a worker, `openWorkbook(bytes)` reads and edits a workbook through the agent interface
+(docs/AGENT.md), and `Workbook.fromBytes(bytes)` gives the model the editor uses.
 
-As in open-docx-editor:
+Two more entry points load only when imported:
+
+- `open-xlsx-editor/pdf`: `exportPdf(editor)` makes a PDF of the workbook as Excel prints it (docs/PDF.md).
+- `open-xlsx-editor/collab`: `connectWorkbook(editor, ydoc)` co-edits a workbook over Yjs (docs/COLLAB.md).
+
+### Options
 
 ```js
 const editor = mountXlsxEditor(el, {
@@ -39,6 +97,11 @@ const editor = mountXlsxEditor(el, {
   toolbar: true,                        // false hides the ribbon but keeps editing
   ribbon: 'simple',                     // start with the one-line ribbon ('classic': the full one); setRibbon() later
   statusBar: true,                      // false hides Average, Count and Sum; { minimum: true, maximum: true } adds those
+  theme: 'dark',                        // 'light' or 'dark'; without it, the page's colour scheme
+  fillLists: [['North', 'East', 'South', 'West']], // custom lists the fill handle goes round
+  errorChecking: false,                 // no green error triangles; { rules: [...] } chooses Excel's rules
+  onLink: (url) => window.open(url),    // a hyperlink clicked
+  onChange: () => {},                   // the workbook changed
 });
 editor.setReadOnly(false);              // switch at any time
 editor.setFeatures({ number: true });
@@ -47,28 +110,17 @@ editor.setFeatures({ number: true });
 Tab names: `home`, `insert`, `page-layout`, `formulas`, `data`, `review`, `view`. Group names are their labels in lower
 case with dashes: `undo`, `clipboard`, `font`, `alignment`, `number`, `cells`, `editing`; on Page Layout,
 `sheet-options`; on View, `show`, `zoom` and `window`. A group turned off also turns off its keys (`font: false`:
-Ctrl+B does nothing; `clipboard: false`: Ctrl+C, X and V). F6 moves between the sheet and the ribbon, Esc goes back to the sheet; the ⌃ at the right switches to a
-one-line ribbon. `docs/FEATURES.md` lists what is there and what isn't yet.
+Ctrl+B does nothing; `clipboard: false`: Ctrl+C, X and V). F6 moves between the sheet and the ribbon, and Esc goes
+back to the sheet.
 
-- `npm run dev`: the demo at http://localhost:8080 (drag an .xlsx onto it).
-- `CONTRIBUTING.md`: setup and tests. `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab,
-  and the functions still missing. `docs/ARCHITECTURE.md`: the module map. Each of the others says how a part was
-  matched to Excel, what was measured, and what isn't done yet:
-  - Opening, saving, printing: `docs/FIDELITY.md` (what survives a save), `docs/ENCRYPTION.md` (password workbooks),
-    `docs/CSV.md` (a .csv opened and saved),
-    `docs/LAYOUT.md` (the grid as Excel lays it out), `docs/PRINT.md` and `docs/PDF.md`.
-  - Calculation: `docs/CALC.md` (formulas and functions), `docs/DYNAMIC.md` (spilling, LET, LAMBDA), `docs/NAMES.md`
-    (defined names), `docs/AUTOSUM.md`.
-  - Editing: `docs/ENTRY.md` (typed entries), `docs/CLIPBOARD.md` (copy, cut, Paste Special), `docs/FILL.md`,
-    `docs/FIND.md`, `docs/GOTOSPECIAL.md` (and several ranges selected), `docs/PROOFING.md` (AutoCorrect, spelling).
-  - Cells, rows and sheets: `docs/FORMATS.md`, `docs/CONDFORMAT.md`, `docs/VALIDATION.md`, `docs/SIZES.md`,
-    `docs/ROWCOL.md`, `docs/SHEETS.md`, `docs/VIEW.md` (frozen panes, zoom, gridlines, headings), `docs/PROTECT.md`
-    (Protect Sheet and Protect Workbook).
-  - Data and objects: `docs/SORT.md`, `docs/FILTER.md`, `docs/DATATOOLS.md` (Flash Fill, Remove Duplicates, Text to
-    Columns...), `docs/PIVOT.md`, `docs/CHARTS.md`, `docs/NOTES.md` (notes and comments), `docs/LINKS.md` (hyperlinks).
-  - Working with others: `docs/COLLAB.md` (co-editing), `docs/AGENT.md` (the agent interface).
-- `LESSONS.md`: what the Word editor taught. `CLAUDE.md`: the rules for working on this code. `docs/REUSE.md`: which
-  Word editor modules carry over.
+## AI assistants (MCP)
+
+```json
+{ "mcpServers": { "excel": { "command": "npx", "args": ["-y", "-p", "open-xlsx-editor", "open-xlsx-editor-mcp", "--root", "/path/to/workbooks"] } } }
+```
+
+The server reads and edits the workbooks in one folder: sheets, cells, formulas, names, tables and notes. It saves to
+a new file unless asked to overwrite, and the assistant shows its changes for review before saving. docs/AGENT.md has the tools and the review.
 
 ## Self-hosting: no CDN, a strict Content-Security-Policy
 
@@ -154,4 +206,33 @@ Not yet:
 The demo loads them from `demo/fonts/omf/` (a copy of the bundle, or of `morrow-sans/`, not in this repository) when
 the page is opened with `?fonts`. `tools/omf-faces.mjs` writes the editor's list of faces from a newer `morrow-sans`.
 
-MIT licence.
+## Documentation
+
+- `docs/FEATURES.md`: what Excel does and what this editor does yet, by ribbon tab, and the functions still missing.
+- `docs/ARCHITECTURE.md`: the module map. Start here to change the code.
+
+Each of the others says how a part was matched to Excel, what was measured, and what isn't done yet:
+
+- **Opening, saving, printing:** `docs/FIDELITY.md` (what survives a save), `docs/ENCRYPTION.md` (password
+  workbooks), `docs/CSV.md` (a .csv opened and saved), `docs/LAYOUT.md` (the grid as Excel lays it out),
+  `docs/PRINT.md` and `docs/PDF.md`.
+- **Calculation:** `docs/CALC.md` (formulas and functions), `docs/DYNAMIC.md` (spilling, LET, LAMBDA),
+  `docs/NAMES.md` (defined names), `docs/AUTOSUM.md`.
+- **Editing:** `docs/ENTRY.md` (typed entries), `docs/CLIPBOARD.md` (copy, cut, Paste Special), `docs/FILL.md`,
+  `docs/FIND.md`, `docs/GOTOSPECIAL.md` (and several ranges selected), `docs/PROOFING.md` (AutoCorrect, spelling).
+- **Cells, rows and sheets:** `docs/FORMATS.md`, `docs/CONDFORMAT.md`, `docs/VALIDATION.md`, `docs/SIZES.md`,
+  `docs/ROWCOL.md`, `docs/SHEETS.md`, `docs/VIEW.md` (frozen panes, zoom, gridlines, headings), `docs/PROTECT.md`
+  (Protect Sheet and Protect Workbook).
+- **Data and objects:** `docs/SORT.md`, `docs/FILTER.md`, `docs/DATATOOLS.md` (Flash Fill, Remove Duplicates, Text
+  to Columns...), `docs/PIVOT.md`, `docs/CHARTS.md`, `docs/NOTES.md` (notes and comments), `docs/LINKS.md`
+  (hyperlinks).
+- **Working with others:** `docs/COLLAB.md` (co-editing), `docs/AGENT.md` (the agent interface and MCP server).
+
+## Contributing, security, licence
+
+- `CONTRIBUTING.md`: setup, the tests, and how changes are measured against Excel. `npm run dev` serves the demo at
+  http://localhost:8080.
+- `SECURITY.md`: how to report a security problem privately.
+- `CHANGELOG.md`: what changed in each release.
+- MIT licence (`LICENSE`). Sister project of [open-docx-editor](https://github.com/janderson12345/open-docx-editor),
+  the same for Word documents.
