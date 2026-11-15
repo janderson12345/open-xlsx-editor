@@ -169,6 +169,34 @@ Format Painter copies the selection (outlined, as a copy is, the system clipboar
 on the next cells selected, through Paste Special > Formats (measured for `test/paste-excel.json`). Pressed twice
 quickly it stays on; Esc, or pressing it again, ends it.
 
+## Draw Borders and More Colors (`formatops.js` drawLines, `src/ooxml/recentcolors.js`, `src/editor/drawborders.js`)
+
+Home > Font > Borders' Draw Borders section and the More Colors... of the Fill Color, Font Color and Line Color menus.
+Measured in a hidden Excel over COM (`tools/excel-compare/excel-drawborders.ps1`, Excel's saved borders cell by cell
+in `test/drawborders-excel.json`; `test/drawborders.test.js` draws each scene here and expects Excel's text).
+Drawing is a mouse gesture COM can't make, so the lines a drag draws are measured as the ribbon's presets on the same
+cells (`ExecuteMso` Outside Borders, All Borders, No Border); the modes through `GetPressedMso` after each step.
+
+| Rule | Seen |
+|---|---|
+| Draw Border, Draw Border Grid and Erase Border are modes, one at a time: picking another switches to it, picking the one on again ends it. | Draw, then Grid: only Grid pressed; Erase twice: none. |
+| A cell selected ends the mode; a value typed doesn't. Here the drag draws and selects nothing, and Esc ends the mode (Excel's documented key). | `Range.Select` after Draw Border: none pressed. `Value2` set: still pressed. |
+| Draw Border draws the outline of the range dragged, Draw Border Grid every line in it, Erase Border takes every line off, the diagonals too. | Outside Borders on H2:J4; All Borders on H8:J10; No Border on N14:P16 took O15's diagonal off. |
+| The neighbours' facing lines go, whatever they are; a neighbour's line the same as the one drawn stays beside one cell and goes beside a range of several. | H1's double bottom and K3's red left went. G24's thin right stayed beside H24; G3's beside H2:J4, H7's beside H8:J10 and H19's beside H20:I20 (Top Border) went. |
+| A click within 4px of a gridline draws or erases just that line (elsewhere the cell's own lines), with the neighbour's facing side going as above. | Excel's documented behaviour; not measurable over COM. |
+| Line Style's thirteen lines are written `hair`, `dotted`, `dashDotDot`, `dashDot`, `dashed`, `thin`, `mediumDashDotDot`, `slantDashDot`, `mediumDashDot`, `mediumDashed`, `medium`, `thick`, `double`; an automatic Line Color is `indexed="64"`. Thin and automatic to start with. | One cell's bottom per line, A20 to A32. |
+| A custom colour (More Colors) is written `rgb="FFRRGGBB"`: a line's `color`, a fill's `fgColor` (solid, `bgColor indexed="64"`), a font's `color`. | RGB 18, 52, 86: `rgb="FF123456"` on C20, C21, C22. |
+| Recent Colors are the workbook's `<colors><mruColors>` in styles.xml (after `tableStyles`); Excel saved such a list back as it was. A colour set over COM added none. Here a More Colors colour goes first, once, at most ten (the schema's limit), and isn't taken back by Undo (the format it came with is). | Two colours put in the saved file: the same `<colors>` after Excel's save. |
+
+Not measured (the Colors box and the Line Color and Line Style menus can't be driven over COM): which end of
+`mruColors` Excel puts the latest at; that picking a line colour or style turns Draw Border on (Excel's documented
+behaviour, followed here); whether the Line Color and Line Style also go to the Borders presets (here they don't).
+Excel's Standard (hexagon) tab of the Colors box is not offered; the Custom tab's Red, Green, Blue and Hex are.
+
+Found in passing, not changed here: over a range of several cells the ribbon's presets also take a neighbour's same
+line away (the rows above follow it for Draw Borders only), and No Border takes the diagonals off, where the presets
+here keep both.
+
 ## Not yet
 
 Cell styles other than the three above, and formatting whole rows or columns (a selection past the used range is cut to it: Excel

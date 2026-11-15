@@ -2066,6 +2066,52 @@
 .oxe-root.oxe-painting .oxe-grid {
   cursor: copy;
 }
+/* Draw Borders on (drawborders.js): a pen over the grid, a cross while erasing. */
+.oxe-root.oxe-drawing-borders .oxe-grid {
+  cursor: crosshair;
+}
+.oxe-root.oxe-erasing-borders .oxe-grid {
+  cursor: cell;
+}
+/* The Line Style menu: each line drawn beside its name. */
+.oxe-linestyle {
+  display: inline-block;
+  width: 36px;
+  height: 0;
+  vertical-align: middle;
+  border-bottom: 1px solid currentColor;
+}
+.oxe-ls-hair { border-bottom-color: color-mix(in srgb, currentColor 55%, transparent); }
+.oxe-ls-dotted, .oxe-ls-dashDotDot, .oxe-ls-mediumDashDotDot { border-bottom-style: dotted; }
+.oxe-ls-dashDot, .oxe-ls-dashed, .oxe-ls-mediumDashDot, .oxe-ls-mediumDashed, .oxe-ls-slantDashDot { border-bottom-style: dashed; }
+.oxe-ls-medium, .oxe-ls-mediumDashDotDot, .oxe-ls-slantDashDot, .oxe-ls-mediumDashDot, .oxe-ls-mediumDashed { border-bottom-width: 2px; }
+.oxe-ls-thick { border-bottom-width: 3px; }
+.oxe-ls-double { border-bottom: 3px double currentColor; }
+/* More Colors (colorbox.js): the fields in a column, the new colour over the current one. */
+.oxe-colorbox-row {
+  display: grid;
+  grid-template-columns: 4.5em 8em;
+  gap: 6px;
+  align-items: center;
+  margin: 0 0 6px;
+}
+.oxe-colorbox-samples {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 8px;
+}
+.oxe-colorbox-sample {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.oxe-colorbox-swatch {
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  border: 1px solid var(--oxe-head-line);
+  background: var(--oxe-swatch, #000000);
+}
 
 /* A comment thread (threadbox.js): its comments listed, each with its author, time and buttons, the reply box under. */
 .oxe-dialog.oxe-thread-box {

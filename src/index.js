@@ -55,7 +55,7 @@ export { OMF_VERSION } from './editor/omf.js';
 
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
-const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
+const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', drawBorders: 'font', moreColor: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
   resizeLines: 'cells', columnWidth: 'cells', rowHeight: 'cells', fitLines: 'cells', hideLines: 'cells', rowHeightBox: 'cells', columnWidthBox: 'cells',
   freeze: 'window', zoom: 'zoom', zoomBox: 'zoom', zoomSelection: 'zoom', zoomToSelection: 'zoom',
   lines: 'cells', cells: 'cells', insertCells: 'cells', deleteCells: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
@@ -432,6 +432,9 @@ export function mountXlsxEditor(host, options = {}) {
           chartKey: (e) => state.picker?.onKey(e),
           formatCells: () => act('formatCellsBox'),
           painted: () => act('paintFormats'),
+          drawing: () => act('drawing'),
+          drawn: (range, side) => act('drawn', range, side),
+          stopDrawing: () => act('stopDrawing'),
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           editNote: () => act('editNote'),
           fitWidth: (c) => state.grid.fitWidth(c),
