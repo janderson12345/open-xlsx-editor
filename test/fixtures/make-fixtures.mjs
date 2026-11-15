@@ -18,6 +18,7 @@
 //                anchored F3 to L15, a rectangle M5 to P9 and notes at A1, B6, D12 and F20 (test/anchors.test.js).
 //
 // special.xlsx  something for each of Go To Special's choices (special.mjs).
+// sparklines.xlsx  sparklines of each type and option, as Excel writes them (sparklines.mjs).
 // print-*.xlsx   probes for the print model: print area, titles and breaks; scale; fit to a page wide; headers and
 //                footers (probes-print.mjs).
 // The zips are written with a fixed date, so the files only change when this script does.
@@ -27,6 +28,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { special } from './special.mjs';
+import { sparklines } from './sparklines.mjs';
 import { write, contentTypes, rels, RT, CT, DECL, X, R, ROOT_RELS, docProps, PROPS_CT, STYLES, esc, col, stringTable } from './fixture-common.mjs';
 import { widths, general, fonts, fills, align, numfmts, rowHeights } from './probes-format.mjs';
 import { formulas } from './probes-formulas.mjs';
@@ -151,4 +153,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   anchors(true);
   printProbes();
   special({ write, contentTypes, rels, RT, CT, DECL, X, R, ROOT_RELS, docProps, PROPS_CT, STYLES, esc });
+  sparklines();
 }

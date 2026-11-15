@@ -5,6 +5,7 @@ import { mergeAt } from './cells.js';
 import { setVars, div } from './dom.js';
 import { lineStyle } from '../ooxml/sheet.js';
 import { LINE } from './cellstyles.js';
+import { sparkElement } from './sparkview.js';
 
 /** Border line widths in units of a thin line: thin and its dash patterns 1, medium and its patterns 2, thick and
  *  double 3; hair is thinner than a unit. */
@@ -41,6 +42,7 @@ export function decorations(st, win) {
   const ox = print ? PRINT_GRID_ORIGIN.x : 0;
   const oy = print ? PRINT_GRID_ORIGIN.y : 0;
   const drawnMerges = new Set();
+  const sparks = [];
   for (let r = win.r0; r <= win.r1; r++) {
     if (!rows.size(r)) continue;
     const line = sheet.cells.get(r);
@@ -54,6 +56,9 @@ export function decorations(st, win) {
         const d = deco(sheet.cells.get(merge.r0)?.get(merge.c0)?.s || 0);
         if (d.fill || !print) fills.push(rect(st, merge.r0, merge.c0, merge.r1, merge.c1, d.fill ? d.fillClass : 'oxe-blank', ox, oy));
       }
+      // (A sparkline, over the cell's fills: ooxml/sparklines.js, sparkview.js.)
+      const sp = st.sparks?.get(`${r},${c}`);
+      if (sp && (!merge || (merge.r0 === r && merge.c0 === c))) sparks.push(sparkElement(st, merge || { r0: r, c0: c, r1: r, c1: c }, sp, ox, oy));
       // (A conditional format's fill, over the cell's own: ooxml/condformat.js.)
       const cf = st.cond?.get(`${r},${c}`);
       if (cf?.fill) {
@@ -86,6 +91,7 @@ export function decorations(st, win) {
       }
     }
   }
+  fills.push(...sparks);
   return { fills, edges };
 }
 

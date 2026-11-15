@@ -342,6 +342,14 @@ export class Workbook {
     this._reread(i, part);
   }
 
+  /** A change to sheet i's sparklines made by `fn(doc)` (sparkedit.js), the sheet read again; fn's answer back. */
+  changeSparklines(i, fn) {
+    const part = this._part(i);
+    const out = fn(part.doc);
+    this._reread(i, part);
+    return out;
+  }
+
   /** Give cells `ranges` of sheet i the data validation `rule` (dvedit.js), or none (null: Clear All). */
   /** A cut's validation moved with it on sheet i (dvedit.js moveValidation). */
   moveValidation(i, rect, dr, dc) { moveValidation(this._part(i).doc, rect, dr, dc); this._reread(i, this._part(i)); }
