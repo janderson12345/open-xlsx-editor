@@ -1,6 +1,6 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, and iterative calculation. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area and Breaks. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -305,5 +305,26 @@ const iterated = await page.evaluate(() => {
 check(dimmed && iterated.a1 === 50 && iterated.iterate === '1' && iterated.count === '50',
   'Iterative Calculation: the box (its numbers dimmed while off); on with 50 iterations, A1 =A1+1 goes round to 50; calcPr as Excel writes it',
   JSON.stringify({ dimmed, ...iterated }));
+
+// Page Layout > Breaks and Print Area: on a new sheet with cells to A40, Insert Page Break at C5 gives a row and a
+// column break (the print layout one page more each way), Ctrl+Z takes it back; Set Print Area on B2:D5, and then the
+// menu offers Add to Print Area, as Excel's does.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for (let r = 1; r <= 40; r++) o.enter(`A${r}`, String(r)); o.enter('F1', 'x'); o.select('C5'); });
+const printed = () => page.evaluate(() => window.oxe.preparePrint());
+const pagesBefore = await printed();
+await page.click('.oxe-rtab >> text=Page Layout');
+await ribbon('Breaks', () => page.click('.oxe-pop >> text=Insert Page Break'));
+const brks = await page.evaluate(() => JSON.stringify(window.oxe.workbook.sheet(window.oxe.sheetIndex).page.breaks));
+const pagesWith = await printed();
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const brksUndone = await page.evaluate(() => JSON.stringify(window.oxe.workbook.sheet(window.oxe.sheetIndex).page.breaks));
+await page.evaluate(() => { window.oxe.select('B2'); window.oxe.command('extendTo', 4, 3); });
+const addBefore = await (async () => { let seen = false; await ribbon('Print Area', async () => { seen = await page.isVisible('.oxe-pop >> text=Add to Print Area'); await page.click('.oxe-pop >> text=Set Print Area'); }); return seen; })();
+const areaText = await page.evaluate(() => window.oxe.workbook.definedNames.find((d) => d.name === '_xlnm.Print_Area' && d.sheet === window.oxe.sheetIndex)?.text);
+const addAfter = await (async () => { let seen = false; await ribbon('Print Area', async () => { seen = await page.isVisible('.oxe-pop >> text=Add to Print Area'); await page.keyboard.press('Escape'); }); return seen; })();
+check(brks === '{"rows":[4],"cols":[2]}' && pagesWith > pagesBefore && brksUndone === '{"rows":[],"cols":[]}' && !addBefore && /!\$B\$2:\$D\$5$/.test(areaText || '') && addAfter,
+  'Page Layout: Insert Page Break at C5 (a row and a column break, more pages), Ctrl+Z; Set Print Area, then Add to Print Area offered',
+  JSON.stringify({ brks, pagesBefore, pagesWith, brksUndone, addBefore, areaText, addAfter }));
 
 await finish();

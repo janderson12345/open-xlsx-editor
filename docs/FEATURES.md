@@ -119,7 +119,7 @@ which is dropped when formulas change (Excel rebuilds it).
 |---|---|---|---|
 | Themes (`themes`) | Theme colours and fonts | Shown | Excel 365's default theme when the file has none. |
 | Page Setup (`page-setup`) | Margins, orientation, paper size, page order | Shown | Used when printing. |
-| | Print area, print titles, page breaks | Shown | Used when printing and exporting, as Excel does (docs/PRINT.md); can't be set here yet. |
+| | Print area, print titles, page breaks | Partly | Used when printing and exporting, as Excel does (docs/PRINT.md). Print Area (Set, Add to, Clear) and Breaks (Insert, Remove, Reset All) set as Excel writes them, measured. Print Titles can't be set here yet. |
 | Scale to Fit (`scale-to-fit`) | Width, height, scale | Shown | Used when printing and exporting, rows and columns in whole printer dots as Excel prints them (docs/PRINT.md); can't be set here yet. |
 | Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Done | Gridlines and Headings, View and Print, saved as Excel saves them (Excel reads them back the same; docs/VIEW.md); Print used when printing and exporting (docs/PRINT.md). |
 

@@ -39,6 +39,24 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   left section starts 1.25px inside the left margin, the right section ends 1.25px inside the right margin, and the
   centre is centred on the page.
 
+## Setting them (measured)
+
+Page Layout > Page Setup's Print Area and Breaks set what the rules above read (`ooxml/pagesetupedit.js`), written as
+Excel writes them. Measured over COM in a hidden Excel: the ribbon's Insert Page Break, Remove Page Break and Reset
+All Page Breaks through ExecuteMso (its Print Area commands don't run in a hidden Excel, so PageSetup.PrintArea, which
+sets the same name), then the file saved (`test/pagesetupedit.test.js`).
+
+| Excel's rule | Excel's file |
+|---|---|
+| Insert Page Break at the active cell: a manual break before its row and one before its column; in row 1 only the column's, in column A only the row's, at A1 none. | C5: `<rowBreaks count="1" manualBreakCount="1"><brk id="4" max="16383" man="1"/></rowBreaks>` and `<colBreaks ...><brk id="2" max="1048575" man="1"/></colBreaks>`. |
+| Remove Page Break: the break above the active row and the one left of its column, those there. | Breaks at rows 5, 9 and columns C, E; at E3: E's alone goes. |
+| Reset All Page Breaks: every manual break, the elements too. | No rowBreaks or colBreaks left. |
+| Set Print Area: the selection, the sheet's own name _xlnm.Print_Area, $-absolute with the sheet's name; Add to Print Area (offered once there is one) adds the selection after a comma; Clear Print Area takes the name away. | `'My Data'!$B$2:$D$5`, `'My Data'!$B$2:$D$5,'My Data'!$F$7:$G$8`, one cell `'My Data'!$C$3`. |
+
+Each is one step of the undo history. Not measured: Excel's joining of neighbouring ranges in Add to Print Area (here
+they are listed as given); the print layout prints a print area of several ranges by its first, as above. Print
+Titles (Excel's Page Setup box) can't be set here yet.
+
 ## Results (10 November 2026)
 
 | | Browser print | PDF export |

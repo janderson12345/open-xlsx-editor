@@ -20,6 +20,7 @@ import { messageBox, unhideBox, passwordBox } from './editor/dialogs.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { readNotes } from './ooxml/notes.js';
 import { breaksRule } from './ooxml/validation.js';
+import { printAreaOf } from './ooxml/pagesetupedit.js';
 import { sheetProtection, workbookProtection, contentsHidden } from './ooxml/protection.js';
 import { conditionalLooks } from './ooxml/condformat.js';
 import { errorFlags } from './ooxml/errorcheck.js';
@@ -222,7 +223,7 @@ export function mountXlsxEditor(host, options = {}) {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
-        'Page Layout': (kit) => pageLayoutTab(kit, { act }),
+        'Page Layout': (kit) => pageLayoutTab(kit, { act, hasPrintArea: () => !!(state.workbook && printAreaOf(state.workbook, state.sheetIndex)) }),
         Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook), names: () => (state.workbook ? namesOnSheet(state.workbook, state.sheetIndex).map((n) => n.name) : []) }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),

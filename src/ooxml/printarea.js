@@ -6,7 +6,7 @@ import { parseRange, colIndex, MAX_ROWS, MAX_COLS } from './refs.js';
 
 /** The ranges a defined name's text holds on its sheet ("Probe!$B$3:$H$70,Probe!$1:$2"): [{ r0, c0, r1, c1 }], whole
  *  rows and columns as whole lines. */
-function rangesOf(text) {
+export function rangesOf(text) {
   const out = [];
   for (const part of String(text || '').split(',')) {
     const ref = part.trim().replace(/^(?:'(?:[^']|'')+'|[^!]+)!/, '').replace(/\$/g, '');

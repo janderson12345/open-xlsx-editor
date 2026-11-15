@@ -1,7 +1,10 @@
 // The commands on the sheet's view (commands.js shares its state with them): Freeze Panes, Show Formulas, the zoom,
-// View > Show (Gridlines, Formula Bar, Headings) and Page Layout > Sheet Options' Print boxes. Kept in the file (all but
+// View > Show (Gridlines, Formula Bar, Headings), Page Layout > Sheet Options' Print boxes, and Page Setup's Print
+// Area and Breaks (ooxml/pagesetupedit.js; those two are steps of the undo history, as Excel's are). Kept in the file (all but
 // the Formula Bar, which Excel keeps as its own setting, not the workbook's) and not in the undo history.
 import { setPrintOptions } from '../ooxml/printopts.js';
+import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea } from '../ooxml/pagesetupedit.js';
+import { areasOf } from './selection.js';
 
 /** The view commands: `env` is createCommands's shared state and helpers. */
 export function viewCommands(env) {
@@ -99,6 +102,22 @@ export function viewCommands(env) {
      *  the sheet shown; saved as Excel saves them (printopts.js), used when printing. */
     printGridlines(on) { return printOption('gridLines', on, 'Gridlines'); },
     printHeadings(on) { return printOption('headings', on, 'Headings'); },
+    /** Page Layout > Print Area: 'set' (the selection's ranges), 'add' (Add to Print Area) or 'clear', on the sheet
+     *  shown, as one step of the history. */
+    printArea(how) {
+      const areas = areasOf(state.sel).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 }));
+      const done = commands.sheetChange((wb, si) => (how === 'clear' ? clearPrintArea(wb, si) : (setPrintArea(wb, si, areas, { add: how === 'add' }), true)));
+      if (done) ctx.announce(how === 'clear' ? 'Print area cleared' : how === 'add' ? 'Added to the print area' : 'Print area set');
+      return done;
+    },
+    /** Page Layout > Breaks: 'insert' or 'remove' at the active cell, or 'reset' (Reset All Page Breaks), on the sheet
+     *  shown, as one step of the history; false when there was nothing to do (Excel adds no break at A1). */
+    pageBreak(how) {
+      const { ar, ac } = state.sel;
+      const done = commands.sheetChange((wb, si) => (how === 'insert' ? insertBreak(wb, si, ar, ac) : how === 'remove' ? removeBreak(wb, si, ar, ac) : resetBreaks(wb, si)));
+      ctx.announce(!done ? 'No page break to change here' : how === 'insert' ? 'Page break inserted' : how === 'remove' ? 'Page break removed' : 'All page breaks reset');
+      return done;
+    },
     /** View > Formula Bar: on, off, or turned over (no argument). The editor's, for every sheet; not in the file. */
     showFormulaBar(on) {
       const now = on ?? !ctx.formulaBar();
