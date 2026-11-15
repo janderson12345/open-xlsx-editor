@@ -23,6 +23,7 @@ import { seriesBox, removeDuplicatesBox, textToColumnsBox, moveCopyBox } from '.
 import { fillSeries, removeDuplicates, textToColumns } from '../ooxml/datatools.js';
 import { flashFill } from '../ooxml/flashfill.js';
 import { justifySteps, JUSTIFY_EXTENDS } from '../ooxml/justifyops.js';
+import { invalidCells } from '../ooxml/validation.js';
 import { excelTextWidth, JUSTIFY_MARGIN } from './textwidth.js';
 import { sheetGeometry } from './geometry.js';
 import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
@@ -274,6 +275,13 @@ export function createMoreActs(env) {
         state.grid.el.focus({ preventScroll: true });
         return o ? editing().run('runTool', fillSeries(state.workbook, i, s, o), 'Filled ') : false;
       });
+    }
+    if (name === 'circleInvalid' || name === 'clearCircles') {
+      // (Data Validation's menu: a circle round each cell of the sheet shown that breaks its rule, kept with the
+      // sheet, not saved; or none. index.js drops one when its cell is put right.)
+      state.circles.set(state.workbook.sheets[i], name === 'circleInvalid' ? invalidCells(state.workbook, i) : []);
+      state.grid.setCircles(state.circles.get(state.workbook.sheets[i]));
+      return true;
     }
     if (name === 'fillJustify') {
       // (Home > Fill > Justify: the first column's text rewrapped to the selection's width, measured in its first

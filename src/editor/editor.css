@@ -851,8 +851,9 @@
   position: absolute;
   inset: 0;
 }
-/* Tracer arrows (arrows.js), in the sheet's coordinates: the row headings' width included in their x. */
-.oxe-arrows {
+/* Tracer arrows (arrows.js) and Circle Invalid Data's ovals (dvcircles.js), in the sheet's coordinates: the row
+   headings' width included in their x. */
+.oxe-arrows, .oxe-circles {
   position: absolute;
   left: 0;
   top: 0;

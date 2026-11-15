@@ -1,6 +1,6 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, and Home > Fill > Justify. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, and Circle Invalid Data. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -212,5 +212,36 @@ await page.click('dialog.oxe-dialog >> button:text-is("OK")');
 const extended = await columnA();
 check(refusedLeft.join('|') === 'alpha|42|beta' && extended.length > 4 && !extended.includes('below') && extended.join(' ') === 'one two three four five six seven eight nine ten',
   'Fill > Justify: a number refused in Excel\'s words; text going on below asked first, then written over the cells there', JSON.stringify({ refusedLeft, extended }));
+
+// Data > Data Validation > Circle Invalid Data: whole numbers 1 to 10 over B2:B5 (B5 blank, ignored): ovals round B3's 50
+// and B4's text, where Excel draws them (dvcircles.js); B3 put right, its oval goes; kept with the sheet; Clear
+// Validation Circles takes them away.
+const circlesNow = () => page.evaluate(() => [...document.querySelectorAll('.oxe-circles ellipse')].map((e) => ['cx', 'cy', 'rx', 'ry'].map((k) => Math.round(Number(e.getAttribute(k)) * 10) / 10).join(',')));
+await page.evaluate(() => {
+  const o = window.oxe;
+  o.command('insertSheet');
+  o.enter('B2', '5'); o.enter('B3', '50'); o.enter('B4', 'abc');
+  o.command('sheetChange', (wb, si) => wb.setValidation(si, [{ r0: 1, c0: 1, r1: 4, c1: 1 }], { type: 'whole', op: 'between', f1: '1', f2: '10', ignoreBlank: true }), 'always');
+});
+const circleSheet = await page.evaluate(() => window.oxe.sheetIndex);
+await page.click('.oxe-rtab >> text=Data');
+await page.click('.oxe-toolbar button.oxe-split-more[aria-label^="Data Validation"]');
+await page.click('.oxe-pop >> text=Circle Invalid Data');
+const circled = await circlesNow();
+// (B3's oval in Excel's place: 3.75pt left of the cell and 1.5pt above, 7.5pt wider and 3pt taller.)
+const want = await page.evaluate(() => {
+  const { rows, cols, rowHeadW } = window.oxe.grid.geometry();
+  const w = cols.size(1) + 10; const h = rows.size(2) + 4;
+  return [rowHeadW + cols.start(1) - 5 + w / 2, rows.start(2) - 2 + h / 2, w / 2, h / 2].map((v) => Math.round(v * 10) / 10).join(',');
+});
+await page.evaluate(() => window.oxe.enter('B3', '7'));
+const afterFix = await circlesNow();
+await page.evaluate((i) => { window.oxe.showSheet(0); window.oxe.showSheet(i); }, circleSheet);
+const back = await circlesNow();
+await page.click('.oxe-toolbar button.oxe-split-more[aria-label^="Data Validation"]');
+await page.click('.oxe-pop >> text=Clear Validation Circles');
+const cleared = await circlesNow();
+check(circled.length === 2 && circled.includes(want) && afterFix.length === 1 && back.join() === afterFix.join() && !cleared.length,
+  'Circle Invalid Data: B3 and B4 circled, B3 put right loses its oval, kept with its sheet, Clear Validation Circles takes them', JSON.stringify({ circled, want, afterFix, back, cleared }));
 
 await finish();

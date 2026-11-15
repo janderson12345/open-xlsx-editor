@@ -101,3 +101,44 @@ export function valid(wb, si, rule, r, c, v) {
     default: return true;
   }
 }
+
+/** Data > Data Validation > Circle Invalid Data: Excel draws a circle round each cell of sheet si whose value breaks
+ *  its rule, at most 255 (measured over COM: CircleInvalid on 300 broken cells made 255). Blank cells count when the
+ *  rule doesn't ignore blanks; a merged area by its top-left cell. Rule by rule, each range row by row (Excel's own
+ *  order not measured). [{ r, c }] */
+export function invalidCells(wb, si, limit = 255) {
+  const sheet = wb.sheet(si);
+  const out = [];
+  const seen = new Set();
+  const inMerge = (r, c) => sheet.merges?.some((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1 && (r !== m.r0 || c !== m.c0));
+  for (const rule of sheet.validations || []) {
+    if (rule.type === 'none') continue;
+    for (const a of rule.ranges) {
+      // (Blanks pass a rule that ignores them, so only the cells there are looked at; else every cell, up to the
+      // limit.)
+      const last = rule.allowBlank ? Math.min(a.r1, sheet.maxRow) : a.r1;
+      for (let r = a.r0; r <= last && out.length < limit; r++) {
+        const line = sheet.cells.get(r);
+        if (rule.allowBlank && !line) continue;
+        const cols = rule.allowBlank ? [...line.keys()].filter((c) => c >= a.c0 && c <= a.c1).sort((x, y) => x - y) : Array.from({ length: a.c1 - a.c0 + 1 }, (_, k) => a.c0 + k);
+        for (const c of cols) {
+          if (out.length >= limit) break;
+          const key = `${r},${c}`;
+          if (seen.has(key) || inMerge(r, c) || ruleAt(sheet, r, c) !== rule) continue;
+          seen.add(key);
+          if (breaksRule(wb, si, r, c)) out.push({ r, c });
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/** Whether cell (r, c) of sheet si breaks the rule over it (none: false). */
+export function breaksRule(wb, si, r, c) {
+  const sheet = wb.sheet(si);
+  const rule = ruleAt(sheet, r, c);
+  if (!rule) return false;
+  const cell = sheet.cells.get(r)?.get(c);
+  return !valid(wb, si, rule, r, c, !cell ? null : cell.t === 'e' ? { code: String(cell.v) } : cell.v);
+}

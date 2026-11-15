@@ -18,6 +18,7 @@ import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, passwordBox } from './editor/dialogs.js';
 import { PasswordError } from './ooxml/encryption.js';
 import { readNotes } from './ooxml/notes.js';
+import { breaksRule } from './ooxml/validation.js';
 import { sheetProtection, workbookProtection, contentsHidden } from './ooxml/protection.js';
 import { conditionalLooks } from './ooxml/condformat.js';
 import { errorFlags } from './ooxml/errorcheck.js';
@@ -79,7 +80,7 @@ export function mountXlsxEditor(host, options = {}) {
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
-  const state = { onEdit: new Set(), onSelect: new Set(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
+  const state = { onEdit: new Set(), onSelect: new Set(), circles: new WeakMap(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
     features: { ...(options.features || {}) }, toolbar: options.toolbar !== false };
   const at = (ref) => {
     const p = typeof ref === 'string' ? parseRef(ref) : ref;
@@ -162,6 +163,11 @@ export function mountXlsxEditor(host, options = {}) {
     state.grid.setErrors(options.errorChecking === false ? null : errorFlags(state.workbook, state.sheetIndex));
     // (Notes too: written, deleted, or moved with rows and columns.)
     state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
+    // (Circle Invalid Data's circles on this sheet, less those whose cells are now put right, as Excel's go.)
+    const key = state.workbook.sheets[state.sheetIndex];
+    const circled = (state.circles.get(key) || []).filter(({ r, c }) => breaksRule(state.workbook, state.sheetIndex, r, c));
+    state.circles.set(key, circled);
+    state.grid.setCircles(circled);
     // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)
     // (Each with its place among the sheet's charts, which the chart edits go by: chartedit.js.)
     const charts = readCharts(state.workbook, state.sheetIndex).map((c, index) => ({ ...c, index })).filter((c) => c.kind);

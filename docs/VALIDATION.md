@@ -64,8 +64,27 @@ titles, messages and the dropdown.
 A fix with this: rules covering several ranges (`sqref="A1:A3 A6:A10"`) were read as one. The reader split the
 list on the letter s, not on spaces. Conditional formats had the same fault, also fixed.
 
+## Circle Invalid Data (measured)
+
+Data > Data Validation ▾ > Circle Invalid Data draws a red oval round each cell of the sheet shown whose value breaks
+its rule; Clear Validation Circles takes them away (`validation.js invalidCells`, `editor/dvcircles.js`). Measured
+with CircleInvalid in a hidden Excel, whose ovals are shapes that COM can read:
+
+| Excel's rule | Excel's example |
+|---|---|
+| A cell is circled when its value breaks its rule, judged as typing is (above): formulas by their result, Information and Warning rules too. | 50, text, 2.5 and =40+2 under whole numbers 1 to 10; `pink` and `RED` under the typed list red,green,blue: 14 ovals in all. |
+| A blank cell is circled when its rule doesn't ignore blanks. | C3:C6 blank under such a rule: four ovals. |
+| At most 255. | 300 broken cells: 255 ovals. |
+| Each oval is 3.75pt left of the cell and 1.5pt above it, 7.5pt wider and 3pt taller, in any row height or column width; cut off at the sheet's top and left (A1's at 0,0, that much narrower and shorter). | B2 (48, 15, 48 x 15pt): 44.25, 13.5, 55.5 x 18. A1: 0, 0, 51.75 x 16.5. |
+| A merged area's oval is as wide as the area and as tall as its first row. | F6:G7, 96 x 30pt: 103.5 x 18. |
+| Red (FF0000), 1.35pt, solid, no fill; not saved in the file. | The workbook saved with ovals shown has no drawing. |
+
+The ovals stay with their sheet when another is shown. One goes when its cell is put right: that is Microsoft's
+description of the command, not measured (a value changed over COM left Excel's oval where it was). Which 255 of
+more are circled, and the message Excel may show then, are not measured either: here, rule by rule, row by row.
+
 ## Not yet
 
-Circle Invalid Data, "Apply these changes to all other cells with the same settings", a list's choices from a name defined as a formula
+Circle Invalid Data's ovals don't move with inserted rows or columns or sorted cells; "Apply these changes to all other cells with the same settings", a list's choices from a name defined as a formula
 of another kind, and rules following their cells when rows are inserted or sorted (their ranges move with inserted
 rows already).
