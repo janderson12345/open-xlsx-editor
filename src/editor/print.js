@@ -8,10 +8,8 @@ import { cellElement, mergeAt, fitNumbers } from './cells.js';
 import { setVars, div } from './dom.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
-import { fontStack, fontRowPx } from './fonts.js';
-import { printRowPx } from '../ooxml/units.js';
 import { setSheet } from './sheets.js';
-import { parseHeaderFooter, fillFields } from '../ooxml/headerfooter.js';
+import { drawHeaderFooter } from './printhf.js';
 import { colName } from '../ooxml/refs.js';
 
 const DPI = 96;
@@ -19,14 +17,6 @@ const DPI = 96;
  *  600 dpi, 47 to a 9.5in page; at 60% rows of 73 dots, 77 to it, where 78 would fill 5,694 of its 5,700 dots; at 90%
  *  columns of 387 dots, 10 across 7.1in where 11 would fill 4,257 of 4,260). */
 const ROOM_LESS = 96 / 72;
-/** A header or footer picture prints larger than its VML size, by these across and down (Excel's PDFs: 60 by 30pt as
- *  85.92 by 40.64px alone, 40.5 by 20.25pt as 58.08 by 27.36px), PIC_BESIDE px wider still for text before it and as
- *  much for text after it (87.84px after "Title ", 89.76px between "Foot " and " end"), and beside text with its
- *  bottom this many em below the text's baseline (2.6 to 2.7px at 11pt). */
-const PIC_W = 1.075;
-const PIC_H = 1.015;
-const PIC_DROP = 0.183;
-const PIC_BESIDE = 1.92;
 
 /** Split an axis's indexes `from`..`last` into runs that each fit in `room` pixels (a run always takes at least one),
  *  starting a new run at each of `breaks` (indexes a page starts at). `roomAt(start)` gives the room of a run that
@@ -151,93 +141,6 @@ function drawBlock(st, block, x, y, layout, rest = false) {
     for (let c = block.c0; c <= block.c1 + 1; c++) if (c === block.c1 + 1 || st.cols.size(c)) line('oxe-print-grid-v', { '--oxe-gx': st.cols.start(c) - st.cols.start(block.c0), '--oxe-gl': ch });
   }
   return clip;
-}
-
-/**
- * A page's header or footer (`which`), as Excel prints it (print-headers.xlsx): in the Normal style's font and size
- * (scaled with the sheet unless scaleWithDoc is off), the header's baseline 1.05em below its margin, the footer's 0.436em
- * above its margin; the left section from the left margin and the right one to the right margin, each 1.25px in, the
- * centre centred on the page.
- */
-function drawHeaderFooter(pageEl, which, k, layout, hf) {
-  const { page } = layout.sheet;
-  const setup = page.headerFooter;
-  if (!setup) return;
-  const set = k === 0 && setup.differentFirst ? setup.first : setup.differentOddEven && k % 2 === 1 ? setup.even : setup.odd;
-  const sections = parseHeaderFooter(set[which]);
-  if (!sections.left.length && !sections.center.length && !sections.right.length) return;
-  const scale = setup.scaleWithDoc ? layout.scale : 1;
-  const basePt = hf.sizePt || 11;
-  const px = (pt) => (pt * 96) / 72 * scale;
-  const em = px(basePt);
-  const m = page.margins;
-  const y = which === 'header' ? m.header * DPI + 1.05 * em : layout.paper.h - m.footer * DPI - 0.436 * em;
-  const ctx = (drawHeaderFooter.canvas ||= document.createElement('canvas')).getContext('2d');
-  ctx.font = `${em}px ${fontStack(hf.family || 'Calibri')}`;
-  const met = ctx.measureText('Hg');
-  const asc = met.fontBoundingBoxAscent ?? em * 0.95;
-  const desc = met.fontBoundingBoxDescent ?? em * 0.25;
-  const inset = 1.25;
-  const left = setup.alignWithMargins ? m.left * DPI + inset : inset;
-  const right = layout.paper.w - (setup.alignWithMargins ? m.right * DPI + inset : inset);
-  // (A run that prints something other than a picture.)
-  const words = (r) => !r.picture && (r.field || r.text?.trim());
-  const tail = k === 0 && setup.differentFirst ? 'FIRST' : setup.differentOddEven && k % 2 === 1 ? 'EVEN' : '';
-  for (const [name, runs] of Object.entries(sections)) {
-    if (!runs.length) continue;
-    const el = div(`oxe-hf oxe-hf-${name}`);
-    // (The section's picture (&G), its VML shape named for the section: LH, CF, RHFIRST, ...)
-    const found = hf.pictures?.[`${name[0].toUpperCase()}${which === 'header' ? 'H' : 'F'}${tail}`];
-    const pic = found && runs.some((r) => r.picture) ? { ...found, w: found.w * PIC_W * (4 / 3) * scale, h: found.h * PIC_H * (4 / 3) * scale } : null;
-    // (A section of several lines, as Excel prints one (its PDFs: two and three lines, 11 and 14pt, header and
-    // footer): the lines a printed row of their size apart; a header's first baseline 1.014em below its margin, a
-    // footer's last 0.361em above it, the lines before it above; no inset from the margin at the left or right.)
-    const lines = runs.map((r) => r.text).join('').split('\n').length;
-    if (pic && lines === 1) {
-      // (A picture, as Excel prints one (its PDFs: alone and beside text, in each section, header and footer): alone, its
-      // top on the header margin or its bottom on the footer margin; beside text, its bottom PIC_DROP em below the
-      // text's baseline and that much further from the margin; the section from the margin itself, no inset; the
-      // other sections where they were. The line's top is the picture's: line-height 0.)
-      const d = runs.some(words) ? PIC_DROP * em : 0;
-      const top = which === 'header' ? m.header * DPI + d : layout.paper.h - m.footer * DPI - d - pic.h;
-      setVars(el, { '--oxe-hf-top': top, '--oxe-hf-lh': 0, '--oxe-hf-left': name === 'left' ? left - inset : name === 'right' ? right + inset : layout.paper.w / 2, '--oxe-hf-drop': -d });
-    } else if (lines > 1) {
-      const size = Math.max(basePt, ...runs.map((r) => r.size || 0));
-      const pitch = printRowPx(fontRowPx(hf.family || 'Calibri', (size * 4) / 3) * 0.75, hf.family) * scale;
-      const sem = px(size);
-      const first = which === 'header' ? m.header * DPI + 1.014 * sem : layout.paper.h - m.footer * DPI - 0.361 * sem - (lines - 1) * pitch;
-      // (The section in its own size, so that its lines are the pitch apart, its ascent and descent with it.)
-      const k = sem / em;
-      const inBox = (pitch - (asc + desc) * k) / 2 + asc * k;
-      setVars(el, { '--oxe-hf-top': first - inBox, '--oxe-hf-lh': pitch, '--oxe-hf-left': name === 'left' ? left - inset : name === 'right' ? right + inset : layout.paper.w / 2 });
-      el.dataset.size = String(sem);
-    } else setVars(el, { '--oxe-hf-top': y - asc, '--oxe-hf-lh': asc + desc, '--oxe-hf-left': name === 'left' ? left : name === 'right' ? right : layout.paper.w / 2 });
-    el.style.setProperty('--oxe-hf-font', fontStack(hf.family || 'Calibri'));
-    el.style.setProperty('--oxe-hf-size', `${el.dataset.size ? Number(el.dataset.size) : em}px`);
-    delete el.dataset.size;
-    for (const [i, r] of fillFields(runs, { page: k + 1, pages: layout.pages.length, sheet: hf.sheet, file: hf.file }).entries()) {
-      if (r.picture) {
-        if (!pic) continue;
-        const img = document.createElement('img');
-        img.className = 'oxe-hf-pic';
-        img.alt = '';
-        img.src = pic.src;
-        const beside = (runs.slice(0, i).some(words) ? 1 : 0) + (runs.slice(i + 1).some(words) ? 1 : 0);
-        setVars(img, { '--oxe-hf-pw': pic.w + beside * PIC_BESIDE * scale, '--oxe-hf-ph': pic.h });
-        el.appendChild(img);
-        continue;
-      }
-      const span = document.createElement('span');
-      span.textContent = r.text;
-      const cls = [r.bold && 'oxe-hf-b', r.italic && 'oxe-hf-i', r.underline && 'oxe-hf-u', r.strike && 'oxe-hf-s'].filter(Boolean);
-      if (cls.length) span.className = cls.join(' ');
-      if (r.size) span.style.setProperty('--oxe-hf-run-size', `${px(r.size)}px`);
-      if (r.font) span.style.setProperty('--oxe-hf-run-font', fontStack(r.font));
-      if (r.color) span.style.setProperty('--oxe-hf-run-color', r.color);
-      el.appendChild(span);
-    }
-    pageEl.appendChild(el);
-  }
 }
 
 /** One page: its title rows and columns (when the page starts after them), then its cells, in the zoomed box; its

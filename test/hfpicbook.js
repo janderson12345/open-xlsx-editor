@@ -25,20 +25,24 @@ const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 /**
  * A workbook of `rows` rows of numbers whose sheet has the headerFooter `hf` ({ oddHeader, oddFooter, firstHeader, ...,
- * differentFirst, differentOddEven }) and the pictures `pictures` ([{ id: 'LH' | 'CF' | 'RHFIRST' | ..., w, h }], points).
+ * differentFirst, differentOddEven, scaleWithDoc }) and the pictures `pictures` ([{ id: 'LH' | 'CF' | 'RHFIRST' | ..., w,
+ * h }], points), printed at `scale` percent.
  */
-export function hfPictureBook({ hf = {}, pictures = [], rows = 12 } = {}) {
+export function hfPictureBook({ hf = {}, pictures = [], rows = 12, scale = null } = {}) {
   const csv = Array.from({ length: rows }, (_, r) => `${r + 1},${(r + 1) * 2},${(r + 1) * 3}`).join('\r\n');
   const files = unzipSync(csvWorkbook(strToU8(csv), 'Pics.csv', new Date(2026, 0, 15)).toBytes());
   const sheetPath = 'xl/worksheets/sheet1.xml';
-  const flags = `${hf.differentOddEven ? ' differentOddEven="1"' : ''}${hf.differentFirst ? ' differentFirst="1"' : ''}`;
+  const flags = `${hf.differentOddEven ? ' differentOddEven="1"' : ''}${hf.differentFirst ? ' differentFirst="1"' : ''}${hf.scaleWithDoc === false ? ' scaleWithDoc="0"' : ''}`;
   const parts = ['oddHeader', 'oddFooter', 'evenHeader', 'evenFooter', 'firstHeader', 'firstFooter'].filter((k) => hf[k]).map((k) => `<${k}>${esc(hf[k])}</${k}>`).join('');
   let xml = strFromU8(files[sheetPath]).replace(/<headerFooter[\s\S]*?(<\/headerFooter>|\/>)/, '');
   const hfXml = `<headerFooter${flags}>${parts}</headerFooter>`;
   const legacy = pictures.length ? '<legacyDrawingHF r:id="rIdHF"/>' : '';
+  // (A scale: a pageSetup of its own, in place of the sheet's, after pageMargins.)
+  const setup = scale ? `<pageSetup scale="${scale}" orientation="portrait"/>` : '';
+  if (setup) xml = xml.replace(/<pageSetup\b[^>]*\/>/, '');
   // (After pageMargins and pageSetup, before anything else of CT_Worksheet's that follows them here.)
   const at = xml.search(/<(rowBreaks|colBreaks|drawing|legacyDrawing|tableParts|extLst)\b|<\/worksheet>/);
-  xml = xml.slice(0, at) + hfXml + legacy + xml.slice(at);
+  xml = xml.slice(0, at) + setup + hfXml + legacy + xml.slice(at);
   if (!/xmlns:r=/.test(xml)) xml = xml.replace('<worksheet ', '<worksheet xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ');
   files[sheetPath] = strToU8(xml);
   if (pictures.length) {

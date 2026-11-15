@@ -91,3 +91,25 @@ test('header and footer pictures (&G): the VML shapes named for their sections, 
   assert.equal(wb.sheet(0).page.headerFooter.first.header, '&C&G');
   assert.deepEqual(headerPictures(Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/print-headers.xlsx'))), 0), {});
 });
+
+test('header and footer pictures in sections of several lines: each line a box under the one before, as Excel prints them', async () => {
+  const { pictureLines, linesOf } = await import('../src/editor/printhf.js');
+  const { parseHeaderFooter } = await import('../src/ooxml/headerfooter.js');
+  const em = (11 * 4) / 3;
+  const at = (text, which, edge, h) => pictureLines(linesOf(parseHeaderFooter(text).left), { which, edge, h, em, sem: em, pitch: 20.32 });
+  const near = (a, b, what) => assert.ok(Math.abs(a - b) <= 0.5, `${what}: ${a} against Excel's ${b}`);
+  // (Excel's PDF, ..\runs\hfpic2 lines.xlsx: 60 by 30pt pictures 40.64px tall, 30 by 15pt 20.3px; margins 28.8px.)
+  const left = at('&LTop line\n&G', 'header', 28.8, 40.64);
+  near(left[0].base, 43.7, '"Top line"');
+  near(left[1].picTop, 49.12, 'the picture under it');
+  const centre = at('&L&G\nBelow', 'header', 28.8, 40.64);
+  near(centre[0].picTop, 31.52, 'a picture with its line break: dropped');
+  near(centre[1].base, 89.8, '"Below"');
+  const foot = at('&LFoot one\nFoot &G two', 'footer', 1027.2, 20.3);
+  near(foot[1].base, 1021.9, '"Foot  two"');
+  near(foot[1].picTop, 1004.16, 'its picture');
+  near(foot[0].base, 996.2, '"Foot one"');
+  // (One line: alone, the picture on the margin; beside text, Excel's single-line places.)
+  near(at('&L&G', 'footer', 1027.2, 27.36)[0].picTop, 999.84, 'a footer picture alone');
+  near(at('&LTitle &G', 'header', 28.8, 40.64)[0].base, 69.5, '"Title" beside a picture');
+});

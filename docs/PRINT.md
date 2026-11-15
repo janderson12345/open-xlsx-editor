@@ -75,8 +75,18 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   further from the margin (2.7px at 11pt). The other sections stay where they were (workbooks made in code with a PNG
   made in code, alone, beside text, first and even pages, `..\runs\hfpic`: 532 of 532 text pieces within 1px
   both ways, browser print and PDF export; all 9 pictures (`tools/excel-compare/images.cjs`) within 0.5px in place
-  and size, Chrome's print rounding them to whole pixels, PDF export within 0.15px). Not measured: a picture in a header of several lines, or scaled
-  with the sheet.
+  and size, Chrome's print rounding them to whole pixels, PDF export within 0.15px).
+- **Pictures in sections of several lines, and at a scale** (`editor/printhf.js`): the section's lines are boxes one
+  under the other from the header margin (up from the footer margin), at the margin itself. A text line's baseline is
+  1.014em below its box's top and its box a printed row tall, as in any section of several lines; a picture's line has
+  its baseline the picture's height below its top. The picture's bottom is on that baseline, or 0.183em below it when
+  its line has any characters, its line break included; the box then goes on below the baseline as a text line's does,
+  and it ends at the baseline when the line has none. The 1.92px for text beside a picture counts the text on its own
+  line. With the sheet printed at a scale, pictures, the drop and the 1.92px scale with it when the header scales with
+  the sheet (half at 50%) and not when scaleWithDoc is off (workbooks made in code, `..\runs\hfpic2`: two and three
+  lines, a picture above and below text and between words, at 50% and at 75% with scaleWithDoc off; all 9 pictures
+  within 0.5px in place and size, print and export; 121 of 122 text pieces within 1px both ways, the other a plain
+  footer's text at 50%, 1.3px low, the single-line rule at a scale, not measured further).
 
 ## Setting them (measured)
 
