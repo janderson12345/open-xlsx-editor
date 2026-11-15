@@ -28,6 +28,12 @@ insides:
 | `src/ooxml/stats.js` | The status bar's Average, Count and Sum of the selection, by Excel's rules. |
 | `src/ooxml/fillops.js` | Fill Down, Right, Up and Left, and the fill handle (AutoFill) as Excel does them: series, lists, dates, formulas moved, formats repeated (docs/FILL.md). |
 | `src/ooxml/charts.js` | A sheet's charts read from its drawing and chart parts, their data from the cells, and Excel's automatic value axis; drawn by `src/editor/chartview.js` (docs/CHARTS.md). |
+| `src/ooxml/chartlook.js` | A chart's own formatting read from its part: fills and lines, fonts and the axes' titles (docs/CHARTS.md). |
+| `src/ooxml/charttext.js` | A chart part's text taken apart by elements, so an edit rewrites only what it changes. |
+| `src/ooxml/chartformat.js` | Axis titles, fills and lines, and fonts written into a chart as Excel writes them (docs/CHARTS.md). |
+| `src/ooxml/chartcombo.js` | Combo charts and the secondary axis: a series' chart type and axis group changed as Excel writes it (docs/CHARTS.md). |
+| `src/editor/chartplot.js` | A chart's axes, titles, secondary axis and plot drawn; `chartpaint.js` the colours and fonts it is drawn in. |
+| `src/editor/chartformatbox.js` | The Format Chart box; `chartacts.js` its named commands (chartFormat, chartAxisTitle, chartFill, chartFont, chartSeriesType, chartSeriesAxis). |
 | `src/ooxml/tables.js` | The workbook's tables, and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
 | `src/ooxml/cfb.js` | Compound files (MS-CFB): every stream read by its path; written as version 3, small streams in the mini stream. |
 | `src/ooxml/encryption.js` | Workbooks saved with a password (MS-OFFCRYPTO agile): decrypted and encrypted with @noble/hashes and @noble/ciphers; PasswordError; docs/ENCRYPTION.md. |

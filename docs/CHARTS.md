@@ -50,14 +50,56 @@ Moved or sized: the anchor's two corners, as the cells and offsets under the new
 Excel's own rounding). Deleted: the anchor, its relationship and the chart part with what only it uses.
 
 Not yet: editing a chart part not written with the `c:` prefix (refused with a message), the data range, series
-one at a time, axis titles, secondary axes, combo charts and the 2016 kinds (waterfall, histogram, treemap, ...).
+one at a time and the 2016 kinds (waterfall, histogram, treemap, ...).
+
+## Formatting a chart
+
+Format Chart... on a chart's menu, or Ctrl+1 on a picked chart, opens the Format Chart box: one part of the chart at a
+time, by Excel's names (Chart Area, Plot Area, Chart Title, the axes and their titles, Legend, Data Labels, each
+series), with what can be set on it. Each OK is one step of Undo; the named commands are `chartFormat` and the single
+changes it is made of, `chartAxisTitle`, `chartFill`, `chartFont`, `chartSeriesType` and `chartSeriesAxis`
+(`src/editor/chartacts.js`; written by `src/ooxml/chartformat.js` and `chartcombo.js`).
+
+Measured over COM on the clustered column chart of Editing a chart (`tools/excel-compare/excel-chart-format.ps1`:
+41 changes through the chart object model, each chart part Excel saved in `test/chartformat-excel.json`, with its
+series' types and axis groups, the secondary axis's scale and a PDF of each). 31 of 31 changes made here are Excel's
+text for text, but for the axis ids it makes up; Excel opened the workbook of all 31 written here and read them through
+its object model as it reads its own (`excel-chart-format-check.ps1`, `test/chartformat-readback-excel.json`).
+
+| Change | As Excel writes it |
+|---|---|
+| An axis's title (`Axis.HasTitle`, `AxisTitle.Text`) | A `c:title` in the axis before its number format: its text as rich text, 10pt in the axis's grey; on an upright axis (left or right) the text turned a quarter (`rot="-5400000"`). With no text of its own, Excel's "Axis Title". Off: the title taken out, the part as it was. The secondary value axis's title the same. |
+| A series' fill (`Format.Fill.ForeColor.RGB`) | The colour as an `srgbClr` in place of its accent. A line series' colour is its line's (`Format.Line`), in its `a:ln`, width and ends kept. |
+| A series' line | `<a:ln><a:solidFill>` in place of `noFill`, no width. |
+| A point's fill (`Points(n).Format.Fill`) | A `c:dPt` among the series' points: its index, `invertIfNegative` on a column, `bubble3D`, the series' spPr with the fill changed, and a unique id numbered after the part's others. A pie's slice has its `dPt` already: its fill changed and a unique id added. |
+| The chart area's and plot area's fill and line | The colour in place of the default style's (the chart area white with a 15% grey line, the plot area without either). |
+| A font by Excel's Font object (`ChartTitle.Font`, `TickLabels.Font`, `Legend.Font`, `DataLabels.Font`, `AxisTitle.Font`) | Only the `defRPr` of the element's text properties (and of a title's own rich text): `sz`, `b`, the fill, and `latin`, `ea` and `cs` all the one name. Setting one leaves the others. |
+| A series as a line, line with markers or area (`Series.ChartType`) | The series taken out of the column group and put in a group of its kind on the same axes, in its order: a line group after the columns (markers on in the group, whether its series show them or not), an area group before them. The series' look the new kind's default in the accent of its place: a series given its own red came out a line in accent 2. Back to columns: it joins the column group again, which loses its overlap (its gap width kept). |
+| A series on the secondary axis (`Series.AxisGroup = 2`) | A second group of its kind (a copy of its group's settings) on two new axes after the others: a value axis on the right (no gridlines, ticks out, crossing at the maximum, the primary's number format and text) and a hidden category axis. Back on the primary axis: the part as it was. |
+
+Not followed: Excel's `TextFrame2` font (the pane's own) also writes the title's text into the part and the font's
+panose numbers, which the Font object doesn't; a line or chart border made invisible (`Line.Visible = 0`) keeps its
+colour in a hidden-line extension, which here is just `noFill`. A series' type and secondary axis are offered on
+charts of columns, lines and areas only (not bar charts, pies or scatter charts: not measured).
+
+How they are drawn, against Excel's PDF of the same charts (`test/chartdraw-excel.json` from
+`tools/excel-compare/chart-pdf.mjs`; `test/chartdraw.test.js`):
+
+| Rule | Seen |
+|---|---|
+| An axis title of 10pt takes 2.12 times its size (28.3px) from the plot; a horizontal one's baseline its size above the space's bottom, centred on the plot; an upright one turned to read upwards, centred on the plot. | The plot's bottom 28.2px higher, its left 28.3px further in; here 28.3. |
+| The secondary axis's labels start 11.2px right of the plot, which gives up their width and 5px; scaled over its own series. | Cost (45 to 90) on it: 0 to 100 by 10; the primary 0 to 160 by 20. |
+| Each chart group's columns are clustered on their own: a secondary group's columns drawn over the primary's, at the same places. | One column a category in each group, 34.6px wide in a 440px plot. |
+| A line is 2.25pt (3px); a line series' legend key a short line. | |
+| A chart's own fills, lines and fonts drawn as it has them; theme colours with `lumMod` and `lumOff` in Windows' integer HLS. | 65% and 35% of black #595959, 15% and 85% #D9D9D9, as Excel prints them. |
 
 ## What is read
 
 From each sheet's drawing, every two-cell anchor whose graphic frame points to a chart part: where it sits (its two
 corner cells and the offsets into them), its kind (column, bar, line, area, pie, doughnut, scatter; clustered, stacked,
 100% stacked), its title (its own text, a cell, or, with none, the series' name when there is one series), its legend's
-place, and its series: names, categories and values read from the cells they point to in this workbook, else from the
+place, its own formatting (fills, lines, fonts, axis titles: `src/ooxml/chartlook.js`), its chart groups and
+secondary axis, and its series: names, categories and values read from the cells they point to in this workbook, else from the
 file's cache. `test/fixtures/charts.xlsx` is written as Excel writes chart parts; opened in Excel over COM, it reads
 four charts of the kinds, series and titles the editor reads, at the same places.
 
@@ -78,7 +120,7 @@ giving `test/axes-excel.json`). `npm test` (`test/charts.test.js`) scales each a
 
 ## How they look
 
-In the look of Excel's default chart style: a white area with a light grey border, the title in grey 14pt, grey 9pt
+In the chart's own fills, lines and fonts where its part sets them, else in the look of Excel's default chart style: a white area with a light grey border, the title in grey 14pt, grey 9pt
 axis labels in the series' number format, light grey gridlines, the series in the theme's accent colours (a series'
 own colour when it has one), bars spaced by the chart's gap width and overlap, pie slices clockwise from the top, a
 bar chart's first category at the bottom. The pictures are hidden from screen readers; each chart is given to them as a
@@ -86,7 +128,7 @@ figure after the sheet, its kind and title as the caption and its data as a tabl
 
 ## Not yet
 
-Bubble, radar, stock, surface, combo and the 2016 kinds (waterfall, histogram, treemap...); changing a chart's data
-range; markers' own shapes, trendlines, error bars, secondary axes, a logarithmic or date axis, axis titles, a chart's
-own fonts, fills and layout; charts on chart sheets; and a title borrowed from the series drawn bold and smaller, as
+Bubble, radar, stock, surface and the 2016 kinds (waterfall, histogram, treemap...); changing a chart's data
+range; markers' own shapes, trendlines, error bars, a logarithmic or date axis, gradient and picture fills, a
+chart's own layout; charts on chart sheets; and a title borrowed from the series drawn bold and smaller, as
 Excel draws it. (Scatter charts, data labels, and picking, moving, sizing and deleting a chart are done: above.)
