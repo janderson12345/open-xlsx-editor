@@ -44,7 +44,7 @@ export function formulasTab(kit, { act, recent = () => null, calcMode = () => 'a
         btn('ƒ⇣', 'Evaluate Formula', () => act('evaluateFormula'), { label: 'Evaluate Formula' })),
       btn('👁', 'Watch Window', () => act('watchWindow'), { label: 'Watch Window', big: true })),
     grp('Calculation', menu('⚙', 'Calculation Options', () => [['auto', 'Automatic'], ['autoNoTable', 'Automatic Except for Data Tables'], ['manual', 'Manual']]
-      .map(([m, label]) => item(label, () => act('calcMode', m), { on: calcMode() === m, icon: calcMode() === m ? '✓' : ' ' })), { label: 'Calculation Options', big: true }),
+      .map(([m, label]) => item(label, () => act('calcMode', m), { on: calcMode() === m, icon: calcMode() === m ? '✓' : ' ' })).concat([el('hr'), item('Iterative Calculation...', () => act('iterationBox'))]), { label: 'Calculation Options', big: true }),
     col(btn('▦', 'Calculate Now (F9)', () => act('calculate', 'now'), { label: 'Calculate Now' }),
       btn('▤', 'Calculate Sheet (Shift+F9)', () => act('calculate', 'sheet'), { label: 'Calculate Sheet' }))),
   ];

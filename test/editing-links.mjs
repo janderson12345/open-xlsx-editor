@@ -1,6 +1,6 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, and Apply Names. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, and iterative calculation. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -285,5 +285,25 @@ const unapplied = await formulasH();
 check(offeredNames.join() === 'Pair*,Price*,Qty*' && applied.join('|') === `Qty*Price|SUM(Pair)&"B2"|${beforeApply[2]}` && unapplied.join('|') === beforeApply.join('|'),
   'Apply Names: the names offered, all chosen; OK applies them over the sheet as Excel\'s ApplyNames (text and sheet-named references left); Ctrl+Z takes it back',
   JSON.stringify({ offeredNames, beforeApply, applied, unapplied }));
+
+// Formulas > Calculation Options > Iterative Calculation...: on a new sheet A1 =A1+1 is circular (left out, 0); the box
+// turned on with Maximum Iterations 50 gives A1 50 (each pass one more, as Excel goes round), and calcPr has
+// iterate="1" iterateCount="50" as Excel writes it.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); o.enter('A1', '=A1+1'); o.select('B2'); });
+await page.click('.oxe-rtab >> text=Formulas');
+await ribbon('Calculation Options', () => page.click('.oxe-pop >> text=Iterative Calculation...'));
+await page.waitForSelector('dialog.oxe-iteration-box');
+const dimmed = await page.isDisabled('dialog.oxe-iteration-box input.oxe-dialog-field >> nth=0');
+await page.check('dialog.oxe-iteration-box input[type=checkbox]');
+await page.fill('dialog.oxe-iteration-box input.oxe-dialog-field >> nth=0', '50');
+await page.click('dialog.oxe-iteration-box >> button:text-is("OK")');
+const iterated = await page.evaluate(() => {
+  const o = window.oxe;
+  const pr = o.workbook.doc.getElementsByTagNameNS('*', 'calcPr')[0];
+  return { a1: o.workbook.sheet(o.sheetIndex).cells.get(0).get(0).v, iterate: pr?.getAttribute('iterate'), count: pr?.getAttribute('iterateCount') };
+});
+check(dimmed && iterated.a1 === 50 && iterated.iterate === '1' && iterated.count === '50',
+  'Iterative Calculation: the box (its numbers dimmed while off); on with 50 iterations, A1 =A1+1 goes round to 50; calcPr as Excel writes it',
+  JSON.stringify({ dimmed, ...iterated }));
 
 await finish();

@@ -2065,3 +2065,12 @@
   pointer-events: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
+/* The iterative calculation box (iterbox.js): each number beside its label. */
+.oxe-iteration-box .oxe-dialog-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+.oxe-iteration-box .oxe-dialog-row .oxe-dialog-label { min-width: 10em; }
+.oxe-iteration-box .oxe-dialog-field { width: 8em; }

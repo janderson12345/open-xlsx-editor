@@ -2,6 +2,8 @@
 // Home > Conditional Formatting (its menu's rules, Clear Rules, the Rules Manager). Each runs through the editor's
 // commands as one step of the history.
 import { messageBox } from './dialogs.js';
+import { iterationBox } from './iterbox.js';
+import { iteration } from '../ooxml/calcmode.js';
 import { cfRuleBox } from './datadialogs.js';
 import { readNotes } from '../ooxml/notes.js';
 import { deleteNote } from '../ooxml/noteedit.js';
@@ -55,6 +57,14 @@ export function createMoreActs(env) {
     if (name === 'errorChecking') return errorCheckingBox(env);
     // (Formulas > Evaluate Formula: evalbox.js.)
     if (name === 'evaluateFormula') return evaluateFormulaBox(env);
+    if (name === 'iterationBox') {
+      // (Excel's File > Options > Formulas, its iterative calculation part: iterbox.js.)
+      if (state.readOnly) return false;
+      return iterationBox(root, iteration(state.workbook)).then((got) => {
+        state.grid.el.focus({ preventScroll: true });
+        return got ? editing().run('iteration', got) : false;
+      });
+    }
     // (Formulas > Watch Window, shown or hidden: watchwindow.js.)
     if (name === 'watchWindow') { state.watch?.toggle(); return true; }
     if (name === 'insertFunction') {

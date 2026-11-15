@@ -4,7 +4,7 @@
 import { readPivots, refreshPivot, pivotAt } from '../ooxml/pivot.js';
 import { addHyperlink } from '../ooxml/links.js';
 import { SheetError } from '../ooxml/sheetops.js';
-import { setCalcMode, calculateNow, calculateSheet, calculateFull } from '../ooxml/calcmode.js';
+import { setCalcMode, calculateNow, calculateSheet, calculateFull, setIteration } from '../ooxml/calcmode.js';
 
 /** These commands: `env` is createCommands's shared state and helpers (commands.js). */
 export function partCommands(env) {
@@ -60,6 +60,14 @@ export function partCommands(env) {
     calcMode(mode) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const out = setCalcMode(ctx.workbook(), mode);
+      ctx.edited?.({ book: true });
+      return calculated(out);
+    },
+    /** Iterative calculation on or off, with its Maximum Iterations and Maximum Change ({ on, count, delta }:
+     *  calcmode.js setIteration); circular formulas worked out again. Not a step of the history, as in Excel. */
+    iteration(settings) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const out = setIteration(ctx.workbook(), settings);
       ctx.edited?.({ book: true });
       return calculated(out);
     },
