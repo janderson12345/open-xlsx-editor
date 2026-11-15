@@ -34,9 +34,10 @@ Home > Styles > Conditional Formatting has the menu's rules, each added for the 
 - **Highlight Cells Rules:** Greater Than, Less Than, Between, Equal To, Text that Contains, A Date Occurring,
   Duplicate Values (or Unique).
 - **Top/Bottom Rules:** Top 10 Items, Top 10%, Bottom 10 Items, Bottom 10%, Above Average, Below Average.
-- **Color Scales:** Excel's twelve gallery presets, Green - Yellow - Red to Yellow - Green (their colours Excel's
-  standard ones as its files have them: red F8696B, yellow FFEB84, green 63BE7B, white FCFCFF, blue 5A8AC6, the
-  two-colour yellow FFEF9C; the gallery isn't reachable over COM, so not measured here).
+- **Color Scales:** Excel's twelve gallery presets, Green - Yellow - Red to Yellow - Green: red F8696B, yellow
+  FFEB84, green 63BE7B, white FCFCFF, blue 5A8AC6, the two-colour yellow FFEF9C, three colours with the 50th
+  percentile between. Measured: each applied in Excel's own window and its colours read over COM
+  (`test/cfgallery-excel.json`, 12 of 12 as here).
 - **Clear Rules** from Selected Cells (their cells taken out of every rule's range) or from Entire Sheet. A rule left
   without its first cell has its formulas written for its new first cell, as Excel's (*measured*: =E1>F1 over E1:E4,
   E1:E2's rules deleted, is =E3>F3 over E3:E4); before, the formula kept its text and so meant other cells.
@@ -120,8 +121,9 @@ sheet, each change made here, 5 of 5 as Excel makes them.
 
 Edit Rule was measured apart (`tools/excel-compare/excel-cf-edit.ps1`, `test/cfedit-excel.json`, FormatCondition.Modify:
 4 of 4 as Excel writes them, `test/cfeditrule.test.js`). COM's Modify also gives the rule one more than the last
-priority and sets Stop If True, as its Add does; the Rules Manager keeps an edited rule where it is in its list, so here
-it keeps its priority and its own Stop If True (not measured through the box itself, which COM doesn't reach). A new
+priority and sets Stop If True, as its Add does; Excel's own Rules Manager doesn't, measured in its window
+(`test/cfedit-ui-excel.json`): the middle of three rules edited keeps priority 2, its Stop If True off and its format,
+as here. A new
 format picked is a new dxf. A data bar or icon set, or a rule edited into one, is replaced: the new rule on the same
 ranges, given the old one's place in the order.
 

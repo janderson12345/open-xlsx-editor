@@ -101,8 +101,8 @@ export function setRuleRanges(wb, si, p, ranges) {
  * Edit Rule: the rule of priority `p` given the settings of `rule` (cfedit.js's, `preset` null to keep the rule's own
  * format). As Excel edits one (tools/excel-compare/excel-cf-edit.ps1, FormatCondition.Modify): in its place among the
  * rules of its conditionalFormatting, its ranges and its format (dxfId) kept, its type and criteria new. COM also sends
- * an edited rule last and sets Stop If True, as its Add does; here, as the Rules Manager shows it, the rule keeps its
- * priority and its own Stop If True. A data bar or icon set (with its part in the extLst) is replaced instead: the new
+ * an edited rule last and sets Stop If True, as its Add does; Excel's Rules Manager keeps its priority and its own
+ * Stop If True (measured in its window, test/cfedit-ui-excel.json), and so does this. A data bar or icon set (with its part in the extLst) is replaced instead: the new
  * rule added on the same ranges and given the old one's place.
  */
 export function editRule(wb, si, p, rule) {

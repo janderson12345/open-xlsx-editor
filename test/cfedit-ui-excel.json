@@ -1,0 +1,6 @@
+{
+ "source": "Excel 365's Rules Manager, Edit Rule used in its own window on the middle of three rules (A1:A10: Cell Value > 8, Cell Value < 3 with Stop If True off, Formula =A1=5), its value changed and OK twice; the rules read over COM, 15 November 2026",
+ "before": [{ "priority": 1, "rule": "> 8", "stop": true }, { "priority": 2, "rule": "< 3", "stop": false }, { "priority": 3, "rule": "=A1=5", "stop": true }],
+ "after": [{ "priority": 1, "rule": "> 8", "stop": true }, { "priority": 2, "rule": "< 36", "stop": false }, { "priority": 3, "rule": "=A1=5", "stop": true }],
+ "note": "The edited rule keeps its priority, its Stop If True and its format, unlike COM's FormatCondition.Modify, which sends it last and sets Stop If True."
+}

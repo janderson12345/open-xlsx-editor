@@ -23,8 +23,8 @@ export const CF_PRESETS = {
   redText: { label: 'Red Text', font: 'FF9C0006', fill: null },
 };
 /** Excel's Color Scales gallery: each preset's colours from the lowest value to the highest, named as Excel names
- *  them, the highest's colour first (Excel's standard scale colours, as its files have them; the gallery isn't
- *  reachable over COM, so they aren't measured here). */
+ *  them, the highest's colour first. Measured: each applied in Excel's own window, its colours read over COM
+ *  (test/cfgallery-excel.json, 12 of 12). */
 const R = 'FFF8696B'; const Y = 'FFFFEB84'; const G = 'FF63BE7B'; const W = 'FFFCFCFF'; const B = 'FF5A8AC6'; const Y2 = 'FFFFEF9C';
 export const CF_GALLERY = [
   ['Green - Yellow - Red', [R, Y, G]], ['Red - Yellow - Green', [G, Y, R]], ['Green - White - Red', [R, W, G]], ['Red - White - Green', [G, W, R]],

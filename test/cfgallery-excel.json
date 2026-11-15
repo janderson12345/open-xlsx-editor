@@ -1,0 +1,9 @@
+{
+ "source": "Excel 365's Home > Conditional Formatting > Color Scales gallery, each preset applied in its own window (KeyTips Alt H L S, the arrows, Enter) to 1 to 10 in A1:A10, its colours read over COM (FormatCondition.ColorScaleCriteria), 15 November 2026; lowest value first",
+ "presets": [
+  ["F8696B", "FFEB84", "63BE7B"], ["63BE7B", "FFEB84", "F8696B"], ["F8696B", "FCFCFF", "63BE7B"], ["63BE7B", "FCFCFF", "F8696B"],
+  ["F8696B", "FCFCFF", "5A8AC6"], ["5A8AC6", "FCFCFF", "F8696B"], ["F8696B", "FCFCFF"], ["FCFCFF", "F8696B"],
+  ["FCFCFF", "63BE7B"], ["63BE7B", "FCFCFF"], ["FFEF9C", "63BE7B"], ["63BE7B", "FFEF9C"]
+ ],
+ "midpoint": "percentile 50 (three colours)"
+}

@@ -107,3 +107,9 @@ test('a colour scale with thresholds and colours of its own: written and shown a
     }
   }
 });
+
+test("Excel's twelve Color Scales: the gallery's colours in its order, as Excel applies them (cfgallery-excel.json)", async () => {
+  const { CF_GALLERY } = await import('../src/ooxml/cfedit.js');
+  const X = JSON.parse(fs.readFileSync('test/cfgallery-excel.json', 'utf8'));
+  assert.deepEqual(CF_GALLERY.map(([, colors]) => colors.map((c) => c.slice(2))), X.presets);
+});
