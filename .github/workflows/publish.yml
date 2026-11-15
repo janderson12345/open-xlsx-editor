@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'The release tag to publish (for example v0.1.0)'
+        description: 'The release tag to publish (for example v0.5.0)'
         required: true
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
-      # The version published is the tag's (v0.1.0 publishes 0.1.0): a mismatch stops it.
+      # The version published is the tag's (v0.5.0 publishes 0.5.0): a mismatch stops it.
       - name: Check the version matches the tag
         run: |
           tag="${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}"

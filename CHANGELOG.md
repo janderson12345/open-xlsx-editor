@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0
+## 0.5.0
 
 The first release. An editor for Excel workbooks that runs in the browser, matched to Excel by measuring Excel's own
 output. `docs/FEATURES.md` has the details, ribbon tab by ribbon tab.
