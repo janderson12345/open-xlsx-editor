@@ -31,8 +31,10 @@ const rangeRef = (name, r0, c0, r1, c1) => `${sheetPrefix(name)}$${colName(c0)}$
 /**
  * The series a chart of `sel` ({ r0, c0, r1, c1 }) on sheet si gets, as Excel takes them: { byRows, series: [{ name,
  * cat, val }] }, each part { f, values, numeric, format } or null. Null when the range has no numbers to chart.
+ * `byRows` true or false takes the series along the rows or down the columns (Excel's Select Data keeps a chart's own
+ * way and Switch Row/Column turns it: excel-chart-data.ps1); null, Excel's rule for a new chart.
  */
-export function chartSeries(wb, si, sel) {
+export function chartSeries(wb, si, sel, byRows = null) {
   const sheet = wb.sheet(si);
   const name = wb.sheets[si].name;
   const { r0, c0, r1, c1 } = sel;
@@ -50,7 +52,7 @@ export function chartSeries(wb, si, sel) {
   const dr0 = r0 + (rowLabels ? 1 : 0);
   const dc0 = c0 + (colLabels ? 1 : 0);
   if (dr0 > r1 || dc0 > c1) return null;
-  const byRows = !(r1 - dr0 > c1 - dc0);
+  byRows ??= !(r1 - dr0 > c1 - dc0);
   const data = (a0, b0, a1, b1, numeric) => {
     const values = [];
     for (let r = a0; r <= a1; r++) for (let c = b0; c <= b1; c++) values.push(shown(cellAt(sheet, r, c)));

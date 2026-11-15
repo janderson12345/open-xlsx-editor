@@ -1,0 +1,161 @@
+{
+  "source": "tools/excel-compare/excel-chartdata-readback.ps1 on test/out/charts/chartdata-all.xlsx (chartdata.test.js)",
+  "charts": {
+    "sourceWider": [
+      "=SERIES(sourceWider!$B$1,sourceWider!$A$2:$A$5,sourceWider!$B$2:$B$5,1)",
+      "=SERIES(sourceWider!$C$1,sourceWider!$A$2:$A$5,sourceWider!$C$2:$C$5,2)",
+      "=SERIES(sourceWider!$D$1,sourceWider!$A$2:$A$5,sourceWider!$D$2:$D$5,3)"
+    ],
+    "sourceSmaller": [
+      "=SERIES(sourceSmaller!$B$1,sourceSmaller!$A$2:$A$4,sourceSmaller!$B$2:$B$4,1)"
+    ],
+    "sourceRows": [
+      "=SERIES(sourceRows!$A$2,sourceRows!$B$1:$C$1,sourceRows!$B$2:$C$2,1)",
+      "=SERIES(sourceRows!$A$3,sourceRows!$B$1:$C$1,sourceRows!$B$3:$C$3,2)",
+      "=SERIES(sourceRows!$A$4,sourceRows!$B$1:$C$1,sourceRows!$B$4:$C$4,3)",
+      "=SERIES(sourceRows!$A$5,sourceRows!$B$1:$C$1,sourceRows!$B$5:$C$5,4)"
+    ],
+    "sourceCols": [
+      "=SERIES(sourceCols!$B$1,sourceCols!$A$2:$A$3,sourceCols!$B$2:$B$3,1)",
+      "=SERIES(sourceCols!$C$1,sourceCols!$A$2:$A$3,sourceCols!$C$2:$C$3,2)",
+      "=SERIES(sourceCols!$D$1,sourceCols!$A$2:$A$3,sourceCols!$D$2:$D$3,3)"
+    ],
+    "sourceShort": [
+      "=SERIES(sourceShort!$B$1,sourceShort!$A$2:$A$3,sourceShort!$B$2:$B$3,1)",
+      "=SERIES(sourceShort!$C$1,sourceShort!$A$2:$A$3,sourceShort!$C$2:$C$3,2)",
+      "=SERIES(sourceShort!$D$1,sourceShort!$A$2:$A$3,sourceShort!$D$2:$D$3,3)"
+    ],
+    "plotByRows": [
+      "=SERIES(plotByRows!$A$2,plotByRows!$B$1:$C$1,plotByRows!$B$2:$C$2,1)",
+      "=SERIES(plotByRows!$A$3,plotByRows!$B$1:$C$1,plotByRows!$B$3:$C$3,2)",
+      "=SERIES(plotByRows!$A$4,plotByRows!$B$1:$C$1,plotByRows!$B$4:$C$4,3)",
+      "=SERIES(plotByRows!$A$5,plotByRows!$B$1:$C$1,plotByRows!$B$5:$C$5,4)"
+    ],
+    "rowsThenSource": [
+      "=SERIES(rowsThenSource!$A$2,rowsThenSource!$B$1:$D$1,rowsThenSource!$B$2:$D$2,1)",
+      "=SERIES(rowsThenSource!$A$3,rowsThenSource!$B$1:$D$1,rowsThenSource!$B$3:$D$3,2)",
+      "=SERIES(rowsThenSource!$A$4,rowsThenSource!$B$1:$D$1,rowsThenSource!$B$4:$D$4,3)",
+      "=SERIES(rowsThenSource!$A$5,rowsThenSource!$B$1:$D$1,rowsThenSource!$B$5:$D$5,4)"
+    ],
+    "newSeries": [
+      "=SERIES(newSeries!$B$1,newSeries!$A$2:$A$5,newSeries!$B$2:$B$5,1)",
+      "=SERIES(newSeries!$C$1,newSeries!$A$2:$A$5,newSeries!$C$2:$C$5,2)",
+      "=SERIES(newSeries!$D$1,newSeries!$A$2:$A$5,newSeries!$D$2:$D$5,3)"
+    ],
+    "newSeriesBare": [
+      "=SERIES(newSeriesBare!$B$1,newSeriesBare!$A$2:$A$5,newSeriesBare!$B$2:$B$5,1)",
+      "=SERIES(newSeriesBare!$C$1,newSeriesBare!$A$2:$A$5,newSeriesBare!$C$2:$C$5,2)",
+      "=SERIES(,,newSeriesBare!$D$2:$D$5,3)"
+    ],
+    "nameText": [
+      "=SERIES(\"Takings\",nameText!$A$2:$A$5,nameText!$B$2:$B$5,1)",
+      "=SERIES(nameText!$C$1,nameText!$A$2:$A$5,nameText!$C$2:$C$5,2)"
+    ],
+    "nameRef": [
+      "=SERIES(nameRef!$D$1,nameRef!$A$2:$A$5,nameRef!$B$2:$B$5,1)",
+      "=SERIES(nameRef!$C$1,nameRef!$A$2:$A$5,nameRef!$C$2:$C$5,2)"
+    ],
+    "nameEmpty": [
+      "=SERIES(,nameEmpty!$A$2:$A$5,nameEmpty!$B$2:$B$5,1)",
+      "=SERIES(nameEmpty!$C$1,nameEmpty!$A$2:$A$5,nameEmpty!$C$2:$C$5,2)"
+    ],
+    "valuesRef": [
+      "=SERIES(valuesRef!$B$1,valuesRef!$A$2:$A$5,valuesRef!$B$2:$B$5,1)",
+      "=SERIES(valuesRef!$C$1,valuesRef!$A$2:$A$5,valuesRef!$D$2:$D$5,2)"
+    ],
+    "valuesRelative": [
+      "=SERIES(valuesRelative!$B$1,valuesRelative!$A$2:$A$5,valuesRelative!$B$2:$B$5,1)",
+      "=SERIES(valuesRelative!$C$1,valuesRelative!$A$2:$A$5,valuesRelative!$D$2:$D$5,2)"
+    ],
+    "xvaluesRef": [
+      "=SERIES(xvaluesRef!$B$1,xvaluesRef!$D$2:$D$5,xvaluesRef!$B$2:$B$5,1)",
+      "=SERIES(xvaluesRef!$C$1,xvaluesRef!$A$2:$A$5,xvaluesRef!$C$2:$C$5,2)"
+    ],
+    "xvaluesEmpty": [
+      "=SERIES(xvaluesEmpty!$B$1,,xvaluesEmpty!$B$2:$B$5,1)",
+      "=SERIES(xvaluesEmpty!$C$1,xvaluesEmpty!$A$2:$A$5,xvaluesEmpty!$C$2:$C$5,2)"
+    ],
+    "formula": [
+      "=SERIES(formula!$B$1,formula!$A$2:$A$5,formula!$B$2:$B$5,1)",
+      "=SERIES(formula!$D$1,formula!$A$2:$A$5,formula!$D$2:$D$5,2)"
+    ],
+    "plotOrder": [
+      "=SERIES(plotOrder!$C$1,plotOrder!$A$2:$A$5,plotOrder!$C$2:$C$5,1)",
+      "=SERIES(plotOrder!$B$1,plotOrder!$A$2:$A$5,plotOrder!$B$2:$B$5,2)"
+    ],
+    "deleteFirst": [
+      "=SERIES(deleteFirst!$C$1,deleteFirst!$A$2:$A$5,deleteFirst!$C$2:$C$5,1)"
+    ],
+    "deleteThenAdd": [
+      "=SERIES(deleteThenAdd!$C$1,deleteThenAdd!$A$2:$A$5,deleteThenAdd!$C$2:$C$5,1)",
+      "=SERIES(deleteThenAdd!$D$1,,deleteThenAdd!$D$2:$D$5,2)"
+    ],
+    "threeMoveDown": [
+      "=SERIES(threeMoveDown!$C$1,threeMoveDown!$A$2:$A$5,threeMoveDown!$C$2:$C$5,1)",
+      "=SERIES(threeMoveDown!$B$1,threeMoveDown!$A$2:$A$5,threeMoveDown!$B$2:$B$5,2)",
+      "=SERIES(threeMoveDown!$D$1,threeMoveDown!$A$2:$A$5,threeMoveDown!$D$2:$D$5,3)"
+    ],
+    "blanksZero": [
+      "=SERIES(blanksZero!$B$1,blanksZero!$A$2:$A$5,blanksZero!$B$2:$B$5,1)",
+      "=SERIES(blanksZero!$C$1,blanksZero!$A$2:$A$5,blanksZero!$C$2:$C$5,2)"
+    ],
+    "blanksSpan": [
+      "=SERIES(blanksSpan!$B$1,blanksSpan!$A$2:$A$5,blanksSpan!$B$2:$B$5,1)",
+      "=SERIES(blanksSpan!$C$1,blanksSpan!$A$2:$A$5,blanksSpan!$C$2:$C$5,2)"
+    ],
+    "hiddenShown": [
+      "=SERIES(hiddenShown!$B$1,hiddenShown!$A$2:$A$5,hiddenShown!$B$2:$B$5,1)",
+      "=SERIES(hiddenShown!$C$1,hiddenShown!$A$2:$A$5,hiddenShown!$C$2:$C$5,2)"
+    ],
+    "labelsThenSource": [
+      "=SERIES(labelsThenSource!$B$1,labelsThenSource!$A$2:$A$5,labelsThenSource!$B$2:$B$5,1)",
+      "=SERIES(labelsThenSource!$C$1,labelsThenSource!$A$2:$A$5,labelsThenSource!$C$2:$C$5,2)",
+      "=SERIES(labelsThenSource!$D$1,labelsThenSource!$A$2:$A$5,labelsThenSource!$D$2:$D$5,3)"
+    ],
+    "labelsThenNew": [
+      "=SERIES(labelsThenNew!$B$1,labelsThenNew!$A$2:$A$5,labelsThenNew!$B$2:$B$5,1)",
+      "=SERIES(labelsThenNew!$C$1,labelsThenNew!$A$2:$A$5,labelsThenNew!$C$2:$C$5,2)",
+      "=SERIES(,,labelsThenNew!$D$2:$D$5,3)"
+    ],
+    "labelsThenRows": [
+      "=SERIES(labelsThenRows!$A$2,labelsThenRows!$B$1:$C$1,labelsThenRows!$B$2:$C$2,1)",
+      "=SERIES(labelsThenRows!$A$3,labelsThenRows!$B$1:$C$1,labelsThenRows!$B$3:$C$3,2)",
+      "=SERIES(labelsThenRows!$A$4,labelsThenRows!$B$1:$C$1,labelsThenRows!$B$4:$C$4,3)",
+      "=SERIES(labelsThenRows!$A$5,labelsThenRows!$B$1:$C$1,labelsThenRows!$B$5:$C$5,4)"
+    ],
+    "titleThenSource": [
+      "=SERIES(titleThenSource!$B$1,titleThenSource!$A$2:$A$5,titleThenSource!$B$2:$B$5,1)"
+    ],
+    "colorThenSource": [
+      "=SERIES(colorThenSource!$B$1,colorThenSource!$A$2:$A$5,colorThenSource!$B$2:$B$5,1)",
+      "=SERIES(colorThenSource!$C$1,colorThenSource!$A$2:$A$5,colorThenSource!$C$2:$C$5,2)",
+      "=SERIES(colorThenSource!$D$1,colorThenSource!$A$2:$A$5,colorThenSource!$D$2:$D$5,3)"
+    ],
+    "colorThenRows": [
+      "=SERIES(colorThenRows!$A$2,colorThenRows!$B$1:$C$1,colorThenRows!$B$2:$C$2,1)",
+      "=SERIES(colorThenRows!$A$3,colorThenRows!$B$1:$C$1,colorThenRows!$B$3:$C$3,2)",
+      "=SERIES(colorThenRows!$A$4,colorThenRows!$B$1:$C$1,colorThenRows!$B$4:$C$4,3)",
+      "=SERIES(colorThenRows!$A$5,colorThenRows!$B$1:$C$1,colorThenRows!$B$5:$C$5,4)"
+    ],
+    "lineNewSeries": [
+      "=SERIES(lineNewSeries!$B$1,lineNewSeries!$A$2:$A$5,lineNewSeries!$B$2:$B$5,1)",
+      "=SERIES(lineNewSeries!$C$1,lineNewSeries!$A$2:$A$5,lineNewSeries!$C$2:$C$5,2)",
+      "=SERIES(,,lineNewSeries!$D$2:$D$5,3)"
+    ],
+    "lineSource": [
+      "=SERIES(lineSource!$B$1,lineSource!$A$2:$A$5,lineSource!$B$2:$B$5,1)",
+      "=SERIES(lineSource!$C$1,lineSource!$A$2:$A$5,lineSource!$C$2:$C$5,2)",
+      "=SERIES(lineSource!$D$1,lineSource!$A$2:$A$5,lineSource!$D$2:$D$5,3)"
+    ],
+    "pieSource": [
+      "=SERIES(pieSource!$B$1,pieSource!$A$2:$A$5,pieSource!$B$2:$B$5,1)",
+      "=SERIES(pieSource!$C$1,pieSource!$A$2:$A$5,pieSource!$C$2:$C$5,2)",
+      "=SERIES(pieSource!$D$1,pieSource!$A$2:$A$5,pieSource!$D$2:$D$5,3)"
+    ],
+    "scatterSource": [
+      "=SERIES(scatterSource!$B$1,scatterSource!$A$2:$A$5,scatterSource!$B$2:$B$5,1)",
+      "=SERIES(scatterSource!$C$1,scatterSource!$A$2:$A$5,scatterSource!$C$2:$C$5,2)",
+      "=SERIES(scatterSource!$D$1,scatterSource!$A$2:$A$5,scatterSource!$D$2:$D$5,3)"
+    ]
+  }
+}

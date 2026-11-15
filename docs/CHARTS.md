@@ -1,7 +1,7 @@
 # Charts
 
 How charts are drawn (`src/ooxml/charts.js` reads them, `src/editor/chartview.js` draws them), inserted
-(`src/ooxml/chartnew.js`, `chartxml.js`) and edited (`src/ooxml/chartedit.js`). A chart's data follows its cells
+(`src/ooxml/chartnew.js`, `chartxml.js`), edited (`src/ooxml/chartedit.js`) and given other data (`src/ooxml/chartdata.js`). A chart's data follows its cells
 (a value typed in redraws it); a chart not edited is saved as it was.
 
 ## Inserting a chart (Insert > Charts)
@@ -49,8 +49,41 @@ Measured over COM on a clustered column chart (`tools/excel-compare/excel-chart-
 Moved or sized: the anchor's two corners, as the cells and offsets under the new rectangle (not yet measured against
 Excel's own rounding). Deleted: the anchor, its relationship and the chart part with what only it uses.
 
-Not yet: editing a chart part not written with the `c:` prefix (refused with a message), the data range, series
-one at a time, axis titles, secondary axes, combo charts and the 2016 kinds (waterfall, histogram, treemap, ...).
+Not yet: editing a chart part not written with the `c:` prefix (refused with a message), axis titles, secondary axes,
+combo charts and the 2016 kinds (waterfall, histogram, treemap, ...).
+
+## A chart's data (Select Data)
+
+The chart's menu (or Edit Chart's Select Data... button) opens Excel's Select Data Source box
+(`src/editor/chartdatabox.js`): the Chart data range, Switch Row/Column, the series (Legend Entries) with Add, Edit,
+Remove, Move Up and Move Down, and Hidden and Empty Cells. Each reference field has Excel's collapse button
+(`src/editor/refpick.js`): the box steps aside for a bar, the cells selected on the sheet (by mouse or keys, another
+sheet's tab too) go into it as an absolute reference, and Enter brings the box back. As in Excel each change is made at
+once and the chart redrawn behind the box; Cancel takes back every change made since it opened, OK keeps them, each a
+named command and a step of Undo (`src/editor/acts-chartdata.js`: `chartData`, `chartSeriesAdd`, `chartSeriesEdit`,
+`chartSeriesRemove`, `chartSeriesMove`, `chartBlanks`, `chartDataBox`). The range is shown only when the series are
+the ones it gives; otherwise, as Excel says, it is too complex to be displayed.
+
+Measured over COM (`tools/excel-compare/excel-chart-data.ps1`, `test/chartdata-excel.json`): 35 changes of a clustered
+column chart of A1:C5 (`SetSourceData`, `PlotBy`, `SeriesCollection.NewSeries`, a series' `Name`, `Values`, `XValues`,
+`Formula`, `PlotOrder` and `Delete`, `DisplayBlanksAs`, `PlotVisibleOnly`; some after a title, data labels, a colour or
+another kind), saved and read back. 34 of them written here are Excel's chart part text for text
+(`test/chartdata.test.js`); Excel opened the workbook of all 34 (`excel-chartdata-readback.ps1`,
+`test/chartdata-readback-excel.json`) and read every series' formula as the one it made itself.
+
+| Change | As Excel writes it |
+|---|---|
+| A series moved (`PlotOrder`) or another removed | Each series keeps its `c:idx`, and with it its colour (the accent of its idx); only the `c:order`s are numbered again, and the `c:ser` elements written in that order. |
+| A series added (`NewSeries`) | The lowest idx no series has, the next order, a unique id one past the highest, the look a new chart of its kind gives series idx (in a pie or scatter chart whose kind was changed, its series' outline and hidden line), data labels when the chart shows them. No name: no `c:tx`; no categories: no `c:cat`. |
+| A new data range, the same way round | Series k keeps the k-th series' idx, id and look (a colour of its own kept) with the new references; more are added as above, fewer drop the last. With no way given Excel keeps the chart's own, whatever the range's shape (A1:D3, wider than tall, still down the columns). |
+| Switch Row/Column, or a range given the other way round | Every series made afresh: idx, order and ids from 0, the kind's own look, the chart's data labels. |
+| A name typed as text | `<c:tx><c:v>`; emptied: an empty `c:v`. A reference: `c:strRef` with its cache. |
+| Values, categories | `c:numRef` (the first cell's number format) or, for categories that are text, `c:strRef`, written absolute (`D2:D5` typed: `$D$2:$D$5`), the sheet's name quoted only when it must be. Categories emptied: no `c:cat`, and when the first series has none, the category axis without its linked `c:numFmt`. |
+| Hidden and Empty Cells | `dispBlanksAs` gap, zero or span (Connect data points with line, offered for line and scatter charts); `plotVisOnly` 0 shows hidden rows' and columns' data. |
+
+The rest of the chart part is kept as it was: the title, legend, axes, gap width. Not modelled: a new range after a
+series was removed and given its own colour (Excel gave the colour to another series there; it stays with its series
+here); series as literal arrays (`={1,2,3}`), refused as not a reference.
 
 ## What is read
 
@@ -86,7 +119,6 @@ figure after the sheet, its kind and title as the caption and its data as a tabl
 
 ## Not yet
 
-Bubble, radar, stock, surface, combo and the 2016 kinds (waterfall, histogram, treemap...); changing a chart's data
-range; markers' own shapes, trendlines, error bars, secondary axes, a logarithmic or date axis, axis titles, a chart's
+Bubble, radar, stock, surface, combo and the 2016 kinds (waterfall, histogram, treemap...); markers' own shapes, trendlines, error bars, secondary axes, a logarithmic or date axis, axis titles, a chart's
 own fonts, fills and layout; charts on chart sheets; and a title borrowed from the series drawn bold and smaller, as
-Excel draws it. (Scatter charts, data labels, and picking, moving, sizing and deleting a chart are done: above.)
+Excel draws it. (Scatter charts, data labels, a chart's data, and picking, moving, sizing and deleting a chart are done: above.)

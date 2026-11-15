@@ -2019,6 +2019,35 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+/* Select Data (chartdatabox.js): reference fields with Excel's collapse button (refpick.js), the series list, and the
+   bar that stands in for the boxes while cells are picked on the sheet. */
+.oxe-dialog.oxe-select-data, .oxe-dialog.oxe-series-box { width: min(480px, calc(100vw - 32px)); max-width: min(480px, calc(100vw - 32px)); }
+.oxe-ref-field { display: flex; gap: 4px; align-items: center; }
+.oxe-ref-field .oxe-dialog-field { flex: 1; min-width: 0; }
+.oxe-ref-collapse { flex: none; min-width: 0; padding-inline: 8px; }
+.oxe-series-list { width: 100%; margin: 6px 0; }
+.oxe-select-data-note:empty { display: none; }
+.oxe-refbar {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  width: min(480px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 6px;
+  background: var(--oxe-head-bg);
+  color: var(--oxe-head-fg);
+  font: 13px var(--oxe-ui-font);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.oxe-refbar .oxe-dialog-field { flex: 1; min-width: 0; }
+.oxe-refbar-label { flex: none; }
 
 /* The Format Cells box (formatbox.js): its tabs in a row, one panel shown, fields label above control. */
 .oxe-dialog.oxe-format-box {

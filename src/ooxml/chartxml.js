@@ -47,7 +47,7 @@ export const CHART_KINDS = {
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 /** A reference with its cached points: strRef for text, numRef (with the first value's format code) for numbers. */
-function ref(tag, data) {
+export function ref(tag, data) {
   if (!data) return '';
   const pts = data.values.map((v, i) => (v == null || v === '' ? '' : `<c:pt idx="${i}"><c:v>${esc(v)}</c:v></c:pt>`)).join('');
   const body = data.numeric
@@ -58,7 +58,7 @@ function ref(tag, data) {
 const marker = (i) => `<c:marker><c:symbol val="circle"/><c:size val="5"/><c:spPr>${fill(accent(i))}<a:ln w="9525">${fill(accent(i))}</a:ln><a:effectLst/></c:spPr></c:marker>`;
 
 /** One series of `kind` (CHART_KINDS's), i its index: name, categories (or x values) and values. */
-function seriesXml(k, s, i, guid) {
+export function seriesXml(k, s, i, guid) {
   const head = `<c:ser><c:idx val="${i}"/><c:order val="${i}"/>${s.name ? ref('tx', { ...s.name, numeric: false }) : ''}`;
   const tail = EXT_SER(i, guid);
   if (k.family === 'bar') return `${head}<c:spPr>${fill(accent(i))}<a:ln><a:noFill/></a:ln><a:effectLst/></c:spPr><c:invertIfNegative val="0"/>${ref('cat', s.cat)}${ref('val', s.val)}${tail}</c:ser>`;

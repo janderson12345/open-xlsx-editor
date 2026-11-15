@@ -19,6 +19,7 @@ import { insertChart } from '../ooxml/chartnew.js';
 import { BAR_COLORS } from '../ooxml/cfbarsedit.js';
 import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
 import { chartBox } from './chartbox.js';
+import { createChartDataActs } from './acts-chartdata.js';
 import { currentRegion } from '../ooxml/special.js';
 import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { newRuleBox, rulesManager } from './cfmanager.js';
@@ -54,7 +55,11 @@ const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Con
  *  what the action returns, or undefined for one that isn't here. */
 export function createMoreActs(env) {
   const { root, state, options, editing, act } = env;
+  const chartData = createChartDataActs(env);
   return (name, args, i) => {
+    // (A chart's data, Select Data: acts-chartdata.js.)
+    const data = chartData(name, args);
+    if (data !== undefined) return data;
     // (Excel's error button's menu, at a point: errormenu.js.)
     if (name === 'errorMenu') return openErrorMenu(env, args[0]);
     // (Formulas > Error Checking: errorbox.js.)
@@ -314,6 +319,7 @@ export function createMoreActs(env) {
       if (!chart) return false;
       return chartBox(root, chart).then((change) => {
         state.grid.el.focus({ preventScroll: true });
+        if (change?.selectData) return act('chartDataBox', args[0]);
         return change ? act('chartEdit', args[0], change) : false;
       });
     }

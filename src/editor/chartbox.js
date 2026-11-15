@@ -1,6 +1,6 @@
 // The Edit Chart box: a picked chart's kind (Excel's Change Chart Type, by the Insert tab's names), its title (none,
 // Excel's own, or text), its legend's place (or none) and its data labels. Resolves to the change (only what was
-// changed) for acts.js chartEdit, or null.
+// changed) for acts.js chartEdit, { selectData: true } for its Select Data... button (chartdatabox.js), or null.
 import { modal, button } from './dialogs.js';
 import { make, check, select, labelled } from './formatbox-kit.js';
 import { CHART_MENUS } from './inserttab.js';
@@ -46,6 +46,6 @@ export function chartBox(root, chart) {
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') { e.preventDefault(); ok(); } });
     dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: `Edit Chart: ${chart.name}` }),
       labelled('Chart type:', kind), labelled('Chart title:', titleMode), titleText, labelled('Legend:', legend), labels.el,
-      make('div', { className: 'oxe-dialog-buttons' }, button('OK', ok), button('Cancel', () => done(null))));
+      make('div', { className: 'oxe-dialog-buttons' }, button('Select Data...', () => done({ selectData: true })), button('OK', ok), button('Cancel', () => done(null))));
   });
 }

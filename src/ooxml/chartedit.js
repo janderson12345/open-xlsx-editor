@@ -27,7 +27,7 @@ export function chartParts(wb, si) {
 }
 
 /** Chart k of sheet si: its part's text changed by `fn(text)`. Refused for a part not written with the c: prefix. */
-function change(wb, si, k, fn) {
+export function change(wb, si, k, fn) {
   const part = chartParts(wb, si)[k];
   if (!part) throw new Error('No such chart');
   const text = wb.pkg.text(part.path);
