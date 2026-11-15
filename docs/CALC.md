@@ -370,6 +370,33 @@ Excel (and checked the same way by `test/calcmode.test.js`):
   with focus, and `Formula result =` for the whole call. OK writes the call (at the caret, or in place of the name and
   arguments it opened on; `=` first in an empty cell) and enters the cell as one step of the history; Cancel leaves the
   cell as it was. The command is `functionArguments` (`insertFunction` leads into it).
+  - **Pointing at the sheet** (`editor/pointing.js`, the same pointing as a formula typed in a cell): the box doesn't
+    hold the page, so while an argument has focus a click, a drag (Shift+click extends) or the arrow keys (Ctrl jumps,
+    Shift extends; from the active cell) put the reference in it, where the box is empty, its text selected (the
+    reference replacing it, as when Tab moves into a box) or the caret where a reference can go; F4 cycles the $
+    signs. A sheet's tab clicked shows that sheet to point at (`'Notes & more'!B2`); the cell being edited is hidden
+    there, and the cell's own sheet comes back when the box closes. The references in the box are outlined on the
+    sheet in their colours. The ribbon and the formula bar wait while the box is open; the box sits at the lower right.
+    Each argument has Excel's Collapse Dialog button (out of the Tab order), which shrinks the box to that argument's
+    text box alone, and Expand Dialog back. Excel also collapses the box by itself while a range is dragged over; here
+    it stays as it is.
+  - **Hints**: an empty box shows the kind of value it takes, `= number`, `= text`, `= logical`, `= reference`,
+    `= array` or `= any`, as Excel's box shows them (`calc/argkinds.js`). Excel's own list of each argument's kind is
+    in no file or COM property, so the kinds are given by what each argument means; not measured. A filled box shows
+    its value as Evaluate Formula writes it: `= 6`, `= "abc"`, `= TRUE`, `= {1,2,3}` for a row and `= {1;2;3}` for a
+    column.
+  - **Quotes** (`needsQuotes` in `calc/fnargs.js`): text typed in a text or any box (LEFT's text, COUNTIF's criteria,
+    IF's values) is put in quotes when focus leaves the box and when the formula is written, if it isn't a formula:
+    `>1` becomes `">1"`, `yes` `"yes"`, `x"y` `"x""y"`. That Excel's box does this is Microsoft's description of it;
+    the box can't be driven over COM without sending keys, so which boxes Excel quotes in was not measured. What is
+    measured is the rule for "isn't a formula" (`tools/excel-compare/excel-fnquote.ps1`, 58 texts typed after `=` in a
+    hidden Excel, `test/fnquote-excel.json`, checked by `test/fnquote.test.js`): Excel refuses `>1`, `<>`, `1,000`,
+    `$5`, `*`, `?a`, `1 2` and takes the rest, exactly as this parser does (58 of 58); of those it takes, plain words
+    (`abc`, `apple pie`, `Jan`, `XFE1`, `a-b`) are names it doesn't know (`#NAME?`), so they are quoted too, but not a
+    defined name or table (`Rate`), a reference (`A1`, `'My Data'!A1`, `Q1`), a number, TRUE, an error value, an array
+    or a call (`SUMM(1)`, a function misspelt, stays as typed). Two differ: `R1C1`, which Excel reads as `$A$1`, and
+    `N/A`, which it works out to #VALUE!; both are quoted here. LAMBDA, LET and the functions that name their own
+    parameters quote nothing. Number, logical, reference and array boxes keep what is typed (`=SUM(abc)`).
 - **Descriptions** (`calc/describe.js`): one sentence for every one of the 499 functions listed, and for each argument
   (by its name, or the function's own where the name means something else: PMT's type against T.TEST's), written for
   this project in its own words, not Microsoft's.
@@ -396,10 +423,9 @@ Excel (and checked the same way by `test/calcmode.test.js`):
   `=AVERAGE()` (docs/AUTOSUM.md), since Excel would refuse it. The box itself is drawn as Excel's is laid out; what
   Excel's own box writes was not driven over COM (it would need keys sent to a dialog), only the formulas it can write.
   The engine took too few arguments without a word; it still does when typed (Not yet).
-- **Not yet**: Function Arguments' collapse button and picking an argument's range on the sheet with the mouse (type
-  the reference), the type hints Excel shows beside an empty box (`= number`), quotes added round text typed in a box
-  (`>1` for `">1"`), opening it from the formula bar on a cell's formula, and refusing a typed formula with too few
-  arguments as Excel does.
+- **Not yet**: Function Arguments collapsing by itself while a range is dragged over, moving the box by its title,
+  opening it from the formula bar on a cell's formula, and refusing a typed formula with too few arguments as Excel
+  does.
 
 ## What Excel does (measured)
 

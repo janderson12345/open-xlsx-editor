@@ -1,7 +1,7 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
 // Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks, Print Titles, Orientation and Scale to Fit; Function Arguments (Ctrl+A,
-// AutoSum > More Functions). Run after `npm run build`:
+// AutoSum > More Functions, pointing at the sheet from it, its hints and quotes). Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -451,5 +451,68 @@ await page.keyboard.type('A1:A3');
 await page.keyboard.press('Enter');
 await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'));
 check(await d1() === 'AVERAGE(A1:A3)=2', 'Home > AutoSum > More Functions...: Insert Function, AVERAGE, Function Arguments, =AVERAGE(A1:A3)', await d1());
+
+// Function Arguments points at the sheet as Excel's does: =COUNTIF and Ctrl+A on D2; the empty boxes' hints (= reference,
+// = any); A1:A3 dragged over into Range; >1 typed in Criteria, quoted as focus leaves it (">1"); the ribbon waits while
+// the box is open; Collapse Dialog shrinks it to Criteria and shownBack; OK: =COUNTIF(A1:A3,">1") is 2. Then =SUM and Ctrl+A
+// on D3: the down arrow points at D4; Number2 from another sheet, its tab clicked and a cell clicked there; OK, and the
+// cell's own sheet shown again.
+const home = await page.evaluate(() => { window.oxe.select('D2'); return window.oxe.sheetIndex; });
+await page.focus('.oxe-grid');
+await page.keyboard.type('=COUNTIF');
+await page.keyboard.press('Control+a');
+await page.waitForSelector(fa);
+const hints = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-fnargs-box .oxe-fnargs-hint')].map((o) => o.textContent).join());
+const from = await pointAt(0, 0);
+const to = await pointAt(2, 0);
+await page.mouse.move(from.x, from.y);
+await page.mouse.down();
+await page.mouse.move(to.x, to.y);
+await page.mouse.up();
+const dragged = await page.inputValue(`${fa} .oxe-fnargs-field >> nth=0`);
+await page.keyboard.press('Tab');
+await page.keyboard.type('>1');
+await page.keyboard.press('Shift+Tab');
+const quotedIn = await page.inputValue(`${fa} .oxe-fnargs-field >> nth=1`);
+const quotedValue = await page.textContent(`${fa} .oxe-fnargs-row >> nth=1 >> .oxe-fnargs-value`);
+const holding = await page.evaluate(() => getComputedStyle(document.querySelector('.oxe-toolbar')).pointerEvents);
+await page.click(`${fa} .oxe-fnargs-current .oxe-fnargs-fold`);
+const folded = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-fnargs-box .oxe-fnargs-field')].filter((e) => e.offsetParent).length);
+await page.click(`${fa} .oxe-fnargs-current .oxe-fnargs-fold`);
+await page.click(`${fa} >> button:text-is("OK")`);
+await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'));
+const cellAt = (r, c) => page.evaluate(([r, c]) => { const x = window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(r)?.get(c); return x && x.f != null ? `${x.f}=${x.v}` : null; }, [r, c]);
+check(hints === '= reference,= any' && dragged === 'A1:A3' && quotedIn === '">1"' && quotedValue === '= ">1"' && holding === 'none' && folded === 1 && await cellAt(1, 3) === 'COUNTIF(A1:A3,">1")=2',
+  'Function Arguments: hints, A1:A3 dragged over, >1 quoted on leaving the box, the ribbon held, Collapse Dialog; OK: =COUNTIF(A1:A3,">1")',
+  JSON.stringify({ hints, dragged, quotedIn, quotedValue, holding, folded, d2: await cellAt(1, 3) }));
+await page.evaluate(() => window.oxe.select('D3'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('=SUM');
+await page.keyboard.press('Control+a');
+await page.waitForSelector(fa);
+await page.keyboard.press('ArrowDown');
+const arrowed = await page.inputValue(`${fa} .oxe-fnargs-field >> nth=0`);
+await page.keyboard.press('Tab');
+const otherTab = home === 0 ? 1 : 0;
+await page.click(`.oxe-tabs [role=tab] >> nth=${otherTab}`);
+const away = await page.evaluate(() => [window.oxe.sheetIndex, getComputedStyle(document.querySelector('.oxe-editor')).visibility]);
+// (A cell in view there, wherever that sheet was left scrolled: the one at the grid's middle.)
+const spot = await page.evaluate(() => {
+  const v = window.oxe.grid.el.getBoundingClientRect();
+  const x = v.left + v.width / 3;
+  const y = v.top + v.height / 2;
+  const { r, c } = window.oxe.grid.hitTest(x, y);
+  return { x, y, ref: `${String.fromCharCode(65 + c)}${r + 1}` };
+});
+await page.mouse.click(spot.x, spot.y);
+const other = await page.inputValue(`${fa} .oxe-fnargs-field >> nth=1`);
+const firstName = await page.evaluate((i) => window.oxe.workbook.sheets[i].name, otherTab);
+await page.click(`${fa} >> button:text-is("OK")`);
+await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'));
+const shownBack = await page.evaluate(() => window.oxe.sheetIndex);
+const d3 = await cellAt(2, 3);
+check(arrowed === 'D4' && away[0] === otherTab && away[1] === 'hidden' && other === `${firstName}!${spot.ref}` && shownBack === home && d3?.startsWith(`SUM(D4,${firstName}!${spot.ref})=`),
+  'Function Arguments: the down arrow points at D4; a cell of another sheet clicked; OK: =SUM(D4,Sheet!cell) on the cell\'s own sheet',
+  JSON.stringify({ arrowed, away, other, spot, shownBack, home, d3 }));
 
 await finish();

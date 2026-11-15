@@ -128,7 +128,14 @@ export function createMoreActs(env) {
         const at = { si: state.sheetIndex, r: editing().selection.ar, c: editing().selection.ac };
         state.workbook.calc.build();
         const values = call ? call.args : (args[1] || []);
-        return functionArgumentsBox(root, { name: fn, values, calc: state.workbook.calc, at }).then((got) => {
+        // (The sheet pointed at from its boxes, as the formula bar's pointing; a name defined isn't put in quotes.)
+        const defined = new Set([...namesOnSheet(state.workbook, at.si).map((n) => n.name), ...(state.workbook.calc.tables || []).map((t) => t.name)].map((n) => n.toLowerCase()));
+        const pointer = (input) => ed.pointWith(input, at);
+        const isName = (n) => defined.has(String(n).toLowerCase());
+        return functionArgumentsBox(root, { name: fn, values, calc: state.workbook.calc, at, pointer, isName }).then((got) => {
+          // (Back on the cell's own sheet if another was shown to point at, then pointing back with the cell editor.)
+          if (state.sheetIndex !== at.si) editing().run('showSheet', at.si);
+          ed.pointWith(null);
           if (!got) return back();
           // (The call in place of the name and arguments it opened on, or at the caret; "=" first in an empty cell.)
           const [from, to] = call ? [call.start, call.end] : caret;
