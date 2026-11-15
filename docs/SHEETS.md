@@ -67,6 +67,7 @@ deletion can be undone, a difference kept on purpose.
 
 ## Not yet
 
-- Copying a sheet (Move or Copy... with "Create a copy").
 - Grouping sheets (selecting several tabs).
-- References across several sheets (`Sheet1:Sheet3!A1`). The formula engine doesn't read them yet.
+
+(Copying a sheet, Move or Copy... with "Create a copy", is in docs/DATATOOLS.md; references across several sheets,
+`Jan:Apr!A1`, in docs/CALC.md.)
