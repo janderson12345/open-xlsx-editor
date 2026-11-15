@@ -2,6 +2,7 @@ import './setup.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { insertChart } from '../src/ooxml/chartnew.js';
 import { setChartTitle, setChartLabels, setChartKind, chartParts } from '../src/ooxml/chartedit.js';
@@ -20,55 +21,57 @@ function withChart(name) {
   const sheet = wb.sheet(0);
   for (const r of [...sheet.cells.keys()]) for (const c of [...sheet.cells.get(r).keys()]) wb.setCell(0, { r, c }, null);
   DATA.forEach((row, r) => row.forEach((v, c) => wb.setCell(0, { r, c }, v)));
+  // (The fixture's column D is hidden; Excel would leave a series there out of the chart it reads back.)
+  wb.setLines(0, 'col', 3, 3, { hidden: false });
   insertChart(wb, 0, parseRange('A1:C5'), 'columnClustered', { at: { r: 1, c: 6 } });
   return wb;
 }
-const part = (wb) => chartParts(wb, 0)[0].path;
+const part = (wb, si = 0) => chartParts(wb, si)[0].path;
 const bare = (xml, name) => xml.replace(/axId val="\d+"/g, 'axId').replace(/crossAx val="\d+"/g, 'crossAx')
   .replace(/uniqueId val="\{(\d{8})-[^}]*\}"/g, 'uid $1').split(`${name}!`).join('S!');
 /** Series 2 given a red fill of its own, as Excel writes Format.Fill.ForeColor.RGB = 255. */
-const red = (wb) => {
-  const t = wb.pkg.text(part(wb));
+const red = (wb, si = 0) => {
+  const t = wb.pkg.text(part(wb, si));
   const sers = [...t.matchAll(/<c:ser>[\s\S]*?<\/c:ser>/g)];
   const two = sers[1][0];
-  wb.pkg.setText(part(wb), t.replace(two, two.replace('<a:schemeClr val="accent2"/>', '<a:srgbClr val="FF0000"/>')));
+  wb.pkg.setText(part(wb, si), t.replace(two, two.replace('<a:schemeClr val="accent2"/>', '<a:srgbClr val="FF0000"/>')));
 };
-const flip = (wb) => { const d = chartData(wb, 0, 0); return setChartData(wb, 0, 0, d.range, !d.byRows); };
+const flip = (wb, si = 0) => { const d = chartData(wb, si, 0); return setChartData(wb, si, 0, d.range, !d.byRows); };
 const EDITS = {
-  sourceWider: (wb, s) => setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`),
-  sourceSmaller: (wb, s) => setChartData(wb, 0, 0, `=${s}!$A$1:$B$4`),
-  sourceRows: (wb, s) => setChartData(wb, 0, 0, `=${s}!$A$1:$C$5`, true),
-  sourceCols: (wb, s) => setChartData(wb, 0, 0, `=${s}!$A$1:$D$3`, false),
-  sourceShort: (wb, s) => setChartData(wb, 0, 0, `=${s}!$A$1:$D$3`),
-  plotByRows: (wb) => flip(wb),
-  rowsThenSource: (wb, s) => { flip(wb); setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); },
-  newSeries: (wb, s) => addChartSeries(wb, 0, 0, { name: `='${s}'!$D$1`, val: `='${s}'!$D$2:$D$5`, cat: `='${s}'!$A$2:$A$5` }),
-  newSeriesBare: (wb, s) => addChartSeries(wb, 0, 0, { val: `='${s}'!$D$2:$D$5` }),
-  nameText: (wb) => editChartSeries(wb, 0, 0, 0, { name: 'Takings' }),
-  nameRef: (wb, s) => editChartSeries(wb, 0, 0, 0, { name: `='${s}'!$D$1` }),
-  nameEmpty: (wb) => editChartSeries(wb, 0, 0, 0, { name: '' }),
-  valuesRef: (wb, s) => editChartSeries(wb, 0, 0, 1, { val: `='${s}'!$D$2:$D$5` }),
-  valuesRelative: (wb, s) => editChartSeries(wb, 0, 0, 1, { val: `=${s}!D2:D5` }),
-  xvaluesRef: (wb, s) => editChartSeries(wb, 0, 0, 0, { cat: `='${s}'!$D$2:$D$5` }),
-  xvaluesEmpty: (wb) => editChartSeries(wb, 0, 0, 0, { cat: '' }),
-  formula: (wb, s) => editChartSeries(wb, 0, 0, 1, { name: `=${s}!$D$1`, cat: `=${s}!$A$2:$A$5`, val: `=${s}!$D$2:$D$5` }),
-  plotOrder: (wb) => moveChartSeries(wb, 0, 0, 1, -1),
-  deleteFirst: (wb) => removeChartSeries(wb, 0, 0, 0),
-  deleteThenAdd: (wb, s) => { removeChartSeries(wb, 0, 0, 0); addChartSeries(wb, 0, 0, { name: `=${s}!$D$1`, val: `=${s}!$D$2:$D$5` }); },
-  threeMoveDown: (wb, s) => { setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); moveChartSeries(wb, 0, 0, 0, 1); },
-  blanksZero: (wb) => setChartBlanks(wb, 0, 0, { blanks: 'zero' }),
-  blanksSpan: (wb) => setChartBlanks(wb, 0, 0, { blanks: 'span' }),
-  hiddenShown: (wb) => setChartBlanks(wb, 0, 0, { hidden: true }),
-  labelsThenSource: (wb, s) => { setChartLabels(wb, 0, 0, true); setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); },
-  labelsThenNew: (wb, s) => { setChartLabels(wb, 0, 0, true); addChartSeries(wb, 0, 0, { val: `=${s}!$D$2:$D$5` }); },
-  labelsThenRows: (wb) => { setChartLabels(wb, 0, 0, true); flip(wb); },
-  titleThenSource: (wb, s) => { setChartTitle(wb, 0, 0, 'Own'); setChartData(wb, 0, 0, `=${s}!$A$1:$B$5`); },
-  colorThenSource: (wb, s) => { red(wb); setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); },
-  colorThenRows: (wb) => { red(wb); flip(wb); },
-  lineNewSeries: (wb, s) => { setChartKind(wb, 0, 0, 'lineMarkers'); addChartSeries(wb, 0, 0, { val: `=${s}!$D$2:$D$5` }); },
-  lineSource: (wb, s) => { setChartKind(wb, 0, 0, 'lineMarkers'); setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); },
-  pieSource: (wb, s) => { setChartKind(wb, 0, 0, 'pie'); setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); },
-  scatterSource: (wb, s) => { setChartKind(wb, 0, 0, 'scatter'); setChartData(wb, 0, 0, `=${s}!$A$1:$D$5`); },
+  sourceWider: (wb, s, si = 0) => setChartData(wb, si, 0, `=${s}!$A$1:$D$5`),
+  sourceSmaller: (wb, s, si = 0) => setChartData(wb, si, 0, `=${s}!$A$1:$B$4`),
+  sourceRows: (wb, s, si = 0) => setChartData(wb, si, 0, `=${s}!$A$1:$C$5`, true),
+  sourceCols: (wb, s, si = 0) => setChartData(wb, si, 0, `=${s}!$A$1:$D$3`, false),
+  sourceShort: (wb, s, si = 0) => setChartData(wb, si, 0, `=${s}!$A$1:$D$3`),
+  plotByRows: (wb, s, si = 0) => flip(wb, si),
+  rowsThenSource: (wb, s, si = 0) => { flip(wb, si); setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); },
+  newSeries: (wb, s, si = 0) => addChartSeries(wb, si, 0, { name: `='${s}'!$D$1`, val: `='${s}'!$D$2:$D$5`, cat: `='${s}'!$A$2:$A$5` }),
+  newSeriesBare: (wb, s, si = 0) => addChartSeries(wb, si, 0, { val: `='${s}'!$D$2:$D$5` }),
+  nameText: (wb, s, si = 0) => editChartSeries(wb, si, 0, 0, { name: 'Takings' }),
+  nameRef: (wb, s, si = 0) => editChartSeries(wb, si, 0, 0, { name: `='${s}'!$D$1` }),
+  nameEmpty: (wb, s, si = 0) => editChartSeries(wb, si, 0, 0, { name: '' }),
+  valuesRef: (wb, s, si = 0) => editChartSeries(wb, si, 0, 1, { val: `='${s}'!$D$2:$D$5` }),
+  valuesRelative: (wb, s, si = 0) => editChartSeries(wb, si, 0, 1, { val: `=${s}!D2:D5` }),
+  xvaluesRef: (wb, s, si = 0) => editChartSeries(wb, si, 0, 0, { cat: `='${s}'!$D$2:$D$5` }),
+  xvaluesEmpty: (wb, s, si = 0) => editChartSeries(wb, si, 0, 0, { cat: '' }),
+  formula: (wb, s, si = 0) => editChartSeries(wb, si, 0, 1, { name: `=${s}!$D$1`, cat: `=${s}!$A$2:$A$5`, val: `=${s}!$D$2:$D$5` }),
+  plotOrder: (wb, s, si = 0) => moveChartSeries(wb, si, 0, 1, -1),
+  deleteFirst: (wb, s, si = 0) => removeChartSeries(wb, si, 0, 0),
+  deleteThenAdd: (wb, s, si = 0) => { removeChartSeries(wb, si, 0, 0); addChartSeries(wb, si, 0, { name: `=${s}!$D$1`, val: `=${s}!$D$2:$D$5` }); },
+  threeMoveDown: (wb, s, si = 0) => { setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); moveChartSeries(wb, si, 0, 0, 1); },
+  blanksZero: (wb, s, si = 0) => setChartBlanks(wb, si, 0, { blanks: 'zero' }),
+  blanksSpan: (wb, s, si = 0) => setChartBlanks(wb, si, 0, { blanks: 'span' }),
+  hiddenShown: (wb, s, si = 0) => setChartBlanks(wb, si, 0, { hidden: true }),
+  labelsThenSource: (wb, s, si = 0) => { setChartLabels(wb, si, 0, true); setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); },
+  labelsThenNew: (wb, s, si = 0) => { setChartLabels(wb, si, 0, true); addChartSeries(wb, si, 0, { val: `=${s}!$D$2:$D$5` }); },
+  labelsThenRows: (wb, s, si = 0) => { setChartLabels(wb, si, 0, true); flip(wb, si); },
+  titleThenSource: (wb, s, si = 0) => { setChartTitle(wb, si, 0, 'Own'); setChartData(wb, si, 0, `=${s}!$A$1:$B$5`); },
+  colorThenSource: (wb, s, si = 0) => { red(wb, si); setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); },
+  colorThenRows: (wb, s, si = 0) => { red(wb, si); flip(wb, si); },
+  lineNewSeries: (wb, s, si = 0) => { setChartKind(wb, si, 0, 'lineMarkers'); addChartSeries(wb, si, 0, { val: `=${s}!$D$2:$D$5` }); },
+  lineSource: (wb, s, si = 0) => { setChartKind(wb, si, 0, 'lineMarkers'); setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); },
+  pieSource: (wb, s, si = 0) => { setChartKind(wb, si, 0, 'pie'); setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); },
+  scatterSource: (wb, s, si = 0) => { setChartKind(wb, si, 0, 'scatter'); setChartData(wb, si, 0, `=${s}!$A$1:$D$5`); },
 };
 
 test(`each change of a chart's data written as Excel writes it (${Object.keys(EDITS).length} changes)`, () => {
@@ -118,4 +121,24 @@ test('a chart whose data changed is drawn from its new series; Excel refuses wha
   removeChartSeries(wb, 0, 0, 0);
   removeChartSeries(wb, 0, 0, 0);
   assert.throws(() => removeChartSeries(wb, 0, 0, 0), /at least one/);
+});
+
+test('Excel reads the edited charts back with the series it made itself (test/chartdata-readback-excel.json)', () => {
+  // (Each change on a sheet of its own, saved to test/out/charts/chartdata-all.xlsx: excel-chartdata-readback.ps1
+  // opened it in Excel, read only, and read every series' formula back; they are the formulas Excel gave its own.)
+  const names = Object.keys(EDITS);
+  const wb = withChart(names[0]);
+  for (let k = 1; k < names.length; k++) {
+    wb.addSheet(k, names[k]);
+    DATA.forEach((row, r) => row.forEach((v, c) => wb.setCell(k, { r, c }, v)));
+    insertChart(wb, k, parseRange('A1:C5'), 'columnClustered', { at: { r: 1, c: 6 } });
+  }
+  names.forEach((name, k) => EDITS[name](wb, name, k));
+  fs.mkdirSync('test/out/charts', { recursive: true });
+  fs.writeFileSync('test/out/charts/chartdata-all.xlsx', wb.toBytes());
+  const out = spawnSync(process.execPath, ['tools/check-ooxml.mjs', 'test/out/charts/chartdata-all.xlsx'], { encoding: 'utf8' });
+  assert.equal(out.status, 0, out.stdout + out.stderr);
+  const back = JSON.parse(fs.readFileSync('test/chartdata-readback-excel.json', 'utf8')).charts;
+  const wrong = names.filter((name) => JSON.stringify(back[name]) !== JSON.stringify(excel.formulas[name])).map((name) => `${name}: Excel read ${JSON.stringify(back[name])}, made ${JSON.stringify(excel.formulas[name])}`);
+  assert.deepEqual(wrong, []);
 });
