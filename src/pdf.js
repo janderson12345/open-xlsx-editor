@@ -4,13 +4,14 @@
 // Separate from the main bundle: import { exportPdf } from 'open-xlsx-editor/pdf'. Adapted from open-docx-editor's
 // pdf.js.
 //
-// Fonts, the first that has the face: the fonts installed on the computer, read with the browser's Local Font Access
-// (Chromium browsers: it asks the user once), embedded as subsets (fontkit); else the PDF standard fonts (Helvetica,
-// Times, Courier and their bold and italic faces), each piece of text drawn at the width the layout measured, so the
-// columns and pages are the layout's in any font. A standard font draws characters it lacks as "?" (it covers
-// Windows-1252's only).
+// Fonts, the first of the cell's font stack that has the face: the fonts installed on the computer, read with the
+// browser's Local Font Access (Chromium browsers: it asks the user once), and the open-metric-fonts twins the page serves
+// (`fonts.omf`: pdfomf.js), embedded as subsets (fontkit); else the PDF standard fonts (Helvetica, Times, Courier and
+// their bold and italic faces), each piece of text drawn at the width the layout measured, so the columns and pages are
+// the layout's in any font. A standard font draws characters it lacks as "?" (it covers Windows-1252's only).
 import { PDFDocument, StandardFonts, rgb, PDFOperator, PDFOperatorNames, PDFNumber, pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize, setTextMatrix, showText, setFillingRgbColor, rectangle, clip, endPath } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
+import { twinFor, twinSegments } from './pdfomf.js';
 
 const PT = 0.75; // CSS px to PDF points
 
@@ -31,6 +32,8 @@ export async function exportPdf(editor, { sheets = 'shown', title, author, local
   if (author) pdf.setAuthor(author);
   pdf.setProducer('open-xlsx-editor');
   const sources = await fontSources(localFonts);
+  // (The twins' folder, as mountXlsxEditor's `fonts.omf` gave it: index.js.)
+  sources.omf = root.dataset.omf || '';
   const fonts = {};
   // (The print pages shown off-screen while they're measured, in print's colours: editor.css, .oxe-exporting.)
   root.classList.add('oxe-exporting');
@@ -68,7 +71,8 @@ async function fontSources(local) {
   return { key, installed };
 }
 
-/** The font for a computed style: an installed one embedded as a subset, else a standard font of its kind. */
+/** The font for a computed style: an installed one embedded as a subset, or a served twin (`{ twin }`: pdfomf.js),
+ *  else a standard font of its kind. */
 async function fontFor(pdf, cs, { sources, fonts }) {
   const bold = (parseInt(cs.fontWeight, 10) || 400) >= 600;
   const italic = /italic|oblique/.test(cs.fontStyle);
@@ -76,6 +80,8 @@ async function fontFor(pdf, cs, { sources, fonts }) {
     const k = sources.key(fam, bold, italic);
     if (fonts[k] !== undefined) { if (fonts[k]) return fonts[k]; continue; }
     fonts[k] = null;
+    const twin = await twinFor(pdf, fam, bold, italic, sources.omf);
+    if (twin) return (fonts[k] = { twin });
     const f = sources.installed.get(k);
     if (!f) continue;
     try {
@@ -156,21 +162,27 @@ async function drawPage(pdf, pageEl, ctx) {
     const cr = cell ? cell.getBoundingClientRect() : pr;
     const box = { left: Math.max(cr.left, bound.left), top: Math.max(cr.top, bound.top), right: Math.min(cr.right, bound.right), bottom: Math.min(cr.bottom, bound.bottom) };
     if (box.right <= box.left || box.bottom <= box.top) continue;
-    const { font, chars } = await fontFor(pdf, cs, ctx);
+    const got = await fontFor(pdf, cs, ctx);
     const z = el.currentCSSZoom || 1;
     const size = (parseFloat(cs.fontSize) || 16) * z * PT;
     const c = color(cs.color) || { rgb: rgb(0, 0, 0) };
-    const key = page.node.newFontDictionary(font.name, font.ref);
+    // (Each font's key in this page's resources, once.)
+    const keys = new Map();
+    const keyOf = (font) => { if (!keys.has(font)) keys.set(font, page.node.newFontDictionary(font.name, font.ref)); return keys.get(font); };
     for (const piece of pieces(t, range)) {
-      const safe = [...piece.text.replace(/[\u00a0\u2000-\u200a\u202f\u205f]/g, ' ').replace(/[\u200b-\u200d\u2060\ufeff\u00ad]/g, '').replace(/[\u2010\u2011\u2012\u2212]/g, '-')]
-        .map((ch) => (chars.has(ch.codePointAt(0)) ? ch : ch.trim() ? '?' : ' ')).join('');
-      if (!safe.trim()) continue;
-      const natural = font.widthOfTextAtSize(safe, size);
+      const plain = piece.text.replace(/[\u00a0\u2000-\u200a\u202f\u205f]/g, ' ').replace(/[\u200b-\u200d\u2060\ufeff\u00ad]/g, '').replace(/[\u2010\u2011\u2012\u2212]/g, '-');
+      if (!plain.trim()) continue;
+      // (The piece in its font, or a twin's alphabets in theirs: pdfomf.js.)
+      const segs = got.twin ? await twinSegments(got.twin, plain)
+        : [{ font: got.font, text: [...plain].map((ch) => (got.chars.has(ch.codePointAt(0)) ? ch : ch.trim() ? '?' : ' ')).join('') }];
+      const natural = segs.reduce((w, sg) => w + sg.font.widthOfTextAtSize(sg.text, size), 0);
       const want = piece.r.width * PT;
-      const ops = [...clipTo({ left: box.left, bottom: box.bottom, width: box.right - box.left, height: box.bottom - box.top }), beginText(), setFontAndSize(key, size), setFillingRgbColor(c.rgb.red, c.rgb.green, c.rgb.blue)];
+      const ops = [...clipTo({ left: box.left, bottom: box.bottom, width: box.right - box.left, height: box.bottom - box.top }), beginText(), setFillingRgbColor(c.rgb.red, c.rgb.green, c.rgb.blue)];
       // (Scaled to the width the layout measured in the page's font: another font's letters fill the same room.)
       if (natural > 0 && Math.abs(want - natural) > 0.1) ops.push(PDFOperator.of(PDFOperatorNames.SetTextHorizontalScaling, [PDFNumber.of(+(100 * want / natural).toFixed(2))]));
-      ops.push(setTextMatrix(1, 0, 0, 1, X(piece.r.left), Y(piece.r.top + ascent(cs, z))), showText(font.encodeText(safe)), endText(), popGraphicsState());
+      ops.push(setTextMatrix(1, 0, 0, 1, X(piece.r.left), Y(piece.r.top + ascent(cs, z))));
+      for (const sg of segs) ops.push(setFontAndSize(keyOf(sg.font), size), showText(sg.font.encodeText(sg.text)));
+      ops.push(endText(), popGraphicsState());
       page.pushOperators(...ops);
       // Underline and strikethrough, from the cell text's own decoration.
       const lines = cs.textDecorationLine || '';
