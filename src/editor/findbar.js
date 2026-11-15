@@ -1,7 +1,8 @@
 // Find and Replace: the bar under the ribbon (Ctrl+F, Ctrl+H), as open-docx-editor's findbar.js, with Excel's options
 // (Match case, Match entire cell contents, Within, Search, Look in) and Find All. The search itself is findops.js.
 import { el } from './ribbonkit.js';
-import { findAll, findNext, replaceChanges } from '../ooxml/findops.js';
+import { findAll, findNext, replaceChanges, searchText } from '../ooxml/findops.js';
+import { colName } from '../ooxml/refs.js';
 
 const NOT_FOUND = "We couldn't find what you were looking for. Select Options for more ways to search.";
 const NOTHING_TO_REPLACE = "We couldn't find anything to replace. Select Options for more ways to search.";
@@ -29,7 +30,7 @@ export function createFindBar(ctx) {
   const [whole, wholeOpt] = check('Match entire cell contents');
   const [within, withinOpt] = choice('Within:', [['sheet', 'Sheet'], ['workbook', 'Workbook']]);
   const [order, orderOpt] = choice('Search:', [['rows', 'By Rows'], ['cols', 'By Columns']]);
-  const [lookIn, lookOpt] = choice('Look in:', [['formulas', 'Formulas'], ['values', 'Values']]);
+  const [lookIn, lookOpt] = choice('Look in:', [['formulas', 'Formulas'], ['values', 'Values'], ['notes', 'Notes'], ['comments', 'Comments']]);
   const info = el('span', { class: 'oxe-findinfo', role: 'status' }); // (read out by screen readers, 4.1.3)
   const opts = (forReplace = false) => ({
     matchCase: matchCase.checked, whole: whole.checked, within: within.value, byColumns: order.value === 'cols',
@@ -46,9 +47,21 @@ export function createFindBar(ctx) {
     say('');
     return true;
   }
+  /** Find All: how many, and Excel's list of them (sheet, cell, value, formula), each going to its cell. */
   function all() {
-    const n = findAll(ctx.workbook(), ctx.from().si, findBox.value, opts()).length;
-    say(n ? `${n} cell(s) found` : NOT_FOUND);
+    const wb = ctx.workbook();
+    const hits = findAll(wb, ctx.from().si, findBox.value, opts());
+    say(hits.length ? `${hits.length} cell(s) found` : NOT_FOUND);
+    list.replaceChildren(...hits.slice(0, 500).map((hit) => {
+      const cell = wb.sheet(hit.si).cells.get(hit.r)?.get(hit.c);
+      const value = searchText(wb, hit.si, cell, 'values');
+      const formula = cell?.f != null ? searchText(wb, hit.si, cell, 'formulas') : '';
+      const row = el('button', { type: 'button', class: 'oxe-findall-row', onmousedown: (e) => { e.preventDefault(); ctx.go(hit); } },
+        el('span', {}, wb.sheets[hit.si].name), el('span', {}, `$${colName(hit.c)}$${hit.r + 1}`), el('span', {}, value), el('span', {}, formula));
+      row.setAttribute('aria-label', `${wb.sheets[hit.si].name} ${colName(hit.c)}${hit.r + 1}${value ? `, ${value}` : ''}${formula ? `, ${formula}` : ''}`);
+      return row;
+    }));
+    list.hidden = !hits.length;
   }
   /** Replace: the active cell, if it matches, then on to the next match. */
   function replaceOne() {
@@ -69,6 +82,8 @@ export function createFindBar(ctx) {
     say(`All done. We made ${steps.count} replacement${steps.count === 1 ? '' : 's'}.${steps.refused ? ` ${steps.refused} left as they were.` : ''}`);
   }
 
+  // (Find All's list, Excel's columns: Sheet, Cell, Value, Formula.)
+  const list = el('div', { class: 'oxe-findall', role: 'group', 'aria-label': 'Cells found', hidden: true });
   const replRow = el('div', { class: 'oxe-replrow' }, replBox, button('Replace', 'Replace', replaceOne), button('Replace All', 'Replace All', replaceAll));
   const bar = el('div', { class: 'oxe-findbar', role: 'search', 'aria-label': 'Find and Replace', hidden: true },
     el('div', { class: 'oxe-findrow' }, findBox,
@@ -76,7 +91,7 @@ export function createFindBar(ctx) {
       button('✕', 'Close (Esc)', () => close())),
     replRow,
     el('div', { class: 'oxe-findrow oxe-findopts' }, caseOpt, wholeOpt, withinOpt, orderOpt, lookOpt),
-    info);
+    info, list);
   findBox.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') { e.preventDefault(); next(e.shiftKey ? -1 : 1); }
   });
@@ -97,6 +112,7 @@ export function createFindBar(ctx) {
     lookIn.disabled = withReplace;
     if (withReplace) lookIn.value = 'formulas';
     say('');
+    list.hidden = true;
     // (At once, not after a moment: typing straight after Ctrl+H would land in whichever box had focus by then.)
     findBox.focus();
     findBox.select();

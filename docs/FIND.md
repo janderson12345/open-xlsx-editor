@@ -10,8 +10,9 @@ After replacements across formulas.xlsx, Excel works out all 399 formulas as the
 - Ctrl+F opens the bar under the ribbon (as open-docx-editor's), Ctrl+H with its Replace row; Home > Editing > Find &
   Select has both. Enter finds the next match, Shift+Enter the previous; Esc closes the bar and goes back to the sheet.
 - Options as Excel's dialog has them: Match case, Match entire cell contents, Within (Sheet or Workbook), Search (By
-  Rows or By Columns), Look in (Formulas or Values; Replace always looks in formulas, as Excel's does).
-- Find All says how many cells match; Replace replaces the active cell when it matches and goes on to the next;
+  Rows or By Columns), Look in (Formulas, Values, Notes or Comments; Replace always looks in formulas, as Excel's does).
+- Find All says how many cells match and lists them as Excel's dialog does (sheet, cell, value, formula), each going
+  to its cell when clicked; Replace replaces the active cell when it matches and goes on to the next;
   Replace All replaces every match as one step of the undo history.
 - The bar keeps focus while the matches are selected, as Excel's dialog does; its status line is read out by screen
   readers.
@@ -28,6 +29,7 @@ After replacements across formulas.xlsx, Excel works out all 399 formulas as the
 | Replace changes every match within a cell (or the whole cell), and the result is entered as if typed: a number becomes a number, `=...` a formula, nothing empties the cell. | `apple` with `pear`: `pear pie`, `pinepear`. `1` with `9`: 12 becomes the number 92. `12` with `=1+1`: a formula. |
 | In a formula, replacing is plain text: references aren't recognised. | `A1` with `B9`: `=A1+A10` becomes `=B9+B90`. |
 | Replace doesn't look in values: a formula's result isn't replaced. | `apple` doesn't change `=A1&"x"`, which shows `applex`. |
+| Look in Notes searches the notes' text, any capitals; Look in Comments the threaded comments'; neither finds the other or the cells, and Formulas finds neither. | `apple` in notes: A1 ("Check the apple stock") and E5 ("APPLES"); in comments: C3; in formulas: D4 alone (`tools/excel-compare/excel-find2.ps1`, `test/find2-excel.json`). |
 
 The messages are Excel 365's: "We couldn't find what you were looking for. Select Options for more ways to search."
 and "All done. We made 3 replacements." (Excel shows them in a message box; here they are in the bar's status line.
@@ -35,7 +37,9 @@ They come from Excel's dialog, which COM doesn't reach, so their wording isn't m
 
 ## Not yet
 
-Look in Notes and Comments, Format (finding and replacing formats), and the Find All list of cells. (Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
+Format (finding and replacing formats, Find Format and Replace Format). Over COM it can't be measured as the dialog
+does it: FindNext drops the format (it went on to a plain "apple" when bold ones were asked for), and a Replace with
+nothing to find emptied the bold cells instead of only formatting them (`excel-find2.ps1`). (Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
 
 ## Found on the way
 

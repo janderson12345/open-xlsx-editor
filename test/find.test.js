@@ -105,3 +105,24 @@ test('patterns and a whole workbook', () => {
   const all = findAll(wb, si, 'apple', { within: 'workbook' });
   assert.ok(all.length >= 3 && all[0].si === si);
 });
+
+test('Look in Notes and Comments as Excel 365: notes alone, threaded comments alone, neither for Formulas', async () => {
+  const { build } = await import('./steps.js');
+  const { setNote } = await import('../src/ooxml/noteedit.js');
+  const { addThread } = await import('../src/ooxml/threadedit.js');
+  const { findAll: all } = await import('../src/ooxml/findops.js');
+  const { refName } = await import('../src/ooxml/refs.js');
+  const EXCEL = JSON.parse((await import('node:fs')).readFileSync('test/find2-excel.json', 'utf8'));
+  // (Excel's cells, test/find2-excel.json from excel-find2.ps1: notes in A1, B2 and E5, a thread in C3, "apple" in D4.)
+  const { wb, si } = build({ cells: { D4: 'apple' } });
+  setNote(wb, si, 0, 0, 'Check the apple stock', '');
+  setNote(wb, si, 1, 1, 'nothing here', '');
+  setNote(wb, si, 4, 4, 'APPLES', '');
+  addThread(wb, si, 2, 2, 'apple pie thread', 'Someone');
+  const found = (lookIn) => all(wb, si, 'apple', { lookIn }).map((h) => refName(h.r, h.c));
+  const of = (name) => EXCEL.find((x) => x.name === name).found;
+  // (Excel's list starts after A1, so A1 comes last: the same cells here in search order.)
+  assert.deepEqual(found('notes').sort(), [...of('notes: apple')].sort());
+  assert.deepEqual(found('comments'), of('comments: apple'));
+  assert.deepEqual(found('formulas'), of('formulas: apple, with notes about'));
+});

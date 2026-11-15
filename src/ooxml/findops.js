@@ -3,6 +3,7 @@
 // (Values). Search goes from the cell after the active one, by rows or by columns, round to the start; * and ? are
 // wildcards, ~ takes the next character as it is. A replacement is entered as if typed (a number becomes a number,
 // "=..." a formula); in a formula it is plain text, so A1 to B9 also makes A10 B90, as in Excel.
+import { readNotes } from './notes.js';
 import { cellDisplay } from './numfmt.js';
 import { formatCodeOf } from './styles.js';
 import { editText } from './input.js';
@@ -35,17 +36,26 @@ const sheetsFrom = (wb, si, within) => (within === 'workbook'
   ? [...wb.sheets.keys()].filter((k) => wb.canShow(k)).sort((a, b) => ((a - si + wb.sheets.length) % wb.sheets.length) - ((b - si + wb.sheets.length) % wb.sheets.length))
   : [si]);
 
-/** The cells of sheet si that match, in search order (rows, or columns with `byColumns`). */
+/** The cells of sheet si that match, in search order (rows, or columns with `byColumns`). Look in Notes searches
+ *  the notes' text, Look in Comments the threaded comments' (each comment's, not its authors'), as Excel 365's
+ *  (excel-find2.ps1: neither finds the other, nor the cells). */
 function matchesIn(wb, si, re, opts) {
   const out = [];
-  for (const [r, line] of wb.sheet(si).cells) {
-    for (const [c, cell] of line) if (re.test(searchText(wb, si, cell, opts.lookIn))) out.push({ si, r, c });
+  if (opts.lookIn === 'notes' || opts.lookIn === 'comments') {
+    for (const [key, n] of readNotes(wb, si)) {
+      const text = n.kind === 'thread' ? n.items.map((x) => x.text).join('\n') : n.text;
+      if ((n.kind === 'thread') === (opts.lookIn === 'comments') && re.test(text)) { const [r, c] = key.split(',').map(Number); out.push({ si, r, c }); }
+    }
+  } else {
+    for (const [r, line] of wb.sheet(si).cells) {
+      for (const [c, cell] of line) if (re.test(searchText(wb, si, cell, opts.lookIn))) out.push({ si, r, c });
+    }
   }
   return out.sort(opts.byColumns ? (a, b) => a.c - b.c || a.r - b.r : (a, b) => a.r - b.r || a.c - b.c);
 }
 
 /**
- * Every matching cell, from the sheet `si` on (opts: { matchCase, whole, lookIn: 'formulas' | 'values', byColumns,
+ * Every matching cell, from the sheet `si` on (opts: { matchCase, whole, lookIn: 'formulas' | 'values' | 'notes' | 'comments', byColumns,
  * within: 'sheet' | 'workbook' }): [{ si, r, c }].
  */
 export function findAll(wb, si, what, opts = {}) {
