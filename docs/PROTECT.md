@@ -104,10 +104,21 @@ one gets Excel's words. test/editranges.test.js; in the browser, test/editing-pr
 
 Files from before Excel 2013 keep a 16-bit hash in `password`; it is read (test: "test" is CBEB), not written.
 
+## Selecting on a protected sheet
+
+Select locked cells and Select unlocked cells (Protect Sheet's first two choices) are kept as Excel keeps them, and the
+keys and clicks go as Excel's do, measured in its own window (keys pressed and cells clicked there, the active cell read
+over COM after each; five cells unlocked: B2, C2, B3, C3, E5; `test/protsel.test.js`):
+
+| Allowed | Arrows | Tab, Shift+Tab | Enter, Shift+Enter | A click |
+|---|---|---|---|---|
+| Both (Excel's default) | as usual | the next (last) unlocked cell in reading order, wrapping round: E5 to B2 | as usual | as usual |
+| Unlocked cells only | Right and Left as Tab; Down and Up the next (last) unlocked cell down the columns, wrapping: B2, B3, C2 | as above | down the columns: E5 to B2 | on a locked cell, nothing |
+| Neither | nothing | as above: B2 to C2 | down the columns: C2 to C3 | nothing |
+
 ## Not yet
 
-- Selecting: Select locked cells and Select unlocked cells are written and kept but not enforced (every cell can be
-  selected); measuring them needs keys and clicks in Excel's window. Scenarios aren't enforced (there are none here).
+- (Selecting is enforced as Excel does it: below.) Scenarios aren't enforced (there are none here).
 - Comments (threads) on a protected sheet aren't stopped; Excel's rule for them wasn't measured. Nor is a new
   PivotTable put on a protected sheet's cells.
 - Excel refuses as soon as a locked cell is typed into; here the entry is refused when it is entered.

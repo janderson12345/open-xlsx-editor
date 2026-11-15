@@ -22,7 +22,7 @@ import { clearChanges } from '../ooxml/clearops.js';
 import { partsClear, PARTS_ONLY, hyperlinksIn } from '../ooxml/clearparts.js';
 import { traceLevel } from './tracing.js';
 import { ruleAt, valid, VALIDATION_MESSAGE } from '../ooxml/validation.js';
-import { protectionRefusal, isLocked } from '../ooxml/protection.js';
+import { protectionRefusal, isLocked, protectedStep, canSelect } from '../ooxml/protection.js';
 import { inOpenRange, lockedRangeAt } from '../ooxml/editranges.js';
 
 /** The commands for one editor. `ctx` = { workbook(), sheetIndex(), showSheet(i), sheetsChanged(), grid, readOnly(),
@@ -242,14 +242,20 @@ export function createCommands(ctx) {
 
   const commands = {
     /** Select one cell. */
-    select(r, c) { show(cellSelection(r, c)); },
+    select(r, c) { if (canSelect(ctx.workbook(), ctx.sheetIndex(), r, c)) show(cellSelection(r, c)); },
     /** Ctrl+click: cell (r, c) a new range, the ranges selected before kept. */
     addArea(r, c) { show(addArea(state.sel, r, c), { r, c }, 'Added '); },
     /** Extend the selection from the active cell to (r, c). */
-    extendTo(r, c) { show(extendSelection(state.sel, r, c), { r, c }); },
+    extendTo(r, c) { if (canSelect(ctx.workbook(), ctx.sheetIndex(), r, c)) show(extendSelection(state.sel, r, c), { r, c }); },
     /** Arrow keys: a cell (or, with `jump`, to the edge of the data) in direction (dr, dc); `extend` moves the far
      *  corner of the selection instead of the active cell. */
-    move(dr, dc, { extend = false, jump: far = false } = {}) {
+    move(dr, dc, { extend = false, jump: far = false, via = 'arrow' } = {}) {
+      // (A protected sheet: Tab, Enter and the arrows as Excel moves them there, protection.js protectedStep.)
+      if (!extend && !far) {
+        const p = protectedStep(ctx.workbook(), ctx.sheetIndex(), { r: state.sel.ar, c: state.sel.ac }, dr, dc, via);
+        if (p === null) return;
+        if (p) { show(cellSelection(p.r, p.c)); return; }
+      }
       const from = extend ? state.focus : { r: state.sel.ar, c: state.sel.ac };
       const to = (far ? jump : step)(sheet(), from.r, from.c, dr, dc, limits());
       if (extend) commands.extendTo(to.r, to.c);

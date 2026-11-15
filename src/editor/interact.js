@@ -62,7 +62,7 @@ export function attachEditing(root, ctx) {
     onFinish: (text, move, runs) => {
       // (An entry refused, a formula with a mistake in it, goes back into the editor to be put right, as in Excel.)
       commit(text, null, () => {
-        if (move) cmd.run('move', move[0], move[1]);
+        if (move) cmd.run('move', move[0], move[1], { via: move[2] || 'arrow' });
         view.focus({ preventScroll: true });
       }, runs);
     },
@@ -180,10 +180,10 @@ export function attachEditing(root, ctx) {
     // (Alt+Down on a heading cell of a filter opens its list, as in Excel.)
     if (e.altKey && !ctrl && key === 'ArrowDown' && ctx.filterMenu?.()) { /* opened */ }
     else if (ARROWS[key]) cmd.run('move', ARROWS[key][0], ARROWS[key][1], { extend: e.shiftKey, jump: ctrl });
-    else if (key === 'Tab') cmd.run('move', 0, e.shiftKey ? -1 : 1);
+    else if (key === 'Tab') cmd.run('move', 0, e.shiftKey ? -1 : 1, { via: 'tab' });
     // (Format Painter waiting: Enter paints the selection, as a click does.)
     else if (key === 'Enter' && ctx.painting?.()) ctx.painted();
-    else if (key === 'Enter') cmd.run('move', e.shiftKey ? -1 : 1, 0);
+    else if (key === 'Enter') cmd.run('move', e.shiftKey ? -1 : 1, 0, { via: 'enter' });
     else if (key === 'Home') cmd.run('home', { sheetStart: ctrl });
     else if (key === 'End' && ctrl) cmd.run('end');
     else if ((key === 'PageDown' || key === 'PageUp') && ctrl) cmd.run('nextSheet', key === 'PageDown' ? 1 : -1);

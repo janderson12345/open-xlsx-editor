@@ -170,3 +170,41 @@ export function unprotectWorkbook(wb, password = '') {
 /** Said when a change to a protected workbook's sheets is refused. (Excel greys those commands out; its words for
  *  the refusal couldn't be read over COM, which gives only a general error.) */
 export const WORKBOOK_PROTECTED = 'Workbook is protected and cannot be changed.';
+
+/**
+ * Where a key takes the active cell on a protected sheet, as Excel's do (measured in its window, docs/PROTECT.md), or
+ * undefined where the key moves as usual. `how`: 'arrow' (with `dr`, `dc`), 'tab' (dc ±1) or 'enter' (dr ±1).
+ * With Select unlocked cells off (selectUnlockedCells), arrows and clicks do nothing; with Select locked cells off,
+ * Right and Left go to the next or last unlocked cell in reading order (rows, wrapping round), Down and Up down the
+ * columns; Tab always goes through the unlocked cells in rows, and Enter down the columns once locked cells can't be
+ * selected. Returns { r, c }, null (stay), or undefined.
+ */
+export function protectedStep(wb, si, from, dr, dc, how) {
+  const p = sheetProtection(wb, si);
+  if (!p) return undefined;
+  const none = !p.selectUnlocked;
+  const unlockedOnly = !p.selectLocked;
+  if (how === 'arrow' && none) return null;
+  const rows = how === 'tab' || (how === 'arrow' && unlockedOnly && dc !== 0);
+  const cols = (how === 'enter' && (none || unlockedOnly)) || (how === 'arrow' && unlockedOnly && dr !== 0);
+  if (!rows && !cols) return undefined;
+  const cells = [];
+  for (const [r, line] of wb.sheet(si).cells) for (const c of line.keys()) if (!isLocked(wb, si, r, c)) cells.push({ r, c });
+  if (!cells.length) return null;
+  const key = rows ? (a) => a.r * 1e5 + a.c : (a) => a.c * 1e7 + a.r;
+  cells.sort((a, b) => key(a) - key(b));
+  const back = dr < 0 || dc < 0;
+  const at = key(from);
+  const next = back ? [...cells].reverse().find((x) => key(x) < at) : cells.find((x) => key(x) > at);
+  return next || (back ? cells[cells.length - 1] : cells[0]);
+}
+
+/** Whether cell (r, c) can be selected on sheet si: not on a protected sheet that allows no selection, or only
+ *  unlocked cells and this one locked (Excel ignores a click there). */
+export function canSelect(wb, si, r, c) {
+  const p = sheetProtection(wb, si);
+  if (!p) return true;
+  if (!p.selectUnlocked) return false;
+  return p.selectLocked || !isLocked(wb, si, r, c);
+}
+

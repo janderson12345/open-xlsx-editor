@@ -60,8 +60,8 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
       size();
       return;
     }
-    if (e.key === 'Enter') { e.preventDefault(); finish(e.shiftKey ? [-1, 0] : [1, 0]); return; }
-    if (e.key === 'Tab') { e.preventDefault(); finish(e.shiftKey ? [0, -1] : [0, 1]); return; }
+    if (e.key === 'Enter') { e.preventDefault(); finish(e.shiftKey ? [-1, 0, 'enter'] : [1, 0, 'enter']); return; }
+    if (e.key === 'Tab') { e.preventDefault(); finish(e.shiftKey ? [0, -1, 'tab'] : [0, 1, 'tab']); return; }
     if (open.mode === 'enter' && MOVES[e.key]) { e.preventDefault(); finish(MOVES[e.key]); }
   });
   box.addEventListener('input', () => {
