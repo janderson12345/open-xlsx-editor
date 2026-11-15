@@ -16,7 +16,7 @@
 #     "valuesFormats" | "noBorders", op: "add" | "subtract" | "multiply" | "divide", skip: bool, transpose: bool },
 #   { do: "link", from, to },
 #   { do: "fill", range, dir: "down" | "right" | "up" | "left" } (Range.FillDown...),
-#   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" } (the fill handle: AutoFill),
+#   { do: "autofill", from, to, type: "default" | "copy" | "series" | "formats" | "values" | "days" | "weekdays" | "months" | "years" } (the fill handle: AutoFill),
 #   { do: "clear", range, what: "all" | "contents" | "formats" } (Range.Clear, ClearContents, ClearFormats),
 #   { do: "sort", range, region: bool (range's CurrentRegion, as Sort on one cell takes it), keys: [{ key (a cell of
 #     the column, or row, to sort by), order: "asc" | "desc", textAsNumbers: bool }], header: "guess" | "yes" | "no",
@@ -29,7 +29,7 @@ $ErrorActionPreference = 'Stop'
 $list = Get-Content $Cases -Raw | ConvertFrom-Json
 $shifts = @{ down = -4121; right = -4161; up = -4162; left = -4159 }
 $pastes = @{ all = -4104; formulas = -4123; values = -4163; formats = -4122; widths = 8; formulasFormats = 11; valuesFormats = 12; noBorders = 7 }
-$fills = @{ default = 0; copy = 1; series = 2; formats = 3; values = 4 }
+$fills = @{ default = 0; copy = 1; series = 2; formats = 3; values = 4; days = 5; weekdays = 6; months = 7; years = 8 }
 $ops = @{ none = -4142; add = 2; subtract = 3; multiply = 4; divide = 5 }
 $missing = [Type]::Missing
 $x = New-Object -ComObject Excel.Application

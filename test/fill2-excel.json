@@ -1,0 +1,435 @@
+{
+  "excel": "Excel.Application: Range.Insert, Range.Delete, Range.Copy and PasteSpecial, Worksheet.Paste with Link, Range.Fill and AutoFill, Range.Clear, Worksheet.Sort and Range.Sort",
+  "cases": [
+    {
+      "name": "a date, days",
+      "cells": {
+        "A1": {
+          "v": 45321.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45323.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 45324.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 45325.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "a date, weekdays",
+      "cells": {
+        "A1": {
+          "v": 46338.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 46339.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 46342.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46343.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 46344.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 46345.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A7": {
+          "v": 46346.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "a Saturday, weekdays",
+      "cells": {
+        "A1": {
+          "v": 46340.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 46342.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 46343.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46344.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "a date, months",
+      "cells": {
+        "A1": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45351.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45382.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 45412.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 45443.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 45473.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "a date, years",
+      "cells": {
+        "A1": {
+          "v": 45351.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45716.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 46081.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46446.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "dates a week apart, months",
+      "cells": {
+        "A1": {
+          "v": 45292.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45299.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45323.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 45330.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 45352.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "dates two days apart, weekdays",
+      "cells": {
+        "A1": {
+          "v": 46338.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 46340.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 46345.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46346.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 46352.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 46353.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "dates a month apart, days",
+      "cells": {
+        "A1": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45351.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45380.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 45409.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 45438.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "a date and time, days",
+      "cells": {
+        "A1": {
+          "v": 45321.395833333336,
+          "fmt": "m/d/yyyy h:mm"
+        },
+        "A2": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy h:mm"
+        },
+        "A3": {
+          "v": 45323.0,
+          "fmt": "m/d/yyyy h:mm"
+        },
+        "A4": {
+          "v": 45324.0,
+          "fmt": "m/d/yyyy h:mm"
+        }
+      }
+    },
+    {
+      "name": "three dates in a row, weekdays",
+      "cells": {
+        "A1": {
+          "v": 46342.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 46343.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 46344.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46345.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 46346.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 46349.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A7": {
+          "v": 46350.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A8": {
+          "v": 46351.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A9": {
+          "v": 46352.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "two weekdays a day apart, weekdays",
+      "cells": {
+        "A1": {
+          "v": 46342.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 46343.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 46344.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46345.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 46346.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 46349.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A7": {
+          "v": 46350.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A8": {
+          "v": 46351.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "three dates, months",
+      "cells": {
+        "A1": {
+          "v": 45306.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45311.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 45306.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 45311.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A7": {
+          "v": 45306.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A8": {
+          "v": 45311.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A9": {
+          "v": 45322.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "two years apart, years",
+      "cells": {
+        "A1": {
+          "v": 43891.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 44621.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45352.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 46082.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 46813.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "three dates, days",
+      "cells": {
+        "A1": {
+          "v": 45292.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A2": {
+          "v": 45293.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A3": {
+          "v": 45295.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A4": {
+          "v": 45292.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A5": {
+          "v": 45293.0,
+          "fmt": "m/d/yyyy"
+        },
+        "A6": {
+          "v": 45295.0,
+          "fmt": "m/d/yyyy"
+        }
+      }
+    },
+    {
+      "name": "a date with a format, years",
+      "cells": {
+        "A1": {
+          "v": 43905.0,
+          "fmt": "d-mmm-yy",
+          "bold": true
+        },
+        "A2": {
+          "v": 44270.0,
+          "fmt": "d-mmm-yy",
+          "bold": true
+        },
+        "A3": {
+          "v": 44635.0,
+          "fmt": "d-mmm-yy",
+          "bold": true
+        },
+        "A4": {
+          "v": 45000.0,
+          "fmt": "d-mmm-yy",
+          "bold": true
+        }
+      },
+      "widths": {
+        "A": 9.0
+      }
+    }
+  ]
+}

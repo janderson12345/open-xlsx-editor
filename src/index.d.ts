@@ -158,6 +158,8 @@ export declare function mountXlsxEditor(
     /** false hides the status bar's figures for the selection; an object ({ minimum: true, maximum: true,
      *  numericalCount: true, average, count, sum }) chooses them, as Excel's Customize Status Bar does. */
     statusBar?: boolean | Record<string, boolean>;
+    /** Custom lists the fill handle goes round, as Excel's Edit Custom Lists: [['North', 'East', 'South', 'West']]. */
+    fillLists?: string[][];
     /** false leaves formulas saved without a result empty on opening (by default they are worked out, as Excel does). */
     calculateOnOpen?: boolean;
     onChange?: () => void;

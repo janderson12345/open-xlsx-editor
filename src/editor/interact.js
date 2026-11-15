@@ -324,6 +324,9 @@ export function attachEditing(root, ctx) {
     e.preventDefault();
     e.stopImmediatePropagation();
     view.focus({ preventScroll: true });
+    // (A double click on the fill handle, from the click count as the grid's other double clicks: filled down beside
+    // the next column's data.)
+    if (e.detail === 2) { filling = null; cmd.run('fillDoubleClick'); return; }
     filling = { to: null };
   }, true);
   view.addEventListener('mousedown', (e) => {

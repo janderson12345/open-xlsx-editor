@@ -38,8 +38,10 @@ import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
 import { formulasTab } from './editor/formulastab.js';
 import { calcMode, needsCalculation, calculateBeforeSave } from './ooxml/calcmode.js';
-import { fontFamily } from './ooxml/styles.js';
+import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
+import { isDateFormat } from './ooxml/format.js';
+import { fillOptionChoices } from './editor/fillopts.js';
 import { selectionStats } from './ooxml/stats.js';
 import { parseRef } from './ooxml/refs.js';
 import { namesOnSheet } from './ooxml/names.js';
@@ -75,6 +77,8 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  * - `ribbon`: 'simple' starts with the one-line simplified ribbon, 'classic' with the full one (without it, the one
  *   the user last chose in this browser); the user can still switch with the ribbon's own button. `setRibbon()`
  *   changes it.
+ * - `fillLists`: custom lists the fill handle goes round, as Excel's Edit Custom Lists ([['North', 'East', 'South',
+ *   'West']]), after its own day and month names.
  * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs; an object
  *   ({ minimum: true, maximum: true, numericalCount: true, average, count, sum }) chooses which figures it shows, as
  *   Excel's Customize Status Bar (the status bar right-clicked) does, over the user's own last choice.
@@ -213,6 +217,9 @@ export function mountXlsxEditor(host, options = {}) {
   /** The status bar: the figures on (STATUS_ITEMS) for the selection (stats.js); Count alone for text or an error. */
   const showStats = () => {
     if (!state.tabs || !state.editing) return;
+    // (Auto Fill Options go once the selection is no longer the cells filled.)
+    const sel = state.editing.commands.selection;
+    if (state.lastFill && ['r0', 'c0', 'r1', 'c1'].some((k) => sel[k] !== state.lastFill.to[k])) { state.lastFill = null; state.grid?.showFillOptions(null); }
     if (options.statusBar === false) { state.tabs.status('', true); return; }
     const s = selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
     const parts = !s ? [] : STATUS_ITEMS.filter(([k]) => statusOn[k]).map(([, , label, value]) => [label, value(s)]).filter(([, v]) => v != null).map(([l, v]) => `${l}: ${v}`);
@@ -277,6 +284,27 @@ export function mountXlsxEditor(host, options = {}) {
     state.find.el.after(state.watch.el);
   };
 
+  /** Auto Fill Options' menu: the last fill done again another way (fillopts.js): undone, the cells it started from
+   *  selected again, and filled with the type chosen, as one more step. Date choices when those cells hold dates. */
+  const fillOptionsMenu = (point) => {
+    const fill = state.lastFill;
+    if (!fill) return;
+    const wb = state.workbook;
+    const sheet = wb.sheet(state.sheetIndex);
+    let dated = false;
+    for (let r = fill.from.r0; r <= fill.from.r1; r++) {
+      for (let c = fill.from.c0; c <= fill.from.c1; c++) {
+        const cell = sheet.cells.get(r)?.get(c);
+        if (typeof cell?.v === 'number' && cell.t !== 's' && isDateFormat(formatCodeOf(wb.styles, cell.s || 0))) dated = true;
+      }
+    }
+    menu.open(fillOptionChoices(dated).map(({ type, label }) => ({ label, run: () => {
+      editing().run('undo');
+      editing().run('select', fill.from.r0, fill.from.c0);
+      editing().run('extendTo', fill.from.r1, fill.from.c1);
+      editing().run('autoFill', fill.to, { type });
+    } })), point, { label: 'Auto Fill Options' });
+  };
   /** Customize Status Bar (the status bar right-clicked): each figure ticked or not, its value now beside it. */
   const statusMenu = (point) => {
     const s = state.editing && selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
@@ -335,6 +363,8 @@ export function mountXlsxEditor(host, options = {}) {
       const i = wb.activeSheet;
       const sheet = wb.sheet(i);
       state.workbook = wb;
+      // (Custom lists the fill handle goes round, as Excel's Edit Custom Lists: fillops.js.)
+      if (options.fillLists) wb.fillLists = options.fillLists;
       state.sheetIndex = i;
       state.fileName = fileName;
       state.looks = looksOf(wb);
@@ -343,6 +373,7 @@ export function mountXlsxEditor(host, options = {}) {
         state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
         state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
         state.grid.onErrorButton((point) => act('errorMenu', point));
+        state.grid.onFillOptions((point) => fillOptionsMenu(point));
         state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
         state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], act, menu: (point, k) => chartMenu(point, k), readOnly: () => state.readOnly });
         state.grid.onChartsDrawn(() => state.picker?.redrawn());
@@ -391,6 +422,8 @@ export function mountXlsxEditor(host, options = {}) {
           editNote: () => act('editNote'),
           fitWidth: (c) => state.grid.fitWidth(c),
           fitHeight: (r) => state.grid.fitHeight(r),
+          // (A fill handle's fill: Auto Fill Options shown for it.)
+          filled: (fill) => { state.lastFill = fill; state.grid.showFillOptions(fill.to); },
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),
           allowed,

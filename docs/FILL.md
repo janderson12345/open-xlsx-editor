@@ -13,6 +13,13 @@ hidden instance (`tools/excel-compare/excel-steps.ps1` on `fill-cases.json`, fro
   right or left (the way the pointer is furthest out of the selection), the cells it will fill are outlined; let go,
   they are filled and selected. Ctrl held while letting go fills the other way: a single cell counts on, more cells
   are copied as they are (Excel's Ctrl-drag, from its documentation; COM doesn't reach the drag).
+- A double click on the handle fills down as far as the data beside goes: the column left of the selection, or else
+  the one right of it, from the row below to its first empty cell, stopping before a cell already filled (Excel's
+  documented rule; COM doesn't reach the double click).
+- After a fill by the handle, Excel's Auto Fill Options button at the filled cells' corner: Copy Cells, Fill Series,
+  Fill Formatting Only, Fill Without Formatting, and for dates Fill Days, Fill Weekdays, Fill Months, Fill Years. A
+  choice fills the cells again that way, one more step of the undo history; the button goes when the selection moves.
+- Custom lists (`fillLists`, as Excel's Edit Custom Lists) go round as the day and month names do.
 - Ctrl+D (Fill Down) and Ctrl+R (Fill Right), and Home > Editing > Fill: Down, Right, Up, Left.
 - Each is one step of the undo history. Not on a read-only workbook; `features: { editing: false }` turns them off.
 
@@ -56,8 +63,23 @@ times a factor did no better than 28. Excel's advances are its fonts' hinted one
 (Aptos Narrow's digits are 7px at 15, not 8): a long paragraph can break a word differently. The browser check runs
 the Calibri and Arial paragraphs through the Fill menu: 20 of 24, as fitted.
 
+## Fill Days, Weekdays, Months and Years (Auto Fill Options for dates)
+
+Measured over COM as the others (AutoFill's xlFillDays to xlFillYears: `fill2-cases.mjs`, `test/fill2-excel.json`,
+15 of 15 cells as Excel's, `src/ooxml/filldates.js`):
+
+| Rule | Seen |
+|---|---|
+| One date goes on by one unit a row: a day, the next weekday (Saturday and Sunday left out), a month or a year, the day kept or the month's last. | Thu 11/12/2026, weekdays: Fri, Mon, Tue... A Saturday: Mon. 1/31/2024, months: 2/29, 3/31, 4/30. 2/29/2024, years: 2/28/2025. |
+| Dates the same number of units apart go on by it. | 3/1/2020 and 3/1/2022, years: 2024, 2026. 1/31 and 2/29, days: 29 days on. Mon, Tue, weekdays: Wed, Thu, Fri, Mon. |
+| Dates whose steps differ, or that don't move in the unit, are copied as a block; two such dates instead go on by one month (year; a week for weekdays) each round. | 1/1, 1/2, 1/4, days: copied. 1/15, 1/20, 1/31, months: copied. 1/1 and 1/8, months: 2/1, 2/8, 3/1. Thu and Sat, weekdays: Thu, Fri a week on. |
+| Fill Days and Weekdays drop the time of day. | 1/30/2024 9:30: 1/31/2024 0:00. |
+
+Upwards and leftwards these choices take Excel's guess, as before (not measured).
+
 ## Not yet
 
-The Auto Fill Options button after a fill, a double click on the handle (filling down beside the next column's
-data), Fill > Across Worksheets, custom lists, and a drag back into the selection (Excel clears those cells).
+Fill > Across Worksheets (sheets can't be grouped yet), a drag back into the selection (Excel clears those cells), and
+custom lists measured in Excel (adding one over COM would change the user's own Excel settings; they go round as the
+built-in lists, whose rules were measured).
 Justify's 255-character limit on a line is not checked.

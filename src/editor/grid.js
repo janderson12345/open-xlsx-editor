@@ -10,6 +10,7 @@ import { sheetGeometry, MDW, OVERSCAN } from './geometry.js';
 import { drawColumnHeadings, drawPanes, drawGridlines, drawRows } from './gridlayers.js';
 import { columnFitWidth } from './cells.js';
 import { decorations } from './decor.js';
+import { fillOptionsButton } from './fillopts.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
 import { drawSelection, drawMarks, rangeBox, handleCorner } from './selection.js';
 import { arrowLayer, drawArrows } from './arrows.js';
@@ -71,7 +72,9 @@ function drawErrorButton(st) {
   const layer = st.errLayer;
   if (!layer) return;
   const s = st.sel;
-  if (!s || !st.errors?.has(`${s.ar},${s.ac}`) || !st.rows.size(s.ar)) { layer.replaceChildren(); return; }
+  // (Auto Fill Options after a fill, in the same layer: fillopts.js.)
+  const fillButton = fillOptionsButton(st);
+  if (!s || !st.errors?.has(`${s.ar},${s.ac}`) || !st.rows.size(s.ar)) { layer.replaceChildren(...(fillButton ? [fillButton] : [])); return; }
   const b = document.createElement('button');
   b.type = 'button';
   b.tabIndex = -1;
@@ -83,7 +86,7 @@ function drawErrorButton(st) {
   setVars(b, { '--oxe-x': st.rowHeadW + x, '--oxe-y': st.rows.start(s.ar) });
   b.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); });
   b.addEventListener('click', (e) => { e.stopPropagation(); const box = b.getBoundingClientRect(); st.onErrorButton?.({ x: box.left, y: box.bottom }); });
-  layer.replaceChildren(b);
+  layer.replaceChildren(b, ...(fillButton ? [fillButton] : []));
 }
 
 let gridCount = 0;
@@ -332,6 +335,10 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     onFilterButton(fn) { st.onFilter = fn; },
     /** Excel's error button clicked: fn({ x, y }) opens its menu there. */
     onErrorButton(fn) { st.onErrorButton = fn; },
+    /** Auto Fill Options at the bottom-right of `area` (null: none); its button clicked, fn({ x, y }). */
+    showFillOptions(area) { st.fillOptions = area || null; draw(st, true); },
+    onFillOptions(fn) { st.onFillOptions = fn; },
+    get fillOptions() { return st.fillOptions || null; },
     /** Where the error button is, if it is shown (Alt+Shift+F10 opens its menu there). */
     errorButtonAt() { const b = st.errLayer?.firstChild; if (!b) return null; const box = b.getBoundingClientRect(); return { x: box.left, y: box.bottom }; },
     /** Show the fill handle on the selection (not on a read-only workbook, or with filling turned off). */

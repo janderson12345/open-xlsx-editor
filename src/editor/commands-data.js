@@ -2,7 +2,7 @@
 // and AutoFill, sort, AutoSum, the Name Box and the filter.
 import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
-import { fillCopy, autoFill } from '../ooxml/fillops.js';
+import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
@@ -135,7 +135,14 @@ export function dataCommands(env) {
       const steps = autoFill(ctx.workbook(), ctx.sheetIndex(), s, to, how);
       if (!steps || !runSteps(steps)) return false;
       show({ ...s, r0: to.r0, c0: to.c0, r1: to.r1, c1: to.c1 }, null, `Filled ${refName(to.r0, to.c0)} to ${refName(to.r1, to.c1)}, `);
+      // (Auto Fill Options: the fill to be done again another way, index.js.)
+      ctx.filled?.({ from: { r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }, to: { r0: to.r0, c0: to.c0, r1: to.r1, c1: to.c1 } });
       return true;
+    },
+    /** A double click on the fill handle: the selection filled down beside the next column's data (doubleClickFill). */
+    fillDoubleClick() {
+      const to = doubleClickFill(ctx.workbook().sheet(ctx.sheetIndex()), state.sel);
+      return to ? this.autoFill(to) : false;
     },
     /** Sort (sortops.js), as one step of the history; the selection stays. With `how` ({ area, keys, header,
      *  matchCase, leftToRight }, as the Sort box gives it) that sort; else A to Z ('asc') or Z to A ('desc') as

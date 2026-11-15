@@ -7,11 +7,15 @@ import { shiftFormula } from '../calc/tokens.js';
 import { formatCodeOf } from './styles.js';
 import { isDateFormat, dateParts } from './format.js';
 import { dateSerial } from './input.js';
+import { DATE_FILLS, fillDates } from './filldates.js';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 /** Excel's built-in lists: short and long day and month names. */
 const LISTS = [DAYS.map((d) => d.slice(0, 3)), DAYS, MONTHS.map((m) => m.slice(0, 3)), MONTHS];
+/** The lists a workbook's fills go round: Excel's built-in ones, then the custom lists given (`wb.fillLists`, as
+ *  Excel's Edit Custom Lists: each a list of words, matched whatever their capitals). */
+const listsOf = (wb) => [...LISTS, ...(Array.isArray(wb?.fillLists) ? wb.fillLists.filter((l) => Array.isArray(l) && l.length > 1).map((l) => l.map(String)) : [])];
 /** A number as Excel keeps one (15 significant digits: 0.1 + 0.2 is 0.3). */
 const exact = (n) => Number(n.toPrecision(15));
 
@@ -28,8 +32,9 @@ function kindOf(wb, cell) {
   }
   if (typeof cell.v !== 'string') return { kind: 'text' };
   const t = cell.v;
-  for (let li = 0; li < LISTS.length; li++) {
-    const i = LISTS[li].findIndex((x) => x.toLowerCase() === t.toLowerCase());
+  const lists = listsOf(wb);
+  for (let li = 0; li < lists.length; li++) {
+    const i = lists[li].findIndex((x) => x.toLowerCase() === t.toLowerCase());
     if (i >= 0) return { kind: 'list', list: li, i, look: t === t.toUpperCase() ? 'upper' : t === t.toLowerCase() ? 'lower' : 'title' };
   }
   // (Q1 to Q4, Qtr1, Quarter 1...: round the four quarters.)
@@ -74,7 +79,7 @@ function line(values) {
 /** Runs of a line's cells the fill carries on together: next to each other and of one kind (numbers, the same text
  *  with a number, one list...). Each is { start, items, at(i) } where at(i) gives the run's i-th value on (i < 0
  *  before it), as a cell content: { value } or null to copy the cell itself. */
-function runsOf(kinds, { series, date1904 }) {
+function runsOf(kinds, { series, date1904, lists = LISTS }) {
   const runs = [];
   const same = (a, b) => a.kind === b.kind && ['number', 'date', 'time', 'list', 'quarter', 'counted'].includes(a.kind) && a.key === b.key && a.list === b.list;
   kinds.forEach((k, i) => {
@@ -101,12 +106,12 @@ function runsOf(kinds, { series, date1904 }) {
         run.at = (i) => (i < items.length && i >= 0 && items.length > 2 ? null : { value: exact(a + step * i) });
       }
     } else if (first.kind === 'list' || first.kind === 'quarter') {
-      const size = first.kind === 'list' ? LISTS[first.list].length : 4;
+      const size = first.kind === 'list' ? lists[first.list].length : 4;
       const step = items.length > 1 ? ((first.kind === 'list' ? items[1].i - first.i : items[1].n - first.n) + size) % size : 1;
       run.at = (i) => {
         const k = ((((first.kind === 'list' ? first.i : first.n - 1) + step * i) % size) + size) % size;
         if (first.kind === 'quarter') return { value: `${first.before}${k + 1}` };
-        const word = LISTS[first.list][k];
+        const word = lists[first.list][k];
         return { value: first.look === 'upper' ? word.toUpperCase() : first.look === 'lower' ? word.toLowerCase() : word };
       };
     } else if (first.kind === 'counted') {
@@ -160,9 +165,29 @@ export function fillWay(from, to) {
 }
 
 /**
+ * Where a double click on the fill handle fills `sel` down to, as Excel's documentation has it (COM doesn't reach the
+ * double click): as far as the data goes on in the column left of the selection, or else the one right of it, from
+ * the row below the selection to its first empty cell; stopping before a cell already filled in the selection's own
+ * columns. Null when there is nothing to go by.
+ */
+export function doubleClickFill(sheet, sel) {
+  const has = (r, c) => c >= 0 && sheet.cells.get(r)?.get(c)?.v != null && sheet.cells.get(r).get(c).v !== '';
+  const below = sel.r1 + 1;
+  const side = has(below, sel.c0 - 1) ? sel.c0 - 1 : has(below, sel.c1 + 1) ? sel.c1 + 1 : null;
+  if (side == null) return null;
+  let r1 = below;
+  while (has(r1 + 1, side)) r1++;
+  for (let r = below; r <= r1; r++) {
+    for (let c = sel.c0; c <= sel.c1; c++) if (has(r, c)) { r1 = r - 1; break; }
+  }
+  return r1 < below ? null : { r0: sel.r0, c0: sel.c0, r1, c1: sel.c1 };
+}
+
+/**
  * The fill handle: `from` (the selection) carried on over `to` (the selection dragged out down, up, right or left),
  * as Excel's AutoFill. `type`: 'default' (Excel's guess), 'series' (Fill Series: one number counts on), 'copy' (Copy
- * Cells), 'formats' (Fill Formatting Only) or 'values' (Fill Without Formatting). Each column (row) on its own; the
+ * Cells), 'formats' (Fill Formatting Only), 'values' (Fill Without Formatting), or 'days', 'weekdays', 'months',
+ * 'years' (Fill Days ... Fill Years: filldates.js). Each column (row) on its own; the
  * copy's formats repeat over the new cells.
  */
 export function autoFill(wb, si, from, to, type = 'default') {
@@ -178,7 +203,10 @@ export function autoFill(wb, si, from, to, type = 'default') {
   for (let line = l0; line <= l1; line++) {
     const at = (i) => (rows ? [i, line] : [line, i]);
     const cells = Array.from({ length: n }, (_, k) => sheet.cells.get(at(a0 + k)[0])?.get(at(a0 + k)[1]));
-    const runs = type === 'copy' || type === 'formats' ? null : runsOf(cells.map((cell) => kindOf(wb, cell)), { series: type === 'series', date1904: wb.date1904 });
+    // (Fill Days ... Years: the dates going on in that unit, the cells after them from the new values.)
+    // (Downwards and rightwards: Excel's measured ones; upwards and leftwards Excel's guess, as before.)
+    const dated = DATE_FILLS.includes(type) && (way === 'down' || way === 'right') ? fillDates(cells.map((cell) => (typeof cell?.v === 'number' && cell.t !== 's' ? cell.v : null)), type, b1 - a1, wb.date1904) : null;
+    const runs = type === 'copy' || type === 'formats' || dated ? null : runsOf(cells.map((cell) => kindOf(wb, cell)), { series: type === 'series', date1904: wb.date1904, lists: listsOf(wb) });
     for (let i = b0; i <= b1; i++) {
       if (i >= a0 && i <= a1) continue;
       const k = i - a0;
@@ -188,6 +216,11 @@ export function autoFill(wb, si, from, to, type = 'default') {
       const [fr, fc] = at(a0 + j);
       if (type !== 'values') out.styles.push({ r, c, s: cells[j]?.s || 0 });
       if (type === 'formats') continue;
+      if (dated) {
+        // (The k-th cell after the dates takes the k-th value.)
+        out.contents.push({ r, c, value: dated[i - a1 - 1] });
+        continue;
+      }
       const run = runs?.find((x) => j >= x.start && j < x.start + x.items.length);
       const next = run && run.at(cycle * run.items.length + (j - run.start));
       out.contents.push(next ? { r, c, ...next } : copyOf(sheet, fr, fc, r - fr, c - fc, { r, c }));
