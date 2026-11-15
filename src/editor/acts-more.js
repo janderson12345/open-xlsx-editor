@@ -1,7 +1,7 @@
 // More of the ribbon's actions (acts.js): Insert > Charts and a chart's edits, comment threads, the Format Cells box and
 // Home > Conditional Formatting (its menu's rules, Clear Rules, the Rules Manager). Each runs through the editor's
 // commands as one step of the history.
-import { messageBox } from './dialogs.js';
+import { messageBox, numberBox } from './dialogs.js';
 import { iterationBox } from './iterbox.js';
 import { pageSetupBox } from './pagesetupbox.js';
 import { printAreaOf, printTitlesOf } from '../ooxml/pagesetupedit.js';
@@ -59,6 +59,15 @@ export function createMoreActs(env) {
     if (name === 'errorChecking') return errorCheckingBox(env);
     // (Formulas > Evaluate Formula: evalbox.js.)
     if (name === 'evaluateFormula') return evaluateFormulaBox(env);
+    if (name === 'scaleBox') {
+      // (Page Layout > Scale to Fit > Scale: a percentage from 10 to 400, as Excel's; it takes fit to pages off.)
+      if (state.readOnly) return false;
+      const p = state.workbook.sheet(i).page;
+      return numberBox(root, { title: 'Scale', label: 'Scale (%):', value: String(p.fitToPage ? 100 : p.scale), min: 10, max: 400, refusal: 'Enter a scale from 10 to 400.' }).then((n) => {
+        state.grid.el.focus({ preventScroll: true });
+        return n == null ? false : editing().run('pageLayout', { scale: Math.round(n) });
+      });
+    }
     if (name === 'printTitlesBox') {
       // (Page Layout > Print Titles: Excel's Page Setup box at its Sheet tab, pagesetupbox.js.)
       if (state.readOnly) return false;

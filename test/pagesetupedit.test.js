@@ -2,7 +2,7 @@ import './setup.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { serializeXml } from '../src/ooxml/xml.js';
-import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, printAreaOf, readTitles, setPrintTitles, printTitlesOf } from '../src/ooxml/pagesetupedit.js';
+import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, printAreaOf, readTitles, setPrintTitles, printTitlesOf, setPageLayout, MARGINS } from '../src/ooxml/pagesetupedit.js';
 import { readArea } from '../src/editor/pagesetupbox.js';
 import { build } from './steps.js';
 
@@ -78,4 +78,33 @@ test('print titles as Excel takes and saves them: columns first, then rows; loos
   assert.deepEqual(readArea("$B$2:$D$5,'Q1 Plan'!$F$7"), [{ r0: 1, c0: 1, r1: 4, c1: 3 }, { r0: 6, c0: 5, r1: 6, c1: 5 }]);
   assert.deepEqual(readArea(''), []);
   assert.equal(readArea('B2:'), null);
+});
+
+test('Margins, Orientation, Size and Scale to Fit as Excel writes them (its printer\'s own attributes aside)', () => {
+  // (Excel: PageSetup set over COM and the file saved; it also wrote horizontalDpi, verticalDpi and r:id, its printer's.)
+  const xml = (wb, si) => { const s = serializeXml(wb._part(si).doc); return [...(s.match(/<sheetPr[^>]*>.*?<\/sheetPr>/g) || []), ...(s.match(/<pageMargins[^>]*\/>/g) || []), ...(s.match(/<pageSetup[^>]*\/>/g) || [])]; };
+  const M = (m) => `<pageMargins left="${m[0]}" right="${m[1]}" top="${m[2]}" bottom="${m[3]}" header="${m[4]}" footer="${m[5]}"/>`;
+  const NORMAL = M([0.7, 0.7, 0.75, 0.75, 0.3, 0.3]);
+  const FIT = '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>';
+  for (const [name, change, want] of [
+    ['landscape', { landscape: true }, [NORMAL, '<pageSetup orientation="landscape"/>']],
+    ['A4', { paperSize: 9 }, [NORMAL, '<pageSetup paperSize="9" orientation="portrait"/>']],
+    ['Legal', { paperSize: 5 }, [NORMAL, '<pageSetup paperSize="5" orientation="portrait"/>']],
+    ['Wide margins', { margins: MARGINS.wide }, [M([1, 1, 1, 1, 0.5, 0.5]), '<pageSetup orientation="portrait"/>']],
+    ['Narrow margins', { margins: MARGINS.narrow }, [M([0.25, 0.25, 0.75, 0.75, 0.3, 0.3]), '<pageSetup orientation="portrait"/>']],
+    ['fit 1 by 1', { fit: { width: 1, height: 1 } }, [FIT, NORMAL, '<pageSetup orientation="portrait"/>']],
+    ['width 1, height Automatic', { fit: { width: 1, height: 0 } }, [FIT, NORMAL, '<pageSetup fitToHeight="0" orientation="portrait"/>']],
+    ['width Automatic, height 2', { fit: { width: 0, height: 2 } }, [FIT, NORMAL, '<pageSetup fitToWidth="0" fitToHeight="2" orientation="portrait"/>']],
+    ['scale 75%', { scale: 75 }, [NORMAL, '<pageSetup scale="75" orientation="portrait"/>']],
+  ]) {
+    const { wb, si } = build({ cells: { A1: '1' } });
+    setPageLayout(wb, si, change);
+    assert.deepEqual(xml(wb, si), want, name);
+  }
+  // (Fit to 1 by 1, then a scale of 80%: fit to pages gone, sheetPr with it, as Excel's.)
+  const { wb, si } = build({ cells: { A1: '1' } });
+  setPageLayout(wb, si, { fit: { width: 1, height: 1 } });
+  setPageLayout(wb, si, { scale: 80 });
+  assert.deepEqual(xml(wb, si), [NORMAL, '<pageSetup scale="80" orientation="portrait"/>']);
+  assert.equal(wb.sheet(si).page.fitToPage, false);
 });

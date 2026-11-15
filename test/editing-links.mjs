@@ -1,6 +1,6 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks and Print Titles. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks, Print Titles, Orientation and Scale to Fit. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -345,5 +345,24 @@ const titlesUndone = await page.evaluate(() => window.oxe.workbook.definedNames.
 check(shownArea === '$B$2:$D$5' && /rows/i.test(refusedNote || '') && /!\$1:\$2$/.test(titlesText || '') && !titlesUndone,
   'Print Titles: the Page Setup box shows the print area; a lone $3 refused; 1:2 saved as $1:$2; Ctrl+Z takes it back',
   JSON.stringify({ shownArea, refusedNote, titlesText, titlesUndone }));
+
+// Page Layout > Orientation and Scale to Fit: Landscape from the menu (the sheet's page landscape, its pages fewer
+// down); Width 1 page (fit to pages, height Automatic); Ctrl+Z twice back to portrait and unfitted.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for (let r = 1; r <= 120; r++) o.enter(`A${r}`, String(r)); o.enter('M1', 'x'); o.select('A1'); });
+const pageNow = () => page.evaluate(() => { const p = window.oxe.workbook.sheet(window.oxe.sheetIndex).page; return { landscape: p.landscape, fit: p.fitToPage, w: p.fitToWidth, h: p.fitToHeight }; });
+const portraitPages = await printed();
+await page.click('.oxe-rtab >> text=Page Layout');
+await ribbon('Orientation', () => page.click('.oxe-pop >> text=Landscape'));
+const afterLandscape = await pageNow();
+const landscapePages = await printed();
+await ribbon('Width', () => page.click('.oxe-pop >> text=1 page'));
+const afterWidth = await pageNow();
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+await page.keyboard.press('Control+z');
+const undoneLayout = await pageNow();
+check(afterLandscape.landscape && landscapePages !== portraitPages && afterWidth.fit && afterWidth.w === 1 && afterWidth.h === 0 && !undoneLayout.landscape && !undoneLayout.fit,
+  'Page Layout: Orientation > Landscape (a different page count), Scale to Fit Width 1 page (height Automatic), Ctrl+Z back',
+  JSON.stringify({ portraitPages, afterLandscape, landscapePages, afterWidth, undoneLayout }));
 
 await finish();

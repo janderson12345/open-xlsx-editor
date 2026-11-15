@@ -170,3 +170,75 @@ export function setPrintTitles(wb, si, { rows = null, cols = null }) {
   d.el.textContent = d.text;
   wb.bookDirty = true;
 }
+
+/** Excel's Margins presets (inches): Normal, Wide, Narrow. */
+export const MARGINS = {
+  normal: { left: 0.7, right: 0.7, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 },
+  wide: { left: 1, right: 1, top: 1, bottom: 1, header: 0.5, footer: 0.5 },
+  narrow: { left: 0.25, right: 0.25, top: 0.75, bottom: 0.75, header: 0.3, footer: 0.3 },
+};
+/** pageSetup's attributes in the order Excel writes them. */
+const SETUP_ORDER = ['paperSize', 'paperHeight', 'paperWidth', 'scale', 'firstPageNumber', 'fitToWidth', 'fitToHeight', 'pageOrder', 'orientation',
+  'usePrinterDefaults', 'blackAndWhite', 'draft', 'cellComments', 'useFirstPageNumber', 'errors', 'horizontalDpi', 'verticalDpi', 'copies'];
+const AFTER_MARGINS = ['pageSetup', 'headerFooter', 'rowBreaks', ...AFTER_ROW];
+const AFTER_SETUP = AFTER_MARGINS.slice(1);
+
+/** The sheet's child `tag`, made before the first of `after` when missing. */
+function child(doc, tag, after) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  let el = kid(root, tag, ns);
+  if (!el) {
+    el = doc.createElementNS(ns, root.prefix ? `${root.prefix}:${tag}` : tag);
+    root.insertBefore(el, [...root.childNodes].find((n) => n.nodeType === 1 && after.includes(n.localName)) || null);
+  }
+  return el;
+}
+
+/** Page Layout's Margins, Orientation, Size and Scale to Fit on sheet si, as Excel writes them (measured over COM,
+ *  PageSetup set and the file saved): `margins` ({ left, right, top, bottom, header, footer }, inches) all six in
+ *  pageMargins; `landscape`; `paperSize` (left out for Letter, 1); `fit` ({ width, height }: pages, 0 for Automatic)
+ *  fitToPage="1" in sheetPr's pageSetUpPr and fitToWidth / fitToHeight unless 1 (width 1, height Automatic:
+ *  fitToHeight="0"); `scale` (a percentage) takes fit to pages off. With pageSetup written, orientation always is. */
+export function setPageLayout(wb, si, { margins, landscape, paperSize, fit, scale }) {
+  const part = wb._part(si);
+  const doc = part.doc;
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  if (margins) {
+    const m = child(doc, 'pageMargins', AFTER_MARGINS);
+    for (const k of ['left', 'right', 'top', 'bottom', 'header', 'footer']) m.setAttribute(k, String(margins[k]));
+  }
+  const ps = child(doc, 'pageSetup', AFTER_SETUP);
+  const now = Object.fromEntries([...ps.attributes].map((a) => [a.name, a.value]));
+  if (paperSize != null) { if (paperSize === 1) delete now.paperSize; else now.paperSize = String(paperSize); }
+  if (landscape != null) now.orientation = landscape ? 'landscape' : 'portrait';
+  if (!now.orientation) now.orientation = 'portrait';
+  const pr = () => {
+    let sheetPr = kid(root, 'sheetPr', ns);
+    if (!sheetPr) { sheetPr = doc.createElementNS(ns, root.prefix ? `${root.prefix}:sheetPr` : 'sheetPr'); root.insertBefore(sheetPr, root.firstChild); }
+    let up = kid(sheetPr, 'pageSetUpPr', ns);
+    if (!up) { up = doc.createElementNS(ns, root.prefix ? `${root.prefix}:pageSetUpPr` : 'pageSetUpPr'); sheetPr.appendChild(up); }
+    return up;
+  };
+  const unfit = () => {
+    const sheetPr = kid(root, 'sheetPr', ns);
+    const up = kid(sheetPr, 'pageSetUpPr', ns);
+    if (!up) return;
+    up.removeAttribute('fitToPage');
+    if (!up.attributes.length) sheetPr.removeChild(up);
+    if (!sheetPr.attributes.length && ![...sheetPr.childNodes].some((x) => x.nodeType === 1)) root.removeChild(sheetPr);
+  };
+  if (fit) {
+    if (!fit.width && !fit.height) { unfit(); delete now.fitToWidth; delete now.fitToHeight; } else {
+      pr().setAttribute('fitToPage', '1');
+      for (const [k, v] of [['fitToWidth', fit.width], ['fitToHeight', fit.height]]) { if (v === 1) delete now[k]; else now[k] = String(v); }
+    }
+  }
+  if (scale != null) { unfit(); if (scale === 100) delete now.scale; else now.scale = String(scale); }
+  // (Written again in Excel's order, the attributes this doesn't know after them.)
+  for (const a of [...ps.attributes]) ps.removeAttribute(a.name);
+  const known = SETUP_ORDER.filter((k) => now[k] != null);
+  for (const k of [...known, ...Object.keys(now).filter((k) => !SETUP_ORDER.includes(k))]) ps.setAttribute(k, now[k]);
+  wb._reread(si, part);
+}

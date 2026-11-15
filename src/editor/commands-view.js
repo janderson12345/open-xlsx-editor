@@ -3,7 +3,7 @@
 // Area and Breaks (ooxml/pagesetupedit.js; those two are steps of the undo history, as Excel's are). Kept in the file (all but
 // the Formula Bar, which Excel keeps as its own setting, not the workbook's) and not in the undo history.
 import { setPrintOptions } from '../ooxml/printopts.js';
-import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, setPrintTitles } from '../ooxml/pagesetupedit.js';
+import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, setPrintTitles, setPageLayout, MARGINS } from '../ooxml/pagesetupedit.js';
 import { areasOf } from './selection.js';
 
 /** The view commands: `env` is createCommands's shared state and helpers. */
@@ -118,6 +118,14 @@ export function viewCommands(env) {
         setPrintTitles(wb, si, { rows, cols });
         return true;
       });
+      if (done) ctx.announce('Page setup changed');
+      return done;
+    },
+    /** Page Layout's Margins ('normal', 'wide', 'narrow'), Orientation, Size and Scale to Fit on the sheet shown
+     *  (pagesetupedit.js setPageLayout: { margins, landscape, paperSize, fit, scale }), as one step of the history. */
+    pageLayout(change) {
+      const c = { ...change, margins: typeof change.margins === 'string' ? MARGINS[change.margins] : change.margins };
+      const done = commands.sheetChange((wb, si) => { setPageLayout(wb, si, c); return true; });
       if (done) ctx.announce('Page setup changed');
       return done;
     },

@@ -51,10 +51,14 @@ sets the same name), then the file saved (`test/pagesetupedit.test.js`).
 | Insert Page Break at the active cell: a manual break before its row and one before its column; in row 1 only the column's, in column A only the row's, at A1 none. | C5: `<rowBreaks count="1" manualBreakCount="1"><brk id="4" max="16383" man="1"/></rowBreaks>` and `<colBreaks ...><brk id="2" max="1048575" man="1"/></colBreaks>`. |
 | Remove Page Break: the break above the active row and the one left of its column, those there. | Breaks at rows 5, 9 and columns C, E; at E3: E's alone goes. |
 | Reset All Page Breaks: every manual break, the elements too. | No rowBreaks or colBreaks left. |
+| Margins: all six in pageMargins, inches; Excel's presets Normal (0.7 sides, 0.75 top and bottom, 0.3 header and footer), Wide (1, 0.5), Narrow (0.25 sides). | `<pageMargins left="1" right="1" top="1" bottom="1" header="0.5" footer="0.5"/>`. |
+| Orientation and Size: orientation always written once pageSetup is, paperSize unless Letter (1). | `<pageSetup paperSize="9" orientation="portrait"/>` for A4; `orientation="landscape"`. |
+| Scale to Fit: fitting is `fitToPage="1"` in sheetPr's pageSetUpPr, fitToWidth and fitToHeight written unless 1, Automatic as 0; a scale takes fit to pages off, sheetPr with it when left empty. | Width 1, Height Automatic: `fitToHeight="0"`; Width Automatic, Height 2: `fitToWidth="0" fitToHeight="2"`; 75%: `scale="75"`. |
 | Print Titles (Page Layout > Print Titles, Excel's Page Setup box at its Sheet tab): the sheet's own name _xlnm.Print_Titles, columns first, then rows; rows typed "1:2" or a range's rows; a lone row refused; neither, the name gone. | `'Q1 Plan'!$A:$B,'Q1 Plan'!$1:$2`; "B2:C4" for rows: `$2:$4`; "$3": refused. |
 | Set Print Area: the selection, the sheet's own name _xlnm.Print_Area, $-absolute with the sheet's name; Add to Print Area (offered once there is one) adds the selection after a comma; Clear Print Area takes the name away. | `'My Data'!$B$2:$D$5`, `'My Data'!$B$2:$D$5,'My Data'!$F$7:$G$8`, one cell `'My Data'!$C$3`. |
 
-Each is one step of the undo history. Not measured: Excel's joining of neighbouring ranges in Add to Print Area (here
+Excel also writes its printer's own horizontalDpi, verticalDpi and a printerSettings part when page setup is touched;
+the editor leaves those to the printer. Each is one step of the undo history. Not measured: Excel's joining of neighbouring ranges in Add to Print Area (here
 they are listed as given); the print layout prints a print area of several ranges by its first, as above. The Page
 Setup box's messages for what it won't take are the editor's own, and only its Sheet tab's print area and titles are
 there.

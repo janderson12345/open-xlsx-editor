@@ -210,7 +210,7 @@ function formulaKind(cell, fEl, r, c, shared, arrays, dynamic = false) {
 }
 
 /** Paper sizes by `paperSize` code, in inches (ECMA-376 Part 1, 18.3.1.63): only the common ones so far. */
-const PAPER = { 1: [8.5, 11], 5: [8.5, 14], 8: [11.69, 16.54], 9: [8.27, 11.69], 11: [5.83, 8.27] };
+const PAPER = { 1: [8.5, 11], 3: [11, 17], 5: [8.5, 14], 7: [7.25, 10.5], 8: [11.69, 16.54], 9: [8.27, 11.69], 11: [5.83, 8.27], 13: [7.17, 10.12] };
 
 /** What the sheet says about printing: paper, orientation, margins (inches), gridlines and headings, its scale or
  *  fit to pages (fitToWidth, fitToHeight: 0 as many as it takes), its manual page breaks (before rows and columns,

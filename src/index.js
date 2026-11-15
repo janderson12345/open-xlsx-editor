@@ -223,7 +223,7 @@ export function mountXlsxEditor(host, options = {}) {
       tabs: {
         Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
-        'Page Layout': (kit) => pageLayoutTab(kit, { act, hasPrintArea: () => !!(state.workbook && printAreaOf(state.workbook, state.sheetIndex)) }),
+        'Page Layout': (kit) => pageLayoutTab(kit, { act, hasPrintArea: () => !!(state.workbook && printAreaOf(state.workbook, state.sheetIndex)), page: () => (state.workbook ? state.workbook.sheet(state.sheetIndex).page : null) }),
         Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook), names: () => (state.workbook ? namesOnSheet(state.workbook, state.sheetIndex).map((n) => n.name) : []) }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
