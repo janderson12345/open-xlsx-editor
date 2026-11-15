@@ -1,0 +1,350 @@
+[
+  {
+    "typed": ">1",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "<>",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": ">=10",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "=5",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "abc",
+    "ok": true,
+    "formula": "=abc",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "Abc",
+    "ok": true,
+    "formula": "=abc",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "hello world",
+    "ok": true,
+    "formula": "=hello world",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "yes",
+    "ok": true,
+    "formula": "=yes",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "No",
+    "ok": true,
+    "formula": "=No",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "A1",
+    "ok": true,
+    "formula": "=A1",
+    "text": "1"
+  },
+  {
+    "typed": "a1",
+    "ok": true,
+    "formula": "=A1",
+    "text": "1"
+  },
+  {
+    "typed": "A1:A3",
+    "ok": true,
+    "formula": "=A1:A3",
+    "text": "1"
+  },
+  {
+    "typed": "$A$1",
+    "ok": true,
+    "formula": "=$A$1",
+    "text": "1"
+  },
+  {
+    "typed": "A:A",
+    "ok": true,
+    "formula": "=A:A",
+    "text": "1"
+  },
+  {
+    "typed": "1:1",
+    "ok": true,
+    "formula": "=1:1",
+    "text": "0"
+  },
+  {
+    "typed": "'My Data'!A1",
+    "ok": true,
+    "formula": "='My Data'!A1",
+    "text": "0"
+  },
+  {
+    "typed": "Sheet2!A1",
+    "ok": true,
+    "formula": "=Sheet2!A1",
+    "text": "#REF!"
+  },
+  {
+    "typed": "1.5",
+    "ok": true,
+    "formula": "=1.5",
+    "text": "1.5"
+  },
+  {
+    "typed": "-2",
+    "ok": true,
+    "formula": "=-2",
+    "text": "-2"
+  },
+  {
+    "typed": "1,000",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "$5",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "5%",
+    "ok": true,
+    "formula": "=5%",
+    "text": "0.05"
+  },
+  {
+    "typed": "1/2",
+    "ok": true,
+    "formula": "=1/2",
+    "text": "0.5"
+  },
+  {
+    "typed": "1e3",
+    "ok": true,
+    "formula": "=1000",
+    "text": "1000"
+  },
+  {
+    "typed": "TRUE",
+    "ok": true,
+    "formula": "=TRUE",
+    "text": "TRUE"
+  },
+  {
+    "typed": "false",
+    "ok": true,
+    "formula": "=FALSE",
+    "text": "FALSE"
+  },
+  {
+    "typed": "\"x\"",
+    "ok": true,
+    "formula": "=\"x\"",
+    "text": "x"
+  },
+  {
+    "typed": "\"",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "x\"y",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "Rate",
+    "ok": true,
+    "formula": "=Rate",
+    "text": "0.05"
+  },
+  {
+    "typed": "rate*2",
+    "ok": true,
+    "formula": "=Rate*2",
+    "text": "0.1"
+  },
+  {
+    "typed": "SUM(A1:A3)",
+    "ok": true,
+    "formula": "=SUM(A1:A3)",
+    "text": "6"
+  },
+  {
+    "typed": "sum(1,2)",
+    "ok": true,
+    "formula": "=SUM(1,2)",
+    "text": "3"
+  },
+  {
+    "typed": "SUMM(1)",
+    "ok": true,
+    "formula": "=SUMM(1)",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "A1+1",
+    "ok": true,
+    "formula": "=A1+1",
+    "text": "2"
+  },
+  {
+    "typed": "{1,2,3}",
+    "ok": true,
+    "formula": "={1,2,3}",
+    "text": "1"
+  },
+  {
+    "typed": "#N/A",
+    "ok": true,
+    "formula": "=#N/A",
+    "text": "#N/A"
+  },
+  {
+    "typed": "#DIV/0!",
+    "ok": true,
+    "formula": "=#DIV/0!",
+    "text": "#DIV/0!"
+  },
+  {
+    "typed": "*",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "?a",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "a*",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "Jan",
+    "ok": true,
+    "formula": "=Jan",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "Q1",
+    "ok": true,
+    "formula": "=Q1",
+    "text": "0"
+  },
+  {
+    "typed": "XFD1",
+    "ok": true,
+    "formula": "=XFD1",
+    "text": "0"
+  },
+  {
+    "typed": "XFE1",
+    "ok": true,
+    "formula": "=XFE1",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "R1C1",
+    "ok": true,
+    "formula": "=$A$1",
+    "text": "1"
+  },
+  {
+    "typed": "x_y",
+    "ok": true,
+    "formula": "=x_y",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "a.b",
+    "ok": true,
+    "formula": "=a.b",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "a-b",
+    "ok": true,
+    "formula": "=a-b",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "(1)",
+    "ok": true,
+    "formula": "=(1)",
+    "text": "1"
+  },
+  {
+    "typed": "1 2",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "A1 A2",
+    "ok": true,
+    "formula": "=A1 A2",
+    "text": "#NULL!"
+  },
+  {
+    "typed": " ",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "apple pie",
+    "ok": true,
+    "formula": "=apple pie",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "N/A",
+    "ok": true,
+    "formula": "=N/a",
+    "text": "#VALUE!"
+  },
+  {
+    "typed": "@",
+    "ok": false,
+    "formula": null,
+    "text": null
+  },
+  {
+    "typed": "a b c",
+    "ok": true,
+    "formula": "=a b D:D",
+    "text": "#NAME?"
+  },
+  {
+    "typed": "ABC123",
+    "ok": true,
+    "formula": "=ABC123",
+    "text": "0"
+  }
+]
