@@ -168,8 +168,8 @@ export declare function mountXlsxEditor(
      *  them, `rules` naming those on ('evalError', 'twoDigitTextYear', 'numberStoredAsText', 'formula',
      *  'formulaRange', 'unlockedFormula'). */
     errorChecking?: boolean | { background?: boolean; rules?: string[] };
-    /** Aptos Narrow's and Aptos's twins (open-metric-fonts' Morrow Sans) from the site's own copy: the folder's URL
-     *  (README, Fonts). */
+    /** open-metric-fonts' metric twins of 151 Microsoft fonts (Aptos Narrow's, Tahoma's, Verdana's, Garamond's...),
+     *  drawn where the computer lacks the font, from the site's own copy: the folder's URL (README, Fonts). */
     fonts?: { omf?: string };
     /** A hyperlink to a web address clicked: the host page opens it (otherwise the editor opens a new tab). */
     onLink?: (url: string) => void;
@@ -177,5 +177,5 @@ export declare function mountXlsxEditor(
   },
 ): XlsxEditor;
 
-/** The open-metric-fonts release the editor's list of faces is made for (README, Fonts). */
+/** The open-metric-fonts release the editor's map of faces is made for (README, Fonts). */
 export declare const OMF_VERSION: string;

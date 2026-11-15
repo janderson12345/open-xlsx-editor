@@ -146,14 +146,17 @@ attributes), whose values still come through.
 
 Workbooks name Office fonts, and a browser draws only the fonts installed on the computer or served by the page.
 Aptos Narrow, the body font of Excel 365's default theme, isn't installed with Windows, macOS or Linux, so without
-help it is drawn in Calibri (or Carlito), which is close but not the same width. [open-metric-fonts](https://github.com/open-metric-fonts/open-metric-fonts)
-makes Morrow Sans Narrow and Morrow Sans: open (SIL OFL) fonts with exactly Aptos Narrow's and Aptos's character
-widths and line metrics. The editor loads them from a folder your site serves, the same folder the Word editor
+help it is drawn in Calibri (or Carlito), which is close but not the same width; Tahoma, Verdana, Century Gothic,
+Garamond and the other Microsoft fonts are missing on most computers that aren't Windows ones. [open-metric-fonts](https://github.com/open-metric-fonts/open-metric-fonts)
+makes open (SIL OFL) fonts with exactly their character widths and line metrics, 151 families in release 1.0.1:
+Morrow Sans Narrow for Aptos Narrow, Tamarack for Tahoma, Glade for Verdana, Compass for Century Gothic, Colines for
+Garamond and so on. The editor loads them from a folder your site serves, the same folder the Word editor
 (open-docx-editor) uses, so one copy serves every viewer of Office documents on the site:
 
 1. **Serve the open-metric-fonts web bundle once, in a folder named for its version.** The editor is made for release
    `OMF_VERSION` (exported by the package; 1.0.1 now). The release's web bundle holds every package as
-   `<package>/files/<face>-<alphabet>.woff2`, as the editor looks for them; it needs `morrow-sans/` only.
+   `<package>/files/<face>-<alphabet>.woff2`, as the editor looks for them (about 70 MB on disk, every family and
+   alphabet; a browser downloads only the files a workbook needs).
 
    ```bash
    curl -LO https://github.com/open-metric-fonts/open-metric-fonts/releases/download/v1.0.1/open-metric-fonts-web-1.0.1.zip
@@ -173,11 +176,12 @@ widths and line metrics. The editor loads them from a folder your site serves, t
    unzip -q open-metric-fonts-web-1.0.1.zip && mkdir -p wwwroot/lib/fonts/omf/1.0.1 && cp -R open-metric-fonts-web-1.0.1/. wwwroot/lib/fonts/omf/1.0.1/
    ```
 
-   Or only `morrow-sans`, from npm with your other dependencies, pinned (`npm install --save-exact
-   @open-metric-fonts/morrow-sans@1.0.1`), copied to `<folder>/morrow-sans/` by your build. Serve `.woff2` as
-   `font/woff2`; the folder's name carries the version, so it can be cached as immutable. A site that already serves
-   the bundle for another viewer points this editor at that copy rather than adding its own; a different release goes
-   in as a sibling version folder.
+   Or only the families you want, from npm with your other dependencies, pinned (`npm install --save-exact
+   @open-metric-fonts/morrow-sans@1.0.1 @open-metric-fonts/tamarack@1.0.1`; each font's package is named in
+   `src/editor/omf.js`), each copied to `<folder>/<package>/` by your build; a font whose package isn't there falls
+   back as before. Serve `.woff2` as `font/woff2`; the folder's name carries the version, so it can be cached as
+   immutable. A site that already serves the bundle for another viewer points this editor at that copy rather than
+   adding its own; a different release goes in as a sibling version folder.
 2. **Point the editor at it**, by the URL the site serves it at (absolute, or relative to the page):
 
    ```js
@@ -188,23 +192,44 @@ widths and line metrics. The editor loads them from a folder your site serves, t
    (A bundle under `lib/<name>/` beside that folder can also say `new URL(`../fonts/omf/${OMF_VERSION}/`,
    import.meta.url).href`.)
 
-The editor adds each face of Morrow Sans Narrow and Morrow Sans to the page's fonts, per alphabet, as `FontFace`
-objects (no stylesheet, so `font-src 'self'` is all the policy needs). The browser downloads a file only when a cell
-shows text in it, and when one arrives the editor places and measures the text again with that font's own metrics.
-Without `fonts.omf`, or before a file arrives, Calibri stands in. Measured with release 1.0.1 served this way (Edge,
-the comparison in `tools/excel-compare`): Excel's PDFs of basic.xlsx and large.xlsx (Aptos Narrow) and the editor's
-print of them agree within 1px across, down and in text width for 100,049 of 100,049 cells; with Calibri in its
-place, 99,028 are within 1px in width. Text widths decide where wrapped text breaks, where a number shows `####` and
-what AutoFit picks, so these match too.
+The first time a workbook names one of the 151 fonts, the editor adds its twin's faces to the page's fonts, per
+alphabet, as `FontFace` objects (no stylesheet, so `font-src 'self'` is all the policy needs), after the font itself in
+the cell's font stack. The browser downloads a file only when a cell shows text in that font, the computer lacks the
+font, and the file holds the text's characters: a computer with Tahoma installed never fetches Tamarack. When a file
+arrives the editor places and measures the text again, Excel's placement worked out from the original's Windows
+metrics (the twin's are the same) and the browser's from the twin's own. Without `fonts.omf`, or before a file
+arrives, the stand-ins as before (Calibri for Aptos Narrow). `exportPdf` embeds the twins too (docs/PDF.md).
+
+Measured on this repository's Windows machine, for the fonts installed on it, against their twins served from the
+release 1.0.1 bundle:
+
+- **Canvas widths in Chromium**: every face of the 66 installed families the release has a twin for, 174 faces as
+  Chromium names them, each character of U+0020-007E and U+00A1-00FF at 100px and six cell-like strings at 11pt: 156
+  faces the same within 0.01px for every character. Of the other 18, 12 are Sitka italics, at most 0.27px at 100px
+  (on "î") and 0.007px on a whole string at 11pt, and 2 Bahnschrift SemiCondensed, at most 0.05px. Bahnschrift
+  Condensed and SemiCondensed are installed only as instances of one variable font, which Chromium draws at the same
+  widths for both, so Condensed differs (by up to 20px at 100px; the twin is the condensed one).
+  Franklin Gothic Medium and its italic differ on the canvas though their files' advances are the same: Chromium
+  draws another installed face for that name.
+- **The font files**: 141 installed faces (by name ID 1 and the style bits, as Windows links a family's faces), every
+  character both map, 81,950 characters: the same advance widths, and the same Windows ascent and descent.
+- **Against Excel's PDFs** (Edge, `tools/excel-compare`): basic.xlsx and large.xlsx (Aptos Narrow) and the editor's
+  print of them agree within 1px across, down and in text width for 100,049 of 100,049 cells; with Calibri in its
+  place, 99,028 are within 1px in width. Text widths decide where wrapped text breaks, where a number shows `####`
+  and what AutoFit picks, so these match too. `exportPdf` with the twin embedded: large.xlsx's 100,000 cells all
+  within 1px in width too, and the ten fixtures 99.9% (95.0% when it drew Aptos Narrow in Calibri; docs/PDF.md).
 
 Not yet:
-- Only the Aptos family is wired to its twin. open-metric-fonts' other families (Tahoma's, Verdana's, Century
-  Gothic's, Garamond's and more) aren't yet in the editor's font stacks.
-- `exportPdf` (`open-xlsx-editor/pdf`) embeds installed fonts only, so a served font is drawn there in a PDF standard
-  font at the same widths. The browser's own Print uses the served font.
+- Row heights: a row sized to its font takes the font's metrics from `src/engine/metrics.js` (read from a Windows
+  machine's fonts), else Calibri's (for Aptos Narrow that gives Excel's 15pt). The families not in that table get
+  Calibri's row height even when drawn in their twin; the twin's metrics, the original's, aren't used for it yet,
+  as that hasn't been measured against Excel.
+- A face the family doesn't have (Tahoma's italic) is slanted by the browser, as for an installed font; `exportPdf`
+  draws it upright.
 
-The demo loads them from `demo/fonts/omf/` (a copy of the bundle, or of `morrow-sans/`, not in this repository) when
-the page is opened with `?fonts`. `tools/omf-faces.mjs` writes the editor's list of faces from a newer `morrow-sans`.
+The demo loads them from `demo/fonts/omf/` (a copy of the bundle, not in this repository) when the page is opened with
+`?fonts`. `tools/omf-map.py` (ported from open-docx-editor's `build-omf.py`) writes the editor's map of them,
+`src/editor/omf.js`, from an open-metric-fonts checkout; `OMF_VERSION` is the release it was made from.
 
 ## Documentation
 

@@ -5,7 +5,7 @@ import { mountXlsxEditor } from '../src/index.js';
 const host = document.getElementById('host');
 const status = document.getElementById('status');
 const input = document.querySelector('input[type=file]');
-// (?fonts: open-metric-fonts served from demo/fonts/omf/, a copy of its web bundle (at least morrow-sans) that isn't in
+// (?fonts: open-metric-fonts served from demo/fonts/omf/, a copy of its web bundle (or of the packages wanted) that isn't in
 // the repository: README, Fonts. ?ribbon=simple or classic: the ribbon's layout to start with.)
 const params = new URLSearchParams(location.search);
 const editor = mountXlsxEditor(host, { ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}) });

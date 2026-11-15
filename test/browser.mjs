@@ -7,7 +7,7 @@ import path from 'node:path';
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.map': 'application/json' };
 
-export async function openDemo({ width = 1200, height = 900, colorScheme = 'light' } = {}) {
+export async function openDemo({ width = 1200, height = 900, colorScheme = 'light', query = '', route = null } = {}) {
   const root = path.resolve('demo');
   const server = http.createServer((req, res) => {
     const p = path.join(root, decodeURIComponent(req.url.split('?')[0]).replace(/\/$/, '/index.html'));
@@ -21,7 +21,9 @@ export async function openDemo({ width = 1200, height = 900, colorScheme = 'ligh
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
-  await page.goto(`http://localhost:${server.address().port}/`);
+  // (`route`: requests the suite answers itself, set up before the page loads: [pattern, handler].)
+  if (route) await page.route(...route);
+  await page.goto(`http://localhost:${server.address().port}/${query}`);
   const mode = await page.evaluate(() => document.compatMode);
   if (mode !== 'CSS1Compat') throw new Error(`demo page in ${mode}, not standards mode: it needs <!doctype html>`);
   const close = async () => { await browser.close(); server.close(); };
