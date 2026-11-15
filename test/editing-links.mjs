@@ -1,7 +1,7 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks, Print Titles, Orientation and Scale to Fit; Function Arguments (Ctrl+A).
-// Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks, Print Titles, Orientation and Scale to Fit; Function Arguments (Ctrl+A,
+// AutoSum > More Functions). Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -404,6 +404,7 @@ check(twoAreas.n === 2 && twoAreas.firsts.join() === 'a1,a30', 'A print area of 
 // Function Arguments: =VLOOKUP typed and Ctrl+A, as in Excel: a box per argument, the required ones bold; each one's
 // value beside it at the cell, the argument with focus described, "Formula result ="; OK enters =VLOOKUP(2,A1:A3,1),
 // one step undone by Ctrl+Z. =MAX( and Ctrl+A, OK with nothing in it: =MAX(), which Excel refuses, left being edited.
+// Home > AutoSum > More Functions...: Insert Function, then Function Arguments.
 await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); o.enter('A1', '1'); o.enter('A2', '2'); o.enter('A3', '3'); o.select('D1'); });
 const fa = 'dialog.oxe-fnargs-box';
 const faNames = () => page.evaluate(() => [...document.querySelectorAll('dialog.oxe-fnargs-box .oxe-fnargs-name')].map((l) => l.textContent + (l.classList.contains('oxe-fnargs-required') ? '*' : '')).join());
@@ -440,4 +441,15 @@ await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'
 const maxLeft = await page.evaluate(() => document.querySelector('.oxe-editor')?.value ?? null);
 check(maxLeft === '=MAX()' && await d1() === null, 'OK with nothing in MAX: =MAX(), which Excel refuses, left being edited', maxLeft);
 await page.keyboard.press('Escape');
+await page.click('.oxe-rtab >> text=Home');
+await menu('AutoSum (Alt+=) options', 'More Functions...');
+await page.waitForSelector('dialog.oxe-function-box');
+await page.selectOption('dialog.oxe-function-box .oxe-function-list', 'AVERAGE');
+await page.click('dialog.oxe-function-box >> button:text-is("OK")');
+await page.waitForSelector(fa);
+await page.keyboard.type('A1:A3');
+await page.keyboard.press('Enter');
+await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'));
+check(await d1() === 'AVERAGE(A1:A3)=2', 'Home > AutoSum > More Functions...: Insert Function, AVERAGE, Function Arguments, =AVERAGE(A1:A3)', await d1());
+
 await finish();
