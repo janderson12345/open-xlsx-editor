@@ -21,6 +21,7 @@ insides:
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
 | `src/ooxml/refs.js` | A1 references and ranges; rows and columns are 0-based in code. |
 | `src/ooxml/workbook.js` | `Workbook`: sheets in order (`canShow`, `tabColor` read from the part's start), shared strings, defined names, each sheet's model read on first use, `setCell`, `setFormula` and `apply` (then recalculation), `calculate`, `toBytes` (only dirty sheets serialised, with their XML declaration; calcChain.xml dropped when formulas change; `fullCalcOnLoad` when a formula couldn't be worked out). |
+| `src/ooxml/workbookstate.js` | The workbook's state taken and put back for Undo (snapshot, restore), and a formula's result written into its cell. |
 | `src/ooxml/sheetops.js` | Sheets added, renamed, moved, hidden, coloured and deleted as Excel does it, with Excel's refusals; references rewritten (formulas, names, charts, hyperlinks, pivot sources) or made #REF!, sheet-local names and the active tab kept with their sheets, a deleted sheet's own parts removed (docs/SHEETS.md). |
 | `src/ooxml/stylesedit.js` | Cell formats changed as Excel writes them: a copy of the cell's format, font, fill or border with the change, an equal one reused, a new one at the end; Excel's Percent, Comma and Currency cell styles; a styles part made when there is none (docs/FORMATS.md). |
 | `src/ooxml/formatops.js` | What each Home button does to a selection, as Excel does it (toggles from the active cell, font sizes, indent, border presets and the neighbour's facing side, decimals): the cells' new formats, for the editor to apply and undo. |
@@ -124,6 +125,7 @@ insides:
 | `src/ooxml/numfmt.js` | What a cell shows (`cellDisplay`): the General format, and format codes through format.js. |
 | `src/ooxml/format.js` | Excel's number format codes: sections, digits, scaling, scientific, fractions, dates and times, text; built-in formats; serial dates (1900 and 1904). |
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines; frozen panes (their own layers, sticking in place) and zoom. An ARIA grid (rows, row and column headers, gridcells with indexes). |
+| `src/editor/errbutton.js` | Excel's error button beside the active cell, in the layer Auto Fill Options share. |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
 | `src/editor/rowheights.js` | The row heights Excel works out itself (tallest font, wrapped lines) and each row's shared baseline. |
 | `src/editor/selection.js` | The selection (active cell and range, and with Ctrl the other ranges) and its overlay, with the fill handle and the outline of a fill being dragged; view state only. |

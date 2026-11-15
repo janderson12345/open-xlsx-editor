@@ -2,13 +2,13 @@
 // Saving rewrites only the sheets that were changed; every other part goes back byte for byte.
 import { OpcPackage } from './package.js';
 import { fileType, setFileType } from './filetype.js';
-import { kids, kid, attr, serializeXml, parseXml, NS } from './xml.js';
+import { kids, kid, attr, serializeXml, NS } from './xml.js';
 import { readSharedStrings, richRunsXml } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
 import { readStyles } from './styles.js';
 import { readTheme, resolveColor } from './theme.js';
-import { setCellXml, setFormulaXml, setResultXml, setStyleXml, setMergesXml, unshareXml } from './sheetedit.js';
-import { setDynamicXml, clearSpilledXml, RICH_ERRORS } from './spillxml.js';
+import { setCellXml, setFormulaXml, setStyleXml, setMergesXml, unshareXml } from './sheetedit.js';
+import { setDynamicXml, clearSpilledXml } from './spillxml.js';
 import { recalcAfter } from './calcmode.js';
 import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
@@ -23,6 +23,7 @@ import { parseFormula } from '../calc/parse.js';
 import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.js';
 import { setValidation as setValidationXml, addToRule, moveValidation } from './dvedit.js';
 import { addConditional, clearConditional } from './cfedit.js';
+import { snapshotOf, restoreTo, writeResultTo } from './workbookstate.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
  *  `standalone="yes"`). */
@@ -390,41 +391,9 @@ export class Workbook {
     this.edited = true;
   }
 
-  /** The workbook as it is now, to go back to (restore): the parts, the sheets read so far and the workbook part. */
-  snapshot() {
-    return {
-      files: { ...this.pkg.files }, rels: this.pkg.rels, book: serializeXml(this.doc), dirty: new Set(this.dirty), bookDirty: this.bookDirty,
-      // (The sheets as they were, names, order and all, and the parsed ones by their ids: sheets added, renamed, moved
-      // or deleted since are put back too.)
-      sheets: this.sheets.map((info) => ({ ...info })),
-      parsed: [...this._parsed].map(([info, part]) => [info.sheetId, serializeXml(part.doc)]),
-    };
-  }
-
-  /** Back to a snapshot: its parts, its sheets (their list read again) and its defined names. Cell formats added
-   *  since stay (no cell of the snapshot uses them). */
-  restore(snap) {
-    this.pkg.files = { ...snap.files };
-    this.pkg.rels = snap.rels;
-    this.doc = parseXml(snap.book);
-    const root = this.doc.documentElement;
-    const els = kids(kid(root, 'sheets', this.ns), 'sheet', this.ns);
-    this.sheets = snap.sheets.map((info) => withEl({ ...info }, els.find((el) => Number(attr(el, 'sheetId')) === info.sheetId) || null));
-    this._parsed = new Map(snap.parsed.map(([id, text]) => {
-      const doc = parseXml(text);
-      return [this.sheets.find((s) => s.sheetId === id), { doc, model: readSheet(doc, this.sharedStrings) }];
-    }).filter(([info]) => info));
-    this.definedNames = kids(kid(root, 'definedNames', this.ns), 'definedName', this.ns).map((el) => withEl({
-      name: attr(el, 'name'),
-      sheet: attr(el, 'localSheetId') == null ? null : Number(attr(el, 'localSheetId')),
-      text: el.textContent,
-    }, el));
-    this.dirty = new Set(snap.dirty);
-    this._dynamicCm = null;
-    this.bookDirty = true;
-    this.edited = true;
-    this.resetCalc();
-  }
+  /** The workbook as it is now, to go back to (restore), and back to it: workbookstate.js. */
+  snapshot() { return snapshotOf(this); }
+  restore(snap) { restoreTo(this, snap); }
 
   /** A dynamic array formula's cell in the file's form (spillxml.js), and a cell its spill no longer reaches emptied. */
   setDynamic(i, r, c, rect) { setDynamicXml(this, i, r, c, rect); }
@@ -470,26 +439,8 @@ export class Workbook {
     return also.length;
   }
 
-  /** Write a formula's result into a cell (from the engine); nothing changes if it is the value the cell has. */
-  writeResult(i, r, c, value) {
-    const part = this._part(i);
-    const model = part.model;
-    const cell = model.cells.get(r)?.get(c);
-    const t = typeof value === 'number' ? 'n' : typeof value === 'boolean' ? 'b' : typeof value === 'string' ? 'str' : 'e';
-    const v = t === 'e' ? value.code : value;
-    if (cell && cell.t === t && cell.v === v) return;
-    // (#SPILL! and #CALC! are rich values in Excel's file: #VALUE! there, worked out again when Excel opens it.)
-    if (t === 'e' && RICH_ERRORS.has(v)) this._incomplete = true;
-    setResultXml(part.doc, r, c, t === 'e' ? (RICH_ERRORS.has(v) ? { code: '#VALUE!' } : value) : v);
-    if (cell) { cell.t = t; cell.v = v; }
-    else {
-      if (!model.cells.has(r)) model.cells.set(r, new Map());
-      model.cells.get(r).set(c, { t, v, s: 0, f: null });
-    }
-    model.maxRow = Math.max(model.maxRow, r);
-    model.maxCol = Math.max(model.maxCol, c);
-    this.dirty.add(this.sheets[i].path);
-  }
+  /** Write a formula's result into a cell (from the engine): workbookstate.js. */
+  writeResult(i, r, c, value) { writeResultTo(this, i, r, c, value); }
 
   /** Write each cell of shared formula `si` on sheet i with its own formula. */
   _unshare(i, si) {
