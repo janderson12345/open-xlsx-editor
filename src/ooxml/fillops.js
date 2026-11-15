@@ -8,6 +8,7 @@ import { formatCodeOf } from './styles.js';
 import { isDateFormat, dateParts } from './format.js';
 import { dateSerial } from './input.js';
 import { DATE_FILLS, fillDates } from './filldates.js';
+import { currentRegion } from './sortops.js';
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -165,22 +166,19 @@ export function fillWay(from, to) {
 }
 
 /**
- * Where a double click on the fill handle fills `sel` down to, as Excel's documentation has it (COM doesn't reach the
- * double click): as far as the data goes on in the column left of the selection, or else the one right of it, from
- * the row below the selection to its first empty cell; stopping before a cell already filled in the selection's own
- * columns. Null when there is nothing to go by.
+ * Where a double click on the fill handle fills `sel` down to, as Excel fills (its window, test/fill-dblclick-excel.json,
+ * 13 of 13): to the last row of the region round the selection (sortops.js currentRegion: grown while a filled cell
+ * touches it, side or corner, as Ctrl+* finds it; so data beside it on the left or the right, or further over through
+ * cells that touch), stopping before a cell already filled in the selection's own columns. Null when the region goes
+ * no lower than the selection.
  */
 export function doubleClickFill(sheet, sel) {
-  const has = (r, c) => c >= 0 && sheet.cells.get(r)?.get(c)?.v != null && sheet.cells.get(r).get(c).v !== '';
-  const below = sel.r1 + 1;
-  const side = has(below, sel.c0 - 1) ? sel.c0 - 1 : has(below, sel.c1 + 1) ? sel.c1 + 1 : null;
-  if (side == null) return null;
-  let r1 = below;
-  while (has(r1 + 1, side)) r1++;
-  for (let r = below; r <= r1; r++) {
+  const has = (r, c) => sheet.cells.get(r)?.get(c)?.v != null && sheet.cells.get(r).get(c).v !== '';
+  let r1 = currentRegion(sheet, { r0: sel.r0, c0: sel.c0, r1: sel.r1, c1: sel.c1 }).r1;
+  for (let r = sel.r1 + 1; r <= r1; r++) {
     for (let c = sel.c0; c <= sel.c1; c++) if (has(r, c)) { r1 = r - 1; break; }
   }
-  return r1 < below ? null : { r0: sel.r0, c0: sel.c0, r1, c1: sel.c1 };
+  return r1 <= sel.r1 ? null : { r0: sel.r0, c0: sel.c0, r1, c1: sel.c1 };
 }
 
 /**

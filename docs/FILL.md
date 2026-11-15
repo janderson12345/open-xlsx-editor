@@ -13,9 +13,13 @@ hidden instance (`tools/excel-compare/excel-steps.ps1` on `fill-cases.json`, fro
   right or left (the way the pointer is furthest out of the selection), the cells it will fill are outlined; let go,
   they are filled and selected. Ctrl held while letting go fills the other way: a single cell counts on, more cells
   are copied as they are (Excel's Ctrl-drag, from its documentation; COM doesn't reach the drag).
-- A double click on the handle fills down as far as the data beside goes: the column left of the selection, or else
-  the one right of it, from the row below to its first empty cell, stopping before a cell already filled (Excel's
-  documented rule; COM doesn't reach the double click).
+- A double click on the handle fills down to the last row of the region round the selection (as Ctrl+* finds it:
+  grown while a filled cell touches it, side or corner), stopping before a cell already filled in the selection's own
+  columns. Measured in Excel's own window (the handle double-clicked, the cells set up and read over COM;
+  `test/fill-dblclick-excel.json`, 13 of 13): three values on the left and eight on the right fill eight rows, ten and
+  four fill ten; a gap in the column beside stops it; data touching only at a corner further on, or two columns over
+  through a filled cell, takes it on; a cell filled below in its own column stops it a row above; with an empty column
+  between, nothing.
 - After a fill by the handle, Excel's Auto Fill Options button at the filled cells' corner: Copy Cells, Fill Series,
   Fill Formatting Only, Fill Without Formatting, and for dates Fill Days, Fill Weekdays, Fill Months, Fill Years. A
   choice fills the cells again that way, one more step of the undo history; the button goes when the selection moves.

@@ -1,0 +1,18 @@
+{
+ "source": "Excel 365's fill handle double-clicked in its own window (computer use), the cells set up and read over COM, 15 November 2026",
+ "cases": [
+  { "name": "beside a column of ten", "cells": { "A1": "1", "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "A9": "9", "A10": "10", "B1": "=A1*2" }, "sel": "B1", "filled": "B1:B10" },
+  { "name": "a gap in the column beside", "cells": { "A1": "1", "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A7": "7", "A8": "8", "A9": "9", "A10": "10", "B1": "=A1*2" }, "sel": "B1", "filled": "B1:B5" },
+  { "name": "the column right of it", "cells": { "C1": "1", "C2": "2", "C3": "3", "C4": "4", "C5": "5", "C6": "6", "B1": "=C1*2" }, "sel": "B1", "filled": "B1:B6" },
+  { "name": "three left, eight right", "cells": { "A1": "1", "A2": "2", "A3": "3", "C1": "1", "C2": "2", "C3": "3", "C4": "4", "C5": "5", "C6": "6", "C7": "7", "C8": "8", "B1": "=A1+1" }, "sel": "B1", "filled": "B1:B8" },
+  { "name": "ten left, four right", "cells": { "A1": "1", "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "A9": "9", "A10": "10", "C1": "1", "C2": "2", "C3": "3", "C4": "4", "B1": "=A1+1" }, "sel": "B1", "filled": "B1:B10" },
+  { "name": "a cell filled below in its own column", "cells": { "A1": "1", "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "A9": "9", "A10": "10", "B1": "=A1*2", "B6": "x" }, "sel": "B1", "filled": "B1:B5" },
+  { "name": "the column beside starting a row down", "cells": { "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "A9": "9", "A10": "10", "B1": "=A1*2" }, "sel": "B1", "filled": "B1:B10" },
+  { "name": "two cells, a series", "cells": { "A1": "1", "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "B1": "1", "B2": "2" }, "sel": "B1:B2", "filled": "B1:B8" },
+  { "name": "nothing touching below", "cells": { "A1": "1", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "B1": "=A1*2" }, "sel": "B1", "filled": null },
+  { "name": "from row three", "cells": { "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "A9": "9", "B3": "=A3*2" }, "sel": "B3", "filled": "B3:B9" },
+  { "name": "data touching only at a corner further on", "cells": { "A1": "1", "A2": "2", "A3": "3", "C1": "1", "C2": "2", "C3": "3", "D4": "4", "D5": "5", "D6": "6", "D7": "7", "D8": "8", "D9": "9", "B1": "=A1+1" }, "sel": "B1", "filled": "B1:B9" },
+  { "name": "data two columns over, through a cell", "cells": { "A1": "1", "A2": "2", "A3": "3", "C1": "q", "D1": "1", "D2": "2", "D3": "3", "D4": "4", "D5": "5", "D6": "6", "D7": "7", "D8": "8", "B1": "=A1+1" }, "sel": "B1", "filled": "B1:B8" },
+  { "name": "an empty column between", "cells": { "A1": "1", "A2": "2", "A3": "3", "A4": "4", "A5": "5", "A6": "6", "A7": "7", "A8": "8", "C1": "q" }, "sel": "C1", "filled": null }
+ ]
+}

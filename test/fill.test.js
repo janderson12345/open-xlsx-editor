@@ -65,3 +65,14 @@ test('fill: custom lists (fillLists) go round as the built-in day and month name
   run('B1:B2', 'B1:B5');
   assert.deepEqual([2, 3, 4].map((r) => wb.sheet(si).cells.get(r).get(1).v), ['North', 'South', 'North']);
 });
+
+test("fill: a double click on the handle, as Excel fills (its window, test/fill-dblclick-excel.json)", async () => {
+  const fs = await import('node:fs');
+  const { doubleClickFill } = await import('../src/ooxml/fillops.js');
+  const { rangeName } = await import('../src/ooxml/refs.js');
+  for (const c of JSON.parse(fs.readFileSync('test/fill-dblclick-excel.json', 'utf8')).cases) {
+    const { wb, si } = build({ cells: c.cells });
+    const got = doubleClickFill(wb.sheet(si), area(c.sel));
+    assert.equal(got ? rangeName(got) : null, c.filled, c.name);
+  }
+});
