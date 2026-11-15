@@ -1,0 +1,503 @@
+{
+  "adds": [
+    {
+      "location": "O2",
+      "data": "B2:M2",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2:O3",
+      "data": "B2:M3",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O3 <- B3:M3"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "B6:M6",
+      "data": "B2:M3",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "B6 <- B2:B3",
+            "C6 <- C2:C3",
+            "D6 <- D2:D3",
+            "E6 <- E2:E3",
+            "F6 <- F2:F3",
+            "G6 <- G2:G3",
+            "H6 <- H2:H3",
+            "I6 <- I2:I3",
+            "J6 <- J2:J3",
+            "K6 <- K2:K3",
+            "L6 <- L2:L3",
+            "M6 <- M2:M3"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2:O4",
+      "data": "B2:D4",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:D2",
+            "O3 <- B3:D3",
+            "O4 <- B4:D4"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "B6:D6",
+      "data": "B2:D4",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "B6 <- B2:D2",
+            "C6 <- B3:D3",
+            "D6 <- B4:D4"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2:O3",
+      "data": "B2:M2",
+      "error": "0x800A03EC"
+    },
+    {
+      "location": "O2:P3",
+      "data": "B2:M3",
+      "error": "0x800A03EC"
+    },
+    {
+      "location": "O2",
+      "data": "B2:M3",
+      "error": "0x800A03EC"
+    },
+    {
+      "location": "O2",
+      "data": "B2",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2",
+      "data": "'My data'!B2:M2",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- 'My data'!B2:M2"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "B2",
+      "data": "B2:M2",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "B2 <- B2:M2"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2:O13",
+      "data": "B2:B13",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:B2",
+            "O3 <- B3:B3",
+            "O4 <- B4:B4",
+            "O5 <- B5:B5",
+            "O6 <- B6:B6",
+            "O7 <- B7:B7",
+            "O8 <- B8:B8",
+            "O9 <- B9:B9",
+            "O10 <- B10:B10",
+            "O11 <- B11:B11",
+            "O12 <- B12:B12",
+            "O13 <- B13:B13"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2",
+      "data": "B2:B13",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:B13"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "O2:P2",
+      "data": "B2:C13",
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:B13",
+            "P2 <- C2:C13"
+          ]
+        }
+      ]
+    },
+    {
+      "location": "",
+      "data": "B2:M2",
+      "error": "no location"
+    },
+    {
+      "location": "O2",
+      "data": "",
+      "error": "0x800A03EC"
+    }
+  ],
+  "edits": {
+    "start": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O3 <- B3:M3",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{0FA18F63-93B8-467C-B08E-58C93D6CEA46}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{8E5ECDBD-3FAF-4756-A498-93461BEAE5E8}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "group": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6",
+            "O3 <- B3:M3"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{9B1F5B15-B626-486D-B86A-24335E8594AD}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{399B8B6F-6D40-4CAE-9A90-3CD4D8BD4CC1}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "groupAtLine": {
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O3 <- B3:M3",
+            "O4 <- B4:M4",
+            "O6 <- B6:M6"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{751EE63C-315D-4C04-8089-3AF8E53D3C3D}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "ungroup": {
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O3 <- B3:M3"
+          ]
+        },
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{B45BD18F-2B00-4648-8D74-936271D4C35C}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{8792611B-C408-486A-8BAB-CEDED239950D}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{1E7E64A3-431D-449C-B546-1CFBF59D79ED}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "ungroupTwo": {
+      "groups": [
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O3 <- B3:M3"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2"
+          ]
+        },
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{A20F590F-2BB9-4A37-A736-0E12FC1F58E5}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{87515E1E-2F23-4555-B372-F64666BFC814}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{C76D73D4-8095-4682-85B6-1FB8F6DACF32}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{63F9D40A-7424-413A-9169-7EFD0F850CA6}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "addOver": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O3 <- B3:M3"
+          ]
+        },
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{D2C47F14-B9D0-467C-B5B0-133F815385FF}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{C9447FA8-DAA2-4E75-B52E-C07A94188EA7}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{7ABF772F-6B1A-466E-9930-08A2F1C9F476}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "weight": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O3 <- B3:M3",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{2CFDFDB3-0828-4226-BD67-06F8D394DA07}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup manualMin=\"-2\" lineWeight=\"1.5\" minAxisType=\"custom\" xr2:uid=\"{A31E4013-F913-4F48-80F4-381C300ECD9D}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "clear": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- B2:M2",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{772018A3-82C7-46EE-A4C9-52C8A31A4B98}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{57B47EED-75D0-44F6-8A02-D2CF3894EEF1}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "clearGroups": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{FE2D1F03-1B30-442A-B16D-AB07AD0CAD81}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "clearAll": {
+      "groups": [],
+      "ext": ""
+    },
+    "themeColor": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 6375440,
+          "cells": [
+            "O2 <- B2:M2",
+            "O3 <- B3:M3",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{6DB93F7B-2F17-40BB-B53B-DFFB23B6090B}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{8706DBB4-DF1D-4E5D-A9CA-E48FC9DD3F07}\"><x14:colorSeries theme=\"4\" tint=\"-0.249977111117893\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers theme=\"9\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B2:M2</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "modify": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "P2 <- C2:M2",
+            "P3 <- C3:M3",
+            "P4 <- C4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{68FD95F8-0D2C-4544-BF74-0B1556454842}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{40A76955-D4E9-487F-8D45-CD96D6A3D8C4}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!C2:M2</xm:f><xm:sqref>P2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!C3:M3</xm:f><xm:sqref>P3</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!C4:M4</xm:f><xm:sqref>P4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    },
+    "single": {
+      "groups": [
+        {
+          "type": 2,
+          "markers": false,
+          "series": 255,
+          "cells": [
+            "O6 <- B6:M6"
+          ]
+        },
+        {
+          "type": 1,
+          "markers": false,
+          "series": 9592887,
+          "cells": [
+            "O2 <- C3:H3",
+            "O3 <- B3:M3",
+            "O4 <- B4:M4"
+          ]
+        }
+      ],
+      "ext": "<x14:sparklineGroups xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:sparklineGroup type=\"column\" displayEmptyCellsAs=\"gap\" xr2:uid=\"{AD6FB9CB-7A48-469E-B4B7-5900239C2486}\"><x14:colorSeries rgb=\"FFFF0000\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!B6:M6</xm:f><xm:sqref>O6</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup><x14:sparklineGroup displayEmptyCellsAs=\"gap\" xr2:uid=\"{0DEB0ECD-581C-4A63-B019-C8105E182A9C}\"><x14:colorSeries rgb=\"FF376092\"/><x14:colorNegative rgb=\"FFD00000\"/><x14:colorAxis rgb=\"FF000000\"/><x14:colorMarkers rgb=\"FFD00000\"/><x14:colorFirst rgb=\"FFD00000\"/><x14:colorLast rgb=\"FFD00000\"/><x14:colorHigh rgb=\"FFD00000\"/><x14:colorLow rgb=\"FFD00000\"/><x14:sparklines><x14:sparkline><xm:f>Sheet1!C3:H3</xm:f><xm:sqref>O2</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B3:M3</xm:f><xm:sqref>O3</xm:sqref></x14:sparkline><x14:sparkline><xm:f>Sheet1!B4:M4</xm:f><xm:sqref>O4</xm:sqref></x14:sparkline></x14:sparklines></x14:sparklineGroup></x14:sparklineGroups>"
+    }
+  }
+}
