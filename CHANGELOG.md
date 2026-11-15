@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2
+
+- **Fixed: right click on a chart.** On Windows the chart's menu (Edit Chart..., Delete) was replaced by the cell
+  menu (Cut, Copy, Paste...) when the button was let go. The chart's menu now stays open.
+
 ## 0.5.1
 
 The first release published from GitHub, with npm provenance. It has the security fixes below; 0.5.0, published by
