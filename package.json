@@ -67,7 +67,8 @@
   "files": [
     "src",
     "dist",
-    "bin"
+    "bin",
+    "THIRD-PARTY-NOTICES.md"
   ],
   "peerDependencies": {
     "yjs": "^13.6.0"

@@ -234,5 +234,5 @@ Each of the others says how a part was matched to Excel, what was measured, and 
   http://localhost:8080.
 - `SECURITY.md`: how to report a security problem privately.
 - `CHANGELOG.md`: what changed in each release.
-- MIT licence (`LICENSE`). Sister project of [open-docx-editor](https://github.com/janderson12345/open-docx-editor),
-  the same for Word documents.
+- MIT licence (`LICENSE`); the libraries it bundles are listed in `THIRD-PARTY-NOTICES.md`.
+- Sister project of [open-docx-editor](https://github.com/janderson12345/open-docx-editor), the same for Word documents.
