@@ -8,6 +8,7 @@ import { formatCodeOf } from './styles.js';
 import { refName, colName } from './refs.js';
 import { readNotes } from './notes.js';
 import { setNote, deleteNote } from './noteedit.js';
+import { moveNamesForCut } from './names.js';
 import { addThread, replyThread, resolveThread } from './threadedit.js';
 import { boxRule, coalesce } from './dvedit.js';
 import { copyConditionals, moveCutConditionals } from './clipcf.js';
@@ -95,6 +96,8 @@ export function moveCutParts(wb, si, area, clip) {
   let changed = false;
   for (const x of clip.notes || []) { deleteNote(wb, clip.si, clip.rect.r0 + x.dr, clip.rect.c0 + x.dc); changed = true; }
   changed = pasteNotes(wb, si, area, clip) || changed;
+  // (Defined names follow the cut cells as formulas do: names.js moveNamesForCut.)
+  if (clip.wb === wb && moveNamesForCut(wb, { sheet: clip.sheetName, ...clip.rect }, { sheet: wb.sheets[si].name, dr: area.r0 - clip.rect.r0, dc: area.c0 - clip.rect.c0 })) changed = true;
   const had = (sheetOf) => (wb.sheet(sheetOf).validations || []).some((v) => v.type !== 'none');
   if (clip.si === si) {
     if (had(si)) { wb.moveValidation(si, clip.rect, area.r0 - clip.rect.r0, area.c0 - clip.rect.c0); changed = true; }

@@ -7,7 +7,7 @@
 import { kids, kid } from './xml.js';
 import { colIndex, MAX_ROWS, MAX_COLS } from './refs.js';
 import { withEl } from './sheetops.js';
-import { tokenize } from '../calc/tokens.js';
+import { tokenize, moveRefs } from '../calc/tokens.js';
 import { normalizeFormula } from '../calc/fileform.js';
 import { parseFormula } from '../calc/parse.js';
 
@@ -195,4 +195,25 @@ export function namesOnSheet(wb, si) {
   const key = (n) => n.toLowerCase();
   return seen.filter((d) => !own(d)).map((d) => ({ name: d.name.replace(/^_xlnm\./i, ''), text: d.text }))
     .sort((a, b) => (key(a.name) < key(b.name) ? -1 : key(a.name) > key(b.name) ? 1 : 0));
+}
+
+/** The defined names after cells were cut and pasted (tokens.js moveRefs: `from` the cells cut, `to` where they went),
+ *  as Excel's follow (measured over COM, B2:C3 cut to E5): a name wholly in the cut cells moves with them ($B$2:$C$3:
+ *  $E$5:$F$6; to another sheet, Data!$E$5:$F$6), one only partly in them as a formula's range does ($B$2:$B$5 cut
+ *  to another sheet: $B$4:$B$5), a single cell pasted over is Sheet1!#REF!; a name with relative references (B2), a
+ *  constant and names apart from the cut stay. Returns how many changed. */
+export function moveNamesForCut(wb, from, to) {
+  let n = 0;
+  for (const d of [...wb.definedNames]) {
+    let toks;
+    try { toks = tokenize(d.text); } catch { continue; }
+    const refs = toks.filter((t) => t.type === 'ref' && t.area);
+    const abs = (a) => a.kind === 'cols' ? a.ac0 && a.ac1 : a.kind === 'rows' ? a.ar0 && a.ar1 : a.ar0 && a.ac0 && (a.kind === 'cell' || (a.ar1 && a.ac1));
+    if (!refs.length || !refs.every((t) => abs(t.area))) continue;
+    const next = moveRefs(d.text, { here: from.sheet, from, to });
+    if (next === d.text) continue;
+    editName(wb, { name: d.name, sheet: d.sheet ?? null }, { refersTo: `=${next}` });
+    n++;
+  }
+  return n;
 }

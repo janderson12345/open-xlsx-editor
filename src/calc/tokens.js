@@ -363,6 +363,9 @@ export function shiftRefs(text, { here, sheet, axis, at, n, band = null }) {
  * `to`: { sheet, dr, dc }, where they went. A reference wholly inside the cut cells moves with them, $ or not; a
  * reference to a single cell that was pasted over becomes #REF!; other references stay, with their sheet named when
  * the formula has moved to another sheet. Text that doesn't read as a formula comes back as it was.
+ * A range only partly cut becomes the cells of it left behind and those of it moved (on the same sheet), when they
+ * make a rectangle, else stays (measured over COM, B2:C3 cut: =SUM(B2:B5) is =SUM(B3:B5) for B3, =SUM(B4:B5) for
+ * another sheet, as it was for E5; A1:A3 with A1 moved onto A3, A2:A3).
  */
 export function moveRefs(text, { here, home = here, from, to }) {
   const same = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
@@ -378,13 +381,48 @@ export function moveRefs(text, { here, home = here, from, to }) {
         const a = { ...t.area, r0: t.area.r0 + to.dr, r1: t.area.r1 + to.dr, c0: t.area.c0 + to.dc, c1: t.area.c1 + to.dc };
         return named(to.sheet, areaText(a));
       }
-      if (same(sheet, to.sheet) && t.area.kind === 'cell' && inside(t.area, over)) return '#REF!';
+      if (same(sheet, from.sheet) && t.area.kind === 'area' && overlap(t.area, from)) {
+        const kept = partlyMoved(t.area, from, same(from.sheet, to.sheet) ? to : null);
+        if (kept) return (t.sheet == null && !same(here, home) ? sheetPrefix(here) : text.slice(t.start, t.start + t.prefix.length)) + areaText({ ...t.area, ...kept });
+      }
+      if (same(sheet, to.sheet) && t.area.kind === 'cell' && inside(t.area, over)) return `${text.slice(t.start, t.start + t.prefix.length)}#REF!`;
       if (t.sheet == null && !same(here, home)) return sheetPrefix(here) + body;
       return null;
     });
   } catch {
     return text;
   }
+}
+
+const overlap = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
+
+/** The cells of rectangles (overlaps counted once). */
+function unionArea(rects) {
+  const rs = [...new Set(rects.flatMap((x) => [x.r0, x.r1 + 1]))].sort((a, b) => a - b);
+  const cs = [...new Set(rects.flatMap((x) => [x.c0, x.c1 + 1]))].sort((a, b) => a - b);
+  let n = 0;
+  for (let i = 0; i + 1 < rs.length; i++) {
+    for (let j = 0; j + 1 < cs.length; j++) {
+      if (rects.some((x) => rs[i] >= x.r0 && rs[i] <= x.r1 && cs[j] >= x.c0 && cs[j] <= x.c1)) n += (rs[i + 1] - rs[i]) * (cs[j + 1] - cs[j]);
+    }
+  }
+  return n;
+}
+
+/** Range `a`, partly inside the cut cells `cut`, after the cut: the cells of it left behind and those of it moved by
+ *  `to` (null: to another sheet), as { r0, c0, r1, c1 } when they make one rectangle other than `a`, else null. */
+function partlyMoved(a, cut, to) {
+  const k = { r0: Math.max(a.r0, cut.r0), c0: Math.max(a.c0, cut.c0), r1: Math.min(a.r1, cut.r1), c1: Math.min(a.c1, cut.c1) };
+  const left = [];
+  if (a.r0 < k.r0) left.push({ r0: a.r0, c0: a.c0, r1: k.r0 - 1, c1: a.c1 });
+  if (k.r1 < a.r1) left.push({ r0: k.r1 + 1, c0: a.c0, r1: a.r1, c1: a.c1 });
+  if (a.c0 < k.c0) left.push({ r0: k.r0, c0: a.c0, r1: k.r1, c1: k.c0 - 1 });
+  if (k.c1 < a.c1) left.push({ r0: k.r0, c0: k.c1 + 1, r1: k.r1, c1: a.c1 });
+  const pieces = to ? [...left, { r0: k.r0 + to.dr, c0: k.c0 + to.dc, r1: k.r1 + to.dr, c1: k.c1 + to.dc }] : left;
+  if (!pieces.length) return null;
+  const box = { r0: Math.min(...pieces.map((x) => x.r0)), c0: Math.min(...pieces.map((x) => x.c0)), r1: Math.max(...pieces.map((x) => x.r1)), c1: Math.max(...pieces.map((x) => x.c1)) };
+  if (box.r0 < 0 || box.c0 < 0 || unionArea(pieces) !== (box.r1 - box.r0 + 1) * (box.c1 - box.c0 + 1)) return null;
+  return box.r0 === a.r0 && box.c0 === a.c0 && box.r1 === a.r1 && box.c1 === a.c1 ? null : box;
 }
 
 /** A sheet name as a formula writes it before a reference: plain (Data!) when it reads as a name, quoted otherwise

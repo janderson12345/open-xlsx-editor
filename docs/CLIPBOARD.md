@@ -93,6 +93,19 @@ C1:E1`, its formula as it was; A1:B2's two columns to rows 1 and 2, `D1:E1` and 
 their rules (C1:F1's list keeps F1); onto another sheet a rule of its own, moved by the corner only (=A1>B1 over A1:A3
 turned to C1: =C1>D1 over C1:E1). Six cases, all the same here.
 
+## A cut's defined names and ranges partly cut (measured)
+
+Measured over COM: B2:C3 cut (Range.Cut) to E5, to another sheet's E5 and to B3, with names and formulas reading
+cells in, around and apart from it (`test/cutnames.test.js`; all the same here, `tokens.js` moveRefs, `names.js`
+moveNamesForCut).
+
+| Excel's rule | Excel's example |
+|---|---|
+| A defined name follows the cut as a formula's references do: one wholly in the cut cells moves with them. | Qty $B$2: $E$5; Block $B$2:$C$3: $E$5:$F$6 (Data!$E$5:$F$6 to another sheet). |
+| A name for a single cell pasted over is #REF!, its sheet still named. | Over $E$5, B2:C3 cut to E5: Sheet1!#REF!. |
+| A name with relative references, a constant, and names around or apart from the cut stay. | Rel B2, Cnst 7, Wide $A$1:$F$8, Far $H$9. |
+| A range only partly cut, in a name or a formula, becomes the cells of it left behind and those of it moved (on the same sheet) when they make a rectangle; else it stays. | =SUM(B2:B5): to B3, =SUM(B3:B5); to another sheet, =SUM(B4:B5); to E5, as it was. =SUM(A1:A3) with A1 moved onto A3: =SUM(A2:A3). |
+
 ## A cut's notes and validation
 
 Measured over COM (B2:C3 cut to E5, B2 with a note, C2:C4 a custom rule =C2>B2, F6 a note and E5 a rule of their
@@ -132,5 +145,4 @@ a rule leaves the rule where it was (not measured).
 
 Paste
 Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
-program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was
-pasted onto (Excel shrinks it: `=SUM(A1:A3)` became `=SUM(A2:A3)` when A1 was moved onto A3).
+program's cells (only its text is read).
