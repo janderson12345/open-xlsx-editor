@@ -36,6 +36,28 @@ const sheetsFrom = (wb, si, within) => (within === 'workbook'
   ? [...wb.sheets.keys()].filter((k) => wb.canShow(k)).sort((a, b) => ((a - si + wb.sheets.length) % wb.sheets.length) - ((b - si + wb.sheets.length) % wb.sheets.length))
   : [si]);
 
+/**
+ * Whether cell `cell`'s format has every property `f` sets (Find Format: { bold, italic, underline, strike, color, fill
+ * (ARGB), numFmt }), the others free; as Excel's Find matches (its window, test/find-format-excel.json: Bold alone
+ * found the bold cells whatever their font, fill or size).
+ */
+export function formatMatches(wb, cell, f) {
+  if (!f) return true;
+  const xf = wb.styles.cellXfs[cell?.s || 0] || wb.styles.cellXfs[0];
+  const font = wb.styles.fonts[xf.fontId] || {};
+  const fill = wb.styles.fills[xf.fillId];
+  const fillRgb = fill?.pattern === 'solid' ? fill.fg?.rgb?.toUpperCase() : null;
+  if (f.bold != null && !!font.b !== !!f.bold) return false;
+  if (f.italic != null && !!font.i !== !!f.italic) return false;
+  if (f.underline != null && !!font.u !== !!f.underline) return false;
+  if (f.strike != null && !!font.strike !== !!f.strike) return false;
+  if (f.color && font.color?.rgb?.toUpperCase() !== f.color.toUpperCase()) return false;
+  if (f.fill && fillRgb !== f.fill.toUpperCase()) return false;
+  if (f.numFmt && formatCodeOf(wb.styles, cell?.s || 0) !== f.numFmt) return false;
+  return true;
+}
+const filledCell = (cell) => cell && (cell.v != null && cell.v !== '' || (cell.f != null && cell.f !== ''));
+
 /** The cells of sheet si that match, in search order (rows, or columns with `byColumns`). Look in Notes searches
  *  the notes' text, Look in Comments the threaded comments' (each comment's, not its authors'), as Excel 365's
  *  (excel-find2.ps1: neither finds the other, nor the cells). */
@@ -48,7 +70,7 @@ function matchesIn(wb, si, re, opts) {
     }
   } else {
     for (const [r, line] of wb.sheet(si).cells) {
-      for (const [c, cell] of line) if (re.test(searchText(wb, si, cell, opts.lookIn))) out.push({ si, r, c });
+      for (const [c, cell] of line) if (filledCell(cell) && re.test(searchText(wb, si, cell, opts.lookIn)) && formatMatches(wb, cell, opts.findFormat)) out.push({ si, r, c });
     }
   }
   return out.sort(opts.byColumns ? (a, b) => a.c - b.c || a.r - b.r : (a, b) => a.r - b.r || a.c - b.c);
@@ -59,7 +81,8 @@ function matchesIn(wb, si, re, opts) {
  * within: 'sheet' | 'workbook' }): [{ si, r, c }].
  */
 export function findAll(wb, si, what, opts = {}) {
-  const re = pattern(what, opts);
+  // (Nothing to find but a format: every filled cell of it, as Excel's Find All does.)
+  const re = what === '' && opts.findFormat ? /[\s\S]*/ : pattern(what, opts);
   if (!re) return [];
   return sheetsFrom(wb, si, opts.within).flatMap((k) => matchesIn(wb, k, re, opts));
 }
@@ -86,6 +109,17 @@ export function replaced(text, what, withText, opts = {}) {
   return opts.whole ? withText : text.replace(re, () => withText);
 }
 
+/** A Replace Format ({ bold, italic, underline, strike, color, fill, numFmt }) as a styleWith change. */
+function formatChange(f) {
+  const font = {};
+  if (f.bold != null) font.b = !!f.bold;
+  if (f.italic != null) font.i = !!f.italic;
+  if (f.underline != null) font.u = f.underline ? 'single' : null;
+  if (f.strike != null) font.strike = !!f.strike;
+  if (f.color) font.color = { rgb: f.color };
+  return { ...(Object.keys(font).length ? { font } : {}), ...(f.fill ? { fill: { rgb: f.fill } } : {}), ...(f.numFmt ? { numFmt: f.numFmt } : {}) };
+}
+
 /**
  * The changes Replace makes to cells [{ si, r, c }] (Look in is always Formulas, as in Excel's Replace): grouped by
  * sheet for the editor's undo history, [{ si, contents: [{ r, c, value } or { r, c, formula }], styles, merges }]
@@ -98,13 +132,25 @@ export function replaceChanges(wb, cells, what, withText, opts = {}) {
   let refused = 0;
   for (const { si, r, c } of cells) {
     const cell = wb.sheet(si).cells.get(r)?.get(c);
+    if (!formatMatches(wb, cell, opts.findFormat)) continue;
+    if (!bySheet.has(si)) bySheet.set(si, { si, contents: [], styles: [], merges: wb.sheet(si).merges });
+    const step = bySheet.get(si);
+    // (Nothing to find but a format: only the format replaced, the text as it is, as Excel's dialog does.)
+    if (what === '' && opts.findFormat) {
+      if (!opts.replaceFormat) continue;
+      step.styles.push({ r, c, s: wb.styleWith(cell?.s || 0, formatChange(opts.replaceFormat)) });
+      count++;
+      continue;
+    }
     const next = replaced(searchText(wb, si, cell, 'formulas'), what, withText, opts);
     if (next == null) continue;
     const ch = entryChanges(wb, si, r, c, next);
     if (ch.error) { refused++; continue; }
-    if (!bySheet.has(si)) bySheet.set(si, { si, contents: [], styles: [], merges: wb.sheet(si).merges });
-    bySheet.get(si).contents.push(ch.content);
-    if (ch.style) bySheet.get(si).styles.push(ch.style);
+    step.contents.push(ch.content);
+    // (Replace Format: the cell's format given its properties too, as Excel's Replace All gives them.)
+    const s = ch.style ? ch.style.s : cell?.s || 0;
+    if (opts.replaceFormat) step.styles.push({ r, c, s: wb.styleWith(s, formatChange(opts.replaceFormat)) });
+    else if (ch.style) step.styles.push(ch.style);
     count++;
   }
   return Object.assign([...bySheet.values()], { count, refused });

@@ -1,0 +1,9 @@
+{
+ "source": "Excel 365's Find and Replace dialog, used in its own window (computer use): Find Format Bold, Replace Format a yellow fill; cells set up and read over COM, 15 November 2026",
+ "cells": { "A1": "apple", "A2": "apple", "A3": "pear", "B1": "apple tart", "B2": "green apple" },
+ "bold": ["A1", "A3", "B1"],
+ "filled": ["B2"],
+ "findAll": { "what": "", "found": ["A1", "B1", "A3"] },
+ "replaceAll": { "what": "apple", "with": "fruit", "replacements": 2, "after": { "A1": ["fruit", true, true], "A2": ["apple", false, false], "A3": ["pear", true, false], "B1": ["fruit tart", true, true], "B2": ["green apple", false, true] } },
+ "formatsOnly": { "what": "", "with": "", "replacements": 3, "after": { "A1": ["fruit", true, true], "A2": ["apple", false, false], "A3": ["pear", true, true], "B1": ["fruit tart", true, true], "B2": ["green apple", false, true] } }
+}

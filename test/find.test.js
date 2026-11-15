@@ -126,3 +126,30 @@ test('Look in Notes and Comments as Excel 365: notes alone, threaded comments al
   assert.deepEqual(found('comments'), of('comments: apple'));
   assert.deepEqual(found('formulas'), of('formulas: apple, with notes about'));
 });
+
+test("Find and Replace with formats, as Excel's dialog does them (its window, find-format-excel.json)", async () => {
+  const fs = await import('node:fs');
+  const { build, area } = await import('./steps.js');
+  const { findAll: all, replaceChanges } = await import('../src/ooxml/findops.js');
+  const { refName } = await import('../src/ooxml/refs.js');
+  const X = JSON.parse(fs.readFileSync('test/find-format-excel.json', 'utf8'));
+  const { wb, si } = build({ cells: X.cells, formats: [...X.bold.map((a) => ({ range: a, bold: true })), ...X.filled.map((a) => ({ range: a, color: 65535 }))] });
+  const opts = { findFormat: { bold: true }, replaceFormat: { fill: 'FFFFFF00' } };
+  assert.deepEqual(all(wb, si, X.findAll.what, opts).map((h) => refName(h.r, h.c)), X.findAll.found, 'Find All, Bold alone');
+  const run = (what, withText) => {
+    const steps = replaceChanges(wb, all(wb, si, what, opts), what, withText, opts);
+    for (const st of steps) { if (st.contents.length) wb.apply(st.si, st.contents); if (st.styles.length) wb.setStyles(st.si, st.styles); }
+    return steps.count;
+  };
+  const after = () => Object.fromEntries(Object.keys(X.replaceAll.after).map((ref) => {
+    const a = area(ref);
+    const cell = wb.sheet(si).cells.get(a.r0)?.get(a.c0);
+    const xf = wb.styles.cellXfs[cell?.s || 0];
+    const fill = wb.styles.fills[xf.fillId];
+    return [ref, [cell?.v, !!wb.styles.fonts[xf.fontId].b, fill?.pattern === 'solid' && fill.fg?.rgb?.toUpperCase() === 'FFFFFF00']];
+  }));
+  assert.equal(run(X.replaceAll.what, X.replaceAll.with), X.replaceAll.replacements, 'apple to fruit: two replaced');
+  assert.deepEqual(after(), X.replaceAll.after);
+  assert.equal(run(X.formatsOnly.what, X.formatsOnly.with), X.formatsOnly.replacements, 'formats only: three');
+  assert.deepEqual(after(), X.formatsOnly.after);
+});

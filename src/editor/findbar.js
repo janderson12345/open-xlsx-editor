@@ -3,6 +3,7 @@
 import { el } from './ribbonkit.js';
 import { findAll, findNext, replaceChanges, searchText } from '../ooxml/findops.js';
 import { colName } from '../ooxml/refs.js';
+import { ruleFormatBox } from './cfformatbox.js';
 
 const NOT_FOUND = "We couldn't find what you were looking for. Select Options for more ways to search.";
 const NOTHING_TO_REPLACE = "We couldn't find anything to replace. Select Options for more ways to search.";
@@ -32,9 +33,25 @@ export function createFindBar(ctx) {
   const [order, orderOpt] = choice('Search:', [['rows', 'By Rows'], ['cols', 'By Columns']]);
   const [lookIn, lookOpt] = choice('Look in:', [['formulas', 'Formulas'], ['values', 'Values'], ['notes', 'Notes'], ['comments', 'Comments']]);
   const info = el('span', { class: 'oxe-findinfo', role: 'status' }); // (read out by screen readers, 4.1.3)
+  // (Find Format and Replace Format: Excel's Format... beside each box, its format shown, Clear to take it off.)
+  const formats = { find: null, replace: null };
+  const formatControl = (key, label) => {
+    const shown = el('span', { class: 'oxe-find-format', 'aria-live': 'polite' }, 'No Format Set');
+    const clear = el('button', { type: 'button', title: `Clear ${label}`, hidden: true, onmousedown: (e) => { e.preventDefault(); set(null); } }, 'Clear');
+    const set = (f) => {
+      formats[key] = f && Object.keys(f).length ? f : null;
+      const f2 = formats[key];
+      shown.textContent = f2 ? ['bold', 'italic', 'underline', 'strike'].filter((k) => f2[k]).concat(f2.numFmt ? [f2.numFmt] : [], f2.color ? ['font colour'] : [], f2.fill ? ['fill'] : []).join(', ') || 'Format set' : 'No Format Set';
+      if (f2?.fill) shown.style.background = `#${f2.fill.slice(2)}`; else shown.style.background = '';
+      clear.hidden = !f2;
+    };
+    const pick = el('button', { type: 'button', title: label, onmousedown: (e) => { e.preventDefault(); ctx.hold?.(true); ruleFormatBox(ctx.root).then((f) => { if (f) { delete f.border; set(f); } ctx.hold?.(false); findBox.focus(); }); } }, 'Format...');
+    return el('span', { class: 'oxe-find-formats' }, shown, pick, clear);
+  };
   const opts = (forReplace = false) => ({
     matchCase: matchCase.checked, whole: whole.checked, within: within.value, byColumns: order.value === 'cols',
     lookIn: forReplace ? 'formulas' : lookIn.value,
+    ...(formats.find ? { findFormat: formats.find } : {}), ...(forReplace && formats.replace ? { replaceFormat: formats.replace } : {}),
   });
   const say = (text) => { info.textContent = text; };
   const button = (label, title, fn) => el('button', { type: 'button', title, onmousedown: (e) => { e.preventDefault(); fn(); } }, label);
@@ -84,9 +101,9 @@ export function createFindBar(ctx) {
 
   // (Find All's list, Excel's columns: Sheet, Cell, Value, Formula.)
   const list = el('div', { class: 'oxe-findall', role: 'group', 'aria-label': 'Cells found', hidden: true });
-  const replRow = el('div', { class: 'oxe-replrow' }, replBox, button('Replace', 'Replace', replaceOne), button('Replace All', 'Replace All', replaceAll));
+  const replRow = el('div', { class: 'oxe-replrow' }, replBox, formatControl('replace', 'Replace Format'), button('Replace', 'Replace', replaceOne), button('Replace All', 'Replace All', replaceAll));
   const bar = el('div', { class: 'oxe-findbar', role: 'search', 'aria-label': 'Find and Replace', hidden: true },
-    el('div', { class: 'oxe-findrow' }, findBox,
+    el('div', { class: 'oxe-findrow' }, findBox, formatControl('find', 'Find Format'),
       button('↑', 'Find Previous (Shift+Enter)', () => next(-1)), button('↓', 'Find Next (Enter)', () => next(1)), button('Find All', 'Find All', all),
       button('✕', 'Close (Esc)', () => close())),
     replRow,

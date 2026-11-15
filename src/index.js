@@ -281,6 +281,7 @@ export function mountXlsxEditor(host, options = {}) {
       apply: (steps) => editing().run('applyChanges', steps),
       home: () => state.grid?.el.focus({ preventScroll: true }),
       readOnly: () => state.readOnly,
+      root,
     });
     el.after(state.find.el);
     // (Formulas > Watch Window: docked under the Find bar, kept up to date as the workbook changes.)

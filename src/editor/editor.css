@@ -1429,6 +1429,9 @@
 /* A filter list of dates: years, their months indented, the days further. */
 .oxe-filter-month { padding-left: 16px; }
 .oxe-filter-day { padding-left: 32px; }
+/* Find and Replace's formats: what is set, Format..., Clear. */
+.oxe-find-formats { display: inline-flex; align-items: center; gap: 4px; }
+.oxe-find-format { min-width: 90px; padding: 1px 6px; border: 1px solid #b0b0b0; font-size: 12px; text-align: center; }
 /* Find All's list: a row a cell found, its sheet, cell, value and formula. */
 .oxe-findall { max-height: 160px; overflow: auto; border-top: 1px solid #d0d0d0; font-size: 12px; }
 .oxe-findall-row { display: grid; grid-template-columns: 1fr 70px 2fr 2fr; gap: 8px; width: 100%; padding: 2px 6px; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }

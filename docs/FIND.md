@@ -35,11 +35,23 @@ The messages are Excel 365's: "We couldn't find what you were looking for. Selec
 and "All done. We made 3 replacements." (Excel shows them in a message box; here they are in the bar's status line.
 They come from Excel's dialog, which COM doesn't reach, so their wording isn't measured.)
 
+## Formats (Find Format and Replace Format)
+
+Format... beside Find what and Replace with: the format to find (bold, italic, underline, strikethrough, font colour,
+fill, number format) and the format a replacement gives, each shown, Clear to take it off. Measured in Excel's own dialog
+(used in its window; `test/find-format-excel.json`): COM can't, its FindNext dropping the format and an empty Replace
+emptying cells (`excel-find2.ps1`).
+
+| Rule | Seen |
+|---|---|
+| A cell matches when it has every property the find format sets; the others are free. | Bold alone: the bold cells, whatever else. |
+| Nothing in Find what, a find format: every filled cell of that format. | Find All: A1, B1, A3, the bold ones, in rows. |
+| Replace All replaces in the cells of the find format alone, and gives them the replace format, keeping their own. | apple to fruit, bold ones only, a yellow fill: 2 replaced, still bold; the plain apple and the bold pear as they were. |
+| Nothing in either box: only the format replaced, the text kept. | 3 replaced: the three bold cells yellow, their text as it was. |
+
 ## Not yet
 
-Format (finding and replacing formats, Find Format and Replace Format). Over COM it can't be measured as the dialog
-does it: FindNext drops the format (it went on to a plain "apple" when bold ones were asked for), and a Replace with
-nothing to find emptied the bold cells instead of only formatting them (`excel-find2.ps1`). (Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
+Choose Format From Cell, and a border in Find Format. (Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
 
 ## Found on the way
 
