@@ -66,7 +66,11 @@ function readDate(s, thisYear) {
 /** A time typed alone: { value (a fraction of a day, more past 24 hours), format } or null. Minutes or seconds past
  *  59 still make a number, but General, as Excel leaves it; AM and PM want a space before them. */
 function readTime(s) {
-  const ap = /^(.*?)\s+(am|pm)$/i.exec(s);
+  // (AM or PM at the end with a space before it, and what comes before: by slicing, not /^(.*?)\s+(am|pm)$/, which a
+  // long run of spaces makes slow, code scanning.)
+  const end = /(am|pm)$/i.exec(s);
+  const before = end ? s.slice(0, -2) : '';
+  const ap = end && /\s$/.test(before) ? [s, before.trimEnd(), end[1]] : null;
   const body = ap ? ap[1] : s;
   if (ap && /^\d{1,2}$/.test(body)) {
     const h = Number(body);
@@ -174,7 +178,9 @@ export function parseInput(text, { today = new Date(), date1904 = false, asText 
   const time = readTime(t);
   if (time) return { value: time.value, format: time.format === 'General' ? undefined : time.format, kind: 'time' };
   // A date and a time: m/d/yyyy h:mm, whatever the time's own form (General when the time is past 24 hours).
-  const both = /^(\S+)\s+(.+)$/.exec(t);
+  // (Split at the first space by its index, not /^(\S+)\s+(.+)$/, which a long run of spaces makes slow, code scanning.)
+  const gap = t.search(/\s/);
+  const both = gap > 0 && t.slice(gap).trim() ? [t, t.slice(0, gap), t.slice(gap).trimStart()] : null;
   if (both) {
     const d = readDate(both[1], thisYear);
     const tm = d && (/:/.test(both[2]) || /\s(am|pm)$/i.test(both[2])) && readTime(both[2]);

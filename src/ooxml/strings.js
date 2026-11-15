@@ -59,12 +59,14 @@ export function readSharedStrings(doc) {
 }
 
 const escText = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// (An attribute's value: its quotes escaped too, whatever a run's font was given through the API.)
+const escAttr = (t) => escText(t).replace(/"/g, '&quot;');
 /** A font colour (styles.js readColor) as its element. */
 const colorXml = (c) => {
   if (!c) return '';
   if (c.auto) return '<color auto="1"/>';
-  if (c.rgb) return `<color rgb="${c.rgb}"/>`;
-  if (c.theme != null) return `<color theme="${c.theme}"${c.tint ? ` tint="${c.tint}"` : ''}/>`;
+  if (c.rgb) return `<color rgb="${escAttr(c.rgb)}"/>`;
+  if (c.theme != null) return `<color theme="${escAttr(c.theme)}"${c.tint ? ` tint="${escAttr(c.tint)}"` : ''}/>`;
   if (c.indexed != null) return `<color indexed="${c.indexed}"/>`;
   return '';
 };
@@ -82,9 +84,9 @@ export function richRunsXml(runs, base) {
     const t = `<t${/^\s|\s$|[\t\n]/.test(r.text) ? ' xml:space="preserve"' : ''}>${escText(r.text)}</t>`;
     if (!f || !Object.values(f).some((v) => v != null && v !== false)) return `<r>${t}</r>`;
     const own = f.name && f.name !== base.name;
-    const props = [f.b && '<b/>', f.i && '<i/>', f.strike && '<strike/>', f.u && (f.u === 'single' || f.u === true ? '<u/>' : `<u val="${f.u}"/>`), f.vertAlign && `<vertAlign val="${f.vertAlign}"/>`,
-      `<sz val="${f.size ?? base.size}"/>`, f.color ? `<color rgb="${f.color}"/>` : colorXml(base.color), `<rFont val="${escText(own ? f.name : base.name)}"/>`,
-      !own && base.family != null ? `<family val="${base.family}"/>` : '', !own && base.scheme ? `<scheme val="${base.scheme}"/>` : ''].filter(Boolean).join('');
+    const props = [f.b && '<b/>', f.i && '<i/>', f.strike && '<strike/>', f.u && (f.u === 'single' || f.u === true ? '<u/>' : `<u val="${escAttr(f.u)}"/>`), f.vertAlign && `<vertAlign val="${escAttr(f.vertAlign)}"/>`,
+      `<sz val="${escAttr(f.size ?? base.size)}"/>`, f.color ? `<color rgb="${escAttr(f.color)}"/>` : colorXml(base.color), `<rFont val="${escAttr(own ? f.name : base.name)}"/>`,
+      !own && base.family != null ? `<family val="${escAttr(base.family)}"/>` : '', !own && base.scheme ? `<scheme val="${escAttr(base.scheme)}"/>` : ''].filter(Boolean).join('');
     return `<r><rPr>${props}</rPr>${t}</r>`;
   }).join('');
 }

@@ -55,7 +55,7 @@ test('Clear Hyperlinks: a hyperlink meeting the cells goes whole, with its relat
   assert.notEqual(style(wb, si, 'E2'), 0);
   run(wb, si, 'hyperlinks', 'A1:E2');
   assert.deepEqual(links(wb, si), []);
-  assert.ok(!(wb.pkg.text(wb.sheets[si].path.replace(/worksheets\//, 'worksheets/_rels/') + '.rels') || '').includes('example.com'));
+  assert.ok(!/relationships\/hyperlink"/.test(wb.pkg.text(wb.sheets[si].path.replace(/worksheets\//, 'worksheets/_rels/') + '.rels') || ''));
   assert.ok(!wb.pkg.text(wb.sheets[si].path).includes('<hyperlinks'));
 });
 

@@ -19,7 +19,6 @@ export class FormulaError extends Error {
 // What ends an unquoted sheet name.
 const STOP = String.raw`\s!'"(),;:{}\[\]=<>+\-*/^&%#$`;
 const RE_BOOK = /\[(\d+)\]/y;
-const RE_QSHEET = /'((?:[^']|'')+)'!/y;
 const RE_SHEET = new RegExp(`([^${STOP}0-9.][^${STOP}]*)!`, 'y');
 // (A 3D reference's sheets, Jan:Apr!, unless the first reads as a cell: S1:S4!A1 is S1 to S4!A1, as Excel reads it.)
 const RE_SHEETS = new RegExp(`([^${STOP}0-9.][^${STOP}]*):([^${STOP}0-9.][^${STOP}]*)!`, 'y');
@@ -33,6 +32,21 @@ const RE_IDENT = /[A-Za-z_\\][A-Za-z0-9_.?\\]*/y;
 const RE_AFTER_REF = /[A-Za-z0-9_.?\\(!]/;
 
 const at = (re, text, i) => { re.lastIndex = i; return re.exec(text); };
+/** A quoted sheet name at i ('Q1 ''24'!A1): its text as written, '' doubled, and its length with the quotes and the
+ *  "!"; null if there is none. A loop rather than a regular expression, so a long run of quotes can't make it slow
+ *  (code scanning, js/polynomial-redos). */
+function quotedSheetAt(text, i) {
+  if (text[i] !== "'") return null;
+  let j = i + 1;
+  while (j < text.length) {
+    if (text[j] === "'") {
+      if (text[j + 1] !== "'") break;
+      j += 2;
+    } else j++;
+  }
+  if (j >= text.length || j === i + 1 || text[j + 1] !== '!') return null;
+  return { raw: text.slice(i + 1, j), length: j + 2 - i };
+}
 /** Where the brackets opened at i close (a table reference's), nested ones and ' escapes passed over; -1 if never. */
 function bracketsEnd(text, i) {
   let depth = 0;
@@ -53,9 +67,10 @@ function refAt(text, i) {
   let book = null;
   let m = at(RE_BOOK, text, j);
   if (m) { book = m[1]; j += m[0].length; }
-  if ((m = at(RE_QSHEET, text, j))) {
-    sheet = m[1].replace(/''/g, "'");
-    j += m[0].length;
+  const quoted = quotedSheetAt(text, j);
+  if (quoted) {
+    sheet = quoted.raw.replace(/''/g, "'");
+    j += quoted.length;
     const inner = /^\[(\d+)\](.*)$/.exec(sheet);
     if (inner) { book = inner[1]; sheet = inner[2]; }
   } else if ((m = at(RE_SHEETS, text, j)) && !/^\$?[A-Za-z]{1,3}\$?[0-9]{1,7}$/.test(m[1])) {
@@ -108,7 +123,10 @@ function refAt(text, i) {
 function literal(s) {
   const m = /^(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(s);
   const all = (m[1] + (m[2] || '')).replace(/^0+/, '');
-  if (all.replace(/0+$/, '').length <= 15) return Number(s);
+  // (Trailing zeros counted by a loop: /0+$/ on a long run of zeros followed by another digit is slow, code scanning.)
+  let end = all.length;
+  while (end > 0 && all[end - 1] === '0') end--;
+  if (end <= 15) return Number(s);
   // (Significant digits counted from the first non-zero one; the point stays where it was.)
   const lead = (m[1] + (m[2] || '')).length - all.length;
   const digits = (m[1] + (m[2] || '')).slice(0, lead + 15);

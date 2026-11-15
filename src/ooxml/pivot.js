@@ -368,7 +368,7 @@ function layoutTable(wb, t, records, shared, sharedIndex, oldShared, fresh = fal
     if (!order[i]) return field;
     const items = `<items count="${order[i].length + 1}">${order[i].map((v) => `<item x="${sharedIndex[i].get(keyOf(v))}"/>`).join('')}<item t="default"/></items>`;
     if (/<items\b/.test(field)) return field.replace(/<items\b[^>]*?(?:\/>|>[\s\S]*?<\/items>)/, items);
-    return field.endsWith('/>') ? `${field.slice(0, -2)}>${items}</pivotField>` : field.replace(/>/, `>${items}`);
+    return field.endsWith('/>') ? `${field.slice(0, -2)}>${items}</pivotField>` : field.replace(/^<pivotField\b[^>]*>/, (open) => open + items);
   });
   const block = (name, list) => `<${name} count="${list.length}">${list.join('')}</${name}>`;
   // (Where a part has none yet, as a new one hasn't: after the element the schema puts first among those there.)
