@@ -13,6 +13,9 @@ insides:
 | Module | What it does |
 |---|---|
 | `src/index.js` | `mountXlsxEditor(host, { bytes, fileName, theme })`: opens a workbook and shows the sheet it opens on, with the sheet tabs; `showSheet` changes sheet; `insertSheet`, `renameSheet`, `moveSheet`, `hideSheet`, `setTabColor`, `deleteSheet`; the tab menu's actions; `save()` gives the bytes back. Types in `src/index.d.ts`. |
+| `src/editor/mountparts.js` | The grid, its editing and the sheet tabs, made with the first workbook opened. |
+| `src/editor/statusbar.js` | The status bar's figures for the selection and Customize Status Bar. |
+| `src/editor/features.js` | The ribbon group each command belongs to, for `features`. |
 | `src/ooxml/package.js` | The OPC package (the zip): every part kept byte for byte, relationships, content types; only changed parts rewritten. From open-docx-editor. |
 | `src/ooxml/xml.js` | Parsing and serialising XML (injectable DOMParser for Node), namespace-aware lookups defaulting to SpreadsheetML, `_xHHHH_` decoding. From open-docx-editor. |
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
@@ -134,6 +137,7 @@ insides:
 | `src/editor/commands-sheets.js`, `commands-data.js`, `commands-parts.js` | The rest of the named commands, as factories given `commands.js`'s shared state and helpers as one object: the sheets' (show, insert, rename, move, hide, colour, delete, through sheetOp); data (copy, cut, paste, fill, sort, AutoSum, the Name Box, the filter); and parts beyond the cells (PivotTables, notes and rules, another editor's contents, the agent). |
 | `src/editor/commands-borders.js` | The drawBorders, moreColor and recentColor commands (Draw Borders over a range, a custom colour on the selection, Recent Colors). |
 | `src/editor/commands.js` | Every action as a named command (select, move, enter, clear, undo, redo, showSheet, nextSheet, insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet, and the formatting ones: format, toggleFont, stepFont, toggleWrap, stepIndent, align, borders, stepDecimal, clearFormats), with the workbook's undo history of cell contents and formats (values and formulas; undoing a change on another sheet shows it; cleared by a rename or delete) and each sheet's selection and scroll position, both by sheetId. |
+| `src/editor/commands-lines.js` | Row and column sizes as commands: a heading edge dragged, Column Width, Row Height, Default Width, AutoFit, hiding and showing lines. |
 | `src/calc/functions-info.js`, `cellinfo.js` | CELL and INFO; a cell's format as CELL's letters (G, F2, C0-, D4...), its prefix, protection and column width. |
 | `src/ooxml/protection.js`, `src/editor/protectbox.js` | Protect Sheet: written and read as Excel writes it (the password's SHA-512 hash), whether a cell is locked, why a change is refused; Excel's boxes. |
 | `src/ooxml/pivotdata.js` | GETPIVOTDATA's lookup: a PivotTable's cache, only what the pivot shows. |
@@ -146,6 +150,7 @@ insides:
 | `src/editor/formulabar.js` | The active cell's name (or the selection's name) and contents; Enter there enters into the cell. |
 | `src/editor/namelist.js` | The Name Box's drop-down list of names to go to. |
 | `src/editor/interact.js` | Keys and mouse on the grid wired to the commands, the editor and the bar; screen-reader announcements (`live.js`). |
+| `src/editor/clipevents.js` | Copy, cut and paste through the browser's clipboard events and the async clipboard, for the grid. |
 | `src/editor/pointing.js` | Pointing at cells while a formula is typed (Excel's Point mode): arrows, clicks and drags put references in where one can go, F4 cycles $, the formula's ranges outlined in colours, references on another sheet with its name. |
 | `src/editor/tabs.js` | The sheet tabs: an ARIA tablist under the grid, sheets whose tabs aren't hidden, in their tab colours (text black or white, whichever reads better); chart sheets' tabs there but not shown yet; the New sheet button, renaming in place, dragging a tab to move it. |
 | `src/editor/sheetmenu.js` | A menu of buttons (arrows, Home, End, Esc, a colour submenu) and the tab's entries: Insert, Delete, Rename, Move Left/Right, Tab Color (theme and standard colours), Hide, Unhide. |

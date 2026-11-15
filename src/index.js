@@ -1,21 +1,19 @@
 // open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. The ribbon over a sheet at a time
 // in a virtualised grid, the sheet tabs under it (with their menu: insert, delete, rename, move, colour, hide, unhide).
 import { Workbook } from './ooxml/workbook.js';
-import { createGrid } from './editor/grid.js';
 import { renderPrint } from './editor/print.js';
 import { createActs } from './editor/acts.js';
-import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { headerPictures } from './ooxml/hfpictures.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { fontsChanged } from './editor/fonts.js';
 import { useOmf } from './editor/omffonts.js';
 import { dropSheet } from './editor/sheets.js';
-import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
 import { csvWorkbook, isCsv, csvBytes } from './ooxml/csv.js';
-import { attachEditing } from './editor/interact.js';
-import { createSheetTabs } from './editor/tabs.js';
+import { createParts } from './editor/mountparts.js';
+import { groupOf } from './editor/features.js';
+import { createStatusBar } from './editor/statusbar.js';
 import { createMenu, tabMenuEntries } from './editor/sheetmenu.js';
 import { messageBox, unhideBox, passwordBox } from './editor/dialogs.js';
 import { PasswordError } from './ooxml/encryption.js';
@@ -39,12 +37,11 @@ import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
 import { sparklineTab } from './editor/sparklinetab.js';
 import { formulasTab } from './editor/formulastab.js';
-import { calcMode, needsCalculation, calculateBeforeSave } from './ooxml/calcmode.js';
+import { calcMode, calculateBeforeSave } from './ooxml/calcmode.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
 import { isDateFormat } from './ooxml/format.js';
 import { fillOptionChoices } from './editor/fillopts.js';
-import { selectionStats } from './ooxml/stats.js';
 import { parseRef } from './ooxml/refs.js';
 import { namesOnSheet } from './ooxml/names.js';
 import { AgentWorkbook } from './agent.js';
@@ -55,19 +52,6 @@ export { PasswordError };
 /** The open-metric-fonts release the editor's font faces are for (`fonts: { omf }`; README, Fonts). */
 export { OMF_VERSION } from './editor/omf.js';
 
-/** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
- *  ribbon or the keyboard. */
-const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', drawBorders: 'font', moreColor: 'font', toggleWrap: 'alignment', stepIndent: 'alignment', align: 'alignment', merge: 'alignment',
-  resizeLines: 'cells', columnWidth: 'cells', rowHeight: 'cells', fitLines: 'cells', hideLines: 'cells', rowHeightBox: 'cells', columnWidthBox: 'cells',
-  freeze: 'window', zoom: 'zoom', zoomBox: 'zoom', zoomSelection: 'zoom', zoomToSelection: 'zoom',
-  lines: 'cells', cells: 'cells', insertCells: 'cells', deleteCells: 'cells', insertRows: 'cells', deleteRows: 'cells', insertColumns: 'cells', deleteColumns: 'cells',
-  clipCopy: 'clipboard', clipCut: 'clipboard', clipPaste: 'clipboard', copy: 'clipboard', cut: 'clipboard', paste: 'clipboard',
-  pasteSpecial: 'clipboard', pasteSpecialBox: 'clipboard', pasteAs: 'clipboard', formatPainter: 'clipboard', paintFormats: 'clipboard',
-  formatCells: 'font', formatCellsBox: 'font',
-  stepDecimal: 'number', clearFormats: 'editing', clearAs: 'editing', fill: 'editing', autoFill: 'editing',
-  sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing', autoSum: 'editing',
-  filterToggle: 'editing', filterBy: 'editing', filterClear: 'editing', filterReapply: 'editing', filterAll: 'editing', filterSort: 'editing' };
-const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');
 
 /**
  * Mount the editor in `host`.
@@ -220,30 +204,10 @@ export function mountXlsxEditor(host, options = {}) {
     state.ribbon.update({ ...look, fontName: fontFamily(look.font, wb.theme), fonts: wb.theme.fonts, canUndo: state.editing.commands.canUndo(), canRedo: state.editing.commands.canRedo(), view: { ...state.grid.view(), formulaBar: !root.querySelector('.oxe-bar')?.hidden }, sheetProtected: !!sheetProtection(wb, state.sheetIndex), bookProtected: !!workbookProtection(wb)?.structure });
     showStats();
   };
-  /** The status bar's figures in Excel's order: [key, menu label, the bar's label, the value from stats.js]. */
-  const STATUS_ITEMS = [['average', 'Average', 'Average', (s) => s.text?.average], ['count', 'Count', 'Count', (s) => String(s.count)],
-    ['numericalCount', 'Numerical Count', 'Numerical Count', (s) => (s.text ? String(s.numbers) : null)], ['minimum', 'Minimum', 'Min', (s) => s.text?.min],
-    ['maximum', 'Maximum', 'Max', (s) => s.text?.max], ['sum', 'Sum', 'Sum', (s) => s.text?.sum]];
-  /** Which of them are on: `statusBar` ({ minimum: true, ... }) over the user's last choice in this browser over
-   *  Excel's default three (Average, Count, Sum). */
-  const statusOn = (() => {
-    let saved = {};
-    try { saved = JSON.parse(localStorage.getItem('oxe-status') || '{}') || {}; } catch { /* storage blocked */ }
-    return { average: true, count: true, numericalCount: false, minimum: false, maximum: false, sum: true, ...saved, ...(typeof options.statusBar === 'object' ? options.statusBar : {}) };
-  })();
-  /** The status bar: the figures on (STATUS_ITEMS) for the selection (stats.js); Count alone for text or an error. */
-  const showStats = () => {
-    if (!state.tabs || !state.editing) return;
-    // (Auto Fill Options go once the selection is no longer the cells filled.)
-    const sel = state.editing.commands.selection;
-    if (state.lastFill && ['r0', 'c0', 'r1', 'c1'].some((k) => sel[k] !== state.lastFill.to[k])) { state.lastFill = null; state.grid?.showFillOptions(null); }
-    if (options.statusBar === false) { state.tabs.status('', true); return; }
-    const s = selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
-    const parts = !s ? [] : STATUS_ITEMS.filter(([k]) => statusOn[k]).map(([, , label, value]) => [label, value(s)]).filter(([, v]) => v != null).map(([l, v]) => `${l}: ${v}`);
-    // (Manual calculation with formulas waiting: Excel's Calculate.)
-    if (needsCalculation(state.workbook)) parts.unshift('Calculate');
-    state.tabs.status(parts.join('    '));
-  };
+  // (The status bar's figures and its Customize Status Bar menu: editor/statusbar.js.)
+  const status = createStatusBar({ state, options, menu });
+  const showStats = status.show;
+  const statusMenu = status.menu;
   /** The workbook's cell formats as the grid draws them (cellstyles.js), and which cells of the sheet shown are
    *  hidden by its protection (ooxml/protection.js contentsHidden). */
   const looksOf = (wb) => ({ ...applyCellStyles(root, wb), hiddenAt: (r, c) => contentsHidden(wb, state.sheetIndex, r, c) });
@@ -324,15 +288,6 @@ export function mountXlsxEditor(host, options = {}) {
       editing().run('autoFill', fill.to, { type });
     } })), point, { label: 'Auto Fill Options' });
   };
-  /** Customize Status Bar (the status bar right-clicked): each figure ticked or not, its value now beside it. */
-  const statusMenu = (point) => {
-    const s = state.editing && selectionStats(state.workbook, state.sheetIndex, state.editing.commands.selection);
-    menu.open(STATUS_ITEMS.map(([k, label, , value]) => ({ label, checked: statusOn[k], value: s ? value(s) ?? '' : '', run: () => {
-      statusOn[k] = !statusOn[k];
-      try { localStorage.setItem('oxe-status', JSON.stringify(statusOn)); } catch { /* storage blocked */ }
-      showStats();
-    } })), point, { label: 'Customize Status Bar' });
-  };
   const openMenu = (i, point, byKeyboard) => {
     // (As in Excel, the tab right-clicked becomes the sheet shown.)
     if (state.workbook.canShow(i)) editing().run('showSheet', i);
@@ -389,81 +344,10 @@ export function mountXlsxEditor(host, options = {}) {
       state.looks = looksOf(wb);
       if (state.grid) { state.grid.setSheet(sheet, wb.sheets[i].name, state.looks); state.grid.setNotes(readNotes(wb, i)); showConditional(); }
       else {
-        state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
-        state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
-        state.grid.onErrorButton((point) => act('errorMenu', point));
-        state.grid.onFillOptions((point) => fillOptionsMenu(point));
-        state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
-        state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], act, menu: (point, k) => chartMenu(point, k), readOnly: () => state.readOnly });
-        state.grid.onChartsDrawn(() => state.picker?.redrawn());
-        state.grid.setNotes(readNotes(wb, i));
-        showConditional();
-        state.editing = attachEditing(root, {
-          workbook: () => state.workbook,
-          sheetIndex: () => state.sheetIndex,
-          showSheet,
-          sheetsChanged,
-          alert,
-          // (Excel's Unlock Range, for a change to an Allow Edit Range with a password: rangesbox.js.)
-          followLink,
-          unlockRange: (name) => unlockRangeBox(root).then((pw) => pw != null && editing().run('unlockEditRange', name, pw)),
-          grid: state.grid,
-          looks: () => state.looks,
-          readOnly: () => state.readOnly,
-          changed: () => { showConditional(); options.onChange?.(); },
-          edited: (e) => { for (const f of [...state.onEdit]) f(e); },
-          lookChanged,
-          restyled,
-          clipShown: (c) => { state.clip = c; showClip(); },
-          reloaded: () => { state.grid.setModel(state.workbook.sheet(state.sheetIndex)); lookChanged(); },
-          lines,
-          headerMenu,
-          cellMenu,
-          pasteSpecial: () => act('pasteSpecialBox'),
-          link: () => act('linkBox'),
-          autoSum: (fn) => act('autoSum', fn),
-          filterMenu: () => filterMenu() || listMenu(),
-          askInvalid: (info) => askInvalid(info),
-          selectionShown: () => { for (const f of [...state.onSelect]) f(); return showValidation(); },
-          goToBox: () => act('goToBox'),
-          nameManager: () => act('nameManager'),
-          createNames: () => act('createNames'),
-          insertFunction: () => act('insertFunction'),
-          functionArguments: () => act('functionArguments'),
-          pasteNames: () => act('pasteNames'),
-          errorMenu: () => { const at = state.grid.errorButtonAt(); return at ? act('errorMenu', at) : false; },
-          painting: () => act('painting'),
-          commentBox: () => act('commentBox'),
-          flashFill: () => act('flashFill'),
-          chartKey: (e) => state.picker?.onKey(e),
-          formatCells: () => act('formatCellsBox'),
-          painted: () => act('paintFormats'),
-          drawing: () => act('drawing'),
-          drawn: (range, side) => act('drawn', range, side),
-          stopDrawing: () => act('stopDrawing'),
-          toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
-          editNote: () => act('editNote'),
-          fitWidth: (c) => state.grid.fitWidth(c),
-          fitHeight: (r) => state.grid.fitHeight(r),
-          // (A fill handle's fill: Auto Fill Options shown for it.)
-          filled: (fill) => { state.lastFill = fill; state.grid.showFillOptions(fill.to); },
-          find: (replace) => state.find?.open(replace),
-          shownText: (r, c) => state.grid.shownText(r, c),
-          allowed,
-        });
-        state.editing.setReadOnly(state.readOnly);
-        state.tabs = createSheetTabs(root, {
-          controls: state.grid.el.id,
-          on: {
-            select: (k) => editing().run('showSheet', k),
-            menu: openMenu,
-            statusMenu,
-            rename: sheetActs.rename,
-            move: (from, to) => editing().run('moveSheet', from, to),
-            add: () => editing().run('insertSheet', { after: true }),
-            keepFocus: () => !!state.editing?.keepsFocus(),
-          },
-        });
+        // (The grid, its editing and the sheet tabs, made with the first workbook: editor/mountparts.js.)
+        createParts({ root, state, options, act, openFilter, fillOptionsMenu, listMenu, chartMenu, showConditional, showSheet,
+          sheetsChanged, alert, followLink, editing, lookChanged, restyled, showClip, lines, headerMenu, cellMenu, filterMenu,
+          askInvalid, showValidation, allowed, openMenu, statusMenu, sheetActs }, wb, i, sheet);
       }
       if (!state.ribbon) makeRibbon();
       state.tabs.set(tabList(wb), i);

@@ -17,6 +17,7 @@ import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { contentsHidden } from '../ooxml/protection.js';
 import { linkFollower } from './linkfollow.js';
+import { attachClipboard } from './clipevents.js';
 import { attachBorderDrag } from './drawdrag.js';
 import { areasOf } from './selection.js';
 import { selectionName, goToNames } from '../ooxml/goto.js';
@@ -252,7 +253,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');
     else if (ctrl && (key === 'y' || ((key === 'z' || key === 'Z') && e.shiftKey))) cmd.run('redo');
     // (Ctrl+C, X and V: the browser's copy and paste go on after the key, so its default isn't stopped.)
-    else if (ctrl && !e.altKey && !e.shiftKey && /^[cxv]$/i.test(key)) { if (key.toLowerCase() === 'v') keyPaste(); else keyCopy(key.toLowerCase() === 'x'); handled = false; }
+    else if (ctrl && !e.altKey && !e.shiftKey && /^[cxv]$/i.test(key)) { if (key.toLowerCase() === 'v') clipboard.keyPaste(); else clipboard.keyCopy(key.toLowerCase() === 'x'); handled = false; }
     // (Excel's font shortcuts: Ctrl+B or 2 bold, I or 3 italic, U or 4 underline, 5 strikethrough.)
     else if (ctrl && !e.shiftKey && !e.altKey && FONT_KEYS[key.toLowerCase()]) { if (ctx.allowed?.('toggleFont') !== false) cmd.run('toggleFont', FONT_KEYS[key.toLowerCase()]); }
     else if (key.length === 1 && !ctrl && !e.altKey) startEdit('enter', key);
@@ -260,65 +261,8 @@ export function attachEditing(root, ctx) {
     if (handled) e.preventDefault();
   });
 
-  // Copy, cut and paste through the browser's clipboard events (Ctrl+C, X, V, and the browser's own menu): the cells go
-  // on the system clipboard as text, tabs between cells and a line for each row, as Excel puts them.
-  /** The text of the cells a copy holds, as the grid shows them. */
-  const clipText = (clip) => {
-    const lines = [];
-    for (let r = clip.rect.r0; r <= clip.rect.r1; r++) {
-      const line = [];
-      for (let c = clip.rect.c0; c <= clip.rect.c1; c++) line.push(grid.shownText(r, c) ?? '');
-      lines.push(line.join('\t'));
-    }
-    return `${lines.join('\r\n')}\r\n`;
-  };
-  const norm = (t) => t.replace(/\r\n?/g, '\n').replace(/\n$/, '');
-  /** Copy or cut the selection: kept here, and its text returned for the system clipboard (null if refused). */
-  const takeClip = (cut) => {
-    const clip = cmd.run(cut ? 'cut' : 'copy');
-    if (!clip) return null;
-    const text = clipText(clip);
-    clip.text = norm(text);
-    announce(`${cut ? 'Cut' : 'Copied'} ${refName(clip.rect.r0, clip.rect.c0)}${clip.rect.r1 > clip.rect.r0 || clip.rect.c1 > clip.rect.c0 ? ` to ${refName(clip.rect.r1, clip.rect.c1)}` : ''}`);
-    return text;
-  };
-  const pasteText = (text) => cmd.run('paste', text == null ? null : norm(text));
-  // Ctrl+C and Ctrl+X take the cells at the key, and the copy event that follows puts their text on the clipboard (a
-  // browser may send none to a sheet with no text selected: the async clipboard is tried too). Ctrl+V waits a moment
-  // for the paste event; without one it reads the async clipboard, or pastes what was copied here.
-  let pending = null;
-  let pasteTimer = 0;
-  const keyCopy = (cut) => {
-    if (ctx.allowed?.('copy') === false) return;
-    pending = takeClip(cut);
-    if (pending != null) navigator.clipboard?.writeText(pending).catch(() => {});
-  };
-  const keyPaste = () => {
-    if (ctx.allowed?.('paste') === false) return;
-    clearTimeout(pasteTimer);
-    pasteTimer = setTimeout(async () => {
-      let text = null;
-      try { text = await navigator.clipboard.readText(); } catch { /* not allowed: what was copied here */ }
-      pasteText(text);
-    }, 80);
-  };
-  const onCopy = (e) => {
-    if (document.activeElement !== view || ctx.allowed?.('copy') === false) return;
-    const text = pending ?? takeClip(e.type === 'cut');
-    pending = null;
-    if (text == null) return;
-    e.clipboardData.setData('text/plain', text);
-    e.preventDefault();
-  };
-  const onPaste = (e) => {
-    if (document.activeElement !== view || ctx.allowed?.('paste') === false) return;
-    clearTimeout(pasteTimer);
-    e.preventDefault();
-    pasteText(e.clipboardData.getData('text/plain'));
-  };
-  document.addEventListener('copy', onCopy);
-  document.addEventListener('cut', onCopy);
-  document.addEventListener('paste', onPaste);
+  // (Copy, cut and paste through the browser's clipboard events: clipevents.js.)
+  const clipboard = attachClipboard({ view, grid, ctx, run: (...a) => cmd.run(...a) });
 
   let dragging = false;
   let pointingDrag = false;
@@ -505,19 +449,19 @@ export function attachEditing(root, ctx) {
     },
     /** The ribbon's Copy and Cut: the clipboard written through the async API (a button has no clipboard event). */
     copyOut(cut = false) {
-      const text = takeClip(cut);
+      const text = clipboard.takeClip(cut);
       if (text != null) navigator.clipboard?.writeText(text).catch(() => {});
       view.focus({ preventScroll: true });
     },
     /** Format Painter's copy: the selection kept, outlined, as Copy keeps it but leaving the system clipboard
      *  alone. False if it couldn't be copied. */
-    pickFormats() { return takeClip(false) != null; },
+    pickFormats() { return clipboard.takeClip(false) != null; },
     /** The ribbon's Paste: the system clipboard's text if the browser lets it be read, else what was copied here. */
     async pasteIn() {
       let text = null;
       try { text = await navigator.clipboard.readText(); } catch { /* not allowed: what was copied here */ }
       if (text == null && !cmd.selection) return;
-      if (!pasteText(text) && text == null) announce('Use Ctrl+V to paste from another program');
+      if (!clipboard.pasteText(text) && text == null) announce('Use Ctrl+V to paste from another program');
       view.focus({ preventScroll: true });
     },
     editor,
@@ -530,10 +474,7 @@ export function attachEditing(root, ctx) {
       detachDrawing();
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('mouseup', onUp);
-      document.removeEventListener('copy', onCopy);
-      document.removeEventListener('cut', onCopy);
-      document.removeEventListener('paste', onPaste);
-      clearTimeout(pasteTimer);
+      clipboard.detach();
     },
   };
 }
