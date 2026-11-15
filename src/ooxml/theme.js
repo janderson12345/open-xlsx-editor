@@ -97,3 +97,17 @@ export function readTheme(doc) {
     colors: kids(clr).length ? colors : DEFAULT_THEME.colors,
   };
 }
+
+/** A DrawingML colour as charts write it ({ rgb } or { scheme: 'accent1', 'tx1', ... }, with lumMod and lumOff, the
+ *  fractions of luminance kept and added) as '#RRGGBB', or null. Luminance in Windows' integer HLS, as tints are:
+ *  black at 65% and 35% is #595959, at 15% and 85% #D9D9D9, Excel's chart text and line greys in its PDFs. */
+export function resolveDrawingColor(c, theme) {
+  if (!c || c.none) return null;
+  const at = c.scheme != null ? SCHEME.indexOf({ tx1: 'dk1', bg1: 'lt1', tx2: 'dk2', bg2: 'lt2' }[c.scheme] || c.scheme) : -1;
+  const rgb = c.rgb || (at >= 0 ? theme.colors[at] : null);
+  if (!rgb || !/^[0-9A-Fa-f]{6}$/.test(rgb)) return null;
+  if (c.lumMod == null && c.lumOff == null) return `#${rgb.toUpperCase()}`;
+  const [h, l, s] = rgbToHls(...[0, 2, 4].map((i) => parseInt(rgb.slice(i, i + 2), 16)));
+  const l2 = Math.max(0, Math.min(HLS, Math.round(l * (c.lumMod ?? 1) + HLS * (c.lumOff ?? 0))));
+  return `#${hlsToRgb(h, l2, s).map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+}

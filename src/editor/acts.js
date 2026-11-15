@@ -384,10 +384,10 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     return true;
   };
   /** The menu of a cell (right-click): Excel's, as far as the editor goes. */
-  /** A chart's menu (right click, Shift+F10): Edit Chart..., Select Data..., Delete. */
+  /** A chart's menu (right click, Shift+F10): Edit Chart..., Select Data..., Format Chart..., Delete. */
   const chartMenu = (point, k) => {
     const ro = state.readOnly;
-    menu.open([{ label: 'Edit Chart...', run: () => act('chartBox', k), disabled: ro }, { label: 'Select Data...', run: () => act('chartDataBox', k), disabled: ro }, 'separator', { label: 'Delete', run: () => act('chartDelete', k), disabled: ro }], point,
+    menu.open([{ label: 'Edit Chart...', run: () => act('chartBox', k), disabled: ro }, { label: 'Select Data...', run: () => act('chartDataBox', k), disabled: ro }, { label: 'Format Chart...', run: () => act('chartFormatBox', k), disabled: ro }, 'separator', { label: 'Delete', run: () => act('chartDelete', k), disabled: ro }], point,
       { back: () => state.grid.el.focus({ preventScroll: true }) });
   };
   const cellMenu = (point) => {

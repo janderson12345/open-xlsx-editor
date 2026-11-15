@@ -20,6 +20,7 @@ import { BAR_COLORS } from '../ooxml/cfbarsedit.js';
 import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
 import { chartBox } from './chartbox.js';
 import { createChartDataActs } from './acts-chartdata.js';
+import { createChartActs } from './chartacts.js';
 import { currentRegion } from '../ooxml/special.js';
 import { xfOf, fontFamily } from '../ooxml/styles.js';
 import { newRuleBox, rulesManager } from './cfmanager.js';
@@ -56,10 +57,13 @@ const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Con
 export function createMoreActs(env) {
   const { root, state, options, editing, act } = env;
   const chartData = createChartDataActs(env);
+  const chartActs = createChartActs(env, FONT_NAMES);
   return (name, args, i) => {
-    // (A chart's data, Select Data: acts-chartdata.js.)
+    // (A chart's data, Select Data: acts-chartdata.js; its formatting: chartacts.js.)
     const data = chartData(name, args);
     if (data !== undefined) return data;
+    const chart = name.startsWith('chart') ? chartActs(name, args) : undefined;
+    if (chart !== undefined) return chart;
     // (Excel's error button's menu, at a point: errormenu.js.)
     if (name === 'errorMenu') return openErrorMenu(env, args[0]);
     // (Formulas > Error Checking: errorbox.js.)

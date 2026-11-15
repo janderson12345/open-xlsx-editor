@@ -6,6 +6,7 @@
 import { kids, kid, attr, NS } from './xml.js';
 import { parseRange } from './refs.js';
 import { emuToPx } from './units.js';
+import { fontOf, axisTitle, seriesLook, chartLookOf } from './chartlook.js';
 
 const C = 'http://schemas.openxmlformats.org/drawingml/2006/chart';
 const A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
@@ -108,14 +109,39 @@ function colorOf(spPr) {
 
 const KINDS = { barChart: 'bar', bar3DChart: 'bar', lineChart: 'line', line3DChart: 'line', areaChart: 'area', area3DChart: 'area', pieChart: 'pie', pie3DChart: 'pie', doughnutChart: 'doughnut', scatterChart: 'scatter' };
 
-/** One chart part: { kind, dir, grouping, title, legend, series, axis, cats } (kind null for a kind not drawn yet). */
+/** One chart group's settings: { kind, dir, grouping, gapWidth, overlap, secondary }. */
+function groupOf(g, secondary) {
+  const grouping = val(g, 'grouping') || 'clustered';
+  return { kind: KINDS[g.localName], dir: val(g, 'barDir') === 'bar' ? 'bar' : 'col', grouping, gapWidth: Number(val(g, 'gapWidth') ?? 150),
+    overlap: Number(val(g, 'overlap') ?? (/stacked/i.test(grouping) ? 100 : 0)), secondary };
+}
+
+/** A value axis's own settings: { min, max, major, gridlines, code, linked, hidden, title, font, pos }. */
+function axisSettings(ax) {
+  const scaling = kid(ax, 'scaling', C);
+  const num = (name) => { const v = val(scaling, name) ?? val(ax, name); return v == null ? null : Number(v); };
+  return { min: num('min'), max: num('max'), major: ax && val(ax, 'majorUnit') != null ? Number(val(ax, 'majorUnit')) : null, gridlines: !!kid(ax, 'majorGridlines', C),
+    code: attr(kid(ax, 'numFmt', C), 'formatCode', null), linked: attr(kid(ax, 'numFmt', C), 'sourceLinked', null) === '1', hidden: val(ax, 'delete') === '1',
+    title: axisTitle(ax), font: fontOf(ax), pos: val(ax, 'axPos') };
+}
+
+/** One chart part: { kind, dir, grouping, title, legend, series, groups, axis, axis2, cats, look } (kind null for a
+ *  kind not drawn yet). A combo chart's series each say their group's kind and whether they are on the secondary axes
+ *  (the first group's axes are the primary ones). */
 function readChart(wb, doc) {
-  const chart = kid(doc.documentElement, 'chart', C);
+  const space = doc.documentElement;
+  const chart = kid(space, 'chart', C);
   const plot = kid(chart, 'plotArea', C);
-  const group = plot && [...plot.childNodes].find((n) => n.nodeType === 1 && n.namespaceURI === C && KINDS[n.localName]);
-  if (!group) return { kind: null };
+  const groupEls = plot ? [...plot.childNodes].filter((n) => n.nodeType === 1 && n.namespaceURI === C && KINDS[n.localName]) : [];
+  if (!groupEls.length) return { kind: null };
+  const group = groupEls[0];
   const kind = KINDS[group.localName];
-  const series = kids(group, 'ser', C).map((s, i) => {
+  const idsOf = (g) => kids(g, 'axId', C).map((a) => attr(a, 'val', null));
+  const primary = idsOf(group);
+  const groups = groupEls.map((g) => groupOf(g, idsOf(g).join() !== primary.join()));
+  let n = 0;
+  const series = groupEls.flatMap((g, gi) => kids(g, 'ser', C).map((s) => {
+    const i = n++;
     const name = data(wb, kid(s, 'tx', C), false).values[0] ?? kid(kid(s, 'tx', C), 'v', C)?.textContent ?? `Series${i + 1}`;
     // (A scatter chart's series have x and y values: xs numbers, or 1, 2, 3... when they are text, as Excel plots them.)
     const values = data(wb, kid(s, 'val', C) || kid(s, 'yVal', C), true);
@@ -123,34 +149,44 @@ function readChart(wb, doc) {
     const xs = xVal ? data(wb, xVal, true).values.map((x, k) => (typeof x === 'number' ? x : k + 1)) : null;
     const line = kid(kid(s, 'spPr', C), 'ln', A);
     return { name, values: values.values, code: values.code, cats: data(wb, kid(s, 'cat', C) || xVal, false).values, xs, color: colorOf(kid(s, 'spPr', C)), index: Number(val(s, 'idx') ?? i),
-      marker: val(kid(s, 'marker', C), 'symbol'), line: !kid(line, 'noFill', A), smooth: val(s, 'smooth') === '1' };
-  });
-  // (The value axis: a scatter chart's is its upright one, the other its x axis.)
-  const valAxes = kids(plot, 'valAx', C);
-  const valAx = valAxes.find((ax) => ['l', 'r'].includes(val(ax, 'axPos'))) || valAxes[0];
+      order: Number(val(s, 'order') ?? i), marker: val(kid(s, 'marker', C), 'symbol'), line: !kid(line, 'noFill', A), smooth: val(s, 'smooth') === '1',
+      type: groups[gi].kind, group: gi, secondary: groups[gi].secondary, look: seriesLook(s) };
+  })).sort((a, b) => a.order - b.order);
+  // (The value axes: a scatter chart's is its upright one, the other its x axis; the secondary one, the value axis of
+  // the other groups' axes.)
+  const axes = [...plot.childNodes].filter((x) => x.nodeType === 1 && /^(catAx|valAx|dateAx|serAx)$/.test(x.localName));
+  const byId = (ids) => axes.filter((a) => ids.includes(val(a, 'axId')));
+  const mine = byId(primary);
+  const valAxes = mine.filter((a) => a.localName === 'valAx');
+  const valAx = valAxes.find((ax) => ['l', 'r'].includes(val(ax, 'axPos'))) || valAxes[0] || kids(plot, 'valAx', C)[0];
   const xAx = kind === 'scatter' ? valAxes.find((ax) => ax !== valAx) : null;
-  const scaling = kid(valAx, 'scaling', C);
-  const num = (name) => { const v = val(scaling, name) ?? val(valAx, name); return v == null ? null : Number(v); };
+  const catAx = mine.find((a) => a.localName !== 'valAx') || xAx;
+  const second = groupEls.map(idsOf).find((ids) => ids.join() !== primary.join());
+  const valAx2 = second ? byId(second).find((a) => a.localName === 'valAx') : null;
   const legend = kid(chart, 'legend', C);
-  const deleted = (ax) => val(ax, 'delete') === '1';
   return {
     kind,
-    dir: val(group, 'barDir') === 'bar' ? 'bar' : 'col',
-    grouping: val(group, 'grouping') || 'clustered',
+    dir: groups[0].dir,
+    grouping: groups[0].grouping,
     varyColors: val(group, 'varyColors') === '1',
-    gapWidth: Number(val(group, 'gapWidth') ?? 150),
-    overlap: Number(val(group, 'overlap') ?? (/stacked/i.test(val(group, 'grouping') || '') ? 100 : 0)),
+    gapWidth: groups[0].gapWidth,
+    overlap: groups[0].overlap,
     holeSize: Number(val(group, 'holeSize') ?? 50),
     title: val(chart, 'autoTitleDeleted') === '1' ? null : titleText(wb, chart, series, kind),
     ownTitle: !!kid(kid(chart, 'title', C), 'tx', C),
     // (Data labels showing values: the chart's own setting, or any series'.)
-    labels: [kid(group, 'dLbls', C), ...kids(group, 'ser', C).map((s) => kid(s, 'dLbls', C))].some((d) => val(d, 'showVal') === '1'),
+    labels: groupEls.flatMap((g) => [kid(g, 'dLbls', C), ...kids(g, 'ser', C).map((s) => kid(s, 'dLbls', C))]).some((d) => val(d, 'showVal') === '1'),
     legend: legend ? val(legend, 'legendPos') || 'r' : null,
     series,
+    groups,
     cats: series[0]?.cats || [],
-    axis: { min: num('min'), max: num('max'), major: valAx && val(valAx, 'majorUnit') != null ? Number(val(valAx, 'majorUnit')) : null, gridlines: !!kid(valAx, 'majorGridlines', C), code: attr(kid(valAx, 'numFmt', C), 'formatCode', null), linked: attr(kid(valAx, 'numFmt', C), 'sourceLinked', null) === '1', hidden: deleted(valAx) },
-    catHidden: deleted(kid(plot, 'catAx', C) || xAx),
+    axis: axisSettings(valAx),
+    axis2: valAx2 ? axisSettings(valAx2) : null,
+    catHidden: val(catAx, 'delete') === '1',
+    catTitle: axisTitle(catAx),
+    catFont: fontOf(catAx),
     xGridlines: !!kid(xAx, 'majorGridlines', C),
+    look: chartLookOf(space, chart, plot, groupEls),
   };
 }
 
@@ -180,27 +216,36 @@ export function readCharts(wb, i) {
   return out;
 }
 
-/** The value axis a chart draws: its own settings where it has them, Excel's automatic scale for the rest. 100%
- *  stacked charts run 0 to 1 (0% to 100%); stacked ones scale the stacks' sums. */
-export function valueAxis(chart) {
+/** The value axis a chart draws (the secondary one with `secondary`): its own settings where it has them, Excel's
+ *  automatic scale for the rest, over the series on that axis. 100% stacked charts run 0 to 1 (0% to 100%); stacked
+ *  ones scale the stacks' sums; groups on one axis scale together. (Excel's secondary axis over Cost, 45 to 90, beside
+ *  Sales' columns of 60 to 140: 0 to 100 by 10, the primary 0 to 160 by 20: test/chartformat-excel.json.) */
+export function valueAxis(chart, secondary = false) {
   let lo = Infinity;
   let hi = -Infinity;
-  const n = Math.max(...chart.series.map((s) => s.values.length), 0);
-  if (chart.grouping === 'percentStacked') { lo = 0; hi = 1; }
-  else if (chart.grouping === 'stacked') {
-    for (let i = 0; i < n; i++) {
-      let up = 0;
-      let down = 0;
-      for (const s of chart.series) { const v = s.values[i]; if (typeof v === 'number') { if (v >= 0) up += v; else down += v; } }
-      lo = Math.min(lo, down); hi = Math.max(hi, up);
+  const own = secondary ? chart.axis2 : chart.axis;
+  const groups = chart.groups || [{ grouping: chart.grouping, secondary: false }];
+  let percent = false;
+  groups.forEach((g, gi) => {
+    if (!!g.secondary !== secondary) return;
+    const list = chart.series.filter((s) => (s.group ?? 0) === gi);
+    const n = Math.max(...list.map((s) => s.values.length), 0);
+    if (g.grouping === 'percentStacked') { percent = true; lo = Math.min(lo, 0); hi = Math.max(hi, 1); }
+    else if (g.grouping === 'stacked') {
+      for (let i = 0; i < n; i++) {
+        let up = 0;
+        let down = 0;
+        for (const s of list) { const v = s.values[i]; if (typeof v === 'number') { if (v >= 0) up += v; else down += v; } }
+        lo = Math.min(lo, down); hi = Math.max(hi, up);
+      }
+    } else {
+      for (const s of list) for (const v of s.values) if (typeof v === 'number') { lo = Math.min(lo, v); hi = Math.max(hi, v); }
     }
-  } else {
-    for (const s of chart.series) for (const v of s.values) if (typeof v === 'number') { lo = Math.min(lo, v); hi = Math.max(hi, v); }
-  }
+  });
   if (lo === Infinity) { lo = 0; hi = 0; }
-  const auto = chart.grouping === 'percentStacked' ? { min: 0, max: 1, major: 0.1 } : autoScale(lo, hi);
-  const min = chart.axis.min ?? auto.min;
-  const max = chart.axis.max ?? auto.max;
-  const major = chart.axis.major ?? (chart.axis.min != null || chart.axis.max != null ? stepFor(min, max) : auto.major);
+  const auto = percent && groups.filter((g) => !!g.secondary === secondary).length === 1 ? { min: 0, max: 1, major: 0.1 } : autoScale(lo, hi);
+  const min = own?.min ?? auto.min;
+  const max = own?.max ?? auto.max;
+  const major = own?.major ?? (own?.min != null || own?.max != null ? stepFor(min, max) : auto.major);
   return { min, max, major };
 }

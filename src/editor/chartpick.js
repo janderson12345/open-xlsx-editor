@@ -123,6 +123,8 @@ export function chartPicker({ grid, charts, act, menu, readOnly }) {
       return true;
     }
     if (e.key === 'Enter') { act('chartBox', picked); return true; }
+    // (Ctrl+1, Excel's Format pane for what is picked: the Format Chart box.)
+    if (e.key === '1' && (e.ctrlKey || e.metaKey)) { act('chartFormatBox', picked); return true; }
     return !e.key.startsWith('F') && e.key.length === 1; // (typing doesn't reach the cells while a chart is picked)
   };
   return {
