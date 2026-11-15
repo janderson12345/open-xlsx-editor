@@ -57,3 +57,53 @@ test('Edit Rule: a new format when one is picked, Stop If True kept, a data bar 
   const order = wb.sheet(si).condFormats.flatMap((cf) => cf.rules).sort((a, b) => a.priority - b.priority).map((r) => r.type);
   assert.deepEqual(order, ['aboveAverage', 'dataBar', 'cellIs']);
 });
+
+test("a rule's own format (New Rule's Format...): its dxf as Excel writes it, its number format and borders drawn", async () => {
+  const { conditionalLooks } = await import('../src/ooxml/condformat.js');
+  const X = Object.fromEntries(JSON.parse(fs.readFileSync('test/cfformat-excel.json', 'utf8')).map((c) => [c.name, c]));
+  const FORMATS = {
+    'number format 0.00%': { numFmt: '0.00%' },
+    'bold, italic, red text, green fill': { bold: true, italic: true, color: 'FFFF0000', fill: 'FF92D050' },
+    'thin border all round': { border: { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } } },
+    'red bottom border': { border: { bottom: { style: 'thin', color: 'FFFF0000' } } },
+    'dashed top border': { border: { top: { style: 'dashed' } } },
+    'all of it': { numFmt: '#,##0.0', bold: true, fill: 'FFFFFF00', border: { left: { style: 'thin' }, right: { style: 'thin' }, top: { style: 'thin' }, bottom: { style: 'thin' } } },
+  };
+  // (Excel's numFmtId for a built-in code in a dxf (14 for 0.00%) and the <i val="0"/> COM's Font leaves are set aside.)
+  const norm = (xml) => xml.replace(/ numFmtId="\d+"/g, '').replace(/<i val="0"\/>/g, '');
+  for (const [name, format] of Object.entries(FORMATS)) {
+    const { wb, si } = build({ cells });
+    const before = wb.styles.dxfs.length;
+    wb.setConditional(si, A, { kind: 'cellIs', operator: 'greaterThan', f1: '5', preset: format });
+    const added = [...wb.stylesDoc.documentElement.getElementsByTagNameNS('*', 'dxf')].slice(before).map((n) => serializeXml(n).replace(/ xmlns(:\w+)?="[^"]*"/g, '')).join('');
+    assert.equal(norm(added), norm(/<dxf>[\s\S]*<\/dxf>/.exec(X[name].dxfs)[0]), name);
+    const look = conditionalLooks(wb, si).get('6,0');
+    if (format.numFmt) assert.equal(look.numFmt, format.numFmt, `${name}: the number format`);
+    if (format.border) assert.deepEqual(Object.keys(look.border).sort(), Object.keys(format.border).sort(), `${name}: the sides`);
+    assert.equal(conditionalLooks(wb, si).get('1,0'), undefined, `${name}: not on 2`);
+  }
+});
+
+test('a colour scale with thresholds and colours of its own: written and shown as Excel does (cfscale-excel.json)', async () => {
+  const { conditionalLooks } = await import('../src/ooxml/condformat.js');
+  const X = JSON.parse(fs.readFileSync('test/cfscale-excel.json', 'utf8'));
+  const STOPS = {
+    '3-color: number 2, percent 50, highest': [{ type: 'num', val: 2, color: 'FFFF0000' }, { type: 'percent', val: 50, color: 'FFFFFF00' }, { type: 'max', color: 'FF008000' }],
+    '2-color: percentile 10, percent 90': [{ type: 'percentile', val: 10, color: 'FFFFFFFF' }, { type: 'percent', val: 90, color: 'FF0070C0' }],
+    '2-color: lowest, number 6': [{ type: 'min', color: 'FFFFFFCC' }, { type: 'num', val: 6, color: 'FF006600' }],
+  };
+  const hex = (n) => `#${[n & 255, (n >> 8) & 255, (n >> 16) & 255].map((x) => x.toString(16).padStart(2, '0')).join('')}`;
+  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  for (const x of X) {
+    const { wb, si } = build({ cells });
+    wb.setConditional(si, A, { kind: 'colorScale', points: STOPS[x.name].length, stops: STOPS[x.name] });
+    const cf = [...wb._part(si).doc.documentElement.childNodes].filter((n) => n.localName === 'conditionalFormatting').map((n) => serializeXml(n).replace(/ xmlns(:\w+)?="[^"]*"/g, '')).join('');
+    assert.equal(cf.replace(/ priority="\d+"/, ''), x.conditionalFormatting.replace(/ priority="\d+"/, ''), `${x.name}: the rule`);
+    const looks = conditionalLooks(wb, si);
+    for (const [ref, r] of [['A1', 0], ['A5', 4], ['A10', 9]]) {
+      const mine = rgb(looks.get(`${r},0`).fill.toLowerCase());
+      const theirs = rgb(hex(x.shown[ref]));
+      assert.ok(mine.every((v, i) => Math.abs(v - theirs[i]) <= 1), `${x.name}, ${ref}: ${mine} against Excel's ${theirs}`);
+    }
+  }
+});

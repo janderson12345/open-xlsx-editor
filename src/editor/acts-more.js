@@ -11,7 +11,7 @@ import { readNotes } from '../ooxml/notes.js';
 import { deleteNote } from '../ooxml/noteedit.js';
 import { colName, rangeName } from '../ooxml/refs.js';
 import { areasOf } from './selection.js';
-import { CF_PRESETS, CF_PERIODS } from '../ooxml/cfedit.js';
+import { CF_PRESETS, CF_PERIODS, CF_GALLERY } from '../ooxml/cfedit.js';
 import { formatCellsBox } from './formatbox.js';
 import { threadBox } from './threadbox.js';
 import { addThread, replyThread, editThread, resolveThread } from '../ooxml/threadedit.js';
@@ -220,6 +220,8 @@ export function createMoreActs(env) {
       const presets = Object.entries(CF_PRESETS).map(([value, p]) => ({ value, label: p.label }));
       const kind = args[0];
       if (kind === 'scale3' || kind === 'scale2') return add({ kind: 'colorScale', points: kind === 'scale2' ? 2 : 3 });
+      // (Excel's Color Scales gallery: cfedit.js CF_GALLERY.)
+      if (kind === 'gallery') { const colors = CF_GALLERY[args[1]]?.[1]; return colors ? add({ kind: 'colorScale', points: colors.length, colors }) : false; }
       // (Data Bars and Icon Sets: added at once, as Excel's galleries add them.)
       if (kind === 'dataBar') return add({ kind: 'dataBar', color: BAR_COLORS[args[1]], solid: args[2] === 'solid' });
       if (kind === 'iconSet') return add({ kind: 'iconSet', set: args[1] });

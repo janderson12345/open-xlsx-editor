@@ -22,6 +22,15 @@ export const CF_PRESETS = {
   redFill: { label: 'Light Red Fill', font: null, fill: 'FFFFC7CE' },
   redText: { label: 'Red Text', font: 'FF9C0006', fill: null },
 };
+/** Excel's Color Scales gallery: each preset's colours from the lowest value to the highest, named as Excel names
+ *  them, the highest's colour first (Excel's standard scale colours, as its files have them; the gallery isn't
+ *  reachable over COM, so they aren't measured here). */
+const R = 'FFF8696B'; const Y = 'FFFFEB84'; const G = 'FF63BE7B'; const W = 'FFFCFCFF'; const B = 'FF5A8AC6'; const Y2 = 'FFFFEF9C';
+export const CF_GALLERY = [
+  ['Green - Yellow - Red', [R, Y, G]], ['Red - Yellow - Green', [G, Y, R]], ['Green - White - Red', [R, W, G]], ['Red - White - Green', [G, W, R]],
+  ['Blue - White - Red', [R, W, B]], ['Red - White - Blue', [B, W, R]], ['White - Red', [R, W]], ['Red - White', [W, R]],
+  ['Green - White', [W, G]], ['White - Green', [G, W]], ['Green - Yellow', [Y2, G]], ['Yellow - Green', [G, Y2]],
+];
 /** The menu's colour scales (Excel's own defaults for three and two colours): min, (50th percentile,) max. */
 export const CF_SCALES = {
   3: ['FFF8696B', 'FFFFEB84', 'FF63BE7B'],
@@ -85,9 +94,16 @@ export function cfRuleXml(rule, dxfId, priority, at) {
   if (rule.kind === 'timePeriod') body = `<formula>${esc(CF_PERIODS[period][1].replaceAll('@', at))}</formula>`;
   if (rule.kind === 'containsText') body = `<formula>${esc(`NOT(ISERROR(SEARCH("${String(rule.text).replace(/"/g, '""')}",${at})))`)}</formula>`;
   if (rule.kind === 'colorScale') {
-    const colors = CF_SCALES[rule.points === 2 ? 2 : 3];
-    const cfvo = colors.length === 3 ? '<cfvo type="min"/><cfvo type="percentile" val="50"/><cfvo type="max"/>' : '<cfvo type="min"/><cfvo type="max"/>';
-    body = `<colorScale>${cfvo}${colors.map((c) => `<color rgb="${c}"/>`).join('')}</colorScale>`;
+    // (Thresholds and colours of its own, `stops` [{ type: 'min' | 'max' | 'num' | 'percent' | 'percentile' | 'formula',
+    // val, color }], as Excel writes them (excel-cf-scale.ps1); else a gallery's colours (`colors`) or Excel's default.)
+    if (rule.stops?.length) {
+      const cfvo = rule.stops.map((s) => (s.type === 'min' || s.type === 'max' ? `<cfvo type="${s.type}"/>` : `<cfvo type="${s.type}" val="${esc(String(s.val ?? '').replace(/^=/, ''))}"/>`)).join('');
+      body = `<colorScale>${cfvo}${rule.stops.map((s) => `<color rgb="${s.color}"/>`).join('')}</colorScale>`;
+    } else {
+      const colors = rule.colors?.length ? rule.colors : CF_SCALES[rule.points === 2 ? 2 : 3];
+      const cfvo = colors.length === 3 ? '<cfvo type="min"/><cfvo type="percentile" val="50"/><cfvo type="max"/>' : '<cfvo type="min"/><cfvo type="max"/>';
+      body = `<colorScale>${cfvo}${colors.map((c) => `<color rgb="${c}"/>`).join('')}</colorScale>`;
+    }
   }
   return body ? `<cfRule ${a.join(' ')}>${body}</cfRule>` : `<cfRule ${a.join(' ')}/>`;
 }
@@ -100,7 +116,24 @@ export const AFTER_CF = ['dataValidations', 'hyperlinks', 'printOptions', 'pageM
  * rule first (priority 1, every other rule of the sheet one after), in the conditionalFormatting of the same ranges or a
  * new one. Edits the sheet's XML and the styles; the caller reads the sheet again.
  */
-/** A preset's format added to the workbook's dxfs (made when it has none): its dxfId. */
+/**
+ * A rule's own format (New Rule's Format...) as a dxf, as Excel writes one (tools/excel-compare/excel-cf-format.ps1):
+ * font (bold, italic, underline, strikethrough, colour), then the number format (numbered `numFmtId` from 164, as
+ * Excel numbers its own), the fill as the pattern's background, and the border's sides in Excel's order, each with its
+ * colour or automatic. `f`: { bold, italic, underline, strike, color, numFmt, fill, border: { left, right, top,
+ * bottom: { style, color } } } (colours ARGB).
+ */
+export function formatDxf(f, numFmtId = 164) {
+  const font = [f.bold && '<b/>', f.italic && '<i/>', f.underline && '<u/>', f.strike && '<strike/>', f.color && `<color rgb="${f.color}"/>`].filter(Boolean).join('');
+  const num = f.numFmt ? `<numFmt numFmtId="${numFmtId}" formatCode="${esc(f.numFmt)}"/>` : '';
+  const fill = f.fill ? `<fill><patternFill><bgColor rgb="${f.fill}"/></patternFill></fill>` : '';
+  const sides = ['left', 'right', 'top', 'bottom'].filter((k) => f.border?.[k]?.style)
+    .map((k) => `<${k} style="${f.border[k].style}">${f.border[k].color ? `<color rgb="${f.border[k].color}"/>` : '<color auto="1"/>'}</${k}>`).join('');
+  return `<dxf>${font ? `<font>${font}</font>` : ''}${num}${fill}${sides ? `<border>${sides}</border>` : ''}</dxf>`;
+}
+
+/** A preset's format (or a rule's own, an object: formatDxf) added to the workbook's dxfs (made when it has none): its
+ *  dxfId. */
 export function addPresetDxf(wb, preset) {
   const sroot = wb.stylesDoc.documentElement;
   const sns = sroot.namespaceURI;
@@ -110,7 +143,10 @@ export function addPresetDxf(wb, preset) {
     const after = [...sroot.childNodes].find((n) => n.nodeType === 1 && ['tableStyles', 'colors', 'extLst'].includes(n.localName));
     sroot.insertBefore(dxfs, after || null);
   }
-  const el = wb.stylesDoc.importNode(parseXml(`<w xmlns="${sns}">${presetDxf(preset)}</w>`).documentElement.firstChild, true);
+  // (A number format of its own takes the next id from 164 not yet used in the styles.)
+  const used = [...wb.stylesDoc.getElementsByTagNameNS(sns, 'numFmt')].map((n) => Number(n.getAttribute('numFmtId')) || 0);
+  const xml = preset && typeof preset === 'object' ? formatDxf(preset, Math.max(163, ...used) + 1) : presetDxf(preset);
+  const el = wb.stylesDoc.importNode(parseXml(`<w xmlns="${sns}">${xml}</w>`).documentElement.firstChild, true);
   dxfs.appendChild(el);
   const dxfId = kids(dxfs, 'dxf', sns).length - 1;
   dxfs.setAttribute('count', String(dxfId + 1));

@@ -34,7 +34,9 @@ Home > Styles > Conditional Formatting has the menu's rules, each added for the 
 - **Highlight Cells Rules:** Greater Than, Less Than, Between, Equal To, Text that Contains, A Date Occurring,
   Duplicate Values (or Unique).
 - **Top/Bottom Rules:** Top 10 Items, Top 10%, Bottom 10 Items, Bottom 10%, Above Average, Below Average.
-- **Color Scales:** Excel's default three-colour and two-colour scales.
+- **Color Scales:** Excel's twelve gallery presets, Green - Yellow - Red to Yellow - Green (their colours Excel's
+  standard ones as its files have them: red F8696B, yellow FFEB84, green 63BE7B, white FCFCFF, blue 5A8AC6, the
+  two-colour yellow FFEF9C; the gallery isn't reachable over COM, so not measured here).
 - **Clear Rules** from Selected Cells (their cells taken out of every rule's range) or from Entire Sheet. A rule left
   without its first cell has its formulas written for its new first cell, as Excel's (*measured*: =E1>F1 over E1:E4,
   E1:E2's rules deleted, is =E3>F3 over E3:E4); before, the formula kept its text and so meant other cells.
@@ -126,7 +128,22 @@ ranges, given the old one's place in the order.
 A formula rule is `type="expression"` with its formula, as Excel writes it (its own rules from COM, `stopIfTrue`
 aside, which COM always sets).
 
+## A rule's own format, and colour scales of its own
+
+New Rule's Format offers Custom Format... beside the presets: Excel's Format Cells for a rule (number format, bold,
+italic, underline, strikethrough, font colour, fill, a border). A colour scale's Minimum, Midpoint and Maximum each take
+a type (Lowest or Highest Value, Number, Percent, Formula, Percentile), a value and a colour. Measured over COM
+(`excel-cf-format.ps1`, `excel-cf-scale.ps1`; `test/cfformat-excel.json`, `test/cfscale-excel.json`):
+
+| Rule | Seen |
+|---|---|
+| The dxf's parts in Excel's order: font (`b`, `i`, colour), `numFmt`, fill (its `bgColor`), `border` (left, right, top, bottom, each its colour or `auto="1"`). | Bold, italic, red, green fill: `<font><b/><i/><color rgb="FFFF0000"/></font><fill><patternFill><bgColor rgb="FF92D050"/></patternFill></fill>`. A red bottom border: `<border><bottom style="thin"><color rgb="FFFF0000"/></bottom></border>`. |
+| The rule's number format is shown in the cells it holds for, its border sides drawn over the cell's own. | 7 under 0.00%: 700.00%; 2 as it was. |
+| A colour scale's own thresholds as `cfvo` (`num`, `percent`, `percentile`, `formula` with a `val`; `min`, `max`), its colours as given; the cells between blended as Excel blends them. | Number 2, percent 50, highest; red, yellow, green: 5 shown FFDA00, as Excel (every channel within 1 of Excel's shown fill in 9 of 9 cells). |
+
+Excel numbered a built-in code in a dxf oddly (`numFmtId="14"` for 0.00%); here a rule's number format takes the next
+id from 164, as Excel numbers its own (Excel reads a dxf's number format by its code).
+
 ## Not yet
 
-A rule's number format and borders, custom thresholds and colours in New Rule (and so a data bar's own colours kept
-when one is edited), and the other presets of Color Scales.
+A data bar's own thresholds and colours in New Rule (and so a data bar's own colours kept when one is edited).

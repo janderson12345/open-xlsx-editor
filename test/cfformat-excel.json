@@ -1,0 +1,50 @@
+[
+ {
+  "name": "number format 0.00%",
+  "dxfs": "<dxfs count=\"1\"><dxf><numFmt numFmtId=\"14\" formatCode=\"0.00%\"/></dxf></dxfs>",
+  "shown": {
+   "A7": "700.00%",
+   "A2": "2"
+  }
+ },
+ {
+  "name": "bold, italic, red text, green fill",
+  "dxfs": "<dxfs count=\"1\"><dxf><font><b/><i/><color rgb=\"FFFF0000\"/></font><fill><patternFill><bgColor rgb=\"FF92D050\"/></patternFill></fill></dxf></dxfs>",
+  "shown": {
+   "A7": "7",
+   "A2": "2"
+  }
+ },
+ {
+  "name": "thin border all round",
+  "dxfs": "<dxfs count=\"1\"><dxf><border><left style=\"thin\"><color auto=\"1\"/></left><right style=\"thin\"><color auto=\"1\"/></right><top style=\"thin\"><color auto=\"1\"/></top><bottom style=\"thin\"><color auto=\"1\"/></bottom></border></dxf></dxfs>",
+  "shown": {
+   "A7": "7",
+   "A2": "2"
+  }
+ },
+ {
+  "name": "red bottom border",
+  "dxfs": "<dxfs count=\"1\"><dxf><border><bottom style=\"thin\"><color rgb=\"FFFF0000\"/></bottom></border></dxf></dxfs>",
+  "shown": {
+   "A7": "7",
+   "A2": "2"
+  }
+ },
+ {
+  "name": "dashed top border",
+  "dxfs": "<dxfs count=\"1\"><dxf><border><top style=\"dashed\"><color auto=\"1\"/></top></border></dxf></dxfs>",
+  "shown": {
+   "A7": "7",
+   "A2": "2"
+  }
+ },
+ {
+  "name": "all of it",
+  "dxfs": "<dxfs count=\"1\"><dxf><font><b/><i val=\"0\"/></font><numFmt numFmtId=\"164\" formatCode=\"#,##0.0\"/><fill><patternFill><bgColor rgb=\"FFFFFF00\"/></patternFill></fill><border><left style=\"thin\"><color auto=\"1\"/></left><right style=\"thin\"><color auto=\"1\"/></right><top style=\"thin\"><color auto=\"1\"/></top><bottom style=\"thin\"><color auto=\"1\"/></bottom></border></dxf></dxfs>",
+  "shown": {
+   "A7": "7.0",
+   "A2": "2"
+  }
+ }
+]

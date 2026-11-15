@@ -1,5 +1,6 @@
 // The Home tab, Excel's groups in Excel's order: Undo, Font, Alignment, Number, Cells, Editing. Every control runs a
 // named command (commands.js, through `act`); update() sets the controls from the active cell, as Excel's do.
+import { CF_GALLERY } from '../ooxml/cfedit.js';
 import { el } from './ribbonkit.js';
 import { STANDARD_COLORS, THEME_COLORS } from './sheetmenu.js';
 import { FONT_SIZES, BORDER_PRESETS } from '../ooxml/formatops.js';
@@ -115,7 +116,7 @@ export function homeTab(kit, { act, color }) {
       item('Below Average...', f('cfAdd', 'below')), el('hr'),
       el('div', { class: 'oxe-cap' }, 'Data Bars'), ...BAR_MENU.map(([fill, color, label]) => item(`${label} Data Bar (${fill === 'solid' ? 'Solid' : 'Gradient'} Fill)`, f('cfAdd', 'dataBar', color, fill))), el('hr'),
       el('div', { class: 'oxe-cap' }, 'Icon Sets'), ...ICON_MENU.map(([set, label]) => item(label, f('cfAdd', 'iconSet', set))), el('hr'),
-      el('div', { class: 'oxe-cap' }, 'Color Scales'), item('Red - Yellow - Green Color Scale', f('cfAdd', 'scale3')), item('Orange - Yellow Color Scale', f('cfAdd', 'scale2')), el('hr'),
+      el('div', { class: 'oxe-cap' }, 'Color Scales'), ...CF_GALLERY.map(([name], k) => item(`${name} Color Scale`, f('cfAdd', 'gallery', k))), el('hr'),
       item('New Rule...', f('cfNewRule')), item('Clear Rules from Selected Cells', f('cfClear', 'selection')), item('Clear Rules from Entire Sheet', f('cfClear', 'sheet')), item('Manage Rules...', f('cfManager'))],
       { label: 'Conditional Formatting', big: true })),
     grp('Cells', col(

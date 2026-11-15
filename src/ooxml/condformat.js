@@ -137,6 +137,14 @@ export function conditionalLooks(wb, si) {
       if (f.strike !== undefined && look.strike === undefined) look.strike = f.strike;
       if (f.u !== undefined && look.underline === undefined) look.underline = f.u;
     }
+    // (Its number format and border sides, each over the cell's own.)
+    if (dxf.numFmt && look.numFmt === undefined) look.numFmt = dxf.numFmt;
+    if (dxf.border) {
+      for (const side of ['left', 'right', 'top', 'bottom']) {
+        const b = dxf.border[side];
+        if (b?.style && !look.border?.[side]) look.border = { ...look.border, [side]: { style: b.style, color: b.color?.auto ? '#000000' : color(b.color) || '#000000' } };
+      }
+    }
     out.set(key, look);
   };
   for (const { rule, ranges } of rules) {

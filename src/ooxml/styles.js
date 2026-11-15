@@ -86,9 +86,14 @@ export function readDxf(el, ns) {
   const p = kid(kid(el, 'fill', ns), 'patternFill', ns);
   const on = (name) => { const x = kid(font, name, ns); return x ? !!onOff(x) : undefined; };
   const u = kid(font, 'u', ns);
+  const numFmt = kid(el, 'numFmt', ns);
+  const border = kid(el, 'border', ns);
   return {
     font: font ? { b: on('b'), i: on('i'), strike: on('strike'), u: u ? attr(u, 'val') || 'single' : undefined, color: readColor(kid(font, 'color', ns)) } : null,
     fill: p ? readColor(kid(p, 'bgColor', ns)) || readColor(kid(p, 'fgColor', ns)) : null,
+    // (A conditional format's number format and borders, as Excel writes them in the dxf.)
+    numFmt: numFmt ? attr(numFmt, 'formatCode') : null,
+    border: border ? readBorder(border, ns) : null,
   };
 }
 

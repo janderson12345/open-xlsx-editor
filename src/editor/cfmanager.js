@@ -4,7 +4,8 @@
 // change is one step of the history (cfmanage.js, cfedit.js through acts-more.js).
 import { modal, button } from './dialogs.js';
 import { make, select, labelled, check } from './formatbox-kit.js';
-import { CF_PRESETS, CF_PERIODS } from '../ooxml/cfedit.js';
+import { ruleFormatBox } from './cfformatbox.js';
+import { CF_PRESETS, CF_PERIODS, CF_SCALES } from '../ooxml/cfedit.js';
 import { BAR_COLORS } from '../ooxml/cfbarsedit.js';
 import { rangeName, parseRange } from '../ooxml/refs.js';
 
@@ -52,7 +53,15 @@ export function newRuleBox(root, { rule: old = null } = {}) {
     type.className = 'oxe-dialog-list';
     type.dataset.first = '';
     const panel = make('div', { className: 'oxe-cf-panel' });
-    const preset = select([...(old ? [['keep', "(the rule's own format)"]] : []), ...Object.entries(CF_PRESETS).map(([v, p]) => [v, p.label])], old ? 'keep' : 'lightRed');
+    const preset = select([...(old ? [['keep', "(the rule's own format)"]] : []), ...Object.entries(CF_PRESETS).map(([v, p]) => [v, p.label]), ['custom', 'Custom Format...']], old ? 'keep' : 'lightRed');
+    // (Custom Format...: Excel's Format Cells for the rule, cfformatbox.js; chosen again, the box opens again.)
+    let customFormat = null;
+    let lastPreset = preset.value;
+    preset.addEventListener('change', async () => {
+      if (preset.value !== 'custom') { lastPreset = preset.value; return; }
+      const f = await ruleFormatBox(root);
+      if (f) { customFormat = f; lastPreset = 'custom'; } else preset.value = lastPreset;
+    });
     const fields = {};
     const field = (k, el) => { fields[k] = el; return el; };
     const input = (k, label) => labelled(label, field(k, make('input', { type: 'text', className: 'oxe-dialog-field', spellcheck: false })));
@@ -66,6 +75,23 @@ export function newRuleBox(root, { rule: old = null } = {}) {
           if (style.value === 'dataBar') k.push(labelled('Bar color:', field('barColor', select(Object.keys(BAR_COLORS).map((c) => [c, c.replace(/([A-Z])/g, ' $1').replace(/^./, (x) => x.toUpperCase())]), 'blue'))),
             labelled('Fill:', field('barFill', select([['gradient', 'Gradient Fill'], ['solid', 'Solid Fill']], 'gradient'))));
           if (style.value === 'iconSet') k.push(labelled('Icon Style:', field('icons', select(ICON_SETS.map((s) => [s, s]), '3TrafficLights1'))));
+          // (A colour scale's Minimum, Midpoint and Maximum: a type, a value, a colour, as Excel's New Rule has them.)
+          if (style.value === 'scale2' || style.value === 'scale3') {
+            const three = style.value === 'scale3';
+            const starts = three ? [['min', '', CF_SCALES[3][0]], ['percentile', '50', CF_SCALES[3][1]], ['max', '', CF_SCALES[3][2]]] : [['min', '', CF_SCALES[2][0]], ['max', '', CF_SCALES[2][1]]];
+            fields.stops = starts.map(([type, val, color], i) => {
+              const ends = i === 0 ? [['min', 'Lowest Value']] : i === starts.length - 1 ? [['max', 'Highest Value']] : [];
+              const t = select([...ends, ['num', 'Number'], ['percent', 'Percent'], ['formula', 'Formula'], ['percentile', 'Percentile']], type);
+              const v = make('input', { type: 'text', className: 'oxe-dialog-field', value: val, spellcheck: false });
+              const c = make('input', { type: 'color', value: `#${color.slice(2)}` });
+              const name = i === 0 ? 'Minimum' : i === starts.length - 1 ? 'Maximum' : 'Midpoint';
+              v.setAttribute('aria-label', `${name} value`); c.setAttribute('aria-label', `${name} colour`);
+              const sync = () => { v.disabled = t.value === 'min' || t.value === 'max'; };
+              t.addEventListener('change', sync); sync();
+              k.push(labelled(`${name}:`, t), v, c);
+              return { t, v, c };
+            });
+          } else fields.stops = null;
           extra.replaceChildren(...k);
         };
         style.addEventListener('change', more);
@@ -116,7 +142,7 @@ export function newRuleBox(root, { rule: old = null } = {}) {
       if (old.type === 'uniqueValues') put('dup', 'unique');
       if (old.type === 'expression') put('formula', typedOf(old.formulas[0]).replace(/^(?!=)/, '='));
     }
-    const format = () => (preset.value === 'keep' ? null : preset.value);
+    const format = () => (preset.value === 'keep' ? null : preset.value === 'custom' ? customFormat || 'lightRed' : preset.value);
     const why = make('p', { className: 'oxe-dialog-text', role: 'alert' });
     const ok = () => {
       const v = (k) => fields[k]?.value ?? '';
@@ -124,8 +150,10 @@ export function newRuleBox(root, { rule: old = null } = {}) {
       switch (type.value) {
         case 'values': {
           const s = v('style');
+          const stops = fields.stops?.map(({ t, v: val, c }) => ({ type: t.value, val: val.value.trim(), color: `FF${c.value.slice(1).toUpperCase()}` }));
+          if (stops?.some((x) => x.type !== 'min' && x.type !== 'max' && !x.val)) { why.textContent = 'Enter a value.'; return; }
           rule = s === 'dataBar' ? { kind: 'dataBar', color: BAR_COLORS[v('barColor')], solid: v('barFill') === 'solid' } : s === 'iconSet' ? { kind: 'iconSet', set: v('icons') }
-            : { kind: 'colorScale', points: s === 'scale2' ? 2 : 3 };
+            : { kind: 'colorScale', points: s === 'scale2' ? 2 : 3, stops };
           break;
         }
         case 'contain':

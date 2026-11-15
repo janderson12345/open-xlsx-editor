@@ -1,0 +1,29 @@
+[
+ {
+  "name": "3-color: number 2, percent 50, highest",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"colorScale\" priority=\"1\"><colorScale><cfvo type=\"num\" val=\"2\"/><cfvo type=\"percent\" val=\"50\"/><cfvo type=\"max\"/><color rgb=\"FFFF0000\"/><color rgb=\"FFFFFF00\"/><color rgb=\"FF008000\"/></colorScale></cfRule></conditionalFormatting>",
+  "shown": {
+   "A1": 255,
+   "A5": 56063,
+   "A10": 32768
+  }
+ },
+ {
+  "name": "2-color: percentile 10, percent 90",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"colorScale\" priority=\"1\"><colorScale><cfvo type=\"percentile\" val=\"10\"/><cfvo type=\"percent\" val=\"90\"/><color rgb=\"FFFFFFFF\"/><color rgb=\"FF0070C0\"/></colorScale></cfRule></conditionalFormatting>",
+  "shown": {
+   "A1": 16777215,
+   "A5": 14992018,
+   "A10": 12611584
+  }
+ },
+ {
+  "name": "2-color: lowest, number 6",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"colorScale\" priority=\"1\"><colorScale><cfvo type=\"min\"/><cfvo type=\"num\" val=\"6\"/><color rgb=\"FFFFFFCC\"/><color rgb=\"FF006600\"/></colorScale></cfRule></conditionalFormatting>",
+  "shown": {
+   "A1": 13434879,
+   "A5": 2721075,
+   "A10": 26112
+  }
+ }
+]

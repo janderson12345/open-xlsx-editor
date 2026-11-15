@@ -13,7 +13,7 @@ let nextId = 1;
  *  now (Excel prints the pattern itself). */
 const DENSITY = { darkGray: 0.75, mediumGray: 0.5, lightGray: 0.25, gray125: 0.125, gray0625: 0.0625 };
 /** CSS line styles for Excel's border styles (dash lengths are CSS's own, not yet Excel's). */
-const LINE = { dotted: 'dotted', hair: 'solid', dashed: 'dashed', mediumDashed: 'dashed', dashDot: 'dashed', mediumDashDot: 'dashed',
+export const LINE = { dotted: 'dotted', hair: 'solid', dashed: 'dashed', mediumDashed: 'dashed', dashDot: 'dashed', mediumDashDot: 'dashed',
   dashDotDot: 'dotted', mediumDashDotDot: 'dotted', slantDashDot: 'dashed', double: 'double' };
 
 const mix = (a, b, t) => '#' + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * t + parseInt(b.slice(i, i + 2), 16) * (1 - t)).toString(16).padStart(2, '0')).join('');

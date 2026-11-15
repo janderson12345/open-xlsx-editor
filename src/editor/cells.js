@@ -58,7 +58,9 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   // 0.25 for 25%, 007 for '007.)
   // (A hidden formula of a protected sheet shows as nothing, a hidden constant as itself: st.hiddenAt, measured.)
   const held = formulas ? (cell.f != null && st.hiddenAt?.(r, c) ? '' : editText(cell, 'General')) : null;
-  const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, MDW), look ? look.code : 'General', st.date1904);
+  // (A conditional format's number format over the cell's own: ooxml/condformat.js.)
+  const cfCode = st.cond?.get(`${r},${c}`)?.numFmt;
+  const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, MDW), cfCode || (look ? look.code : 'General'), st.date1904);
   // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
   const h = shown.hashes ? 'center' : (shown.textFormat || (formulas && cell.f != null)) && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
   // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)

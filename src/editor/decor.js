@@ -4,6 +4,7 @@
 import { mergeAt } from './cells.js';
 import { setVars, div } from './dom.js';
 import { lineStyle } from '../ooxml/sheet.js';
+import { LINE } from './cellstyles.js';
 
 /** Border line widths in units of a thin line: thin and its dash patterns 1, medium and its patterns 2, thick and
  *  double 3; hair is thinner than a unit. */
@@ -67,7 +68,13 @@ export function decorations(st, win) {
       if (!s) continue;
       const d = deco(s);
       if (d.fill && !merge && !cf?.fill) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
-      for (const side of d.sides) edges.push(...edge(st, r, c, side, ox, oy));
+      // (A conditional format's border sides over the cell's own: ooxml/condformat.js.)
+      for (const side of d.sides) if (!cf?.border?.[side.name]) edges.push(...edge(st, r, c, side, ox, oy));
+      if (cf?.border) {
+        for (const [name, b] of Object.entries(cf.border)) {
+          for (const el of edge(st, r, c, { name, style: b.style, cls: 'oxe-cf-edge' }, ox, oy)) { el.style.setProperty('--oxe-es', LINE[b.style] || 'solid'); el.style.setProperty('--oxe-ec', b.color); edges.push(el); }
+        }
+      }
       if (d.diag) {
         const m = merge || { r0: r, c0: c, r1: r, c1: c };
         if (m.r0 === r && m.c0 === c) for (const dir of ['up', 'down']) if (d.diag[dir]) {
