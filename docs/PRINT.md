@@ -36,8 +36,7 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   a point short of it each way: centered horizontally, 1, 3 and 8 columns, portrait and landscape, every cell 1.2 to
   1.3px left of the middle; vertically the same above it (workbooks made in code, printed by Excel; `..
 uns\center`
-  and `center2`: 252 of 252 cells within 1px across, vertical centering within 0.2px of Excel's, beyond the baseline
-  difference below). Read from printOptions' horizontalCentered and verticalCentered.
+  and `center2`: 252 of 252 cells within 1px across and down). Read from printOptions' horizontalCentered and verticalCentered.
 - **Print titles** print only for the page's own columns. With a print area of B3:H70, rows 1:2 print as B1:E2 above
   the B:E pages.
 - **Headers and footers.** They use the Normal style's font and size, scaled with the sheet unless `scaleWithDoc` is
@@ -81,11 +80,6 @@ there.
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
 
-Not yet: a print area of several ranges (only the first prints), "Center on page", gridlines and row and column
+Not yet: a print area of several ranges (only the first prints), gridlines and row and column
 headings in print, pictures in headers (`&G`), headers of more than one line, and the first-page and even-page
 options beyond choosing their text (measured only with odd pages).
-
-## Open differences
-
-- A workbook made from a CSV (csv.js csvWorkbook) prints its text baselines 0.95px higher than Excel's PDF of the same
-  file, centered or not (found measuring Center on page); the fixtures' own workbooks print within 1px.

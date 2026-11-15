@@ -49,7 +49,11 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   unchanged (all within 1px); the ten workbooks 100,962 -> 101,981 of 102,095 in width, the rest of the report the
   same, fills and borders too. The cells are placed again when a served font finishes loading (`fontsChanged`).
   Release 1.0.1, its faces split by alphabet and loaded as FontFace objects from `fonts: { omf }` (`omffonts.js`;
-  run "v101" in `..\runs\omf101`): the same report to the cell.
+  run "v101" in `..\runs\omf101`): the same report to the cell. Installed rather than served, Morrow Sans Narrow was
+  placed by its Windows metrics here and every baseline was 0.95px high again (large.xlsx 61,460 of 100,000; a
+  workbook made from a CSV too): Chromium places a font by its typo metrics when it sets USE_TYPO_METRICS (both Morrow
+  fonts and Aptos Narrow do; Calibri doesn't), installed or served. Placed so (run "typo" in `..\runs\typo`, Morrow
+  installed): the ten workbooks 102,082 of 102,095 within 1px down again, large.xlsx all of them.
 - **Printed baseline** (*measured*). Excel puts all the bottom-aligned text of a row on one baseline: the Windows
   descent of the row's tallest font plus about 0.9px above its printed row boundary (rows.xlsx, whose fills give
   every boundary exactly; Calibri 11, 14, 20, Arial 14, Times New Roman 16, Cambria 20 within about 0.3px). Excel's

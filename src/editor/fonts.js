@@ -50,8 +50,9 @@ const GRID_ORIGIN_Y = 0.7;
  *  descent (`wa`, `wd`: where Excel places text) and the same rounded to whole pixels (`ar`, `dr`: where Chromium
  *  does). */
 /** Open Metric Fonts' vertical metrics, read from the fonts (numbers only): Windows ascent and descent, the same as
- *  the Office font each matches, and hhea ascent and descent, by which Chromium places a web font (an installed one
- *  by the Windows ones). Measured with Morrow Sans Narrow served as a web font, Edge, Excel's PDFs of basic.xlsx and
+ *  the Office font each matches, and hhea ascent and descent, the same as their typo ones, by which Chromium places
+ *  them: they set USE_TYPO_METRICS, served or installed (with Morrow Sans Narrow installed, placed by the Windows
+ *  metrics, large.xlsx had 61,460 of 100,000 baselines within 1px, as served). Measured with Morrow Sans Narrow served as a web font, Edge, Excel's PDFs of basic.xlsx and
  *  large.xlsx (Aptos Narrow): 100,049 of 100,049 cells within 1px across, down and in width (Calibri drawn: the same
  *  across and down, 99,028 in width); placed by the Windows metrics instead, 0.95px high. */
 const MORROW = { win: [1.0098, 0.2749], hhea: [0.939, 0.2817] };
@@ -94,13 +95,17 @@ function fontMetrics(name, sizePx) {
     const o = OPEN[twin.toLowerCase()];
     const wa = o.win[0] * sizePx;
     const wd = o.win[1] * sizePx;
-    const [ca, cd] = hasFont(twin) === 'web' ? o.hhea.map((v) => v * sizePx) : [wa, wd];
+    // (Both Morrow fonts set USE_TYPO_METRICS: placed by their typo metrics, installed or served.)
+    const [ca, cd] = o.hhea.map((v) => v * sizePx);
     return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: BASELINE_ABOVE_DESCENT };
   }
   const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   const wa = m.win[0] * sizePx;
   const wd = m.win[1] * sizePx;
-  return { wa, wd, ar: Math.round(wa), dr: Math.round(wd), base: metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT };
+  // (A font with USE_TYPO_METRICS set placed by its typo ascent and descent, as the Morrow fonts are; installed ones
+  // with it, Bahnschrift, Cascadia, by the same rule, not measured.)
+  const [ca, cd] = m.typo?.[3] ? [m.typo[0] * sizePx, m.typo[1] * sizePx] : [wa, wd];
+  return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT };
 }
 
 /** Where Chromium puts the baseline in a line box of L px: floor((L - (ascent + descent)) / 2) + ascent below its top,
