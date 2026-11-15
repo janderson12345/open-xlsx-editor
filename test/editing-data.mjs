@@ -106,6 +106,24 @@ await page.keyboard.press('Enter');
 await page.evaluate(() => window.oxe.enter('J30', '=SUM(Amounts2)'));
 const named = await page.evaluate(() => ({ text: window.oxe.workbook.definedName('Amounts2', null)?.text, v: window.oxe.workbook.sheet(0).cells.get(29).get(9).v, b: [1, 2, 3].map((r) => window.oxe.workbook.sheet(0).cells.get(r).get(1).v) }));
 check(named.text === 'Data!$B$2:$B$4' && named.v === named.b.reduce((x, y) => x + y, 0), 'Name Box, Amounts2 on B2:B4: the selection named, =SUM(Amounts2) worked out', JSON.stringify(named));
+// The selection's name in the Name Box (as Excel's Selection.Name), the cell again when it is something else; the
+// drop-down (Alt+Down, Down, Enter, or a click) goes to a name, which the box then shows.
+const nameBox = () => page.evaluate(() => document.querySelector('.oxe-namebox').value);
+await page.evaluate(() => { window.oxe.select('B2'); window.oxe.command('extendTo', 3, 1); });
+const asNamed = await nameBox();
+await page.evaluate(() => window.oxe.select('D6'));
+const asCell = await nameBox();
+check(asNamed === 'Amounts2' && asCell === 'D6', 'Name Box: B2:B4 shows Amounts2, D6 shows D6', `${asNamed} ${asCell}`);
+await page.click('.oxe-namebox');
+await page.keyboard.press('Alt+ArrowDown');
+const boxNames = await page.evaluate(() => [...document.querySelectorAll('.oxe-namelist [role=option]')].map((o) => o.textContent));
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('Enter');
+const picked = await page.evaluate(() => ({ s: window.oxe.selection, box: document.querySelector('.oxe-namebox').value, list: !document.querySelector('.oxe-namelist').hidden }));
+check(boxNames.join() === 'Amounts,Amounts2' && picked.s.r0 === 1 && picked.s.r1 === 3 && picked.s.c0 === 1 && picked.box === 'Amounts2' && !picked.list, 'Name Box drop-down: Amounts and Amounts2; Down and Enter goes to Amounts2, shown in the box', JSON.stringify({ boxNames, picked }));
+await page.click('.oxe-namebox-arrow');
+await page.click('.oxe-namelist [role=option]:text-is("Amounts")');
+check(await nameBox() === 'Amounts' && await page.evaluate(() => window.oxe.selection.r1 === 9), 'the arrow and a click on Amounts: B2:B10 selected, Amounts shown', await nameBox());
 await page.focus('.oxe-grid');
 await page.keyboard.press('Control+F3');
 await page.waitForSelector('dialog.oxe-name-manager');

@@ -10,7 +10,9 @@ Names made, changed and deleted as Excel's Formulas > Defined Names does it (`sr
   Delete (after Excel's question) and Close.
 - **Formulas > Define Name**, or New... in the Name Manager: Excel's New Name box, the selection as what the name
   refers to, the workbook as its scope (or a sheet), a comment.
-- **The Name Box:** a new name typed there names the selection, workbook-wide, as Excel's does.
+- **The Name Box:** a new name typed there names the selection, workbook-wide, as Excel's does. When the selection is
+  exactly a name's range it shows the name instead of the cell (below), and its drop-down arrow (or Alt+Down) lists
+  the names to go to.
 - **Formulas > Use in Formula** and **Paste Names** (F3): the names the sheet sees (below), the one chosen typed at
   the caret of the cell being edited, or the active cell opened with "=Name". Paste Names' box has Paste List, which
   writes them from the active cell down as Excel's does (below); not while a cell is being edited, as Excel's is then
@@ -43,6 +45,34 @@ saved names added out of order (`test/names-excel.json`).
 
 `test/names.test.js` checks every verdict (all 39 the same), the saved order, and Define, Edit and Delete with the
 formulas that use them.
+
+## The Name Box (measured, as far as COM reaches)
+
+COM can't read the Name Box: in a hidden Excel its Edit control stays empty (WM_GETTEXT read "" with a named range
+selected, and its list held no items). What Excel reports for the selection itself can be read: `Selection.Name`, the
+name whose range the selection is. `tools/excel-compare/excel-namebox.ps1` selected ranges in a hidden Excel 16 under
+names of each kind, 35 cases (`test/namebox-excel.json`); `selectionName` in `src/ooxml/goto.js` gives the same name
+for all 31 without a table (`test/namebox.test.js`), and the Name Box shows it.
+
+| Rule | Seen |
+|---|---|
+| Exactly the name's range, wherever the active cell is | B2:C4 under =Sheet1!$B$2:$C$4: Rate, with C3 active too. B2:C3, B2:C5 and B2 alone: none. One cell (E5), whole columns ($B:$B) and rows ($3:$5) the same. |
+| A name of ranges: the same ranges in the same order | A1 then C3:D4 under =Sheet1!$A$1,Sheet1!$C$3:$D$4: Multi. C3:D4 then A1, or A1 alone: none. |
+| Absolute references only | A relative =Sheet1!B2 with B2 selected, and =OFFSET(Sheet1!$A$1,0,0,2,2) with A1:B2: none. |
+| Of more than one, the first by name, capitals aside | Zed and Alpha (Zed added first): Alpha. beta and Alpha2: Alpha2. A workbook's Aw and the sheet's own Zown: Aw. |
+| The same name: the sheet's own first | Dup of the workbook and Dup of Sheet1: Sheet1's. Mid of Sheet1 and of Sheet2: Sheet1's. |
+| Hidden names and print areas count | A hidden Hid alone: Hid; hidden Ahid and Seen: Ahid. A print area over B2:C4, with Rate too: Print_Area. |
+| Another sheet's own name counts | Sheet2's own Theirs over Sheet1!B2:C4, selected on Sheet1: Sheet2!Theirs (Sheet2's Aa before Sheet1's Bb too). |
+| A table is no name | Its data rows, the whole of it, a column of it: none. A name over its data rows: that name. |
+| Going to a name | Application.Goto from Sheet2: Rate selected B2:C4 on Sheet1, B2 active; Multi (=Sheet1!$C$3:$D$4,Sheet1!$A$1) C3:D4 and A1, A1 (the last range's first cell) active; Selection.Name then the name. Going to a name of ranges works here now too. |
+
+COM gives a sheet's own name as "Sheet1!Own"; the Name Box shows the shown sheet's own without its sheet ("Own"), and
+another sheet's with it ("Sheet2!Theirs"), as COM gives it: not measured, since the Name Box can't be read.
+
+The drop-down: Excel's Name Box has an arrow that lists the names to go to (documented, not reachable over COM). Its
+list here is Go To's (`goToNames`): the names standing for ranges the sheet sees, not Excel's own hidden ones, and the
+tables, sorted. Which names Excel's list holds (hidden ones, other sheets' own) isn't measured; nor whether it shows a
+table's name for a table's range, which `Selection.Name` doesn't report, so a table's range shows its cells here.
 
 ## Paste List (measured)
 

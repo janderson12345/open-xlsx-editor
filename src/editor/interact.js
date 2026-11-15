@@ -18,6 +18,8 @@ import { formatCodeOf } from '../ooxml/styles.js';
 import { contentsHidden } from '../ooxml/protection.js';
 import { linkFollower } from './linkfollow.js';
 import { attachBorderDrag } from './drawdrag.js';
+import { areasOf } from './selection.js';
+import { selectionName, goToNames } from '../ooxml/goto.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -45,6 +47,7 @@ export function attachEditing(root, ctx) {
     onGo: (text) => {
       if (cmd.run('nameBox', text) !== false) view.focus();
     },
+    names: () => goToNames(ctx.workbook(), ctx.sheetIndex()),
     onKey: (e) => pointing.key(e),
     onFocus: () => pointing.attach(bar.input),
     onBlur: () => {
@@ -153,7 +156,9 @@ export function attachEditing(root, ctx) {
     (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown)));
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
-    bar.show(refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac), s.ar, s.ac));
+    // (The selection's name when it has one, as Excel reports it for the selection: goto.js selectionName.)
+    const named = cmd ? selectionName(ctx.workbook(), ctx.sheetIndex(), areasOf(s)) : null;
+    bar.show(named || refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac), s.ar, s.ac));
   }
   const reopen = (text) => {
     const s = cmd.selection;

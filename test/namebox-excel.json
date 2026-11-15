@@ -1,0 +1,660 @@
+{
+  "excel": "16.0",
+  "cases": [
+    {
+      "id": "exact",
+      "names": [
+        {
+          "name": "Rate",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Rate"
+    },
+    {
+      "id": "exact, the active cell inside",
+      "names": [
+        {
+          "name": "Rate",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": "C3",
+      "excel": "Rate"
+    },
+    {
+      "id": "part of it",
+      "names": [
+        {
+          "name": "Rate",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C3",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "more than it",
+      "names": [
+        {
+          "name": "Rate",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C5",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "its first cell",
+      "names": [
+        {
+          "name": "Rate",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "one cell",
+      "names": [
+        {
+          "name": "One",
+          "refersTo": "=Sheet1!$E$5",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "E5",
+      "active": null,
+      "excel": "One"
+    },
+    {
+      "id": "two of the workbook, added Zed first",
+      "names": [
+        {
+          "name": "Zed",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Alpha",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Alpha"
+    },
+    {
+      "id": "two of the workbook, capitals",
+      "names": [
+        {
+          "name": "beta",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Alpha2",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Alpha2"
+    },
+    {
+      "id": "the workbook's and the sheet's",
+      "names": [
+        {
+          "name": "Wide",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Own",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Own"
+    },
+    {
+      "id": "the sheet's and the workbook's, the sheet's first by name",
+      "names": [
+        {
+          "name": "Zwide",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Aown",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Aown"
+    },
+    {
+      "id": "the workbook's first by name, the sheet's own",
+      "names": [
+        {
+          "name": "Aw",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Zown",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Aw"
+    },
+    {
+      "id": "the workbook's first by name, another sheet's own",
+      "names": [
+        {
+          "name": "Aw",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Zown",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 1,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Aw"
+    },
+    {
+      "id": "each sheet's own, the same name",
+      "names": [
+        {
+          "name": "Mid",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 1,
+          "hidden": false
+        },
+        {
+          "name": "Mid",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Mid"
+    },
+    {
+      "id": "each sheet's own, the other sheet's first by name",
+      "names": [
+        {
+          "name": "Aa",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 1,
+          "hidden": false
+        },
+        {
+          "name": "Bb",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet2!Aa"
+    },
+    {
+      "id": "hidden first by name, the sheet's own",
+      "names": [
+        {
+          "name": "Ahid",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": true
+        },
+        {
+          "name": "Zown",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Ahid"
+    },
+    {
+      "id": "the same name, the workbook's and the sheet's",
+      "names": [
+        {
+          "name": "Dup",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        },
+        {
+          "name": "Dup",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Dup"
+    },
+    {
+      "id": "another sheet's own name over this sheet's cells",
+      "names": [
+        {
+          "name": "Theirs",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 1,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet2!Theirs"
+    },
+    {
+      "id": "another sheet's own and the workbook's",
+      "names": [
+        {
+          "name": "Atheirs",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": 1,
+          "hidden": false
+        },
+        {
+          "name": "Wide",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet2!Atheirs"
+    },
+    {
+      "id": "the sheet's own, from the other sheet",
+      "names": [
+        {
+          "name": "Own",
+          "refersTo": "=Sheet2!$B$2:$C$4",
+          "sheet": 0,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 1,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Own"
+    },
+    {
+      "id": "a name of the other sheet's cells",
+      "names": [
+        {
+          "name": "There",
+          "refersTo": "=Sheet2!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "hidden",
+      "names": [
+        {
+          "name": "Hid",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": true
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Hid"
+    },
+    {
+      "id": "hidden and visible",
+      "names": [
+        {
+          "name": "Ahid",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": true
+        },
+        {
+          "name": "Seen",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Ahid"
+    },
+    {
+      "id": "two areas",
+      "names": [
+        {
+          "name": "Multi",
+          "refersTo": "=Sheet1!$A$1,Sheet1!$C$3:$D$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "A1,C3:D4",
+      "active": null,
+      "excel": "Multi"
+    },
+    {
+      "id": "two areas, the other way round",
+      "names": [
+        {
+          "name": "Multi",
+          "refersTo": "=Sheet1!$A$1,Sheet1!$C$3:$D$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "C3:D4,A1",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "two areas, one of them",
+      "names": [
+        {
+          "name": "Multi",
+          "refersTo": "=Sheet1!$A$1,Sheet1!$C$3:$D$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "A1",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "a whole column",
+      "names": [
+        {
+          "name": "Col",
+          "refersTo": "=Sheet1!$B:$B",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B:B",
+      "active": null,
+      "excel": "Col"
+    },
+    {
+      "id": "whole rows",
+      "names": [
+        {
+          "name": "Rows",
+          "refersTo": "=Sheet1!$3:$5",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "3:5",
+      "active": null,
+      "excel": "Rows"
+    },
+    {
+      "id": "relative",
+      "names": [
+        {
+          "name": "Rel",
+          "refersTo": "=Sheet1!B2",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "B2",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "a formula",
+      "names": [
+        {
+          "name": "Dyn",
+          "refersTo": "=OFFSET(Sheet1!$A$1,0,0,2,2)",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": null,
+      "on": 0,
+      "select": "A1:B2",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "a print area",
+      "names": [],
+      "print": "$B$2:$C$4",
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Print_Area"
+    },
+    {
+      "id": "a print area and a name",
+      "names": [
+        {
+          "name": "Rate",
+          "refersTo": "=Sheet1!$B$2:$C$4",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": "$B$2:$C$4",
+      "table": null,
+      "on": 0,
+      "select": "B2:C4",
+      "active": null,
+      "excel": "Sheet1!Print_Area"
+    },
+    {
+      "id": "a table's data rows",
+      "names": [],
+      "print": null,
+      "table": "A10:C13",
+      "on": 0,
+      "select": "A11:C13",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "a whole table",
+      "names": [],
+      "print": null,
+      "table": "A10:C13",
+      "on": 0,
+      "select": "A10:C13",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "a table's column",
+      "names": [],
+      "print": null,
+      "table": "A10:C13",
+      "on": 0,
+      "select": "B11:B13",
+      "active": null,
+      "excel": null
+    },
+    {
+      "id": "a table and a name over its data rows",
+      "names": [
+        {
+          "name": "Body",
+          "refersTo": "=Sheet1!$A$11:$C$13",
+          "sheet": null,
+          "hidden": false
+        }
+      ],
+      "print": null,
+      "table": "A10:C13",
+      "on": 0,
+      "select": "A11:C13",
+      "active": null,
+      "excel": "Body"
+    }
+  ],
+  "goto": [
+    {
+      "name": "Rate",
+      "sheet": "Sheet1",
+      "selection": "$B$2:$C$4",
+      "active": "$B$2",
+      "excel": "Rate"
+    },
+    {
+      "name": "Multi",
+      "sheet": "Sheet1",
+      "selection": "$C$3:$D$4,$A$1",
+      "active": "$A$1",
+      "excel": "Multi"
+    }
+  ]
+}
