@@ -5,7 +5,6 @@
 // usage: node tools/excel-compare/cells.cjs <pdfDir> <outDir>
 const fs = require('fs');
 const path = require('path');
-const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
 
 const [dir, outDir] = process.argv.slice(2);
 if (!outDir) { console.log('usage: node cells.cjs <pdfDir> <outDir>'); process.exit(1); }
@@ -14,7 +13,9 @@ const PX = 4 / 3; // pixels per point
 // Spaces and zero-width spaces (U+200B) don't count in a key.
 const SPACES = new RegExp('[' + String.fromCharCode(92) + 's' + String.fromCharCode(0x200b) + ']+', 'g');
 
+// (pdf.js ships as an ES module only: loaded with import(), awaited before use.)
 (async () => {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
   for (const f of fs.readdirSync(dir).filter((x) => /\.pdf$/i.test(x))) {
     try {
       const doc = await pdfjs.getDocument({ data: new Uint8Array(fs.readFileSync(path.join(dir, f))), disableFontFace: true, verbosity: 0 }).promise;

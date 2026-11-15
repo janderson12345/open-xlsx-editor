@@ -1,11 +1,10 @@
 // PDF export (src/pdf.js): the sheet shown, and the whole workbook, exported from the demo page; the PDF read back
 // here: its pages as the print layout's, at the sheet's paper size, its text real text with each cell's content.
 // Run after `npm run build`: node test/pdf.mjs
-import { createRequire } from 'node:module';
 import { PDFDocument } from 'pdf-lib';
 import { openDemo, openFixture, checker } from './browser.mjs';
 
-const pdfjs = createRequire(import.meta.url)('pdfjs-dist/legacy/build/pdf.js');
+import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs';
 const t = checker();
 const { page, errors, close } = await openDemo();
 await openFixture(page, 'basic.xlsx');

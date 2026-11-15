@@ -5,12 +5,15 @@
 // usage: node tools/excel-compare/shapes.cjs <pdfDir> <outDir>
 const fs = require('fs');
 const path = require('path');
-const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
+let pdfjs;
+let OPS;
+let FILLS;
+// (pdf.js's DrawOPS: the path codes inside constructPath.)
+const DRAW = { moveTo: 0, lineTo: 1, curveTo: 2, quadraticCurveTo: 3, closePath: 4 };
 
 const [dir, outDir] = process.argv.slice(2);
 if (!outDir) { console.log('usage: node shapes.cjs <pdfDir> <outDir>'); process.exit(1); }
 fs.mkdirSync(outDir, { recursive: true });
-const OPS = pdfjs.OPS;
 const PX = 4 / 3;
 const hex = (c) => (typeof c === 'string' ? c.toLowerCase() : '#' + [...c].slice(0, 3).map((v) => Math.round(v).toString(16).padStart(2, '0')).join(''));
 const gray = (g) => hex([g * 255, g * 255, g * 255]);
@@ -28,6 +31,28 @@ async function shapesOf(file) {
     const stack = [];
     let pathPts = []; // [[x, y], ...] in page points, per subpath
     const toPx = ([x, y]) => [+(x * PX).toFixed(2), +((h - y) * PX).toFixed(2)];
+    const fillPath = () => {
+      for (const sub of pathPts) {
+        if (sub.length < 3) continue;
+        const pts = sub.map(toPx);
+        const xs = pts.map((q) => q[0]);
+        const ys = pts.map((q) => q[1]);
+        const x0 = Math.min(...xs); const y0 = Math.min(...ys);
+        out.push(['fill', p, gs.fill, x0, y0, +(Math.max(...xs) - x0).toFixed(2), +(Math.max(...ys) - y0).toFixed(2)]);
+      }
+      pathPts = [];
+    };
+    const strokePath = () => {
+      const scale = Math.hypot(gs.m[0], gs.m[1]);
+      for (const sub of pathPts) {
+        for (let j = 1; j < sub.length; j++) {
+          const [x1, y1] = toPx(sub[j - 1]);
+          const [x2, y2] = toPx(sub[j]);
+          out.push(['line', p, gs.stroke, x1, y1, x2, y2, +(gs.lw * scale * PX).toFixed(2), gs.dash]);
+        }
+      }
+      pathPts = [];
+    };
     for (let i = 0; i < list.fnArray.length; i++) {
       const fn = list.fnArray[i];
       const a = list.argsArray[i];
@@ -43,45 +68,33 @@ async function shapesOf(file) {
       else if (fn === OPS.setLineWidth) gs.lw = a[0];
       else if (fn === OPS.setDash) gs.dash = !!(a[0] && a[0].length);
       else if (fn === OPS.constructPath) {
-        const [ops, coords] = a;
-        let k = 0;
+        // (pdf.js 5: [the painting operator, [the path as DrawOPS codes, each followed by its points], bounds]; a
+        // rectangle is a moveTo, three lineTos and a closePath. The closing edge isn't reported, as before.)
+        const [paint, [data]] = a;
         let sub = null;
-        for (const op of ops) {
-          if (op === OPS.rectangle) {
-            const [x, y, w, hh] = coords.slice(k, k + 4); k += 4;
-            pathPts.push([[x, y], [x + w, y], [x + w, y + hh], [x, y + hh]].map(([px, py]) => apply(gs.m, px, py)));
-          } else if (op === OPS.moveTo) { sub = [apply(gs.m, coords[k], coords[k + 1])]; pathPts.push(sub); k += 2; }
-          else if (op === OPS.lineTo) { (sub || pathPts[pathPts.length - 1] || []).push(apply(gs.m, coords[k], coords[k + 1])); k += 2; }
-          else if (op === OPS.curveTo) { (sub || []).push(apply(gs.m, coords[k + 4], coords[k + 5])); k += 6; }
-          else if (op === OPS.curveTo2 || op === OPS.curveTo3) { (sub || []).push(apply(gs.m, coords[k + 2], coords[k + 3])); k += 4; }
+        for (let k = 0; data && k < data.length;) {
+          const op = data[k++];
+          if (op === DRAW.moveTo) { sub = [apply(gs.m, data[k], data[k + 1])]; pathPts.push(sub); k += 2; }
+          else if (op === DRAW.lineTo) { (sub || []).push(apply(gs.m, data[k], data[k + 1])); k += 2; }
+          else if (op === DRAW.curveTo) { (sub || []).push(apply(gs.m, data[k + 4], data[k + 5])); k += 6; }
+          else if (op === DRAW.quadraticCurveTo) { (sub || []).push(apply(gs.m, data[k + 2], data[k + 3])); k += 4; }
         }
-      } else if (fn === OPS.fill || fn === OPS.eoFill || fn === OPS.fillStroke || fn === OPS.eoFillStroke || fn === OPS.closeFillStroke || fn === OPS.closeEOFillStroke) {
-        for (const sub of pathPts) {
-          if (sub.length < 3) continue;
-          const pts = sub.map(toPx);
-          const xs = pts.map((q) => q[0]);
-          const ys = pts.map((q) => q[1]);
-          const x0 = Math.min(...xs); const y0 = Math.min(...ys);
-          out.push(['fill', p, gs.fill, x0, y0, +(Math.max(...xs) - x0).toFixed(2), +(Math.max(...ys) - y0).toFixed(2)]);
-        }
-        pathPts = [];
-      } else if (fn === OPS.stroke || fn === OPS.closeStroke) {
-        const scale = Math.hypot(gs.m[0], gs.m[1]);
-        for (const sub of pathPts) {
-          for (let j = 1; j < sub.length; j++) {
-            const [x1, y1] = toPx(sub[j - 1]);
-            const [x2, y2] = toPx(sub[j]);
-            out.push(['line', p, gs.stroke, x1, y1, x2, y2, +(gs.lw * scale * PX).toFixed(2), gs.dash]);
-          }
-        }
-        pathPts = [];
-      } else if (fn === OPS.endPath) pathPts = [];
+        if (FILLS.has(paint)) fillPath();
+        else if (paint === OPS.stroke || paint === OPS.closeStroke) strokePath();
+        else pathPts = [];
+      } else if (FILLS.has(fn)) fillPath();
+      else if (fn === OPS.stroke || fn === OPS.closeStroke) strokePath();
+      else if (fn === OPS.endPath) pathPts = [];
     }
   }
   return out;
 }
 
+// (pdf.js ships as an ES module only: loaded with import(), awaited before use.)
 (async () => {
+  pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  OPS = pdfjs.OPS;
+  FILLS = new Set([OPS.fill, OPS.eoFill, OPS.fillStroke, OPS.eoFillStroke, OPS.closeFillStroke, OPS.closeEOFillStroke]);
   for (const f of fs.readdirSync(dir).filter((x) => /\.pdf$/i.test(x))) {
     try {
       fs.writeFileSync(path.join(outDir, f.replace(/\.pdf$/i, '.json')), JSON.stringify(await shapesOf(path.join(dir, f))));

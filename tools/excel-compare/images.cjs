@@ -1,9 +1,10 @@
 // The images painted on each page of a PDF, one JSON line each: { page, x, y (top), w, h } in pixels at 96 dpi from the
 // page's top left. Used for header and footer pictures (docs/PRINT.md); Excel's PDFs and ours go through it alike.
 // usage: node tools/excel-compare/images.cjs <file.pdf>
-const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
 const fs = require('fs');
+// (pdf.js ships as an ES module only: loaded with import(), awaited before use.)
 (async () => {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
   const doc = await pdfjs.getDocument({ data: new Uint8Array(fs.readFileSync(process.argv[2])) }).promise;
   for (let p = 1; p <= doc.numPages; p++) {
     const page = await doc.getPage(p);
