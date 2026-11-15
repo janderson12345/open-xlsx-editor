@@ -24,7 +24,7 @@ import { breaksRule } from './ooxml/validation.js';
 import { printAreaOf } from './ooxml/pagesetupedit.js';
 import { sheetProtection, workbookProtection, contentsHidden } from './ooxml/protection.js';
 import { conditionalLooks } from './ooxml/condformat.js';
-import { errorFlags } from './ooxml/errorcheck.js';
+import { errorFlags, ERROR_RULES } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
 import { chartFigure } from './editor/chartview.js';
 import { createRibbon } from './editor/ribbon.js';
@@ -173,12 +173,25 @@ export function mountXlsxEditor(host, options = {}) {
     return !group || (state.features[group] !== false && state.features[tab] !== false);
   };
   /** The shown sheet's conditional formats worked out again (after a change, or another sheet shown). */
+  /** Excel's Error Checking Options: `errorChecking` (false: off; { background, rules }) over the user's last choice
+   *  in this browser over Excel's defaults (every rule here on). */
+  state.errorOptions = (() => {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('oxe-error-options') || 'null'); } catch { /* storage blocked */ }
+    const given = options.errorChecking === false ? { background: false } : typeof options.errorChecking === 'object' ? options.errorChecking : {};
+    return { background: true, rules: [...ERROR_RULES], ...(saved || {}), ...given };
+  })();
+  /** The error indicators worked out again (errorcheck.js), with the rules turned on; none without background checking. */
+  state.refreshErrors = () => {
+    if (!state.grid || !state.workbook) return;
+    state.workbook.errorRules = state.errorOptions.rules;
+    state.grid.setErrors(state.errorOptions.background ? errorFlags(state.workbook, state.sheetIndex) : null);
+  };
   const showConditional = () => {
     if (!state.grid || !state.workbook) return;
     state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex));
     state.watch?.refresh();
-    // (Excel's error indicators, worked out again: errorcheck.js; `errorChecking: false` turns them off.)
-    state.grid.setErrors(options.errorChecking === false ? null : errorFlags(state.workbook, state.sheetIndex));
+    state.refreshErrors();
     // (Notes too: written, deleted, or moved with rows and columns.)
     state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
     // (Circle Invalid Data's circles on this sheet, less those whose cells are now put right, as Excel's go.)

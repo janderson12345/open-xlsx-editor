@@ -35,7 +35,7 @@ import { insertFunctionBox } from './functionbox.js';
 import { pasteNameBox, applyNamesBox } from './namesbox.js';
 import { applicableNames, applyNamesSteps } from '../ooxml/applynames.js';
 import { openErrorMenu } from './errormenu.js';
-import { errorCheckingBox } from './errorbox.js';
+import { errorCheckingBox, errorOptionsBox } from './errorbox.js';
 import { evaluateFormulaBox } from './evalbox.js';
 import { protectBox, passwordAsk, workbookProtectBox } from './protectbox.js';
 import { editRangesBox, refersOf } from './rangesbox.js';
@@ -57,6 +57,14 @@ export function createMoreActs(env) {
     if (name === 'errorMenu') return openErrorMenu(env, args[0]);
     // (Formulas > Error Checking: errorbox.js.)
     if (name === 'errorChecking') return errorCheckingBox(env);
+    if (name === 'errorOptions') {
+      // (Excel's Error Checking Options: kept in the browser, as Excel keeps them as its own settings.)
+      return errorOptionsBox(root, state.errorOptions).then((got) => {
+        if (got) { state.errorOptions = got; try { localStorage.setItem('oxe-error-options', JSON.stringify(got)); } catch { /* storage blocked */ } state.refreshErrors?.(); }
+        state.grid.el.focus({ preventScroll: true });
+        return !!got;
+      });
+    }
     // (Formulas > Evaluate Formula: evalbox.js.)
     if (name === 'evaluateFormula') return evaluateFormulaBox(env);
     if (name === 'scaleBox') {

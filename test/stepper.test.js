@@ -33,3 +33,19 @@ test("Evaluate Formula's steps, as Microsoft's example has them: a function of a
   assert.deepEqual(steps(wb, si, 'F3'), ['=([D2]+D3)/2&" each"', '=(_55_+[D3])/2&" each"', '=([55+_35_])/2&" each"', '=[_90_/2]&" each"',
     '=[_45_&" each"]', '=_"45 each"_']);
 });
+
+test("Step In: the part underlined a cell holding a formula, that cell's formula to work out; Step Out puts its value back", async () => {
+  const { build } = await import('./steps.js');
+  const { Stepper } = await import('../src/calc/stepper.js');
+  const { wb, si } = build({ cells: { A1: '4', B1: '=A1*2', C1: '=B1+1', D1: '=5+1' } });
+  wb.calc.build();
+  const at = (r, c) => { const e = wb.calc.entries.get(`${si}:${r}:${c}`); return new Stepper(wb.sheet(si).cells.get(r).get(c).f, wb.calc.context(e)); };
+  const outer = at(0, 2);
+  assert.deepEqual(outer.stepInTarget(), { si, r: 0, c: 1 }, 'B1, holding =A1*2');
+  const inner = at(0, 1);
+  assert.deepEqual(inner.stepInTarget(), { si, r: 0, c: 0 }, 'A1 is a cell too (a constant: no formula to step into)');
+  while (!inner.done) inner.step();
+  outer.step();
+  assert.equal(outer.pieces().map((p) => p.text).join(''), '=8+1', 'back out with 8 in B1\'s place');
+  assert.equal(at(0, 3).stepInTarget(), null, 'nothing to step into in =5+1');
+});

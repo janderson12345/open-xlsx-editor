@@ -3,7 +3,7 @@
 // what it means, its fix (errormenu.js errorChoices), Ignore Error, Edit in Formula Bar, Previous and Next. Past the
 // last it starts again at the top; back where it started, "The error check is complete for the entire sheet."
 import { modal, button, messageBox } from './dialogs.js';
-import { errorFlags } from '../ooxml/errorcheck.js';
+import { errorFlags, ERROR_OPTIONS } from '../ooxml/errorcheck.js';
 import { refName } from '../ooxml/refs.js';
 import { editText } from '../ooxml/input.js';
 import { errorChoices } from './errormenu.js';
@@ -57,7 +57,9 @@ export async function errorCheckingBox(env) {
       text.textContent = ch.text;
       // (A fix or Ignore Error, then on to the next, as Excel goes on; Edit in Formula Bar closes the box.)
       const act = (choice, close = false) => button(choice.label, () => { choice.run(); if (close) done(null); else go(1); });
-      side.replaceChildren(...ch.fixes.map((f) => act(f)), act(ch.ignore), act(ch.edit, true));
+      side.replaceChildren(...ch.fixes.map((f) => act(f)), act(ch.ignore), act(ch.edit, true),
+        // (Options...: Excel's Error Checking Options; the box closes, as Excel's waits on its options.)
+        button('Options...', () => { done(null); env.act?.('errorOptions'); }));
       for (const b of side.children) b.disabled = state.readOnly;
       side.firstChild?.setAttribute('data-first', '');
     };
@@ -74,3 +76,27 @@ export async function errorCheckingBox(env) {
     show();
   });
 }
+
+/**
+ * Excel's Error Checking Options (File > Options > Formulas): Enable background error checking, and each rule's tick
+ * box. `now`: { background, rules: [on] }. Resolves to the same shape, or null. Excel keeps them as its own settings,
+ * not in the workbook; so does the editor (index.js, in the browser).
+ */
+export function errorOptionsBox(root, now) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    dlg.classList.add('oxe-erropts-box');
+    const tick = (label, on) => {
+      const input = make('input', { type: 'checkbox', checked: on, id: `${id}-${label.replace(/\W/g, '')}` });
+      return { input, el: make('div', { className: 'oxe-dialog-option' }, input, make('label', { htmlFor: input.id, textContent: label })) };
+    };
+    const background = tick('Enable background error checking', now.background);
+    const rules = ERROR_OPTIONS.map(([key, label]) => ({ key, ...tick(label, now.rules.includes(key)) }));
+    const ok = () => done({ background: background.input.checked, rules: rules.filter((x) => x.input.checked).map((x) => x.key) });
+    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Error Checking Options' }), background.el,
+      make('fieldset', {}, make('legend', { textContent: 'Error checking rules' }), ...rules.map((x) => x.el)),
+      make('div', { className: 'oxe-dialog-buttons' }, button('OK', ok), button('Cancel', () => done(null))));
+    background.input.dataset.first = '';
+  });
+}
+

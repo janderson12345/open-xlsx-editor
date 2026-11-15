@@ -84,6 +84,17 @@ export class Stepper {
     return node.k === 'val' ? node.v : evaluate(node, this.ctx, 'scalar');
   }
 
+  /** Where Step In goes: the cell the underlined part refers to ({ si, r, c }), when it is one cell's reference;
+   *  else null. (Excel's Step In: the referenced cell's own formula worked out beneath; Step Out puts its value back.) */
+  stepInTarget() {
+    const n = this.next();
+    if (!n || n.node.k !== 'ref') return null;
+    this.ctx.root = null;
+    let v;
+    try { v = evaluate(n.node, this.ctx, 'scalar'); } catch { return null; }
+    return v instanceof Area && v.r0 === v.r1 && v.c0 === v.c1 ? { si: v.si, r: v.r0, c: v.c0 } : null;
+  }
+
   /** Work out the underlined part: its value in its place. */
   step() {
     const n = this.next();

@@ -27,6 +27,12 @@ export const ERROR_TEXT = {
 };
 
 export const ERROR_RULES = ['evalError', 'twoDigitTextYear', 'numberStoredAsText', 'formula', 'formulaRange', 'unlockedFormula'];
+/** Excel's Error Checking Options (File > Options > Formulas, Error checking rules) for the rules here, in its words. */
+export const ERROR_OPTIONS = [
+  ['evalError', 'Cells containing formulas that result in an error'], ['twoDigitTextYear', 'Cells containing years represented as 2 digits'],
+  ['numberStoredAsText', 'Numbers formatted as text or preceded by an apostrophe'], ['formula', 'Formulas inconsistent with other formulas in the region'],
+  ['formulaRange', 'Formulas which omit cells in a region'], ['unlockedFormula', 'Unlocked cells containing formulas'],
+];
 
 const MONTH = '(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?';
 const TWO_DIGIT_DATES = [
@@ -129,7 +135,8 @@ export function errorFlags(wb, si, limit = 200000) {
         const rule = textRule(cell.v);
         if (rule) rules.push(rule);
       }
-      const kept = rules.filter((rule) => !off(rule, r, c));
+      // (A rule turned off in Error Checking Options, `wb.errorRules` the ones on, isn't checked.)
+      const kept = rules.filter((rule) => !off(rule, r, c) && (!wb.errorRules || wb.errorRules.includes(rule)));
       if (kept.length) out.set(`${r},${c}`, kept);
     }
   }

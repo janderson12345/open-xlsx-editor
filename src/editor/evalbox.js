@@ -1,6 +1,7 @@
 // Formulas > Evaluate Formula: Excel's box over the active cell's formula (calc/stepper.js). Reference names the cell;
 // Evaluation shows the formula with the next part underlined and the last value worked out in italics; Evaluate works
-// out the underlined part, and at the end becomes Restart; Close. Step In and Step Out are there, not yet working.
+// out the underlined part, and at the end becomes Restart; Step In, when the part underlined is a cell holding a
+// formula, shows that formula beneath to work out, and Step Out goes back up with its value; Close.
 import { modal, button } from './dialogs.js';
 import { Stepper } from '../calc/stepper.js';
 import { colName } from '../ooxml/refs.js';
@@ -19,6 +20,17 @@ export function evaluateFormulaBox(env) {
   wb.calc.build();
   const entry = wb.calc.entries.get(`${si}:${s.ar}:${s.ac}`);
   const stepper = cell?.f != null && entry?.tree ? new Stepper(cell.f, wb.calc.context(entry)) : null;
+  // (Step In's levels: the cell's formula, then each formula stepped into, the last being worked out.)
+  const levels = stepper ? [{ stepper, ref: `${quoted(wb.sheets[si].name)}!$${colName(s.ac)}$${s.ar + 1}` }] : [];
+  const top = () => levels[levels.length - 1];
+  /** The formula of the cell the part underlined refers to, as a level to step into, or null. */
+  const inner = () => {
+    const at = top()?.stepper.stepInTarget();
+    if (!at) return null;
+    const one = wb.sheet(at.si).cells.get(at.r)?.get(at.c);
+    const e = wb.calc.entries.get(`${at.si}:${at.r}:${at.c}`);
+    return one?.f != null && e?.tree ? { stepper: new Stepper(one.f, wb.calc.context(e)), ref: `${quoted(wb.sheets[at.si].name)}!$${colName(at.c)}$${at.r + 1}` } : null;
+  };
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     dlg.classList.add('oxe-evaluate-box');
@@ -31,23 +43,29 @@ export function evaluateFormulaBox(env) {
     shown.setAttribute('aria-live', 'polite');
     const note = make('p', { className: 'oxe-dialog-text oxe-evaluate-note', textContent: 'To show the result of the underlined expression, click Evaluate. The most recent result appears italicized.' });
     const evaluate = button('Evaluate', () => {
-      if (stepper.done) stepper.restart(); else stepper.step();
+      const s0 = top().stepper;
+      if (s0.done && levels.length === 1) s0.restart(); else if (!s0.done) s0.step();
       draw();
     });
-    const stepIn = button('Step In', () => {});
-    const stepOut = button('Step Out', () => {});
-    stepIn.disabled = true;
-    stepOut.disabled = true;
+    const stepIn = button('Step In', () => { const next = inner(); if (next) { levels.push(next); draw(); } });
+    // (Step Out: the level stepped into done with, its cell's value put in place of the reference above.)
+    const stepOut = button('Step Out', () => { if (levels.length > 1) { levels.pop(); top().stepper.step(); draw(); } });
+    const line = (st) => st.pieces().map((p) => {
+      let el = document.createTextNode(p.text);
+      if (p.last) el = make('em', {}, el);
+      if (p.under) el = make('u', {}, el);
+      return el;
+    });
     const draw = () => {
-      if (!stepper) { shown.textContent = editText(cell); evaluate.disabled = true; return; }
-      // (Underlined: the part Evaluate works out next; italic: the value it just gave, as Excel shows them.)
-      shown.replaceChildren(...stepper.pieces().map((p) => {
-        let el = document.createTextNode(p.text);
-        if (p.last) el = make('em', {}, el);
-        if (p.under) el = make('u', {}, el);
-        return el;
-      }));
-      evaluate.textContent = stepper.done ? 'Restart' : 'Evaluate';
+      if (!stepper) { shown.textContent = editText(cell); evaluate.disabled = true; stepIn.disabled = true; stepOut.disabled = true; return; }
+      // (Underlined: the part Evaluate works out next; italic: the value it just gave, as Excel shows them. Each level
+      // stepped into on a line of its own, its cell named.)
+      shown.replaceChildren(...levels.flatMap((lv, i) => [make('div', { className: 'oxe-evaluate-level' }, ...(i ? [make('span', { className: 'oxe-evaluate-ref', textContent: `${lv.ref} = ` })] : []), ...line(lv.stepper))]));
+      ref.textContent = `Reference: ${top().ref}`;
+      evaluate.textContent = top().stepper.done && levels.length === 1 ? 'Restart' : 'Evaluate';
+      evaluate.disabled = top().stepper.done && levels.length > 1;
+      stepIn.disabled = !inner();
+      stepOut.disabled = levels.length < 2;
     };
     evaluate.dataset.first = '';
     dlg.append(title, ref, make('p', { className: 'oxe-dialog-text', textContent: 'Evaluation:' }), shown, note,

@@ -293,9 +293,14 @@ Range.Errors on about 60 cells; `test/errorcheck.test.js` has them):
   Excel's as its documentation and the box itself show them, not measured; Excel's box lets the sheet be clicked
   while it is open, this one doesn't.
 - **Not yet**: the two-digit year's Convert XX to 19XX and 20XX, Update Formula to Include Cells, Show Calculation Steps,
-  Help and Error Checking Options; whether Convert to Number changes a Text number format (not measured: it is kept).
+  Help; whether Convert to Number changes a Text number format (not measured: it is kept).
   The rules Excel has off by default (formulas referring to empty cells). One case Excel didn't flag here does: =SUM(M1:M3)
   in M5 with a number in M4, when M7 held =M1+M2 (alone, Excel flags it). The triangle's green isn't measured.
+
+Error Checking Options (the error button's menu, or Options... in the Error Checking box): Excel's own, Enable
+background error checking and each rule here in Excel's words (File > Options > Formulas). A rule turned off isn't
+checked, and with background checking off no triangles are drawn. As Excel keeps them as its own settings, not in the
+workbook, the editor keeps them in the browser; `errorChecking` sets them (`false`, or { background, rules }).
 
 Evaluate Formula (`calc/stepper.js`, `editor/evalbox.js`; `test/stepper.test.js`): the active cell's formula worked out
 a step at a time, the next part underlined and the value just worked out in italics; Evaluate, Restart at the end.
@@ -305,7 +310,10 @@ one handed to a function goes with it; a function or operator once its arguments
 condition, then only the argument it returns, IFERROR its value_if_error only after an error; brackets go with what
 is in them. Excel's box is a dialog COM can't drive, so the steps aren't measured beyond that example.
 
-- **Not yet**: Step In and Step Out (there, not working); a defined name's own steps.
+- **Step In** (when the part underlined is one cell holding a formula): that cell's formula on a line of its own
+  beneath, named ("Sheet1!$B$1 = "), worked out with Evaluate; **Step Out**: back to the formula above, the cell's
+  value put in place of its reference. As Excel's box does (its documentation; the box is a dialog COM can't drive).
+- **Not yet**: a defined name's own steps; Step In on a cell holding a constant (Excel shows its value).
 
 The Watch Window (`ooxml/watches.js`, `editor/watchwindow.js`; `test/watches.test.js`): the watched cells with their Book,
 Sheet, Name (a defined name for just that cell), Cell, Value (as the cell shows it) and Formula, kept up to date as

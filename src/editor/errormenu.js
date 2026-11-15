@@ -69,6 +69,6 @@ export function openErrorMenu(env, point) {
   const ch = errorChoices(env, rule, cells, { r: s.ar, c: s.ac });
   // (Focus on the grid first: the menu gives it back there when it closes.)
   state.grid.el.focus({ preventScroll: true });
-  menu.open([{ label: ch.heading, heading: true }, ...ch.fixes, ch.ignore, ch.edit], point, { label: `${ch.heading}: error options` });
+  menu.open([{ label: ch.heading, heading: true }, ...ch.fixes, ch.ignore, ch.edit, 'separator', { label: 'Error Checking Options...', run: () => env.act?.('errorOptions') }], point, { label: `${ch.heading}: error options` });
   return true;
 }
