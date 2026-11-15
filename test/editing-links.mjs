@@ -381,4 +381,13 @@ check(onMargins === 'true' && marginsNow.left === 0.6 && marginsNow.h && margins
   'Custom Margins...: the Page Setup box at Margins; Left 0.6 and Center horizontally set; Ctrl+Z back',
   JSON.stringify({ onMargins, marginsNow, marginsUndone }));
 
+// Page Layout > Sheet Options > Gridlines: Print: the printed page gets a hairline at each row and column edge of its
+// cells (A1:C8 here: 9 across, 4 down), none with it off.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for (let r = 1; r <= 8; r++) for (const c of ['A', 'B', 'C']) o.enter(`${c}${r}`, String(r)); });
+const gridCount = () => page.evaluate(() => { window.oxe.preparePrint(); return [document.querySelectorAll('.oxe-page .oxe-print-grid-h').length, document.querySelectorAll('.oxe-page .oxe-print-grid-v').length]; });
+const gridOff = await gridCount();
+await page.evaluate(() => window.oxe.command('printGridlines', true));
+const gridOn = await gridCount();
+check(gridOff.join() === '0,0' && gridOn.join() === '9,4', 'Gridlines: Print draws a hairline at each row and column edge of the printed cells', JSON.stringify({ gridOff, gridOn }));
+
 await finish();

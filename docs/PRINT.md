@@ -37,6 +37,11 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   1.3px left of the middle; vertically the same above it (workbooks made in code, printed by Excel; `..
 uns\center`
   and `center2`: 252 of 252 cells within 1px across and down). Read from printOptions' horizontalCentered and verticalCentered.
+- **Printed gridlines** (Sheet Options > Gridlines: Print, printOptions gridLines) are hairlines (0.19px in Excel's
+  PDF) at every row and column edge of each printed block of cells, print titles included; Excel draws an outline
+  round the printed range too, over the same edges (a workbook made in code, `..
+uns\gridprint`: all 13 of its
+  gridlines within 1px, the text where it was).
 - **Print titles** print only for the page's own columns. With a print area of B3:H70, rows 1:2 print as B1:E2 above
   the B:E pages.
 - **Headers and footers.** They use the Normal style's font and size, scaled with the sheet unless `scaleWithDoc` is
@@ -80,6 +85,6 @@ there.
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
 
-Not yet: a print area of several ranges (only the first prints), gridlines and row and column
-headings in print, pictures in headers (`&G`), headers of more than one line, and the first-page and even-page
-options beyond choosing their text (measured only with odd pages).
+Not yet: a print area of several ranges (only the first prints), row and column headings in print, pictures in headers
+(`&G`), headers of more than one line, and the first-page and even-page options beyond choosing their text (measured
+only with odd pages).

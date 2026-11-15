@@ -121,7 +121,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Page Setup (`page-setup`) | Margins, orientation, paper size, page order | Done | Used when printing. Margins (Normal, Wide, Narrow, and Custom Margins... in Excel's Page Setup box with Center on page), Orientation, Size and Page order set as Excel writes them, measured; a centered page prints as Excel's does (docs/PRINT.md). |
 | | Print area, print titles, page breaks | Done | Used when printing and exporting, as Excel does (docs/PRINT.md). Print Area (Set, Add to, Clear), Breaks (Insert, Remove, Reset All) and Print Titles (Excel's Page Setup box, its Sheet tab) set as Excel writes them, measured. |
 | Scale to Fit (`scale-to-fit`) | Width, height, scale | Done | Used when printing and exporting, rows and columns in whole printer dots as Excel prints them (docs/PRINT.md); Width and Height (Automatic, 1 to 9 pages) and Scale (10 to 400%) set as Excel writes them, measured. |
-| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Done | Gridlines and Headings, View and Print, saved as Excel saves them (Excel reads them back the same; docs/VIEW.md); Print used when printing and exporting (docs/PRINT.md). |
+| Sheet Options (`sheet-options`) | Gridlines and headings, view and print | Partly | Gridlines and Headings, View and Print, saved as Excel saves them (Excel reads them back the same; docs/VIEW.md). Gridlines: Print draws them as Excel prints them (docs/PRINT.md); printed row and column headings aren't drawn yet. |
 
 ## Formulas (`formulas`)
 

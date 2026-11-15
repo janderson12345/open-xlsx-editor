@@ -69,7 +69,7 @@ export function paginate(sheet, geometry = sheetGeometry(sheet, { print: true })
   const add = ([r0, r1], [c0, c1]) => pages.push({ r0, r1, c0, c1 });
   if (page.pageOrder === 'overThenDown') for (const rr of rowRuns) for (const cr of colRuns) add(rr, cr);
   else for (const cr of colRuns) for (const rr of rowRuns) add(rr, cr);
-  return { pages, paper: { w: pw * DPI, h: ph * DPI }, area, scale, titles, center: { h: !!page.centerH, v: !!page.centerV } };
+  return { pages, paper: { w: pw * DPI, h: ph * DPI }, area, scale, titles, center: { h: !!page.centerH, v: !!page.centerV }, gridLines: !!page.gridLines };
 }
 
 /**
@@ -119,6 +119,14 @@ function drawBlock(st, block, x, y, layout, rest = false) {
   layer.prepend(...fills);
   layer.append(...edges);
   clip.appendChild(layer);
+  // (Page Layout > Sheet Options > Gridlines: Print: a hairline at each row and column edge of the block's cells.)
+  if (layout.gridLines) {
+    const cw = span(st.cols, block.c0, block.c1);
+    const ch = span(st.rows, block.r0, block.r1);
+    const line = (cls, vars) => { const e = div(`oxe-print-grid ${cls}`); setVars(e, vars); clip.appendChild(e); };
+    for (let r = block.r0; r <= block.r1 + 1; r++) if (r === block.r1 + 1 || st.rows.size(r)) line('oxe-print-grid-h', { '--oxe-gy': st.rows.start(r) - st.rows.start(block.r0), '--oxe-gl': cw });
+    for (let c = block.c0; c <= block.c1 + 1; c++) if (c === block.c1 + 1 || st.cols.size(c)) line('oxe-print-grid-v', { '--oxe-gx': st.cols.start(c) - st.cols.start(block.c0), '--oxe-gl': ch });
+  }
   return clip;
 }
 
