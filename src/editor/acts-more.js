@@ -30,7 +30,7 @@ import { justifySteps, JUSTIFY_EXTENDS } from '../ooxml/justifyops.js';
 import { invalidCells } from '../ooxml/validation.js';
 import { excelTextWidth, JUSTIFY_MARGIN } from './textwidth.js';
 import { sheetGeometry } from './geometry.js';
-import { deleteRule, moveRule, setStopIfTrue, setRuleRanges } from '../ooxml/cfmanage.js';
+import { deleteRule, moveRule, setStopIfTrue, setRuleRanges, editRule } from '../ooxml/cfmanage.js';
 import { insertFunctionBox } from './functionbox.js';
 import { pasteNameBox, applyNamesBox } from './namesbox.js';
 import { applicableNames, applyNamesSteps } from '../ooxml/applynames.js';
@@ -428,6 +428,7 @@ export function createMoreActs(env) {
               if (change.move) moveRule(wb, si, change.move.p, change.move.to);
               if (change.stop) setStopIfTrue(wb, si, change.stop.p, change.stop.on);
               if (change.ranges) setRuleRanges(wb, si, change.ranges.p, change.ranges.ranges);
+              if (change.edit) editRule(wb, si, change.edit.p, change.edit.rule);
             });
           } catch (e) { refused = e.message; return false; }
           return true;

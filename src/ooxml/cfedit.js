@@ -100,29 +100,40 @@ export const AFTER_CF = ['dataValidations', 'hyperlinks', 'printOptions', 'pageM
  * rule first (priority 1, every other rule of the sheet one after), in the conditionalFormatting of the same ranges or a
  * new one. Edits the sheet's XML and the styles; the caller reads the sheet again.
  */
+/** A preset's format added to the workbook's dxfs (made when it has none): its dxfId. */
+export function addPresetDxf(wb, preset) {
+  const sroot = wb.stylesDoc.documentElement;
+  const sns = sroot.namespaceURI;
+  let dxfs = kid(sroot, 'dxfs', sns);
+  if (!dxfs) {
+    dxfs = wb.stylesDoc.createElementNS(sns, sroot.prefix ? `${sroot.prefix}:dxfs` : 'dxfs');
+    const after = [...sroot.childNodes].find((n) => n.nodeType === 1 && ['tableStyles', 'colors', 'extLst'].includes(n.localName));
+    sroot.insertBefore(dxfs, after || null);
+  }
+  const el = wb.stylesDoc.importNode(parseXml(`<w xmlns="${sns}">${presetDxf(preset)}</w>`).documentElement.firstChild, true);
+  dxfs.appendChild(el);
+  const dxfId = kids(dxfs, 'dxf', sns).length - 1;
+  dxfs.setAttribute('count', String(dxfId + 1));
+  wb.styles.dxfs.push(readDxf(el, sns));
+  wb.dirty.add(wb.stylesPath);
+  return dxfId;
+}
+
+/** A cfRule's XML (cfRuleXml's, or barRuleXml's base) as an element of the sheet's part, in the part's prefix. */
+export function ruleElement(doc, xml) {
+  const root = doc.documentElement;
+  const p = root.prefix ? `${root.prefix}:` : '';
+  const prefixed = xml.replace(/<(\/?)(cfRule|formula|colorScale|cfvo|color|dataBar|iconSet|extLst|ext)\b/g, `<$1${p}$2`);
+  return doc.importNode(parseXml(`<w xmlns${root.prefix ? `:${root.prefix}` : ''}="${root.namespaceURI}">${prefixed}</w>`).documentElement.firstChild, true);
+}
+
 export function addConditional(wb, si, ranges, rule) {
   const doc = wb._part(si).doc;
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const p = root.prefix ? `${root.prefix}:` : '';
-  let dxfId = null;
   const bars = rule.kind === 'dataBar' || rule.kind === 'iconSet';
-  if (rule.kind !== 'colorScale' && !bars) {
-    const sroot = wb.stylesDoc.documentElement;
-    const sns = sroot.namespaceURI;
-    let dxfs = kid(sroot, 'dxfs', sns);
-    if (!dxfs) {
-      dxfs = wb.stylesDoc.createElementNS(sns, sroot.prefix ? `${sroot.prefix}:dxfs` : 'dxfs');
-      const after = [...sroot.childNodes].find((n) => n.nodeType === 1 && ['tableStyles', 'colors', 'extLst'].includes(n.localName));
-      sroot.insertBefore(dxfs, after || null);
-    }
-    const el = wb.stylesDoc.importNode(parseXml(`<w xmlns="${sns}">${presetDxf(rule.preset)}</w>`).documentElement.firstChild, true);
-    dxfs.appendChild(el);
-    dxfId = kids(dxfs, 'dxf', sns).length - 1;
-    dxfs.setAttribute('count', String(dxfId + 1));
-    wb.styles.dxfs.push(readDxf(el, sns));
-    wb.dirty.add(wb.stylesPath);
-  }
+  const dxfId = rule.kind !== 'colorScale' && !bars ? addPresetDxf(wb, rule.preset) : null;
   // Every rule of the sheet one later: the new one first.
   // (Excel 2010's rules in the extLst have priorities among the others: cfbarsedit.js.)
   for (const r of [...doc.getElementsByTagNameNS(ns, 'cfRule'), ...x14Rules(doc).filter((x) => x.hasAttribute('priority'))]) r.setAttribute('priority', String(Number(r.getAttribute('priority') || 0) + 1));
@@ -134,8 +145,7 @@ export function addConditional(wb, si, ranges, rule) {
     base = made.base;
     if (!base) return;
   }
-  const xml = (base ?? cfRuleXml(rule, dxfId, 1, rangeName({ r0: ranges[0].r0, c0: ranges[0].c0, r1: ranges[0].r0, c1: ranges[0].c0 }))).replace(/<(\/?)(cfRule|formula|colorScale|cfvo|color|dataBar|iconSet|extLst|ext)\b/g, `<$1${p}$2`);
-  const ruleEl = doc.importNode(parseXml(`<w xmlns${root.prefix ? `:${root.prefix}` : ''}="${ns}">${xml}</w>`).documentElement.firstChild, true);
+  const ruleEl = ruleElement(doc, base ?? cfRuleXml(rule, dxfId, 1, rangeName({ r0: ranges[0].r0, c0: ranges[0].c0, r1: ranges[0].r0, c1: ranges[0].c0 })));
   let cf = kids(root, 'conditionalFormatting', ns).find((e) => e.getAttribute('sqref') === sqref);
   if (!cf) {
     cf = doc.createElementNS(ns, `${p}conditionalFormatting`);

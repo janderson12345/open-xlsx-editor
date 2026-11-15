@@ -1,0 +1,22 @@
+[
+ {
+  "name": "greater than 5 to between 3 and 7",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"3\" stopIfTrue=\"1\" operator=\"between\"><formula>3</formula><formula>7</formula></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"2\" stopIfTrue=\"1\"><formula>A1=2</formula></cfRule></conditionalFormatting>",
+  "dxfs": "<dxfs count=\"2\"><dxf><fill><patternFill><bgColor rgb=\"FFFFEB9C\"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb=\"FFFFC7CE\"/></patternFill></fill></dxf></dxfs>"
+ },
+ {
+  "name": "greater than 5 to a formula",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"expression\" dxfId=\"1\" priority=\"3\" stopIfTrue=\"1\"><formula>MOD(A1,2)=0</formula></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"2\" stopIfTrue=\"1\"><formula>A1=2</formula></cfRule></conditionalFormatting>",
+  "dxfs": "<dxfs count=\"2\"><dxf><fill><patternFill><bgColor rgb=\"FFFFEB9C\"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb=\"FFFFC7CE\"/></patternFill></fill></dxf></dxfs>"
+ },
+ {
+  "name": "formula to less than 4",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>5</formula></cfRule><cfRule type=\"cellIs\" dxfId=\"0\" priority=\"3\" stopIfTrue=\"1\" operator=\"lessThan\"><formula>4</formula></cfRule></conditionalFormatting>",
+  "dxfs": "<dxfs count=\"2\"><dxf><fill><patternFill><bgColor rgb=\"FFFFEB9C\"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb=\"FFFFC7CE\"/></patternFill></fill></dxf></dxfs>"
+ },
+ {
+  "name": "the middle of three, stop if true off",
+  "conditionalFormatting": "<conditionalFormatting sqref=\"A1:A10\"><cfRule type=\"cellIs\" dxfId=\"2\" priority=\"1\" stopIfTrue=\"1\" operator=\"greaterThan\"><formula>8</formula></cfRule><cfRule type=\"cellIs\" dxfId=\"1\" priority=\"4\" stopIfTrue=\"1\" operator=\"equal\"><formula>6</formula></cfRule><cfRule type=\"expression\" dxfId=\"0\" priority=\"3\" stopIfTrue=\"1\"><formula>A1=5</formula></cfRule></conditionalFormatting>",
+  "dxfs": "<dxfs count=\"3\"><dxf><fill><patternFill><bgColor rgb=\"FFC6EFCE\"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb=\"FFFFEB9C\"/></patternFill></fill></dxf><dxf><fill><patternFill><bgColor rgb=\"FFFFC7CE\"/></patternFill></fill></dxf></dxfs>"
+ }
+]

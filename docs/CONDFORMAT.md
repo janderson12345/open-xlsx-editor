@@ -98,9 +98,11 @@ What they draw follows Excel's documented rules, not measured (COM can't read ba
 ## The Rules Manager (`src/ooxml/cfmanage.js`, `src/editor/cfmanager.js`)
 
 Manage Rules... lists the rules for the selection or the whole sheet in priority order: each with its description, the
-cells it applies to (editable), and Stop If True. New Rule..., Delete Rule, Move Up and Move Down are each one step of
-Undo. New Rule offers Excel's six rule types: based on values (colour scales, data bars, icon sets), cell value with
-all eight comparisons, top or bottom, above or below average, unique or duplicate, and a formula.
+cells it applies to (editable), and Stop If True. New Rule..., Edit Rule..., Delete Rule, Move Up and Move Down are each
+one step of Undo. New Rule offers Excel's six rule types: based on values (colour scales, data bars, icon sets), cells
+that contain a cell value (all eight comparisons), specific text or a date occurring, top or bottom, above or below
+average, unique or duplicate, and a formula. Edit Rule (or a double-click on a rule) opens the same box as Edit
+Formatting Rule, set to the rule, its Format "(the rule's own format)" unless another is picked.
 
 Measured over COM (`tools/excel-compare/excel-cf-manage.ps1`, `test/cfmanage-excel.json`): Excel's four rules on a
 sheet, each change made here, 5 of 5 as Excel makes them.
@@ -112,11 +114,19 @@ sheet, each change made here, 5 of 5 as Excel makes them.
 | Sent last | One more than the last. |
 | Stop If True | `stopIfTrue="1"` after the priority. |
 | Applies to | The rule moves to a `conditionalFormatting` of its own just after the one it was in. |
+| Edit Rule | The rule stays in its place in its `conditionalFormatting`, its ranges and its format (dxfId) kept, its type and criteria new: greater than 5 to between 3 and 7, or to a formula; a formula to less than 4; the middle of three rules. |
+
+Edit Rule was measured apart (`tools/excel-compare/excel-cf-edit.ps1`, `test/cfedit-excel.json`, FormatCondition.Modify:
+4 of 4 as Excel writes them, `test/cfeditrule.test.js`). COM's Modify also gives the rule one more than the last
+priority and sets Stop If True, as its Add does; the Rules Manager keeps an edited rule where it is in its list, so here
+it keeps its priority and its own Stop If True (not measured through the box itself, which COM doesn't reach). A new
+format picked is a new dxf. A data bar or icon set, or a rule edited into one, is replaced: the new rule on the same
+ranges, given the old one's place in the order.
 
 A formula rule is `type="expression"` with its formula, as Excel writes it (its own rules from COM, `stopIfTrue`
 aside, which COM always sets).
 
 ## Not yet
 
-A rule's number format and borders, editing a rule's
-settings (Edit Rule), custom thresholds and colours in New Rule, and the other presets of Color Scales.
+A rule's number format and borders, custom thresholds and colours in New Rule (and so a data bar's own colours kept
+when one is edited), and the other presets of Color Scales.

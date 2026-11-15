@@ -33,18 +33,26 @@ export function describeRule(rule) {
   }
 }
 
-/** The New Formatting Rule box: resolves to a rule for cfedit.js (or cfbarsedit.js), or null. */
-export function newRuleBox(root) {
+/** A rule's formula as the box's Value takes it: a number as it is, a quoted text without its quotes, else =formula. */
+const typedOf = (f) => (f == null ? '' : /^-?[\d.]+(E[+-]?\d+)?$/i.test(f) ? f : /^"(.*)"$/s.test(f) ? f.slice(1, -1).replace(/""/g, '"') : `=${f}`);
+/** The box's rule type for a rule read from the sheet. */
+const TYPE_OF = { cellIs: 'contain', containsText: 'contain', timePeriod: 'contain', top10: 'rank', aboveAverage: 'average', duplicateValues: 'unique', uniqueValues: 'unique',
+  expression: 'formula', colorScale: 'values', dataBar: 'values', iconSet: 'values' };
+
+/** The New Formatting Rule box, or (`rule`, a rule read from the sheet) Edit Formatting Rule, set to that rule, its
+ *  Format the rule's own unless another is picked. Resolves to a rule for cfedit.js (or cfbarsedit.js; `preset` null
+ *  to keep the rule's format), or null. */
+export function newRuleBox(root, { rule: old = null } = {}) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     dlg.classList.add('oxe-cf-new');
     const type = select([['values', 'Format all cells based on their values'], ['contain', 'Format only cells that contain'], ['rank', 'Format only top or bottom ranked values'],
-      ['average', 'Format only values that are above or below average'], ['unique', 'Format only unique or duplicate values'], ['formula', 'Use a formula to determine which cells to format']], 'values');
+      ['average', 'Format only values that are above or below average'], ['unique', 'Format only unique or duplicate values'], ['formula', 'Use a formula to determine which cells to format']], old ? TYPE_OF[old.type] || 'formula' : 'values');
     type.size = 6;
     type.className = 'oxe-dialog-list';
     type.dataset.first = '';
     const panel = make('div', { className: 'oxe-cf-panel' });
-    const preset = select(Object.entries(CF_PRESETS).map(([v, p]) => [v, p.label]), 'lightRed');
+    const preset = select([...(old ? [['keep', "(the rule's own format)"]] : []), ...Object.entries(CF_PRESETS).map(([v, p]) => [v, p.label])], old ? 'keep' : 'lightRed');
     const fields = {};
     const field = (k, el) => { fields[k] = el; return el; };
     const input = (k, label) => labelled(label, field(k, make('input', { type: 'text', className: 'oxe-dialog-field', spellcheck: false })));
@@ -64,12 +72,22 @@ export function newRuleBox(root) {
         more();
         kids.push(labelled('Format Style:', style), extra);
       } else if (type.value === 'contain') {
-        const op = field('op', select(OPS, 'between'));
-        const second = make('div');
-        const sync = () => second.replaceChildren(...(op.value === 'between' || op.value === 'notBetween' ? [input('v2', 'and')] : []));
-        op.addEventListener('change', sync);
-        kids.push(labelled('Cell Value', op), input('v1', 'Value'), second);
-        sync();
+        // (Cell Value and its comparison, Specific Text containing, or Dates Occurring and the period.)
+        const what = field('what', select([['value', 'Cell Value'], ['text', 'Specific Text'], ['date', 'Dates Occurring']], 'value'));
+        const rest = make('div');
+        const syncWhat = () => {
+          if (what.value === 'text') { rest.replaceChildren(input('text', 'containing')); return; }
+          if (what.value === 'date') { rest.replaceChildren(labelled('Dates in the period', field('period', select(Object.entries(CF_PERIODS).map(([v, [l]]) => [v, l]), 'yesterday')))); return; }
+          const op = field('op', select(OPS, 'between'));
+          const second = make('div');
+          const sync = () => second.replaceChildren(...(op.value === 'between' || op.value === 'notBetween' ? [input('v2', 'and')] : []));
+          op.addEventListener('change', sync);
+          rest.replaceChildren(labelled('Comparison', op), input('v1', 'Value'), second);
+          sync();
+        };
+        what.addEventListener('change', syncWhat);
+        kids.push(labelled('Format only cells with', what), rest);
+        syncWhat();
       } else if (type.value === 'rank') {
         kids.push(labelled('Format values that rank in the', field('which', select([['top', 'Top'], ['bottom', 'Bottom']], 'top'))), input('rank', 'Number'));
         fields.rank.value = '10';
@@ -84,6 +102,21 @@ export function newRuleBox(root) {
     };
     type.addEventListener('change', build);
     build();
+    // (Edit Rule: the box set to the rule's settings.)
+    const put = (k, v) => { if (fields[k] && v != null) { fields[k].value = String(v); fields[k].dispatchEvent(new Event('change')); } };
+    if (old) {
+      if (old.type === 'colorScale') put('style', old.colorScale?.cfvo.length === 2 ? 'scale2' : 'scale3');
+      if (old.type === 'dataBar') put('style', 'dataBar');
+      if (old.type === 'iconSet') { put('style', 'iconSet'); put('icons', old.iconSet?.set); }
+      if (old.type === 'containsText') { put('what', 'text'); put('text', old.text); }
+      if (old.type === 'timePeriod') { put('what', 'date'); put('period', old.timePeriod); }
+      if (old.type === 'cellIs') { put('op', old.operator); put('v1', typedOf(old.formulas[0])); put('v2', typedOf(old.formulas[1])); }
+      if (old.type === 'top10') { put('which', old.bottom ? 'bottom' : 'top'); put('rank', old.rank); fields.percent.checked = !!old.percent; }
+      if (old.type === 'aboveAverage') put('avg', old.aboveAverage ? 'above' : 'below');
+      if (old.type === 'uniqueValues') put('dup', 'unique');
+      if (old.type === 'expression') put('formula', typedOf(old.formulas[0]).replace(/^(?!=)/, '='));
+    }
+    const format = () => (preset.value === 'keep' ? null : preset.value);
     const why = make('p', { className: 'oxe-dialog-text', role: 'alert' });
     const ok = () => {
       const v = (k) => fields[k]?.value ?? '';
@@ -96,27 +129,30 @@ export function newRuleBox(root) {
           break;
         }
         case 'contain':
+          if (v('what') === 'text') { rule = { kind: 'containsText', text: v('text'), preset: format() }; break; }
+          if (v('what') === 'date') { rule = { kind: 'timePeriod', period: v('period'), preset: format() }; break; }
           if (!v('v1').trim() || ((v('op') === 'between' || v('op') === 'notBetween') && !v('v2').trim())) { why.textContent = 'Enter a value.'; return; }
-          rule = { kind: 'cellIs', operator: v('op'), f1: v('v1'), f2: v('v2'), preset: preset.value };
+          rule = { kind: 'cellIs', operator: v('op'), f1: v('v1'), f2: v('v2'), preset: format() };
           break;
-        case 'rank': rule = { kind: 'top10', rank: Math.max(1, Math.round(Number(v('rank')) || 10)), percent: fields.percent.checked, bottom: v('which') === 'bottom', preset: preset.value }; break;
-        case 'average': rule = { kind: 'average', below: v('avg') === 'below', preset: preset.value }; break;
-        case 'unique': rule = { kind: 'duplicate', unique: v('dup') === 'unique', preset: preset.value }; break;
+        case 'rank': rule = { kind: 'top10', rank: Math.max(1, Math.round(Number(v('rank')) || 10)), percent: fields.percent.checked, bottom: v('which') === 'bottom', preset: format() }; break;
+        case 'average': rule = { kind: 'average', below: v('avg') === 'below', preset: format() }; break;
+        case 'unique': rule = { kind: 'duplicate', unique: v('dup') === 'unique', preset: format() }; break;
         default:
           if (!v('formula').trim()) { why.textContent = 'Enter a formula.'; return; }
-          rule = { kind: 'expression', formula: v('formula'), preset: preset.value };
+          rule = { kind: 'expression', formula: v('formula'), preset: format() };
       }
       done(rule);
     };
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT') { e.preventDefault(); ok(); } });
-    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'New Formatting Rule' }), labelled('Select a Rule Type:', type), panel, why,
+    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: old ? 'Edit Formatting Rule' : 'New Formatting Rule' }), labelled('Select a Rule Type:', type), panel, why,
       make('div', { className: 'oxe-dialog-buttons' }, button('OK', ok), button('Cancel', () => done(null))));
   });
 }
 
 /** The Rules Manager. `rules()` gives the sheet's rules ([{ rule, ranges }]), `selection` the selected cells;
  *  `run(change)` makes a change (cfmanage.js's, by priority) as one step and returns Excel's words when refused;
- *  `newRule()` opens New Rule for the selection. Resolves when closed. */
+ *  `newRule()` opens New Rule for the selection. Edit Rule (or a double-click on the rule) opens Edit Formatting Rule.
+ *  Resolves when closed. */
 export function rulesManager(root, { rules, selection, run, newRule }) {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
@@ -150,6 +186,7 @@ export function rulesManager(root, { rules, selection, run, newRule }) {
         row.setAttribute('aria-selected', String(p === chosen));
         row.addEventListener('click', () => { chosen = p; for (const r of body.children) r.setAttribute('aria-selected', String(r === row)); });
         row.addEventListener('focus', () => { chosen = p; for (const r of body.children) r.setAttribute('aria-selected', String(r === row)); });
+        row.addEventListener('dblclick', (e) => { if (e.target === row || e.target.tagName === 'TD') editChosen(); });
         row.addEventListener('keydown', (e) => { if (e.target === row && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) { e.preventDefault(); (e.key === 'ArrowDown' ? row.nextSibling : row.previousSibling)?.focus(); } });
         return row;
       }));
@@ -160,8 +197,15 @@ export function rulesManager(root, { rules, selection, run, newRule }) {
     // (Down: the next rule moved above this one, as Excel's priorities go.)
     const down = () => { const ps = order(); const k = ps.indexOf(chosen); if (k >= 0 && k < ps.length - 1) { const next = ps[k + 1]; say(run({ move: { p: next, to: chosen } })); chosen += 1; fill(); } };
     scope.addEventListener('change', fill);
+    async function editChosen() {
+      const x = rules().find((y) => y.rule.priority === chosen);
+      if (!x) return;
+      const rule = await newRuleBox(root, { rule: x.rule });
+      if (rule) { say(run({ edit: { p: chosen, rule } })); fill(); }
+    }
     const top = make('div', { className: 'oxe-dialog-buttons oxe-names-actions' },
       button('New Rule...', async () => { await newRule(); fill(); }),
+      button('Edit Rule...', editChosen),
       button('Delete Rule', () => { if (chosen != null) { say(run({ remove: chosen })); chosen = null; fill(); } }),
       button('Move Up', up), button('Move Down', down));
     fill();

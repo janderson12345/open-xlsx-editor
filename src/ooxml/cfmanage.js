@@ -3,9 +3,10 @@
 // unique on a sheet. A rule deleted goes with its extLst part, the others keeping their priorities (Excel doesn't
 // number them again); a rule given priority p comes before the rule that had it, every rule from p on one later; a rule
 // sent last takes one more than the last; Stop If True is the rule's attribute; a rule given other ranges moves to a
-// conditionalFormatting of its own just after the one it was in.
+// conditionalFormatting of its own just after the one it was in. Edit Rule: see editRule.
 import { kids, kid } from './xml.js';
-import { rangeName } from './refs.js';
+import { rangeName, parseRange } from './refs.js';
+import { addConditional, addPresetDxf, cfRuleXml, ruleElement } from './cfedit.js';
 import { X14, XM, EXT_CF } from './cfext.js';
 import { x14Rules, dropX14Rules } from './cfbarsedit.js';
 
@@ -94,4 +95,35 @@ export function setRuleRanges(wb, si, p, ranges) {
   if (!kids(r.cf, 'cfRule', ns).length) r.cf.parentNode.removeChild(r.cf);
   // (A data bar's settings in the extLst go to the same cells.)
   if (id) for (const x of x14Rules(doc)) if (x.getAttribute('id') === id) { const sq = kid(x.parentNode, 'sqref', XM); if (sq) sq.textContent = sqref; }
+}
+
+/**
+ * Edit Rule: the rule of priority `p` given the settings of `rule` (cfedit.js's, `preset` null to keep the rule's own
+ * format). As Excel edits one (tools/excel-compare/excel-cf-edit.ps1, FormatCondition.Modify): in its place among the
+ * rules of its conditionalFormatting, its ranges and its format (dxfId) kept, its type and criteria new. COM also sends
+ * an edited rule last and sets Stop If True, as its Add does; here, as the Rules Manager shows it, the rule keeps its
+ * priority and its own Stop If True. A data bar or icon set (with its part in the extLst) is replaced instead: the new
+ * rule added on the same ranges and given the old one's place.
+ */
+export function editRule(wb, si, p, rule) {
+  const doc = wb._part(si).doc;
+  const r = find(doc, p);
+  const sqref = r.x14 ? [...r.cf.getElementsByTagNameNS(XM, 'sqref')].map((e) => e.textContent)[0] || '' : r.cf.getAttribute('sqref');
+  const ranges = sqref.split(/\s+/).map(parseRange).filter(Boolean);
+  const bars = (k) => k === 'dataBar' || k === 'iconSet';
+  if (r.x14 || x14IdOf(r.el) || bars(r.el.getAttribute('type')) || bars(rule.kind)) {
+    const stop = !r.x14 && r.el.getAttribute('stopIfTrue') === '1';
+    deleteRule(wb, si, p);
+    addConditional(wb, si, ranges, { ...rule, preset: rule.preset || 'lightRed' });
+    // (Added first, every other rule one later: put back after the rules that came before it.)
+    moveRule(wb, si, 1, p + 1);
+    if (stop && !bars(rule.kind)) setStopIfTrue(wb, si, p + 1, true);
+    return;
+  }
+  const own = r.el.getAttribute('dxfId');
+  const dxfId = rule.kind === 'colorScale' ? null : rule.preset == null && own != null ? Number(own) : addPresetDxf(wb, rule.preset || 'lightRed');
+  const first = ranges[0];
+  let xml = cfRuleXml(rule, dxfId, p, rangeName({ r0: first.r0, c0: first.c0, r1: first.r0, c1: first.c0 }));
+  if (r.el.getAttribute('stopIfTrue') === '1' && rule.kind !== 'colorScale') xml = xml.replace(/ priority="(\d+)"/, ' priority="$1" stopIfTrue="1"');
+  r.cf.replaceChild(ruleElement(doc, xml), r.el);
 }
