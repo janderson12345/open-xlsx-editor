@@ -10,7 +10,7 @@
 // - The print area is the sheet's own name _xlnm.Print_Area (localSheetId), its ranges $-absolute with the sheet's name
 //   ('My Data'!$B$2:$D$5, two joined by a comma; one cell 'My Data'!$C$3); cleared, the name goes.
 import { kids, kid } from './xml.js';
-import { rangeName } from './refs.js';
+import { rangeName, parseRange, colIndex, colName } from './refs.js';
 import { sheetPrefix } from '../calc/tokens.js';
 import { rangesOf } from './printarea.js';
 import { findName, defineName, editName, deleteName } from './names.js';
@@ -123,4 +123,50 @@ export function clearPrintArea(wb, si) {
   if (!findName(wb, PRINT_AREA, si)) return false;
   deleteName(wb, { name: PRINT_AREA, sheet: si });
   return true;
+}
+
+const PRINT_TITLES = '_xlnm.Print_Titles';
+
+/** Sheet si's print titles: { rows: [r0, r1] or null, cols: [c0, c1] or null }. */
+export function printTitlesOf(wb, si) {
+  const d = findName(wb, PRINT_TITLES, si);
+  const out = { rows: null, cols: null };
+  for (const a of d ? rangesOf(d.text) : []) {
+    if (a.rows) out.rows = [a.r0, a.r1];
+    if (a.cols) out.cols = [a.c0, a.c1];
+  }
+  return out;
+}
+
+/** What is typed for Rows to repeat at top (`axis` 'rows') or Columns to repeat at left ('cols'), as Excel takes it:
+ *  [first, last], '' as null, or undefined when it isn't one. Measured: "1:2" and "$1:$2" rows 1 to 2, a range
+ *  ("B2:C4") its rows (2 to 4), a lone "$3" refused; columns the same ("A:B", "$A:$A", a range's columns). */
+export function readTitles(text, axis) {
+  const t = String(text || '').trim().replace(/^(?:'(?:[^']|'')+'|[^!]+)!/, '').replace(/\$/g, '').toUpperCase();
+  if (!t) return null;
+  const lines = axis === 'rows' ? /^(\d+):(\d+)$/.exec(t) : /^([A-Z]{1,3}):([A-Z]{1,3})$/.exec(t);
+  if (lines) {
+    const [a, b] = axis === 'rows' ? [Number(lines[1]) - 1, Number(lines[2]) - 1] : [colIndex(lines[1]), colIndex(lines[2])];
+    return a >= 0 && b >= 0 ? [Math.min(a, b), Math.max(a, b)] : undefined;
+  }
+  const r = /^[A-Z]{1,3}\d+:[A-Z]{1,3}\d+$/.test(t) ? parseRange(t) : null;
+  if (!r) return undefined;
+  return axis === 'rows' ? [r.r0, r.r1] : [r.c0, r.c1];
+}
+
+/** Sheet si's print titles set to `titles` ({ rows, cols }: [first, last] or null), as Excel saves them: columns
+ *  first, then rows, each with the sheet's name ('Q1 Plan'!$A:$B,'Q1 Plan'!$1:$2); neither, the name gone. */
+export function setPrintTitles(wb, si, { rows = null, cols = null }) {
+  const prefix = sheetPrefix(wb.sheets[si].name);
+  const parts = [];
+  if (cols) parts.push(`${prefix}$${colName(cols[0])}:$${colName(cols[1])}`);
+  if (rows) parts.push(`${prefix}$${rows[0] + 1}:$${rows[1] + 1}`);
+  const had = findName(wb, PRINT_TITLES, si);
+  if (!parts.length) { if (had) deleteName(wb, { name: PRINT_TITLES, sheet: si }); return; }
+  if (had) editName(wb, { name: PRINT_TITLES, sheet: si }, { refersTo: `=${parts[0]}` });
+  else defineName(wb, { name: PRINT_TITLES, refersTo: `=${parts[0]}`, sheet: si });
+  const d = findName(wb, PRINT_TITLES, si);
+  d.text = parts.join(',');
+  d.el.textContent = d.text;
+  wb.bookDirty = true;
 }

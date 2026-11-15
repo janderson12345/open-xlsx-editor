@@ -2,7 +2,8 @@ import './setup.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { serializeXml } from '../src/ooxml/xml.js';
-import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, printAreaOf } from '../src/ooxml/pagesetupedit.js';
+import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, printAreaOf, readTitles, setPrintTitles, printTitlesOf } from '../src/ooxml/pagesetupedit.js';
+import { readArea } from '../src/editor/pagesetupbox.js';
 import { build } from './steps.js';
 
 // Excel's own XML for its Page Layout > Breaks commands (ExecuteMso in a hidden Excel; docs/PRINT.md) and the
@@ -50,4 +51,31 @@ test('the print area as Excel saves it: the sheet\'s own name, absolute, two ran
   assert.equal(clearPrintArea(wb, si), true);
   assert.deepEqual(area(), []);
   assert.equal(clearPrintArea(wb, si), false);
+});
+
+test('print titles as Excel takes and saves them: columns first, then rows; loose rows read; a lone row refused', () => {
+  // (Excel's PrintTitleRows: "1:2" and "$1:$2" are $1:$2, "B2:C4" is $2:$4, "$3" refused.)
+  assert.deepEqual(readTitles('1:2', 'rows'), [0, 1]);
+  assert.deepEqual(readTitles('$1:$2', 'rows'), [0, 1]);
+  assert.deepEqual(readTitles('B2:C4', 'rows'), [1, 3]);
+  assert.equal(readTitles('$3', 'rows'), undefined);
+  assert.equal(readTitles('', 'rows'), null);
+  assert.deepEqual(readTitles('$A:$B', 'cols'), [0, 1]);
+  assert.deepEqual(readTitles("'Q1 Plan'!$A:$A", 'cols'), [0, 0]);
+  const { wb, si } = build({ cells: { A1: '1' } });
+  wb.renameSheet(si, 'Q1 Plan');
+  const titles = () => wb.definedNames.filter((d) => d.name === '_xlnm.Print_Titles').map((d) => d.text);
+  setPrintTitles(wb, si, { rows: [0, 1], cols: [0, 1] });
+  assert.deepEqual(titles(), ["'Q1 Plan'!$A:$B,'Q1 Plan'!$1:$2"]);
+  assert.deepEqual(printTitlesOf(wb, si), { rows: [0, 1], cols: [0, 1] });
+  setPrintTitles(wb, si, { rows: null, cols: [0, 1] });
+  assert.deepEqual(titles(), ["'Q1 Plan'!$A:$B"]);
+  setPrintTitles(wb, si, { rows: [0, 0] });
+  assert.deepEqual(titles(), ["'Q1 Plan'!$1:$1"]);
+  setPrintTitles(wb, si, {});
+  assert.deepEqual(titles(), []);
+  // (The box's print area: ranges by commas, the sheet's name allowed; anything else refused.)
+  assert.deepEqual(readArea("$B$2:$D$5,'Q1 Plan'!$F$7"), [{ r0: 1, c0: 1, r1: 4, c1: 3 }, { r0: 6, c0: 5, r1: 6, c1: 5 }]);
+  assert.deepEqual(readArea(''), []);
+  assert.equal(readArea('B2:'), null);
 });

@@ -1,6 +1,6 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area and Breaks. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks and Print Titles. Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -326,5 +326,24 @@ const addAfter = await (async () => { let seen = false; await ribbon('Print Area
 check(brks === '{"rows":[4],"cols":[2]}' && pagesWith > pagesBefore && brksUndone === '{"rows":[],"cols":[]}' && !addBefore && /!\$B\$2:\$D\$5$/.test(areaText || '') && addAfter,
   'Page Layout: Insert Page Break at C5 (a row and a column break, more pages), Ctrl+Z; Set Print Area, then Add to Print Area offered',
   JSON.stringify({ brks, pagesBefore, pagesWith, brksUndone, addBefore, areaText, addAfter }));
+
+// Page Layout > Print Titles: Excel's Page Setup box at its Sheet tab, the print area set above in it; rows "1:2"
+// typed, OK: _xlnm.Print_Titles as Excel saves it; a lone "$3" refused with a note; Ctrl+Z takes the titles back.
+await page.click('.oxe-rtab >> text=Page Layout');
+await ribbon('Print Titles');
+await page.waitForSelector('dialog.oxe-page-setup');
+const shownArea = await page.inputValue('dialog.oxe-page-setup input >> nth=0');
+await page.fill('dialog.oxe-page-setup input >> nth=1', '$3');
+await page.click('dialog.oxe-page-setup >> button:text-is("OK")');
+const refusedNote = await page.textContent('dialog.oxe-page-setup .oxe-dialog-note');
+await page.fill('dialog.oxe-page-setup input >> nth=1', '1:2');
+await page.click('dialog.oxe-page-setup >> button:text-is("OK")');
+const titlesText = await page.evaluate(() => window.oxe.workbook.definedNames.find((d) => d.name === '_xlnm.Print_Titles' && d.sheet === window.oxe.sheetIndex)?.text);
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const titlesUndone = await page.evaluate(() => window.oxe.workbook.definedNames.some((d) => d.name === '_xlnm.Print_Titles' && d.sheet === window.oxe.sheetIndex));
+check(shownArea === '$B$2:$D$5' && /rows/i.test(refusedNote || '') && /!\$1:\$2$/.test(titlesText || '') && !titlesUndone,
+  'Print Titles: the Page Setup box shows the print area; a lone $3 refused; 1:2 saved as $1:$2; Ctrl+Z takes it back',
+  JSON.stringify({ shownArea, refusedNote, titlesText, titlesUndone }));
 
 await finish();

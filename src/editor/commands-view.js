@@ -3,7 +3,7 @@
 // Area and Breaks (ooxml/pagesetupedit.js; those two are steps of the undo history, as Excel's are). Kept in the file (all but
 // the Formula Bar, which Excel keeps as its own setting, not the workbook's) and not in the undo history.
 import { setPrintOptions } from '../ooxml/printopts.js';
-import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea } from '../ooxml/pagesetupedit.js';
+import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, setPrintTitles } from '../ooxml/pagesetupedit.js';
 import { areasOf } from './selection.js';
 
 /** The view commands: `env` is createCommands's shared state and helpers. */
@@ -108,6 +108,17 @@ export function viewCommands(env) {
       const areas = areasOf(state.sel).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 }));
       const done = commands.sheetChange((wb, si) => (how === 'clear' ? clearPrintArea(wb, si) : (setPrintArea(wb, si, areas, { add: how === 'add' }), true)));
       if (done) ctx.announce(how === 'clear' ? 'Print area cleared' : how === 'add' ? 'Added to the print area' : 'Print area set');
+      return done;
+    },
+    /** Page Setup's Sheet tab answered ({ area: ranges, [] for none; rows, cols: [first, last] or null}): the print
+     *  area and print titles of the sheet shown, as one step of the history. */
+    pageSetupSheet({ area, rows, cols }) {
+      const done = commands.sheetChange((wb, si) => {
+        if (area.length) setPrintArea(wb, si, area); else clearPrintArea(wb, si);
+        setPrintTitles(wb, si, { rows, cols });
+        return true;
+      });
+      if (done) ctx.announce('Page setup changed');
       return done;
     },
     /** Page Layout > Breaks: 'insert' or 'remove' at the active cell, or 'reset' (Reset All Page Breaks), on the sheet

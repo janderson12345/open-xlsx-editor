@@ -3,11 +3,13 @@
 // commands as one step of the history.
 import { messageBox } from './dialogs.js';
 import { iterationBox } from './iterbox.js';
+import { pageSetupBox } from './pagesetupbox.js';
+import { printAreaOf, printTitlesOf } from '../ooxml/pagesetupedit.js';
 import { iteration } from '../ooxml/calcmode.js';
 import { cfRuleBox } from './datadialogs.js';
 import { readNotes } from '../ooxml/notes.js';
 import { deleteNote } from '../ooxml/noteedit.js';
-import { colName } from '../ooxml/refs.js';
+import { colName, rangeName } from '../ooxml/refs.js';
 import { areasOf } from './selection.js';
 import { CF_PRESETS } from '../ooxml/cfedit.js';
 import { formatCellsBox } from './formatbox.js';
@@ -57,6 +59,21 @@ export function createMoreActs(env) {
     if (name === 'errorChecking') return errorCheckingBox(env);
     // (Formulas > Evaluate Formula: evalbox.js.)
     if (name === 'evaluateFormula') return evaluateFormulaBox(env);
+    if (name === 'printTitlesBox') {
+      // (Page Layout > Print Titles: Excel's Page Setup box at its Sheet tab, pagesetupbox.js.)
+      if (state.readOnly) return false;
+      const abs = (a) => rangeName(a).replace(/([A-Z]+)(\d+)/g, '$$$1$$$2');
+      const t = printTitlesOf(state.workbook, i);
+      const now = {
+        area: (printAreaOf(state.workbook, i) || []).map(abs).join(','),
+        rows: t.rows ? `$${t.rows[0] + 1}:$${t.rows[1] + 1}` : '',
+        cols: t.cols ? `$${colName(t.cols[0])}:$${colName(t.cols[1])}` : '',
+      };
+      return pageSetupBox(root, now).then((got) => {
+        state.grid.el.focus({ preventScroll: true });
+        return got ? editing().run('pageSetupSheet', got) : false;
+      });
+    }
     if (name === 'iterationBox') {
       // (Excel's File > Options > Formulas, its iterative calculation part: iterbox.js.)
       if (state.readOnly) return false;
