@@ -2,11 +2,13 @@
 // exists (same advance widths and vertical metrics, so text measures the same where the original isn't installed),
 // then a generic family. And each font's line height for celltext.js.
 import metrics from '../engine/metrics.js';
+import { omfEntry, omfFamily } from './omffonts.js';
 
 /** Free fonts drawn to the same metrics as Office's. Aptos Narrow (the body font of Excel 365's default theme since
  *  2023) isn't installed with Windows (Office keeps it in its own cloud-font cache, out of browsers' reach); its
- *  metric-compatible twin is Open Metric Fonts' Morrow Sans Narrow, which a page can serve itself (README: Fonts),
- *  and Aptos's is Morrow Sans. Without them, Calibri is the closest measured: as wide within a pixel in Excel's PDFs
+ *  metric-compatible twin is Open Metric Fonts' Morrow Sans Narrow, which a page can serve itself (README: Fonts;
+ *  omffonts.js puts it in the stack, with the other families' twins) or a computer has installed, and Aptos's is
+ *  Morrow Sans. Without them, Calibri is the closest measured: as wide within a pixel in Excel's PDFs
  *  of test/fixtures/basic.xlsx ("Amount" 47.7px in Aptos Narrow, 48 in Calibri), its baseline within half a pixel. */
 const STAND_INS = {
   'aptos narrow': ['Morrow Sans Narrow', 'Calibri', 'Carlito'],
@@ -22,10 +24,12 @@ const MONO = /^(courier|consolas|lucida console|aptos mono|cascadia)/i;
 
 const quote = (name) => (/^[\w-]+$/.test(name) ? name : `'${name.replace(/'/g, '')}'`);
 
-/** The CSS font-family for a typeface name. */
+/** The CSS font-family for a typeface name: the font, its open-metric-fonts twin where the page serves them
+ *  (omffonts.js: drawn only where the font itself is missing), the stand-ins, a generic family. */
 export function fontStack(name) {
   const generic = SERIF.test(name) ? 'serif' : MONO.test(name) ? 'monospace' : 'sans-serif';
-  return [name, ...(STAND_INS[name.toLowerCase()] || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
+  const twin = omfFamily(name);
+  return [name, ...(twin ? [twin] : []), ...(STAND_INS[name.toLowerCase()] || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
 }
 
 /** Where Excel's baseline sits above the cell's bottom edge, beyond the Windows descent of the font the browser draws,
@@ -44,19 +48,6 @@ const TOP_INSET = 0.8;
 /** Excel's printed grid starts this much lower than this one (decor.js PRINT_GRID_ORIGIN): targets read from Excel's
  *  boundaries move down by it here. */
 const GRID_ORIGIN_Y = 0.7;
-
-/** The font's metrics in px at `sizePx`, from engine/metrics.js (the installed fonts), the stand-in's when the font
- *  isn't in the table (it is the stand-in that the browser draws), Calibri's when neither is: Windows ascent and
- *  descent (`wa`, `wd`: where Excel places text) and the same rounded to whole pixels (`ar`, `dr`: where Chromium
- *  does). */
-/** Open Metric Fonts' vertical metrics, read from the fonts (numbers only): Windows ascent and descent, the same as
- *  the Office font each matches, and hhea ascent and descent, the same as their typo ones, by which Chromium places
- *  them: they set USE_TYPO_METRICS, served or installed (with Morrow Sans Narrow installed, placed by the Windows
- *  metrics, large.xlsx had 61,460 of 100,000 baselines within 1px, as served). Measured with Morrow Sans Narrow served as a web font, Edge, Excel's PDFs of basic.xlsx and
- *  large.xlsx (Aptos Narrow): 100,049 of 100,049 cells within 1px across, down and in width (Calibri drawn: the same
- *  across and down, 99,028 in width); placed by the Windows metrics instead, 0.95px high. */
-const MORROW = { win: [1.0098, 0.2749], hhea: [0.939, 0.2817] };
-const OPEN = { 'morrow sans narrow': MORROW, 'morrow sans': MORROW };
 
 /** What each family's check found (hasFont): a web font can arrive after the first look. */
 const found = new Map();
@@ -86,26 +77,38 @@ export function fontsChanged() {
   }
   return changed;
 }
+/** The metrics of the open-metric-fonts twin the browser draws in place of `name` (the font itself missing), served
+ *  (omffonts.js) or installed (a Morrow font of STAND_INS); null when it draws none. Read from the twins' files
+ *  (omf.js, numbers only): their Windows ascent and descent are the Office font's own, where Excel puts the text; the
+ *  browser places them by their own, the typo metrics where they set USE_TYPO_METRICS (both Morrow fonts: with Morrow
+ *  Sans Narrow installed, placed by the Windows metrics, large.xlsx had 61,460 of 100,000 baselines within 1px). Measured
+ *  with Morrow Sans Narrow served, Edge, Excel's PDFs of basic.xlsx and large.xlsx (Aptos Narrow): 100,049 of 100,049
+ *  cells within 1px across, down and in width (Calibri drawn: the same across and down, 99,028 in width); placed by the
+ *  Windows metrics instead, 0.95px high. */
+function twinMetrics(name) {
+  const entry = omfEntry(name);
+  if (!entry || hasFont(name)) return null;
+  const served = omfFamily(name);
+  const installed = (STAND_INS[name.toLowerCase()] || []).find((s) => /^morrow /i.test(s));
+  return (served && hasFont(served)) || (installed && hasFont(installed)) ? entry[1] : null;
+}
+
+/** The font's metrics in px at `sizePx`: the twin's when the browser draws one (twinMetrics), else from
+ *  engine/metrics.js (the installed fonts), the stand-in's when the font isn't in the table (it is the stand-in that
+ *  the browser draws), Calibri's when neither is: Windows ascent and descent (`wa`, `wd`: where Excel places text) and
+ *  the same rounded to whole pixels (`ar`, `dr`: where Chromium does). */
 function fontMetrics(name, sizePx) {
   const key = name.toLowerCase();
   // (A metric twin drawn: the Office font's own metrics for where Excel puts the text, those the browser places the
   // twin by for where it goes.)
-  const twin = !metrics[key] && (STAND_INS[key] || []).find((s) => OPEN[s.toLowerCase()] && hasFont(s));
-  if (twin) {
-    const o = OPEN[twin.toLowerCase()];
-    const wa = o.win[0] * sizePx;
-    const wd = o.win[1] * sizePx;
-    // (Both Morrow fonts set USE_TYPO_METRICS: placed by their typo metrics, installed or served.)
-    const [ca, cd] = o.hhea.map((v) => v * sizePx);
-    return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: BASELINE_ABOVE_DESCENT };
-  }
-  const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
+  const twin = twinMetrics(name);
+  const m = twin || metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   const wa = m.win[0] * sizePx;
   const wd = m.win[1] * sizePx;
   // (A font with USE_TYPO_METRICS set placed by its typo ascent and descent, as the Morrow fonts are; installed ones
-  // with it, Bahnschrift, Cascadia, by the same rule, not measured.)
+  // with it, Bahnschrift, Cascadia, and the other twins with it, by the same rule, not measured against Excel.)
   const [ca, cd] = m.typo?.[3] ? [m.typo[0] * sizePx, m.typo[1] * sizePx] : [wa, wd];
-  return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT };
+  return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: twin || metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT };
 }
 
 /** Where Chromium puts the baseline in a line box of L px: floor((L - (ascent + descent)) / 2) + ascent below its top,

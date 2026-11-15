@@ -9,7 +9,7 @@ import { printSetup } from './ooxml/printarea.js';
 import { headerPictures } from './ooxml/hfpictures.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { fontsChanged } from './editor/fonts.js';
-import { addOmfFaces } from './editor/omffonts.js';
+import { useOmf } from './editor/omffonts.js';
 import { dropSheet } from './editor/sheets.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
@@ -85,17 +85,17 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  * - `onLink(url)`: a hyperlink clicked that goes outside the workbook (http, https, mailto, ftp); without it, the
  *   browser opens it in a new tab.
  * - `fonts: { omf }`: the URL of an open-metric-fonts web bundle folder the site serves (each package as
- *   <package>/files/, release OMF_VERSION), for Aptos Narrow's and Aptos's metric twins (README, Fonts).
+ *   <package>/files/, release OMF_VERSION), for the metric twins of the Microsoft fonts the computer lacks (README, Fonts).
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
  *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean | Record<string, boolean>, calculateOnOpen?: boolean,
  *   onChange?: () => void, onLink?: (url: string) => void, fonts?: { omf?: string } }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
-  // (Aptos Narrow's and Aptos's twins from the site's own copy of open-metric-fonts: omffonts.js.)
-  if (options.fonts?.omf) addOmfFaces(options.fonts.omf);
   const root = document.createElement('div');
   root.className = 'oxe-root';
+  // (The metric twins from the site's own copy of open-metric-fonts, omffonts.js; its folder kept for exportPdf.)
+  if (options.fonts?.omf) root.dataset.omf = useOmf(options.fonts.omf);
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
   const state = { onEdit: new Set(), onSelect: new Set(), circles: new WeakMap(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
