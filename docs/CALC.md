@@ -312,8 +312,12 @@ is in them. Excel's box is a dialog COM can't drive, so the steps aren't measure
 
 - **Step In** (when the part underlined is one cell holding a formula): that cell's formula on a line of its own
   beneath, named ("Sheet1!$B$1 = "), worked out with Evaluate; **Step Out**: back to the formula above, the cell's
-  value put in place of its reference. As Excel's box does (its documentation; the box is a dialog COM can't drive).
-- **Not yet**: a defined name's own steps; Step In on a cell holding a constant (Excel shows its value).
+  value put in place of its reference. As Excel's box does (used in its window: each level its own line, the cell
+named).
+- **Step In on a cell holding a constant**: its value on a line of its own, "The cell currently being evaluated
+  contains a constant.", Evaluate and Step In off, Step Out to go back (seen in Excel's own box: =B1+1 into =A1*2 into
+  5).
+- **Not yet**: a defined name's own steps.
 
 The Watch Window (`ooxml/watches.js`, `editor/watchwindow.js`; `test/watches.test.js`): the watched cells with their Book,
 Sheet, Name (a defined name for just that cell), Cell, Value (as the cell shows it) and Formula, kept up to date as

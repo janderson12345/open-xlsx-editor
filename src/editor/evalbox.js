@@ -1,10 +1,13 @@
 // Formulas > Evaluate Formula: Excel's box over the active cell's formula (calc/stepper.js). Reference names the cell;
 // Evaluation shows the formula with the next part underlined and the last value worked out in italics; Evaluate works
 // out the underlined part, and at the end becomes Restart; Step In, when the part underlined is a cell holding a
-// formula, shows that formula beneath to work out, and Step Out goes back up with its value; Close.
+// formula, shows that formula beneath to work out (a constant: its value, and Excel's "contains a constant"), and Step
+// Out goes back up with its value; Close.
 import { modal, button } from './dialogs.js';
 import { Stepper } from '../calc/stepper.js';
 import { colName } from '../ooxml/refs.js';
+import { cellText } from '../ooxml/numfmt.js';
+import { formatCodeOf } from '../ooxml/styles.js';
 import { editText } from '../ooxml/input.js';
 
 const make = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
@@ -23,13 +26,17 @@ export function evaluateFormulaBox(env) {
   // (Step In's levels: the cell's formula, then each formula stepped into, the last being worked out.)
   const levels = stepper ? [{ stepper, ref: `${quoted(wb.sheets[si].name)}!$${colName(s.ac)}$${s.ar + 1}` }] : [];
   const top = () => levels[levels.length - 1];
-  /** The formula of the cell the part underlined refers to, as a level to step into, or null. */
+  /** The cell the part underlined refers to, as a level to step into: its formula, or (a constant, as Excel steps into
+   *  one: its value, nothing more to work out) `constant`; null when there is none. */
   const inner = () => {
+    if (top()?.constant) return null;
     const at = top()?.stepper.stepInTarget();
     if (!at) return null;
     const one = wb.sheet(at.si).cells.get(at.r)?.get(at.c);
     const e = wb.calc.entries.get(`${at.si}:${at.r}:${at.c}`);
-    return one?.f != null && e?.tree ? { stepper: new Stepper(one.f, wb.calc.context(e)), ref: `${quoted(wb.sheets[at.si].name)}!$${colName(at.c)}$${at.r + 1}` } : null;
+    const where = `${quoted(wb.sheets[at.si].name)}!$${colName(at.c)}$${at.r + 1}`;
+    if (one?.f != null && e?.tree) return { stepper: new Stepper(one.f, wb.calc.context(e)), ref: where };
+    return { constant: one ? cellText(one, Infinity, formatCodeOf(wb.styles, one.s || 0), wb.date1904) : '0', ref: where };
   };
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
@@ -43,6 +50,7 @@ export function evaluateFormulaBox(env) {
     shown.setAttribute('aria-live', 'polite');
     const note = make('p', { className: 'oxe-dialog-text oxe-evaluate-note', textContent: 'To show the result of the underlined expression, click Evaluate. The most recent result appears italicized.' });
     const evaluate = button('Evaluate', () => {
+      if (top().constant) return;
       const s0 = top().stepper;
       if (s0.done && levels.length === 1) s0.restart(); else if (!s0.done) s0.step();
       draw();
@@ -60,10 +68,12 @@ export function evaluateFormulaBox(env) {
       if (!stepper) { shown.textContent = editText(cell); evaluate.disabled = true; stepIn.disabled = true; stepOut.disabled = true; return; }
       // (Underlined: the part Evaluate works out next; italic: the value it just gave, as Excel shows them. Each level
       // stepped into on a line of its own, its cell named.)
-      shown.replaceChildren(...levels.flatMap((lv, i) => [make('div', { className: 'oxe-evaluate-level' }, ...(i ? [make('span', { className: 'oxe-evaluate-ref', textContent: `${lv.ref} = ` })] : []), ...line(lv.stepper))]));
+      shown.replaceChildren(...levels.flatMap((lv, i) => [make('div', { className: 'oxe-evaluate-level' }, ...(i ? [make('span', { className: 'oxe-evaluate-ref', textContent: `${lv.ref} = ` })] : []), ...(lv.constant != null ? [document.createTextNode(lv.constant)] : line(lv.stepper)))]));
       ref.textContent = `Reference: ${top().ref}`;
-      evaluate.textContent = top().stepper.done && levels.length === 1 ? 'Restart' : 'Evaluate';
-      evaluate.disabled = top().stepper.done && levels.length > 1;
+      // (A constant stepped into: Excel's words, Evaluate and Step In off, Step Out to go back.)
+      note.textContent = top().constant != null ? 'The cell currently being evaluated contains a constant.' : 'To show the result of the underlined expression, click Evaluate. The most recent result appears italicized.';
+      evaluate.textContent = top().constant == null && top().stepper.done && levels.length === 1 ? 'Restart' : 'Evaluate';
+      evaluate.disabled = top().constant != null || (top().stepper.done && levels.length > 1);
       stepIn.disabled = !inner();
       stepOut.disabled = levels.length < 2;
     };
