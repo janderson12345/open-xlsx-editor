@@ -36,3 +36,17 @@ test("an existing note's text replaced, its author kept; another added; one dele
   assert.equal(notes.get('5,0').author, 'Sam Rivera');
   assert.ok(!/ref="C3"/.test(again(wb).pkg.text('xl/threadedComments/threadedComment1.xml')), 'its replies gone too');
 });
+
+test("a note's box as its VML shape has it: its corners (x:Anchor) and whether it's always shown (x:Visible)", async () => {
+  const { readNotes } = await import('../src/ooxml/notes.js');
+  const { build } = await import('./steps.js');
+  const { setNote } = await import('../src/ooxml/noteedit.js');
+  const { wb, si } = build({ cells: { A1: 'x' } });
+  setNote(wb, si, 2, 1, 'Hello', 'Someone');
+  // (setNote writes Excel's default box: two columns wide from the column right of the cell, the row above, four rows tall.)
+  assert.deepEqual(readNotes(wb, si).get('2,1').anchor, { c0: 2, dx0: 15, r0: 1, dy0: 10, c1: 4, dx1: 31, r1: 5, dy1: 9 });
+  assert.equal(readNotes(wb, si).get('2,1').visible, false);
+  const rel = wb.pkg.readRels(wb.sheets[si].path).find((r) => /vmlDrawing$/.test(r.type));
+  wb.pkg.setText(rel.target, wb.pkg.text(rel.target).replace('<x:ClientData ObjectType="Note">', '<x:ClientData ObjectType="Note"><x:Visible/>'));
+  assert.equal(readNotes(wb, si).get('2,1').visible, true);
+});

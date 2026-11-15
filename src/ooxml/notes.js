@@ -63,5 +63,29 @@ export function readNotes(wb, i) {
       out.set(`${at.r},${at.c}`, { kind: 'note', author: author.startsWith('tc=') ? '' : author, runs, text: runs.map((x) => x.text).join('') });
     }
   }
+  // (Each note's box as its VML shape has it: where its corners are, and whether it is always shown.)
+  for (const [key, shape] of noteShapes(wb, rels)) { const n = out.get(key); if (n?.kind === 'note') Object.assign(n, shape); }
+  return out;
+}
+
+/**
+ * The notes' shapes in the sheet's VML drawing, by cell: Map("r,c" => { anchor: { c0, dx0, r0, dy0, c1, dx1, r1, dy1 }
+ * (x:Anchor: the box's top-left and bottom-right corners, a column or row and a pixel offset into it), visible }).
+ */
+function noteShapes(wb, rels) {
+  const out = new Map();
+  const vml = rels.find((r) => r.type === `${NS.r}/vmlDrawing`)?.target;
+  const text = vml && wb.pkg.text(vml);
+  if (!text) return out;
+  for (const m of text.matchAll(/<v:shape\b[\s\S]*?<\/v:shape>/g)) {
+    const shape = m[0];
+    if (!/ObjectType="Note"/.test(shape)) continue;
+    const row = /<x:Row>(\d+)<\/x:Row>/.exec(shape);
+    const col = /<x:Column>(\d+)<\/x:Column>/.exec(shape);
+    if (!row || !col) continue;
+    const a = /<x:Anchor>([^<]*)<\/x:Anchor>/.exec(shape)?.[1].split(',').map((x) => Number(x.trim()));
+    const anchor = a?.length === 8 && a.every(Number.isFinite) ? { c0: a[0], dx0: a[1], r0: a[2], dy0: a[3], c1: a[4], dx1: a[5], r1: a[6], dy1: a[7] } : null;
+    out.set(`${row[1]},${col[1]}`, { anchor, visible: /<x:Visible\s*\/>|<x:Visible>\s*(True|1)?\s*<\/x:Visible>/i.test(shape) });
+  }
   return out;
 }

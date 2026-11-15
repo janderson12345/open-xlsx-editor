@@ -50,11 +50,20 @@ it edits a note, adds one, deletes another and deletes the thread. Excel opened 
 read every note back with the cell, author and text written (`Comment.Text()`, the bold name and the text), with no
 thread left. `test/noteedit.test.js` covers the same in the unit tests.
 
+## A note's box, and Show All Notes
+
+A note's box is drawn where its VML shape puts it, at its size: `x:Anchor`'s corners, each a column or row and a pixel
+offset into it (Excel's default for a new note: from the column right of the cell, 15px in, the row above, 10px down,
+to two columns and four rows on). A note whose shape has `x:Visible` (Excel's Show/Hide Note) is always shown. Review >
+Notes > Show All Notes shows every note's box, or hides them again; as Excel's, it is a view of the notes, not saved.
+
 ## Not yet
 
-@mentions (threads are written, resolved, replied to, edited and deleted: below), Show All Notes, a
-note's own size and position (from its VML shape), notes following their cells when rows are sorted, and marks in
-frozen panes' cells drawn twice. Notes do
+@mentions written (threads are written, resolved, replied to, edited and deleted: below). Excel makes a mention from
+the signed-in organisation's directory (a person with a provider and a user id), which COM can't make in a hidden
+instance, so there is nothing to measure them against; a mention already in a file shows, its "@Name" being part of
+the comment's text. Also: Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), notes
+following their cells when rows are sorted, and marks in frozen panes' cells drawn twice. Notes do
 follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
 
 ## Writing threaded comments (`src/ooxml/threadedit.js`, `src/editor/threadbox.js`)

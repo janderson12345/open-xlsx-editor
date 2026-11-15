@@ -133,6 +133,7 @@ export function createActs(env) {
       return editing().run('sheetChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
     }
     if (name === 'showNote') { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); }
+    if (name === 'showAllNotes') return state.grid.showAllNotes();
     if (name === 'validationBox') {
       // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
       const s = editing().selection;

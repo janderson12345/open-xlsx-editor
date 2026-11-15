@@ -10,10 +10,17 @@ export function describeNote(n) {
   return `Note. ${n.text.replace(/\s*\n\s*/g, ' ')}`;
 }
 
-/** The box shown beside cell (r, c). */
+/** The box shown beside cell (r, c): a note where its VML shape puts it, at its size; else (a thread, or a note with
+ *  no shape) beside the cell. */
 function noteBox(st, n, r, c) {
   const box = div(n.kind === 'thread' ? 'oxe-note-box oxe-thread-box' : 'oxe-note-box');
-  setVars(box, { '--oxe-x': st.cols.start(c + 1) + 10, '--oxe-y': st.rows.start(r) });
+  const a = n.anchor;
+  if (a) {
+    const x0 = st.cols.start(a.c0) + a.dx0;
+    const y0 = st.rows.start(a.r0) + a.dy0;
+    setVars(box, { '--oxe-x': x0, '--oxe-y': y0, '--oxe-nw': Math.max(20, st.cols.start(a.c1) + a.dx1 - x0), '--oxe-nh': Math.max(12, st.rows.start(a.r1) + a.dy1 - y0) });
+    box.classList.add('oxe-note-sized');
+  } else setVars(box, { '--oxe-x': st.cols.start(c + 1) + 10, '--oxe-y': st.rows.start(r) });
   if (n.kind === 'thread') {
     for (const item of n.items) {
       const one = div('oxe-thread-item');
@@ -59,7 +66,9 @@ export function drawNoteMarks(st, win) {
       d.textContent = describeNote(n);
       texts.push(d);
     }
-    if (st.noteOpen === key) marks.push(noteBox(st, n, r, c));
+    // (Open: hovered or Shift+F2'd; a note its shape shows always (x:Visible, Show/Hide Note in Excel); every note
+    // with Review > Show All Notes.)
+    if (st.noteOpen === key || (n.kind === 'note' && (n.visible || st.allNotes))) marks.push(noteBox(st, n, r, c));
   }
   layer.replaceChildren(...marks);
   if (st.noteTexts && st.idBase) st.noteTexts.replaceChildren(...texts);

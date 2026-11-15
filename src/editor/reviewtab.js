@@ -14,7 +14,7 @@ export function reviewTab(kit, { act }) {
   const groups = [
     grp('Comments', btn('💬', 'New Comment (Ctrl+Alt+M)', f('commentBox'), { label: 'New Comment', big: true }), btn('🗑', 'Delete Comment', f('deleteNote'), { label: 'Delete' })),
     grp('Notes', menu('🗒', 'Notes', () => [item('New Note', f('editNote'), { hint: 'Shift+F2' }), item('Edit Note', f('editNote')), item('Delete Note', f('deleteNote')),
-      item('Show/Hide Note', f('showNote'))], { label: 'Notes', big: true })),
+      item('Show/Hide Note', f('showNote')), item('Show All Notes', f('showAllNotes'))], { label: 'Notes', big: true })),
     grp('Protect', protect, book, btn('🔓', 'Allow Edit Ranges', f('editRangesBox'), { label: 'Allow Edit Ranges' })),
   ];
   return {

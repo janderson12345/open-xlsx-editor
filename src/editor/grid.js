@@ -308,6 +308,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       draw(st, true);
     },
     /** Shift+F2: cell (r, c)'s note shown beside it, or hidden again; false when it has none. */
+    /** Review > Show All Notes: every note's box shown, or not (as Excel's, a view of the notes, not saved). */
+    showAllNotes(on) { st.allNotes = on == null ? !st.allNotes : !!on; drawNoteMarks(st, st.win); return st.allNotes; },
     toggleNote(r, c) {
       const key = `${r},${c}`;
       if (!st.notes?.has(key)) { if (st.noteOpen) showNote(null); return false; }

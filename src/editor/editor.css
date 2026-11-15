@@ -1714,11 +1714,14 @@
 .oxe-note-mark.oxe-thread-mark.oxe-thread-done {
   border-top-color: #8a8a8a;
 }
+/* A note at its own size, as its VML shape has it. */
+.oxe-note-box.oxe-note-sized { width: var(--oxe-nw); height: var(--oxe-nh); overflow: hidden; }
 .oxe-note-box {
   position: absolute;
   left: var(--oxe-x);
   top: var(--oxe-y);
   width: 200px;
+  box-sizing: border-box;
   padding: 4px 6px;
   border: 1px solid #767676;
   background: #ffffe1;
