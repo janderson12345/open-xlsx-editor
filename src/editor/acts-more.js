@@ -68,17 +68,20 @@ export function createMoreActs(env) {
         return n == null ? false : editing().run('pageLayout', { scale: Math.round(n) });
       });
     }
-    if (name === 'printTitlesBox') {
-      // (Page Layout > Print Titles: Excel's Page Setup box at its Sheet tab, pagesetupbox.js.)
+    if (name === 'printTitlesBox' || name === 'customMarginsBox') {
+      // (Page Layout > Print Titles, and Margins > Custom Margins...: Excel's Page Setup box at its Sheet or Margins tab,
+      // pagesetupbox.js.)
       if (state.readOnly) return false;
       const abs = (a) => rangeName(a).replace(/([A-Z]+)(\d+)/g, '$$$1$$$2');
       const t = printTitlesOf(state.workbook, i);
+      const page = state.workbook.sheet(i).page;
       const now = {
+        margins: page.margins, center: { h: page.centerH, v: page.centerV }, pageOrder: page.pageOrder,
         area: (printAreaOf(state.workbook, i) || []).map(abs).join(','),
         rows: t.rows ? `$${t.rows[0] + 1}:$${t.rows[1] + 1}` : '',
         cols: t.cols ? `$${colName(t.cols[0])}:$${colName(t.cols[1])}` : '',
       };
-      return pageSetupBox(root, now).then((got) => {
+      return pageSetupBox(root, now, { tab: name === 'customMarginsBox' ? 'margins' : 'sheet' }).then((got) => {
         state.grid.el.focus({ preventScroll: true });
         return got ? editing().run('pageSetupSheet', got) : false;
       });

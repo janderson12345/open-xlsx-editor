@@ -108,3 +108,22 @@ test('Margins, Orientation, Size and Scale to Fit as Excel writes them (its prin
   assert.deepEqual(xml(wb, si), [NORMAL, '<pageSetup scale="80" orientation="portrait"/>']);
   assert.equal(wb.sheet(si).page.fitToPage, false);
 });
+
+test('custom margins, Center on page and Page order as Excel writes them', () => {
+  // (Excel: margins 0.6, 1.25, 0.33, 2, 0.1, 0 written as typed; CenterHorizontally then CenterVertically; Order
+  // over, then down.)
+  const { wb, si } = build({ cells: { A1: '1' } });
+  setPageLayout(wb, si, { margins: { left: 0.6, right: 1.25, top: 0.33, bottom: 2, header: 0.1, footer: 0 } });
+  const xml = () => serializeXml(wb._part(si).doc);
+  assert.match(xml(), /<pageMargins left="0.6" right="1.25" top="0.33" bottom="2" header="0.1" footer="0"\/>/);
+  setPageLayout(wb, si, { center: { h: true } });
+  assert.match(xml(), /<printOptions horizontalCentered="1"\/>/);
+  setPageLayout(wb, si, { center: { v: true } });
+  assert.match(xml(), /<printOptions horizontalCentered="1" verticalCentered="1"\/>/);
+  setPageLayout(wb, si, { pageOrder: 'overThenDown' });
+  assert.match(xml(), /<pageSetup pageOrder="overThenDown" orientation="portrait"\/>/);
+  const p = wb.sheet(si).page;
+  assert.deepEqual([p.centerH, p.centerV, p.pageOrder], [true, true, 'overThenDown']);
+  setPageLayout(wb, si, { center: { h: false, v: false }, pageOrder: 'downThenOver' });
+  assert.doesNotMatch(xml(), /printOptions|pageOrder/);
+});

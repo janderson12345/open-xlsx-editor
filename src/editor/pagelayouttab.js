@@ -3,6 +3,7 @@
 // and Print: ooxml/printopts.js). Excel's check boxes; here buttons that stay pressed while ticked.
 
 import { MARGINS } from '../ooxml/pagesetupedit.js';
+import { el } from './ribbonkit.js';
 
 /** Excel's Size list, as far as the print layout knows the papers: [label, paperSize code]. */
 const SIZES = [['Letter 8.5" x 11"', 1], ['Legal 8.5" x 14"', 5], ['Executive 7.25" x 10.5"', 7], ['Tabloid 11" x 17"', 3], ['A3 11.69" x 16.54"', 8],
@@ -23,7 +24,8 @@ export function pageLayoutTab(kit, { act, hasPrintArea = () => false, page = () 
   // (Width and height: Automatic is 0; fit to pages off is Automatic both ways.)
   const fitNow = () => { const p = page(); return p && p.fitToPage ? { width: p.fitToWidth, height: p.fitToHeight } : { width: 0, height: 0 }; };
   const setup = grp('Page Setup',
-    menu('▭', 'Margins', () => marginNames.map(([label, key, hint]) => item(label, () => act('pageLayout', { margins: key }), { hint, ...tick(same(page()?.margins, MARGINS[key])) })), { label: 'Margins', big: true }),
+    menu('▭', 'Margins', () => [...marginNames.map(([label, key, hint]) => item(label, () => act('pageLayout', { margins: key }), { hint, ...tick(same(page()?.margins, MARGINS[key])) })),
+      el('hr'), item('Custom Margins...', () => act('customMarginsBox'))], { label: 'Margins', big: true }),
     menu('⇄', 'Orientation', () => [['Portrait', false], ['Landscape', true]].map(([label, v]) => item(label, () => act('pageLayout', { landscape: v }), tick(!!page()?.landscape === v))), { label: 'Orientation', big: true }),
     menu('▯', 'Size', () => SIZES.map(([label, code]) => item(label, () => act('pageLayout', { paperSize: code }), tick((page()?.paperSize ?? 1) === code))), { label: 'Size', big: true }),
     menu('▣', 'Print Area', () => [item('Set Print Area', () => act('printArea', 'set')), item('Clear Print Area', () => act('printArea', 'clear')),

@@ -199,8 +199,10 @@ function child(doc, tag, after) {
  *  PageSetup set and the file saved): `margins` ({ left, right, top, bottom, header, footer }, inches) all six in
  *  pageMargins; `landscape`; `paperSize` (left out for Letter, 1); `fit` ({ width, height }: pages, 0 for Automatic)
  *  fitToPage="1" in sheetPr's pageSetUpPr and fitToWidth / fitToHeight unless 1 (width 1, height Automatic:
- *  fitToHeight="0"); `scale` (a percentage) takes fit to pages off. With pageSetup written, orientation always is. */
-export function setPageLayout(wb, si, { margins, landscape, paperSize, fit, scale }) {
+ *  fitToHeight="0"); `scale` (a percentage) takes fit to pages off; `pageOrder` ('overThenDown' written, Down, then
+ *  over left out); `center` ({ h, v }: Center on page) in printOptions. With pageSetup written, orientation always is.
+ *  Measured too: custom margins written as typed (0.6, 1.25, 0.33, 2, 0.1, 0). */
+export function setPageLayout(wb, si, { margins, landscape, paperSize, fit, scale, center, pageOrder }) {
   const part = wb._part(si);
   const doc = part.doc;
   const root = doc.documentElement;
@@ -236,6 +238,18 @@ export function setPageLayout(wb, si, { margins, landscape, paperSize, fit, scal
     }
   }
   if (scale != null) { unfit(); if (scale === 100) delete now.scale; else now.scale = String(scale); }
+  if (pageOrder) { if (pageOrder === 'overThenDown') now.pageOrder = pageOrder; else delete now.pageOrder; }
+  // (Center on page: printOptions' horizontalCentered and verticalCentered, before its headings and gridLines, as
+  // Excel writes them; the element gone when nothing is left in it.)
+  if (center) {
+    const po = child(doc, 'printOptions', ['pageMargins', ...AFTER_MARGINS]);
+    const keep = Object.fromEntries([...po.attributes].map((x) => [x.name, x.value]));
+    if (center.h != null) { if (center.h) keep.horizontalCentered = '1'; else delete keep.horizontalCentered; }
+    if (center.v != null) { if (center.v) keep.verticalCentered = '1'; else delete keep.verticalCentered; }
+    for (const x of [...po.attributes]) po.removeAttribute(x.name);
+    for (const k of ['horizontalCentered', 'verticalCentered', 'headings', 'gridLines', 'gridLinesSet']) if (keep[k] != null) po.setAttribute(k, keep[k]);
+    if (!po.attributes.length) po.parentNode.removeChild(po);
+  }
   // (Written again in Excel's order, the attributes this doesn't know after them.)
   for (const a of [...ps.attributes]) ps.removeAttribute(a.name);
   const known = SETUP_ORDER.filter((k) => now[k] != null);

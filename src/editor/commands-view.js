@@ -110,12 +110,14 @@ export function viewCommands(env) {
       if (done) ctx.announce(how === 'clear' ? 'Print area cleared' : how === 'add' ? 'Added to the print area' : 'Print area set');
       return done;
     },
-    /** Page Setup's Sheet tab answered ({ area: ranges, [] for none; rows, cols: [first, last] or null}): the print
-     *  area and print titles of the sheet shown, as one step of the history. */
-    pageSetupSheet({ area, rows, cols }) {
+    /** The Page Setup box answered ({ margins, center, pageOrder; area: ranges, [] for none; rows, cols: [first, last]
+     *  or null }): the sheet shown's margins, centering, page order, print area and print titles, as one step of the
+     *  history. */
+    pageSetupSheet({ area, rows, cols, margins, center, pageOrder }) {
       const done = commands.sheetChange((wb, si) => {
-        if (area.length) setPrintArea(wb, si, area); else clearPrintArea(wb, si);
-        setPrintTitles(wb, si, { rows, cols });
+        if (margins || center || pageOrder) setPageLayout(wb, si, { margins, center, pageOrder });
+        if (area) { if (area.length) setPrintArea(wb, si, area); else clearPrintArea(wb, si); }
+        if (rows !== undefined || cols !== undefined) setPrintTitles(wb, si, { rows, cols });
         return true;
       });
       if (done) ctx.announce('Page setup changed');

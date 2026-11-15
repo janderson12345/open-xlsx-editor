@@ -332,11 +332,11 @@ check(brks === '{"rows":[4],"cols":[2]}' && pagesWith > pagesBefore && brksUndon
 await page.click('.oxe-rtab >> text=Page Layout');
 await ribbon('Print Titles');
 await page.waitForSelector('dialog.oxe-page-setup');
-const shownArea = await page.inputValue('dialog.oxe-page-setup input >> nth=0');
-await page.fill('dialog.oxe-page-setup input >> nth=1', '$3');
+const shownArea = await page.inputValue('dialog.oxe-page-setup input:visible >> nth=0');
+await page.fill('dialog.oxe-page-setup input:visible >> nth=1', '$3');
 await page.click('dialog.oxe-page-setup >> button:text-is("OK")');
 const refusedNote = await page.textContent('dialog.oxe-page-setup .oxe-dialog-note');
-await page.fill('dialog.oxe-page-setup input >> nth=1', '1:2');
+await page.fill('dialog.oxe-page-setup input:visible >> nth=1', '1:2');
 await page.click('dialog.oxe-page-setup >> button:text-is("OK")');
 const titlesText = await page.evaluate(() => window.oxe.workbook.definedNames.find((d) => d.name === '_xlnm.Print_Titles' && d.sheet === window.oxe.sheetIndex)?.text);
 await page.focus('.oxe-grid');
@@ -364,5 +364,21 @@ const undoneLayout = await pageNow();
 check(afterLandscape.landscape && landscapePages !== portraitPages && afterWidth.fit && afterWidth.w === 1 && afterWidth.h === 0 && !undoneLayout.landscape && !undoneLayout.fit,
   'Page Layout: Orientation > Landscape (a different page count), Scale to Fit Width 1 page (height Automatic), Ctrl+Z back',
   JSON.stringify({ portraitPages, afterLandscape, landscapePages, afterWidth, undoneLayout }));
+
+// Margins > Custom Margins...: the Page Setup box at its Margins tab; Left 0.6 and Center horizontally, OK: pageMargins
+// left="0.6" and printOptions horizontalCentered="1"; Ctrl+Z takes them back.
+await ribbon('Margins', () => page.click('.oxe-pop >> text=Custom Margins...'));
+await page.waitForSelector('dialog.oxe-page-setup');
+const onMargins = await page.getAttribute('dialog.oxe-page-setup [role=tab] >> nth=0', 'aria-selected');
+await page.fill('dialog.oxe-page-setup input:visible >> nth=2', '0.6');
+await page.check('dialog.oxe-page-setup input[type=checkbox] >> nth=0');
+await page.click('dialog.oxe-page-setup >> button:text-is("OK")');
+const marginsNow = await page.evaluate(() => { const p = window.oxe.workbook.sheet(window.oxe.sheetIndex).page; return { left: p.margins.left, h: p.centerH }; });
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const marginsUndone = await page.evaluate(() => { const p = window.oxe.workbook.sheet(window.oxe.sheetIndex).page; return { left: p.margins.left, h: p.centerH }; });
+check(onMargins === 'true' && marginsNow.left === 0.6 && marginsNow.h && marginsUndone.left === 0.7 && !marginsUndone.h,
+  'Custom Margins...: the Page Setup box at Margins; Left 0.6 and Center horizontally set; Ctrl+Z back',
+  JSON.stringify({ onMargins, marginsNow, marginsUndone }));
 
 await finish();
