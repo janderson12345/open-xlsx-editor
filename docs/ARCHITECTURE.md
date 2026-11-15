@@ -145,7 +145,7 @@ insides:
 | `src/editor/inserttab.js` | The Insert tab: Tables > PivotTable. |
 | `src/editor/formulastab.js`, `src/editor/namesbox.js` | The Formulas tab: Defined Names, Excel's Name Manager and its New / Edit Name box. |
 | `src/calc/catalog.js`, `src/editor/functionbox.js`, `src/editor/fntip.js` | The Function Library: each function's category and syntax, Excel's Insert Function box, and the syntax screen tip under a cell being edited. |
-| `src/calc/fnargs.js`, `src/calc/describe*.js`, `src/editor/fnargsbox.js` | Function Arguments: the boxes a function has and the formula written from them (the fewest arguments Excel takes), what each function and argument does, and the box itself. |
+| `src/calc/fnargs.js`, `src/calc/argkinds.js`, `src/calc/describe*.js`, `src/editor/fnargsbox.js` | Function Arguments: the boxes a function has and the formula written from them (the fewest arguments Excel takes, text quoted), each argument's kind, what each function and argument does, and the box itself (pointing at the sheet from it through `editor/pointing.js`). |
 | `src/editor/commands-view.js` | The view commands: Freeze Panes, Show Formulas, the zoom, Zoom to Selection, View > Show (Gridlines, Formula Bar, Headings) and Page Layout > Sheet Options' Print boxes; kept in the file but not in the undo history. |
 | `src/editor/pagelayouttab.js`, `src/ooxml/printopts.js` | The Page Layout tab (Sheet Options), and its Print boxes written as Excel writes them (`printOptions`). |
 | `src/editor/commands-pivot.js` | The newPivot command: a PivotTable made on a new sheet or at a cell, styled and fitted, as one step. |

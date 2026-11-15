@@ -92,6 +92,14 @@ export function attachEditing(root, ctx) {
       announce(`${note}${refName(sel.ar, sel.ac)}${cell && cell.v != null ? `, ${cellText(cell)}` : ', blank'}${range}${prompt}`);
     },
     showSheet: (i) => {
+      // (Function Arguments open: the sheet shown to point at, the cell being edited left as it is.)
+      if (pointing.argument) {
+        ctx.showSheet(i);
+        pointing.sheetShown();
+        root.classList.toggle('oxe-pointing-away', pointing.away);
+        pointing.control.focus({ preventScroll: true });
+        return;
+      }
       if (pointing.ready && !carried) carry();
       else if (editor.isOpen) editor.commit();
       ctx.showSheet(i);
@@ -478,6 +486,13 @@ export function attachEditing(root, ctx) {
     holdEditor(on) { editor.hold(on); },
     /** Function Arguments' formula for the cell being edited, or the active cell: entered (refused, back into the
      *  editor), or with `wait` (one Excel refuses as it stands) left being edited with it. */
+    /** A Function Arguments box (`el`, for cell `at`) pointed from as a formula is (pointing.js); null: back to the
+     *  cell being edited. Returns the pointing, for the box's keys. */
+    pointWith(el, at) {
+      if (el) pointing.attachArgument(el, at);
+      else { root.classList.remove('oxe-pointing-away'); pointing.attach(editor.isOpen ? editor.el : null); }
+      return pointing;
+    },
     putFormula(text, wait = false) {
       if (wait) { reopen(text); return; }
       const at = editor.at;

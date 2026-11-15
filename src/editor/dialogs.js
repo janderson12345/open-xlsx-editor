@@ -4,21 +4,26 @@
 
 let dialogCount = 0;
 
-export function modal(root, build) {
+/** A box over `root`, built by `build(dlg, done, id)`; resolves to what `done` is given. `modeless`: the sheet can still
+ *  be clicked while it is open (Function Arguments, as in Excel), the ribbon and the formula bar can't (oxe-holding). */
+export function modal(root, build, { modeless = false } = {}) {
   return new Promise((resolve) => {
     const dlg = document.createElement('dialog');
-    dlg.className = 'oxe-dialog';
+    dlg.className = modeless ? 'oxe-dialog oxe-dialog-modeless' : 'oxe-dialog';
     const back = document.activeElement;
     const done = (value) => {
       dlg.close();
       dlg.remove();
+      if (modeless) root.classList.remove('oxe-holding');
       back?.focus?.({ preventScroll: true });
       resolve(value);
     };
     dlg.addEventListener('cancel', (e) => { e.preventDefault(); done(null); });
+    // (A box shown without showModal gets no cancel event: Esc closes it here.)
+    if (modeless) dlg.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); done(null); } });
     build(dlg, done, `oxe-dlg${++dialogCount}`);
     root.append(dlg);
-    dlg.showModal();
+    if (modeless) { root.classList.add('oxe-holding'); dlg.show(); } else dlg.showModal();
     dlg.querySelector('[data-first]')?.focus();
   });
 }

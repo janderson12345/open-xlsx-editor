@@ -2250,15 +2250,33 @@
 .oxe-fnargs-group { margin: 0 0 12px; padding: 6px 10px; border: 1px solid var(--oxe-head-line); border-radius: 4px; }
 .oxe-fnargs-group legend { margin: 0; padding: 0 4px; font-weight: 600; }
 .oxe-fnargs-rows { max-height: min(40vh, 260px); overflow-y: auto; }
-.oxe-fnargs-row { display: grid; grid-template-columns: minmax(6em, 9em) minmax(0, 1fr) minmax(0, 10em); gap: 6px; align-items: center; margin: 4px 0; }
+.oxe-fnargs-row { display: grid; grid-template-columns: minmax(6em, 9em) minmax(0, 1fr) auto minmax(0, 10em); gap: 6px; align-items: center; margin: 4px 0; }
 .oxe-fnargs-row .oxe-dialog-field { min-width: 0; }
 .oxe-fnargs-name { margin: 0; overflow-wrap: anywhere; }
 .oxe-fnargs-required { font-weight: 700; }
 .oxe-fnargs-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .oxe-fnargs-help { min-height: 2.6em; }
+.oxe-fnargs-hint { opacity: 0.7; }
+.oxe-fnargs-fold { padding: 0 6px; border: 1px solid var(--oxe-head-line); border-radius: 4px; background: var(--oxe-head-bg); color: inherit; font: inherit; cursor: pointer; }
+.oxe-fnargs-fold:focus-visible { outline: 2px solid var(--oxe-focus); outline-offset: 1px; }
 @media (max-width: 480px) {
-  .oxe-fnargs-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .oxe-fnargs-row { grid-template-columns: minmax(0, 1fr) auto; gap: 2px; }
+  .oxe-fnargs-name, .oxe-fnargs-value { grid-column: 1 / -1; }
 }
+/* The box doesn't hold the page (the sheet is pointed at), so it sits at the lower right, the sheet's first columns
+   clear, and the ribbon and the formula bar wait while it is open. */
+.oxe-dialog-modeless { position: fixed; inset: auto 16px 36px auto; z-index: 40; margin: 0; }
+@media (max-width: 600px) { .oxe-dialog-modeless { inset: auto 0 0; margin: 0 auto; } }
+.oxe-holding .oxe-toolbar, .oxe-holding .oxe-bar { pointer-events: none; opacity: 0.6; }
+/* The cell being edited, while another sheet is shown to point at from Function Arguments. */
+.oxe-pointing-away .oxe-editor { visibility: hidden; }
+/* Collapse Dialog: only the argument with focus, its box and its Expand button. */
+.oxe-fnargs-collapsed { padding: 6px 8px; }
+.oxe-fnargs-collapsed > :not(.oxe-fnargs-group), .oxe-fnargs-collapsed .oxe-fnargs-group > legend,
+.oxe-fnargs-collapsed .oxe-fnargs-row:not(.oxe-fnargs-current), .oxe-fnargs-collapsed .oxe-fnargs-name,
+.oxe-fnargs-collapsed .oxe-fnargs-value { display: none; }
+.oxe-fnargs-collapsed .oxe-fnargs-group { margin: 0; padding: 0; border: 0; }
+.oxe-fnargs-collapsed .oxe-fnargs-row { grid-template-columns: minmax(0, 1fr) auto; margin: 0; }
 
 /* The function screen tip under a cell being edited (fntip.js). */
 .oxe-fntip {

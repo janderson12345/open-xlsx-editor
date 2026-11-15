@@ -12,6 +12,9 @@
 //   eight are MIN_ARGS. So the box writes the arguments up to the last one filled, and at least that many, empty ones
 //   left as empty places.
 import { functionInfo } from './catalog.js';
+import { argKind } from './argkinds.js';
+import { parseFormula } from './parse.js';
+import { normalizeFormula } from './fileform.js';
 
 /** The functions whose fewest arguments, as Excel takes them, aren't their syntax's unbracketed ones (fnmin-excel.json). */
 const MIN_ARGS = { IF: 2, DCOUNT: 3, DCOUNTA: 3, PROB: 3, REDUCE: 3, SCAN: 3, BYCOL: 1, BYROW: 1 };
@@ -63,11 +66,42 @@ export function argBoxes(info, values = []) {
   return boxes;
 }
 
+/** The functions whose arguments name their own parameters: nothing typed in them is put in quotes. */
+export const OWN_NAMES = new Set(['LAMBDA', 'LET', 'MAP', 'REDUCE', 'SCAN', 'BYROW', 'BYCOL', 'MAKEARRAY', 'ISOMITTED']);
+/** The parts of a formula that are only names and the operators between them. */
+const NAMES_ONLY = new Set(['name', 'isect', 'bin', 'neg', 'pct', 'paren']);
+
+/** Whether text typed in a text or any box is put in quotes, as Excel's box does to text that isn't a formula: when it
+ *  doesn't read as one (>1, 1,000, $5: measured, Excel refuses each as a formula), or reads only as names none of which
+ *  is defined (abc, apple pie, N/A: Excel takes them as names, #NAME?). `isName(name)`: defined in the workbook. */
+export function needsQuotes(text, isName = () => false) {
+  const t = String(text).trim();
+  if (!t || t.startsWith('"')) return false;
+  let tree;
+  try { tree = parseFormula(normalizeFormula(t)); } catch { return true; }
+  const names = [];
+  const walk = (n) => {
+    if (!n || !NAMES_ONLY.has(n.k)) return false;
+    if (n.k === 'name') { names.push(n.name); return true; }
+    return [n.a, n.b].filter(Boolean).every(walk);
+  };
+  return walk(tree) && !names.some((n) => isName(n));
+}
+
+/** `text` in quotes, quotes inside doubled. */
+const quoted = (text) => `"${String(text).trim().replace(/"/g, '""')}"`;
+
 /** The call written from the boxes' `values`: NAME(a,b,...), up to the last one filled and at least the fewest Excel
- *  takes, empty ones kept as empty places. `refused` when Excel would refuse it (too few: =SUM() with nothing). */
-export function buildCall(name, values) {
+ *  takes, empty ones kept as empty places; text in a text or any box quoted (needsQuotes). `refused` when Excel would
+ *  refuse it (too few: =SUM() with nothing). */
+export function buildCall(name, values, { isName } = {}) {
   const info = functionInfo(name);
-  const vals = values.map((v) => String(v ?? '').trim());
+  const boxes = info ? argBoxes(info, values) : [];
+  const quotes = info && !OWN_NAMES.has(info.name);
+  const vals = values.map((v, k) => {
+    const kind = boxes[k] ? argKind(info.name, boxes[k].name) : 'number';
+    return quotes && (kind === 'text' || kind === 'any') && needsQuotes(v ?? '', isName) ? quoted(v) : String(v ?? '').trim();
+  });
   let last = vals.length;
   while (last > 0 && vals[last - 1] === '') last--;
   const min = info ? minArgs(info) : 0;
