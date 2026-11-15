@@ -72,6 +72,8 @@ function tableLookup(a, ctx, byRow) {
   const g = grid(a[1], ctx);
   const k = Math.trunc(num(a[2], ctx));
   const approx = given(a[3]) ? bool(a[3], ctx) : a[3] !== MISSING;
+  // (No table, its place left empty: #N/A before the column is looked at, as Excel gives =VLOOKUP(,,) and =VLOOKUP(2,,1).)
+  if (a[1] === MISSING) throw E.na;
   if (k < 1) throw E.value;
   if (k > (byRow ? g.rows : g.cols)) throw E.ref;
   const list = byRow ? { length: g.cols, at: (i) => g.at(0, i) } : { length: Math.min(g.rows, Math.max(g.used, 1)), at: (i) => g.at(i, 0) };
