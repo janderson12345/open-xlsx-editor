@@ -65,6 +65,38 @@ test("a paste's validation as Excel's: the copy's rules over the pasted cells, j
   assert.deepEqual(there, ['I5:I6 | I5&gt;H5', 'H5:H6 | $A$1:$A$3']);
 });
 
+test('validation pasted with Transpose, as Excel\'s: the turned cells join the rule on its own sheet, elsewhere a rule moved by the corner', async () => {
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  // (Excel: A1:A3 or A1:B2 copied, PasteSpecial(xlPasteAll, Transpose) at C1 or D1; the dataValidations it saved.)
+  const rules = (wb, k) => [...serializeXml(wb._part(k).doc).matchAll(/<dataValidation [^>]*sqref="([^"]+)"[^>]*>(?:<formula1>([^<]*))?/g)].map((m) => `${m[1]} | ${m[2]}`);
+  const sheet = (set) => {
+    const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+    const si = wb.addSheet(wb.sheets.length, 'Turned');
+    for (const [range, rule] of set) wb.setValidation(si, [range], rule);
+    return { wb, si };
+  };
+  const A13 = { r0: 0, c0: 0, r1: 2, c1: 0 };
+  const C1E1 = { r0: 0, c0: 2, r1: 0, c1: 4 };
+  const whole = { type: 'whole', op: 'between', f1: '1', f2: '10' };
+  for (const [rule, want] of [[whole, 'A1:A3 C1:E1 | 1'], [{ type: 'custom', f1: '=A1>B1' }, 'A1:A3 C1:E1 | A1&gt;B1'], [{ type: 'list', f1: '=$H$1:$H$3' }, 'A1:A3 C1:E1 | $H$1:$H$3']]) {
+    const { wb, si } = sheet([[A13, rule]]);
+    pasteValidation(wb, si, C1E1, snapshot(wb, si, A13), { transpose: true });
+    assert.deepEqual(rules(wb, si), [want]);
+  }
+  // (A block: A's rule to row 1, B's to row 2; over C1:F1's list, F1 keeps it.)
+  const block = sheet([[{ r0: 0, c0: 0, r1: 1, c1: 0 }, whole], [{ r0: 0, c0: 1, r1: 1, c1: 1 }, { type: 'list', f1: 'a,b' }]]);
+  pasteValidation(block.wb, block.si, { r0: 0, c0: 3, r1: 1, c1: 4 }, snapshot(block.wb, block.si, { r0: 0, c0: 0, r1: 1, c1: 1 }), { transpose: true });
+  assert.deepEqual(rules(block.wb, block.si), ['A1:A2 D1:E1 | 1', 'B1:B2 D2:E2 | "a,b"']);
+  const over = sheet([[A13, whole], [{ r0: 0, c0: 2, r1: 0, c1: 5 }, { type: 'list', f1: 'p,q' }]]);
+  pasteValidation(over.wb, over.si, C1E1, snapshot(over.wb, over.si, A13), { transpose: true });
+  assert.deepEqual(rules(over.wb, over.si), ['A1:A3 C1:E1 | 1', 'F1 | "p,q"']);
+  // (Another sheet: a rule of its own, =C1>D1 over C1:E1.)
+  const custom = sheet([[A13, { type: 'custom', f1: '=A1>B1' }]]);
+  const other = custom.wb.addSheet(custom.wb.sheets.length, 'Other');
+  pasteValidation(custom.wb, other, C1E1, snapshot(custom.wb, custom.si, A13), { transpose: true });
+  assert.deepEqual(rules(custom.wb, other), ['C1:E1 | C1&gt;D1']);
+});
+
 test("a cut's notes and validation move with its cells, as Excel's (B2:C3 cut to E5: the note to E5, F6's gone; C2:C4's rule C4 F5:F6, =C4>B4; E5's rule gone)", async () => {
   const { serializeXml } = await import('../src/ooxml/xml.js');
   const { moveCutParts } = await import('../src/ooxml/clipops.js');

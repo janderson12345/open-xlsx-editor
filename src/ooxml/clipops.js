@@ -51,8 +51,10 @@ const clipTo = (a, b) => (overlaps(a, b) ? { r0: Math.max(a.r0, b.r0), c0: Math.
 /** What a paste does to validation, as Excel's Paste, Paste Special's All and Validation do (measured over COM): the
  *  pasted cells end with the copy's rules, each over the cells it covered, moved with them; its formulas move as a
  *  copied formula does (relative references follow); cells the copy had no rule for, none. `area` and the copy as
- *  pasteNotes's. Not with Transpose. Changes the workbook; returns whether anything changed. */
-export function pasteValidation(wb, si, area, clip) {
+ *  pasteNotes's. With Transpose (measured too) the same over the turned cells, a rule of its own moved by the
+ *  corner only (=A1>B1 over A1:A3, turned onto another sheet's C1: =C1>D1 over C1:E1). Changes the workbook; returns
+ *  whether anything changed. */
+export function pasteValidation(wb, si, area, clip, { transpose = false } = {}) {
   const h = clip.rect.r1 - clip.rect.r0 + 1;
   const w = clip.rect.c1 - clip.rect.c0 + 1;
   const had = (wb.sheet(si).validations || []).some((v) => v.type !== 'none' && v.ranges.some((a) => overlaps(a, area)));
@@ -61,7 +63,10 @@ export function pasteValidation(wb, si, area, clip) {
   const sameSheet = clip.wb === wb && clip.si === si;
   for (const { v, parts } of clip.validations || []) {
     const ranges = [];
-    for (let tr = area.r0; tr <= area.r1; tr += h) {
+    // (Turned: each part's rows become columns from the pasted cells' corner, once.)
+    const turn = (a) => ({ r0: area.r0 + (a.c0 - clip.rect.c0), c0: area.c0 + (a.r0 - clip.rect.r0), r1: area.r0 + (a.c1 - clip.rect.c0), c1: area.c0 + (a.r1 - clip.rect.r0) });
+    if (transpose) for (const a of parts) ranges.push(turn(a));
+    for (let tr = area.r0; !transpose && tr <= area.r1; tr += h) {
       for (let tc = area.c0; tc <= area.c1; tc += w) {
         for (const a of parts) {
           const moved = clipTo({ r0: a.r0 + tr - clip.rect.r0, c0: a.c0 + tc - clip.rect.c0, r1: a.r1 + tr - clip.rect.r0, c1: a.c1 + tc - clip.rect.c0 }, area);
@@ -75,9 +80,8 @@ export function pasteValidation(wb, si, area, clip) {
     // formulas written for its first cell as a formula copied there is: shifted from the rule's first cell to the
     // copied cell, and on as far as it was pasted.)
     if (sameSheet && wb.addToValidation(si, { first: { r: base.r0, c: base.c0 }, type: v.type, formula1: v.formulas[0] }, coalesce(ranges))) continue;
-    const dr = area.r0 - clip.rect.r0;
-    const dc = area.c0 - clip.rect.c0;
-    const formulas = v.formulas.map((f) => (f == null ? f : shiftFormula(f, parts[0].r0 - base.r0 + dr, parts[0].c0 - base.c0 + dc)));
+    const first = transpose ? turn(parts[0]) : { r0: parts[0].r0 + area.r0 - clip.rect.r0, c0: parts[0].c0 + area.c0 - clip.rect.c0 };
+    const formulas = v.formulas.map((f) => (f == null ? f : shiftFormula(f, first.r0 - base.r0, first.c0 - base.c0)));
     wb.setValidation(si, coalesce(ranges), boxRule({ ...v, formulas }, wb.date1904));
   }
   return true;

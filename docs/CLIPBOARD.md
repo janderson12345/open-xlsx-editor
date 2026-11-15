@@ -83,8 +83,13 @@ on the sheet copied from, the pasted cells join the rule itself, its formula as 
 so I5 reads I5>H5), and ranges that carry on one another are joined (`C2:C3 I5:I6 M5:M6 P5:P8 R5:R8`); a rule of
 the pasted-over cells loses them. Here (`clipops.js` pasteValidation, `dvedit.js` addToRule): Ctrl+V, Paste Special's
 All, All except borders and Validation do the same, Excel's file to the attribute (test/pastenotes.test.js); onto
-another sheet, a rule of its own, its formula moved as a copied formula is (`I5>H5`; not measured). Not with
-Transpose.
+another sheet, a rule of its own, its formula moved as a copied formula is (`I5>H5`; not measured).
+
+With Transpose (*measured*: A1:A3 or A1:B2 with a whole-number, custom or list rule, PasteSpecial All with Transpose at
+C1 or D1, the file saved): the same over the turned cells. On the sheet copied from they join the rule (`A1:A3
+C1:E1`, its formula as it was; A1:B2's two columns to rows 1 and 2, `D1:E1` and `D2:E2`), the pasted-over cells leave
+their rules (C1:F1's list keeps F1); onto another sheet a rule of its own, moved by the corner only (=A1>B1 over A1:A3
+turned to C1: =C1>D1 over C1:E1). Six cases, all the same here.
 
 ## A cut's notes and validation
 
@@ -123,8 +128,7 @@ a rule leaves the rule where it was (not measured).
 
 ## Not yet
 
-Validation with Transpose; validation
-pasted or cut onto another sheet measured against Excel; Paste
+Validation pasted or cut onto another sheet without Transpose measured against Excel; Paste
 Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
 program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was
 pasted onto (Excel shrinks it: `=SUM(A1:A3)` became `=SUM(A2:A3)` when A1 was moved onto A3).

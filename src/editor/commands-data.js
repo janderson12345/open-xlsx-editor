@@ -32,7 +32,7 @@ export function dataCommands(env) {
     if (!runSteps(steps)) return false;
     // (A cut: its notes and validation move, clipops.js moveCutParts.)
     const notes = copy.cut ? clip.moveCutParts(wb, si, area, copy) : parts.notes && clip.pasteNotes(wb, si, area, copy, opts);
-    const rules = !copy.cut && parts.validation && !opts.transpose && clip.pasteValidation(wb, si, area, copy);
+    const rules = !copy.cut && parts.validation && clip.pasteValidation(wb, si, area, copy, { transpose: !!opts.transpose });
     const cf = !copy.cut && parts.cf && clip.pasteConditionals(wb, si, area, copy, { merge: !!opts.merge, transpose: !!opts.transpose });
     if (!notes && !rules && !cf) return true;
     // (The steps' own entry gives way to one for the whole paste, notes and all.)
