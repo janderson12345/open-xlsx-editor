@@ -1,8 +1,11 @@
 # Changelog
 
-## 0.5.0
+## 0.5.1
 
-The first release. An editor for Excel workbooks that runs in the browser, matched to Excel by measuring Excel's own
+The first release on npm. (0.5.0 was tagged on GitHub but never published: its publish job stopped on a test, a
+complex number's 15th digit that differs between Node versions.)
+
+An editor for Excel workbooks that runs in the browser, matched to Excel by measuring Excel's own
 output. `docs/FEATURES.md` has the details, ribbon tab by ribbon tab.
 
 - **Opening and saving.** It opens .xlsx, .xlsm, .xltx, .xltm and .csv files, including workbooks saved with a
@@ -32,3 +35,5 @@ output. `docs/FEATURES.md` has the details, ribbon tab by ribbon tab.
   (`open-xlsx-editor-mcp`) let AI assistants read and edit workbooks, with every change reviewed before saving.
 - **Hosting.** One script and one stylesheet, run under a strict Content-Security-Policy, with nothing fetched from
   another host. There are light and dark themes, and keyboard and screen reader support checked with axe.
+- **Security.** No CodeQL code scanning or Dependabot alerts are open. Typed entries and formulas that could make
+  the parser slow are read in linear time, and rich text attributes are escaped (`test/scanning.test.js`).
