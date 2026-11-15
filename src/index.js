@@ -24,6 +24,7 @@ import { breaksRule } from './ooxml/validation.js';
 import { printAreaOf } from './ooxml/pagesetupedit.js';
 import { sheetProtection, workbookProtection, contentsHidden } from './ooxml/protection.js';
 import { conditionalLooks } from './ooxml/condformat.js';
+import { sparklineLooks } from './ooxml/sparklines.js';
 import { errorFlags, ERROR_RULES } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
 import { chartFigure } from './editor/chartview.js';
@@ -204,6 +205,8 @@ export function mountXlsxEditor(host, options = {}) {
     const charts = readCharts(state.workbook, state.sheetIndex).map((c, index) => ({ ...c, index })).filter((c) => c.kind);
     state.charts = charts;
     state.grid.setCharts(charts, state.workbook.theme);
+    // (The sheet's sparklines, with their data as it is now.)
+    state.grid.setSparklines(sparklineLooks(state.workbook, state.sheetIndex));
     let figures = root.querySelector(':scope > .oxe-chart-figures');
     if (!figures && charts.length) { figures = document.createElement('section'); figures.className = 'oxe-chart-figures'; figures.setAttribute('aria-label', 'Charts on this sheet'); root.append(figures); }
     figures?.replaceChildren(...charts.map(chartFigure));
@@ -542,7 +545,7 @@ export function mountXlsxEditor(host, options = {}) {
     preparePrint() {
       if (!state.workbook) return 0;
       const wb = state.workbook;
-      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex) });
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex), sparks: sparklineLooks(wb, state.sheetIndex) });
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },

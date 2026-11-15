@@ -8,6 +8,7 @@ import { stringItemText, stringItemRuns } from './strings.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { readColor } from './styles.js';
 import { readExtRules, readDataBar, readIconSet, extIdOf } from './cfext.js';
+import { readSparklines } from './sparklines.js';
 import { readFilterColumn } from './filtermore.js';
 
 /** A cell as stored: `t` its type (n number, s string, b boolean, e error, str formula text, d ISO date), `v` its
@@ -109,6 +110,7 @@ export function readSheet(doc, sst = []) {
     autoFilter: readAutoFilter(kid(root, 'autoFilter', ns), ns),
     condFormats: readCondFormats(root, ns),
     validations: readValidations(root, ns),
+    sparklines: readSparklines(root, ns),
     maxRow,
     maxCol,
   };

@@ -1854,6 +1854,11 @@
 .oxe-fill.oxe-cf-axis {
   box-sizing: border-box;
 }
+/* Sparklines (sparkview.js): an SVG the size of its cell, under the text, clipped to the cell. */
+.oxe-fill.oxe-spark {
+  overflow: hidden;
+  pointer-events: none;
+}
 .oxe-cell .oxe-cf-icon {
   position: absolute;
   left: 2px;

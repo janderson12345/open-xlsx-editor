@@ -237,19 +237,22 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
 /** Build the printed pages of a sheet into `root` (replacing any from before) and set the paper size for printing;
  *  `looks` gives cell format classes and decorations (cellstyles.js), `normalFamily` the Normal style's typeface (printed
  *  row heights depend on it), `print` its print area and titles (printarea.js printSetup) and, for headers and footers,
- *  `sheet` and `file` (names), `sizePt` (the Normal style's size) and `pictures` (hfpictures.js headerPictures). Returns the number of pages. */
+ *  `sheet` and `file` (names), `sizePt` (the Normal style's size) and `pictures` (hfpictures.js headerPictures), and
+ *  `sparks` (ooxml/sparklines.js sparklineLooks). Returns the number of pages. */
 export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, print = {}) {
   const screen = sheetGeometry(sheet);
   const auto = autoRowHeights(sheet, looks.deco, screen.cols);
   const full = sheetGeometry(sheet, { print: true, normalFamily, auto });
-  const range = print.area || { r0: 0, c0: 0, r1: Math.max(0, sheet.maxRow), c1: Math.max(0, sheet.maxCol) };
+  // (Cells holding only a sparkline are printed too, as Excel prints them: sparklines.xlsx's column O.)
+  const keys = [...(print.sparks?.keys() || [])].map((k) => k.split(',').map(Number));
+  const range = print.area || { r0: 0, c0: 0, r1: Math.max(0, sheet.maxRow, ...keys.map((k) => k[0])), c1: Math.max(0, sheet.maxCol, ...keys.map((k) => k[1])) };
   const scale = printScale(sheet, full, range);
   const geometry = scale === 1 ? full : sheetGeometry(sheet, { print: true, normalFamily, auto, scale });
-  const layout = { ...paginate(sheet, geometry, { ...print, scale }), sheet };
+  const layout = { ...paginate(sheet, geometry, { ...print, area: range, scale }), sheet };
   // (A print area of several ranges: each on pages of its own, in the order listed, as Excel prints them (its PDFs:
   // two ranges down or across, three out of order, with print titles over each); the scale is the first range's.)
   if (print.areas?.length > 1) layout.pages = print.areas.flatMap((a) => paginate(sheet, geometry, { ...print, area: a, scale }).pages);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), print: true };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), sparks: print.sparks, print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');

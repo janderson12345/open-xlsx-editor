@@ -128,6 +128,21 @@ async function drawPage(pdf, pageEl, ctx) {
       if (s === 'Right') line(X(r.right - w / 2), Y(r.top), X(r.right - w / 2), Y(r.bottom));
     }
   }
+  // Sparklines (sparkview.js): their SVG paths, at the cell's place and scale, clipped to the cell.
+  for (const svg of areaEl.querySelectorAll('svg.oxe-spark')) {
+    const r = svg.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    if (!r.width || !r.height || !vb?.width) continue;
+    const k = (r.width / vb.width) * PT;
+    page.pushOperators(...clipTo(r));
+    for (const p of svg.querySelectorAll('path')) {
+      const fill = hexColor(p.getAttribute('fill'));
+      const stroke = hexColor(p.getAttribute('stroke'));
+      if (!fill && !stroke) continue;
+      page.drawSvgPath(p.getAttribute('d'), { x: X(r.left), y: Y(r.top), scale: k, ...(fill ? { color: fill } : { borderColor: stroke, borderWidth: (parseFloat(p.getAttribute('stroke-width')) || 1) * k }) });
+    }
+    page.pushOperators(popGraphicsState());
+  }
   page.pushOperators(popGraphicsState());
   // 2. Text: each cell's text node, line by line, clipped to the cell (and the cell to the printable area); headers
   //    and footers.
@@ -191,6 +206,9 @@ async function drawPage(pdf, pageEl, ctx) {
     page.drawImage(ctx.images.get(img.src), { x: X(r.left), y: Y(r.bottom), width: r.width * PT, height: r.height * PT });
   }
 }
+
+/** '#RRGGBB' as a pdf-lib colour, or null. */
+const hexColor = (h) => (/^#[0-9a-f]{6}$/i.test(h || '') ? rgb(...[1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)) : null);
 
 /** A text node's pieces, one per line it's on (wrapped cell text): [{ text, r }]. */
 function pieces(t, rg) {
