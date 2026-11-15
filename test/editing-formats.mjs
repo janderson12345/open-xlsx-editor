@@ -1,6 +1,6 @@
 // Browser check of formats: rich text drawn, a row's and a column's own format (drawn, given by formatting whole
-// lines and the whole sheet), a row grown by its font, a .csv opened as Excel opens one, and notes and validation
-// pasted with their cells.
+// lines and the whole sheet), a row grown by its font, a .csv opened as Excel opens one, and notes, validation and
+// conditional formats pasted with their cells.
 // Run after `npm run build`: node test/editing-formats.mjs [outDir]
 import fs from 'node:fs';
 import { editingPage } from './editing-kit.mjs';
@@ -168,5 +168,41 @@ await page.keyboard.press('Control+v');
 const refsMoved = await noteRefs();
 await page.keyboard.press('Control+z');
 check(refsBefore === 'B2,F4' && refsMoved === 'B2,H4' && await noteRefs() === 'B2,F4', 'a note cut and pasted moves with its cell; Ctrl+Z puts it back', JSON.stringify({ refsBefore, refsMoved }));
+
+// Conditional formats copied with their cells (clipcf.js): on a new sheet, "cell value > 5" over A1:A3 (dark red
+// text); Paste Special lists Excel's twelve choices; Formats at C1 brings the rule (C1's 8 drawn by it), Values at E1
+// none; Ctrl+Z takes the Formats paste back.
+await page.evaluate(() => {
+  const o = window.oxe;
+  o.command('insertSheet');
+  for (const ref of ['A1', 'A2', 'A3', 'C1', 'C2', 'C3']) o.enter(ref, ref.startsWith('A') ? '7' : '8');
+  o.command('sheetChange', (wb, si) => { wb.setConditional(si, [{ r0: 0, c0: 0, r1: 2, c1: 0 }], { kind: 'cellIs', operator: 'greaterThan', f1: '5', preset: 'lightRed' }); return true; }, 'always');
+  o.select('A1'); o.command('extendTo', 2, 0);
+});
+const cfRanges = () => page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).condFormats.map((x) => x.ranges.map((a) => `${String.fromCharCode(65 + a.c0)}${a.r0 + 1}:${String.fromCharCode(65 + a.c1)}${a.r1 + 1}`).join(' ')).sort().join(','));
+const pasteAs = async (ref, label) => {
+  await page.evaluate((r) => window.oxe.select(r), ref);
+  await page.focus('.oxe-grid');
+  await page.keyboard.press('Control+Alt+v');
+  await page.waitForSelector('dialog.oxe-dialog >> text=All merging conditional formats');
+  const choices = await page.evaluate(() => [...document.querySelectorAll('dialog.oxe-dialog fieldset')][0].querySelectorAll('label').length);
+  await page.click(`dialog.oxe-dialog >> label:text-is("${label}")`);
+  await page.click('dialog.oxe-dialog >> button:text-is("OK")');
+  return choices;
+};
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+c');
+const choices = await pasteAs('C1', 'Formats');
+const afterFormats = await cfRanges();
+const drawn = await page.evaluate(() => document.querySelectorAll('.oxe-grid .oxe-cf-color').length);
+await pasteAs('E1', 'Values');
+const afterValues = await cfRanges();
+await page.keyboard.press('Control+z');
+await page.keyboard.press('Control+z');
+const undoneCf = await cfRanges();
+await page.keyboard.press('Escape');
+check(choices === 12 && afterFormats === 'A1:A3,C1:C3' && drawn >= 6 && afterValues === afterFormats && undoneCf === 'A1:A3',
+  'conditional formats: Paste Special\'s twelve choices; Formats brings the rule (the pasted cells drawn by it), Values none; Ctrl+Z takes it back',
+  JSON.stringify({ choices, afterFormats, drawn, afterValues, undoneCf }));
 
 await finish();

@@ -29,8 +29,9 @@ import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
 /** The Paste menu's choices, as Paste Special options. */
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
 /** Excel's Paste Special box: its Paste and Operation choices, by label, as clipops.js pasteSpecial's options. */
-const PASTE_CHOICES = { All: 'all', Formulas: 'formulas', Values: 'values', Formats: 'formats', 'Comments and Notes': 'comments', Validation: 'validation', 'All except borders': 'noBorders',
-  'Column widths': 'widths', 'Formulas and number formats': 'formulasFormats', 'Values and number formats': 'valuesFormats' };
+const PASTE_CHOICES = { All: 'all', Formulas: 'formulas', Values: 'values', Formats: 'formats', 'Comments and Notes': 'comments', Validation: 'validation',
+  'All using Source theme': 'theme', 'All except borders': 'noBorders', 'Column widths': 'widths', 'Formulas and number formats': 'formulasFormats', 'Values and number formats': 'valuesFormats',
+  'All merging conditional formats': 'merging' };
 const OPERATIONS = { None: null, Add: 'add', Subtract: 'subtract', Multiply: 'multiply', Divide: 'divide' };
 
 /** The actions: `env` is mountXlsxEditor's shared state and helpers (index.js). Returns each by name. */

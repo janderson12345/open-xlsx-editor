@@ -98,9 +98,32 @@ there as a copy's are (not measured).
 Cells taken out of a rule any other way (Data Validation's Clear All, a paste over them) rebase its formulas too when
 its first cell changes, as Excel's cut did.
 
+## Conditional formats (measured)
+
+Conditional formats come with their cells (`ooxml/clipcf.js`). Measured over COM in a hidden Excel: a copy and
+PasteSpecial (or a cut) in each case, then the conditionalFormatting in the file Excel saved; 22 cases, all the same
+here (`test/pastecf.test.js`).
+
+| Excel's rule | Excel's example |
+|---|---|
+| Paste, All, Formats, All except borders, All using Source theme and All merging conditional formats bring them, with Skip blanks or an operation too. Values, Formulas, the number-format pairs and Validation don't. | Values at C1: no rule there. |
+| The pasted cells first leave every rule over them; All merging conditional formats leaves those rules as they were. | A1:A3 pasted at E1 over E1:E4's rule: E4 keeps it; merging: E1:E4 keeps it. |
+| A rule that loses its first cell is written for its new one. | =E1>F1 over E1:E4, E1:E2 pasted over: =E3>F3 over E3:E4. |
+| Each conditionalFormatting the copy meets comes as a new one over the pasted cells: all its rules, their formats copied, their formulas moved as a copied formula moves, first in priority (the sheet's others that many later). | "> 5" and =A1>B1 over A1:A3, pasted at C1: C1:C3, =C1>D1, priorities 1 and 2; A1:A3's 3 and 4. |
+| On the sheet copied from, a rule over one row or one column, pasted along that line against or over it, takes the cells in instead, its formulas written for its new first cell. Otherwise a copy of its own. | A1:A3 at A4: A1:A6; A3:A4 at A1 of A3:A5: A1:A5 (=A1>B1); A1:C1 at D1: A1:F1. At B1, A5, B4: copies. A 2 by 2 rule: always a copy. |
+| With Transpose, the turned cells, the formulas moved by the corner only. | A1:A3 at C1: C1:E1, =C1>D1. |
+| To another sheet: a copy there; the sheet copied from as it was. | Sheet2!C1:C3, =C1>D1. |
+| A cut moves the rules over the cells cut, their formulas as a cut formula's. | =A1>B1 over A1:A3, cut to C1: C1:C3, =C1>B1. |
+
+Paste Special's box now has Excel's twelve choices, All using Source theme and All merging conditional formats
+among them; within one workbook the first pastes as All does (its theme is the same).
+
+Not yet: rules with Excel 2010's settings in the extLst (data bars, its icon sets) aren't brought; a cut of part of
+a rule leaves the rule where it was (not measured).
+
 ## Not yet
 
-Paste Special's All using Source theme and All merging conditional formats; validation with Transpose; validation
+Validation with Transpose; validation
 pasted or cut onto another sheet measured against Excel; Paste
 Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
 program's cells (only its text is read), defined names following a cut, and a range partly over the cells a cut was

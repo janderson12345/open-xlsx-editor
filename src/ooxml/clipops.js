@@ -10,6 +10,9 @@ import { readNotes } from './notes.js';
 import { setNote, deleteNote } from './noteedit.js';
 import { addThread, replyThread, resolveThread } from './threadedit.js';
 import { boxRule, coalesce } from './dvedit.js';
+import { copyConditionals, moveCutConditionals } from './clipcf.js';
+
+export { pasteConditionals } from './clipcf.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
 const inside = (a, b) => a.r0 >= b.r0 && a.r1 <= b.r1 && a.c0 >= b.c0 && a.c1 <= b.c1;
@@ -37,6 +40,8 @@ export function snapshot(wb, si, sel, cut = false) {
       .map(({ r, c, n }) => ({ dr: r - rect.r0, dc: c - rect.c0, ...(n.kind === 'thread' ? { thread: { items: n.items, resolved: !!n.resolved } } : { author: n.author, text: noteBody(n) }) })),
     // (The validation rules over the copied cells, each with the parts of it in the copy: a paste brings them.)
     validations: (sheet.validations || []).filter((v) => v.type !== 'none').map((v) => ({ v, parts: v.ranges.map((a) => clipTo(a, rect)).filter(Boolean) })).filter((x) => x.parts.length),
+    // (And the conditional formats over them, rules and formats: clipcf.js.)
+    conditionals: copyConditionals(wb, si, rect),
   };
 }
 
@@ -93,6 +98,7 @@ export function moveCutParts(wb, si, area, clip) {
     if (clip.validations?.length) { wb.setValidation(clip.si, [clip.rect], null); changed = true; }
     changed = pasteValidation(wb, si, area, clip) || changed;
   }
+  changed = moveCutConditionals(wb, si, area, clip) || changed;
   return changed;
 }
 

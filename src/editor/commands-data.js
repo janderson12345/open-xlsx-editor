@@ -19,10 +19,11 @@ export const MULTIPLE_MESSAGE = "This action won't work on multiple selections."
 
 export function dataCommands(env) {
   const { allowed, commands, ctx, state, sheet, show, runSteps, sizeStep, moved, idOf } = env;
-  /** Paste's steps run as one step of the history, the copy's notes and validation (`parts.notes`,
-   *  `parts.validation`: clipops.js pasteNotes, pasteValidation) put over the pasted cells too when `copy` is given
-   *  and has or meets any: then the step is the workbook before and after. */
-  function withNotes(steps, copy, opts = {}, parts = { notes: true, validation: true }) {
+  /** Paste's steps run as one step of the history, the copy's notes, validation and conditional formats
+   *  (`parts.notes`, `parts.validation`, `parts.cf`: clipops.js pasteNotes, pasteValidation, pasteConditionals; `opts.merge`
+   *  for All merging conditional formats) put over the pasted cells too when `copy` is given and has or meets any: then
+   *  the step is the workbook before and after. */
+  function withNotes(steps, copy, opts = {}, parts = { notes: true, validation: true, cf: true }) {
     const wb = ctx.workbook();
     const si = ctx.sheetIndex();
     const area = steps.find((x) => x.si === si)?.area;
@@ -32,7 +33,8 @@ export function dataCommands(env) {
     // (A cut: its notes and validation move, clipops.js moveCutParts.)
     const notes = copy.cut ? clip.moveCutParts(wb, si, area, copy) : parts.notes && clip.pasteNotes(wb, si, area, copy, opts);
     const rules = !copy.cut && parts.validation && !opts.transpose && clip.pasteValidation(wb, si, area, copy);
-    if (!notes && !rules) return true;
+    const cf = !copy.cut && parts.cf && clip.pasteConditionals(wb, si, area, copy, { merge: !!opts.merge, transpose: !!opts.transpose });
+    if (!notes && !rules && !cf) return true;
     // (The steps' own entry gives way to one for the whole paste, notes and all.)
     state.undo.pop();
     state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
@@ -88,11 +90,16 @@ export function dataCommands(env) {
         return sizeStep((book, k) => { for (const { c, width } of widths) book.setLines(k, 'col', c, c, { width }); }, 'Pasted column widths');
       }
       if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
-      const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste, op, skip, transpose });
+      // (All using Source theme and All merging conditional formats paste the cells as All does: within one workbook
+      // the theme is the same; the second leaves the rules already over the pasted cells.)
+      const cells = paste === 'theme' || paste === 'merging' ? 'all' : paste;
+      const steps = link ? clip.pasteLink(wb, si, state.sel, copy) : clip.pasteSpecial(wb, si, state.sel, copy, { paste: cells, op, skip, transpose });
       // (All and All except borders bring the copy's notes and validation, Comments and Notes and Validation each its
-      // own, as Excel's do.)
-      const parts = { notes: ['all', 'noBorders', 'comments'].includes(paste), validation: ['all', 'noBorders', 'validation'].includes(paste) };
-      if (!withNotes(steps, !link && (parts.notes || parts.validation) && !op && !skip ? copy : null, { transpose }, parts)) return false;
+      // own, as Excel's do; the conditional formats come with All, Formats and All except borders, with Skip blanks
+      // or an operation too, as Excel's did: clipcf.js.)
+      const plain = !op && !skip;
+      const parts = { notes: plain && ['all', 'noBorders', 'comments'].includes(cells), validation: plain && ['all', 'noBorders', 'validation'].includes(cells), cf: ['all', 'noBorders', 'formats'].includes(cells) };
+      if (!withNotes(steps, !link && (parts.notes || parts.validation || parts.cf) ? copy : null, { transpose, merge: paste === 'merging' }, parts)) return false;
       const area = steps[0].area;
       show({ ar: area.r0, ac: area.c0, ...area }, null, link ? 'Pasted links, ' : 'Pasted, ');
       return true;
