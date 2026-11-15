@@ -97,6 +97,36 @@ test('validation pasted with Transpose, as Excel\'s: the turned cells join the r
   assert.deepEqual(rules(custom.wb, other), ['C1:E1 | C1&gt;D1']);
 });
 
+test('validation copied or cut to another sheet, as Excel\'s: the same formulas there, the cut cells leaving their rules, the pasted-over cells theirs', async () => {
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const { moveCutParts } = await import('../src/ooxml/clipops.js');
+  const { parseRange } = await import('../src/ooxml/refs.js');
+  // (Excel: B2:B3 a list =$A$1:$A$3 and C2:C3 =C2>B2 (or =$E$1>C2), B2:C3 copied or cut to another sheet's H5; there,
+  // in one case, whole numbers over H5:K8. Its rules compared by the cells they cover and their first formula.)
+  const cellsOf = (sqref) => sqref.split(' ').flatMap((t) => { const a = parseRange(t); const out = []; for (let r = a.r0; r <= a.r1; r++) for (let c = a.c0; c <= a.c1; c++) out.push(`${r},${c}`); return out; }).sort().join(' ');
+  const rules = (wb, k) => [...serializeXml(wb._part(k).doc).matchAll(/<dataValidation [^>]*sqref="([^"]+)"[^>]*>(?:<formula1>([^<]*))?/g)].map((m) => `${cellsOf(m[1])} | ${m[2]}`).sort();
+  const want = (list) => list.map(([sq, f]) => `${cellsOf(sq)} | ${f}`).sort();
+  for (const [name, abs, cut, over, src, dest] of [
+    ['copy', false, false, false, [['B2:B3', '$A$1:$A$3'], ['C2:C3', 'C2&gt;B2']], [['I5:I6', 'I5&gt;H5'], ['H5:H6', '$A$1:$A$3']]],
+    ['cut', false, true, false, [], [['I5:I6', 'I5&gt;H5'], ['H5:H6', '$A$1:$A$3']]],
+    ['copy with $E$1', true, false, false, [['B2:B3', '$A$1:$A$3'], ['C2:C3', '$E$1&gt;C2']], [['I5:I6', '$E$1&gt;I5'], ['H5:H6', '$A$1:$A$3']]],
+    ['cut with $E$1', true, true, false, [], [['I5:I6', '$E$1&gt;I5'], ['H5:H6', '$A$1:$A$3']]],
+    ['copy over a rule', false, false, true, [['B2:B3', '$A$1:$A$3'], ['C2:C3', 'C2&gt;B2']], [['J5:K8 H7:I8', '1'], ['I5:I6', 'I5&gt;H5'], ['H5:H6', '$A$1:$A$3']]],
+  ]) {
+    const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+    const si = wb.addSheet(wb.sheets.length, 'Src');
+    const d = wb.addSheet(wb.sheets.length, 'Dest');
+    wb.setValidation(si, [{ r0: 1, c0: 1, r1: 2, c1: 1 }], { type: 'list', f1: '=$A$1:$A$3' });
+    wb.setValidation(si, [{ r0: 1, c0: 2, r1: 2, c1: 2 }], { type: 'custom', f1: abs ? '=$E$1>C2' : '=C2>B2' });
+    if (over) wb.setValidation(d, [{ r0: 4, c0: 7, r1: 7, c1: 10 }], { type: 'whole', op: 'between', f1: '1', f2: '9' });
+    const copy = snapshot(wb, si, { r0: 1, c0: 1, r1: 2, c1: 2 }, cut);
+    const area = { r0: 4, c0: 7, r1: 5, c1: 8 };
+    if (cut) moveCutParts(wb, d, area, copy); else pasteValidation(wb, d, area, copy);
+    assert.deepEqual(rules(wb, si), want(src), `${name}: the sheet copied from`);
+    assert.deepEqual(rules(wb, d), want(dest), `${name}: the sheet pasted on`);
+  }
+});
+
 test("a cut's notes and validation move with its cells, as Excel's (B2:C3 cut to E5: the note to E5, F6's gone; C2:C4's rule C4 F5:F6, =C4>B4; E5's rule gone)", async () => {
   const { serializeXml } = await import('../src/ooxml/xml.js');
   const { moveCutParts } = await import('../src/ooxml/clipops.js');
