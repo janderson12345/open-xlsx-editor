@@ -61,8 +61,9 @@ Excel's Flash Fill learns from more than these five patterns; others here may di
 The box asks for the Original data type (Delimited or Fixed width), as Excel's wizard does. Fixed width takes the
 column breaks typed as character places (Excel's wizard has a ruler to click), over a preview of the first five cells
 with a | at each break. Column data format is a list for each column the first five cells split into (Excel's wizard
-picks a column in its preview). Not here: Excel's own guess at the breaks, and Advanced's decimal and thousands
-separators.
+picks a column in its preview). Fixed width opens with breaks suggested where every one of the first cells has a
+space just before a character, as Excel's wizard suggests some; Excel's own rule for them isn't reachable over COM, so
+the suggestion is the editor's. Not here: Advanced's decimal and thousands separators.
 
 ## Move or Copy > Create a copy (a sheet tab's menu)
 

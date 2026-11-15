@@ -148,3 +148,10 @@ test("a copy's names: the source's local names, and a workbook-wide name referri
   const want = excel.copy.book.match(/<definedName[^>]*>[^<]*<\/definedName>/g).map((x) => { const m = /name="([^"]+)"(?: localSheetId="(\d+)")?>([^<]*)</.exec(x); return `${m[1]}@${m[2] ?? '-'}=${m[3]}`; }).sort();
   assert.deepEqual(names, want);
 });
+
+test('Text to Columns, Fixed width: breaks suggested where every line has a space before a field', async () => {
+  const { guessBreaks } = await import('../src/ooxml/datatools.js');
+  assert.deepEqual(guessBreaks(['ABC  12345 x', 'DE   678   y', 'XYZ  0000  z']), [5, 11]);
+  assert.deepEqual(guessBreaks(['one']), []);
+  assert.deepEqual(guessBreaks([]), []);
+});

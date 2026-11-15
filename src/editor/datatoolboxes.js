@@ -4,7 +4,7 @@
 import { modal, button } from './dialogs.js';
 import { make, check, select, labelled } from './formatbox-kit.js';
 import { parseRef } from '../ooxml/refs.js';
-import { splitLine } from '../ooxml/datatools.js';
+import { splitLine, guessBreaks } from '../ooxml/datatools.js';
 
 const radios = (id, name, pairs, value) => {
   const inputs = {};
@@ -82,7 +82,8 @@ export function textToColumnsBox(root, { dest, lines = [] }) {
     const quote = select([['"', '"'], ["'", "'"], ['', '{none}']], '"');
     const delimited = make('div', {}, make('fieldset', {}, make('legend', { textContent: 'Delimiters' }), tab.el, semicolon.el, comma.el, space.el, labelled('Other:', other)), consecutive.el,
       labelled('Text qualifier:', quote));
-    const breaks = make('input', { type: 'text', className: 'oxe-dialog-field', spellcheck: false, placeholder: '10, 20' });
+    // (The breaks suggested from the first lines, as Excel's wizard suggests some: datatools.js guessBreaks.)
+    const breaks = make('input', { type: 'text', className: 'oxe-dialog-field', spellcheck: false, placeholder: '10, 20', value: guessBreaks(lines).join(', ') });
     const preview = make('pre', { className: 'oxe-ttc-preview' });
     preview.setAttribute('aria-label', 'Data preview');
     const places = () => breaks.value.split(/[\s,;]+/).filter(Boolean).map(Number);

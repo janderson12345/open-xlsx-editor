@@ -158,6 +158,19 @@ function orderedDate(text, order, date1904) {
   return dateSerial(fullYear(v.y), Number(v.m), Number(v.d), date1904);
 }
 
+/** Column breaks to suggest for Fixed width, as Excel's wizard suggests some when it opens (its rule isn't reachable
+ *  over COM, so this is the editor's own): a break at each place where every line has a space just before and some
+ *  line has a character, after the first character of every line. */
+export function guessBreaks(lines) {
+  const texts = lines.filter((t) => t.trim());
+  if (!texts.length) return [];
+  const width = Math.max(...texts.map((t) => t.length));
+  const blank = (k) => texts.every((t) => k >= t.length || t[k] === ' ');
+  const out = [];
+  for (let k = 1; k < width; k++) if (blank(k - 1) && !blank(k)) out.push(k);
+  return out;
+}
+
 /**
  * Data > Text to Columns on the one-column `range` of sheet si: each cell split (`delimiters` { tab, semicolon,
  * comma, space, other }, `consecutive`, `quote`), the pieces written across from `dest` ({ r, c }: the range's own
