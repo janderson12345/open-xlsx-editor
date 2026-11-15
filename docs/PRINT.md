@@ -32,6 +32,12 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
 - **Text in scaled cells** sits further in and lower than the scale alone puts it: 1.4px × (1 − scale) across (the
   3.2px left padding becomes 1.4 + 1.8 × scale px) and 1.2px × (1 − scale) down. In the zoomed box the browser draws
   baselines up to a pixel higher than placed, half a pixel on average, so half a pixel more is added.
+- **Center on page.** Each page's cells (its print titles with them) sit in the middle of the room between its margins,
+  a point short of it each way: centered horizontally, 1, 3 and 8 columns, portrait and landscape, every cell 1.2 to
+  1.3px left of the middle; vertically the same above it (workbooks made in code, printed by Excel; `..
+uns\center`
+  and `center2`: 252 of 252 cells within 1px across, vertical centering within 0.2px of Excel's, beyond the baseline
+  difference below). Read from printOptions' horizontalCentered and verticalCentered.
 - **Print titles** print only for the page's own columns. With a print area of B3:H70, rows 1:2 print as B1:E2 above
   the B:E pages.
 - **Headers and footers.** They use the Normal style's font and size, scaled with the sheet unless `scaleWithDoc` is
@@ -54,6 +60,7 @@ sets the same name), then the file saved (`test/pagesetupedit.test.js`).
 | Margins: all six in pageMargins, inches; Excel's presets Normal (0.7 sides, 0.75 top and bottom, 0.3 header and footer), Wide (1, 0.5), Narrow (0.25 sides). | `<pageMargins left="1" right="1" top="1" bottom="1" header="0.5" footer="0.5"/>`. |
 | Orientation and Size: orientation always written once pageSetup is, paperSize unless Letter (1). | `<pageSetup paperSize="9" orientation="portrait"/>` for A4; `orientation="landscape"`. |
 | Scale to Fit: fitting is `fitToPage="1"` in sheetPr's pageSetUpPr, fitToWidth and fitToHeight written unless 1, Automatic as 0; a scale takes fit to pages off, sheetPr with it when left empty. | Width 1, Height Automatic: `fitToHeight="0"`; Width Automatic, Height 2: `fitToWidth="0" fitToHeight="2"`; 75%: `scale="75"`. |
+| Custom margins (Margins > Custom Margins..., Excel's Page Setup box at its Margins tab) written as typed; Center on page in printOptions, before its headings and gridLines; Page order (the Sheet tab) as pageOrder, left out for Down, then over. | `<pageMargins left="0.6" right="1.25" top="0.33" bottom="2" header="0.1" footer="0"/>`, `<printOptions horizontalCentered="1" verticalCentered="1"/>`, `pageOrder="overThenDown"`. |
 | Print Titles (Page Layout > Print Titles, Excel's Page Setup box at its Sheet tab): the sheet's own name _xlnm.Print_Titles, columns first, then rows; rows typed "1:2" or a range's rows; a lone row refused; neither, the name gone. | `'Q1 Plan'!$A:$B,'Q1 Plan'!$1:$2`; "B2:C4" for rows: `$2:$4`; "$3": refused. |
 | Set Print Area: the selection, the sheet's own name _xlnm.Print_Area, $-absolute with the sheet's name; Add to Print Area (offered once there is one) adds the selection after a comma; Clear Print Area takes the name away. | `'My Data'!$B$2:$D$5`, `'My Data'!$B$2:$D$5,'My Data'!$F$7:$G$8`, one cell `'My Data'!$C$3`. |
 
@@ -77,3 +84,8 @@ ones as before it (docs/LAYOUT.md).
 Not yet: a print area of several ranges (only the first prints), "Center on page", gridlines and row and column
 headings in print, pictures in headers (`&G`), headers of more than one line, and the first-page and even-page
 options beyond choosing their text (measured only with odd pages).
+
+## Open differences
+
+- A workbook made from a CSV (csv.js csvWorkbook) prints its text baselines 0.95px higher than Excel's PDF of the same
+  file, centered or not (found measuring Center on page); the fixtures' own workbooks print within 1px.

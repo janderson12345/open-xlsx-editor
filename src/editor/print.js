@@ -69,7 +69,7 @@ export function paginate(sheet, geometry = sheetGeometry(sheet, { print: true })
   const add = ([r0, r1], [c0, c1]) => pages.push({ r0, r1, c0, c1 });
   if (page.pageOrder === 'overThenDown') for (const rr of rowRuns) for (const cr of colRuns) add(rr, cr);
   else for (const cr of colRuns) for (const rr of rowRuns) add(rr, cr);
-  return { pages, paper: { w: pw * DPI, h: ph * DPI }, area, scale, titles };
+  return { pages, paper: { w: pw * DPI, h: ph * DPI }, area, scale, titles, center: { h: !!page.centerH, v: !!page.centerV } };
 }
 
 /**
@@ -175,7 +175,15 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
   const pageEl = div('oxe-page');
   setVars(pageEl, { '--oxe-page-w': layout.paper.w, '--oxe-page-h': layout.paper.h });
   const area = div('oxe-page-area');
-  setVars(area, { '--oxe-ml': layout.area.x, '--oxe-mt': layout.area.y, '--oxe-aw': layout.area.w, '--oxe-ah': layout.area.h });
+  // (Center on page, Horizontally and Vertically: each page's cells in the middle of the room between its margins, a
+  // point short of it, as Excel's PDFs have them: 1, 3 and 8 columns, portrait and landscape, each 1.2 to 1.3px left of
+  // the middle, and as much above it.)
+  const { rows: tr0, cols: tc0 } = layout.titles;
+  const wide = ((tc0 && block.c0 > tc0[1] ? span(st.cols, tc0[0], tc0[1]) : 0) + span(st.cols, block.c0, block.c1)) * layout.scale;
+  const tall = ((tr0 && block.r0 > tr0[1] ? span(st.rows, tr0[0], tr0[1]) : 0) + span(st.rows, block.r0, block.r1)) * layout.scale;
+  const dx = layout.center?.h ? Math.max(0, (layout.area.w - wide) / 2 - ROOM_LESS) : 0;
+  const dy = layout.center?.v ? Math.max(0, (layout.area.h - tall) / 2 - ROOM_LESS) : 0;
+  setVars(area, { '--oxe-ml': layout.area.x + dx, '--oxe-mt': layout.area.y + dy, '--oxe-aw': layout.area.w - dx, '--oxe-ah': layout.area.h - dy });
   const box = div('oxe-page-zoom');
   setVars(box, { '--oxe-zw': layout.area.w / layout.scale, '--oxe-zh': layout.area.h / layout.scale });
   box.style.setProperty('--oxe-zoom', String(layout.scale)); // (a number: setVars gives pixels)

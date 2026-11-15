@@ -234,6 +234,8 @@ function readPageSetup(root, ns) {
     margins: { left: margin('left', 0.7), right: margin('right', 0.7), top: margin('top', 0.75), bottom: margin('bottom', 0.75), header: margin('header', 0.3), footer: margin('footer', 0.3) },
     gridLines: on(po, 'gridLines'),
     headings: on(po, 'headings'),
+    centerH: on(po, 'horizontalCentered'),
+    centerV: on(po, 'verticalCentered'),
     pageOrder: attr(ps, 'pageOrder') || 'downThenOver',
     fitToWidth: Number(attr(ps, 'fitToWidth') ?? 1),
     fitToHeight: Number(attr(ps, 'fitToHeight') ?? 1),
