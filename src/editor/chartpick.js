@@ -61,7 +61,13 @@ export function chartPicker({ grid, charts, act, menu, readOnly }) {
     const ch = charts().find((c) => c.index === k);
     drag = { k, handle: e.target.dataset?.h || null, x: e.clientX, y: e.clientY, rect: rectOf(ch), box, moved: false };
   }, true);
-  view.addEventListener('contextmenu', (e) => { if (e.target.closest?.('.oxe-chart')) e.preventDefault(); }, true);
+  // (The right click's own contextmenu event, on Windows after the button is let go: the chart's menu is open already,
+  // so neither the browser's menu nor the grid's cell menu opens over it.)
+  view.addEventListener('contextmenu', (e) => {
+    if (!e.target.closest?.('.oxe-chart')) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, true);
   const onMove = (e) => {
     if (!drag) return;
     const z = (grid.view().zoom || 100) / 100;

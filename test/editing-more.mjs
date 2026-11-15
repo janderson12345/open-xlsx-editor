@@ -266,6 +266,15 @@ const chartGone = await chartsNow();
 await page.keyboard.press('Control+z');
 await page.waitForSelector('.oxe-chart');
 check(chartGone === '' && await chartsNow() === '0', 'Delete deletes the picked chart; Ctrl+Z brings it back', `${chartGone} / ${await chartsNow()}`);
+// (A right click on the chart, pressed and let go: its own menu stays open, not the cell menu, which the contextmenu
+// event that follows the button's release used to open over it.)
+const chartBox1 = await page.locator('.oxe-chart').boundingBox();
+await page.mouse.click(chartBox1.x + 60, chartBox1.y + 60, { button: 'right' });
+await page.waitForSelector('.oxe-menu');
+const chartMenuItems = await page.evaluate(() => [...document.querySelectorAll('.oxe-menu .oxe-menuitem')].map((b) => b.textContent.trim()));
+check(chartMenuItems.includes('Edit Chart...') && !chartMenuItems.some((t) => /^Cut/.test(t)) && await page.locator('.oxe-menu').count() === 1,
+  'right click on a chart, let go: the chart\'s menu (Edit Chart..., Delete), not the cell menu', chartMenuItems.join(' | '));
+await page.keyboard.press('Escape');
 
 // A comment thread (Ctrl+Alt+M) on B2 of a new sheet: posted, replied to, the reply edited, then deleted; the thread
 // read back from the workbook at each step, and Ctrl+Z undoing the deletion.

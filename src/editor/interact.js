@@ -363,6 +363,8 @@ export function attachEditing(root, ctx) {
   view.addEventListener('contextmenu', (e) => {
     // (The menu key's own event, at no pointer: the keydown above opened the menu already.)
     if (e.target === view && e.clientX === 0 && e.clientY === 0 && e.button === 0) { e.preventDefault(); return; }
+    // (On a chart: the chart's menu, chartpick.js, not the cell's under it.)
+    if (e.target.closest?.('.oxe-chart')) { e.preventDefault(); return; }
     const at = grid.hitTest(e.clientX, e.clientY);
     if (at && at.r >= 0 && at.c >= 0) {
       e.preventDefault();
