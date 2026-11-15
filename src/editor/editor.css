@@ -498,8 +498,8 @@
   color: #000000;
 }
 .oxe-hf-left { left: var(--oxe-hf-left); }
-.oxe-hf-right { right: calc(var(--oxe-page-w) - var(--oxe-hf-left)); }
-.oxe-hf-center { left: var(--oxe-hf-left); translate: -50% 0; }
+.oxe-hf-right { right: calc(var(--oxe-page-w) - var(--oxe-hf-left)); text-align: right; }
+.oxe-hf-center { left: var(--oxe-hf-left); translate: -50% 0; text-align: center; }
 .oxe-hf span { font-size: var(--oxe-hf-run-size, inherit); font-family: var(--oxe-hf-run-font, inherit); color: var(--oxe-hf-run-color, inherit); }
 .oxe-hf .oxe-hf-b { font-weight: bold; }
 .oxe-hf .oxe-hf-i { font-style: italic; }

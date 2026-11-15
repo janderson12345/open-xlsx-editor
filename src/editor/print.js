@@ -8,7 +8,8 @@ import { cellElement, mergeAt, fitNumbers } from './cells.js';
 import { setVars, div } from './dom.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
-import { fontStack } from './fonts.js';
+import { fontStack, fontRowPx } from './fonts.js';
+import { printRowPx } from '../ooxml/units.js';
 import { setSheet } from './sheets.js';
 import { parseHeaderFooter, fillFields } from '../ooxml/headerfooter.js';
 import { colName } from '../ooxml/refs.js';
@@ -174,9 +175,24 @@ function drawHeaderFooter(pageEl, which, k, layout, hf) {
   for (const [name, runs] of Object.entries(sections)) {
     if (!runs.length) continue;
     const el = div(`oxe-hf oxe-hf-${name}`);
-    setVars(el, { '--oxe-hf-top': y - asc, '--oxe-hf-lh': asc + desc, '--oxe-hf-left': name === 'left' ? left : name === 'right' ? right : layout.paper.w / 2 });
+    // (A section of several lines, as Excel prints one (its PDFs: two and three lines, 11 and 14pt, header and
+    // footer): the lines a printed row of their size apart; a header's first baseline 1.014em below its margin, a
+    // footer's last 0.361em above it, the lines before it above; no inset from the margin at the left or right.)
+    const lines = runs.map((r) => r.text).join('').split('\n').length;
+    if (lines > 1) {
+      const size = Math.max(basePt, ...runs.map((r) => r.size || 0));
+      const pitch = printRowPx(fontRowPx(hf.family || 'Calibri', (size * 4) / 3) * 0.75, hf.family) * scale;
+      const sem = px(size);
+      const first = which === 'header' ? m.header * DPI + 1.014 * sem : layout.paper.h - m.footer * DPI - 0.361 * sem - (lines - 1) * pitch;
+      // (The section in its own size, so that its lines are the pitch apart, its ascent and descent with it.)
+      const k = sem / em;
+      const inBox = (pitch - (asc + desc) * k) / 2 + asc * k;
+      setVars(el, { '--oxe-hf-top': first - inBox, '--oxe-hf-lh': pitch, '--oxe-hf-left': name === 'left' ? left - inset : name === 'right' ? right + inset : layout.paper.w / 2 });
+      el.dataset.size = String(sem);
+    } else setVars(el, { '--oxe-hf-top': y - asc, '--oxe-hf-lh': asc + desc, '--oxe-hf-left': name === 'left' ? left : name === 'right' ? right : layout.paper.w / 2 });
     el.style.setProperty('--oxe-hf-font', fontStack(hf.family || 'Calibri'));
-    el.style.setProperty('--oxe-hf-size', `${em}px`);
+    el.style.setProperty('--oxe-hf-size', `${el.dataset.size ? Number(el.dataset.size) : em}px`);
+    delete el.dataset.size;
     for (const r of fillFields(runs, { page: k + 1, pages: layout.pages.length, sheet: hf.sheet, file: hf.file })) {
       const span = document.createElement('span');
       span.textContent = r.text;

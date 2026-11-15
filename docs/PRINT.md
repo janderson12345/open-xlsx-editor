@@ -57,6 +57,12 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   off. The header's baseline is 1.05em below the header margin, and the footer's 0.436em above the footer margin. The
   left section starts 1.25px inside the left margin, the right section ends 1.25px inside the right margin, and the
   centre is centred on the page.
+- **Headers and footers of several lines** (a line break in a section): the lines a printed row of their size apart
+  (20.3px at 11pt, 25.4px at 14pt); a header's first baseline 1.014em below the header margin, a footer's last 0.361em
+  above the footer margin and the lines before it above; each line centred in a centre section, right-aligned in a
+  right one; a left or right section of several lines starts at the margin itself, not 1.25px in (workbooks made in
+  code, one to three lines, `..\runs\hf2`: 198 of 198 text pieces within 1px both ways, single-line headers as
+  they were).
 
 ## Setting them (measured)
 
@@ -94,6 +100,5 @@ there.
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
 
-Not yet: pictures in headers
-(`&G`), headers of more than one line, and the first-page and even-page options beyond choosing their text (measured
+Not yet: pictures in headers (`&G`), and the first-page and even-page options beyond choosing their text (measured
 only with odd pages).
