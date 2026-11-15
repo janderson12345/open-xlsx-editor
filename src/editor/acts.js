@@ -96,6 +96,13 @@ export function createActs(env) {
     if (name === 'zoomSelection') return editing().run('zoomToSelection');
     if (name === 'find' || name === 'replace') return state.find?.open(name === 'replace');
     if (name === 'rowHeightBox' || name === 'columnWidthBox') return sizeBox(name === 'rowHeightBox' ? 'row' : 'col');
+    if (name === 'defaultWidthBox') {
+      // (Excel's Standard Width box, holding the sheet's default width in characters.)
+      if (state.readOnly) return false;
+      const value = Math.max(0, state.grid.geometry().cols.base - 5) / 7;
+      return numberBox(root, { title: 'Standard Width', label: 'Standard column width:', value: String(Math.round(value * 100) / 100), max: 255, refusal: 'Column width must be between 0 and 255.' })
+        .then((n) => (n == null ? false : editing().run('defaultWidth', n)));
+    }
     if (name === 'clipCopy' || name === 'clipCut') return state.editing.copyOut(name === 'clipCut');
     if (name === 'clipPaste') return state.editing.pasteIn();
     if (name === 'formatPainter') return painter.toggle();

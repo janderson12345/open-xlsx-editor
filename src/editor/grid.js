@@ -444,6 +444,16 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** The pixels AutoFit gives column c: its widest text as shown (a General number in full, the longest line of
      *  wrapped text), measured in each cell's font, plus 9 of padding (docs/SIZES.md); null when the column is empty. */
     fitWidth(c) { return columnFitWidth(st, c); },
+    /** AutoFit Row Height's height for row r when wrapped text (merged cells aside) makes it taller than the sheet's
+     *  default, in points, which Excel writes (excel-sizes2.ps1: ht="150" without customHeight); else null. */
+    fitHeight(r) {
+      const line = st.sheet.cells.get(r);
+      const merged = (c) => st.sheet.merges.some((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
+      if (!line || ![...line].some(([c, cell]) => cell.v != null && !merged(c) && st.deco?.(cell.s || 0)?.align?.wrap)) return null;
+      const sheet = { ...st.sheet, rows: new Map([...st.sheet.rows].map(([k, x]) => [k, k === r ? { ...x, customHeight: false } : x])) };
+      const pt = autoRowHeights(sheet, st.deco, sheetGeometry(st.sheet).cols).get(r);
+      return pt > st.sheet.format.defaultRowHeight ? Math.round(pt * 4) / 4 : null;
+    },
     /** The sheet read again (rows or columns inserted or deleted, or undone): drawn where the view is. */
     setModel(next) {
       measure(next, { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt, runStyle: st.runStyle });

@@ -390,6 +390,7 @@ export function mountXlsxEditor(host, options = {}) {
           toggleNote: () => { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); },
           editNote: () => act('editNote'),
           fitWidth: (c) => state.grid.fitWidth(c),
+          fitHeight: (r) => state.grid.fitHeight(r),
           find: (replace) => state.find?.open(replace),
           shownText: (r, c) => state.grid.shownText(r, c),
           allowed,

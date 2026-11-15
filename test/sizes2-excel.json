@@ -1,0 +1,162 @@
+[
+ {
+  "name": "default width 12",
+  "sheetFormatPr": "<sheetFormatPr defaultColWidth=\"12.7109375\" defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "<cols><col min=\"3\" max=\"3\" width=\"20.7109375\" customWidth=\"1\"/></cols>",
+  "rows": "<row r=\"1\" spans=\"1:1\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 12.0,
+   "B": 12.0,
+   "D": 12.0,
+   "row1": 15.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 12.0,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "default width 4.5",
+  "sheetFormatPr": "<sheetFormatPr defaultColWidth=\"5.28515625\" defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "",
+  "rows": "<row r=\"1\" spans=\"1:1\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 4.57,
+   "B": 4.57,
+   "D": 4.57,
+   "row1": 15.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 4.57,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "whole sheet row height 21",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"21\" customHeight=\"1\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "",
+  "rows": "<row r=\"1\" spans=\"1:1\" ht=\"21\" customHeight=\"1\" x14ac:dyDescent=\"0.25\"><row r=\"3\" spans=\"1:1\" ht=\"21\" customHeight=\"1\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 8.43,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 21.0,
+   "row2": 21.0,
+   "row5": 21.0,
+   "standard": 8.43,
+   "standardHeight": 21.0
+  }
+ },
+ {
+  "name": "whole sheet row height then one row",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"21\" customHeight=\"1\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "",
+  "rows": "<row r=\"1\" spans=\"1:1\" ht=\"21\" customHeight=\"1\" x14ac:dyDescent=\"0.25\"><row r=\"2\" spans=\"1:1\" ht=\"30\" customHeight=\"1\" x14ac:dyDescent=\"0.25\"/>",
+  "seen": {
+   "A": 8.43,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 21.0,
+   "row2": 30.0,
+   "row5": 21.0,
+   "standard": 8.43,
+   "standardHeight": 21.0
+  }
+ },
+ {
+  "name": "autofit column with a merged cell",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "<cols><col min=\"1\" max=\"1\" width=\"5.5703125\" bestFit=\"1\" customWidth=\"1\"/></cols>",
+  "rows": "<row r=\"1\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><row r=\"2\" spans=\"1:3\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 4.86,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 15.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 8.43,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "autofit column with wrapped text",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "<cols><col min=\"1\" max=\"1\" width=\"8.140625\" bestFit=\"1\" customWidth=\"1\"/></cols>",
+  "rows": "<row r=\"1\" spans=\"1:1\" ht=\"150\" x14ac:dyDescent=\"0.25\"><row r=\"2\" spans=\"1:1\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 7.43,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 150.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 8.43,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "autofit column with a wrapped line break",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "<cols><col min=\"1\" max=\"1\" width=\"8.5703125\" bestFit=\"1\" customWidth=\"1\"/></cols>",
+  "rows": "<row r=\"1\" spans=\"1:1\" ht=\"60\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 7.86,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 60.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 8.43,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "autofit row with wrapped text",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "",
+  "rows": "<row r=\"1\" spans=\"1:1\" ht=\"150\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 8.43,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 150.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 8.43,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "autofit row with a merged wrapped cell",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "",
+  "rows": "<row r=\"1\" spans=\"1:2\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 8.43,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 15.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 8.43,
+   "standardHeight": 15.0
+  }
+ },
+ {
+  "name": "autofit row with a merged wrapped cell and a wrapped one",
+  "sheetFormatPr": "<sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/>",
+  "cols": "",
+  "rows": "<row r=\"1\" spans=\"1:4\" ht=\"45\" x14ac:dyDescent=\"0.25\">",
+  "seen": {
+   "A": 8.43,
+   "B": 8.43,
+   "D": 8.43,
+   "row1": 45.0,
+   "row2": 15.0,
+   "row5": 15.0,
+   "standard": 8.43,
+   "standardHeight": 15.0
+  }
+ }
+]

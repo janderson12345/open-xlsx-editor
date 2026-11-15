@@ -415,13 +415,23 @@ export function createCommands(ctx) {
     },
     rowHeight(points) {
       const [a, b] = linesOf('row');
+      // (Every row selected: the sheet's own row height, as Excel writes it, sizes.js setSheetRowHeight.)
+      const s = state.sel;
+      if (s.r0 === 0 && s.r1 >= MAX_ROWS - 1 && s.c0 === 0 && s.c1 >= MAX_COLS - 1 && points > 0) return sizeStep((wb, si) => wb.setSheetSizes(si, { rowHeight: points }), 'Row height changed', 'formatRows');
       return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: points }), 'Row height changed', 'formatRows');
     },
+    /** Format > Default Width...: every column without a width of its own `chars` wide (sizes.js setDefaultWidth). */
+    defaultWidth(chars) { return sizeStep((wb, si) => wb.setSheetSizes(si, { defaultWidth: chars }), 'Default width changed'); },
     /** AutoFit: columns as wide as their widest text (an empty one left as it is); rows back to the height their text
      *  needs. A heading edge's double click fits line `index` (or the selected lines it is one of). */
     fitLines(axis, index = null) {
       const [a, b] = linesOf(axis, index);
-      if (axis === 'row') return sizeStep((wb, si) => wb.setLines(si, 'row', a, b, { height: null }), 'Row height fitted', 'formatRows');
+      if (axis === 'row') {
+        // (Rows that wrapped text makes taller get the height found, as Excel writes it; the others none.)
+        const fitted = [];
+        for (let r = a; r <= Math.min(b, a + 5000); r++) { const pt = ctx.fitHeight?.(r); if (pt) fitted.push([r, pt]); }
+        return sizeStep((wb, si) => { wb.setLines(si, 'row', a, b, { height: null }); for (const [r, pt] of fitted) wb.setLines(si, 'row', r, r, { fitted: pt }); }, 'Row height fitted', 'formatRows');
+      }
       const widths = [];
       for (let c = a; c <= b; c++) { const px = ctx.fitWidth?.(c); if (px) widths.push([c, px]); }
       if (!widths.length) return false;

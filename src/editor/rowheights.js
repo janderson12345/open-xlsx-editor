@@ -5,27 +5,30 @@
 import { fontRowPx, fontDescentPx } from './fonts.js';
 
 let ctx = null;
-/** Lines a wrapped text takes in `width` px: words greedily, broken at spaces and at line breaks, measured in the
- *  cell's font. Without a canvas (Node) only line breaks count. */
-export function countLines(text, font, width) {
+/** The lines a wrapped text breaks into in `width` px: words greedily, broken at spaces and at line breaks, measured
+ *  in the cell's font. Without a canvas (Node) only line breaks count. */
+export function wrapLines(text, font, width) {
   const paragraphs = String(text).replace(/\r/g, '').split('\n');
-  if (typeof document === 'undefined') return paragraphs.length;
+  if (typeof document === 'undefined') return paragraphs;
   ctx = ctx || document.createElement('canvas').getContext('2d');
   ctx.font = font;
-  let lines = 0;
+  const out = [];
   for (const para of paragraphs) {
     let line = '';
-    lines++;
     for (const word of para.split(' ')) {
       const next = line ? `${line} ${word}` : word;
       if (line && ctx.measureText(next).width > width) {
-        lines++;
+        out.push(line);
         line = word;
       } else line = next;
     }
+    out.push(line);
   }
-  return lines;
+  return out;
 }
+
+/** How many lines a wrapped text takes in `width` px (wrapLines). */
+export const countLines = (text, font, width) => wrapLines(text, font, width).length;
 
 /** Each row's baseline: the Windows descent (px) of the tallest font among its cells (styled empty ones count), for
  *  every row with cells. Excel puts all the bottom-aligned text of a row on that one baseline (its PDF of rows.xlsx:

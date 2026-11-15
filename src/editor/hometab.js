@@ -124,7 +124,7 @@ export function homeTab(kit, { act, color }) {
       sheetMenu('🗑', 'Delete', 'Delete', () => [item('Delete Cells...', f('deleteCells'), { hint: 'Ctrl+-' }), item('Delete Sheet Rows', f('deleteRows')), item('Delete Sheet Columns', f('deleteColumns')),
         item('Delete Sheet', f('deleteShownSheet'))]),
       sheetMenu('✎', 'Format', 'Format', () => [el('div', { class: 'oxe-cap' }, 'Cell Size'), item('Row Height...', f('rowHeightBox')), item('AutoFit Row Height', f('fitLines', 'row')),
-        item('Column Width...', f('columnWidthBox')), item('AutoFit Column Width', f('fitLines', 'col')), el('hr'),
+        item('Column Width...', f('columnWidthBox')), item('AutoFit Column Width', f('fitLines', 'col')), item('Default Width...', f('defaultWidthBox')), el('hr'),
         el('div', { class: 'oxe-cap' }, 'Visibility'), item('Hide Rows', f('hideLines', 'row', true), { hint: 'Ctrl+9' }), item('Hide Columns', f('hideLines', 'col', true), { hint: 'Ctrl+0' }),
         item('Unhide Rows', f('hideLines', 'row', false), { hint: 'Ctrl+Shift+9' }), item('Unhide Columns', f('hideLines', 'col', false)),
         item('Hide Sheet', f('hideShownSheet')), item('Unhide Sheet...', f('unhideSheet')), el('hr'),

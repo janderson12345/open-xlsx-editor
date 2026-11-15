@@ -7,6 +7,7 @@ import { editText } from '../ooxml/input.js';
 import { ERROR_TEXT } from '../ooxml/errorcheck.js';
 import { colChars } from '../ooxml/units.js';
 import { MDW } from './geometry.js';
+import { wrapLines } from './rowheights.js';
 import { setVars, div } from './dom.js';
 import { iconElement } from './cficons.js';
 
@@ -234,9 +235,10 @@ export function fitNumbers(container) {
   }
 }
 
-/** The pixels AutoFit gives column c of the grid's sheet (`st`): its widest text as shown (a General number in full,
- *  the longest line of wrapped text), measured in each cell's font, plus 9 of padding (docs/SIZES.md); null when the
- *  column is empty. */
+/** The pixels AutoFit gives column c of the grid's sheet (`st`): its widest text as shown (a General number in full;
+ *  wrapped text, the longest line it breaks into at the column's width now, as Excel's AutoFit (excel-sizes2.ps1)),
+ *  measured in each cell's font, plus 9 of padding (docs/SIZES.md); merged cells left out, as Excel does; null when
+ *  the column is empty. */
 export function columnFitWidth(st, c) {
     if (!fitCtx) fitCtx = document.createElement('canvas').getContext('2d');
     let widest = 0;
@@ -247,7 +249,8 @@ export function columnFitWidth(st, c) {
       const text = cellDisplay(cell, Infinity, look ? look.code : 'General', st.date1904).text;
       if (!text) continue;
       fitCtx.font = look ? look.font.css : '14.6667px sans-serif';
-      for (const part of String(text).split('\n')) widest = Math.max(widest, fitCtx.measureText(part.replace(/\r/g, '')).width);
+      const parts = look?.align?.wrap ? wrapLines(text, fitCtx.font, st.cols.size(c) - 4) : String(text).split('\n');
+      for (const part of parts) widest = Math.max(widest, fitCtx.measureText(part.replace(/\r/g, '')).width);
     }
     return widest ? Math.ceil(widest) + 9 : null;
 }

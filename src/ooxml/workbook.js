@@ -14,7 +14,7 @@ import { formatsOf } from './stylesedit.js';
 import { parseRef } from './refs.js';
 import { withEl, addSheet, renameSheet, moveSheet, setSheetHidden, setTabColor, deleteSheet } from './sheetops.js';
 import { changeLines } from './rowcol.js';
-import { setColumns, setRows, setLineStyles } from './sizes.js';
+import { setColumns, setRows, setLineStyles, setDefaultWidth, setSheetRowHeight } from './sizes.js';
 import { setFreeze, setZoom, setShowFormulas, setShown } from './view.js';
 import { applyAutoFilter, filterName } from './filterops.js';
 import { applyAdvancedFilter } from './advfilter.js';
@@ -281,6 +281,15 @@ export class Workbook {
     const part = this._part(i);
     if (axis === 'col') setColumns(part.doc, a, b, change, part.model.format);
     else setRows(part.doc, a, b, change);
+    this._reread(i, part);
+    this.resetCalc();
+  }
+
+  /** Format > Default Width... (`chars`), or a row height given to the whole sheet (`rowHeight`, points): sizes.js. */
+  setSheetSizes(i, { defaultWidth = null, rowHeight = null }) {
+    const part = this._part(i);
+    if (defaultWidth != null) setDefaultWidth(part.doc, defaultWidth);
+    if (rowHeight != null) setSheetRowHeight(part.doc, rowHeight);
     this._reread(i, part);
     this.resetCalc();
   }

@@ -96,7 +96,7 @@ export function setColumns(doc, c0, c1, change, format = {}) {
 
 /**
  * Rows r0 to r1 (0-based) changed: { height } (points; 0 hides), { height: null } (AutoFit: the fixed height taken
- * away), { hidden: true/false }, { style } (the rows' own format). Rows without an element get one when something must be written.
+ * away), { fitted } (AutoFit's height for wrapped text, points, without customHeight), { hidden: true/false }, { style } (the rows' own format). Rows without an element get one when something must be written.
  */
 export function setRows(doc, r0, r1, change) {
   const root = doc.documentElement;
@@ -125,6 +125,10 @@ export function setRows(doc, r0, r1, change) {
     if (change.height > 0) {
       el.setAttribute('ht', String(change.height));
       el.setAttribute('customHeight', '1');
+    } else if (change.fitted > 0) {
+      // (AutoFit of a row its wrapped text makes taller: the height found, without customHeight, as Excel writes it.)
+      el.setAttribute('ht', String(change.fitted));
+      el.removeAttribute('customHeight');
     } else if ('height' in change && change.height === null) {
       el.removeAttribute('ht');
       el.removeAttribute('customHeight');
@@ -147,3 +151,43 @@ export function setLineStyles(doc, { cols = [], rows = [] }, format = {}) {
   for (const { a, b, s } of runs(cols, 'c')) setColumns(doc, a, b, { style: s }, format);
   for (const { a, b, s } of runs(rows, 'r')) setRows(doc, a, b, { style: s });
 }
+
+/** CT_SheetFormatPr's attributes in their order (Excel writes them so; others, x14ac:dyDescent, after). */
+const FORMAT_ORDER = ['baseColWidth', 'defaultColWidth', 'defaultRowHeight', 'customHeight', 'zeroHeight', 'thickTop', 'thickBottom', 'outlineLevelRow', 'outlineLevelCol'];
+
+/** The sheet's sheetFormatPr given `attrs` ({ name: value, or null to take it away }), made (after sheetViews) when
+ *  the sheet has none. */
+function setSheetFormat(doc, attrs) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  let el = kid(root, 'sheetFormatPr', ns);
+  if (!el) {
+    el = make(doc, ns, 'sheetFormatPr');
+    const after = [...root.childNodes].find((n) => n.nodeType === 1 && !['sheetPr', 'dimension', 'sheetViews'].includes(n.localName));
+    root.insertBefore(el, after || null);
+  }
+  const all = new Map([...el.attributes].map((a) => [a.name, a.value]));
+  for (const [k, v] of Object.entries(attrs)) { if (v == null) all.delete(k); else all.set(k, String(v)); }
+  for (const a of [...el.attributes]) el.removeAttribute(a.name);
+  const rank = (k) => { const i = FORMAT_ORDER.indexOf(k); return i < 0 ? FORMAT_ORDER.length : i; };
+  for (const [k, v] of [...all].sort((a, b) => rank(a[0]) - rank(b[0]))) el.setAttribute(k, v);
+  if (!el.hasAttribute('defaultRowHeight')) el.setAttribute('defaultRowHeight', '15');
+}
+
+/** Format > Default Width...: the width, typed in characters, of every column without one of its own, as Excel
+ *  writes it (excel-sizes2.ps1): sheetFormatPr's defaultColWidth in whole pixels as a typed width (12: 12.7109375,
+ *  4.5: 5.28515625); columns with their own width keep it. */
+export function setDefaultWidth(doc, chars) {
+  setSheetFormat(doc, { defaultColWidth: typedWidth(chars) });
+}
+
+/** A row height given to the whole sheet (every row selected), as Excel writes it: sheetFormatPr's defaultRowHeight
+ *  with customHeight, and every row the file has given that height. */
+export function setSheetRowHeight(doc, points) {
+  setSheetFormat(doc, { defaultRowHeight: points, customHeight: '1' });
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const rows = kids(kid(root, 'sheetData', ns), 'row', ns);
+  for (const r of rows.map((el) => Number(attr(el, 'r')) - 1)) setRows(doc, r, r, { height: points });
+}
+
