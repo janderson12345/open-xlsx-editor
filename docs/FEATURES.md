@@ -23,7 +23,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | `toolbar: false` | Done | Hides the ribbon but keeps editing. |
 | `features: { tab or group: false }` | Done | Hides a tab or group; `setFeatures()` at any time. A formatting group turned off also turns off its keys (Ctrl+B with `font: false`). |
 | Strict Content-Security-Policy | Done | Runs with only `'self'` allowed, no `'unsafe-inline'`: its styles are made through the CSSOM, and it fetches nothing (README, Self-hosting). |
-| Served fonts (Aptos Narrow's twin) | Done | Open Metric Fonts' Morrow Sans Narrow and Morrow Sans, served by the page, are used for Aptos Narrow and Aptos; text placed again when they load. Excel's PDFs: 100,049 of 100,049 Aptos Narrow cells within 1px across, down and in width (docs/LAYOUT.md). Not yet: the project's other families; `exportPdf` embeds installed fonts only. |
+| Served fonts (Aptos Narrow's twin) | Done | open-metric-fonts' Morrow Sans Narrow and Morrow Sans, loaded from the site's own copy of its web bundle (`fonts: { omf }`, release `OMF_VERSION`, the folder the Word editor uses too), are drawn for Aptos Narrow and Aptos; text placed again when they load. Excel's PDFs: 100,049 of 100,049 Aptos Narrow cells within 1px across, down and in width (docs/LAYOUT.md). Not yet: the project's other families; `exportPdf` embeds installed fonts only. |
 
 ## Outside the ribbon
 

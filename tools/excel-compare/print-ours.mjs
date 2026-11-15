@@ -5,7 +5,7 @@
 // usage: node tools/excel-compare/print-ours.mjs <xlsxDir> <outDir>   (from the repository, after `node build.mjs`)
 //   BROWSER_CHANNEL=msedge (default) | chrome; CHROMIUM_PATH=<executable> instead; OXE_JOBS=4
 //   OXE_EXPORT=1: the PDF made by src/pdf.js exportPdf (the installed fonts allowed) instead of the browser's print
-//   OXE_FONTS=1: the demo with Open Metric Fonts' Morrow Sans served (demo/fonts/morrow-sans; README, Fonts)
+//   OXE_FONTS=1: the demo with Open Metric Fonts' Morrow Sans served (demo/fonts/omf/morrow-sans; README, Fonts)
 // Use the browser your users print from: its fonts and font rendering are part of what's measured (Edge on Windows).
 import { chromium } from 'playwright';
 import http from 'node:http';

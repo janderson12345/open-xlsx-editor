@@ -93,56 +93,64 @@ attributes), whose values still come through.
 
 Workbooks name Office fonts, and a browser draws only the fonts installed on the computer or served by the page.
 Aptos Narrow, the body font of Excel 365's default theme, isn't installed with Windows, macOS or Linux, so without
-help it is drawn in Calibri (or Carlito), which is close but not the same width. [Open Metric Fonts](https://github.com/open-metric-fonts/open-metric-fonts)
+help it is drawn in Calibri (or Carlito), which is close but not the same width. [open-metric-fonts](https://github.com/open-metric-fonts/open-metric-fonts)
 makes Morrow Sans Narrow and Morrow Sans: open (SIL OFL) fonts with exactly Aptos Narrow's and Aptos's character
-widths and line metrics. Serve them from your own site:
+widths and line metrics. The editor loads them from a folder your site serves, the same folder the Word editor
+(open-docx-editor) uses, so one copy serves every viewer of Office documents on the site:
 
-1. Get the `morrow-sans` package, either way:
-   - From the project's [Releases page](https://github.com/open-metric-fonts/open-metric-fonts/releases):
-     `morrow-sans-<version>.zip`. Check it before use:
+1. **Serve the open-metric-fonts web bundle once, in a folder named for its version.** The editor is made for release
+   `OMF_VERSION` (exported by the package; 1.0.1 now). The release's web bundle holds every package as
+   `<package>/files/<face>-<alphabet>.woff2`, as the editor looks for them; it needs `morrow-sans/` only.
 
-     ```bash
-     sha256sum -c SHA256SUMS.txt --ignore-missing
-     ```
-
-     ```bash
-     gh attestation verify morrow-sans-1.0.0.zip --repo open-metric-fonts/open-metric-fonts
-     ```
-
-     Its `web/` folder is what you serve.
-   - Or from npm, with your other dependencies, pinned to an exact version:
-
-     ```bash
-     npm install --save-exact @open-metric-fonts/morrow-sans
-     ```
-
-     Copy `node_modules/@open-metric-fonts/morrow-sans/` (its `index.css` and `files/`) to your static files as part of
-     your build.
-2. Put that folder anywhere on your own site, keeping `index.css` next to `files/`: the CSS loads its `.woff2` files by
-   relative URLs (`./files/...`). Serve `.woff2` as `font/woff2`.
-3. Link the CSS on the page that hosts the editor, before or after the editor's own:
-
-   ```html
-   <link rel="stylesheet" href="/fonts/morrow-sans/index.css">
+   ```bash
+   curl -LO https://github.com/open-metric-fonts/open-metric-fonts/releases/download/v1.0.1/open-metric-fonts-web-1.0.1.zip
    ```
 
-   `morrow-sans-narrow.css` alone is enough for Aptos Narrow (Excel 365's default); `index.css` adds Aptos's twin and
-   all the weights.
+   Check it against the release's `SHA256SUMS.txt` and its build attestation before use:
 
-Nothing else is needed: the editor lists Morrow Sans Narrow after Aptos Narrow (and Morrow Sans after Aptos) in its font
-stacks. The browser downloads a font only when a cell uses it. When the font arrives, the editor places and measures
-the text again, using the font's own metrics. With it, Excel's PDFs of basic.xlsx and large.xlsx (Aptos Narrow) and the
-editor's print of them agree within 1px across, down and in text width for 100,049 of 100,049 cells. With Calibri in
-its place, 99,028 are within 1px in width. Text widths decide where wrapped text breaks, where a number shows `####`
-and what AutoFit picks, so these match too.
+   ```bash
+   sha256sum -c SHA256SUMS.txt --ignore-missing
+   ```
+
+   ```bash
+   gh attestation verify open-metric-fonts-web-1.0.1.zip --repo open-metric-fonts/open-metric-fonts
+   ```
+
+   ```bash
+   unzip -q open-metric-fonts-web-1.0.1.zip && mkdir -p wwwroot/lib/fonts/omf/1.0.1 && cp -R open-metric-fonts-web-1.0.1/. wwwroot/lib/fonts/omf/1.0.1/
+   ```
+
+   Or only `morrow-sans`, from npm with your other dependencies, pinned (`npm install --save-exact
+   @open-metric-fonts/morrow-sans@1.0.1`), copied to `<folder>/morrow-sans/` by your build. Serve `.woff2` as
+   `font/woff2`; the folder's name carries the version, so it can be cached as immutable. A site that already serves
+   the bundle for another viewer points this editor at that copy rather than adding its own; a different release goes
+   in as a sibling version folder.
+2. **Point the editor at it**, by the URL the site serves it at (absolute, or relative to the page):
+
+   ```js
+   import { mountXlsxEditor, OMF_VERSION } from 'open-xlsx-editor';
+   mountXlsxEditor(el, { fonts: { omf: `/lib/fonts/omf/${OMF_VERSION}/` } });
+   ```
+
+   (A bundle under `lib/<name>/` beside that folder can also say `new URL(`../fonts/omf/${OMF_VERSION}/`,
+   import.meta.url).href`.)
+
+The editor adds each face of Morrow Sans Narrow and Morrow Sans to the page's fonts, per alphabet, as `FontFace`
+objects (no stylesheet, so `font-src 'self'` is all the policy needs). The browser downloads a file only when a cell
+shows text in it, and when one arrives the editor places and measures the text again with that font's own metrics.
+Without `fonts.omf`, or before a file arrives, Calibri stands in. Measured with release 1.0.1 served this way (Edge,
+the comparison in `tools/excel-compare`): Excel's PDFs of basic.xlsx and large.xlsx (Aptos Narrow) and the editor's
+print of them agree within 1px across, down and in text width for 100,049 of 100,049 cells; with Calibri in its
+place, 99,028 are within 1px in width. Text widths decide where wrapped text breaks, where a number shows `####` and
+what AutoFit picks, so these match too.
 
 Not yet:
-- Only the Aptos family is wired to its twin. The project's other families (Tahoma's, Verdana's, Century Gothic's,
-  Garamond's and more) aren't yet in the editor's font stacks.
+- Only the Aptos family is wired to its twin. open-metric-fonts' other families (Tahoma's, Verdana's, Century
+  Gothic's, Garamond's and more) aren't yet in the editor's font stacks.
 - `exportPdf` (`open-xlsx-editor/pdf`) embeds installed fonts only, so a served font is drawn there in a PDF standard
   font at the same widths. The browser's own Print uses the served font.
 
-The demo serves them when `demo/fonts/morrow-sans/` holds the package (not in this repository) and the page is opened
-with `?fonts`.
+The demo loads them from `demo/fonts/omf/` (a copy of the bundle, or of `morrow-sans/`, not in this repository) when
+the page is opened with `?fonts`. `tools/omf-faces.mjs` writes the editor's list of faces from a newer `morrow-sans`.
 
 MIT licence.

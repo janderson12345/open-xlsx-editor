@@ -8,6 +8,7 @@ import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { fontsChanged } from './editor/fonts.js';
+import { addOmfFaces } from './editor/omffonts.js';
 import { dropSheet } from './editor/sheets.js';
 import { unlockRangeBox } from './editor/rangesbox.js';
 import { followOf } from './ooxml/links.js';
@@ -45,6 +46,8 @@ import { AgentWorkbook } from './agent.js';
 export { Workbook };
 export { openWorkbook } from './agent.js';
 export { PasswordError };
+/** The open-metric-fonts release the editor's font faces are for (`fonts: { omf }`; README, Fonts). */
+export { OMF_VERSION } from './editor/omf.js';
 
 /** The ribbon group a formatting command belongs to, for `features`: one of a group turned off doesn't run, from the
  *  ribbon or the keyboard. */
@@ -70,12 +73,16 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs.
  * - `onLink(url)`: a hyperlink clicked that goes outside the workbook (http, https, mailto, ftp); without it, the
  *   browser opens it in a new tab.
+ * - `fonts: { omf }`: the URL of an open-metric-fonts web bundle folder the site serves (each package as
+ *   <package>/files/, release OMF_VERSION), for Aptos Narrow's and Aptos's metric twins (README, Fonts).
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
  *   features?: Record<string, boolean>, toolbar?: boolean, statusBar?: boolean, calculateOnOpen?: boolean,
- *   onChange?: () => void, onLink?: (url: string) => void }} [options]
+ *   onChange?: () => void, onLink?: (url: string) => void, fonts?: { omf?: string } }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
+  // (Aptos Narrow's and Aptos's twins from the site's own copy of open-metric-fonts: omffonts.js.)
+  if (options.fonts?.omf) addOmfFaces(options.fonts.omf);
   const root = document.createElement('div');
   root.className = 'oxe-root';
   if (options.theme) root.dataset.theme = options.theme;

@@ -40,13 +40,16 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   Morrow Sans Narrow when the page serves it (README, Fonts), else Calibri: as wide within a pixel. Each cell format
   is a CSS class (`cellstyles.js`). Runs 5 -> 9: text width within 1px 0.3% -> 99.0% of all cells; fonts.xlsx 30 ->
   53 of 55.
-- **Morrow Sans Narrow served** (*measured*, run "final" in `..uns\morrow3`: print-ours with `OXE_FONTS=1`). It
+- **Morrow Sans Narrow served** (*measured*, run "final" in
+  `..\runs\morrow3`: print-ours with `OXE_FONTS=1`). It
   has Aptos Narrow's widths and Windows metrics, so Excel's placement of the text is worked out from those
   (`fonts.js` OPEN), with no stand-in offset. Chromium places a web font by its hhea metrics, though, not the Windows
   ones it uses for an installed font: placed by the Windows ones, every baseline was 0.95px high (large.xlsx 61,460 of
   100,000 within 1px). basic.xlsx and large.xlsx: width within 1px 99,028 -> 100,046 of 100,049, across and down
   unchanged (all within 1px); the ten workbooks 100,962 -> 101,981 of 102,095 in width, the rest of the report the
   same, fills and borders too. The cells are placed again when a served font finishes loading (`fontsChanged`).
+  Release 1.0.1, its faces split by alphabet and loaded as FontFace objects from `fonts: { omf }` (`omffonts.js`;
+  run "v101" in `..\runs\omf101`): the same report to the cell.
 - **Printed baseline** (*measured*). Excel puts all the bottom-aligned text of a row on one baseline: the Windows
   descent of the row's tallest font plus about 0.9px above its printed row boundary (rows.xlsx, whose fills give
   every boundary exactly; Calibri 11, 14, 20, Arial 14, Times New Roman 16, Cambria 20 within about 0.3px). Excel's
