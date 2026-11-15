@@ -61,9 +61,9 @@ changes it is made of, `chartAxisTitle`, `chartFill`, `chartFont`, `chartSeriesT
 (`src/editor/chartacts.js`; written by `src/ooxml/chartformat.js` and `chartcombo.js`).
 
 Measured over COM on the clustered column chart of Editing a chart (`tools/excel-compare/excel-chart-format.ps1`:
-41 changes through the chart object model, each chart part Excel saved in `test/chartformat-excel.json`, with its
-series' types and axis groups, the secondary axis's scale and a PDF of each). 31 of 31 changes made here are Excel's
-text for text, but for the axis ids it makes up; Excel opened the workbook of all 31 written here and read them through
+43 changes through the chart object model, each chart part Excel saved in `test/chartformat-excel.json`, with its
+series' types and axis groups, the secondary axis's scale and a PDF of each). 33 of 33 changes made here are Excel's
+text for text, but for the axis ids it makes up; Excel opened the workbook of all 33 written here and read them through
 its object model as it reads its own (`excel-chart-format-check.ps1`, `test/chartformat-readback-excel.json`).
 
 | Change | As Excel writes it |
@@ -74,6 +74,7 @@ its object model as it reads its own (`excel-chart-format-check.ps1`, `test/char
 | A point's fill (`Points(n).Format.Fill`) | A `c:dPt` among the series' points: its index, `invertIfNegative` on a column, `bubble3D`, the series' spPr with the fill changed, and a unique id numbered after the part's others. A pie's slice has its `dPt` already: its fill changed and a unique id added. |
 | The chart area's and plot area's fill and line | The colour in place of the default style's (the chart area white with a 15% grey line, the plot area without either). |
 | A font by Excel's Font object (`ChartTitle.Font`, `TickLabels.Font`, `Legend.Font`, `DataLabels.Font`, `AxisTitle.Font`) | Only the `defRPr` of the element's text properties (and of a title's own rich text): `sz`, `b`, the fill, and `latin`, `ea` and `cs` all the one name. Setting one leaves the others. |
+| The chart title's text changed after its font was set (Edit Chart) | The new text's paragraph takes the title's own font (its txPr's `defRPr`), its run bare: the font kept. |
 | A series as a line, line with markers or area (`Series.ChartType`) | The series taken out of the column group and put in a group of its kind on the same axes, in its order: a line group after the columns (markers on in the group, whether its series show them or not), an area group before them. The series' look the new kind's default in the accent of its place: a series given its own red came out a line in accent 2. Back to columns: it joins the column group again, which loses its overlap (its gap width kept). |
 | A series on the secondary axis (`Series.AxisGroup = 2`) | A second group of its kind (a copy of its group's settings) on two new axes after the others: a value axis on the right (no gridlines, ticks out, crossing at the maximum, the primary's number format and text) and a hidden category axis. Back on the primary axis: the part as it was. |
 

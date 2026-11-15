@@ -1215,6 +1215,112 @@
     "color": "595959"
    }
   },
+  "titleFontThenText": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 18,
+    "bold": true,
+    "color": "C00000"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleTextFontText": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "none"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "none"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "none",
+    "line": "none"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 18,
+    "bold": true,
+    "color": "C00000"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
   "comboOwnColor": {
    "titles": [
     null,
@@ -2841,6 +2947,112 @@
     "size": 14,
     "bold": false,
     "color": "595959"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleFontThenText": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 18,
+    "bold": true,
+    "color": "C00000"
+   },
+   "cat": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   },
+   "legend": {
+    "name": "Aptos Narrow",
+    "size": 9,
+    "bold": false,
+    "color": "595959"
+   }
+  },
+  "titleTextFontText": {
+   "titles": [
+    null,
+    null,
+    null
+   ],
+   "series": [
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "156082",
+      "line": "000000"
+     },
+     "point2": "156082"
+    },
+    {
+     "type": 51,
+     "group": 1,
+     "look": {
+      "fill": "E97132",
+      "line": "000000"
+     },
+     "point2": "E97132"
+    }
+   ],
+   "area": {
+    "fill": "FFFFFF",
+    "line": "D9D9D9"
+   },
+   "plot": {
+    "fill": "000000",
+    "line": "000000"
+   },
+   "title": {
+    "name": "Arial",
+    "size": 18,
+    "bold": true,
+    "color": "C00000"
    },
    "cat": {
     "name": "Aptos Narrow",

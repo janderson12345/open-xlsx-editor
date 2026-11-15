@@ -58,6 +58,8 @@ $CASES = [ordered]@{
   'comboSecondaryBack' = { param($ch) $s = $ch.SeriesCollection(2); $s.ChartType = 4; $s.AxisGroup = 2; $s.AxisGroup = 1; $s.ChartType = 51 }
   'comboArea' = { param($ch) $ch.SeriesCollection(2).ChartType = 1 }
   'comboOwnColor' = { param($ch) $s = $ch.SeriesCollection(2); $s.Format.Fill.ForeColor.RGB = (rgb 'C00000'); $s.ChartType = 4 }
+  'titleFontThenText' = { param($ch) font1 $ch.ChartTitle.Font 'Arial' 18 $true 'C00000'; $ch.ChartTitle.Text = 'Sales' }
+  'titleTextFontText' = { param($ch) $ch.ChartTitle.Text = 'Sales'; font1 $ch.ChartTitle.Font 'Arial' 18 $true 'C00000'; $ch.ChartTitle.Text = 'Sales & cost' }
   'secondaryTitle' = { param($ch) $ch.SeriesCollection(2).AxisGroup = 2; $a = $ch.Axes(2, 2); $a.HasTitle = $true; $a.AxisTitle.Text = 'Cost' }
 }
 $DATA = @(@('Region', 'Sales', 'Cost'), @('North', '120', '80'), @('South', '95', '70'), @('East', '140', '90'), @('West', '60', '45'))

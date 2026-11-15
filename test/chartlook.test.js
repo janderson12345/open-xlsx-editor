@@ -33,6 +33,7 @@ test('Excel\'s axis titles, fills, lines and fonts read from its parts', () => {
   // (Fonts by Excel's Font object and by TextFrame2, which writes the title's text and the run's own properties.)
   assert.deepEqual(excelChart('titleFont1').look.fonts.title, font('Arial', 18, true, 'C00000'));
   assert.deepEqual(excelChart('titleTextFont').look.fonts.title, font('Arial', 18, true, 'C00000'));
+  assert.deepEqual(excelChart('titleTextFontText').look.fonts.title, font('Arial', 18, true, 'C00000'));
   assert.deepEqual([excelChart('catFont').catFont, excelChart('valFont').axis.font], [font('Arial', 11, true, '1F4E79'), font('Arial', 11, true, '1F4E79')]);
   assert.deepEqual([excelChart('legendFont1').look.fonts.legend, excelChart('labelFont1').look.fonts.labels], [font('Arial', 11, true, '1F4E79'), font('Arial', 11, true, '1F4E79')]);
   assert.deepEqual([excelChart('catTitleFont1').catTitle.font, excelChart('catTitleFont').catTitle.font], [font('Arial', 12, true, 'C00000'), font('Arial', 12, true, 'C00000')]);
@@ -55,5 +56,5 @@ test('combo charts and the secondary axis read as Excel reads them (Series.Chart
     }
   }
   assert.deepEqual(wrong, []);
-  assert.equal(Object.keys(excel.types).length, 42);
+  assert.equal(Object.keys(excel.types).length, 44);
 });

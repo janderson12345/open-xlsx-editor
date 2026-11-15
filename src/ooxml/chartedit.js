@@ -40,7 +40,10 @@ const TITLE = (body) => `<c:title>${body}<c:overlay val="0"/>${chartLook.SP_NONE
 /** The chart's title: `text` its own, null none at all ('Chart Title' or the series' name are Excel's own: 'auto'). */
 export function setChartTitle(wb, si, k, text) {
   return change(wb, si, k, (x) => {
-    const rich = text == null || text === 'auto' ? '' : `<c:tx><c:rich>${chartLook.BODY(0)}<a:lstStyle/><a:p><a:pPr>${chartLook.DEF(1400, ' spc="0"')}</a:pPr><a:r><a:rPr lang="en-US"/><a:t>${esc(text)}</a:t></a:r></a:p></c:rich></c:tx>`;
+    // (The new text takes the title's own font, its txPr's defRPr, as Excel's did after ChartTitle.Font was set:
+    // test/chartformat-excel.json titleFontThenText, titleTextFontText.)
+    const own = /<c:title>(?:(?!<\/c:title>)[\s\S])*?<c:txPr>(?:(?!<\/c:txPr>)[\s\S])*?(<a:defRPr\b(?:[^>]*\/>|[\s\S]*?<\/a:defRPr>))/.exec(x)?.[1];
+    const rich = text == null || text === 'auto' ? '' : `<c:tx><c:rich>${chartLook.BODY(0)}<a:lstStyle/><a:p><a:pPr>${own || chartLook.DEF(1400, ' spc="0"')}</a:pPr><a:r><a:rPr lang="en-US"/><a:t>${esc(text)}</a:t></a:r></a:p></c:rich></c:tx>`;
     let out = x;
     if (text == null) {
       out = out.replace(/<c:title>[\s\S]*?<\/c:title>/, '');

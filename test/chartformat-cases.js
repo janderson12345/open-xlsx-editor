@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { insertChart } from '../src/ooxml/chartnew.js';
-import { setChartKind, setChartLabels } from '../src/ooxml/chartedit.js';
+import { setChartKind, setChartLabels, setChartTitle } from '../src/ooxml/chartedit.js';
 import { setAxisTitle, setChartFont, setChartFill } from '../src/ooxml/chartformat.js';
 import { setSeriesType, setSeriesAxis } from '../src/ooxml/chartcombo.js';
 import { parseRange } from '../src/ooxml/refs.js';
@@ -55,6 +55,8 @@ export const EDITS = {
   pieSlice: (wb, si = 0) => { setChartKind(wb, si, 0, 'pie'); setChartFill(wb, si, 0, { series: 0, point: 1 }, { fill: '00B050' }); },
   comboLine: (wb, si = 0) => setSeriesType(wb, si, 0, 1, 'line'),
   comboLineMarkers: (wb, si = 0) => setSeriesType(wb, si, 0, 1, 'lineMarkers'),
+  titleFontThenText: (wb, si = 0) => { setChartFont(wb, si, 0, 'title', { name: 'Arial', size: 18, bold: true, color: 'C00000' }); setChartTitle(wb, si, 0, 'Sales'); },
+  titleTextFontText: (wb, si = 0) => { setChartTitle(wb, si, 0, 'Sales'); setChartFont(wb, si, 0, 'title', { name: 'Arial', size: 18, bold: true, color: 'C00000' }); setChartTitle(wb, si, 0, 'Sales & cost'); },
   comboOwnColor: (wb, si = 0) => { setChartFill(wb, si, 0, { series: 1 }, { fill: 'C00000' }); setSeriesType(wb, si, 0, 1, 'line'); },
   secondaryTitle: (wb, si = 0) => { setSeriesAxis(wb, si, 0, 1, true); setAxisTitle(wb, si, 0, 'v2', 'Cost'); },
   comboArea: (wb, si = 0) => setSeriesType(wb, si, 0, 1, 'area'),
