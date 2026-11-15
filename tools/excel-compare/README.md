@@ -73,7 +73,9 @@ change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `tes
 <books folder>` has Excel move a pivot's fields, and `pivotmove-ours.mjs <folder>` the editor's moves for the check.
 
 Defined names: `excel-names.ps1 <out.json> <books folder>` adds candidate names with Names.Add and saves names added out
-of order, for `test/names-excel.json` (docs/NAMES.md).
+of order, for `test/names-excel.json` (docs/NAMES.md). `excel-namebox.ps1 <out.json>` selects ranges under
+names of each kind and records the selection's name Excel reports (Selection.Name), and where Application.Goto of a
+name puts the selection, for `test/namebox-excel.json` (docs/NAMES.md, "The Name Box").
 
 Dynamic arrays: `dynamic-cases.mjs` makes the cases, `excel-dynamic.ps1 <cases.json> <out.json> <books folder>` has Excel
 365 enter each with Formula2 and save it, and `dynamic-ours.mjs <folder>` with `excel-dynamic-check.ps1 <folder>
