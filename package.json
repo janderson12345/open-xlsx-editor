@@ -1,8 +1,18 @@
 {
   "name": "open-xlsx-editor",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Open and edit .xlsx files in the browser. 100% JavaScript, no server, no Office.",
+  "author": "open-xlsx-editor contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janderson12345/open-xlsx-editor.git"
+  },
+  "homepage": "https://github.com/janderson12345/open-xlsx-editor#readme",
+  "bugs": {
+    "url": "https://github.com/janderson12345/open-xlsx-editor/issues"
+  },
   "main": "src/index.js",
+  "types": "./src/index.d.ts",
   "bin": {
     "open-xlsx-editor-mcp": "bin/oxe-mcp.mjs"
   },
@@ -15,7 +25,8 @@
     "test:e2e": "npm run build && node test/e2e.mjs && node test/editing.mjs && node test/editing-data.mjs && node test/editing-more.mjs && node test/editing-protect.mjs && node test/editing-links.mjs && node test/editing-formats.mjs && node test/a11y.mjs && node test/collab.mjs && node test/pdf.mjs",
     "check": "node tools/check-ooxml.mjs test/fixtures test/out",
     "lint": "eslint src test tools bin && node tools/scan-bytes.mjs",
-    "ci": "npm run lint && npm test && npm run fixtures && git diff --exit-code test/fixtures && npm run test:e2e && node tools/check-ooxml.mjs test/fixtures test/out"
+    "ci": "npm run lint && npm test && npm run fixtures && git diff --exit-code test/fixtures && npm run test:e2e && node tools/check-ooxml.mjs test/fixtures test/out",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "xlsx",
@@ -45,7 +56,10 @@
     "yjs": "^13.6.33"
   },
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
     "./style.css": "./src/editor/editor.css",
     "./collab": "./src/collab.js",
     "./pdf": "./src/pdf.js"
@@ -62,5 +76,8 @@
     "yjs": {
       "optional": true
     }
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

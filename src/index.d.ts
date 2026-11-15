@@ -162,6 +162,18 @@ export declare function mountXlsxEditor(
     fillLists?: string[][];
     /** false leaves formulas saved without a result empty on opening (by default they are worked out, as Excel does). */
     calculateOnOpen?: boolean;
+    /** Excel's Error Checking Options: false turns the green error triangles off; { background, rules } chooses
+     *  them, `rules` naming those on ('evalError', 'twoDigitTextYear', 'numberStoredAsText', 'formula',
+     *  'formulaRange', 'unlockedFormula'). */
+    errorChecking?: boolean | { background?: boolean; rules?: string[] };
+    /** Aptos Narrow's and Aptos's twins (open-metric-fonts' Morrow Sans) from the site's own copy: the folder's URL
+     *  (README, Fonts). */
+    fonts?: { omf?: string };
+    /** A hyperlink to a web address clicked: the host page opens it (otherwise the editor opens a new tab). */
+    onLink?: (url: string) => void;
     onChange?: () => void;
   },
 ): XlsxEditor;
+
+/** The open-metric-fonts release the editor's list of faces is made for (README, Fonts). */
+export declare const OMF_VERSION: string;

@@ -1,4 +1,4 @@
-// The demo page: open an .xlsx from the file input or by dropping it, show it read-only. `window.oxe` is the editor's
+// The demo page: open an .xlsx from the file input or by dropping it, to view and edit. `window.oxe` is the editor's
 // API, which the browser tests drive.
 import { mountXlsxEditor } from '../src/index.js';
 
@@ -31,3 +31,7 @@ document.addEventListener('drop', (e) => {
   const file = e.dataTransfer.files[0];
   if (file) openFile(file);
 });
+
+// The published demo (GitHub Pages, pages.yml) opens a sample workbook beside the page at the start; the local demo
+// and the browser tests open none (no request that would fail).
+if (location.hostname.endsWith('.github.io')) fetch('sample.xlsx').then((r) => (r.ok ? r.arrayBuffer() : null)).then((b) => b && openFile(new File([b], 'sample.xlsx'))).catch(() => {});
