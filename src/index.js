@@ -37,6 +37,7 @@ import { pageLayoutTab } from './editor/pagelayouttab.js';
 import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
+import { sparklineTab } from './editor/sparklinetab.js';
 import { formulasTab } from './editor/formulastab.js';
 import { calcMode, needsCalculation, calculateBeforeSave } from './ooxml/calcmode.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
@@ -268,6 +269,7 @@ export function mountXlsxEditor(host, options = {}) {
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
+        Sparkline: (kit) => sparklineTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
       },
       // (Not while a cell is being edited: a function from the Function Library was just typed into it.)
       home: () => { if (!state.editing?.editorOpen) state.grid?.el.focus({ preventScroll: true }); },

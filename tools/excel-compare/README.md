@@ -91,6 +91,10 @@ Excel print them and sheets of other cell sizes and line weights to PDF. Excel p
 `node sparkimages.cjs <file.pdf> <outDir>` takes the pictures out of a PDF, and `python spark-features.py <outDir>
 <out.json>` measures them (bars, coloured blobs, the line's trace). Run on Excel's PDF of
 `test/fixtures/sparklines.xlsx` (`excel-print.ps1`), that gives `test/sparklines-excel.json` (docs/SPARKLINES.md).
+`excel-sparkedit.ps1 <out.json> <books folder>` has Excel make sparklines from pairs of location and data and run the
+Sparkline tab's edits through COM, each saved (`test/sparkedit-excel.json`); `excel-sparkedit-check.ps1 <folder>
+<out.json>` has Excel read back the editor's files (`test/out/sparklines`, from `npm test` and `test/sparkline-tab.mjs`)
+into `test/sparkedit-readback-excel.json`.
 
 PDF export (src/pdf.js) is measured the same way: `OXE_EXPORT=1 node tools/excel-compare/print-ours.mjs <books> <out>` makes
 the PDFs through `exportPdf` instead of the browser's print (docs/PDF.md).

@@ -32,8 +32,18 @@ export function parseSheetRange(f) {
  * (its reference), r, c (the cell it's drawn in) }] }].
  */
 export function readSparklines(root, ns) {
+  return groupElements(root, ns).map(readGroup);
+}
+
+/** The worksheet's x14:sparklineGroup elements, in the file's order. */
+export function groupElements(root, ns) {
   const ext = kids(kid(root, 'extLst', ns), 'ext', ns).find((e) => attr(e, 'uri') === EXT_SPARKLINES);
-  return kids(kid(ext, 'sparklineGroups', X14), 'sparklineGroup', X14).map((g) => ({
+  return kids(kid(ext, 'sparklineGroups', X14), 'sparklineGroup', X14);
+}
+
+/** One x14:sparklineGroup, as readSparklines gives it. */
+export function readGroup(g) {
+  return {
     type: attr(g, 'type') || 'line',
     lineWeight: num(g, 'lineWeight') ?? 0.75,
     markers: on(g, 'markers'), high: on(g, 'high'), low: on(g, 'low'), first: on(g, 'first'), last: on(g, 'last'), negative: on(g, 'negative'),
@@ -49,7 +59,7 @@ export function readSparklines(root, ns) {
       const at = parseRef((kid(s, 'sqref', XM)?.textContent || '').trim());
       return at && { source: kid(s, 'f', XM)?.textContent || '', r: at.r, c: at.c };
     }).filter(Boolean),
-  }));
+  };
 }
 
 /** Whether row r or column c of a sheet is hidden. */

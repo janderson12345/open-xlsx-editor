@@ -5,7 +5,7 @@ import { el, iconize, slug, ribbonKit } from './ribbonkit.js';
 
 /**
  * A ribbon in `container`. `tabs`: { name: (kit) => { groups: [elements], update(look) } }; `home()` gives focus back
- * to the sheet; `mode` 'simple' or 'classic' to start in that layout (else the one remembered), `onMode(mode)` told
+ * to the sheet (a tab with `contextual()` is shown only while it gives true); `mode` 'simple' or 'classic' to start in that layout (else the one remembered), `onMode(mode)` told
  * of each change. Returns { update(look), setFeatures(f), features, setMode(mode), mode, showTab(name), destroy() }.
  */
 export function createRibbon(container, { tabs, home, mode = null, onMode = null }) {
@@ -101,22 +101,27 @@ export function createRibbon(container, { tabs, home, mode = null, onMode = null
 
   /** Ribbon features off or on: a tab by name ({ home: false }) or a group by its label on any tab ({ font: false }). */
   let features = {};
+  // (A contextual tab, as Excel's Sparkline tab: shown only while its `contextual()` says so, beside the others.)
+  const away = (name) => !!built[name].contextual && !built[name].contextual();
   function applyFeatures() {
     let first = null;
     for (const name of Object.keys(panels)) {
       const off = features[slug(name)] === false;
-      tabBtns[name].hidden = off;
-      if (!off && !first) first = name;
+      tabBtns[name].hidden = off || away(name);
+      if (!off && !away(name) && !first) first = name;
       panels[name].querySelectorAll('.oxe-group').forEach((g) => { g.hidden = features[g.dataset.feature] === false; });
     }
-    if (features[slug(current)] === false && first) showTab(first);
+    if ((features[slug(current)] === false || away(current)) && first) showTab(first);
     fitRibbon();
   }
 
   return {
     el: container,
     /** Each tab's controls set to the active cell's look (formatops.js activeLook, plus what the tab needs). */
-    update(look) { for (const tab of Object.values(built)) tab.update?.(look); },
+    update(look) {
+      for (const tab of Object.values(built)) tab.update?.(look);
+      if (Object.values(built).some((t) => t.contextual)) applyFeatures();
+    },
     /** Format Painter on (waiting for cells) or off: its button pressed or not. */
     painting(on) { for (const tab of Object.values(built)) tab.painting?.(on); },
     /** Draw Borders' mode ('draw', 'grid', 'erase' or null): the Borders button pressed while one is on. */

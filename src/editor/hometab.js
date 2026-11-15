@@ -29,8 +29,8 @@ const BORDERS = [['bottom', 'Bottom Border'], ['top', 'Top Border'], ['left', 'L
 /** The Borders menu's Draw Borders section: its three modes (drawborders.js). */
 const DRAW = [['draw', 'Draw Border'], ['grid', 'Draw Border Grid'], ['erase', 'Erase Border']];
 /** The tints of each theme colour's column in Excel's palette (rows 2 to 6), as Excel writes them. */
-const LIGHTER = [0.7999816888943144, 0.5999938962981048, 0.3999755851924192, -0.249977111117893, -0.499984740745262];
-const TINTS = {
+export const LIGHTER = [0.7999816888943144, 0.5999938962981048, 0.3999755851924192, -0.249977111117893, -0.499984740745262];
+export const TINTS = {
   0: [-0.0499893185216834, -0.1499984740745262, -0.249977111117893, -0.3499862666707358, -0.499984740745262],
   1: [0.499984740745262, 0.3499862666707358, 0.249977111117893, 0.1499984740745262, 0.0499893185216834],
   2: [-0.0999786370433668, -0.249977111117893, -0.499984740745262, -0.749992370372631, -0.8999908444471572],
