@@ -55,7 +55,7 @@ insides:
 | `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter. |
 | `src/ooxml/special.js` | Go To Special: the cells of a kind Excel's box finds (constants, formulas, blanks, the current region, differences, precedents and dependents, rules), as ranges (docs/GOTOSPECIAL.md). |
 | `src/ooxml/names.js` | Defined names made, changed (formulas following) and deleted as Excel's Name Manager does, with Excel's rules for a name; docs/NAMES.md. |
-| `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise. |
+| `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise; the name a selection has (shown in the Name Box). |
 | `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, the proposal left to edit on one cell (docs/AUTOSUM.md). |
 | `src/ooxml/validation.js` | Data validation judged as Excel judges it: blanks, types, Excel's comparisons, text length, typed and cell lists, custom formulas; a list's choices (docs/VALIDATION.md). |
 | `src/ooxml/condformat.js` | Conditional formatting worked out as Excel draws it: rules in priority order with Stop If True, Excel's comparisons, range rules, colour scales; each cell's fill and font (docs/CONDFORMAT.md). |
@@ -128,7 +128,8 @@ insides:
 | `src/calc/charsets.js` | Characters as Excel counts and codes them: code points for LEFT and RIGHT, code page 1252 for CHAR and CODE, the code points UNICHAR refuses. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
 | `src/editor/autocorrect.js`, `autocorrect-list.js` | AutoCorrect as a cell or the formula bar is typed in (Excel's options and entries of its list), and the spelling underlines. |
-| `src/editor/formulabar.js` | The active cell's name and contents; Enter there enters into the cell. |
+| `src/editor/formulabar.js` | The active cell's name (or the selection's name) and contents; Enter there enters into the cell. |
+| `src/editor/namelist.js` | The Name Box's drop-down list of names to go to. |
 | `src/editor/interact.js` | Keys and mouse on the grid wired to the commands, the editor and the bar; screen-reader announcements (`live.js`). |
 | `src/editor/pointing.js` | Pointing at cells while a formula is typed (Excel's Point mode): arrows, clicks and drags put references in where one can go, F4 cycles $, the formula's ranges outlined in colours, references on another sheet with its name. |
 | `src/editor/tabs.js` | The sheet tabs: an ARIA tablist under the grid, sheets whose tabs aren't hidden, in their tab colours (text black or white, whichever reads better); chart sheets' tabs there but not shown yet; the New sheet button, renaming in place, dragging a tab to move it. |
