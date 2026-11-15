@@ -1,0 +1,94 @@
+{
+ "source": "Excel 365 PDF of excel-chart-format.ps1's workbook, through cells.cjs and shapes.cjs: offsets in px from each chart's top left",
+ "frame": {
+  "w": 516,
+  "h": 292.6
+ },
+ "charts": {
+  "none": {
+   "plot": {
+    "left": 38,
+    "right": 501.3,
+    "top": 49.5,
+    "bottom": 231.3
+   }
+  },
+  "catTitle": {
+   "plot": {
+    "left": 38,
+    "right": 501.3,
+    "top": 49.5,
+    "bottom": 203
+   },
+   "title": {
+    "x": 269.8,
+    "y": 241.8
+   }
+  },
+  "valTitle": {
+   "plot": {
+    "left": 66.3,
+    "right": 501.3,
+    "top": 49.5,
+    "bottom": 231.3
+   },
+   "title": {
+    "x": 29.2,
+    "y": 161.4
+   }
+  },
+  "secondary": {
+   "plot": {
+    "left": 38,
+    "right": 478,
+    "top": 49.5,
+    "bottom": 231.3
+   },
+   "labels": {
+    "x": 489.2
+   },
+   "barWidth": 34.6,
+   "costShare": 0.8
+  },
+  "comboSecondary": {
+   "plot": {
+    "left": 38,
+    "right": 478,
+    "top": 49.5,
+    "bottom": 231.3
+   },
+   "lineShares": [
+    0.801,
+    0.7,
+    0.9,
+    0.45
+   ]
+  },
+  "secondaryTitle": {
+   "plot": {
+    "left": 38,
+    "right": 449.8,
+    "top": 49.5,
+    "bottom": 231.3
+   }
+  },
+  "chartFill": {
+   "fill": "#fff2cc"
+  },
+  "chartLine": {
+   "line": "#1f4e79"
+  },
+  "seriesFill": {
+   "fill": "#c00000"
+  },
+  "pointFill": {
+   "fill": "#00b050"
+  },
+  "plotFill": {
+   "fill": "#ddebf7"
+  },
+  "plotLine": {
+   "line": "#808080"
+  }
+ }
+}
