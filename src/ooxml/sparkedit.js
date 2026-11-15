@@ -7,6 +7,7 @@ import { X14, XM } from './cfext.js';
 import { EXT_SPARKLINES, groupElements, readGroup } from './sparklines.js';
 import { parseRef, colName } from './refs.js';
 import { sheetPrefix } from '../calc/tokens.js';
+import { styleColors } from './sparklinestyles.js';
 
 const XMLNS = 'http://www.w3.org/2000/xmlns/';
 /** The group's attributes in the order Excel writes them (the schema's), each only when it isn't its default. */
@@ -173,8 +174,13 @@ export function setGroupOptions(doc, r, c, changes) {
  *  Darker 25%; sparkedit-excel.json "themeColor"). */
 export function setGroupColor(doc, r, c, name, color) {
   const g = groupAt(doc, r, c);
+  return !!g && colorOn(doc, g, name, color);
+}
+
+/** Group `g`'s colour `name` set to `color`. */
+function colorOn(doc, g, name, color) {
   const key = COLORS.find((n) => n.toLowerCase() === name);
-  if (!g || !key) return false;
+  if (!key) return false;
   let e = kid(g, `color${key}`, X14);
   if (!e) {
     e = x14(doc, g, `color${key}`);
@@ -256,4 +262,14 @@ export function setSparklineData(doc, r, c, data) {
   const s = sparkEls(g).find((x) => { const at = cellOf(x); return at.r === r && at.c === c; });
   kid(s, 'f', XM).textContent = (data.sheet ? sheetPrefix(data.sheet) : '') + rangeText(r0, c0, r1, c1, false);
   return true;
+}
+
+/** A style of the gallery (sparklinestyles.js, 0 to 35) given to the group drawn in (r, c) and every group with a
+ *  sparkline in `areas`: its eight colours, nothing else (excel-sparkstyles.ps1: the group's attributes unchanged). */
+export function applyStyle(doc, areas, r, c, k) {
+  const root = doc.documentElement;
+  const colors = styleColors(k);
+  const picked = groupElements(root, root.namespaceURI).filter((g) => sparkEls(g).some((s) => { const at = cellOf(s); return inAreas(at, areas) || (!!at && at.r === r && at.c === c); }));
+  for (const g of picked) for (const [name, color] of Object.entries(colors)) colorOn(doc, g, name, color);
+  return picked.length > 0;
 }

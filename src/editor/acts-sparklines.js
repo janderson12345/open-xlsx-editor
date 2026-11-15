@@ -5,7 +5,7 @@ import { numberBox } from './dialogs.js';
 import { areasOf } from './selection.js';
 import { parseRange, rangeName } from '../ooxml/refs.js';
 import { parseSheetRange } from '../ooxml/sparklines.js';
-import { sparkPieces, addSparklines, setGroupOptions, setGroupColor, clearSparklines, groupSparklines, ungroupSparklines, setGroupData, setSparklineData, SparklineError } from '../ooxml/sparkedit.js';
+import { sparkPieces, addSparklines, setGroupOptions, setGroupColor, clearSparklines, groupSparklines, ungroupSparklines, setGroupData, setSparklineData, SparklineError, applyStyle } from '../ooxml/sparkedit.js';
 import { sheetPrefix } from '../calc/tokens.js';
 
 const TYPES = { line: 'Line', column: 'Column', stacked: 'Win/Loss' };
@@ -120,6 +120,8 @@ export function createSparklineActs(env) {
     sparklineSet(changes) { const [r, c] = active(); return change((doc) => setGroupOptions(doc, r, c, changes)); },
     /** Sparkline Color and Marker Color's colours (`name`: series, negative, markers, high, low, first, last). */
     sparklineColor(name, color) { const [r, c] = active(); return color ? change((doc) => setGroupColor(doc, r, c, name, color)) : false; },
+    /** A style of the gallery (0 to 35) for the selected sparklines' groups. */
+    sparklineStyle(k) { const [r, c] = active(); return change((doc) => applyStyle(doc, areasOf(editing().selection), r, c, k)); },
     /** Group: the selected sparklines into the active cell's group. */
     sparklineGroup() { const [r, c] = active(); return change((doc) => groupSparklines(doc, areasOf(editing().selection), r, c)); },
     /** Ungroup: each selected sparkline a group of its own. */

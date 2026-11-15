@@ -1,0 +1,506 @@
+[
+  {
+    "n": 1,
+    "name": "Dark Teal, Sparkline Style Accent 1, Darker 50%",
+    "colors": {
+      "series": "theme=\"4\" tint=\"-0.499984740745262\"",
+      "negative": "theme=\"5\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"4\" tint=\"-0.499984740745262\"",
+      "first": "theme=\"4\" tint=\"0.39997558519241921\"",
+      "last": "theme=\"4\" tint=\"0.39997558519241921\"",
+      "high": "theme=\"4\"",
+      "low": "theme=\"4\""
+    }
+  },
+  {
+    "n": 2,
+    "name": "Brown, Sparkline Style Accent 2, Darker 50%",
+    "colors": {
+      "series": "theme=\"5\" tint=\"-0.499984740745262\"",
+      "negative": "theme=\"6\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"5\" tint=\"-0.499984740745262\"",
+      "first": "theme=\"5\" tint=\"0.39997558519241921\"",
+      "last": "theme=\"5\" tint=\"0.39997558519241921\"",
+      "high": "theme=\"5\"",
+      "low": "theme=\"5\""
+    }
+  },
+  {
+    "n": 3,
+    "name": "Dark Green, Sparkline Style Accent 3, Darker 50%",
+    "colors": {
+      "series": "theme=\"6\" tint=\"-0.499984740745262\"",
+      "negative": "theme=\"7\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"6\" tint=\"-0.499984740745262\"",
+      "first": "theme=\"6\" tint=\"0.39997558519241921\"",
+      "last": "theme=\"6\" tint=\"0.39997558519241921\"",
+      "high": "theme=\"6\"",
+      "low": "theme=\"6\""
+    }
+  },
+  {
+    "n": 4,
+    "name": "Dark Teal, Sparkline Style Accent 4, Darker 50%",
+    "colors": {
+      "series": "theme=\"7\" tint=\"-0.499984740745262\"",
+      "negative": "theme=\"8\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"7\" tint=\"-0.499984740745262\"",
+      "first": "theme=\"7\" tint=\"0.39997558519241921\"",
+      "last": "theme=\"7\" tint=\"0.39997558519241921\"",
+      "high": "theme=\"7\"",
+      "low": "theme=\"7\""
+    }
+  },
+  {
+    "n": 5,
+    "name": "Plum, Sparkline Style Accent 5, Darker 50%",
+    "colors": {
+      "series": "theme=\"8\" tint=\"-0.499984740745262\"",
+      "negative": "theme=\"9\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"8\" tint=\"-0.499984740745262\"",
+      "first": "theme=\"8\" tint=\"0.39997558519241921\"",
+      "last": "theme=\"8\" tint=\"0.39997558519241921\"",
+      "high": "theme=\"8\"",
+      "low": "theme=\"8\""
+    }
+  },
+  {
+    "n": 6,
+    "name": "Dark Green, Sparkline Style Accent 6, Darker 50%",
+    "colors": {
+      "series": "theme=\"9\" tint=\"-0.499984740745262\"",
+      "negative": "theme=\"4\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"9\" tint=\"-0.499984740745262\"",
+      "first": "theme=\"9\" tint=\"0.39997558519241921\"",
+      "last": "theme=\"9\" tint=\"0.39997558519241921\"",
+      "high": "theme=\"9\"",
+      "low": "theme=\"9\""
+    }
+  },
+  {
+    "n": 7,
+    "name": "Dark Teal, Sparkline Style Accent 1, Darker 25%",
+    "colors": {
+      "series": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "negative": "theme=\"5\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"5\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 8,
+    "name": "Brown, Sparkline Style Accent 2, Darker 25%",
+    "colors": {
+      "series": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "negative": "theme=\"6\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"6\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 9,
+    "name": "Dark Green, Sparkline Style Accent 3, Darker 25%",
+    "colors": {
+      "series": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "negative": "theme=\"7\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"7\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 10,
+    "name": "Turquoise, Sparkline Style Accent 4, Darker 25%",
+    "colors": {
+      "series": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "negative": "theme=\"8\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"8\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 11,
+    "name": "Plum, Sparkline Style Accent 5, Darker 25%",
+    "colors": {
+      "series": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "negative": "theme=\"9\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"9\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 12,
+    "name": "Dark Green, Sparkline Style Accent 6, Darker 25%",
+    "colors": {
+      "series": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "negative": "theme=\"4\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"4\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 13,
+    "name": "Dark Teal, Sparkline Style Accent 1, (no dark or light)",
+    "colors": {
+      "series": "theme=\"4\"",
+      "negative": "theme=\"5\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"4\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 14,
+    "name": "Orange, Sparkline Style Accent 2, (no dark or light)",
+    "colors": {
+      "series": "theme=\"5\"",
+      "negative": "theme=\"6\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"5\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 15,
+    "name": "Dark Green, Sparkline Style Accent 3, (no dark or light)",
+    "colors": {
+      "series": "theme=\"6\"",
+      "negative": "theme=\"7\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"6\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 16,
+    "name": "Turquoise, Sparkline Style Accent 4, (no dark or light)",
+    "colors": {
+      "series": "theme=\"7\"",
+      "negative": "theme=\"8\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"7\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 17,
+    "name": "Plum, Sparkline Style Accent 5, (no dark or light)",
+    "colors": {
+      "series": "theme=\"8\"",
+      "negative": "theme=\"9\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"8\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 18,
+    "name": "Green, Sparkline Style Accent 6, (no dark or light)",
+    "colors": {
+      "series": "theme=\"9\"",
+      "negative": "theme=\"4\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"9\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 19,
+    "name": "Turquoise, Sparkline Style Accent 1, Lighter 40%",
+    "colors": {
+      "series": "theme=\"4\" tint=\"0.39997558519241921\"",
+      "negative": "theme=\"0\" tint=\"-0.499984740745262\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"4\" tint=\"0.79998168889431442\"",
+      "first": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"4\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"4\" tint=\"-0.499984740745262\"",
+      "low": "theme=\"4\" tint=\"-0.499984740745262\""
+    }
+  },
+  {
+    "n": 20,
+    "name": "Light Orange, Sparkline Style Accent 2, Lighter 40%",
+    "colors": {
+      "series": "theme=\"5\" tint=\"0.39997558519241921\"",
+      "negative": "theme=\"0\" tint=\"-0.499984740745262\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"5\" tint=\"0.79998168889431442\"",
+      "first": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"5\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"5\" tint=\"-0.499984740745262\"",
+      "low": "theme=\"5\" tint=\"-0.499984740745262\""
+    }
+  },
+  {
+    "n": 21,
+    "name": "Green, Sparkline Style Accent 3, Lighter 40%",
+    "colors": {
+      "series": "theme=\"6\" tint=\"0.39997558519241921\"",
+      "negative": "theme=\"0\" tint=\"-0.499984740745262\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"6\" tint=\"0.79998168889431442\"",
+      "first": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"6\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"6\" tint=\"-0.499984740745262\"",
+      "low": "theme=\"6\" tint=\"-0.499984740745262\""
+    }
+  },
+  {
+    "n": 22,
+    "name": "Turquoise, Sparkline Style Accent 4, Lighter 40%",
+    "colors": {
+      "series": "theme=\"7\" tint=\"0.39997558519241921\"",
+      "negative": "theme=\"0\" tint=\"-0.499984740745262\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"7\" tint=\"0.79998168889431442\"",
+      "first": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"7\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"7\" tint=\"-0.499984740745262\"",
+      "low": "theme=\"7\" tint=\"-0.499984740745262\""
+    }
+  },
+  {
+    "n": 23,
+    "name": "Pink, Sparkline Style Accent 5, Lighter 40%",
+    "colors": {
+      "series": "theme=\"8\" tint=\"0.39997558519241921\"",
+      "negative": "theme=\"0\" tint=\"-0.499984740745262\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"8\" tint=\"0.79998168889431442\"",
+      "first": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"8\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"8\" tint=\"-0.499984740745262\"",
+      "low": "theme=\"8\" tint=\"-0.499984740745262\""
+    }
+  },
+  {
+    "n": 24,
+    "name": "Green, Sparkline Style Accent 6, Lighter 40%",
+    "colors": {
+      "series": "theme=\"9\" tint=\"0.39997558519241921\"",
+      "negative": "theme=\"0\" tint=\"-0.499984740745262\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"9\" tint=\"0.79998168889431442\"",
+      "first": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"9\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"9\" tint=\"-0.499984740745262\"",
+      "low": "theme=\"9\" tint=\"-0.499984740745262\""
+    }
+  },
+  {
+    "n": 25,
+    "name": "Blue, Sparkline Style Dark #1",
+    "colors": {
+      "series": "theme=\"3\" tint=\"0.499984740745262\"",
+      "negative": "theme=\"1\" tint=\"0.249977111117893\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"1\" tint=\"0.249977111117893\"",
+      "first": "theme=\"1\" tint=\"0.249977111117893\"",
+      "last": "theme=\"1\" tint=\"0.249977111117893\"",
+      "high": "theme=\"1\" tint=\"0.249977111117893\"",
+      "low": "theme=\"1\" tint=\"0.249977111117893\""
+    }
+  },
+  {
+    "n": 26,
+    "name": "Blue, Sparkline Style Dark #2",
+    "colors": {
+      "series": "theme=\"3\" tint=\"0.34998626667073579\"",
+      "negative": "theme=\"0\" tint=\"-0.249977111117893\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"0\" tint=\"-0.249977111117893\"",
+      "first": "theme=\"0\" tint=\"-0.249977111117893\"",
+      "last": "theme=\"0\" tint=\"-0.249977111117893\"",
+      "high": "theme=\"0\" tint=\"-0.249977111117893\"",
+      "low": "theme=\"0\" tint=\"-0.249977111117893\""
+    }
+  },
+  {
+    "n": 27,
+    "name": "Dark Gray, Sparkline Style Dark #3",
+    "colors": {
+      "series": "rgb=\"FF323232\"",
+      "negative": "rgb=\"FFD00000\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FFD00000\"",
+      "first": "rgb=\"FFD00000\"",
+      "last": "rgb=\"FFD00000\"",
+      "high": "rgb=\"FFD00000\"",
+      "low": "rgb=\"FFD00000\""
+    }
+  },
+  {
+    "n": 28,
+    "name": "Black, Sparkline Style Dark #4",
+    "colors": {
+      "series": "rgb=\"FF000000\"",
+      "negative": "rgb=\"FF0070C0\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FF0070C0\"",
+      "first": "rgb=\"FF0070C0\"",
+      "last": "rgb=\"FF0070C0\"",
+      "high": "rgb=\"FF0070C0\"",
+      "low": "rgb=\"FF0070C0\""
+    }
+  },
+  {
+    "n": 29,
+    "name": "Blue, Sparkline Style Dark #5",
+    "colors": {
+      "series": "rgb=\"FF376092\"",
+      "negative": "rgb=\"FFD00000\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FFD00000\"",
+      "first": "rgb=\"FFD00000\"",
+      "last": "rgb=\"FFD00000\"",
+      "high": "rgb=\"FFD00000\"",
+      "low": "rgb=\"FFD00000\""
+    }
+  },
+  {
+    "n": 30,
+    "name": "Dark Blue, Sparkline Style Dark #6",
+    "colors": {
+      "series": "rgb=\"FF0070C0\"",
+      "negative": "rgb=\"FF000000\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FF000000\"",
+      "first": "rgb=\"FF000000\"",
+      "last": "rgb=\"FF000000\"",
+      "high": "rgb=\"FF000000\"",
+      "low": "rgb=\"FF000000\""
+    }
+  },
+  {
+    "n": 31,
+    "name": "Dark Gray, Sparkline Style Colorful #1",
+    "colors": {
+      "series": "rgb=\"FF5F5F5F\"",
+      "negative": "rgb=\"FFFFB620\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FFD70077\"",
+      "first": "rgb=\"FF5687C2\"",
+      "last": "rgb=\"FF359CEB\"",
+      "high": "rgb=\"FF56BE79\"",
+      "low": "rgb=\"FFFF5055\""
+    }
+  },
+  {
+    "n": 32,
+    "name": "Blue, Sparkline Style Colorful #2",
+    "colors": {
+      "series": "rgb=\"FF5687C2\"",
+      "negative": "rgb=\"FFFFB620\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FFD70077\"",
+      "first": "rgb=\"FF777777\"",
+      "last": "rgb=\"FF359CEB\"",
+      "high": "rgb=\"FF56BE79\"",
+      "low": "rgb=\"FFFF5055\""
+    }
+  },
+  {
+    "n": 33,
+    "name": "Light Green, Sparkline Style Colorful #3",
+    "colors": {
+      "series": "rgb=\"FFC6EFCE\"",
+      "negative": "rgb=\"FFFFC7CE\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FF8CADD6\"",
+      "first": "rgb=\"FFFFDC47\"",
+      "last": "rgb=\"FFFFEB9C\"",
+      "high": "rgb=\"FF60D276\"",
+      "low": "rgb=\"FFFF5367\""
+    }
+  },
+  {
+    "n": 34,
+    "name": "Dark Green, Sparkline Style Colorful #4",
+    "colors": {
+      "series": "rgb=\"FF00B050\"",
+      "negative": "rgb=\"FFFF0000\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "rgb=\"FF0070C0\"",
+      "first": "rgb=\"FFFFC000\"",
+      "last": "rgb=\"FFFFC000\"",
+      "high": "rgb=\"FF00B050\"",
+      "low": "rgb=\"FFFF0000\""
+    }
+  },
+  {
+    "n": 35,
+    "name": "Dark Blue, Sparkline Style Colorful #5",
+    "colors": {
+      "series": "theme=\"3\"",
+      "negative": "theme=\"9\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"8\"",
+      "first": "theme=\"4\"",
+      "last": "theme=\"5\"",
+      "high": "theme=\"6\"",
+      "low": "theme=\"7\""
+    }
+  },
+  {
+    "n": 36,
+    "name": "Dark Blue, Sparkline Style Colorful #6",
+    "colors": {
+      "series": "theme=\"3\"",
+      "negative": "theme=\"4\"",
+      "axis": "rgb=\"FF000000\"",
+      "markers": "theme=\"9\"",
+      "first": "theme=\"5\"",
+      "last": "theme=\"6\"",
+      "high": "theme=\"7\"",
+      "low": "theme=\"8\""
+    }
+  }
+]

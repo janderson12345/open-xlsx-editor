@@ -1859,6 +1859,49 @@
   overflow: hidden;
   pointer-events: none;
 }
+/* The Sparkline tab's style gallery (sparklinetab.js): six by six previews, a bar of the series colour with the high
+   and low points' colours. */
+.oxe-spark-styles {
+  display: grid;
+  grid-template-columns: repeat(6, 34px);
+  gap: 4px;
+  padding: 4px;
+}
+.oxe-spark-style {
+  position: relative;
+  width: 34px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--oxe-head-line);
+  cursor: pointer;
+  background: #ffffff;
+}
+.oxe-spark-style:hover,
+.oxe-spark-style:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-spark-style-line {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 10px;
+  height: 3px;
+}
+.oxe-spark-style-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+}
+.oxe-spark-style-high {
+  left: 6px;
+  top: 4px;
+}
+.oxe-spark-style-low {
+  right: 6px;
+  top: 14px;
+}
 .oxe-cell .oxe-cf-icon {
   position: absolute;
   left: 2px;

@@ -1,6 +1,6 @@
 // Browser check of Insert > Sparklines and the Sparkline tab (docs/SPARKLINES.md) on test/fixtures/sparklines.xlsx:
 // the tab shown only while the active cell holds a sparkline; Create Sparklines filled from the selection, a shape
-// Excel refuses refused; the type, points, colour, axis, Group, Ungroup and Clear each one step of the history; the
+// Excel refuses refused; a style from the gallery; the type, points, colour, axis, Group, Ungroup and Clear each one step of the history; the
 // result saved (to the output folder, for tools/excel-compare/excel-sparkedit-check.ps1) and read back.
 // Run after `npm run build`: node test/sparkline-tab.mjs [outDir]
 import fs from 'node:fs';
@@ -58,6 +58,13 @@ check(dataField === 'B2:M3' && /not valid/.test(refused) && two?.type === 'colum
 await select('Q2');
 await tab('Sparkline');
 await page.screenshot({ path: `${outDir}/sparkline-tab.png` });
+await press('Sparkline Styles');
+const shown = await page.locator('.oxe-pop button.oxe-spark-style').count();
+await page.screenshot({ path: `${outDir}/sparkline-styles.png` });
+await page.click('.oxe-pop button[title="Sparkline Style Colorful #4"]');
+const styled = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).sparklines.find((x) => x.sparklines.some((s) => s.r === 1 && s.c === 16)).colors);
+check(shown === 36 && styled.series.rgb === 'FF00B050' && styled.markers.rgb === 'FF0070C0' && styled.low.rgb === 'FFFF0000',
+  'the style gallery: 36 styles; Colorful #4 gives the group its colours', JSON.stringify({ shown, series: styled.series, markers: styled.markers }));
 await press('Win/Loss');
 await press('High Point');
 await press('Sparkline Color');
