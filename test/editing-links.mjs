@@ -196,12 +196,24 @@ const justifyCase = async (cells, range, chars, font) => {
   await menu('Fill', 'Justify');
 };
 const columnA = () => page.evaluate(() => { const out = []; const s = window.oxe.workbook.sheet(window.oxe.sheetIndex); for (let r = 0; r < 40; r++) { const x = s.cells.get(r)?.get(0); out.push(x?.v == null ? '' : String(x.v)); } while (out.length && out[out.length - 1] === '') out.pop(); return out; });
+// (Excel's breaks follow the font's own widths: counted only where Calibri and Arial are installed, as on Windows.
+// Elsewhere, Linux CI among them, a stand-in measures a little differently, so each paragraph is checked for its words
+// only.)
+const fontsHere = await page.evaluate(() => ['Calibri', 'Arial'].every((f) => {
+  const ctx = document.createElement('canvas').getContext('2d');
+  const w = (font) => { ctx.font = `40px ${font}`; return ctx.measureText('mmmmmmmmmmlli1WQ').width; };
+  return w(`'${f}', monospace`) !== w('monospace') && w(`'${f}', serif`) !== w('serif');
+}));
 let same = 0;
+let kept = 0;
 for (const x of excelLines) {
   await justifyCase([x.text], [39, 0], (x.px - 5) / 7, x.font);
-  if ((await columnA()).join('|') === x.lines.join('|')) same++;
+  const got = await columnA();
+  if (got.join('|') === x.lines.join('|')) same++;
+  if (got.join(' ') === x.text && got.length > 1) kept++;
 }
-check(same >= 20, `Fill > Justify: ${same} of ${excelLines.length} Calibri and Arial paragraphs broken into lines exactly as Excel's (fitted: 20 here, docs/FILL.md)`);
+if (fontsHere) check(same >= 20, `Fill > Justify: ${same} of ${excelLines.length} Calibri and Arial paragraphs broken into lines exactly as Excel's (fitted: 20 here, docs/FILL.md)`);
+else check(kept === excelLines.length, `Fill > Justify: ${kept} of ${excelLines.length} paragraphs broken into lines, every word kept (Calibri and Arial not installed: ${same} broken exactly as Excel's)`);
 await justifyCase(['alpha', 42, 'beta'], [2, 0]);
 await page.waitForSelector('dialog.oxe-dialog >> text=Cannot justify cells containing numbers or formulas.');
 await page.keyboard.press('Enter');
