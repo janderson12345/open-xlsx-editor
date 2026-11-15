@@ -52,3 +52,19 @@ them), Data!B2 set to 7, saved, and read back with openpyxl 3.1.5:
 The two that differ are results that are empty text (`T(1)`, `MID` past the end of its text): the editor writes
 `<v></v>` with `t="str"`, and openpyxl reads that as None. The results nothing changed keep the cached
 values the file came with.
+
+## Templates and macro-enabled files (measured)
+
+Excel's SaveAs of one workbook as .xlsx, .xltx, .xltm and .xlsm (formats 51, 54, 53, 52, in a hidden Excel) gave four
+files that differ only in the workbook part's content type in `[Content_Types].xml` (and the documentId Excel makes
+new on every save). Opening a template in Excel makes a new workbook from it ("book1", no path); that saved as .xlsx
+was the same file as the workbook saved as .xlsx. So here (`ooxml/filetype.js`):
+
+- A .xltx or .xltm opens and edits as any workbook; `editor.fileType` says which kind it is.
+- `editor.save({ as })` ('xlsx', 'xltx', 'xlsm', 'xltm') changes only that content type, the rest of the file as it
+  was: Excel's `[Content_Types].xml` byte for byte for each of the three conversions of its .xlsx, and its template
+  saved as .xlsx (checked against Excel's files; the tests use files made in code).
+- A workbook with macros becomes only a macro kind: Excel would drop the VBA project for .xlsx or .xltx (with a
+  warning; not measured), so the editor refuses.
+
+What a host names the file is its own: Excel names a new workbook from a template after it (book.xltx: "book1").

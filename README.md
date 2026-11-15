@@ -25,7 +25,7 @@ editor.enter('B3', '=B2*2');   // a formula; the cells that read B2 or B3 are wo
 editor.showSheet('Notes');     // another sheet, by name or index, with the selection it had
 editor.renameSheet('Notes', 'Q1 notes'); // formulas that read it follow; also insertSheet, moveSheet, hideSheet...
 editor.command('toggleFont', 'b'); // what the ribbon's buttons do, on the selection; Ctrl+B does the same
-const saved = editor.save(); // Uint8Array
+const saved = editor.save(); // Uint8Array; save({ as: 'xltx' }) as a template, or a template as 'xlsx'
 ```
 
 ## Read-only mode and turning features off

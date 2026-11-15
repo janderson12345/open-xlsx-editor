@@ -1,6 +1,7 @@
 // An .xlsx workbook: its sheets in order, the shared strings, and each sheet's model read when first asked for.
 // Saving rewrites only the sheets that were changed; every other part goes back byte for byte.
 import { OpcPackage } from './package.js';
+import { fileType, setFileType } from './filetype.js';
 import { kids, kid, attr, serializeXml, parseXml, NS } from './xml.js';
 import { readSharedStrings } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
@@ -475,6 +476,11 @@ export class Workbook {
   }
 
   /** The workbook as .xlsx bytes: changed sheets serialised, every other part as it was read. */
+  /** The file's kind: 'xlsx', 'xltx' (a template), 'xlsm' or 'xltm' (filetype.js). */
+  get fileType() { return fileType(this.pkg); }
+  /** Made a file of kind `type` when saved, as Excel's Save As (filetype.js setFileType). */
+  setFileType(type) { setFileType(this.pkg, type); }
+
   toBytes() {
     // (A formula the engine couldn't work out may read a changed cell: have Excel recalculate the workbook on opening.)
     if (this.edited && ((this._calc && this._calc.incomplete) || this._incomplete)) this._fullCalcOnLoad();

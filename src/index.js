@@ -377,8 +377,12 @@ export function mountXlsxEditor(host, options = {}) {
       return api;
     },
     /** The workbook as .xlsx bytes (unchanged parts byte for byte, changed sheets rewritten in place). */
-    save() {
+    /** The workbook as a file's bytes. `as`: 'xlsx', 'xltx', 'xlsm' or 'xltm', made that kind of file from now on, as
+     *  Excel's Save As (a template saved as a workbook; ooxml/filetype.js; a workbook with macros only as a macro
+     *  kind). */
+    save({ as = null } = {}) {
       if (!state.workbook) throw new Error('no workbook open');
+      if (as) state.workbook.setFileType(as);
       // (A manual workbook worked out first, unless Recalculate workbook before saving is off: calcmode.js.)
       if (calculateBeforeSave(state.workbook)) { state.grid.refresh(); showStats(); }
       return state.workbook.toBytes();
@@ -454,6 +458,8 @@ export function mountXlsxEditor(host, options = {}) {
     get grid() { return state.grid; },
     get sheetIndex() { return state.sheetIndex; },
     get fileName() { return state.fileName; },
+    /** The open file's kind: 'xlsx', 'xltx' (a template), 'xlsm' or 'xltm' (null for a .csv). */
+    get fileType() { return state.workbook?.fileType ?? null; },
     get readOnly() { return state.readOnly; },
     setReadOnly(flag) {
       state.readOnly = !!flag;
