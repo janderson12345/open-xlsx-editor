@@ -1,0 +1,19 @@
+[
+  {"name": "box-one-key", "range": "A1:C6", "header": "yes", "keys": [{"key": "B1", "order": "asc"}]},
+  {"name": "box-desc-two-keys", "range": "A1:C6", "header": "yes", "keys": [{"key": "C1", "order": "desc"}, {"key": "A1", "order": "asc"}]},
+  {"name": "box-match-case", "range": "A1:C6", "header": "yes", "matchCase": true, "keys": [{"key": "A1", "order": "asc"}]},
+  {"name": "box-no-header", "range": "A2:C6", "header": "no", "keys": [{"key": "A2", "order": "desc"}]},
+  {"name": "box-left-to-right", "range": "B2:C6", "header": "no", "leftToRight": true, "keys": [{"key": "B2", "order": "asc"}]},
+  {"name": "box-cell-colour", "range": "A1:C6", "header": "yes", "keys": [{"key": "B1", "order": "asc", "on": "cellColor", "color": 255}]},
+  {"name": "box-font-colour", "range": "A1:C6", "header": "yes", "keys": [{"key": "B1", "order": "desc", "on": "fontColor", "color": 16711680}]},
+  {"name": "box-custom-list", "range": "A1:C6", "header": "yes", "keys": [{"key": "C1", "order": "asc", "customOrder": "red,green,brown,purple"}]},
+  {"name": "button-a-to-z", "legacy": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "A1", "order": "asc"}]},
+  {"name": "button-z-to-a", "legacy": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B1", "order": "desc"}]},
+  {"name": "filtered-one-key", "filter": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B1", "order": "desc"}]},
+  {"name": "filtered-two-keys", "filter": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "C1", "order": "asc"}, {"key": "B1", "order": "desc"}]},
+  {"name": "box-data-key", "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "asc"}]},
+  {"name": "box-data-keys-two", "range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}]},
+  {"name": "box-data-key-colour", "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "asc", "on": "cellColor", "color": 255}]},
+  {"name": "box-data-key-ltr", "range": "B2:C6", "header": "no", "leftToRight": true, "keys": [{"key": "B2:C2", "order": "asc"}]},
+  {"name": "filtered-data-key", "filter": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "desc"}]}
+]

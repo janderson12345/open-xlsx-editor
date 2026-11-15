@@ -84,5 +84,5 @@ under it. Measured over COM (`excel-filter.ps1` on `filter2-cases.json`, `test/f
 
 ## Not yet
 
-Excel's `sortState` saved in the autoFilter after a sort, the filter growing as rows are added below, tables' own
-filters, and filtering by an icon.
+The filter growing as rows are added below, tables' own filters, and filtering by an icon. (A sort of the filtered
+range is saved in the autoFilter as Excel saves it: docs/SORT.md.)

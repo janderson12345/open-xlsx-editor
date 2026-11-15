@@ -49,9 +49,28 @@ SortOnValue.Color and CustomOrder: 6 of 6 cases). In the Sort box, each level's 
 Font Color (a colour that column has, On Top or On Bottom); Order's Custom List... takes the list typed, "High, Medium,
 Low" (Excel's box picks from its own lists).
 
+## The sort saved with the sheet
+
+Excel saves the last sort of a sheet as its `sortState`, and so does the editor after every sort (the Sort box, the A
+to Z and Z to A buttons, a filter's), as one step of Undo with the sort (`src/ooxml/sortstate.js`). Measured over COM
+on 17 sorts of a made-up table, saved and read back (`tools/excel-compare/excel-sortstate.ps1`,
+`sortstate-cases.json`, `test/sortstate-excel.json`; `test/sortstate.test.js` makes each and compares: 17 of 17):
+
+| Rule | Excel's file |
+|---|---|
+| The ref is the rows sorted, without the header row; with Left to Right, the columns. | A1:C6 with headers: `<sortState ref="A2:C6">` |
+| One sortCondition per level, its ref the key column's data rows (the key Excel's Sort box passes; given one cell over COM, Excel writes that cell). | `<sortCondition descending="1" ref="C2:C6"/><sortCondition ref="A2:A6"/>` |
+| Z to A: `descending="1"`. Match case: `caseSensitive="1"`. Left to Right: `columnSort="1"`, the key a row. | `<sortState columnSort="1" ref="B2:C6"><sortCondition ref="B2:C2"/>` |
+| Sort On Cell Color or Font Color: `sortBy` and the colour as a new dxf (a solid fill over `indexed="65"`; or the body font with every property given and the colour). | `<sortCondition sortBy="cellColor" ref="B2:B6" dxfId="0"/>` |
+| A custom list: `customList`, its entries joined by commas. | `<sortCondition ref="C2:C6" customList="red,green,brown,purple"/>` |
+| A filtered range's sort: the one sortState is the autoFilter's last child; otherwise it follows the autoFilter in the sheet. A new sort replaces the last. | `<autoFilter ref="A1:C6"><sortState ref="A2:C6">...` |
+| The A to Z and Z to A buttons save the same form as the Sort box. Excel 365 declares the xlrd2 namespace on it (written so here). | |
+
+A sort inside a table is not saved here: Excel keeps that sortState in the table's own part.
+
 ## Not yet
 
 Sorting by a conditional format's icon, Excel's question about numbers stored as text
-(sorted as text here, as without it), sorting a table (ListObject), the cells' menu's Sort, and the sort state Excel
-saves with the sheet. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Notes, hyperlinks, conditional formats and data validation stay where they are.
+(sorted as text here, as without it), sorting a table (ListObject), the cells' menu's Sort, a table's saved sort, and
+moving a saved sort's ranges when rows or columns are inserted or deleted. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Notes, hyperlinks, conditional formats and data validation stay where they are.
 (Filter, and the Data tab's Sort & Filter group, are done: docs/FILTER.md.)

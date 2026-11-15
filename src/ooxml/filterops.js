@@ -176,7 +176,7 @@ export function setAutoFilterXml(doc, filter, wb = null, si = null, today = toda
 }
 
 /** A dxf added to the workbook's styles (its dxfs made when there are none); returns its index. */
-function addDxf(wb, xml) {
+export function addDxf(wb, xml) {
   const sroot = wb.stylesDoc.documentElement;
   const sns = sroot.namespaceURI;
   let dxfs = kidOf(sroot, 'dxfs', sns);

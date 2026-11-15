@@ -4,6 +4,7 @@ import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
+import { setSortState } from '../ooxml/sortstate.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
 import { validName, defineName, namesOnSheet } from '../ooxml/names.js';
@@ -155,7 +156,18 @@ export function dataCommands(env) {
       const plan = typeof how === 'string' ? quickSort(wb, si, state.sel, how === 'desc', { expand }) : how;
       const step = plan.error ? plan : sortChanges(wb, si, plan.area, plan);
       if (step.error) { ctx.alert(step.error); return false; }
-      if (step.contents.length && !runSteps([step])) return false;
+      const before = wb.snapshot();
+      const ran = step.contents.length > 0;
+      if (ran && !runSteps([step])) return false;
+      // (The sort saved as the sheet's sortState, as Excel saves it after every sort, sortstate.js: then the step is the
+      // workbook before and after, the cells' own entry giving way to it.)
+      if (setSortState(wb, si, plan)) {
+        if (ran) state.undo.pop();
+        state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+        state.redo = [];
+        ctx.reloaded?.();
+        ctx.changed?.();
+      }
       const order = typeof how === 'string' ? (how === 'desc' ? ', Z to A' : ', A to Z') : '';
       ctx.announce(`Sorted ${refName(plan.area.r0, plan.area.c0)} to ${refName(plan.area.r1, plan.area.c1)}${order}`);
       return true;

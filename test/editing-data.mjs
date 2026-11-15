@@ -50,8 +50,16 @@ await ribbon('Sort & Filter', async () => {
 rowsNow = await rowsOf();
 const byBoth = rowsNow.every((x, k) => k === 0 || (() => { const [, a, e] = rowsNow[k - 1].split('|'); const [, b, f] = x.split('|'); return e > f || (e === f && Number(a) >= Number(b)); })());
 check(headed && byBoth && await value('A1') === 'Item', 'Custom Sort... on A1:F10: headers guessed, Choice Z to A then Amount largest first, the header row left', rowsNow.join(' '));
+// (The sort saved as the sheet's sortState, as Excel saves it: the data rows, a level per key, Z to A descending.)
+const sortStateNow = () => page.evaluate(() => {
+  const wb = window.oxe.workbook;
+  const xml = wb.sheets.map((s, i) => { try { return new XMLSerializer().serializeToString(wb._part(i).doc); } catch { return ''; } }).join('');
+  return (xml.match(/<sortState[ >].*?<\/sortState>/) || [''])[0].replace(/ xmlns(:\w+)?="[^"]*"/g, '');
+});
+const savedSort = await sortStateNow();
+check(/^<sortState ref="A2:F10"><sortCondition descending="1" ref="[A-F]2:[A-F]10"\/><sortCondition descending="1" ref="[A-F]2:[A-F]10"\/><\/sortState>$/.test(savedSort), "the sort saved as the sheet's sortState, as Excel saves it", savedSort);
 await page.keyboard.press('Control+z');
-check((await rowsOf()).join() === rowsWere.join(), 'Ctrl+Z: as before');
+check((await rowsOf()).join() === rowsWere.join() && await sortStateNow() === '', 'Ctrl+Z: as before, the sortState too');
 
 // AutoSum: 5 and 7 typed in Q40:Q41; on Q42 Alt+= opens the cell with Excel's =SUM(Q40:Q41), Enter enters it.
 // Q40:Q42 selected, AutoSum > Average: =AVERAGE(Q40:Q41) in the blank Q42. Ctrl+Z each.

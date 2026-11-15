@@ -1,0 +1,212 @@
+{
+  "excel": "Excel.Application: Worksheet.Sort, AutoFilter.Sort and Range.Sort, saved; the sheet's sortState and autoFilter",
+  "cases": [
+    {
+      "name": "box-one-key",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"B1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-desc-two-keys",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C1\"/><sortCondition ref=\"A1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-match-case",
+      "autoFilter": null,
+      "sortState": "<sortState caseSensitive=\"1\" ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"A1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-no-header",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"A2\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-left-to-right",
+      "autoFilter": null,
+      "sortState": "<sortState columnSort=\"1\" ref=\"B2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"B2\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-cell-colour",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition sortBy=\"cellColor\" ref=\"B1\" dxfId=\"0\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFF0000\"/><bgColor indexed=\"65\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "box-font-colour",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" sortBy=\"fontColor\" ref=\"B1\" dxfId=\"0\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><font><b val=\"0\"/><i val=\"0\"/><strike val=\"0\"/><condense val=\"0\"/><extend val=\"0\"/><outline val=\"0\"/><shadow val=\"0\"/><u val=\"none\"/><vertAlign val=\"baseline\"/><sz val=\"11\"/><color rgb=\"FF0000FF\"/><name val=\"Aptos Narrow\"/><family val=\"2\"/><scheme val=\"minor\"/></font></dxf></dxfs>"
+    },
+    {
+      "name": "box-custom-list",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C1\" customList=\"red,green,brown,purple\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "button-a-to-z",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"A1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "button-z-to-a",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "filtered-one-key",
+      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{607DB8A2-B104-48ED-A932-C6F389E07843}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/>",
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "autoFilter",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "filtered-two-keys",
+      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{96D0E30F-0273-423F-87C8-32A02B0F58B2}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C1\"/>",
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C1\"/><sortCondition descending=\"1\" ref=\"B1\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "autoFilter",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-data-key",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"B2:B6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-data-keys-two",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C2:C6\"/><sortCondition ref=\"A2:A6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "box-data-key-colour",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition sortBy=\"cellColor\" ref=\"B2:B6\" dxfId=\"0\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFF0000\"/><bgColor indexed=\"65\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "box-data-key-ltr",
+      "autoFilter": null,
+      "sortState": "<sortState columnSort=\"1\" ref=\"B2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"B2:C2\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "filtered-data-key",
+      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{22BBDEB6-1D68-4956-ADCA-A55BD88E069E}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/>",
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "autoFilter",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    }
+  ]
+}
