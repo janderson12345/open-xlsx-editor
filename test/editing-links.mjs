@@ -1,6 +1,7 @@
 // Browser check of hyperlinks: a click on a hyperlink's cell follows it (an address opened, a place in the workbook
 // gone to), a click held selects the cell instead, Excel's ScreenTip and hand over it, and the cell menu's Open
-// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks, Print Titles, Orientation and Scale to Fit. Run after `npm run build`:
+// Hyperlink; and names made by Formulas > Create from Selection, Use in Formula and Paste Names, Home > Fill > Justify, Circle Invalid Data, Apply Names, iterative calculation, and Page Layout's Print Area, Breaks, Print Titles, Orientation and Scale to Fit; Function Arguments (Ctrl+A).
+// Run after `npm run build`:
 // node test/editing-links.mjs [outDir]
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
@@ -400,4 +401,43 @@ await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); for 
 const twoAreas = await page.evaluate(() => { const n = window.oxe.preparePrint(); const firsts = [...document.querySelectorAll('.oxe-page')].map((p) => p.querySelector('.oxe-cell')?.textContent); return { n, firsts }; });
 check(twoAreas.n === 2 && twoAreas.firsts.join() === 'a1,a30', 'A print area of two ranges prints each on a page of its own', JSON.stringify(twoAreas));
 
+// Function Arguments: =VLOOKUP typed and Ctrl+A, as in Excel: a box per argument, the required ones bold; each one's
+// value beside it at the cell, the argument with focus described, "Formula result ="; OK enters =VLOOKUP(2,A1:A3,1),
+// one step undone by Ctrl+Z. =MAX( and Ctrl+A, OK with nothing in it: =MAX(), which Excel refuses, left being edited.
+await page.evaluate(() => { const o = window.oxe; o.command('insertSheet'); o.enter('A1', '1'); o.enter('A2', '2'); o.enter('A3', '3'); o.select('D1'); });
+const fa = 'dialog.oxe-fnargs-box';
+const faNames = () => page.evaluate(() => [...document.querySelectorAll('dialog.oxe-fnargs-box .oxe-fnargs-name')].map((l) => l.textContent + (l.classList.contains('oxe-fnargs-required') ? '*' : '')).join());
+await page.focus('.oxe-grid');
+await page.keyboard.type('=VLOOKUP');
+await page.keyboard.press('Control+a');
+await page.waitForSelector(fa);
+const vNames = await faNames();
+await page.keyboard.type('2');
+await page.keyboard.press('Tab');
+await page.keyboard.type('A1:A3');
+const vHelp = await page.textContent(`${fa} .oxe-fnargs-help`);
+const vValue = await page.textContent(`${fa} .oxe-fnargs-row >> nth=1 >> .oxe-fnargs-value`);
+await page.keyboard.press('Tab');
+await page.keyboard.type('1');
+const vResult = await page.textContent(`${fa} .oxe-fnargs-result`);
+const vAbout = await page.textContent(`${fa} .oxe-fnargs-about`);
+await page.click(`${fa} >> button:text-is("OK")`);
+await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'));
+const d1 = () => page.evaluate(() => { const c = window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(0)?.get(3); return c && c.f != null ? `${c.f}=${c.v}` : null; });
+const vEntered = await d1();
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+z');
+const vUndone = await d1();
+check(vNames === 'Lookup_value*,Table_array*,Col_index_num*,Range_lookup' && vHelp === 'Table_array: The table to look in.' && vValue === '= {1;2;3}'
+  && vResult === 'Formula result = 2' && /first column/.test(vAbout) && vEntered === 'VLOOKUP(2,A1:A3,1)=2' && vUndone === null,
+  'Ctrl+A after =VLOOKUP: Function Arguments, required bold, values and description; OK enters =VLOOKUP(2,A1:A3,1); Ctrl+Z one step',
+  JSON.stringify({ vNames, vHelp, vValue, vResult, vAbout, vEntered, vUndone }));
+await page.keyboard.type('=MAX(');
+await page.keyboard.press('Control+a');
+await page.waitForSelector(fa);
+await page.click(`${fa} >> button:text-is("OK")`);
+await page.waitForFunction(() => !document.querySelector('dialog.oxe-fnargs-box'));
+const maxLeft = await page.evaluate(() => document.querySelector('.oxe-editor')?.value ?? null);
+check(maxLeft === '=MAX()' && await d1() === null, 'OK with nothing in MAX: =MAX(), which Excel refuses, left being edited', maxLeft);
+await page.keyboard.press('Escape');
 await finish();

@@ -2101,6 +2101,22 @@
 .oxe-function-search .oxe-dialog-field { flex: 1; min-width: 0; }
 .oxe-function-list { width: 100%; }
 .oxe-function-syntax { min-height: 2.6em; font-family: Consolas, 'Courier New', monospace; overflow-wrap: anywhere; }
+.oxe-function-about { min-height: 2.6em; }
+
+/* Function Arguments (fnargsbox.js): a row per argument, its name (bold when required), its box and its value. */
+.oxe-fnargs-box { width: min(560px, calc(100vw - 32px)); }
+.oxe-fnargs-group { margin: 0 0 12px; padding: 6px 10px; border: 1px solid var(--oxe-head-line); border-radius: 4px; }
+.oxe-fnargs-group legend { margin: 0; padding: 0 4px; font-weight: 600; }
+.oxe-fnargs-rows { max-height: min(40vh, 260px); overflow-y: auto; }
+.oxe-fnargs-row { display: grid; grid-template-columns: minmax(6em, 9em) minmax(0, 1fr) minmax(0, 10em); gap: 6px; align-items: center; margin: 4px 0; }
+.oxe-fnargs-row .oxe-dialog-field { min-width: 0; }
+.oxe-fnargs-name { margin: 0; overflow-wrap: anywhere; }
+.oxe-fnargs-required { font-weight: 700; }
+.oxe-fnargs-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.oxe-fnargs-help { min-height: 2.6em; }
+@media (max-width: 480px) {
+  .oxe-fnargs-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
 
 /* The function screen tip under a cell being edited (fntip.js). */
 .oxe-fntip {
