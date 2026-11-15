@@ -128,6 +128,10 @@ export interface XlsxEditor {
   /** Turn ribbon features on or off: a tab by name ({ home: false }) or a group by its label ({ font: false }). */
   setFeatures(features: Record<string, boolean>): void;
   readonly features: Record<string, boolean>;
+  /** Switch the ribbon to the one-line simplified layout ('simple') or the full one ('classic'). */
+  setRibbon(mode: 'simple' | 'classic'): void;
+  /** The ribbon's layout now. */
+  readonly ribbon: 'simple' | 'classic' | null;
   /** Build the printed pages of the sheet shown; returns the page count. */
   preparePrint(): number;
   readonly workbook: Workbook | null;
@@ -148,6 +152,9 @@ export declare function mountXlsxEditor(
     features?: Record<string, boolean>;
     /** false hides the ribbon but keeps editing. */
     toolbar?: boolean;
+    /** 'simple' starts with the one-line simplified ribbon, 'classic' with the full one; without it, the user's last
+     *  choice in this browser. The ribbon's own button still switches. */
+    ribbon?: 'simple' | 'classic';
     /** false leaves formulas saved without a result empty on opening (by default they are worked out, as Excel does). */
     calculateOnOpen?: boolean;
     onChange?: () => void;

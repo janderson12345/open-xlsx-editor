@@ -152,6 +152,18 @@ const topLabel = await page.evaluate(() => Math.max(...[...document.querySelecto
 check(await page.locator('.oxe-chart').count() === 4 && figs.join('|') === 'Column chart: Sales by month|Line chart: Chart 2|Pie chart: North|Bar chart: Sales, stacked' && topLabel === 600,
   'charts: four drawn, each a figure for a screen reader; B7 typed 500: the first one\'s axis to 600', `${figs.join('|')} ${topLabel}`);
 
+// The ribbon's layout: setRibbon() switches it; mounted with ribbon: 'simple' (the demo's ?ribbon=simple), it starts
+// one-line though the user last chose the classic one in this browser.
+const simpleNow = () => page.evaluate(() => document.querySelector('.oxe-toolbar').classList.contains('oxe-simple'));
+await page.evaluate(() => window.oxe.setRibbon('simple'));
+const wasSimple = [await simpleNow(), await page.evaluate(() => window.oxe.ribbon)];
+await page.evaluate(() => window.oxe.setRibbon('classic'));
+const wasClassic = [await simpleNow(), await page.evaluate(() => window.oxe.ribbon)];
+await page.goto(`${page.url().split('?')[0]}?ribbon=simple`);
+await openFixture(page, 'basic.xlsx');
+const mounted = [await simpleNow(), await page.evaluate(() => window.oxe.ribbon)];
+check(wasSimple.join() === 'true,simple' && wasClassic.join() === 'false,classic' && mounted.join() === 'true,simple', "ribbon: setRibbon('simple') and ('classic'); mounted with ribbon: 'simple', one-line", `${wasSimple} ${wasClassic} ${mounted}`);
+
 check(!errors.length, 'no page errors', errors.join('\n     '));
 await close();
 console.log(t.failed ? `${t.failed} failed` : 'all passed');

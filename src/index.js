@@ -72,6 +72,9 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  *   with dashes, on any tab ({ font: false, number: false }); `setFeatures()` changes them. A group turned off also
  *   turns off its keys (Ctrl+B with `font: false`).
  * - `toolbar`: false hides the ribbon but keeps editing.
+ * - `ribbon`: 'simple' starts with the one-line simplified ribbon, 'classic' with the full one (without it, the one
+ *   the user last chose in this browser); the user can still switch with the ribbon's own button. `setRibbon()`
+ *   changes it.
  * - `statusBar`: false hides the Average, Count and Sum of the selection beside the sheet tabs.
  * - `onLink(url)`: a hyperlink clicked that goes outside the workbook (http, https, mailto, ftp); without it, the
  *   browser opens it in a new tab.
@@ -79,7 +82,7 @@ const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change
  *   <package>/files/, release OMF_VERSION), for Aptos Narrow's and Aptos's metric twins (README, Fonts).
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
- *   features?: Record<string, boolean>, toolbar?: boolean, statusBar?: boolean, calculateOnOpen?: boolean,
+ *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean, calculateOnOpen?: boolean,
  *   onChange?: () => void, onLink?: (url: string) => void, fonts?: { omf?: string } }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
@@ -90,7 +93,7 @@ export function mountXlsxEditor(host, options = {}) {
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
   const state = { onEdit: new Set(), onSelect: new Set(), circles: new WeakMap(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
-    features: { ...(options.features || {}) }, toolbar: options.toolbar !== false };
+    features: { ...(options.features || {}) }, toolbar: options.toolbar !== false, ribbonMode: options.ribbon ?? null };
   const at = (ref) => {
     const p = typeof ref === 'string' ? parseRef(ref) : ref;
     if (!p) throw new Error(`not a cell reference: ${ref}`);
@@ -232,6 +235,9 @@ export function mountXlsxEditor(host, options = {}) {
       },
       // (Not while a cell is being edited: a function from the Function Library was just typed into it.)
       home: () => { if (!state.editing?.editorOpen) state.grid?.el.focus({ preventScroll: true }); },
+      // (The layout the page asked for, then the user's switch kept when the ribbon is made again.)
+      mode: state.ribbonMode,
+      onMode: (m) => { state.ribbonMode = m; },
     });
     placeRibbon();
     // (Find and Replace: a bar under the ribbon, there with the ribbon hidden too.)
@@ -481,6 +487,12 @@ export function mountXlsxEditor(host, options = {}) {
       placeRibbon();
     },
     get features() { return { ...state.features }; },
+    /** The ribbon's layout: 'simple' (one line) or 'classic'. */
+    setRibbon(mode) {
+      state.ribbonMode = mode === 'simple' ? 'simple' : 'classic';
+      state.ribbon?.setMode(state.ribbonMode);
+    },
+    get ribbon() { return state.ribbon ? state.ribbon.mode : state.ribbonMode; },
     setTheme(theme) {
       if (theme) root.dataset.theme = theme;
       else delete root.dataset.theme;

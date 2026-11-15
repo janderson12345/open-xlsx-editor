@@ -5,9 +5,10 @@ import { el, iconize, slug, ribbonKit } from './ribbonkit.js';
 
 /**
  * A ribbon in `container`. `tabs`: { name: (kit) => { groups: [elements], update(look) } }; `home()` gives focus back
- * to the sheet. Returns { update(look), setFeatures(f), features, showTab(name), destroy() }.
+ * to the sheet; `mode` 'simple' or 'classic' to start in that layout (else the one remembered), `onMode(mode)` told
+ * of each change. Returns { update(look), setFeatures(f), features, setMode(mode), mode, showTab(name), destroy() }.
  */
-export function createRibbon(container, { tabs, home }) {
+export function createRibbon(container, { tabs, home, mode = null, onMode = null }) {
   const kit = ribbonKit(container, home);
   const { pop, closeMenu } = kit;
   const built = Object.fromEntries(Object.entries(tabs).map(([name, make]) => [name, make(kit)]));
@@ -64,9 +65,10 @@ export function createRibbon(container, { tabs, home }) {
     fitRibbon();
   }
 
-  // Simplified ribbon (one line) or the classic one; remembered per browser.
+  // Simplified ribbon (one line) or the classic one; remembered per browser, unless the page gave one (`mode`).
   let simple = false;
   try { simple = localStorage.getItem('oxe-ribbon') === 'simple'; } catch { /* storage blocked */ }
+  if (mode === 'simple' || mode === 'classic') simple = mode === 'simple';
   const layoutBtn = el('button', { type: 'button', class: 'oxe-ribbon-mode', onmousedown: (e) => { e.preventDefault(); setSimple(!simple); } });
   function setSimple(on) {
     simple = on;
@@ -75,6 +77,7 @@ export function createRibbon(container, { tabs, home }) {
     layoutBtn.title = on ? 'Classic ribbon' : 'Simplified ribbon';
     layoutBtn.setAttribute('aria-label', layoutBtn.title);
     try { localStorage.setItem('oxe-ribbon', on ? 'simple' : 'classic'); } catch { /* storage blocked */ }
+    onMode?.(on ? 'simple' : 'classic');
     fitRibbon();
   }
   strip.append(el('span', { class: 'oxe-rtabs-fill' }), layoutBtn);
@@ -118,6 +121,8 @@ export function createRibbon(container, { tabs, home }) {
     painting(on) { for (const tab of Object.values(built)) tab.painting?.(on); },
     setFeatures(f) { features = { ...features, ...f }; applyFeatures(); },
     get features() { return { ...features }; },
+    setMode(m) { setSimple(m === 'simple'); },
+    get mode() { return simple ? 'simple' : 'classic'; },
     showTab,
     destroy() {
       kit.destroy();

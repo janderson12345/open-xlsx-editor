@@ -6,8 +6,9 @@ const host = document.getElementById('host');
 const status = document.getElementById('status');
 const input = document.querySelector('input[type=file]');
 // (?fonts: open-metric-fonts served from demo/fonts/omf/, a copy of its web bundle (at least morrow-sans) that isn't in
-// the repository: README, Fonts.)
-const editor = mountXlsxEditor(host, new URLSearchParams(location.search).has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {});
+// the repository: README, Fonts. ?ribbon=simple or classic: the ribbon's layout to start with.)
+const params = new URLSearchParams(location.search);
+const editor = mountXlsxEditor(host, { ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}) });
 window.oxe = editor;
 
 async function openFile(file) {
