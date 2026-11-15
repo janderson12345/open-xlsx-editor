@@ -158,18 +158,22 @@ function orderedDate(text, order, date1904) {
   return dateSerial(fullYear(v.y), Number(v.m), Number(v.d), date1904);
 }
 
-/** Column breaks to suggest for Fixed width, as Excel's wizard suggests some when it opens (its rule isn't reachable
- *  over COM, so this is the editor's own): a break at each place where every line has a space just before and some
- *  line has a character, after the first character of every line. */
+/** Column breaks to suggest for Fixed width, as Excel's wizard suggests them (seen in its window: "ABC  12345 x" over
+ *  "DE   678   y" breaks after ABC, at 3, and after 12345): a break at the first place where every line has a space
+ *  after one where some line has a character, the end of a field, when more follows. */
 export function guessBreaks(lines) {
   const texts = lines.filter((t) => t.trim());
   if (!texts.length) return [];
   const width = Math.max(...texts.map((t) => t.length));
   const blank = (k) => texts.every((t) => k >= t.length || t[k] === ' ');
   const out = [];
-  for (let k = 1; k < width; k++) if (blank(k - 1) && !blank(k)) out.push(k);
+  for (let k = 1; k < width; k++) if (blank(k) && !blank(k - 1) && texts.some((t) => t.slice(k).trim())) out.push(k);
   return out;
 }
+
+/** Whether Excel's wizard would take the cells' text to be fixed width: no tab, comma or semicolon in it, and columns
+ *  of spaces to break at ("The Text Wizard has determined that your data is Fixed Width", seen in its window). */
+export const looksFixedWidth = (lines) => lines.length > 0 && !lines.some((t) => /[	,;]/.test(t)) && guessBreaks(lines).length > 0;
 
 /**
  * Data > Text to Columns on the one-column `range` of sheet si: each cell split (`delimiters` { tab, semicolon,

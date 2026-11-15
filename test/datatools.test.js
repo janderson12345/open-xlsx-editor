@@ -151,7 +151,8 @@ test("a copy's names: the source's local names, and a workbook-wide name referri
 
 test('Text to Columns, Fixed width: breaks suggested where every line has a space before a field', async () => {
   const { guessBreaks } = await import('../src/ooxml/datatools.js');
-  assert.deepEqual(guessBreaks(['ABC  12345 x', 'DE   678   y', 'XYZ  0000  z']), [5, 11]);
+  // (Excel's wizard on these lines: a break after ABC, at 3, and after the numbers.)
+  assert.deepEqual(guessBreaks(['ABC  12345 x', 'DE   678   y', 'XYZ  0000  z']), [3, 10]);
   assert.deepEqual(guessBreaks(['one']), []);
   assert.deepEqual(guessBreaks([]), []);
 });

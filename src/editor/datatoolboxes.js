@@ -4,7 +4,7 @@
 import { modal, button } from './dialogs.js';
 import { make, check, select, labelled } from './formatbox-kit.js';
 import { parseRef } from '../ooxml/refs.js';
-import { splitLine, guessBreaks } from '../ooxml/datatools.js';
+import { splitLine, guessBreaks, looksFixedWidth } from '../ooxml/datatools.js';
 
 const radios = (id, name, pairs, value) => {
   const inputs = {};
@@ -71,7 +71,8 @@ export function removeDuplicatesBox(root, { columns, headers }) {
  *  data format (as many as the first lines split into), and Destination. Resolves to textToColumns's options. */
 export function textToColumnsBox(root, { dest, lines = [] }) {
   return shell(root, 'Convert Text to Columns', 'oxe-ttc-box', (id, done, say) => {
-    const kind = radios(id, 'kind', [['delimited', 'Delimited'], ['fixed', 'Fixed width']], 'delimited');
+    // (Fixed width chosen at first when the text looks it, as Excel's wizard determines.)
+    const kind = radios(id, 'kind', [['delimited', 'Delimited'], ['fixed', 'Fixed width']], looksFixedWidth(lines) ? 'fixed' : 'delimited');
     const tab = check('Tab', true);
     const semicolon = check('Semicolon', false);
     const comma = check('Comma', false);
