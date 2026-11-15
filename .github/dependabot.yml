@@ -1,0 +1,7 @@
+# Dependabot keeps the workflows' pinned actions current (each a commit, its version beside it), weekly.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

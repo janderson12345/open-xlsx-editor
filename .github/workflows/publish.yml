@@ -20,15 +20,16 @@ concurrency:
   group: publish
   cancel-in-progress: false
 
+# (Actions pinned to the commit of their release, the version beside it: a tag moved later changes nothing here.)
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           ref: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
       # (Node 24's npm, 11.5.1 or later, publishes with trusted publishing.)
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
