@@ -54,9 +54,12 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
 - **Print titles** print only for the page's own columns. With a print area of B3:H70, rows 1:2 print as B1:E2 above
   the B:E pages.
 - **Headers and footers.** They use the Normal style's font and size, scaled with the sheet unless `scaleWithDoc` is
-  off. The header's baseline is 1.05em below the header margin, and the footer's 0.436em above the footer margin. The
-  left section starts 1.25px inside the left margin, the right section ends 1.25px inside the right margin, and the
-  centre is centred on the page.
+  off. A section's baseline is 1.2px + 1.023em below the header margin, or 2.27px + 0.295em above the footer margin,
+  in the section's largest size (16pt in one section moves that section alone). The left section starts 1.25px inside
+  the left margin, the right section ends 1.25px inside the right margin, and the centre is centred on the page. (At
+  100% that is 16.2px and 6.6px at 11pt; the same at 40, 50, 60, 75 and 90%: workbooks made in code, `..\runs\hfscale`,
+  292 of 292 text pieces within 1px both ways, where the rule measured at 100% alone, 1.05em and 0.436em, left 11 of
+  them 1.1 to 3.2px out at the smaller scales.)
 - **Headers and footers of several lines** (a line break in a section): the lines a printed row of their size apart
   (20.3px at 11pt, 25.4px at 14pt); a header's first baseline 1.014em below the header margin, a footer's last 0.361em
   above the footer margin and the lines before it above; each line centred in a centre section, right-aligned in a
@@ -85,8 +88,8 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   line. With the sheet printed at a scale, pictures, the drop and the 1.92px scale with it when the header scales with
   the sheet (half at 50%) and not when scaleWithDoc is off (workbooks made in code, `..\runs\hfpic2`: two and three
   lines, a picture above and below text and between words, at 50% and at 75% with scaleWithDoc off; all 9 pictures
-  within 0.5px in place and size, print and export; 121 of 122 text pieces within 1px both ways, the other a plain
-  footer's text at 50%, 1.3px low, the single-line rule at a scale, not measured further).
+  within 0.5px in place and size, print and export; text pieces within 1px both ways, 122 of 122 since the one-line
+  rule at a scale above).
 
 ## Setting them (measured)
 

@@ -19,6 +19,10 @@ const PIC_BESIDE = 1.92;
  *  margin), and a footer's last 0.361em above the footer margin. */
 const LINE_IN = 1.014;
 const FOOT_LAST = 0.361;
+/** A section of one line: its baseline HEAD.px + HEAD.em em below the header margin, FOOT.px + FOOT.em em above the
+ *  footer margin, in the section's largest size (Excel's PDFs at 40% to 100%, and 16pt at 50%: within 0.2px). */
+const HEAD = { px: 1.2, em: 1.023 };
+const FOOT = { px: 2.27, em: 0.295 };
 
 /** A run that prints something other than a picture. */
 const words = (r) => !r.picture && (r.field || r.text?.trim());
@@ -62,8 +66,8 @@ function appendRuns(el, runs, pic, px, scale) {
 
 /**
  * A page's header or footer (`which`), as Excel prints it (print-headers.xlsx): in the Normal style's font and size
- * (scaled with the sheet unless scaleWithDoc is off), the header's baseline 1.05em below its margin, the footer's 0.436em
- * above its margin; the left section from the left margin and the right one to the right margin, each 1.25px in, the
+ * (scaled with the sheet unless scaleWithDoc is off), a section's baseline 1.2px + 1.023em below the header margin or
+ * 2.27px + 0.295em above the footer margin, in its largest size; the left section from the left margin and the right one to the right margin, each 1.25px in, the
  * centre centred on the page. A section with a picture: drawPictureSection.
  */
 export function drawHeaderFooter(pageEl, which, k, layout, hf) {
@@ -78,7 +82,6 @@ export function drawHeaderFooter(pageEl, which, k, layout, hf) {
   const px = (pt) => (pt * 96) / 72 * scale;
   const em = px(basePt);
   const m = page.margins;
-  const y = which === 'header' ? m.header * DPI + 1.05 * em : layout.paper.h - m.footer * DPI - 0.436 * em;
   const ctx = (drawHeaderFooter.canvas ||= document.createElement('canvas')).getContext('2d');
   ctx.font = `${em}px ${fontStack(hf.family || 'Calibri')}`;
   const met = ctx.measureText('Hg');
@@ -113,7 +116,13 @@ export function drawHeaderFooter(pageEl, which, k, layout, hf) {
       const f = sem / em;
       const inBox = (pitch - (asc + desc) * f) / 2 + asc * f;
       setVars(el, { '--oxe-hf-top': first - inBox, '--oxe-hf-lh': pitch, '--oxe-hf-left': x });
-    } else setVars(el, { '--oxe-hf-top': y - asc, '--oxe-hf-lh': asc + desc, '--oxe-hf-left': name === 'left' ? left : name === 'right' ? right : layout.paper.w / 2 });
+    } else {
+      // (One line, as Excel prints one at 40% to 100%: HEAD and FOOT in the section's largest size; the line as tall
+      // as that size's ascent and descent, so that its baseline is where placed whatever the sizes in it.)
+      const f = sem / em;
+      const y = which === 'header' ? m.header * DPI + HEAD.px + HEAD.em * sem : layout.paper.h - m.footer * DPI - FOOT.px - FOOT.em * sem;
+      setVars(el, { '--oxe-hf-top': y - asc * f, '--oxe-hf-lh': (asc + desc) * f, '--oxe-hf-left': name === 'left' ? left : name === 'right' ? right : layout.paper.w / 2 });
+    }
     el.style.setProperty('--oxe-hf-font', fontStack(hf.family || 'Calibri'));
     el.style.setProperty('--oxe-hf-size', `${lines > 1 ? sem : em}px`);
     appendRuns(el, runs, null, px, scale);
