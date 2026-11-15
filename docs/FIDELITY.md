@@ -2,7 +2,7 @@
 
 What survives when a workbook is opened in the editor, edited and saved. The editor keeps every part of the package
 it doesn't change byte for byte, and inside the parts it does change it keeps the XML it doesn't model where it was
-(`CLAUDE.md`, "Keep what isn't understood"). This benchmark measures that, and has Excel itself check the result.
+(CONTRIBUTING.md, "Keep what isn't understood"). This benchmark measures that, and has Excel itself check the result.
 
 ## How it is measured
 

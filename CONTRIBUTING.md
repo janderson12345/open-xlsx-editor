@@ -27,7 +27,6 @@ fixtures unchanged, the package check) and stops a push that would fail them; tu
 - `docs/LAYOUT.md`: how layout is matched to Excel, the rules found and what was tried and dropped. Read it before
   changing how columns, rows or cell text are placed.
 - `docs/CALC.md`: how formulas are worked out and what Excel was seen to do.
-- `LESSONS.md` and `CLAUDE.md`: what the sister project (open-docx-editor) taught, and the rules that follow from it.
 
 ## How the code is written
 

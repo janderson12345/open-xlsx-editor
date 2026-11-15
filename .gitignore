@@ -4,3 +4,9 @@ demo/dist/
 demo/fonts/
 test/out/
 test/_*.mjs
+# Notes for the maintainer's own tools, kept out of the published repository.
+CLAUDE.md
+LESSONS.md
+docs/REUSE.md
+.claude/
+demo/sample.xlsx
