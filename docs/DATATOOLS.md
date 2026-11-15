@@ -4,9 +4,9 @@ Fill > Series, Flash Fill, Remove Duplicates, Text to Columns (`src/ooxml/datato
 Copy > Create a copy (`src/ooxml/sheetcopy.js`); their boxes in `src/editor/datatoolboxes.js`. Each is one step of
 Undo.
 
-Measured over COM (`tools/excel-compare/excel-datatools.ps1`: 24 cases of `Range.DataSeries`, `RemoveDuplicates`,
+Measured over COM (`tools/excel-compare/excel-datatools.ps1`: 27 cases of `Range.DataSeries`, `RemoveDuplicates`,
 `TextToColumns` and `FlashFill`, each on a new workbook of made-up cells, and a sheet copied with `Worksheet.Copy`;
-`test/datatools-excel.json`). The same cells here and the same tool: every cell of A1:H12 as Excel left it, 24 of 24.
+`test/datatools-excel.json`). The same cells here and the same tool: every cell of A1:H12 as Excel left it, 27 of 27.
 
 ## Fill > Series (Home > Editing > Fill)
 
@@ -52,8 +52,12 @@ Excel's Flash Fill learns from more than these five patterns; others here may di
 | Treat consecutive delimiters as one; an empty piece leaves its cell. | one,,three: one, (nothing), three. |
 | Each piece read as typed: numbers, dates (with their format), TRUE, percentages; 007 is 7. | 007, 3/4/2026, TRUE, -5%. |
 | The destination may be elsewhere; the source then stays. | |
+| Fixed width: each cell cut at the column breaks (character places from the left), each piece the characters between two breaks with the spaces at either end trimmed; an empty piece leaves its cell; a break past a cell's end gives it nothing there. | `ab   cd  e` at 3 and 8: ab, cd, e. `XYZ0000999Y`: XYZ, 9, 99Y. |
+| Fixed width splits a number's cell too, from the text it shows; each piece read as typed, as Delimited's. | 1234567 at 3: 123 and 4567. `2026-01-05`: a date, m/d/yyyy. |
 
-Fixed width (columns at character places) isn't offered yet.
+The box asks for the Original data type (Delimited or Fixed width), as Excel's wizard does. Fixed width takes the
+column breaks typed as character places (Excel's wizard has a ruler to click), over a preview of the first five cells
+with a | at each break. Not here: Excel's own guess at the breaks, and the column data formats (Text, Do not import).
 
 ## Move or Copy > Create a copy (a sheet tab's menu)
 

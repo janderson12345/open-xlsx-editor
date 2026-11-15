@@ -8,6 +8,8 @@
 // returns steps ({ si, contents, styles, area }) for the editor's history, as fillops.js's do.
 import { shiftFormula } from '../calc/tokens.js';
 import { parseInput } from './input.js';
+import { formatCodeOf } from './styles.js';
+import { cellText } from './numfmt.js';
 
 const cellAt = (sheet, r, c) => sheet.cells.get(r)?.get(c) || null;
 const DAY_MS = 86400000;
@@ -147,17 +149,24 @@ export function splitLine(text, set, { consecutive = false, quote = '"' } = {}) 
 /**
  * Data > Text to Columns on the one-column `range` of sheet si: each cell split (`delimiters` { tab, semicolon,
  * comma, space, other }, `consecutive`, `quote`), the pieces written across from `dest` ({ r, c }: the range's own
- * first cell by default), each read as typed; an empty piece leaves its cell.
+ * first cell by default), each read as typed; an empty piece leaves its cell. Fixed width (`breaks`: the character
+ * places columns start at, after the first's at 0), as Excel splits (excel-datatools.ps1): the characters between
+ * two breaks, spaces at either end trimmed; a number's cell split from the text it shows.
  */
-export function textToColumns(wb, si, range, { delimiters = {}, consecutive = false, quote = '"', dest = null } = {}) {
+export function textToColumns(wb, si, range, { delimiters = {}, consecutive = false, quote = '"', dest = null, breaks = null } = {}) {
   const sheet = wb.sheet(si);
   const set = [delimiters.tab ? '\t' : '', delimiters.semicolon ? ';' : '', delimiters.comma ? ',' : '', delimiters.space ? ' ' : '', delimiters.other || ''].join('');
   const to = dest || { r: range.r0, c: range.c0 };
   const out = { si, contents: [], styles: [], area: { r0: to.r, c0: to.c, r1: to.r + range.r1 - range.r0, c1: to.c } };
   for (let r = range.r0; r <= range.r1; r++) {
     const cell = cellAt(sheet, r, range.c0);
-    if (cell?.v == null || typeof cell.v !== 'string') continue;
-    const pieces = set ? splitLine(cell.v, set, { consecutive, quote }) : [cell.v];
+    if (cell?.v == null || (typeof cell.v !== 'string' && !(breaks && cell.t === 'n'))) continue;
+    let pieces;
+    if (breaks) {
+      const text = typeof cell.v === 'string' ? cell.v : cellText(cell, Infinity, formatCodeOf(wb.styles, cell.s || 0), wb.date1904);
+      const at = [0, ...[...new Set(breaks)].filter((b) => b > 0).sort((a, b) => a - b)];
+      pieces = at.map((b, k) => text.slice(b, at[k + 1]).replace(/^ +| +$/g, ''));
+    } else pieces = set ? splitLine(cell.v, set, { consecutive, quote }) : [cell.v];
     pieces.forEach((p, k) => {
       const at = { r: to.r + r - range.r0, c: to.c + k };
       if (p === '') { if (k === 0 && at.r === r && at.c === range.c0) out.contents.push({ ...at, value: null }); return; }

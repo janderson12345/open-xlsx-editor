@@ -65,9 +65,12 @@ export function removeDuplicatesBox(root, { columns, headers }) {
   });
 }
 
-/** Text to Columns (Delimited): the delimiters, Treat consecutive delimiters as one, the text qualifier, Destination. */
-export function textToColumnsBox(root, { dest }) {
+/** Text to Columns: Delimited (the delimiters, Treat consecutive delimiters as one, the text qualifier) or Fixed width
+ *  (the column breaks, character places, over a preview of the first of `lines`, a | at each break), and Destination.
+ *  Resolves to textToColumns's options. */
+export function textToColumnsBox(root, { dest, lines = [] }) {
   return shell(root, 'Convert Text to Columns', 'oxe-ttc-box', (id, done, say) => {
+    const kind = radios(id, 'kind', [['delimited', 'Delimited'], ['fixed', 'Fixed width']], 'delimited');
     const tab = check('Tab', true);
     const semicolon = check('Semicolon', false);
     const comma = check('Comma', false);
@@ -76,14 +79,35 @@ export function textToColumnsBox(root, { dest }) {
     other.setAttribute('aria-label', 'Other delimiter');
     const consecutive = check('Treat consecutive delimiters as one', false);
     const quote = select([['"', '"'], ["'", "'"], ['', '{none}']], '"');
+    const delimited = make('div', {}, make('fieldset', {}, make('legend', { textContent: 'Delimiters' }), tab.el, semicolon.el, comma.el, space.el, labelled('Other:', other)), consecutive.el,
+      labelled('Text qualifier:', quote));
+    const breaks = make('input', { type: 'text', className: 'oxe-dialog-field', spellcheck: false, placeholder: '10, 20' });
+    const preview = make('pre', { className: 'oxe-ttc-preview' });
+    preview.setAttribute('aria-label', 'Data preview');
+    const places = () => breaks.value.split(/[\s,;]+/).filter(Boolean).map(Number);
+    const draw = () => {
+      const at = [...new Set(places().filter((n) => Number.isInteger(n) && n > 0))].sort((x, y) => y - x);
+      preview.textContent = lines.slice(0, 5).map((t) => at.reduce((line, n) => `${line.padEnd(n).slice(0, n)}|${line.slice(n)}`, t)).join('\n');
+    };
+    breaks.addEventListener('input', draw);
+    draw();
+    const fixed = make('div', {}, labelled('Column breaks (characters from the left):', breaks), preview);
+    const show = () => { const f = kind.value() === 'fixed'; delimited.hidden = f; fixed.hidden = !f; };
+    for (const input of Object.values(kind.inputs)) input.addEventListener('change', show);
+    show();
     const to = make('input', { type: 'text', className: 'oxe-dialog-field', value: dest, spellcheck: false });
     const ok = () => {
       const at = parseRef(to.value.replace(/^=/, '').replace(/^.*!/, '').replace(/\$/g, '').trim());
       if (!at) { say('Type the destination cell, like $A$1.'); return; }
+      if (kind.value() === 'fixed') {
+        const p = places();
+        if (!p.length || p.some((n) => !Number.isInteger(n) || n < 1)) { say('Type where the columns break, in characters from the left, like 10, 20.'); return; }
+        done({ breaks: p, dest: at });
+        return;
+      }
       done({ delimiters: { tab: tab.input.checked, semicolon: semicolon.input.checked, comma: comma.input.checked, space: space.input.checked, other: other.value }, consecutive: consecutive.input.checked, quote: quote.value, dest: at });
     };
-    return { body: [make('fieldset', {}, make('legend', { textContent: 'Delimiters' }), tab.el, semicolon.el, comma.el, space.el, labelled('Other:', other)), consecutive.el,
-      labelled('Text qualifier:', quote), labelled('Destination:', to)], ok };
+    return { body: [make('fieldset', {}, make('legend', { textContent: 'Original data type' }), kind.el), delimited, fixed, labelled('Destination:', to)], ok };
   });
 }
 

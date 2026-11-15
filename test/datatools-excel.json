@@ -740,6 +740,186 @@
    }
   },
   {
+   "name": "text to columns fixed width",
+   "error": null,
+   "cells": {
+    "A1": [
+     "ABC",
+     "String",
+     "General",
+     "ABC"
+    ],
+    "B1": [
+     "12345",
+     "Double",
+     "General",
+     "12345"
+    ],
+    "C1": [
+     "x",
+     "String",
+     "General",
+     "x"
+    ],
+    "A2": [
+     "DE",
+     "String",
+     "General",
+     "DE"
+    ],
+    "B2": [
+     "678",
+     "Double",
+     "General",
+     "678"
+    ],
+    "A3": [
+     "XYZ",
+     "String",
+     "General",
+     "XYZ"
+    ],
+    "B3": [
+     "9",
+     "Double",
+     "General",
+     "9"
+    ],
+    "C3": [
+     "99Y",
+     "String",
+     "General",
+     "99Y"
+    ],
+    "A4": [
+     "ab",
+     "String",
+     "General",
+     "ab"
+    ],
+    "B4": [
+     "cd",
+     "String",
+     "General",
+     "cd"
+    ],
+    "C4": [
+     "e",
+     "String",
+     "General",
+     "e"
+    ],
+    "A5": [
+     "123",
+     "Double",
+     "General",
+     "123"
+    ],
+    "B5": [
+     "4567",
+     "Double",
+     "General",
+     "4567"
+    ]
+   }
+  },
+  {
+   "name": "text to columns fixed width types",
+   "error": null,
+   "cells": {
+    "A1": [
+     "1/5/2026",
+     "Double",
+     "m/d/yyyy",
+     "46027"
+    ],
+    "B1": [
+     "12.5",
+     "Double",
+     "General",
+     "12.5"
+    ],
+    "C1": [
+     "TRUE",
+     "Boolean",
+     "General",
+     "True"
+    ],
+    "A2": [
+     "3/4/2026",
+     "Double",
+     "m/d/yyyy",
+     "46085"
+    ],
+    "B2": [
+     "7",
+     "Double",
+     "General",
+     "7"
+    ],
+    "C2": [
+     "-5%",
+     "Double",
+     "0%",
+     "-0.05"
+    ]
+   }
+  },
+  {
+   "name": "text to columns fixed width elsewhere",
+   "error": null,
+   "cells": {
+    "A1": [
+     "abc",
+     "String",
+     "General",
+     "abc"
+    ],
+    "C1": [
+     "ab",
+     "String",
+     "General",
+     "ab"
+    ],
+    "D1": [
+     "c",
+     "String",
+     "General",
+     "c"
+    ],
+    "A2": [
+     "abcdefghij",
+     "String",
+     "General",
+     "abcdefghij"
+    ],
+    "C2": [
+     "ab",
+     "String",
+     "General",
+     "ab"
+    ],
+    "D2": [
+     "cde",
+     "String",
+     "General",
+     "cde"
+    ],
+    "E2": [
+     "fgh",
+     "String",
+     "General",
+     "fgh"
+    ],
+    "F2": [
+     "ij",
+     "String",
+     "General",
+     "ij"
+    ]
+   }
+  },
+  {
    "name": "flash fill first names",
    "error": null,
    "cells": {

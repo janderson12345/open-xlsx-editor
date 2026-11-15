@@ -389,7 +389,9 @@ export function createMoreActs(env) {
       // (Data > Text to Columns: one column of the selection, split across from it.)
       const s = editing().selection;
       if (s.c0 !== s.c1) return messageBox(root, 'Microsoft Excel can convert only one column at a time. The range can be many rows tall but no more than one column wide. Try again by selecting cells in one column only.');
-      return textToColumnsBox(root, { dest: `$${colName(s.c0)}$${s.r0 + 1}` }).then((o) => {
+      const lines = [];
+      for (let r = s.r0; r <= s.r1 && lines.length < 5; r++) { const v = state.workbook.sheet(i).cells.get(r)?.get(s.c0)?.v; if (v != null) lines.push(String(v)); }
+      return textToColumnsBox(root, { dest: `$${colName(s.c0)}$${s.r0 + 1}`, lines }).then((o) => {
         state.grid.el.focus({ preventScroll: true });
         return o ? editing().run('runTool', textToColumns(state.workbook, i, s, o), 'Converted ') : false;
       });

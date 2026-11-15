@@ -794,6 +794,16 @@
   min-width: 220px;
   font: inherit;
 }
+/* Text to Columns' Fixed width preview: the first lines in a fixed-width font, a | at each column break. */
+.oxe-ttc-preview {
+  margin: 6px 0;
+  padding: 4px 6px;
+  border: 1px solid #c8c8c8;
+  max-width: 420px;
+  overflow: auto;
+  font: 12px/1.4 Consolas, "Courier New", monospace;
+  white-space: pre;
+}
 .oxe-dialog-buttons {
   display: flex;
   justify-content: flex-end;

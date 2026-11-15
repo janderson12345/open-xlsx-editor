@@ -11,6 +11,7 @@ New-Item -ItemType Directory -Force $Books | Out-Null
 $Books = (Resolve-Path $Books).Path
 function Put($ws, $cells) { foreach ($k in $cells.Keys) { $ws.Range($k).Formula = [string]$cells[$k] } }
 # Each case: cells to put first, then a script block given the sheet.
+$m = [Type]::Missing
 $CASES = [ordered]@{
   'series linear down' = @(@{ A1 = '1' }, { param($ws) [void]$ws.Range('A1:A6').DataSeries(2, -4132, 1, 2) })
   'series linear stop' = @(@{ A1 = '5' }, { param($ws) [void]$ws.Range('A1:A10').DataSeries(2, -4132, 1, 3, 15) })
@@ -33,6 +34,12 @@ $CASES = [ordered]@{
   'text to columns quoted' = @(@{ A1 = '"Smith, John",42'; A2 = 'x,"y"' }, { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('A1'), 1, 1, $false, $false, $false, $true) })
   'text to columns dates and zeros' = @(@{ A1 = '007,3/4/2026,TRUE,-5%' }, { param($ws) [void]$ws.Range('A1').TextToColumns($ws.Range('A1'), 1, 1, $false, $false, $false, $true) })
   'text to columns elsewhere' = @(@{ A1 = 'a-b'; A2 = 'c-d' }, { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('C1'), 1, 1, $false, $false, $false, $false, $false, $true, '-') })
+  'text to columns fixed width' = @(@{ A1 = 'ABC12345 x'; A2 = 'DE 678'; A3 = 'XYZ0000999Y'; A4 = 'ab   cd  e'; A5 = '1234567' },
+    { param($ws) [void]$ws.Range('A1:A5').TextToColumns($ws.Range('A1'), 2, 1, $m, $m, $m, $m, $m, $m, $m, [object[]]@([object[]]@(0, 1), [object[]]@(3, 1), [object[]]@(8, 1))) })
+  'text to columns fixed width types' = @(@{ A1 = '2026-01-05 12.5  TRUE'; A2 = '3/4/2026  007   -5%' },
+    { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('A1'), 2, 1, $m, $m, $m, $m, $m, $m, $m, [object[]]@([object[]]@(0, 1), [object[]]@(10, 1), [object[]]@(16, 1))) })
+  'text to columns fixed width elsewhere' = @(@{ A1 = 'abc'; A2 = 'abcdefghij' },
+    { param($ws) [void]$ws.Range('A1:A2').TextToColumns($ws.Range('C1'), 2, 1, $m, $m, $m, $m, $m, $m, $m, [object[]]@([object[]]@(0, 1), [object[]]@(2, 1), [object[]]@(5, 1), [object[]]@(8, 1))) })
   'flash fill first names' = @(@{ A1 = 'Full'; B1 = 'First'; A2 = 'Avery Chen'; B2 = 'Avery'; A3 = 'Sam Lee'; A4 = 'Jo Park'; A5 = 'Rin Ito' }, { param($ws) [void]$ws.Range('B2:B5').FlashFill() })
   'flash fill initials' = @(@{ A1 = 'Full'; B1 = 'Short'; A2 = 'Avery Chen'; B2 = 'A. Chen'; A3 = 'Sam Lee'; A4 = 'Jo Park' }, { param($ws) [void]$ws.Range('B2:B4').FlashFill() })
   'flash fill upper' = @(@{ A1 = 'Code'; B1 = 'Up'; A2 = 'ab-12'; B2 = 'AB-12'; A3 = 'cd-34'; A4 = 'ef-56' }, { param($ws) [void]$ws.Range('B2:B4').FlashFill() })
