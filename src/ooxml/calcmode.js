@@ -58,7 +58,9 @@ export function iteration(wb) {
   return { on: ['1', 'true'].includes(attr(pr, 'iterate')), count: count > 0 ? count : 100, delta: delta >= 0 ? delta : 0.001 };
 }
 /** Iterative calculation on or off, with its Maximum Iterations and Maximum Change, written as Excel writes them
- *  (measured: iterate="1", the other two only when not 100 and 0.001); the circular formulas worked out again. */
+ *  (measured: iterate="1", the other two only when not 100 and 0.001). On, every formula is worked out once more, the
+ *  circles going round, as Excel's did (measured over COM: =A1+1, iteration turned on with 50, A1 50; Maximum
+ *  Iterations then 20, 70); off, nothing is worked out again (A1 stays 70). */
 export function setIteration(wb, { on, count = iteration(wb).count, delta = iteration(wb).delta }) {
   if (!Number.isInteger(count) || count < 1 || count > 32767 || !(delta >= 0)) throw new Error('No such iteration settings');
   const pr = calcPr(wb, true);
@@ -68,7 +70,7 @@ export function setIteration(wb, { on, count = iteration(wb).count, delta = iter
   put('iterateDelta', delta, 0.001);
   wb.bookDirty = true;
   wb.edited = true;
-  return calculateNow(wb);
+  return on ? calculateFull(wb) : calculateNow(wb);
 }
 
 /** After cells changed (`rects`) and formulas were entered (`also`): everything they reach worked out, or in Manual

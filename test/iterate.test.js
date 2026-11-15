@@ -65,3 +65,16 @@ test('iterative calculation in the file: iterate="1", iterateCount and iterateDe
   setIteration(again, { on: false });
   assert.equal(calcPr(again), '<calcPr calcId="191029" iterateCount="10" iterateDelta="0.01"/>');
 });
+
+test("iterative calculation turned on works the circles out, as Excel's did; changed while on, round again; off, left", () => {
+  // (Excel over COM: =A1+1 left out at 0; Iteration on, MaxIterations 50: 50; MaxIterations 20: 70; off: 70.)
+  const { wb, si } = book(false);
+  wb.setFormula(si, 'A1', 'A1+1');
+  assert.equal(v(wb, si, 'A1'), 0);
+  setIteration(wb, { on: true, count: 50 });
+  assert.equal(v(wb, si, 'A1'), 50);
+  setIteration(wb, { on: true, count: 20 });
+  assert.equal(v(wb, si, 'A1'), 70);
+  setIteration(wb, { on: false });
+  assert.equal(v(wb, si, 'A1'), 70);
+});

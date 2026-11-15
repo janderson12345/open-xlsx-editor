@@ -477,8 +477,11 @@ functions.
   (Telling it from a function Excel has but this editor hasn't needs Excel's whole list.)
 - **The range operator and intersection in Evaluate Formula** are one step each, as a reference is (=SUM(A1:INDEX(A:A,3))
   goes straight to its sum); Excel's steps there aren't measured.
-- **Iterative calculation: what isn't yet as Excel.** No on-screen switch for it (Excel's File > Options > Formulas):
-  it is read from the file and kept, and `setIteration` (calcmode.js) turns it on. A circle whose cells change only
+- **Iterative calculation turned on or changed** (*measured*: =A1+1 left out at 0; Iteration turned on with Maximum
+  Iterations 50, A1 50; Maximum Iterations then 20, 70; off again, 70 left): on, every formula is worked out once
+  more, the circles going round; off, nothing is (`setIteration`). Formulas > Calculation Options > Iterative
+  Calculation... has Excel's File > Options > Formulas settings for it (`editor/iterbox.js`).
+- **Iterative calculation: what isn't yet as Excel.** A circle whose cells change only
   in text or errors isn't measured: here only numbers count toward Maximum Change. Array and dynamic formulas in a
   circle aren't measured either.
 - **Dates and times typed as entries** are read as dates and times (docs/ENTRY.md). Inside a formula, text such as
