@@ -204,7 +204,7 @@ Not yet:
   font at the same widths. The browser's own Print uses the served font.
 
 The demo loads them from `demo/fonts/omf/` (a copy of the bundle, or of `morrow-sans/`, not in this repository) when
-the page is opened with `?fonts`. `tools/omf-faces.mjs` writes the editor's list of faces from a newer `morrow-sans`.
+the page is opened with `?fonts`. `tools/omf-map.py` writes the editor's map of them from an open-metric-fonts checkout.
 
 ## Documentation
 
