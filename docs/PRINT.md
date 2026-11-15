@@ -63,6 +63,9 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   right one; a left or right section of several lines starts at the margin itself, not 1.25px in (workbooks made in
   code, one to three lines, `..\runs\hf2`: 198 of 198 text pieces within 1px both ways, single-line headers as
   they were).
+- **Different first page and different odd and even pages** (headerFooter differentFirst, differentOddEven): the
+  first page takes firstHeader and firstFooter, even pages evenHeader and evenFooter, placed as any page's (workbooks
+  made in code, three pages each way and both, `..\runs\hf3`: 1,187 of 1,187 text pieces within 1px both ways).
 
 ## Setting them (measured)
 
@@ -100,5 +103,4 @@ there.
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
 
-Not yet: pictures in headers (`&G`), and the first-page and even-page options beyond choosing their text (measured
-only with odd pages).
+Not yet: pictures in headers (`&G`).
