@@ -62,7 +62,7 @@ which is dropped when formulas change (Excel rebuilds it).
 | Status bar (Sum, Average, Count of the selection) | Done | Beside the sheet tabs; Count alone for text or an error; hidden rows and columns left out; the first number's format (`src/ooxml/stats.js`, by Excel's documented rules: COM doesn't reach the status bar). Choosing Min, Max and Numerical Count missing; `statusBar: false` hides it. |
 | Zoom | Done | View tab, Ctrl+wheel; saved (docs/VIEW.md). |
 | Print | Done | Pages as Excel lays them out, measured against its PDFs; print area, titles, breaks, scale, fit to page, headers and footers as Excel applies them (docs/PRINT.md). |
-| PDF export | Done | `exportPdf` (src/pdf.js, docs/PDF.md): the sheet shown or the whole workbook, from the print layout, as real text in the installed fonts; 102,079 of 102,097 cells within 1px of Excel's PDFs. Headers, footers, charts and pictures not drawn, as in print. |
+| PDF export | Done | `exportPdf` (src/pdf.js, docs/PDF.md): the sheet shown or the whole workbook, from the print layout, as real text in the installed fonts; 102,079 of 102,097 cells within 1px of Excel's PDFs. Headers and footers with their pictures; charts and pictures on the sheet not drawn, as in print. |
 | Accessibility | Done | ARIA grid and tablist, announcements, axe clean in light and dark at 1280 and 320px. |
 | Light and dark | Done | The chrome follows the theme; the sheet stays white, as in Excel. |
 

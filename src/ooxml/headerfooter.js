@@ -3,11 +3,11 @@
 // number (&P+1, &P-1 offset it), &N the number of pages, &D the date, &T the time, &F the file's name, &A the sheet's,
 // &Z the file's path; &B, &I, &U, &E, &S, &X, &Y bold, italic, underline, double underline, strikethrough, superscript
 // and subscript (each toggles); &"Font,Style" a font (- for the same font, "Bold", "Italic" in its style), &nn a size
-// in points, &Kxxxxxx a colour; && an ampersand; &G a picture (not drawn).
+// in points, &Kxxxxxx a colour; && an ampersand; &G the section's picture (hfpictures.js).
 
 /**
  * A header's or footer's text as its three sections: { left, center, right }, each a list of runs { text } or
- * { field: 'page' | 'pages' | 'date' | 'time' | 'file' | 'sheet' | 'path', offset }, with { bold, italic, underline,
+ * { field: 'page' | 'pages' | 'date' | 'time' | 'file' | 'sheet' | 'path', offset } or { picture: true }, with { bold, italic, underline,
  * strike, size, font, color } as the codes before it set them. Each section starts in the default format.
  */
 export function parseHeaderFooter(text) {
@@ -33,6 +33,7 @@ export function parseHeaderFooter(text) {
       out[section].push({ field: FIELDS[code], offset: m ? Number(m[1]) : 0, ...fmt });
       continue;
     }
+    if (code === 'G') { out[section].push({ picture: true, ...fmt }); continue; }
     if (code === 'B') fmt = { ...fmt, bold: !fmt.bold };
     else if (code === 'I') fmt = { ...fmt, italic: !fmt.italic };
     else if (code === 'U' || code === 'E') fmt = { ...fmt, underline: !fmt.underline };
@@ -50,7 +51,7 @@ export function parseHeaderFooter(text) {
       const hex = /^[0-9A-Fa-f]{6}/.exec(text.slice(i + 1));
       if (hex) { fmt = { ...fmt, color: `#${hex[0]}` }; i += 6; }
     }
-    // (X, Y, G and anything else: no change drawn.)
+    // (X, Y and anything else: no change drawn.)
   }
   flush();
   return out;

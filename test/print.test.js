@@ -75,3 +75,19 @@ test("headers and footers: Excel's codes read into sections, fields filled in pe
   assert.equal(fillFields(f.center, { page: 3, pages: 9 }).at(-1).text, '4', '&P+1');
   assert.deepEqual(sheetOf('print-headers.xlsx').page.headerFooter.odd, { header: '&LQuarterly stock&CPage &P of &N&R&A', footer: '&C&F' });
 });
+
+test('header and footer pictures (&G): the VML shapes named for their sections, sizes in points, as Excel writes them', async () => {
+  const { parseHeaderFooter } = await import('../src/ooxml/headerfooter.js');
+  const { headerPictures } = await import('../src/ooxml/hfpictures.js');
+  const { hfPictureBook } = await import('./hfpicbook.js');
+  const s = parseHeaderFooter('&L&G&CTitle &G');
+  assert.deepEqual(s.left.map((r) => !!r.picture), [true]);
+  assert.deepEqual(s.center.map((r) => r.text ?? 'pic'), ['Title ', 'pic']);
+  const wb = Workbook.fromBytes(hfPictureBook({ hf: { oddHeader: '&L&G', oddFooter: '&R&G', firstHeader: '&C&G', differentFirst: true }, pictures: [{ id: 'LH', w: 60, h: 30 }, { id: 'RF', w: 40.5, h: 20.25 }, { id: 'CHFIRST', w: 30, h: 15 }] }));
+  const pics = headerPictures(wb, 0);
+  assert.deepEqual(Object.keys(pics).sort(), ['CHFIRST', 'LH', 'RF']);
+  assert.deepEqual([pics.RF.w, pics.RF.h], [40.5, 20.25]);
+  assert.match(pics.LH.src, /^data:image\/png;base64,iVBORw0KGgo/);
+  assert.equal(wb.sheet(0).page.headerFooter.first.header, '&C&G');
+  assert.deepEqual(headerPictures(Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/print-headers.xlsx'))), 0), {});
+});

@@ -1,7 +1,8 @@
 // PDF export drawn from the editor's own print layout (pdf-lib, MIT): each printed page becomes a PDF page of the same
 // paper size, and on it, at the places the layout put them, the fills, the borders and the cells' text, as real text
-// (selectable and searchable), each piece clipped to its cell as the page clips it. Separate from the main bundle:
-// import { exportPdf } from 'open-xlsx-editor/pdf'. Adapted from open-docx-editor's pdf.js.
+// (selectable and searchable), each piece clipped to its cell as the page clips it; header and footer pictures.
+// Separate from the main bundle: import { exportPdf } from 'open-xlsx-editor/pdf'. Adapted from open-docx-editor's
+// pdf.js.
 //
 // Fonts, the first that has the face: the fonts installed on the computer, read with the browser's Local Font Access
 // (Chromium browsers: it asks the user once), embedded as subsets (fontkit); else the PDF standard fonts (Helvetica,
@@ -178,6 +179,16 @@ async function drawPage(pdf, pageEl, ctx) {
       if (lines.includes('underline')) page.drawLine({ start: { x: X(piece.r.left), y: y - size * 0.12 }, end: { x: X(piece.r.left) + want, y: y - size * 0.12 }, thickness: thick, color: c.rgb });
       if (lines.includes('line-through')) page.drawLine({ start: { x: X(piece.r.left), y: y + size * 0.3 }, end: { x: X(piece.r.left) + want, y: y + size * 0.3 }, thickness: thick, color: c.rgb });
     }
+  }
+  // 3. Header and footer pictures (&G), PNG or JPEG, where the layout put them.
+  for (const img of pageEl.querySelectorAll('.oxe-hf-pic')) {
+    const m = /^data:image\/(png|jpeg);base64,(.*)$/.exec(img.src);
+    if (!m) continue;
+    const bytes = Uint8Array.from(atob(m[2]), (ch) => ch.charCodeAt(0));
+    ctx.images ||= new Map();
+    if (!ctx.images.has(img.src)) ctx.images.set(img.src, await (m[1] === 'png' ? pdf.embedPng(bytes) : pdf.embedJpg(bytes)));
+    const r = img.getBoundingClientRect();
+    page.drawImage(ctx.images.get(img.src), { x: X(r.left), y: Y(r.bottom), width: r.width * PT, height: r.height * PT });
   }
 }
 

@@ -11,7 +11,7 @@ fonts, padding, baselines) is in docs/LAYOUT.md.
 | Manual page breaks | `rowBreaks`, `colBreaks` (`man="1"`) | A page starts at each. |
 | Scale | `pageSetup scale` | Columns and rows print at the scale, each rounded to whole printer dots (600 dpi). |
 | Fit to pages | `pageSetUpPr fitToPage`, `fitToWidth`, `fitToHeight` (0: as many as it takes) | The largest whole percentage, 10 to 100, at which the print area fits. |
-| Header and footer | `headerFooter` | Left, centre and right sections with Excel's codes (`&P`, `&N`, `&D`, `&T`, `&F`, `&A`, `&Z`, bold, italic, underline, strikethrough, font, size, colour), and different first and even pages. |
+| Header and footer | `headerFooter`; pictures in the VML drawing of `legacyDrawingHF` | Left, centre and right sections with Excel's codes (`&P`, `&N`, `&D`, `&T`, `&F`, `&A`, `&Z`, `&G` a picture, bold, italic, underline, strikethrough, font, size, colour), and different first and even pages. |
 
 ## Measured rules
 
@@ -66,6 +66,17 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
 - **Different first page and different odd and even pages** (headerFooter differentFirst, differentOddEven): the
   first page takes firstHeader and firstFooter, even pages evenHeader and evenFooter, placed as any page's (workbooks
   made in code, three pages each way and both, `..\runs\hf3`: 1,187 of 1,187 text pieces within 1px both ways).
+- **Pictures in headers and footers** (`&G`; `ooxml/hfpictures.js`): each section's picture is a shape of the VML
+  drawing that legacyDrawingHF names, its id the section's (LH, CH, RH, LF, CF, RF, with FIRST or EVEN after it for
+  the first and even pages: LHFIRST, RFEVEN), its style the size in points. Excel prints it 1.075 times as wide and
+  1.015 times as tall (60 by 30pt as 85.92 by 40.64px), 1.92px wider again for text before it and for text after it.
+  Alone in its section, its top is on the header margin, or its bottom on the footer margin, at the margin itself
+  (no 1.25px inset) or centred. Beside text, its bottom is 0.183em below the text's baseline, and the line that much
+  further from the margin (2.7px at 11pt). The other sections stay where they were (workbooks made in code with a PNG
+  made in code, alone, beside text, first and even pages, `..\runs\hfpic`: 532 of 532 text pieces within 1px
+  both ways, browser print and PDF export; all 9 pictures (`tools/excel-compare/images.cjs`) within 0.5px in place
+  and size, Chrome's print rounding them to whole pixels, PDF export within 0.15px). Not measured: a picture in a header of several lines, or scaled
+  with the sheet.
 
 ## Setting them (measured)
 
@@ -102,5 +113,3 @@ there.
 
 The ten earlier fixtures were checked so the print model didn't change them. The 15 cells that differ are the same
 ones as before it (docs/LAYOUT.md).
-
-Not yet: pictures in headers (`&G`).

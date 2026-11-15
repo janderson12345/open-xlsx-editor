@@ -23,8 +23,11 @@ skip the installed fonts.
 - **Fonts:** the installed fonts, embedded as subsets, read with the browser's Local Font Access (Chromium browsers ask
   once). Otherwise the PDF standard fonts are used, each piece of text scaled to the width the layout measured.
 
-Not drawn yet, as the print layout doesn't have them either: headers and footers, print areas and titles, scaling and
-fit to page, charts, pictures and notes.
+- **Headers and footers:** their text, as the cells', and their pictures (`&G`, PNG and JPEG) at the layout's places
+  (docs/PRINT.md).
+
+Print areas, titles, scaling and fit to page come from the print layout (docs/PRINT.md). Not drawn yet, as the print
+layout doesn't have them either: charts, pictures on the sheet, and notes.
 
 ## Measured against Excel (10 November 2026)
 

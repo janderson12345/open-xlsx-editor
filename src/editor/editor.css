@@ -505,6 +505,7 @@
 .oxe-hf .oxe-hf-i { font-style: italic; }
 .oxe-hf .oxe-hf-u { text-decoration: underline; }
 .oxe-hf .oxe-hf-s { text-decoration: line-through; }
+.oxe-hf .oxe-hf-pic { width: var(--oxe-hf-pw); height: var(--oxe-hf-ph); vertical-align: var(--oxe-hf-drop, 0px); }
 .oxe-page-zoom .oxe-tx {
   translate: 0 var(--oxe-pshift, 0px);
 }

@@ -6,6 +6,7 @@ import { renderPrint } from './editor/print.js';
 import { createActs } from './editor/acts.js';
 import { chartPicker } from './editor/chartpick.js';
 import { printSetup } from './ooxml/printarea.js';
+import { headerPictures } from './ooxml/hfpictures.js';
 import { applyCellStyles } from './editor/cellstyles.js';
 import { fontsChanged } from './editor/fonts.js';
 import { addOmfFaces } from './editor/omffonts.js';
@@ -460,7 +461,7 @@ export function mountXlsxEditor(host, options = {}) {
     preparePrint() {
       if (!state.workbook) return 0;
       const wb = state.workbook;
-      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11 });
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex) });
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },
