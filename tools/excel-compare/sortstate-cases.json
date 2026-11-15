@@ -15,5 +15,20 @@
   {"name": "box-data-keys-two", "range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}]},
   {"name": "box-data-key-colour", "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "asc", "on": "cellColor", "color": 255}]},
   {"name": "box-data-key-ltr", "range": "B2:C6", "header": "no", "leftToRight": true, "keys": [{"key": "B2:C2", "order": "asc"}]},
-  {"name": "filtered-data-key", "filter": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "desc"}]}
+  {"name": "filtered-data-key", "filter": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "desc"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-row-inserted-above", "after": [{"do": "insert", "range": "1:1"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-row-inserted-inside", "after": [{"do": "insert", "range": "4:4"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-row-inserted-below", "after": [{"do": "insert", "range": "8:8"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-row-deleted-inside", "after": [{"do": "delete", "range": "3:3"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-header-row-deleted", "after": [{"do": "delete", "range": "1:1"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-column-inserted-before", "after": [{"do": "insert", "range": "A:A"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-column-inserted-between", "after": [{"do": "insert", "range": "B:B"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-key-column-deleted", "after": [{"do": "delete", "range": "C:C"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-other-column-deleted", "after": [{"do": "delete", "range": "B:B"}]},
+  {"range": "A1:C6", "header": "yes", "keys": [{"key": "C2:C6", "order": "desc"}, {"key": "A2:A6", "order": "asc"}], "name": "then-rows-deleted-all-data", "after": [{"do": "delete", "range": "2:6"}]},
+  {"name": "filtered-then-row-inserted", "filter": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "desc"}], "after": [{"do": "insert", "range": "4:4"}]},
+  {"name": "table-one-key", "table": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "desc"}]},
+  {"name": "table-two-keys-case", "table": true, "range": "A1:C6", "header": "yes", "matchCase": true, "keys": [{"key": "C2:C6", "order": "asc"}, {"key": "A2:A6", "order": "desc"}]},
+  {"name": "table-cell-colour", "table": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "asc", "on": "cellColor", "color": 255}]},
+  {"name": "table-then-row-inserted", "table": true, "range": "A1:C6", "header": "yes", "keys": [{"key": "B2:B6", "order": "desc"}], "after": [{"do": "insert", "range": "4:4"}]}
 ]

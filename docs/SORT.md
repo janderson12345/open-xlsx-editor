@@ -66,11 +66,22 @@ on 17 sorts of a made-up table, saved and read back (`tools/excel-compare/excel-
 | A filtered range's sort: the one sortState is the autoFilter's last child; otherwise it follows the autoFilter in the sheet. A new sort replaces the last. | `<autoFilter ref="A1:C6"><sortState ref="A2:C6">...` |
 | The A to Z and Z to A buttons save the same form as the Sort box. Excel 365 declares the xlrd2 namespace on it (written so here). | |
 
-A sort inside a table is not saved here: Excel keeps that sortState in the table's own part.
+| A sort inside a table (its own Sort) is saved in the table's part, after its autoFilter, and none in the sheet. | `<autoFilter ref="A1:C6"/><sortState ref="A2:C6"><sortCondition descending="1" ref="B2:B6"/></sortState><tableColumns ...` |
+
+The saved sort follows inserted and deleted rows and columns as Excel moves it (the same probe's then-* and
+table-then-* cases, `test/sortstate.test.js`: 10 of 11, and the table's):
+
+| Rule | Excel's file, from `<sortState ref="A2:C6">` with levels C2:C6 and A2:A6 |
+|---|---|
+| Lines inserted above or before move it; inserted inside, it grows; inserted below its last row, it stays. | a row above: `ref="A3:C7"`, levels C3:C7 and A3:A7; a row inside: A2:C7 |
+| Lines deleted inside shrink it; a level whose column is deleted goes; all its rows deleted, the sortState goes. | column C deleted: `<sortState ref="A2:B6"><sortCondition ref="A2:A6"/>` |
+| A filtered range's (in the autoFilter) and a table's (in its part) follow the same way. | a row inserted in the table: `ref="A2:C7"`, level B2:B7 |
+
+One difference: with the header row above it deleted, Excel keeps the sortState starting on row 2 (`ref="A2:C5"`) while
+its levels move up (C1:C5); here the sortState moves up with them (A1:C5).
 
 ## Not yet
 
 Sorting by a conditional format's icon, Excel's question about numbers stored as text
-(sorted as text here, as without it), sorting a table (ListObject), the cells' menu's Sort, a table's saved sort, and
-moving a saved sort's ranges when rows or columns are inserted or deleted. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Notes, hyperlinks, conditional formats and data validation stay where they are.
+(sorted as text here, as without it), sorting a table (ListObject) from its own buttons, and the cells' menu's Sort. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Notes, hyperlinks, conditional formats and data validation stay where they are.
 (Filter, and the Data tab's Sort & Filter group, are done: docs/FILTER.md.)

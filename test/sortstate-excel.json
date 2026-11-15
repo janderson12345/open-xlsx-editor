@@ -123,7 +123,7 @@
     },
     {
       "name": "filtered-one-key",
-      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{607DB8A2-B104-48ED-A932-C6F389E07843}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/>",
+      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{33BEADEA-93EE-4F80-B92E-6085EB3AC178}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/>",
       "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B1\"/></sortState>",
       "sortStates": 1,
       "order": [
@@ -136,7 +136,7 @@
     },
     {
       "name": "filtered-two-keys",
-      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{96D0E30F-0273-423F-87C8-32A02B0F58B2}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C1\"/>",
+      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{D8F5D6DE-B1A1-45F0-9BEA-9CA30A204B98}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C1\"/>",
       "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C1\"/><sortCondition descending=\"1\" ref=\"B1\"/></sortState>",
       "sortStates": 1,
       "order": [
@@ -197,7 +197,7 @@
     },
     {
       "name": "filtered-data-key",
-      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{22BBDEB6-1D68-4956-ADCA-A55BD88E069E}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/>",
+      "autoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{B5D1A6F9-26A7-42B9-AD40-D7B3BBAA60B9}\"><sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/>",
       "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/></sortState>",
       "sortStates": 1,
       "order": [
@@ -206,6 +206,194 @@
         "sortState",
         "pageMargins"
       ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-row-inserted-above",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A3:C7\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C3:C7\"/><sortCondition ref=\"A3:A7\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-row-inserted-inside",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C7\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C2:C7\"/><sortCondition ref=\"A2:A7\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-row-inserted-below",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C2:C6\"/><sortCondition ref=\"A2:A6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-row-deleted-inside",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C5\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C2:C5\"/><sortCondition ref=\"A2:A5\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-header-row-deleted",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:C5\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"C1:C5\"/><sortCondition ref=\"A1:A5\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-column-inserted-before",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"B2:D6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"D2:D6\"/><sortCondition ref=\"B2:B6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-column-inserted-between",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:D6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"D2:D6\"/><sortCondition ref=\"A2:A6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-key-column-deleted",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:B6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"A2:A6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-other-column-deleted",
+      "autoFilter": null,
+      "sortState": "<sortState ref=\"A2:B6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/><sortCondition ref=\"A2:A6\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "then-rows-deleted-all-data",
+      "autoFilter": null,
+      "sortState": null,
+      "sortStates": 0,
+      "order": [
+        "sheetData",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "filtered-then-row-inserted",
+      "autoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{86245E6A-E634-4D0E-A859-4A9A6CD0F204}\"><sortState ref=\"A2:C7\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B7\"/>",
+      "sortState": "<sortState ref=\"A2:C7\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B7\"/></sortState>",
+      "sortStates": 1,
+      "order": [
+        "sheetData",
+        "autoFilter",
+        "sortState",
+        "pageMargins"
+      ],
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "table-one-key",
+      "autoFilter": null,
+      "sortState": null,
+      "sortStates": 0,
+      "order": [
+        "sheetData",
+        "pageMargins"
+      ],
+      "table": "<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{3A06FAD7-C2F3-41BF-BEE8-2003A46DE2A1}\" name=\"Table1\" displayName=\"Table1\" ref=\"A1:C6\" totalsRowShown=\"0\">",
+      "tableAutoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{3A06FAD7-C2F3-41BF-BEE8-2003A46DE2A1}\"/>",
+      "tableSortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B6\"/></sortState>",
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "table-two-keys-case",
+      "autoFilter": null,
+      "sortState": null,
+      "sortStates": 0,
+      "order": [
+        "sheetData",
+        "pageMargins"
+      ],
+      "table": "<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{2DCCA35B-316B-4666-8FF0-D0CC47216245}\" name=\"Table1\" displayName=\"Table1\" ref=\"A1:C6\" totalsRowShown=\"0\">",
+      "tableAutoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{2DCCA35B-316B-4666-8FF0-D0CC47216245}\"/>",
+      "tableSortState": "<sortState caseSensitive=\"1\" ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition ref=\"C2:C6\"/><sortCondition descending=\"1\" ref=\"A2:A6\"/></sortState>",
+      "dxfs": "<dxfs count=\"0\"/>"
+    },
+    {
+      "name": "table-cell-colour",
+      "autoFilter": null,
+      "sortState": null,
+      "sortStates": 0,
+      "order": [
+        "sheetData",
+        "pageMargins"
+      ],
+      "table": "<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{C84031E4-8679-4D5F-B64F-055C2F17E6E0}\" name=\"Table1\" displayName=\"Table1\" ref=\"A1:C6\" totalsRowShown=\"0\">",
+      "tableAutoFilter": "<autoFilter ref=\"A1:C6\" xr:uid=\"{C84031E4-8679-4D5F-B64F-055C2F17E6E0}\"/>",
+      "tableSortState": "<sortState ref=\"A2:C6\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition sortBy=\"cellColor\" ref=\"B2:B6\" dxfId=\"0\"/></sortState>",
+      "dxfs": "<dxfs count=\"1\"><dxf><fill><patternFill patternType=\"solid\"><fgColor rgb=\"FFFF0000\"/><bgColor indexed=\"65\"/></patternFill></fill></dxf></dxfs>"
+    },
+    {
+      "name": "table-then-row-inserted",
+      "autoFilter": null,
+      "sortState": null,
+      "sortStates": 0,
+      "order": [
+        "sheetData",
+        "pageMargins"
+      ],
+      "table": "<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{3BA8B8B0-E14D-4BF2-BE40-FCC8B256BD0A}\" name=\"Table1\" displayName=\"Table1\" ref=\"A1:C7\" totalsRowShown=\"0\">",
+      "tableAutoFilter": "<autoFilter ref=\"A1:C7\" xr:uid=\"{3BA8B8B0-E14D-4BF2-BE40-FCC8B256BD0A}\"/>",
+      "tableSortState": "<sortState ref=\"A2:C7\" xmlns:xlrd2=\"http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2\"><sortCondition descending=\"1\" ref=\"B2:B7\"/></sortState>",
       "dxfs": "<dxfs count=\"0\"/>"
     }
   ]

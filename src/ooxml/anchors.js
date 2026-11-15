@@ -294,6 +294,23 @@ export function applyTables(wb, si, axis, plans, doc, setCell) {
       }
     }
     const ref = `${name(r0, c0)}:${name(r1, c1)}`;
+    // (A saved sort's levels follow too, as Excel's table sort was seen to (excel-sortstate.ps1, table-then-row-inserted):
+    // each over the data rows, its column moved with the table's columns, gone with its column.)
+    const levelCol = (c) => {
+      const k = c - t.c0;
+      if (axis !== 'col') return c;
+      if (plan.shift) return c + plan.shift;
+      if (plan.grow) return k >= plan.grow.index ? c + plan.grow.count : c;
+      if (plan.shrink?.length) return plan.shrink.includes(k) ? null : c - plan.shrink.filter((x) => x < k).length;
+      return c;
+    };
+    text = text.replace(/<sortCondition\b[^>]*?\sref="([A-Z]+)\d+(?::[A-Z]+\d+)?"[^>]*?\/>/g, (el, col) => {
+      let c = 0;
+      for (const ch of col) c = c * 26 + ch.charCodeAt(0) - 64;
+      const to = levelCol(c - 1);
+      if (to == null) return '';
+      return el.replace(/\sref="[^"]*"/, ` ref="${name(r0 + t.headers, to)}:${name(r1 - t.totals, to)}"`);
+    });
     text = text.replace(/(<table\b[^>]*\sref=")[^"]*"/, `$1${ref}"`)
       .replace(/(<autoFilter\b[^>]*\sref=")[^"]*"/, `$1${name(r0, c0)}:${name(r1 - t.totals, c1)}"`)
       .replace(/(<sortState\b[^>]*\sref=")[^"]*"/, `$1${name(r0 + t.headers, c0)}:${name(r1 - t.totals, c1)}"`);

@@ -33,13 +33,15 @@ try {
     $way = if ($case.leftToRight) { 2 } else { 1 }
     $keys = @($case.keys)
     if ($case.filter) { [void]$ws.Range('A1').AutoFilter() }
+    # (A table over the data: its own Sort, which Excel saves in the table's part.)
+    if ($case.table) { $lo = $ws.ListObjects.Add(1, $ws.Range('A1:C6'), $missing, 1) }
     $r = $ws.Range($case.range)
     if ($case.legacy) {
       $k1 = $ws.Range($keys[0].key); $o1 = if ($keys[0].order -eq 'desc') { 2 } else { 1 }
       [void]$r.Sort($k1, $o1, $missing, $missing, 1, $missing, 1, $hdr, 1, [bool]$case.matchCase, $way)
     } else {
       # (A filtered range is sorted through its AutoFilter's Sort, as its buttons and the Sort box sort it.)
-      $so = if ($case.filter) { $ws.AutoFilter.Sort } else { $ws.Sort }
+      $so = if ($case.table) { $lo.Sort } elseif ($case.filter) { $ws.AutoFilter.Sort } else { $ws.Sort }
       $so.SortFields.Clear()
       foreach ($k in $keys) {
         $order = if ($k.order -eq 'desc') { 2 } else { 1 }
@@ -48,11 +50,16 @@ try {
         $sf = $so.SortFields.Add($ws.Range($k.key), $(if ($on) { $on } else { 0 }), $order, $custom, 0)
         if ($on) { $sf.SortOnValue.Color = [int]$k.color }
       }
-      if (-not $case.filter) { $so.SetRange($r) }
+      if (-not $case.filter -and -not $case.table) { $so.SetRange($r) }
       $so.Header = $hdr
       $so.MatchCase = [bool]$case.matchCase
       $so.Orientation = $way
       $so.Apply()
+    }
+    # (Steps after the sort: whole rows or columns inserted or deleted, to see the saved sort follow them.)
+    foreach ($st in @($case.after)) {
+      if ($null -eq $st) { continue }
+      if ($st.do -eq 'insert') { [void]$ws.Range($st.range).Insert() } else { [void]$ws.Range($st.range).Delete() }
     }
     $file = Join-Path $dir "$($case.name).xlsx"
     $wb.SaveAs($file, 51)
@@ -61,6 +68,8 @@ try {
     try {
       $sheet = (New-Object IO.StreamReader($zip.GetEntry('xl/worksheets/sheet1.xml').Open())).ReadToEnd()
       $styles = (New-Object IO.StreamReader($zip.GetEntry('xl/styles.xml').Open())).ReadToEnd()
+      $te = $zip.GetEntry('xl/tables/table1.xml')
+      $tablePart = if ($te) { (New-Object IO.StreamReader($te.Open())).ReadToEnd() } else { $null }
     } finally { $zip.Dispose() }
     $a.autoFilter = if ($sheet -match '(?s)<autoFilter\b.*?(</autoFilter>|/>)') { $Matches[0] } else { $null }
     $a.sortState = if ($sheet -match '(?s)<sortState\b.*?</sortState>') { $Matches[0] } else { $null }
@@ -68,6 +77,7 @@ try {
     # (Where the sortState sits among the sheet's elements: the names before and after it.)
     $names = [regex]::Matches($sheet, '<(\w+)[ >/]') | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -in 'sheetData','autoFilter','sortState','mergeCells','conditionalFormatting','pageMargins','pageSetup','sheetProtection','dataValidations' }
     $a.order = @($names | Select-Object -Unique)
+    if ($tablePart) { $a.table = if ($tablePart -match '(?s)<table' + [char]92 + 'b[^>]*>') { $Matches[0] } else { $null }; $a.tableAutoFilter = if ($tablePart -match '(?s)<autoFilter' + [char]92 + 'b.*?(</autoFilter>|/>)') { $Matches[0] } else { $null }; $a.tableSortState = if ($tablePart -match '(?s)<sortState' + [char]92 + 'b.*?</sortState>') { $Matches[0] } else { $null } }
     $a.dxfs = if ($styles -match '(?s)<dxfs count="0"/>|<dxfs' + [char]92 + 'b.*?</dxfs>') { $Matches[0] } else { $null }
     $answers.Add($a)
     Remove-Item $file

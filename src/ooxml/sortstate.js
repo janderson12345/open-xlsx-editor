@@ -10,8 +10,8 @@
 //   last child; otherwise it follows the autoFilter in the sheet, before the elements CT_Worksheet puts after it;
 // - Excel 365 declares the xlrd2 namespace on it, written so here too;
 // - the A to Z and Z to A buttons save one in the same form as the Sort box.
-// A new sort replaces the sheet's last one. A sort inside a table, whose sortState Excel keeps in the table's part,
-// is not written here (the table's is kept as it was).
+// - a sort inside a table (its own Sort) is saved in the table's part, after its autoFilter, and none in the sheet;
+// A new sort replaces the last one. A saved sort follows inserted and deleted rows and columns: rowcol.js, anchors.js.
 import { kid, kids, parseXml } from './xml.js';
 import { rangeName, colName } from './refs.js';
 import { addDxf } from './filterops.js';
@@ -53,13 +53,21 @@ export function sortStateXml(wb, plan) {
   return `<sortState${leftToRight ? ' columnSort="1"' : ''}${matchCase ? ' caseSensitive="1"' : ''} ref="${rangeName(data)}" xmlns:xlrd2="${XLRD2}">${conditions}</sortState>`;
 }
 
-/** Sheet si's last sort saved as `plan` (sortStateXml): in its autoFilter when the sort was of the filtered range,
- *  else after it in the sheet; the sheet's earlier one replaced. Not for a sort inside a table. Returns true when
- *  written. */
+/** Sheet si's last sort saved as `plan` (sortStateXml): in the table's part when the sort was inside a table; in the
+ *  autoFilter when it was of the filtered range; else after the autoFilter in the sheet; the earlier one replaced.
+ *  Returns true. */
 export function setSortState(wb, si, plan) {
   const { area } = plan;
   const inside = (t) => t.si === si && area.r0 >= t.r0 && area.r1 <= t.r1 && area.c0 >= t.c0 && area.c1 <= t.c1;
-  if (readTables(wb).some(inside)) return false;
+  const table = readTables(wb).find(inside);
+  if (table) {
+    // (CT_Table: autoFilter, sortState, tableColumns...; Excel's table-* cases.)
+    const xml = sortStateXml(wb, plan);
+    const text = wb.pkg.text(table.path).replace(/<sortState\b[\s\S]*?<\/sortState>/, '');
+    wb.pkg.setText(table.path, text.replace(/<tableColumns\b/, `${xml}<tableColumns`));
+    wb.edited = true;
+    return true;
+  }
   const part = wb._part(si);
   const root = part.doc.documentElement;
   const ns = root.namespaceURI;

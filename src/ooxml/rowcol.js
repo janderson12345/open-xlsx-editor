@@ -292,6 +292,15 @@ function moveRanges(doc, axis, at, n, band = null, split = []) {
   }
   const filter = kid(root, 'autoFilter', ns);
   if (filter && !one(filter, 'ref')) root.removeChild(filter);
+  // (The saved sort, the sheet's or the autoFilter's: its range and each level's follow the lines as Excel moves them,
+  // a level whose column is deleted going, and the sortState once its rows or all its levels are (excel-sortstate.ps1,
+  // test/sortstate-excel.json, the then-* cases).)
+  const kept = kid(root, 'autoFilter', ns);
+  for (const st of [kid(root, 'sortState', ns), kept && kid(kept, 'sortState', ns)].filter(Boolean)) {
+    const rowsLeft = one(st, 'ref');
+    const levels = kids(st, 'sortCondition', ns).filter((sc) => (one(sc, 'ref') ? true : (st.removeChild(sc), false)));
+    if (!rowsLeft || !levels.length) st.parentNode.removeChild(st);
+  }
   for (const view of kids(kid(root, 'sheetViews', ns), 'sheetView', ns)) {
     for (const sel of kids(view, 'selection', ns)) {
       const cell = parseRef(attr(sel, 'activeCell'));

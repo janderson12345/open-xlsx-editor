@@ -18,7 +18,7 @@ export function readTables(wb) {
       if (!area) continue;
       const ns = root.namespaceURI;
       out.push({
-        name: attr(root, 'displayName') || attr(root, 'name'), si, ...area,
+        name: attr(root, 'displayName') || attr(root, 'name'), si, ...area, path: rel.target,
         headers: attr(root, 'headerRowCount') === '0' ? 0 : 1,
         totals: Number(attr(root, 'totalsRowCount') || 0) > 0 ? 1 : 0,
         columns: kids(kid(root, 'tableColumns', ns), 'tableColumn', ns).map((c) => attr(c, 'name') || ''),
