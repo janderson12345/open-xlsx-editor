@@ -7,6 +7,7 @@ import { hyperlinkAt } from '../ooxml/links.js';
 import { formulaLink } from '../calc/hyperlinkcell.js';
 import { createMoreActs } from './acts-more.js';
 import { createSparklineActs } from './acts-sparklines.js';
+import { createOutlineActs, OUTLINE_ACTS } from './acts-outline.js';
 import { borderDrawing, DRAW_ACTS } from './drawborders.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
@@ -76,6 +77,7 @@ export function createActs(env) {
   const drawing = borderDrawing(env);
   let more = null;
   let sparks = null;
+  let outline = null;
   const moreAct = (name, args, i) => (more ??= createMoreActs({ ...env, act }))(name, args, i);
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
@@ -88,6 +90,8 @@ export function createActs(env) {
     const i = state.sheetIndex;
     // (Insert > Sparklines and the Sparkline tab: acts-sparklines.js.)
     if (name.startsWith('sparkline')) return (sparks ??= createSparklineActs({ ...env, act }))(name, args);
+    // (Data > Outline's boxes: acts-outline.js.)
+    if (OUTLINE_ACTS.has(name)) return (outline ??= createOutlineActs({ ...env, act }))(name, args, i);
     // (Charts, comments, Format Cells and conditional formatting: acts-more.js.)
     const more = moreAct(name, args, i);
     if (more !== undefined) return more;

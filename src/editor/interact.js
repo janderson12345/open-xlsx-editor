@@ -199,6 +199,8 @@ export function attachEditing(root, ctx) {
     let handled = true;
     // (Alt+Down on a heading cell of a filter opens its list, as in Excel.)
     if (e.altKey && !ctrl && key === 'ArrowDown' && ctx.filterMenu?.()) { /* opened */ }
+    // (Shift+Alt+Right and Left: Group and Ungroup, as in Excel.)
+    else if (e.altKey && e.shiftKey && !ctrl && (key === 'ArrowRight' || key === 'ArrowLeft') && ctx.outline) ctx.outline(key === 'ArrowRight' ? 1 : -1);
     else if (ARROWS[key]) cmd.run('move', ARROWS[key][0], ARROWS[key][1], { extend: e.shiftKey, jump: ctrl });
     else if (key === 'Tab') cmd.run('move', 0, e.shiftKey ? -1 : 1, { via: 'tab' });
     // (Format Painter waiting: Enter paints the selection, as a click does.)
