@@ -19,6 +19,13 @@ const ALIGN_KEYS = { horizontal: ['horizontal', 'general'], vertical: ['vertical
  *  number format, and the font of its own (Hyperlink's: underlined, the theme's colour 10, measured). */
 export const CELL_STYLES = { Comma: { builtinId: 3, numFmtId: 43 }, Currency: { builtinId: 4, numFmtId: 44 }, Percent: { builtinId: 5, numFmtId: 9 },
   Hyperlink: { builtinId: 8, numFmtId: 0, font: { u: 'single', color: { theme: 10 } } } };
+// (The outline's automatic styles, outlinestyles.js: RowLevel_n and ColLevel_n, builtinId 1 and 2 told apart by iLevel;
+// level 1 bold, level 2 italic, deeper the Normal font. Declared here, so they exist whatever module loads first.)
+for (let n = 1; n <= 7; n++) {
+  const font = n === 1 ? { b: true } : n === 2 ? { i: true } : {};
+  CELL_STYLES[`RowLevel_${n}`] = { builtinId: 1, iLevel: n - 1, numFmtId: 0, font };
+  CELL_STYLES[`ColLevel_${n}`] = { builtinId: 2, iLevel: n - 1, numFmtId: 0, font };
+}
 /** Built-in formats whose codes depend on the computer's locale: Excel writes their codes out (numFmts) when it uses
  *  them, so another locale reads the same thing. */
 const LOCALE_BUILTINS = new Set([5, 6, 7, 8, 41, 42, 43, 44]);

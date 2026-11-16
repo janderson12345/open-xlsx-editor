@@ -6,14 +6,8 @@
 // 1, RowLevel_1). Apply Styles styles the cells of a range (empty ones made); Group and Subtotal with Automatic styles
 // on give the summary rows (columns) the style as their own format, the cells there too; Create (Auto Outline) styles
 // the cells of the used range.
-import { CELL_STYLES } from './stylesedit.js';
+// (The styles themselves, RowLevel_n and ColLevel_n, are declared with Excel's other built-in ones: stylesedit.js.)
 import { outlineOf } from './outline.js';
-
-for (let n = 1; n <= 7; n++) {
-  const font = n === 1 ? { b: true } : n === 2 ? { i: true } : {};
-  CELL_STYLES[`RowLevel_${n}`] = { builtinId: 1, iLevel: n - 1, numFmtId: 0, font };
-  CELL_STYLES[`ColLevel_${n}`] = { builtinId: 2, iLevel: n - 1, numFmtId: 0, font };
-}
 
 /** For each summary line, the lowest level of the groups it sums up: Map(index => level). */
 function summaries(groups) {
