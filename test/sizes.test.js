@@ -17,9 +17,9 @@ const sheetXml = (wb, si) => {
 };
 
 test('widths as Excel stores them: whole pixels over the digit width, cut to 1/256', () => {
-  assert.deepEqual([20, 12.5, 5, 9, 255].map(typedWidth), [20.7109375, 13.28515625, 5.7109375, 9.7109375, 255.7109375]);
+  assert.deepEqual([20, 12.5, 5, 9, 255].map((c) => typedWidth(c)), [20.7109375, 13.28515625, 5.7109375, 9.7109375, 255.7109375]);
   // (AutoFit's pixels: "Hello world" 77, "W" 19, "A much longer piece of text here" 204.)
-  assert.deepEqual([77, 19, 204].map(pxWidth), [11, 2.7109375, 29.140625]);
+  assert.deepEqual([77, 19, 204].map((px) => pxWidth(px)), [11, 2.7109375, 29.140625]);
 });
 
 test('columns: set, split where a range cuts them, hidden as width 0', () => {

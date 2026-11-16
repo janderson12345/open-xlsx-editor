@@ -20,7 +20,7 @@ resized here reads back in Excel with the widths, heights and hidden lines Excel
 
 | Rule | Seen |
 |---|---|
-| A width typed in characters becomes whole pixels: the characters times the maximum digit width (7 for Aptos Narrow and Calibri 11), rounded, plus 5. It is stored as those pixels over the digit width, cut to 1/256, with `customWidth`. | 20: `20.7109375`. 12.5: 93 pixels, `13.28515625`, shown as 12.57. 5: `5.7109375`. 255: `255.7109375`. |
+| A width typed in characters becomes whole pixels: the characters times the maximum digit width (7 for Aptos Narrow and Calibri 11; the Normal style font's, docs/LAYOUT.md), rounded, plus the padding (5 up to a digit width of 8, 7 to 12, 9 to 16). It is stored as those pixels over the digit width, cut to 1/256, with `customWidth`. | 20: `20.7109375`. 12.5: 93 pixels, `13.28515625`, shown as 12.57. 5: `5.7109375`. 255: `255.7109375`. |
 | A width can be 0 to 255 characters, a height 0 to 409 points. | 255.01 and 409.5 refused. |
 | A width or height of 0 hides the line. A hidden column is written `width="0" hidden="1"`; a hidden row `hidden="1"`. | Column H hidden: `<col min="8" max="8" width="0" hidden="1" customWidth="1"/>`. |
 | Setting part of a range of columns splits its `col` element. | D:F at 5, then E at 9: three elements. |

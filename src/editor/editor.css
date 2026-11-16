@@ -634,7 +634,7 @@
   pointer-events: none;
 }
 .oxe-print-grid-h { left: 0; top: var(--oxe-gy); width: var(--oxe-gl); height: 0.25px; }
-.oxe-print-grid-v { top: 0; left: var(--oxe-gx); height: var(--oxe-gl); width: 0.25px; }
+.oxe-print-grid-v { top: var(--oxe-gt, 0); left: var(--oxe-gx); height: var(--oxe-gl); width: 0.25px; }
 .oxe-page-block {
   position: absolute;
   left: var(--oxe-bx);

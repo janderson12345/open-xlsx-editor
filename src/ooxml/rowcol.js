@@ -343,7 +343,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   mapFormulas(wb, (text, here) => shiftRefs(text, { here, sheet: info.name, axis, at, n, band }), { name: info.name, target: si, shared: true });
   if (band) moveBandCells(doc, axis, at, n, band); else moveCells(doc, axis, at, n);
   const format = wb.sheet(si).format;
-  if (axis === 'col' && !band) moveCols(doc, at, n, pxWidth(defaultColPx(format, 7)));
+  if (axis === 'col' && !band) moveCols(doc, at, n, pxWidth(defaultColPx(format, format.mdw ?? 7), format.mdw ?? 7));
   moveRanges(doc, axis, at, n, band, split);
   moveExtRanges(doc, axis, at, n, band, (text) => shiftSqref(text, axis, at, n, band));
   extendRules(doc, axis, at, n, band);
@@ -367,7 +367,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   applyPivots(wb, si, axis, pivots);
   movePivotSources(wb, info.name, (area) => shiftRange(area, axis, at, n, band));
   // The sheet read again from its moved XML, and everything worked out again.
-  wb._parsed.set(info, { doc, model: readSheet(doc, wb.sharedStrings) });
+  wb._parsed.set(info, { doc, model: wb._withMdw(readSheet(doc, wb.sharedStrings)) });
   // (Counted by sheet for what a view holds by position and Excel drops on any insert or delete there: Circle Invalid
   // Data's ovals, excel-refmoves.ps1, all gone after every step on their sheet, kept after one on another sheet.)
   wb.lineChanges.set(info.sheetId, (wb.lineChanges.get(info.sheetId) || 0) + 1);

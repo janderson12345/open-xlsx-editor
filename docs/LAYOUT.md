@@ -9,10 +9,25 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
 
 ## Rules in use
 
-- **Column width.** Stored width `w` in characters of the maximum digit width `mdw`, padding included:
-  `px = trunc(((256 w + trunc(128 / mdw)) / 256) mdw)` (ECMA-376 Part 1, 18.3.1.13). `mdw` is fixed at 7px
-  (Calibri 11 at 96 dpi) until the Normal style's font is read. `src/ooxml/units.js`. On screen; still to be checked
-  against Excel's own screen.
+- **Column width** (*measured*). Stored width `w` in characters of the maximum digit width `mdw`, padding included:
+  `px = trunc(((256 w + trunc(128 / mdw)) / 256) mdw)` (ECMA-376 Part 1, 18.3.1.13), `src/ooxml/units.js`.
+- **Maximum digit width** (*measured*, `tools/excel-compare/excel-digitwidth.ps1`, `test/digitwidth-excel.json`). The
+  workbook's Normal style font sets it (`workbook.mdw`, `src/ooxml/digitwidth.js`): Excel 365 over COM, the Normal
+  style given 41 fonts and sizes, columns of 1, 2, 5, 10 and 20 characters read back in points and as saved, the
+  default width and AutoFit. Calibri 8-9: 6, 10-11: 7, 12: 8, 14: 10, 16: 11, 18: 12, 20: 14, 24: 16; Aptos Narrow 11:
+  7; Aptos 10, 11, 12: 7, 8, 9; Arial 8 to 16: 6, 7, 7, 8, 9, 11, 12; Times New Roman 10, 11, 12, 14: 6, 7, 8, 9;
+  Cambria 10, 11, 12: 7, 8, 9; Segoe UI 9, 10, 11: 6, 7, 8; Verdana 8, 10, 12: 7, 8, 10; Courier New 10, 11, 12: 8, 9,
+  10 (and Tahoma, Georgia, Consolas, MS Sans Serif). The padding grows with it: 2 x ceil(mdw / 4) + 1 pixels (5 up to
+  an mdw of 8, 7 to 12, 9 to 16), so n characters are n x mdw + padding, stored as that over mdw cut to 1/256 (Arial
+  12's 10 characters: 97px, `10.77734375`), and the default column 8 characters plus padding rounded up to a multiple
+  of 8 (56px for an mdw of 6, 80 for 9, 128 for 14, 144 for 16). AutoFit pads its text by the padding and 2px more.
+  All 41 x (5 widths, stored widths, default width, StandardWidth, AutoFit) as Excel has them (`npm test`). Excel's
+  widths come from Windows' hinted glyphs: worked out from the font files alone (the digits' advance at the size in
+  pixels, rounded), 32 of the 36 installed fonts are right and Calibri 8 and 14, Arial 14 and Times New Roman 10 a
+  pixel off; so the measured table comes first and any other font is measured in the browser (a canvas, 0-9, rounded
+  to the nearest pixel, `src/editor/digitmeasure.js`). Grid, column headings, typed and dragged widths, AutoFit, the
+  Width box and tip, CELL("width"), pasted column widths, print (screen pixels x 1.075) all count in it. Browser check:
+  `test/display-diffs.mjs`, the headings of seven fonts (mdw 6 to 16) at Excel's pixels.
 - **Printed column width** (*measured*). Screen pixels x 1.075 (`PRINT_COL_SCALE`): 30 columns of the probe from 8 to
   285 screen pixels all within 0.15px (64 prints as 68.8, 145 as 155.9). Measured with Excel 365 exporting through
   the default printer's driver (a 600 dpi inkjet): the factor may belong to the printer, which a second machine
@@ -91,6 +106,13 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   Runs 10 -> 13: Excel's fill and border shapes within 1px 32 -> 122 of 153; the rest are double lines (Excel
   shortens the inner line at corners), dash pieces cut by Chromium's whole-pixel snapping, and the hatched fill.
 - **Gridlines.** The right and bottom pixel of each cell, inside its width and height.
+- **Gridlines under text running on** (*measured* in print, `tools/excel-compare/excel-runover.ps1`: Excel's PDF with
+  Gridlines: Print, `test/runover-excel.json`). Text running on into empty cells leaves out the column gridlines it
+  crosses in its row: left text the ones to its right, right text to its left, centred both ways, stopped where the
+  text stops (a neighbour with something in it, or the text's own end: nine zeros cross an 8.43 column's edge, eight
+  don't); the row's own gridline stays. Measured with the text's width in the browser (`cells.js runGaps`): on screen
+  21 of 21 left out and the other 210 drawn (read off a screenshot) and in print the same as Excel's PDF
+  (`test/display-diffs.mjs`).
 - **Cell text.** 2px side padding on screen (3.2 and 1.9 in print); general alignment puts numbers right, text left,
   booleans and errors in the middle. Size, line height and baseline shifts only through `celltext.js`'s custom
   properties, on an inner span (`.oxe-tx`).
@@ -103,7 +125,10 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   widths already match). Run 17: align.xlsx 32 of 32 pieces matched, 30 within 1px both ways. Fill, justify and
   distributed are drawn left.
 - **Turned, stacked and shrunk text** (*measured* in print, `test/fixtures/rotate.xlsx`: 37 samples, Excel's PDF in
-  `..\excel-pdfsotate`, runs in `..unsotate`). General alignment of turned text goes by the angle, not the
+  `..\excel-pdfs
+otate`, runs in `..
+uns
+otate`). General alignment of turned text goes by the angle, not the
   value: 1 to 89 degrees up on the left, 90 up and every angle down on the right, 90 down on the left (a number
   too); stacked letters are centred. Stacked letters are a line each, stepping by the font's default row height as
   wrapped lines do (19.36px for Calibri 11; 17.96 with the vertical writing mode used before), each centred, and set
@@ -136,6 +161,16 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   keeps the room of its space, digits and slash, `*x` repeats x across the room left, a format's colour beats the
   font's, a number in `@` sits left, negative dates and formatted numbers wider than their cell show centred #s (as
   many as fit, measured in the cell's font).
+- **East Asian built-in dates** (*measured*, `tools/excel-compare/excel-eastasia.ps1`, `test/eastasia-excel.json`).
+  Built-in ids 27-36 and 50-58 mean a different code in each East Asian locale and a file gives only the id. Excel 365
+  en-US reads them as m/d/yyyy (the short date, as format 14, so following the locale) and 32-35 as h:mm:ss (266 cells
+  over COM); in ja-JP, zh-CN, zh-TW (and zh-HK, zh-MO) and ko-KR they are ECMA-376's table of codes (18.8.30;
+  `src/ooxml/eastasia.js`): Windows' Region can't be changed for Excel alone, so which code each id takes in those
+  locales is the specification's, and how Excel draws each code was measured (840 cells): `[$-411]` codes count
+  Japanese eras (g R/H/S/T/M, gg 令/平/昭/大/明, ggg 令和..., e the era's year, ee two digits; 1989-01-07 is 昭和64,
+  1989-01-08 平成1, 2019-05-01 令和1, 元 only with `[$-ja-JP-x-gannen]`), `[$-404]e` is the Gregorian year (no
+  Republic of China calendar without its calendar id), 上午/下午 is AM/PM, other locale tags change nothing. `e` alone is
+  the year and `g` nothing, as in Excel. The locale is the editor's (`docs/LOCALE.md`).
 
 ## Where it stands
 
@@ -214,9 +249,6 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
 
 ## Open differences
 
-- East Asian date formats (built-in ids 27-36 and 50-58) are shown as General (`ooxml/format.js`).
-- The maximum digit width is fixed at 7px (right for Calibri 11 and Aptos Narrow 11); other Normal fonts need theirs.
-- Gridlines show under text that runs on into empty cells; Excel hides them there.
 - The grid ends 100 rows and 10 columns past the used range; Excel's goes on to row 1,048,576 and column XFD.
 - Printing (print area, print titles, scale, fit to pages, page breaks, headers and footers): docs/PRINT.md.
 

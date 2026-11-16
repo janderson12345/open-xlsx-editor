@@ -1,3 +1,5 @@
+import { colPad } from './digitwidth.js';
+
 // Office Open XML's units in CSS pixels (96 per inch): drawings measure in EMUs (914,400 an inch), row heights and font
 // sizes in points, column widths in characters of the default font's maximum digit width.
 
@@ -20,26 +22,30 @@ export const ptToPx = (v) => Number(v) / PT_PER_PX;
 export const pxToPt = (px) => px * PT_PER_PX;
 
 // Column widths (ECMA-376 Part 1, 18.3.1.13 `col@width`). A stored width is characters of the maximum digit width
-// (mdw: the widest of 0-9 in the Normal style's font, 7px for Calibri 11 at 96 dpi) plus 5px of padding, in 1/256ths:
-// a column shown as "8.43" is stored as 9.140625. The formulas are the specification's; they still have to be checked
-// against Excel's own PDFs (tools/excel-compare) before anything is laid out on top of them (LESSONS.md section 3).
+// (mdw: the widest of 0-9 in the Normal style's font, 7px for Calibri 11 at 96 dpi, digitwidth.js) plus its padding
+// (5px up to an mdw of 8, more for larger fonts: digitwidth.js colPad), in 1/256ths: a column shown as "8.43" is stored
+// as 9.140625. The formulas are the specification's with Excel's padding, measured over COM for 41 fonts and sizes
+// (Excel's stored widths and its widths in points, test/digitwidth-excel.json).
 
 /** A stored column width (characters, padding included) to whole pixels. */
 export const colWidthToPx = (width, mdw) => Math.trunc(((256 * Number(width) + Math.trunc(128 / mdw)) / 256) * mdw);
 /** Whole pixels to the stored column width that gives them. */
 export const pxToColWidth = (px, mdw) => Math.trunc((px / mdw) * 256) / 256;
 /** Characters as the user sees them ("8.43") to the stored width (9.140625). */
-export const charsToColWidth = (chars, mdw) => Math.trunc(((chars * mdw + 5) / mdw) * 256) / 256;
+export const charsToColWidth = (chars, mdw) => Math.trunc(((chars * mdw + colPad(mdw)) / mdw) * 256) / 256;
 /** The stored width to the characters the user sees, to Excel's two decimals. */
-export const colWidthToChars = (width, mdw) => Math.round(((colWidthToPx(width, mdw) - 5) / mdw) * 100) / 100;
+export const colWidthToChars = (width, mdw) => Math.round(((colWidthToPx(width, mdw) - colPad(mdw)) / mdw) * 100) / 100;
+/** A column's pixels to the characters Excel shows for it (the width box, the drag tip): unrounded. */
+export const pxToChars = (px, mdw) => Math.max(0, px - colPad(mdw)) / mdw;
 
-/** How many characters of the maximum digit width fit in a column, its 5px of padding taken off: the room Excel gives
+/** How many characters of the maximum digit width fit in a column, its padding taken off: the room Excel gives
  *  a General number (64px holds 8, 22px holds 2; fitted with numfmt.js formatGeneral on test/fixtures/general.xlsx). */
-export const colChars = (px, mdw) => Math.max(0, Math.floor((px - 5) / mdw));
+export const colChars = (px, mdw) => Math.max(0, Math.floor((px - colPad(mdw)) / mdw));
 
 /** A sheet's default column width in pixels: `defaultColWidth` when given, else `baseColWidth` (8) characters plus
  *  padding, rounded up to a multiple of 8 pixels, which is how Excel's untouched columns come to be 64px (8.43) in
- *  Calibri 11 rather than 61. (The multiple of 8 is [MS-OI29500]'s note on `baseColWidth`, not yet measured.) */
+ *  Calibri 11 rather than 61 ([MS-OI29500]'s note on `baseColWidth`; measured for 41 Normal fonts, from 56px for an
+ *  mdw of 6 to 144px for 16: excel-digitwidth.ps1's StandardWidth and default column). */
 export function defaultColPx({ defaultColWidth, baseColWidth } = {}, mdw = 7) {
   if (defaultColWidth != null) return colWidthToPx(defaultColWidth, mdw);
   const base = baseColWidth != null ? Number(baseColWidth) : 8;

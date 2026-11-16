@@ -4,7 +4,7 @@
 // the sheet's scale or the scale that fits it on the pages asked for, each page at its paper size with the sheet's
 // margins. Built only for printing (and for PDF export and tools/excel-compare); hidden on screen.
 import { sheetGeometry } from './geometry.js';
-import { cellElement, mergeAt, fitNumbers } from './cells.js';
+import { cellElement, mergeAt, fitNumbers, lineSegments } from './cells.js';
 import { setVars, div } from './dom.js';
 import { decorations } from './decor.js';
 import { autoRowHeights, rowDescents } from './rowheights.js';
@@ -111,6 +111,9 @@ export function printScale(sheet, geometry, range) {
 /** One block of a page: cells r0..r1 by c0..c1 at (x, y) of the zoomed box, clipped to their size, or (`rest`, the
  *  page's own cells) to the rest of the printable area, as text running on past them prints. */
 function drawBlock(st, block, x, y, layout, rest = false) {
+  // (Which gridlines text running on crosses, from the cells as they are made: cells.js runGaps.)
+  const gaps = new Map();
+  st.gaps = gaps;
   const w = rest ? layout.area.w / layout.scale - x : span(st.cols, block.c0, block.c1);
   const h = rest ? layout.area.h / layout.scale - y : span(st.rows, block.r0, block.r1);
   const clip = div('oxe-page-block');
@@ -141,7 +144,14 @@ function drawBlock(st, block, x, y, layout, rest = false) {
     const ch = span(st.rows, block.r0, block.r1);
     const line = (cls, vars) => { const e = div(`oxe-print-grid ${cls}`); setVars(e, vars); clip.appendChild(e); };
     for (let r = block.r0; r <= block.r1 + 1; r++) if (r === block.r1 + 1 || st.rows.size(r)) line('oxe-print-grid-h', { '--oxe-gy': st.rows.start(r) - st.rows.start(block.r0), '--oxe-gl': cw });
-    for (let c = block.c0; c <= block.c1 + 1; c++) if (c === block.c1 + 1 || st.cols.size(c)) line('oxe-print-grid-v', { '--oxe-gx': st.cols.start(c) - st.cols.start(block.c0), '--oxe-gl': ch });
+    // (Text running on over empty cells leaves out the lines it crosses, inside the block: Excel's PDF, runGaps.)
+    const y0 = st.rows.start(block.r0);
+    for (let c = block.c0; c <= block.c1 + 1; c++) {
+      if (c !== block.c1 + 1 && !st.cols.size(c)) continue;
+      const inner = c > block.c0 && c <= block.c1 && [...gaps.values()].some((s) => s.has(c));
+      const pieces = inner ? lineSegments(st.rows, block.r0, block.r1, (r) => gaps.get(r)?.has(c), y0, 0) : [[y0, ch]];
+      for (const [py, ph] of pieces) line('oxe-print-grid-v', { '--oxe-gx': st.cols.start(c) - st.cols.start(block.c0), '--oxe-gt': py - y0, '--oxe-gl': ph });
+    }
   }
   return clip;
 }

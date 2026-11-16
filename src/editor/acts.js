@@ -36,6 +36,7 @@ import { mergeLoss } from '../ooxml/mergeops.js';
 import { MULTI_RANGE_MESSAGE } from '../ooxml/multiarea.js';
 import { stepSize } from '../ooxml/formatops.js';
 import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
+import { pxToChars } from '../ooxml/units.js';
 
 /** The Paste menu's choices, as Paste Special options. */
 const PASTE_AS = { formulas: { paste: 'formulas' }, values: { paste: 'values' }, formats: { paste: 'formats' }, transpose: { paste: 'all', transpose: true }, link: { link: true } };
@@ -166,7 +167,7 @@ export function createActs(env) {
     if (name === 'defaultWidthBox') {
       // (Excel's Standard Width box, holding the sheet's default width in characters.)
       if (state.readOnly) return false;
-      const value = Math.max(0, state.grid.geometry().cols.base - 5) / 7;
+      const value = pxToChars(state.grid.geometry().cols.base, state.workbook.mdw);
       return numberBox(root, { title: 'Standard Width', label: 'Standard column width:', value: String(Math.round(value * 100) / 100), max: 255, refusal: 'Column width must be between 0 and 255.' })
         .then((n) => (n == null ? false : editing().run('defaultWidth', n)));
     }
@@ -531,7 +532,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     const s = editing().selection;
     const g = state.grid.geometry();
     const rows = axis === 'row';
-    const value = rows ? g.rows.size(s.ar) * 0.75 : Math.max(0, g.cols.size(s.ac) - 5) / 7;
+    const value = rows ? g.rows.size(s.ar) * 0.75 : pxToChars(g.cols.size(s.ac), state.workbook.mdw);
     const n = await numberBox(root, rows
       ? { title: 'Row Height', label: 'Row height:', value: String(Math.round(value * 100) / 100), max: 409, refusal: 'Row height must be between 0 and 409.' }
       : { title: 'Column Width', label: 'Column width:', value: String(Math.round(value * 100) / 100), max: 255, refusal: 'Column width must be between 0 and 255.' });

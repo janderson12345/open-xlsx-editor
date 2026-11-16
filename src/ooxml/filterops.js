@@ -210,7 +210,7 @@ export function applyAutoFilter(wb, i, filter) {
     }
   }
   if (filter) filterName(wb, i, filter);
-  wb._parsed.set(wb.sheets[i], { doc: part.doc, model: readSheet(part.doc, wb.sharedStrings) });
+  wb._parsed.set(wb.sheets[i], { doc: part.doc, model: wb._withMdw(readSheet(part.doc, wb.sharedStrings)) });
   wb.dirty.add(wb.sheets[i].path);
   wb.edited = true;
   wb.resetCalc();

@@ -7,6 +7,7 @@
 import { readHtmlTable, cssUnescape } from './htmltable.js';
 import { parseInput, formatAfterEntry } from './input.js';
 import { maxOf } from './listmath.js';
+import { colPad } from './digitwidth.js';
 
 const NAMED = {
   black: '000000', white: 'FFFFFF', red: 'FF0000', lime: '00FF00', green: '008000', blue: '0000FF', yellow: 'FFFF00',
@@ -241,8 +242,9 @@ export function pasteHtml(wb, si, sel, html, { widths = false } = {}) {
   const overlaps = (m) => m.r0 <= area.r1 && area.r0 <= m.r1 && m.c0 <= area.c1 && area.c0 <= m.c1;
   const out = { si, contents, styles, merges: [...wb.sheet(si).merges.filter((m) => !overlaps(m)), ...merges], area };
   if (widths) {
-    // (A column's width in pixels to Excel's characters: px = chars * 7 + 5, docs/SIZES.md.)
-    out.widths = table.cols.map((col, k) => ({ c: sel.c0 + k, width: col.width ? Math.round(((col.width - 5) / 7) * 256) / 256 : null })).filter((x) => x.width > 0);
+    // (A column's width in pixels to Excel's characters: px = chars x mdw + padding, docs/SIZES.md, digitwidth.js.)
+    const mdw = wb.mdw ?? 7;
+    out.widths = table.cols.map((col, k) => ({ c: sel.c0 + k, width: col.width ? Math.round(((col.width - colPad(mdw)) / mdw) * 256) / 256 : null })).filter((x) => x.width > 0);
   }
   return [out];
 }

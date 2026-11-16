@@ -3,7 +3,7 @@
 // whether negative numbers are in colour or the positive in parentheses, the text alignment's prefix, the protection and
 // the column's width.
 import { xfOf, formatCodeOf } from '../ooxml/styles.js';
-import { colWidthToChars, defaultColPx } from '../ooxml/units.js';
+import { colWidthToChars, defaultColPx, pxToChars } from '../ooxml/units.js';
 
 /** The first section of a format code with quoted text, escaped and padded characters taken out. */
 function bare(section) {
@@ -91,7 +91,8 @@ export function cellInfo(book, si, r, c) {
   const typedText = typeof cell?.v === 'string' && !cell.f;
   const ownWidth = col && col.width != null && !col.hidden;
   const fmt = sheet.format || {};
-  const chars = col?.hidden ? 0 : ownWidth ? colWidthToChars(col.width, 7) : (defaultColPx(fmt, 7) - 5) / 7;
+  const mdw = fmt.mdw ?? 7;
+  const chars = col?.hidden ? 0 : ownWidth ? colWidthToChars(col.width, mdw) : pxToChars(defaultColPx(fmt, mdw), mdw);
   return {
     code: formatCodeOf(book.styles, s),
     prefix: typedText ? PREFIX[xf.align.horizontal] ?? "'" : '',

@@ -67,7 +67,7 @@ export function applyAdvancedFilter(wb, i, { list, criteria = null, copyTo = nul
       setRows(part.doc, r, end, { hidden: on });
       r = end + 1;
     }
-    wb._parsed.set(wb.sheets[i], { doc: part.doc, model: readSheet(part.doc, wb.sharedStrings) });
+    wb._parsed.set(wb.sheets[i], { doc: part.doc, model: wb._withMdw(readSheet(part.doc, wb.sharedStrings)) });
     wb.dirty.add(wb.sheets[i].path);
   } else {
     const sheet = wb.sheet(i);

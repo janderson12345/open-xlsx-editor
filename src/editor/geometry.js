@@ -3,8 +3,11 @@ import { Axis } from './axis.js';
 import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { colWidthToPx, defaultColPx, rowHeightToPx, printColPx, printRowPx } from '../ooxml/units.js';
 
-/** Calibri 11's maximum digit width at 96 dpi; it will come from the Normal style's font once styles are read. */
+/** Calibri 11's maximum digit width at 96 dpi: the headings' digits, and a sheet's own when its model has none
+ *  (a workbook's sheets carry theirs, `format.mdw`, from the Normal style's font: ooxml/digitwidth.js). */
 export const MDW = 7;
+/** The maximum digit width a sheet's column widths count in. */
+export const mdwOf = (sheet) => sheet?.format?.mdw ?? MDW;
 /** How far past the used range the grid reaches (Excel's goes on to row 1,048,576; this one grows with the content). */
 export const PAD_ROWS = 100;
 export const PAD_COLS = 10;
@@ -29,16 +32,17 @@ export function sheetGeometry(sheet, { print = false, normalFamily, auto = null,
   }
   if (auto) for (const [r, pt] of auto) if (r < rowCount && !rowSizes.has(r)) rowSizes.set(r, rowPx(pt));
   const colSizes = new Map();
+  const mdw = mdwOf(sheet);
   for (const col of sheet.cols) {
     for (let c = col.min; c <= Math.min(col.max, colCount - 1); c++) {
       if (col.hidden) colSizes.set(c, 0);
-      else if (col.width != null) colSizes.set(c, colPx(colWidthToPx(col.width, MDW)));
+      else if (col.width != null) colSizes.set(c, colPx(colWidthToPx(col.width, mdw)));
     }
   }
   // (Show Formulas draws every column twice as wide, its width as saved unchanged: Excel's 54.75 points to 109.5.)
   if (sheet.showFormulas) for (const [c, px] of colSizes) colSizes.set(c, px * 2);
   const rows = new Axis(rowCount, rowPx(sheet.format.defaultRowHeight), rowSizes);
-  const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, MDW)) * (sheet.showFormulas ? 2 : 1), colSizes);
+  const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, mdw)) * (sheet.showFormulas ? 2 : 1), colSizes);
   // (View > Headings off: no room for them, as in Excel; showHeadings is undefined in a model made by hand.)
   const heads = sheet.showHeadings !== false;
   // (The outline bar left of the row headings and over the column headings: on screen only, outlinebar.js.)

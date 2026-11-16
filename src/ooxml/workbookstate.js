@@ -32,7 +32,7 @@ export function restoreTo(wb, snap) {
   wb.sheets = snap.sheets.map((info) => withEl({ ...info }, els.find((el) => Number(attr(el, 'sheetId')) === info.sheetId) || null));
   wb._parsed = new Map(snap.parsed.map(([id, text]) => {
     const doc = parseXml(text);
-    return [wb.sheets.find((s) => s.sheetId === id), { doc, model: readSheet(doc, wb.sharedStrings) }];
+    return [wb.sheets.find((s) => s.sheetId === id), { doc, model: wb._withMdw(readSheet(doc, wb.sharedStrings)) }];
   }).filter(([info]) => info));
   wb.definedNames = kids(kid(root, 'definedNames', wb.ns), 'definedName', wb.ns).map((el) => withEl({
     name: attr(el, 'name'),

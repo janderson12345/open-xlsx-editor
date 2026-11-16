@@ -13,13 +13,12 @@ export function lineCommands(env) {
     resizeLines(axis, index, px) {
       const spans = linesEach(axis, index);
       const size = Math.max(0, Math.round(px));
-      const change = axis === 'col' ? { width: size ? pxWidth(size) : 0 } : { height: size ? size * 0.75 : 0 };
-      return sizeStep((wb, si) => setEach(wb, si, axis, spans, change), `${axis === 'col' ? 'Column width' : 'Row height'} changed`, axis === 'col' ? 'formatColumns' : 'formatRows');
+      return sizeStep((wb, si) => setEach(wb, si, axis, spans, axis === 'col' ? { width: size ? pxWidth(size, wb.mdw) : 0 } : { height: size ? size * 0.75 : 0 }), `${axis === 'col' ? 'Column width' : 'Row height'} changed`, axis === 'col' ? 'formatColumns' : 'formatRows');
     },
     /** Column Width (characters) and Row Height (points) of the selection's columns or rows; 0 hides. */
     columnWidth(chars) {
       const spans = linesEach('col');
-      return sizeStep((wb, si) => setEach(wb, si, 'col', spans, { width: chars > 0 ? typedWidth(chars) : 0 }), 'Column width changed');
+      return sizeStep((wb, si) => setEach(wb, si, 'col', spans, { width: chars > 0 ? typedWidth(chars, wb.mdw) : 0 }), 'Column width changed');
     },
     rowHeight(points) {
       const spans = linesEach('row');
@@ -43,7 +42,7 @@ export function lineCommands(env) {
       const widths = [];
       for (const [a, b] of spans) for (let c = a; c <= b; c++) { const px = ctx.fitWidth?.(c); if (px) widths.push([c, px]); }
       if (!widths.length) return false;
-      return sizeStep((wb, si) => { for (const [c, px] of widths) wb.setLines(si, 'col', c, c, { width: pxWidth(px), bestFit: true }); }, 'Column width fitted');
+      return sizeStep((wb, si) => { for (const [c, px] of widths) wb.setLines(si, 'col', c, c, { width: pxWidth(px, wb.mdw), bestFit: true }); }, 'Column width fitted');
     },
     /** Hide (Ctrl+9 rows, Ctrl+0 columns) or show again (Ctrl+Shift+9, Ctrl+Shift+0) the selection's rows or columns. */
     hideLines(axis, hidden = true) {

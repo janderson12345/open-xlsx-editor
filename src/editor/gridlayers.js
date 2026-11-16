@@ -1,14 +1,15 @@
 // The grid's layers drawn for the part of the sheet in view (grid.js draws them in turn): the column headings, the
 // frozen panes, the gridlines and the rows of cells.
 import { setVars, div } from './dom.js';
-import { cellElement, mergeAt, fitNumbers } from './cells.js';
+import { cellElement, mergeAt, fitNumbers, lineSegments } from './cells.js';
 import { decorations } from './decor.js';
 import { drawSelection } from './selection.js';
 import { drawFilterButtons } from './filterbuttons.js';
 import { drawNoteMarks } from './notemarks.js';
 import { colName } from '../ooxml/refs.js';
 import { drawPaneDrawings } from './drawview.js';
-import { SPILL_BACK, MDW } from './geometry.js';
+import { SPILL_BACK, mdwOf } from './geometry.js';
+import { pxToChars } from '../ooxml/units.js';
 
 export function drawColumnHeadings(st, win) {
   const heading = (c, role) => {
@@ -40,10 +41,11 @@ export function drawPanes(st, win) {
     if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer', 'filterLayer', 'noteLayer', 'objLayer']) pane[k]?.replaceChildren(); return; }
     // (The pane's own layers; no cell ids, which belong to the sheet's own cells.)
     const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, filterLayer: pane.filterLayer, noteLayer: pane.noteLayer, noteTexts: null, idBase: null });
-    drawGridlines(sub, w);
     const { fills, edges } = decorations(sub, w);
     pane.fills.replaceChildren(...fills);
+    sub.gaps = new Map();
     drawRows(sub, w);
+    drawGridlines(sub, w);
     pane.edges.replaceChildren(...edges);
     drawSelection(sub);
     drawFilterButtons(sub, w);
@@ -66,12 +68,20 @@ export function drawGridlines(st, win) {
   const height = st.rows.start(win.r1 + 1) - top;
   const width = st.cols.start(win.c1 + 1) - left;
   const kids = [];
-  // (A cell's gridlines are its right and bottom pixel, inside its own width and height.)
+  // (A cell's gridlines are its right and bottom pixel, inside its own width and height. Text running on over empty
+  // cells hides the ones it crosses: st.gaps, from cells.js runGaps, which drawRows fills first.)
+  const gaps = st.gaps;
+  const hiddenAt = (k) => (r) => gaps.get(r)?.has(k);
+  const crossed = new Set(gaps ? [...gaps.values()].flatMap((s) => [...s]) : []);
   for (let c = win.c0; c <= win.c1; c++) {
     if (!st.cols.size(c)) continue;
-    const el = div('oxe-vline');
-    setVars(el, { '--oxe-x': st.cols.start(c + 1) - 1, '--oxe-y': top, '--oxe-h': height });
-    kids.push(el);
+    const x = st.cols.start(c + 1) - 1;
+    const pieces = crossed.has(c + 1) ? lineSegments(st.rows, win.r0, win.r1, hiddenAt(c + 1), top) : [[top, height]];
+    for (const [y, h] of pieces) {
+      const el = div('oxe-vline');
+      setVars(el, { '--oxe-x': x, '--oxe-y': y, '--oxe-h': h });
+      kids.push(el);
+    }
   }
   for (let r = win.r0; r <= win.r1; r++) {
     if (!st.rows.size(r)) continue;
@@ -152,7 +162,7 @@ export function drawGuide(st, axis, index, size) {
     const x = st.rowHeadW + st.cols.start(index) + size + (index >= st.freeze.left && index < st.freeze.left + st.freeze.cols ? left - st.paneX0 : 0);
     setVars(line, { '--oxe-x': x, '--oxe-y': top, '--oxe-w': 1, '--oxe-h': view.clientHeight / z });
     setVars(tip, { '--oxe-x': x + 4, '--oxe-y': top + 2 });
-    tip.textContent = `Width: ${(Math.max(0, size - 5) / MDW).toFixed(2)} (${Math.round(size)} pixels)`;
+    tip.textContent = `Width: ${pxToChars(size, mdwOf(st.sheet)).toFixed(2)} (${Math.round(size)} pixels)`;
   } else {
     const y = st.colHeadH + st.rows.start(index) + size + (index >= st.freeze.top && index < st.freeze.top + st.freeze.rows ? top - st.paneY0 : 0);
     setVars(line, { '--oxe-x': left, '--oxe-y': y, '--oxe-w': view.clientWidth / z, '--oxe-h': 1 });

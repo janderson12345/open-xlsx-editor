@@ -21,6 +21,8 @@ insides:
 | `src/ooxml/package.js` | The OPC package (the zip): every part kept byte for byte, relationships, content types; only changed parts rewritten. From open-docx-editor. |
 | `src/ooxml/xml.js` | Parsing and serialising XML (injectable DOMParser for Node), namespace-aware lookups defaulting to SpreadsheetML, `_xHHHH_` decoding. From open-docx-editor. |
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
+| `src/ooxml/digitwidth.js` | The Normal style font's maximum digit width (Excel's measured table, else the browser's measure) and the column padding that grows with it (docs/LAYOUT.md). |
+| `src/editor/digitmeasure.js` | The browser's canvas measure of a typeface's widest digit, given to digitwidth.js when an editor is made. |
 | `src/ooxml/refs.js` | A1 references and ranges; rows and columns are 0-based in code. |
 | `src/ooxml/workbook.js` | `Workbook`: sheets in order (`canShow`, `tabColor` read from the part's start), shared strings, defined names, each sheet's model read on first use, `setCell`, `setFormula` and `apply` (then recalculation), `calculate`, `toBytes` (only dirty sheets serialised, with their XML declaration; calcChain.xml dropped when formulas change; `fullCalcOnLoad` when a formula couldn't be worked out). |
 | `src/ooxml/workbookstate.js` | The workbook's state taken and put back for Undo (snapshot, restore), and a formula's result written into its cell. |
@@ -170,7 +172,8 @@ insides:
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
 | `src/ooxml/theme.js` | The theme's fonts and colours (Excel 365's default theme without a theme part); `resolveColor`, the one colour resolver (theme swap, integer-HLS tints, indexed palette). |
 | `src/ooxml/numfmt.js` | What a cell shows (`cellDisplay`): the General format, and format codes through format.js. |
-| `src/ooxml/format.js` | Excel's number format codes: sections, digits, scaling, scientific, fractions, dates and times, text; built-in formats; serial dates (1900 and 1904). |
+| `src/ooxml/format.js` | Excel's number format codes: sections, digits, scaling, scientific, fractions, dates and times, text, Japanese eras; built-in formats (by locale for the East Asian ids); serial dates (1900 and 1904). |
+| `src/ooxml/eastasia.js` | ECMA-376's codes for the East Asian built-in formats 27-36 and 50-58 in Japanese, Chinese and Korean (docs/LAYOUT.md). |
 | `src/ooxml/hfpictures.js` | Pictures in headers and footers (Page Setup > Header/Footer > Insert Picture, the &G code). |
 | `src/ooxml/justifyops.js` | Home > Editing > Fill > Justify. |
 | `src/ooxml/links.js` | A sheet's hyperlinks as Excel writes them (measured over COM, Hyperlinks.Add, and the file Excel saved. |

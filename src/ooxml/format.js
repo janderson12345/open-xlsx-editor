@@ -2,10 +2,11 @@
 // thousands and scaling commas, percent, scientific, fractions, dates and times, text, literals, colours, padding and
 // fill. Checked against Excel's own PDF of test/fixtures/numfmt.xlsx (57 formats x 14 values, test/numfmt-excel.json).
 import { decimal, roundTo, formatGeneral } from './numfmt.js';
-import { EN_US, localDecimal, isSpaceGroup } from './locale.js';
+import { EN_US, localDecimal, isSpaceGroup, currentLocale } from './locale.js';
+import { EAST_ASIAN_IDS, eastAsianTable } from './eastasia.js';
 
 /** Built-in formats by id, as Excel shows them in an en-US locale (ids 5-8, 41-44 are locale currency and accounting
- *  formats; the East Asian ids 27-36 and 50-58 fall back to General). 37-40 pad positives with _) as Excel does (its
+ *  formats; the East Asian ids 27-36 and 50-58 are builtinFormat's). 37-40 pad positives with _) as Excel does (its
  *  PDF of numfmt.xlsx leaves the width of a parenthesis after them), where ECMA-376's table shows a space. */
 export const BUILTIN_FORMATS = {
   0: 'General', 1: '0', 2: '0.00', 3: '#,##0', 4: '#,##0.00',
@@ -19,6 +20,28 @@ export const BUILTIN_FORMATS = {
   48: '##0.0E+0', 49: '@',
 };
 
+const EAST_ASIAN = new Set(EAST_ASIAN_IDS);
+const TIME_IDS = new Set([32, 33, 34, 35]);
+
+/** The code built-in format `id` means in `locale`: an East Asian id (27-36, 50-58) is its locale's code from
+ *  ECMA-376's table in Japanese, Chinese and Korean, and elsewhere what Excel 365 en-US reads it as (measured over
+ *  COM: dates as format 14, m/d/yyyy, the short date; 32-35 as h:mm:ss); others are BUILTIN_FORMATS'. */
+export function builtinFormat(id, locale = currentLocale()) {
+  if (!EAST_ASIAN.has(Number(id))) return BUILTIN_FORMATS[id];
+  const table = eastAsianTable(locale?.tag);
+  if (table) return table[id];
+  return TIME_IDS.has(Number(id)) ? 'h:mm:ss' : 'm/d/yyyy';
+}
+
+// Japanese eras by first day (Windows' calendar, as Excel's [$-411] codes show them: 1989-01-07 is Showa 64,
+// 1989-01-08 Heisei 1), with g, gg and ggg names.
+const ERAS = [
+  [20190501, 2018, 'R', '令', '令和'], [19890108, 1988, 'H', '平', '平成'],
+  [19261225, 1925, 'S', '昭', '昭和'], [19120730, 1911, 'T', '大', '大正'],
+  [0, 1867, 'M', '明', '明治'],
+];
+const AMPM_ZH = '上午/下午';
+
 const COLORS = { black: '#000000', blue: '#0000FF', cyan: '#00FFFF', green: '#00FF00', magenta: '#FF00FF', red: '#FF0000', white: '#FFFFFF', yellow: '#FFFF00' };
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -30,7 +53,7 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
  *  { t: 'general' }; with the section's colour and condition. */
 function parseCode(code) {
   const sections = [];
-  let cur = { tokens: [], color: null, cond: null };
+  let cur = { tokens: [], color: null, cond: null, ja: false, gannen: false };
   const lit = (s) => {
     const last = cur.tokens[cur.tokens.length - 1];
     if (last && last.t === 'lit') last.s += s;
@@ -39,7 +62,7 @@ function parseCode(code) {
   for (let i = 0; i < code.length; i++) {
     const ch = code[i];
     const rest = code.slice(i);
-    if (ch === ';') { sections.push(cur); cur = { tokens: [], color: null, cond: null }; continue; }
+    if (ch === ';') { sections.push(cur); cur = { tokens: [], color: null, cond: null, ja: false, gannen: false }; continue; }
     if (ch === '"') { const j = code.indexOf('"', i + 1); lit(code.slice(i + 1, j < 0 ? code.length : j)); i = j < 0 ? code.length : j; continue; }
     if (ch === '\\') { lit(code[i + 1] ?? ''); i++; continue; }
     if (ch === '_') { cur.tokens.push({ t: 'pad', s: code[i + 1] ?? ' ' }); i++; continue; }
@@ -53,12 +76,20 @@ function parseCode(code) {
       else if (/^color\s*\d+$/.test(low)) cur.color = { indexed: Number(low.replace(/\D/g, '')) + 7 };
       else if (/^(<=|>=|<>|<|>|=)/.test(body)) { const m = /^(<=|>=|<>|<|>|=)\s*(-?[\d.]+)/.exec(body); if (m) cur.cond = { op: m[1], v: Number(m[2]) }; }
       else if (/^(h+|m+|s+)$/.test(low)) cur.tokens.push({ t: 'date', s: `[${low}]` });
-      else if (body.startsWith('$')) { const sym = body.slice(1).split('-')[0]; if (sym) lit(sym); }
+      else if (body.startsWith('$')) {
+        const sym = body.slice(1).split('-')[0];
+        if (sym) lit(sym);
+        // A locale after the dash: Japanese ([$-411], [$-ja-JP], a calendar byte before 411) counts eras.
+        const loc = body.slice(body.indexOf('-') + 1).toLowerCase();
+        if (body.includes('-') && (/^ja(-|,|$)/.test(loc) || /^[0-9a-f]*0411(,|$)|^411(,|$)/.test(loc))) cur.ja = true;
+        if (/-x-gannen/.test(loc)) cur.gannen = true;
+      }
       continue;
     }
     if (/^general/i.test(rest)) { cur.tokens.push({ t: 'general' }); i += 6; continue; }
+    if (rest.startsWith(AMPM_ZH)) { cur.tokens.push({ t: 'date', s: AMPM_ZH }); i += AMPM_ZH.length - 1; continue; }
     if (/^(am\/pm|a\/p)/i.test(rest)) { const n = /^am\/pm/i.test(rest) ? 5 : 3; cur.tokens.push({ t: 'date', s: rest.slice(0, n).toUpperCase() === 'AM/PM' ? 'AM/PM' : 'A/P' }); i += n - 1; continue; }
-    if (/[yYmMdDhHsS]/.test(ch) && !/^e/i.test(ch)) {
+    if (/[yYmMdDhHsSgG]/.test(ch) || ((ch === 'e' || ch === 'E') && code[i + 1] !== '+' && code[i + 1] !== '-')) {
       let j = i;
       while (j < code.length && code[j].toLowerCase() === ch.toLowerCase()) j++;
       cur.tokens.push({ t: 'date', s: code.slice(i, j).toLowerCase() });
@@ -324,10 +355,14 @@ export function dateParts(serial, date1904, fracDigits = 0) {
   return { y, m, d, weekday, H: Math.floor(whole / 3600), M: Math.floor((whole % 3600) / 60), S: whole % 60, frac: secs - whole, total: total / unit, day };
 }
 
-function formatDate(tokens, v, date1904, loc = EN_US) {
+function formatDate(tokens, v, date1904, loc = EN_US, ja = { ja: false, gannen: false }) {
   const fracTok = tokens.find((t) => t.t === 'date' && t.s.startsWith('.'));
   const p = dateParts(v, date1904, fracTok ? fracTok.s.length - 1 : 0);
-  const ampm = tokens.some((t) => t.t === 'date' && (t.s === 'AM/PM' || t.s === 'A/P'));
+  const ampm = tokens.some((t) => t.t === 'date' && (t.s === 'AM/PM' || t.s === 'A/P' || t.s === AMPM_ZH));
+  // Japanese era and year in it (e is the plain year outside a Japanese code).
+  const ymd = p.y * 10000 + p.m * 100 + p.d;
+  const era = ERAS.find((x) => ymd >= x[0]);
+  const eraYear = (n) => (ja.gannen && p.y - era[1] === 1 ? '元' : String(p.y - era[1]).padStart(n, '0'));
   const h12 = p.H % 12 === 0 ? 12 : p.H % 12;
   const two = (n) => String(n).padStart(2, '0');
   return tokens.map((t) => {
@@ -355,6 +390,11 @@ function formatDate(tokens, v, date1904, loc = EN_US) {
       case 'ss': return two(p.S);
       case 'AM/PM': return p.H < 12 ? 'AM' : 'PM';
       case 'A/P': return p.H < 12 ? 'A' : 'P';
+      case AMPM_ZH: return AMPM_ZH.split('/')[p.H < 12 ? 0 : 1];
+      case 'g': return ja.ja ? era[2] : '';
+      case 'gg': return ja.ja ? era[3] : '';
+      case 'e': return ja.ja ? eraYear(1) : String(p.y);
+      case 'ee': return ja.ja ? eraYear(2) : String(p.y);
       case '[h]': case '[hh]': return String(Math.floor(p.total / 3600)).padStart(s.length - 2, '0');
       case '[m]': case '[mm]': return String(Math.floor(p.total / 60)).padStart(s.length - 2, '0');
       case '[s]': case '[ss]': return String(Math.floor(p.total)).padStart(s.length - 2, '0');
@@ -365,6 +405,8 @@ function formatDate(tokens, v, date1904, loc = EN_US) {
         if (/^y+$/.test(s)) return String(p.y);
         if (/^h+$/.test(s)) return two(ampm ? h12 : p.H);
         if (/^s+$/.test(s)) return two(p.S);
+        if (/^g+$/.test(s)) return ja.ja ? era[4] : '';
+        if (/^e+$/.test(s)) return ja.ja ? eraYear(2) : String(p.y);
         return '';
     }
   });
@@ -404,7 +446,7 @@ export function formatValue(v, code, { date1904 = false, width = Infinity, local
   const toks = sec.tokens;
   if (sec.isDate) {
     if (v < 0) return { text: '', parts: [], color: sec.color, hashes: true };
-    return finish(formatDate(toks, a, date1904, locale), sec.color);
+    return finish(formatDate(toks, a, date1904, locale, sec), sec.color);
   }
   if (toks.some((t) => t.t === 'general') || (sec.isText && !toks.some((t) => t.t === 'd'))) {
     // General inside a code, or a text format (@) given a number: the number as General, literals around it.
