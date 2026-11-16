@@ -173,6 +173,21 @@
   height: var(--oxe-outline-h, 0px);
   background: var(--oxe-bg);
 }
+/* (The frozen rows' part, stuck under the column headings over the frozen pane; the frozen columns' part in the pinned
+   headings, which start at their own left edge.) */
+.oxe-outline-rows-pin {
+  display: none;
+  top: var(--oxe-colhead-h);
+  z-index: 3;
+  height: var(--oxe-pane-h);
+  margin-bottom: calc(-1 * var(--oxe-pane-h));
+  overflow: clip;
+}
+.oxe-frozen-rows .oxe-outline-rows-pin { display: block; }
+.oxe-outline-cols-pin {
+  width: var(--oxe-pane-w);
+  overflow: clip;
+}
 .oxe-outline-levels {
   position: absolute;
   left: 0;

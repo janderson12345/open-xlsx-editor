@@ -3,7 +3,7 @@
 // measured over COM in excel-outline.ps1), the level buttons 1, 2, 3... in the corner, and for each group a line along
 // its lines with a − button at its summary line, a + when its lines are hidden. Clicked, the grid's onOutline hears
 // { axis, level } (a level button) or { axis, line } (a group's button). View chrome, hidden from assistive technology:
-// the same commands are on the Data tab.
+// the same commands are on the Data tab. Frozen rows and columns keep their part of it in place (pinned strips).
 import { div, setVars } from './dom.js';
 import { OUTLINE_SLOT } from './geometry.js';
 import { outlineOf } from '../ooxml/outline.js';
@@ -68,11 +68,20 @@ export function drawOutline(st, win) {
     st.outlineCols = strip(st, 'oxe-outline-cols');
     st.outlineLevels = strip(st, 'oxe-outline-levels');
     st.corner.append(st.outlineLevels);
+    // (Frozen rows and columns keep their part of the bar in place, over the frozen panes: pinned strips of their own.)
+    st.outlineRowsPin = strip(st, 'oxe-outline-rows oxe-outline-rows-pin');
+    st.panes.top.wrap.after(st.outlineRowsPin);
+    st.outlineColsPin = strip(st, 'oxe-outline-cols oxe-outline-cols-pin');
   }
   const o = st.outlineW || st.outlineH ? outlineOf(st.sheet) : null;
   st.outlineRows.replaceChildren(...(o && st.outlineW ? groupsOf(st, 'row', o.rows.groups, win.r0, win.r1) : []));
   st.outlineCols.replaceChildren(...(o && st.outlineH ? groupsOf(st, 'col', o.cols.groups, win.c0, win.c1) : []));
   if (st.outlineH) st.colheads.append(st.outlineCols); else st.outlineCols.remove();
+  const fr = st.freeze?.rows || 0;
+  const fc = st.freeze?.cols || 0;
+  st.outlineRowsPin.replaceChildren(...(o && st.outlineW && fr ? groupsOf(st, 'row', o.rows.groups, 0, fr - 1) : []));
+  st.outlineColsPin.replaceChildren(...(o && st.outlineH && fc ? groupsOf(st, 'col', o.cols.groups, 0, fc - 1) : []));
+  if (st.outlineH && fc) st.pinHeads.firstChild.append(st.outlineColsPin); else st.outlineColsPin.remove();
   // (The level buttons: the rows' along the column headings' band, the columns' down the row headings'.)
   const levels = [];
   const headsH = st.colHeadH - st.outlineH;

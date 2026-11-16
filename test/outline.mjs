@@ -2,7 +2,8 @@
 // rows selected and draws the outline bar at Excel's size (43px with one level, 19px more for each level after:
 // excel-outline.ps1), its level buttons and the − at the summary row; the − and + hide and show the group, the level
 // buttons show levels, each one step of the history; a range's Group asks Rows or Columns; Ctrl+8 hides and shows the bar; the Settings box's Automatic styles and Apply Styles; Data > Subtotal's box
-// inserts Excel's SUBTOTAL rows with their outline, and Remove All takes them away. The result saved and read back.
+// inserts Excel's SUBTOTAL rows with their outline, and Remove All takes them away; with frozen panes
+// scrolled, the frozen part of the bar stays in place and works. The result saved and read back.
 // Run after `npm run build`: node test/outline.mjs [outDir]
 import fs from 'node:fs';
 import { editingPage } from './editing-kit.mjs';
@@ -108,5 +109,30 @@ await box().getByRole('button', { name: 'Remove All' }).click();
 check(await value('D4') === 'West' && !(await row(1)).level, 'Remove All: the subtotal rows and the outline gone', String(await value('D4')));
 await page.keyboard.press('Control+z');
 check(await value('D4') === 'East Total', 'Ctrl+Z brings the subtotals back in one step');
+
+// Frozen panes: rows 1:6 and columns A:D frozen, the sheet scrolled far down and right; the frozen part of the bar stays
+// in place, on top, and its buttons work.
+await page.evaluate(() => window.oxe.insertSheet({ after: true }));
+await page.evaluate(() => { window.oxe.select('A2'); window.oxe.command('extendTo', 3, 0); window.oxe.command('selectRows'); window.oxe.command('group', 'row'); });
+await page.evaluate(() => { window.oxe.select('B1'); window.oxe.command('extendTo', 0, 2); window.oxe.command('selectColumns'); window.oxe.command('group', 'col'); });
+await page.evaluate(() => { window.oxe.select('E7'); window.oxe.command('freeze', 'panes'); const g = window.oxe.grid.el; g.scrollTop = 1500; g.scrollLeft = 900; });
+await page.waitForTimeout(200);
+/** The pinned strip's toggle: whether it is the element on top at its own centre, clicked if so. */
+const pinned = (cls) => page.evaluate((cls) => {
+  const b = document.querySelector(`.${cls} .oxe-ol-toggle`);
+  if (!b) return { found: false };
+  const r = b.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
+  return { found: true, onTop: document.elementFromPoint(x, y) === b, x, y };
+}, cls);
+const rowPin = await pinned('oxe-outline-rows-pin');
+const colPin = await pinned('oxe-outline-cols-pin');
+await page.screenshot({ path: `${outDir}/outline-frozen.png` });
+if (rowPin.onTop) await page.mouse.click(rowPin.x, rowPin.y);
+const rowsHidden = (await row(1)).hidden && (await row(4)).collapsed;
+if (colPin.onTop) await page.mouse.click(colPin.x, colPin.y);
+const colsHidden = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.some((x) => x.min <= 1 && x.max >= 1 && x.hidden));
+check(rowPin.onTop && colPin.onTop && rowsHidden && colsHidden, "frozen panes scrolled: the frozen rows' and columns' − buttons stay in view on top, and collapse their groups", JSON.stringify({ rowPin, colPin, rowsHidden, colsHidden }));
 
 await finish();
