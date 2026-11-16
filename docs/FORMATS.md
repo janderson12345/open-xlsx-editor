@@ -186,9 +186,29 @@ The last row isn't followed: typing at the end goes on in the font before the ca
 measured (keystrokes can't be sent to Excel over COM, and the object model's insert past the last character may not be
 what typing does). Undo inside the editor (Ctrl+Z, the text box's own) brings the fonts back with the text.
 
-Not yet: a size, colour or font for part of the text (Format Cells' Font tab for a selection inside the cell), Ctrl+B
-with nothing selected to type on in bold, the drawn view's up and down arrows across lines of different heights (the
-caret moves by the text box's own lines), and copying runs.
+The Font group's font and size lists, Increase and Decrease Font Size and Font Color work on the selected part of the
+text too, as they do in Excel's in-cell editor (`src/editor/acts.js` partOfText, `richmarks.js` setFont): that part
+takes the font, the size (Grow and Shrink step from its first character's size, the cell's where it has none) or the
+colour, the rest keeps its own; Automatic is written as theme colour 1, as a cell's own Automatic is. Focus going to
+the font or size list keeps the edit open (`richtrack.js` keepsEdit) and comes back to it once the choice is made;
+going anywhere else enters the edit as before. A new font name drops the run's theme scheme and family, which belonged
+to the old one. With no text selected these format the cells, as before (the edit entered first).
+
+The formula bar keeps a cell's runs through an edit there (`src/editor/formulabar.js`, the same per-character fonts,
+`richtrack.js`): the text shown plain, as Excel's bar shows it, the typed text taking the font before the caret, and
+Ctrl+B, I, U, 5 and the Font group formatting the part selected there. (Before, a rich cell edited in the bar lost its
+runs.) Not measured: Excel's bar is driven by keystrokes, which COM can't send; this follows its in-cell editor.
+
+A run's rPr children that aren't modelled (`outline`, `shadow`, `condense`, `extend`, `charset`, anything newer) are
+kept as they came and written back with the run, in Excel's order (`strings.js` runFont `extra`; `test/richtext.test.js`).
+A run's `family` is read from the file too.
+
+Printed and exported to PDF, a rich cell is drawn as its runs (print.js draws cells as the grid does; `src/pdf.js`
+takes each run's text node in its own computed font; `test/pdf.mjs`).
+
+Not yet: Format Cells' Font tab for a selection inside the cell (Ctrl+1 while editing), Ctrl+B with nothing selected to
+type on in bold, the Font group's controls showing the selected characters' font, the drawn view's up and down arrows
+across lines of different heights (the caret moves by the text box's own lines), and copying runs.
 
 ## Format Painter
 

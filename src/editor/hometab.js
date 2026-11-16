@@ -89,6 +89,9 @@ export function homeTab(kit, { act, color, workbook = () => null }) {
 
   const fontSel = pick('Font', 'oxe-font', [], (v) => act('format', { font: { name: v } }));
   const sizeSel = pick('Font Size', 'oxe-size', [], (v) => act('format', { font: { size: Number(v) } }));
+  // (Picked while part of a cell's text is selected in the cell editor or the formula bar: that part, the edit kept
+  // open while the list has focus, richtrack.js keepsEdit.)
+  for (const sel of [fontSel, sizeSel]) sel.dataset.oxeKeepsEdit = '';
   const numSel = pick('Number Format', 'oxe-numfmt', NUMBER_FORMATS.map(([n, code]) => el('option', { value: code }, n)), (v) => { if (v) act('format', { numFmt: v }); });
   const b = {
     bold: toggle('B', 'Bold (Ctrl+B)', f('toggleFont', 'b'), { cls: 'oxe-b' }),

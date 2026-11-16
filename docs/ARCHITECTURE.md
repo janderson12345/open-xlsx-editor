@@ -184,7 +184,8 @@ insides:
 | `src/calc/functions-words.js`, `xpath.js` | ENCODEURL, BAHTTEXT (Thai number words), PHONETIC and FILTERXML, with an XPath 1.0 reader. |
 | `src/calc/charsets.js` | Characters as Excel counts and codes them: code points for LEFT and RIGHT, code page 1252 for CHAR and CODE, the code points UNICHAR refuses. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
-| `src/editor/richmarks.js` | Rich text while a cell is edited: one font per character, toggled, kept through edits (typed text in the font before the caret, as Excel's insert), turned into runs. |
+| `src/editor/richmarks.js` | Rich text while a cell is edited: one font per character, toggled or given a font, size or colour, kept through edits (typed text in the font before the caret, as Excel's insert), turned into runs. |
+| `src/editor/richtrack.js` | Those fonts kept in step with a text box as it is typed in: the cell editor's and the formula bar's. |
 | `src/editor/richview.js` | The cell editor's text drawn as its runs while part of it is formatted, with the caret and selection placed by the drawn text. |
 | `src/editor/autocorrect.js`, `autocorrect-list.js` | AutoCorrect as a cell or the formula bar is typed in (Excel's options and entries of its list), and the spelling underlines. |
 | `src/editor/formulabar.js` | The active cell's name (or the selection's name) and contents; Enter there enters into the cell. |

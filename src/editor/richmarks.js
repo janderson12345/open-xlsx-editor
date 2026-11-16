@@ -72,6 +72,29 @@ export function toggleFont(fonts, start, end, key) {
   });
 }
 
+/**
+ * A font's properties set over [start, end): `patch` { name, size, color, b, i, u, strike, vertAlign }, what the Font
+ * group's font, size and colour (or Format Cells' Font tab) give part of the text being edited. A new font name drops
+ * the run's theme scheme and family, which belonged to the old one (strings.js richRunsXml then writes the new name
+ * bare, as it writes any font of a run's own).
+ */
+export function setFont(fonts, start, end, patch) {
+  if (end <= start || !patch) return fonts;
+  const made = new Map();
+  return fonts.map((f, i) => {
+    if (i < start || i >= end) return f;
+    if (!made.has(f)) {
+      const next = { ...(f || {}), ...patch };
+      if (patch.name) { next.scheme = null; next.family = null; }
+      made.set(f, sets(next) ? next : null);
+    }
+    return made.get(f);
+  });
+}
+
+/** The size of the first character of [start, end) (`base`, the cell's own, where it has none). */
+export const sizeAt = (fonts, start, base) => fonts[start]?.size ?? base;
+
 /** The text as runs [{ text, font }] by its fonts, or null when nothing is formatted. */
 export function runsOf(text, fonts) {
   if (!anyFormatted(fonts)) return null;
