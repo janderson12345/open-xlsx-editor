@@ -8,6 +8,8 @@ import { entryChanges } from './entry.js';
 import { dateSerial, fullYear } from './input.js';
 import { BUILTIN_FORMATS as B } from './format.js';
 import { currentLocale, localeOf } from './locale.js';
+import { guessBreaks, looksFixedWidth } from './datatools.js';
+import { ansiChar } from '../calc/charsets.js';
 
 const TAB = String.fromCharCode(9);
 
@@ -31,7 +33,10 @@ export function decodeText(bytes, encoding = 'auto') {
       try { new TextDecoder('utf-8', { fatal: true }).decode(bytes); enc = 'utf-8'; } catch { enc = 'windows-1252'; }
     }
   }
-  return { text: new TextDecoder(enc).decode(bytes.subarray(skip)), encoding: enc };
+  const body = bytes.subarray(skip);
+  // (Code page 1252 from its own table: a Node without full ICU reads 'windows-1252' as Latin-1, 0x80 not as the euro.)
+  if (enc === 'windows-1252') { let text = ''; for (const b of body) text += ansiChar(b); return { text, encoding: enc }; }
+  return { text: new TextDecoder(enc).decode(body), encoding: enc };
 }
 
 /**
@@ -93,18 +98,6 @@ export const linesOf = (text) => {
 export function splitFixed(text, breaks) {
   const at = [0, ...[...breaks].sort((a, b) => a - b)];
   return linesOf(text).map((line) => at.map((p, k) => line.slice(p, k + 1 < at.length ? at[k + 1] : undefined).trim()));
-}
-
-/** Where columns of fixed-width text seem to start: after a run of positions that are a space (or past the end) on
- *  every line, as Excel's wizard first places its break lines. */
-export function guessBreaks(text, maxLines = 20) {
-  const lines = linesOf(text).slice(0, maxLines).filter((l) => l.trim());
-  if (!lines.length) return [];
-  const width = Math.max(...lines.map((l) => l.length));
-  const blank = (i) => lines.every((l) => i >= l.length || l[i] === ' ');
-  const out = [];
-  for (let i = 1; i < width; i++) if (blank(i - 1) && !blank(i)) out.push(i);
-  return out;
 }
 
 /** Which of comma, semicolon, tab and pipe splits most lines into the same number of fields (more than one), the
@@ -209,12 +202,16 @@ export function importCells(wb, si, r0, c0, rows, { columns = [], startRow = 1, 
 }
 
 /** The settings a text file most likely wants, as the Text Import box first shows them: its encoding, delimited by
- *  the delimiter detected (a .tsv or .txt by tab when it has tabs), qualifier ", from the first row, General columns. */
+ *  the delimiter detected (a .tsv or .txt by tab when it has tabs) or fixed width when it looks it, qualifier ", from
+ *  the first row, General columns. */
 export function guessSettings(bytes, fileName = '', locale = currentLocale()) {
   const { text, encoding } = decodeText(bytes);
   const tabbed = /\.(txt|tsv|tab)$/i.test(fileName) && text.includes(TAB);
   const seps = tabbed ? TAB : detectSeparator(text, { prefer: locale.listSep });
-  return { encoding, kind: 'delimited', seps, quote: '"', consecutive: false, breaks: guessBreaks(text), startRow: 1, columns: [], locale: locale.tag, decimal: locale.decimal, group: locale.group };
+  // (Fixed width first when the text looks it, as Excel's wizard determines: datatools.js looksFixedWidth.)
+  const lines = linesOf(text).slice(0, 20);
+  const kind = !tabbed && looksFixedWidth(lines) ? 'fixed' : 'delimited';
+  return { encoding, kind, seps, quote: '"', consecutive: false, breaks: guessBreaks(lines), startRow: 1, columns: [], locale: locale.tag, decimal: locale.decimal, group: locale.group };
 }
 
 /** The rows a file gives with `settings` (guessSettings' shape), before column types: { text, rows }. */

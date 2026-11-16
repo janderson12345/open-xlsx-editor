@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { TEXT_IMPORT_CASES, caseBytes } from './textimport-cases.js';
-import { splitText, importCells, decodeText, detectSeparator, guessBreaks, splitDelimited, dateField, guessSettings } from '../src/ooxml/textimport.js';
+import { splitText, importCells, decodeText, detectSeparator, splitFixed, splitDelimited, dateField, guessSettings } from '../src/ooxml/textimport.js';
 import { blankWorkbook, csvWorkbook } from '../src/ooxml/csv.js';
 import { formatCodeOf } from '../src/ooxml/styles.js';
 import { localeOf, EN_US } from '../src/ooxml/locale.js';
@@ -69,7 +69,9 @@ test('the delimiter a file was written with, fixed-width breaks guessed, a date 
   assert.equal(detectSeparator('a,b\n"1,5",2\n'), ',');
   // (One field a line, either way: the locale's list separator.)
   assert.equal(detectSeparator('one\ntwo\n', { prefer: ';' }), ';');
-  assert.deepEqual(guessBreaks('ID    NAME    AMOUNT\r\n00012 Widget    15.25\r\n7     Bolt     -3\r\n'), [6, 14]);
+  // (Breaks as Text to Columns suggests them, datatools.js guessBreaks; the fields trimmed either way.)
+  assert.deepEqual(guessSettings(new TextEncoder().encode('ID    NAME    AMOUNT\r\n00012 Widget    15.25\r\n7     Bolt     -3\r\n'), 'w.txt').breaks, [5, 12]);
+  assert.deepEqual(splitFixed('00012 Widget    15.25\r\n', [5, 12]), [['00012', 'Widget', '15.25']]);
   assert.deepEqual(splitDelimited('a;;b\r\n', { seps: ';', consecutive: true }), [['a', 'b']]);
   assert.deepEqual(splitDelimited('a,b;c\n', { seps: ',;' }), [['a', 'b', 'c']]);
   const today = new Date(2026, 0, 15);
