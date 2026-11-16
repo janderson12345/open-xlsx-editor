@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.6.0
+
+- **Charts.**
+  - **Select Data:** change a chart's data range, Switch Row/Column, and add, edit, remove and reorder series (34 of
+    34 changes written as Excel writes them).
+  - **Format Chart (Ctrl+1):** axis titles; fills, lines and fonts of every part; combo charts and the secondary axis
+    (33 of 33 as Excel writes them). Charts with their own formatting are drawn in it.
+- **Sparklines** are drawn on screen, in print and in PDF export, and can be inserted and edited on the Sparkline tab,
+  with Excel's 36 styles.
+- **Draw Borders and More Colors:**
+  - Draw Border, Draw Border Grid and Erase Border, with Line Color and Line Style;
+  - a custom colour for fill, font and line, kept in Recent Colors.
+- **Function Arguments:**
+  - Excel's box after Insert Function, with a description of every function and argument;
+  - references picked on the sheet, each argument's kind shown, and text quoted as Excel quotes it;
+  - AutoSum > More Functions leads into it.
+- **The Name Box** shows a selected name, and lists the names to go to.
+- **Rich text** is shown formatted while a cell is edited.
+- **Saved sorts:** the last sort is saved with the sheet as Excel saves it, in a table's part for a table. It follows
+  inserted and deleted rows and columns.
+- **Fonts:** metric twins for all 151 open-metric-fonts families where the computer lacks the font. PDF export embeds
+  the served twins.
+- **Fixed:**
+  - a rich text run's colour, which was saved as `[object Object]`;
+  - VLOOKUP with an empty table argument, which now gives #N/A as Excel does.
+- **Housekeeping:**
+  - the largest source files split into smaller modules;
+  - the workflows' actions pinned to their release commits, with Dependabot keeping them current;
+  - a favicon for the demo.
+
 ## 0.5.2
 
 - **Fixed: right click on a chart.** On Windows the chart's menu (Edit Chart..., Delete) was replaced by the cell
