@@ -9,9 +9,6 @@ import { pinRefs, forgetRows } from './sheetedit.js';
 
 /** The maximum digit width of the Normal font in pixels (Calibri 11 and Aptos Narrow 11: 7, as units.js has it). */
 const MDW = 7;
-/** Excel's limits: a column 0 to 255 characters wide, a row 0 to 409 points high. */
-export const MAX_WIDTH = 255;
-export const MAX_HEIGHT = 409;
 
 /** A width typed in characters as Excel stores it: whole pixels (the characters' width rounded, plus 5 of padding). */
 export const typedWidth = (chars) => pxToColWidth(Math.round(chars * MDW) + 5, MDW);

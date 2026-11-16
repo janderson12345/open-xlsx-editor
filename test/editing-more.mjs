@@ -44,15 +44,15 @@ check(await pivotShown() === '150,Central,100,434', 'Alt+F5 in the PivotTable: r
 await page.keyboard.press('Control+z');
 check(await shown(5, 1) === '168' && await shown(6, 0) === 'Grand Total', 'Ctrl+Z: the refresh taken back', await pivotShown());
 await page.click('.oxe-rtab >> text=Data');
-await page.click('.oxe-toolbar button[title="Refresh All (Ctrl+Alt+F5)"]');
+await ribbon('Refresh All (Ctrl+Alt+F5)');
 check(await pivotShown() === '150,Central,100,434', 'Data > Refresh All: refreshed again', await pivotShown());
 // Data > Sort & Filter: Filter on the source sheet turns the filter on over its table of data.
 await page.evaluate(() => { window.oxe.showSheet('Src'); window.oxe.select('B3'); });
-await page.click('.oxe-toolbar button[title="Filter (Ctrl+Shift+L)"]');
+await ribbon('Filter (Ctrl+Shift+L)');
 check(await page.evaluate(() => { const f = window.oxe.workbook.sheet(window.oxe.sheetIndex).autoFilter; return f && `${f.r0},${f.c0},${f.r1},${f.c1}`; }) === '0,0,18,4', 'Data > Filter: the filter on over A1:E19', await page.evaluate(() => JSON.stringify(window.oxe.workbook.sheet(window.oxe.sheetIndex).autoFilter)));
 // Data > Data Validation... on G2:G4: Allow List, Source Yes,No, OK: the rule on the three cells; Maybe refused.
 await page.evaluate(() => { window.oxe.select('G2'); window.oxe.command('extendTo', 3, 6); });
-await page.click('.oxe-toolbar button[title="Data Validation..."]');
+await ribbon('Data Validation...');
 await page.waitForSelector('dialog.oxe-dv-box');
 await page.selectOption('dialog.oxe-dv-box select >> nth=0', 'list');
 await page.fill('dialog.oxe-dv-box .oxe-dv-panel:not([hidden]) input[type=text] >> nth=0', 'Yes,No');

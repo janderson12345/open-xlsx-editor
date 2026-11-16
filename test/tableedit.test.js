@@ -12,6 +12,7 @@ import { parseRange, parseRef, rangeName } from '../src/ooxml/refs.js';
 import { readTables } from '../src/ooxml/tables.js';
 import { createTable, tableEntry, setTableStyle, setTableOption, setTotalsRow, setTotalFunction, setHeaderRow, renameTable, resizeTable, tableAt } from '../src/ooxml/tableedit.js';
 import { convertToRange } from '../src/ooxml/tableconvert.js';
+import { applyTableFilter } from '../src/ooxml/tablefilter.js';
 
 const excel = JSON.parse(fs.readFileSync('test/tablemake-excel.json', 'utf8').trim());
 const cases = JSON.parse(fs.readFileSync('tools/excel-compare/table-cases.json', 'utf8'));
@@ -176,4 +177,26 @@ test("Excel reads back each table the editor wrote as it was written (test/table
     if (f.file !== 'unlist.xlsx' && f.b10 !== 'Good') diffs.push(`${f.file}: B10 ${f.b10}`);
   }
   assert.deepEqual(diffs, []);
+});
+
+test("a table's own filter: written into its part's autoFilter, its rows left out hidden, the sheet's own filter untouched", () => {
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/anchors-table.xlsx')));
+  const t = readTables(wb)[0];
+  const sheet = wb.sheet(t.si);
+  const item = (r) => sheet.cells.get(r)?.get(t.c0)?.v;
+  const keep = item(t.r0 + 1);
+  const left = [];
+  for (let r = t.r0 + 1; r <= t.r1; r++) if (item(r) !== keep) left.push(r);
+  assert.ok(left.length > 0, 'the fixture has other items to leave out');
+  applyTableFilter(wb, t, { r0: t.r0, c0: t.c0, r1: t.r1, c1: t.c1, columns: new Map([[t.c0, { values: [String(keep)], blank: false, other: false }]]) });
+  const part = wb.pkg.text(t.path);
+  assert.match(part, new RegExp(`<autoFilter ref="${rangeName(t)}"><filterColumn colId="0"><filters><filter val="${keep}"/></filters></filterColumn></autoFilter>`));
+  const rows = wb.sheet(t.si).rows;
+  assert.deepEqual(left.filter((r) => !rows.get(r)?.hidden), []);
+  assert.ok(!rows.get(t.r0 + 1)?.hidden);
+  assert.ok(!serializeXml(wb._part(t.si).doc).includes('<autoFilter'));
+  // (Cleared: every row shown again, the autoFilter left without columns.)
+  applyTableFilter(wb, t, { r0: t.r0, c0: t.c0, r1: t.r1, c1: t.c1, columns: new Map() });
+  assert.deepEqual(left.filter((r) => wb.sheet(t.si).rows.get(r)?.hidden), []);
+  assert.match(wb.pkg.text(t.path), new RegExp(`<autoFilter ref="${rangeName(t)}"/>`));
 });

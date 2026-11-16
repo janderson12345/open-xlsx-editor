@@ -10,14 +10,16 @@ import { openFixture } from './browser.mjs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { readTables } from '../src/ooxml/tables.js';
 
-const { page, check, finish, outDir } = await editingPage();
+const { page, check, finish, outDir, ribbon } = await editingPage();
 await openFixture(page, 'tables.xlsx');
 check(await page.evaluate(() => document.compatMode) === 'CSS1Compat', 'standards mode');
 
 const select = (ref) => page.evaluate((ref) => { window.oxe.select(ref); window.oxe.grid.el.focus({ preventScroll: true }); }, ref);
 const tabShown = () => page.evaluate(() => [...document.querySelectorAll('.oxe-rtab')].some((b) => b.textContent === 'Table Design' && !b.hidden));
 const tab = (name) => page.click(`.oxe-rtab >> text="${name}"`);
-const press = (title) => page.click(`.oxe-toolbar button[title="${title}"]`);
+// (Through the kit's ribbon(), which opens More when the ribbon has folded the button's group away, as on a narrower
+// screen or GitHub's Ubuntu runner with its wider fonts.)
+const press = (title) => ribbon(title);
 const box = () => page.locator('dialog[open]');
 const tables = () => page.evaluate(() => window.oxe.workbook.pkg.files && Object.keys(window.oxe.workbook.pkg.files).filter((k) => k.startsWith('xl/tables/')).length);
 const part = (n) => page.evaluate((n) => window.oxe.workbook.pkg.text(`xl/tables/table${n}.xml`), n);

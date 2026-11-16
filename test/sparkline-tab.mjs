@@ -8,7 +8,7 @@ import { editingPage } from './editing-kit.mjs';
 import { openFixture } from './browser.mjs';
 import { Workbook } from '../src/ooxml/workbook.js';
 
-const { page, check, finish, outDir } = await editingPage();
+const { page, check, finish, outDir, ribbon } = await editingPage();
 await openFixture(page, 'sparklines.xlsx');
 check(await page.evaluate(() => document.compatMode) === 'CSS1Compat', 'standards mode');
 
@@ -18,7 +18,9 @@ const tabShown = () => page.evaluate(() => [...document.querySelectorAll('.oxe-r
 const groups = () => page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).sparklines.map((g) => ({ type: g.type, high: g.high, axis: g.axis, minType: g.minType, min: g.min, series: g.colors.series, cells: g.sparklines.map((s) => `${String.fromCharCode(65 + s.c)}${s.r + 1} ${s.source}`) })));
 const groupAt = async (cell) => (await groups()).find((g) => g.cells.some((c) => c.startsWith(`${cell} `)));
 const tab = (name) => page.click(`.oxe-rtab >> text="${name}"`);
-const press = (title) => page.click(`.oxe-toolbar button[title="${title}"]`);
+// (Through the kit's ribbon(), which opens More when the ribbon has folded the button's group away, as on a narrower
+// screen or GitHub's Ubuntu runner with its wider fonts.)
+const press = (title) => ribbon(title);
 const menuItem = (text) => page.click(`.oxe-pop button:has(span:text-is("${text}"))`);
 const box = () => page.locator('dialog[open]');
 const fill = async (label, text) => { await box().getByLabel(label).fill(text); };
