@@ -9,6 +9,8 @@ export function dataTab(kit, { act }) {
   const { btn, grp, col, item, split } = kit;
   const f = (name, ...args) => () => act(name, ...args);
   const groups = [
+    // (Get & Transform Data: a text file through the Text Import box, put at the active cell: files.js.)
+    grp('Get & Transform Data', btn('🗎', 'From Text/CSV', f('fromTextBox'), { label: 'From Text/CSV', big: true })),
     grp('Queries & Connections', split('⟳', 'Refresh All (Ctrl+Alt+F5)', f('refreshPivots', true), () => [
       item('Refresh All', f('refreshPivots', true), { hint: 'Ctrl+Alt+F5' }), item('Refresh', f('refreshPivots', false), { hint: 'Alt+F5' })], { label: 'Refresh All', big: true })),
     grp('Sort & Filter',

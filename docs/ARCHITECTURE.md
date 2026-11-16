@@ -100,6 +100,7 @@ insides:
 | `src/ooxml/entry.js` | What typing text into a cell changes (its content, and its format when Excel would give one), for typing, pasting text and Replace. |
 | `src/ooxml/sheetedit.js` | Changing cells in the worksheet's XML in place: values, formulas, formula results (the formula kept), shared formulas written out cell by cell. Implied positions pinned first, rows indexed, row and cell inserted in order, `spans` hint dropped when wrong, `dimension` grown. |
 | `src/calc/tokens.js` | Formulas as tokens; moving a formula (`shiftFormula`), a sheet's references renamed or made #REF! (`renameSheetRefs`, `sheetPrefix`), references following cells cut and pasted (`moveRefs`) and rows or columns inserted or deleted (`shiftRefs`). |
+| `src/calc/localform.js` | A formula in a comma-decimal locale's form (`;` between arguments, `,` in numbers) and back to the file's en-US form (docs/LOCALE.md). |
 | `src/calc/fileform.js` | The typed form of a formula to the file's (`normalizeFormula`: `_xlfn.` prefixes, Excel 365's dynamic-array and trim-reference forms) and back (`displayFormula`). |
 | `src/calc/parse.js` | Tokens to a tree by Excel's precedence. |
 | `src/calc/values.js` | Values (numbers, text, booleans, errors, blanks, `Area`, `Arr`) and Excel's coercions, comparison, numbers as text, the near-zero rule. |
@@ -140,7 +141,9 @@ insides:
 | `src/ooxml/clipcf.js` | Conditional formats coming with a paste, as Excel's do. |
 | `src/ooxml/clipcfx.js` | The Excel 2010 half of conditional formats a paste or a cut brings (clipcf.js). |
 | `src/ooxml/createnames.js` | Formulas > Defined Names > Create from Selection (Ctrl+Shift+F3). |
-| `src/ooxml/csv.js` | A .csv file opened as Excel opens one (measured over COM, Workbooks.Open of a CSV, each cell's value, format and formula read back. |
+| `src/ooxml/csv.js` | A .csv file opened as Excel opens one (measured over COM, Workbooks.Open of a CSV, each cell's value, format and formula read back), and a sheet saved as Excel's CSV, CSV UTF-8, Text (Tab delimited) and Unicode Text, or any separator and encoding (docs/CSV.md). |
+| `src/ooxml/textimport.js` | Text files into cells as Excel's Text Import Wizard reads them: encodings, delimited or fixed-width fields, text qualifier, start row, General/Text/date/Skip columns with the separators given (docs/CSV.md). |
+| `src/ooxml/locale.js` | The reader's country settings: decimal and thousands separators, date order, built-in format 14's short date, the list separator; the page's locale (docs/LOCALE.md). |
 | `src/ooxml/datatools.js` | Excel's data tools, as Excel does them (measured over COM. |
 | `src/ooxml/editranges.js` | Review > Allow Edit Ranges as Excel writes them (measured over COM, Protection.AllowEditRanges.Add, and the file Excel saved. |
 | `src/ooxml/filetype.js` | What kind of file a workbook is, and saving it as another. |
@@ -225,6 +228,9 @@ insides:
 | `src/editor/chartbox.js` | The Edit Chart box. |
 | `src/editor/chartpick.js` | Charts picked out on the sheet, as in Excel. |
 | `src/editor/datatoolboxes.js` | The data tools' boxes, as Excel lays them out. |
+| `src/editor/textimportbox.js` | The Text Import box: the wizard's steps in one box, with a preview and each column's data format. |
+| `src/editor/saveasbox.js` | The Save As box: file name, type (.xlsx, .xlsm, .csv with separator and encoding, .txt, .pdf), the active-sheet note. |
+| `src/editor/files.js` | Text Import into a new workbook or at the active cell, Save As to the host's onSave or a download, the page's locale set. |
 | `src/editor/dvcircles.js` | Data > Data Validation > Circle Invalid Data. |
 | `src/editor/dvmarks.js` | A data validation list's dropdown button, beside the active cell's right edge as Excel draws it, and the rule's input message in a box under the cell. |
 | `src/editor/editor.css` | Theme variables (light, dark, host-overridable) and the grid's layout. Geometry through custom properties; no `!important`. |

@@ -17,7 +17,10 @@ the page (it stays in your browser, nothing is uploaded).
   LAMBDA, table references and 3D references. 1926 of 1926 test formulas give Excel's results.
 - **Edits like Excel.** Excel's ribbon (classic or simplified), its keys and its dialog boxes: Format Cells, Find and
   Replace, Sort, Filter, Fill, Paste Special, Conditional Formatting, Data Validation, PivotTables, charts, notes and
-  comments, hyperlinks, sheet and workbook protection, password-protected workbooks.
+  comments, hyperlinks, sheet and workbook protection, password-protected workbooks, Text Import and Save As.
+- **Speaks your locale.** Numbers, dates and formulas are shown and typed with the reader's separators and date order
+  (1.234,50, 05.03.2024, `=ROUND(1,5;0)` in Germany), and the file stays as Excel writes it. CSV and text files open
+  and save in UTF-8, UTF-16 or Windows-1252 with any separator.
 - **Keeps your file.** Saving rewrites only the parts you changed. Every other part, including what the editor doesn't
   understand (macros, add-in data, newer features), goes back byte for byte, and the result opens in Excel without
   repair.
@@ -83,6 +86,10 @@ editor.showSheet('Notes');     // another sheet, by name or index, with the sele
 editor.renameSheet('Notes', 'Q1 notes'); // formulas that read it follow; also insertSheet, moveSheet, hideSheet...
 editor.command('toggleFont', 'b'); // what the ribbon's buttons do, on the selection; Ctrl+B does the same
 editor.save({ as: 'xltx' });   // as a template, or a template as 'xlsx'
+editor.saveCsv({ sep: ';', encoding: 'windows-1252' }); // the sheet shown as a CSV or text file (docs/CSV.md)
+editor.saveAs();               // the Save As box (F12): .xlsx, .xlsm, .csv, .txt, .pdf; the file to onSave or downloaded
+editor.importText(bytes, 'data.txt'); // the Text Import box, into a new workbook ({ into: 'sheet' }: at the active cell)
+editor.setLocale('de-DE');     // numbers, dates and formulas shown and typed as in Germany (docs/LOCALE.md)
 ```
 
 Without a page, in Node or a worker, `openWorkbook(bytes)` reads and edits a workbook through the agent interface
@@ -106,6 +113,9 @@ const editor = mountXlsxEditor(el, {
   fillLists: [['North', 'East', 'South', 'West']], // custom lists the fill handle goes round
   errorChecking: false,                 // no green error triangles; { rules: [...] } chooses Excel's rules
   onLink: (url) => window.open(url),    // a hyperlink clicked
+  locale: 'de-DE',                      // country settings for numbers and dates; without it, the browser's language
+  onSave: ({ fileName, bytes }) => {},  // Save As's file; without it, the browser downloads it
+  exportPdf,                            // from 'open-xlsx-editor/pdf': Save As then offers PDF
   onChange: () => {},                   // the workbook changed
 });
 editor.setReadOnly(false);              // switch at any time
@@ -244,7 +254,7 @@ The demo loads them from `demo/fonts/omf/` (a copy of the bundle, not in this re
 Each of the others says how a part was matched to Excel, what was measured, and what isn't done yet:
 
 - **Opening, saving, printing:** `docs/FIDELITY.md` (what survives a save), `docs/ENCRYPTION.md` (password
-  workbooks), `docs/CSV.md` (a .csv opened and saved), `docs/LAYOUT.md` (the grid as Excel lays it out),
+  workbooks), `docs/CSV.md` (a .csv opened and saved, Text Import), `docs/LOCALE.md` (other countries' settings), `docs/LAYOUT.md` (the grid as Excel lays it out),
   `docs/PRINT.md` and `docs/PDF.md`.
 - **Calculation:** `docs/CALC.md` (formulas and functions), `docs/DYNAMIC.md` (spilling, LET, LAMBDA),
   `docs/NAMES.md` (defined names), `docs/AUTOSUM.md`.

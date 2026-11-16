@@ -73,5 +73,8 @@ are written as the editor's locale shows them (docs/LOCALE.md), as Excel's are i
 
 ## Not yet
 
-- `save()` still writes an .xlsx (a file opened from a CSV too); `saveCsv()` is the host's to call, and there is no
-  File > Save As box. A character code page 1252 hasn't is written as ?, as Excel's CSV does (not measured).
+- `save()` still writes an .xlsx (a file opened from a CSV too); the Save As box (F12, `saveAs()`) writes the other
+  types. Excel's own Save As of a CSV with another list separator (the computer's) isn't measured: a field holding a
+  comma is quoted whatever the separator, as Excel's tab-delimited file quotes one.
+- The Text Import box has no "Trailing minus for negative numbers" (3- read as -3) and no date orders beyond MDY, DMY
+  and YMD; Excel's newer Power Query import (Data > From Text/CSV in Excel 365) isn't modelled, only the wizard.

@@ -104,6 +104,9 @@ export function createActs(env) {
     // (Charts, comments, Format Cells and conditional formatting: acts-more.js.)
     const more = moreAct(name, args, i);
     if (more !== undefined) return more;
+    // (Data > From Text/CSV and Save As, F12: files.js.)
+    if (name === 'fromTextBox') return env.files.pickText();
+    if (name === 'saveAsBox') return env.files.saveAs();
     if (name === 'deleteShownSheet') return sheetActs.remove(i);
     if (name === 'renameShownSheet') return sheetActs.rename(i);
     if (name === 'hideShownSheet') return editing().run('hideSheet', i);

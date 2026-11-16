@@ -235,6 +235,8 @@ export function attachEditing(root, ctx) {
     else if (key === 'F2' && e.shiftKey) ctx.editNote?.();
     else if (key === 'F2') startEdit('edit');
     else if (key === 'F11' && e.shiftKey) cmd.run('insertSheet');
+    // (F12: Save As, files.js.)
+    else if (key === 'F12' && !ctrl && !e.shiftKey && !e.altKey) ctx.saveAs?.();
     else if (key === 'Delete') cmd.run('clear');
     else if (key === 'Escape') { if (cmd.run('dropClip')) announce('Copy cancelled'); }
     else if (key === 'Backspace') startEdit('enter', '');
@@ -425,6 +427,8 @@ export function attachEditing(root, ctx) {
 
   return {
     commands: cmd,
+    /** The formula bar shown again (after the locale changed: files.js). */
+    refreshBar,
     /** The active cell opened for editing with `text` (AutoSum's proposal, waiting for Enter as in Excel). */
     editWith(text) { startEdit('enter', text); },
     /** Insert Function's choice: typed at the caret of the cell being edited, or the active cell opened with

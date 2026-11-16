@@ -2562,3 +2562,31 @@
 .oxe-page-setup .oxe-dialog-row .oxe-dialog-label { min-width: 13em; }
 .oxe-page-setup .oxe-dialog-field { width: 14em; }
 .oxe-iteration-box .oxe-dialog-field { width: 8em; }
+
+/* The Text Import box (textimportbox.js): its settings in a wrapping row, the file's first rows in a scrolled table
+   with each column's data format over it, a skipped column greyed. */
+.oxe-textimport-box { max-width: min(760px, 96vw); }
+.oxe-textimport-top { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.oxe-textimport-other { display: flex; align-items: center; gap: 4px; }
+.oxe-textimport-scroll { max-height: 260px; max-width: 100%; overflow: auto; border: 1px solid #c8c8c8; margin-top: 8px; }
+.oxe-textimport-preview { border-collapse: collapse; font-size: 12px; }
+.oxe-textimport-preview th, .oxe-textimport-preview td { border: 1px solid #e0e0e0; padding: 2px 6px; white-space: pre; text-align: left; vertical-align: top; }
+.oxe-textimport-preview .oxe-dialog-select { font-size: 12px; }
+.oxe-textimport-skip { opacity: 0.45; }
+.oxe-textimport-raw {
+  margin: 6px 0;
+  padding: 4px 6px;
+  border: 1px solid #c8c8c8;
+  max-width: 100%;
+  max-height: 160px;
+  overflow: auto;
+  font: 12px/1.4 Consolas, "Courier New", monospace;
+  white-space: pre;
+  cursor: crosshair;
+}
+/* The Save As box (saveasbox.js). */
+.oxe-saveas-box { max-width: min(520px, 96vw); }
+.oxe-saveas-name { width: 22em; max-width: 100%; }
+.oxe-saveas-note { max-width: 32em; }
+.oxe-textimport-delims > .oxe-fc-check, .oxe-textimport-delims > .oxe-textimport-other { display: inline-flex; margin-right: 14px; }
+.oxe-textimport-delims .oxe-fc-field { align-items: flex-start; }

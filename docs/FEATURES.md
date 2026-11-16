@@ -156,7 +156,7 @@ changes); one typed here shows #NAME? until Excel opens the file. Excel's saved 
 
 | Group | Feature | Status | Notes |
 |---|---|---|---|
-| Get & Transform (`get-and-transform`) | Queries and connections | Kept | |
+| Get & Transform Data (`get-and-transform-data`) | From Text/CSV | Partly | The Text Import box (Excel's Text Import Wizard in one box): encoding, delimited or fixed width, qualifier, start row, column types, the data put at the active cell (108 of 108 cells as Excel's wizard reads eleven files; docs/CSV.md). Power Query isn't here; queries and connections are kept. |
 | Queries & Connections (`queries-and-connections`) | Refresh All | Partly | Refreshes the workbook's PivotTables (Ctrl+Alt+F5); Refresh, the one at the active cell (Alt+F5). Data connections aren't refreshed. |
 | Sort & Filter (`sort-and-filter`) | Sort, filter, advanced | Done | Sort A to Z, Z to A, Sort..., Filter, Clear and Reapply on the Data tab, as in Home > Editing (docs/SORT.md, docs/FILTER.md). Text, Number and Date Filters, Top 10, averages and Filter by Color (31 of 31 as Excel), and Advanced Filter in place or copied (7 of 7). |
 | Data Tools (`data-tools`) | Text to Columns, Remove Duplicates | Done | Text to Columns (delimited and fixed width, each column General, Text, a date's order or skipped), Flash Fill, Remove Duplicates as Excel (29 of 29 with Series; docs/DATATOOLS.md). |
@@ -187,5 +187,7 @@ changes); one typed here shows #NAME? until Excel opens the file. Excel's saved 
 | Feature | Status | Notes |
 |---|---|---|
 | Open, Save | Done | Through the host: `open(bytes)`, `save()`. |
+| Save As | Done | The Save As box (F12, `saveAs()`): .xlsx, .xlsm, .csv (separator and encoding), .txt (Text or Unicode Text), .pdf when the host gives `exportPdf`; the active-sheet note for text types; the file to `onSave` or downloaded. Text files byte for byte as Excel's (docs/CSV.md). |
+| Language and region (Options > Advanced > separators) | Done | The `locale` option and `setLocale()`: separators, date order, built-in format 14, `;` in formulas (300 of 300 cells as Excel shows them with its separators changed; docs/LOCALE.md). Function names stay English. |
 | Print | Done | |
 | Properties (title, author) | Kept | |
