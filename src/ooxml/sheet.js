@@ -4,7 +4,7 @@
 // where it was.
 import { readOutlinePr } from './outline.js';
 import { kids, kid, attr } from './xml.js';
-import { parseRef, parseRange } from './refs.js';
+import { parseRef, parseRange, MAX_COLS } from './refs.js';
 import { stringItemText, stringItemRuns } from './strings.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { readColor } from './styles.js';
@@ -44,6 +44,11 @@ export function lineStyle(sheet, r, c) {
 }
 
 /** The sheet's model from its parsed XML and the workbook's shared strings. */
+/** An outline level as Excel allows it, 0 to 7 (a file's larger or negative one kept in range: outline.js MAX_LEVEL). */
+const outlineLevel = (v) => Math.max(0, Math.min(7, Math.trunc(Number(v)) || 0));
+/** A col element's min or max as a 0-based column within the sheet. */
+const colIndex = (v) => Math.max(0, Math.min(MAX_COLS - 1, (Math.trunc(Number(v)) || 1) - 1));
+
 export function readSheet(doc, sst = []) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
@@ -63,7 +68,7 @@ export function readSheet(doc, sst = []) {
     // (A row's own format: `s` with customFormat, as Excel writes a formatted row.)
     const own = attr(rowEl, 'customFormat') === '1' || attr(rowEl, 'customFormat') === 'true' ? Number(attr(rowEl, 's') || 0) : 0;
     // (Its outline: outlineLevel 1 to 7, and collapsed on a summary row whose group is hidden; outline.js.)
-    const level = Number(attr(rowEl, 'outlineLevel') || 0);
+    const level = outlineLevel(attr(rowEl, 'outlineLevel'));
     const collapsed = attr(rowEl, 'collapsed') === '1' || attr(rowEl, 'collapsed') === 'true';
     if (ht != null || hidden || own || level || collapsed) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}) });
     let c = -1;
@@ -83,12 +88,13 @@ export function readSheet(doc, sst = []) {
   for (const colsEl of kids(root, 'cols', ns)) {
     for (const col of kids(colsEl, 'col', ns)) {
       cols.push({
-        min: Number(attr(col, 'min')) - 1,
-        max: Number(attr(col, 'max')) - 1,
+        // (Within the sheet's 16,384 columns, whatever the file says: a crafted max of two billion isn't walked.)
+        min: colIndex(attr(col, 'min')),
+        max: colIndex(attr(col, 'max')),
         width: attr(col, 'width') == null ? null : Number(attr(col, 'width')),
         hidden: attr(col, 'hidden') === '1' || attr(col, 'hidden') === 'true',
         style: Number(attr(col, 'style') || 0),
-        level: Number(attr(col, 'outlineLevel') || 0),
+        level: outlineLevel(attr(col, 'outlineLevel')),
         collapsed: attr(col, 'collapsed') === '1' || attr(col, 'collapsed') === 'true',
       });
     }

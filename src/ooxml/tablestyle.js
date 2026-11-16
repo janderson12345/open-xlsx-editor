@@ -43,7 +43,7 @@ export function tableStyleElements(styles, name) {
 
 /** The regions each element covers in `t` ({ r0, c0, r1, c1, headers, totals, style: { first, last, rows, cols } }),
  *  in the order they are laid on: [{ type, areas: [{ r0, c0, r1, c1 }] }]. Stripe sizes from `els`. */
-function regions(t, els) {
+function regions(t, els, win = null) {
   const o = t.style;
   const d0 = t.r0 + t.headers;
   const d1 = t.r1 - t.totals;
@@ -52,9 +52,13 @@ function regions(t, els) {
     // (First and second stripes, each of its size, taking turns from the first data row or column.)
     const first = [];
     const second = [];
-    const s1 = els.firstRowStripe && a === 'row' ? els.firstRowStripe.size : els.firstColumnStripe && a === 'col' ? els.firstColumnStripe.size : 1;
-    const s2 = a === 'row' ? els.secondRowStripe?.size || 1 : els.secondColumnStripe?.size || 1;
-    for (let i = from, k = 0; i <= to; k ^= 1) {
+    const s1 = Math.max(1, (els.firstRowStripe && a === 'row' ? els.firstRowStripe.size : els.firstColumnStripe && a === 'col' ? els.firstColumnStripe.size : 1) || 1);
+    const s2 = Math.max(1, (a === 'row' ? els.secondRowStripe?.size : els.secondColumnStripe?.size) || 1);
+    // (Only the bands round the window: from the cycle it starts in, a line before it, to a line after it.)
+    const w0 = win ? (a === 'row' ? win.r0 : win.c0) - 1 : from;
+    const w1 = win ? (a === 'row' ? win.r1 : win.c1) + 1 : to;
+    const start = from + Math.floor(Math.max(0, w0 - from) / (s1 + s2)) * (s1 + s2);
+    for (let i = start, k = 0; i <= Math.min(to, w1); k ^= 1) {
       const n = k ? s2 : s1;
       (k ? second : first).push(b(i, Math.min(to, i + n - 1)));
       i += n;
@@ -87,18 +91,24 @@ function regions(t, els) {
  * and `palette`. Each edge is one line, the last element's to set it. With `raw`, each look also has `raw`: the
  * colours as the dxfs give them ({ fill, color, border: { side: colour } }), for formats written from it.
  */
-export function tableLook(t, els, theme, palette, { raw = false } = {}) {
+export function tableLook(t, els, theme, palette, { raw = false, win = null } = {}) {
   const out = new Map();
   if (!els) return out;
+  // (With `win` ({ r0, c0, r1, c1 }), only its cells: a table's look worked out where it is drawn, not all of a huge one.)
+  const R0 = win ? Math.max(t.r0, win.r0) : t.r0;
+  const R1 = win ? Math.min(t.r1, win.r1) : t.r1;
+  const C0 = win ? Math.max(t.c0, win.c0) : t.c0;
+  const C1 = win ? Math.min(t.c1, win.c1) : t.c1;
+  if (R0 > R1 || C0 > C1) return out;
   const color = (c) => (c ? resolveColor(c, theme, palette) : null);
   const edges = new Map();
   const setEdge = (key, side) => { if (side?.style) edges.set(key, { style: side.style, color: side.color?.auto ? '#000000' : color(side.color) || '#000000', raw: side.color }); };
-  for (const { type, areas } of regions(t, els)) {
+  for (const { type, areas } of regions(t, els, win)) {
     const dxf = els[type]?.dxf;
     if (!dxf) continue;
     for (const a of areas) {
-      for (let r = a.r0; r <= a.r1; r++) {
-        for (let c = a.c0; c <= a.c1; c++) {
+      for (let r = Math.max(a.r0, R0); r <= Math.min(a.r1, R1); r++) {
+        for (let c = Math.max(a.c0, C0); c <= Math.min(a.c1, C1); c++) {
           const look = out.get(`${r},${c}`) || {};
           if (dxf.fill) { const f = color(dxf.fill); if (f) { look.fill = f; if (raw) look.raw = { ...look.raw, fill: dxf.fill }; } }
           const f = dxf.font;
@@ -111,20 +121,20 @@ export function tableLook(t, els, theme, palette, { raw = false } = {}) {
       const b = dxf.border;
       if (!b) continue;
       // (Edges: "h r,c" the line above cell (r, c), "v r,c" the line left of it.)
-      for (let c = a.c0; c <= a.c1; c++) {
+      for (let c = Math.max(a.c0, C0); c <= Math.min(a.c1, C1); c++) {
         setEdge(`h${a.r0},${c}`, b.top);
         setEdge(`h${a.r1 + 1},${c}`, b.bottom);
-        for (let r = a.r0 + 1; r <= a.r1; r++) setEdge(`h${r},${c}`, b.horizontal);
+        for (let r = Math.max(a.r0 + 1, R0); r <= Math.min(a.r1, R1 + 1); r++) setEdge(`h${r},${c}`, b.horizontal);
       }
-      for (let r = a.r0; r <= a.r1; r++) {
+      for (let r = Math.max(a.r0, R0); r <= Math.min(a.r1, R1); r++) {
         setEdge(`v${r},${a.c0}`, b.left);
         setEdge(`v${r},${a.c1 + 1}`, b.right);
-        for (let c = a.c0 + 1; c <= a.c1; c++) setEdge(`v${r},${c}`, b.vertical);
+        for (let c = Math.max(a.c0 + 1, C0); c <= Math.min(a.c1, C1 + 1); c++) setEdge(`v${r},${c}`, b.vertical);
       }
     }
   }
-  for (let r = t.r0; r <= t.r1; r++) {
-    for (let c = t.c0; c <= t.c1; c++) {
+  for (let r = R0; r <= R1; r++) {
+    for (let c = C0; c <= C1; c++) {
       const sides = { top: edges.get(`h${r},${c}`), bottom: edges.get(`h${r + 1},${c}`), left: edges.get(`v${r},${c}`), right: edges.get(`v${r},${c + 1}`) };
       const border = Object.fromEntries(Object.entries(sides).filter(([, v]) => v).map(([k, v]) => [k, { style: v.style, color: v.color }]));
       const look = out.get(`${r},${c}`) || {};
@@ -162,15 +172,38 @@ export function withOwnFormat(look, own, styleFont, theme, palette) {
   return out;
 }
 
-/** What the tables on sheet `si` of `wb` draw (readTables' tables): Map "r,c" -> look (tableLook), less what each
- *  cell's own format draws itself (withOwnFormat; its own border sides left out, drawn as the cell's). */
+// (About a screen of cells: 64 rows by 32 columns.)
+const BLOCK_ROWS = 64;
+const BLOCK_COLS = 32;
+/** What the tables on sheet `si` of `wb` draw (readTables' tables): { get("r,c") } -> look (tableLook), less what each
+ *  cell's own format draws itself (withOwnFormat; its own border sides left out, drawn as the cell's). Worked out a
+ *  block of 64 rows by 32 columns at a time as the grid or print asks for them, and kept: a table of a whole sheet costs only
+ *  what is drawn. */
 export function tableLooks(wb, tables, si) {
+  const mine = tables.filter((t) => t.si === si);
+  const blocks = new Map();
+  return {
+    get(key) {
+      const [r, c] = key.split(',').map(Number);
+      const id = `${Math.floor(r / BLOCK_ROWS)},${Math.floor(c / BLOCK_COLS)}`;
+      if (!blocks.has(id)) {
+        const r0 = Math.floor(r / BLOCK_ROWS) * BLOCK_ROWS;
+        const c0 = Math.floor(c / BLOCK_COLS) * BLOCK_COLS;
+        blocks.set(id, blockLooks(wb, mine, si, { r0, c0, r1: r0 + BLOCK_ROWS - 1, c1: c0 + BLOCK_COLS - 1 }));
+      }
+      return blocks.get(id).get(key);
+    },
+  };
+}
+
+/** The looks of tables `tables` in window `win` of sheet si (tableLooks). */
+function blockLooks(wb, tables, si, win) {
   const out = new Map();
   const styles = wb.styles;
   const sheet = wb.sheet(si);
   for (const t of tables) {
-    if (t.si !== si) continue;
-    for (const [k, look] of tableLook(t, tableStyleElements(styles, t.style.name), wb.theme, styles.palette)) {
+    if (t.r1 < win.r0 || t.r0 > win.r1 || t.c1 < win.c0 || t.c0 > win.c1) continue;
+    for (const [k, look] of tableLook(t, tableStyleElements(styles, t.style.name), wb.theme, styles.palette, { win })) {
       const [r, c] = k.split(',').map(Number);
       const xf = xfOf(styles, sheet.cells.get(r)?.get(c)?.s ?? lineStyle(sheet, r, c) ?? 0);
       const border = styles.borders[xf.borderId];

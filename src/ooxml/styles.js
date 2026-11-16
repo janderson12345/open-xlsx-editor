@@ -131,6 +131,10 @@ export function fontFamily(font, theme) {
 /** { fonts, fills, borders, cellXfs: [{ fontId, fillId, borderId, numFmtId, align }], normal, palette, numFmts } from a styles part (null:
  *  Excel's defaults). `normal` is the Normal style's font (cellStyleXfs 0), the one column widths are measured in;
  *  `palette` the indexed colours (the workbook's own `indexedColors`, else the legacy palette). */
+/** A table style element's stripe size as Excel allows it, 1 to 9 (a file's 0, negative or huge one kept in range, so
+ *  stripes always advance). */
+const stripeSize = (v) => Math.max(1, Math.min(9, Math.trunc(Number(v)) || 1));
+
 export function readStyles(doc) {
   if (!doc) return { fonts: [FALLBACK_FONT], fills: [NO_FILL], borders: [NO_BORDER], cellXfs: [{ fontId: 0, fillId: 0, borderId: 0, numFmtId: 0, align: NO_ALIGN, protection: PROTECTED }], normal: FALLBACK_FONT, palette: INDEXED, numFmts: {}, dxfs: [] };
   const root = doc.documentElement;
@@ -152,10 +156,11 @@ export function readStyles(doc) {
   const dxfs = kids(kid(root, 'dxfs', ns), 'dxf', ns).map((el) => readDxf(el, ns));
   // (The workbook's own table styles: each element's dxf and stripe size; docs/TABLES.md.)
   const ts = kid(root, 'tableStyles', ns);
-  const tableStyles = {};
+  // (Keyed by the file's names: no prototype, so a style named __proto__ is just a style.)
+  const tableStyles = Object.create(null);
   for (const el of kids(ts, 'tableStyle', ns)) {
     if (attr(el, 'table') !== '0') {
-      tableStyles[attr(el, 'name')] = Object.fromEntries(kids(el, 'tableStyleElement', ns).map((e) => [attr(e, 'type'), { dxfId: Number(attr(e, 'dxfId') ?? -1), size: Number(attr(e, 'size') || 1) }]));
+      tableStyles[attr(el, 'name')] = Object.fromEntries(kids(el, 'tableStyleElement', ns).map((e) => [attr(e, 'type'), { dxfId: Number(attr(e, 'dxfId') ?? -1), size: stripeSize(attr(e, 'size')) }]));
     }
   }
   return { fonts, fills, borders, cellXfs, styleXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette, numFmts, dxfs, tableStyles, defaultTableStyle: attr(ts, 'defaultTableStyle') || null };

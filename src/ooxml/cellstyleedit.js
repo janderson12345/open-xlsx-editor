@@ -3,7 +3,7 @@
 // border written, a cellStyleXfs entry marking what it doesn't apply, a cellStyle in name order), and a cell given a
 // style takes from it each part the style applies, keeping its own of the rest ("Good then Heading 1": Heading 1's font
 // and border, Good's fill kept); the cell's xf marks applied each part that isn't the style's.
-import { kids, kid, attr, serializeXml, parseXml } from './xml.js';
+import { kids, kid, attr, serializeXml, parseXml, esc } from './xml.js';
 import { readFont, readFill, readBorder, readXf } from './styles.js';
 import { BUILTIN_CELL_STYLES } from '../engine/cellstyles.js';
 import { BUILTIN_FORMATS } from './format.js';
@@ -34,9 +34,10 @@ function append(f, list, el, read) {
 function styleFont(f, def) {
   const normalEl = kids(kid(f.root, 'fonts', f.ns), 'font', f.ns)[0];
   const tail = normalEl ? kids(normalEl, null).filter((n) => ['name', 'family', 'charset', 'scheme'].includes(n.localName)).map((n) => serializeXml(n).replace(/ xmlns="[^"]*"/, '')).join('') : '<name val="Calibri"/><family val="2"/><scheme val="minor"/>';
-  const major = `<name val="${f.wb.theme?.fonts?.major || 'Calibri Light'}"/><family val="2"/><scheme val="major"/>`;
+  // (The theme's heading font is the file's text: escaped, so a name with quotes or tags stays one attribute.)
+  const major = `<name val="${esc(f.wb.theme?.fonts?.major || 'Calibri Light')}"/><family val="2"/><scheme val="major"/>`;
   const size = f.wb.styles.normal?.size || 11;
-  return def.font.replace('MINOR', tail).replace('MAJOR', major).replace('<sz val="11"/>', `<sz val="${size}"/>`);
+  return def.font.replace('MINOR', tail).replace('MAJOR', major).replace('<sz val="11"/>', `<sz val="${esc(size)}"/>`);
 }
 
 /** The cellStyleXfs index of the cell style `name`: the workbook's own of that name, or a built-in one (found by its

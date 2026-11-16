@@ -208,12 +208,17 @@ function accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx) {
   for (let p0 = P[last]; p0 < settle; p0 = on(p0)) total += on(p0) < settle ? 1 : days(p0, settle) / L;
   return total;
 }
+/** Excel's last date, 9999-12-31. */
+const LAST_DATE = 2958465;
 def('ACCRINT', (a, ctx) => {
   const issue = day(a[0], ctx); const first = day(a[1], ctx); const settle = day(a[2], ctx);
   const rate = num(a[3], ctx); const par = given(a[4]) ? num(a[4], ctx) : 1000;
   const freq = freqOf(a[5], ctx); const basis = basisOf(a, 6, ctx);
   const byPeriod = !given(a[7]) || !!num(a[7], ctx);
   if (rate <= 0 || par <= 0 || issue >= settle) throw E.num;
+  // (A date past 9999-12-31, Excel's last (serial 2958465): #NUM!, as Excel gives for each of the three (measured over
+  // COM); and no coupon-by-coupon walk across millions of days for a crafted one.)
+  if (issue > LAST_DATE || first > LAST_DATE || settle > LAST_DATE) throw E.num;
   return (par * rate * accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx)) / freq;
 });
 

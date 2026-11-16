@@ -127,7 +127,7 @@ export function createTable(wb, si, area, { headers = true, style } = {}) {
   const columns = uniqueHeaders(texts);
   wb.apply(si, columns.map((name, k) => ({ r: r0, c: c0 + k, value: name })));
   const name = freeName(wb);
-  const id = Math.max(0, ...tables.map((t) => t.id)) + 1;
+  const id = tables.reduce((m, t) => Math.max(m, t.id || 0), 0) + 1;
   let n = 1;
   while (wb.pkg.has(`xl/tables/table${n}.xml`)) n++;
   const path = `xl/tables/table${n}.xml`;
@@ -412,7 +412,7 @@ export function resizeTable(wb, t, area) {
     if (f) f.setAttribute('ref', rangeName({ r0: area.r0, c0: area.c0, r1: dataEnd, c1: area.c1 }));
     const wrap = kid(root, 'tableColumns', ns);
     const old = kids(wrap, 'tableColumn', ns);
-    let id = Math.max(0, ...old.map((el) => Number(el.getAttribute('id')) || 0));
+    let id = old.reduce((m, el) => Math.max(m, Number(el.getAttribute('id')) || 0), 0);
     for (const el of old) wrap.removeChild(el);
     names.forEach((nm, j) => {
       const k = area.c0 + j - t.c0;

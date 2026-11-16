@@ -561,6 +561,10 @@ timeline of 1 to n and seasonality 0 (no season), so it needn't be measured agai
 
 ## Not yet
 
+- **ACCRINT at the ends of Excel's dates**: a date past 9999-12-31 (serial 2958465) is #NUM!, as in Excel (measured).
+  Nearer the ends Excel gives #NUM! where this works it out: an issue date of serial 1 (1900-01-01) with the first
+  interest date years later, and some first interest dates in the last weeks of 9999 (ACCRINT(2958000,2958440,2958450,
+  0.1,1000,4) is #NUM! in Excel, 123.33 here); their rule isn't found yet.
 - **ACCRINT with first_interest on the 29th, 30th or 31st of a month whose coupon dates pass a shorter February**: 13
   of the 400 cases checked differ from Excel's in the third or fourth digit (ACCRINT(DATE(2006,3,13),DATE(2006,8,29),
   DATE(2008,3,28),0.06,100,2,0) is 12.2809 in Excel, 12.25 here); kept out of the probe.

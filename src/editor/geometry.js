@@ -54,7 +54,7 @@ export function outlineRoom(sheet) {
   if (sheet.outline && !sheet.outline.symbols) return { w: 0, h: 0 };
   let rows = 0;
   for (const [, x] of sheet.rows) if (x.level > rows) rows = x.level;
-  const cols = Math.max(0, ...sheet.cols.map((x) => x.level || 0));
+  const cols = sheet.cols.reduce((m, x) => Math.max(m, x.level || 0), 0);
   const room = (n) => (n ? (n + 1) * OUTLINE_SLOT + 5 : 0);
   return { w: room(rows), h: room(cols), rows, cols };
 }

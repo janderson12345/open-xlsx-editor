@@ -9,11 +9,14 @@ import { kids, kid, attr } from './xml.js';
 import { setColumns, setSheetFormat, pxWidth } from './sizes.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
 import { defaultColPx } from './units.js';
+import { MAX_COLS } from './refs.js';
 import { setShown } from './view.js';
 import { styleSummaryLines, summariesOf, applyOutlineStyles } from './outlinestyles.js';
 
 /** Excel's deepest level: Group refuses an eighth (measured: "Unable to get the Group property"). */
 export const MAX_LEVEL = 7;
+/** An element's outline level as Excel allows it, 0 to 7, whatever the file says. */
+const levelOf = (x) => Math.max(0, Math.min(MAX_LEVEL, Math.trunc(Number(attr(x, 'outlineLevel'))) || 0));
 const on = (v) => v === '1' || v === 'true';
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
@@ -77,7 +80,7 @@ function axisLines(doc, axis, format) {
       return x;
     };
     return {
-      get: (r) => { const x = byRow.get(r); return { level: Number(attr(x, 'outlineLevel') || 0), collapsed: on(attr(x, 'collapsed')), hidden: on(attr(x, 'hidden')) }; },
+      get: (r) => { const x = byRow.get(r); return { level: levelOf(x), collapsed: on(attr(x, 'collapsed')), hidden: on(attr(x, 'hidden')) }; },
       set(r, patch) {
         const x = el(r, (patch.level > 0) || patch.collapsed || patch.hidden);
         if (!x) return;
@@ -93,7 +96,7 @@ function axisLines(doc, axis, format) {
           // (A row left with nothing of its own goes, as Excel leaves none.)
           if (!x.firstChild && [...x.attributes].every((a) => a.name === 'r' || a.name === 'spans')) { x.parentNode.removeChild(x); byRow.delete(Number(attr(x, 'r')) - 1); }
         }
-        setSheetFormat(doc, { outlineLevelRow: Math.max(0, ...this.levels().map(([, l]) => l)) || null });
+        setSheetFormat(doc, { outlineLevelRow: this.levels().reduce((m, [, l]) => Math.max(m, l), 0) || null });
       },
     };
   }
@@ -101,7 +104,7 @@ function axisLines(doc, axis, format) {
   const at = (c) => kids(colsEl(), 'col', ns).find((x) => c >= Number(attr(x, 'min')) - 1 && c <= Number(attr(x, 'max')) - 1);
   const defaultWidth = String(pxWidth(defaultColPx(format, 7)));
   return {
-    get: (c) => { const x = at(c); return { level: Number(attr(x, 'outlineLevel') || 0), collapsed: on(attr(x, 'collapsed')), hidden: on(attr(x, 'hidden')) }; },
+    get: (c) => { const x = at(c); return { level: levelOf(x), collapsed: on(attr(x, 'collapsed')), hidden: on(attr(x, 'hidden')) }; },
     set(c, patch) {
       if (!at(c) && !((patch.level > 0) || patch.collapsed || patch.hidden)) return;
       // (The column given an element of its own, split from its neighbours'; joined again in finish.)
@@ -123,8 +126,9 @@ function axisLines(doc, axis, format) {
     levels() {
       const out = [];
       for (const x of kids(colsEl(), 'col', ns)) {
-        const l = Number(attr(x, 'outlineLevel') || 0);
-        if (l > 0) for (let c = Number(attr(x, 'min')) - 1; c <= Number(attr(x, 'max')) - 1; c++) out.push([c, l]);
+        const l = levelOf(x);
+        // (Within the sheet's columns, whatever the file's min and max say.)
+        if (l > 0) for (let c = Math.max(0, Number(attr(x, 'min')) - 1); c <= Math.min(MAX_COLS - 1, Number(attr(x, 'max')) - 1); c++) out.push([c, l]);
       }
       return out;
     },
@@ -143,7 +147,7 @@ function axisLines(doc, axis, format) {
         // (cols must hold a col: an empty one goes.)
         if (!els.length) root.removeChild(parent);
       }
-      setSheetFormat(doc, { outlineLevelCol: Math.max(0, ...this.levels().map(([, l]) => l)) || null });
+      setSheetFormat(doc, { outlineLevelCol: this.levels().reduce((m, [, l]) => Math.max(m, l), 0) || null });
     },
   };
 }
@@ -354,6 +358,6 @@ export function outlineOf(sheet) {
   const rows = [...sheet.rows].filter(([, x]) => x.level > 0).map(([r, x]) => [r, x.level]);
   const cols = sheet.cols.flatMap((x) => (x.level > 0 ? Array.from({ length: x.max - x.min + 1 }, (_, k) => [x.min + k, x.level]) : []));
   const pr = sheet.outline || { below: true, right: true, symbols: true };
-  const level = (list) => Math.max(0, ...list.map(([, l]) => l));
+  const level = (list) => list.reduce((m, [, l]) => Math.max(m, l), 0);
   return { ...pr, rows: { level: level(rows), groups: outlineGroups(rows, pr.below) }, cols: { level: level(cols), groups: outlineGroups(cols, pr.right) } };
 }
