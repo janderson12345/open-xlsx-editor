@@ -82,6 +82,24 @@ the 15th digit takes its last digit from the JavaScript engine's Math.pow: IMPOW
       (August 31 to February 28: 178 days of 180 in 30/360). With calc_method FALSE, issue's part and the days from
       the start of the period ending at first_interest to settlement over L: negative when settlement is before that
       start (ACCRINT(DATE(2006,11,1),DATE(2008,1,15),DATE(2007,6,1),0.06,100,4,1,FALSE) is -0.99 in Excel).
+    - ACCRINT at the ends of Excel's dates (4251 more cases over COM, `tools/excel-compare/accrint-cases.mjs`, Excel's
+      answers in test/accrint-excel.json; 1911 of them #NUM!, every one as Excel's, 4213 as Excel's in all): **#NUM!
+      where the coupon walk steps to a date before 1900-01-01 or past 9999-12-31**, whichever dates the case walks
+      through. Back from first_interest to issue, on from issue's period to first_interest and on past it to the
+      period holding settlement, and with basis 1 the period ending at first_interest. With calc_method FALSE and issue
+      on or after first_interest Excel steps back from first_interest once too, whatever the basis. So
+      ACCRINT(1,731,731,0.1,1000,4,1,FALSE) is #NUM! (back from 1902-01-01 past 1900), ACCRINT(2958000,2958440,
+      2958450,0.1,1000,4) too (the period after 9999-12-06 ends in 10000), but ACCRINT(2958065,2958281,2958464,0.1,
+      1000,2,0,TRUE) is worked out (the period after 9999-06-30 ends on 9999-12-31). Before this rule 2091 of the 3951
+      near the ends were as Excel's.
+    - The coupon walk steps over a February 1900 of 28 days, as EDATE and EOMONTH do (EDATE(31,1) is 59, EOMONTH(40,0)
+      59), though serial 60 still reads as February 29, 1900; DATE treats 1900 as a leap year (DATE(1900,2,30) is 61).
+      ACCRINT's 30/360 days take February 28, 1900 as the month's last (taking the 29th made 6 more cases wrong).
+    - Issue exactly on a coupon date: with calc_method FALSE (and two or more periods to first_interest) issue's
+      period counts nothing, the answer the days from the period ending at first_interest's start to settlement over
+      L; with TRUE it counts 1, not its days over L, and with settlement before first_interest each period ended
+      before settlement counts 1 and the rest its days over L (ACCRINT(DATE(2010,12,20),DATE(2011,12,20),
+      DATE(2011,10,18),0.1,1000,2,2,TRUE) is 83.33: 1 and 120/180). 287 of 300 such cases as Excel's (121 before).
     - DISC and its kin with basis 1 take YEARFRAC's year (366 over a February 29); PRICEMAT and YIELDMAT the year up
       to settlement's. DISC is (1 - pr/redemption) x (year / days), to Excel's last digit.
   - `functions-complex.js`: the complex numbers, text such as "3+4i" or "3+4j". COMPLEX, IMREAL, IMAGINARY, IMABS,
@@ -176,17 +194,47 @@ the 15th digit takes its last digit from the JavaScript engine's Math.pow: IMPOW
       the 28th, over 365, or for basis 1 over the purchase year's days. None (bought on the first period's last day):
       a whole year, and for AMORDEGRC one period fewer.
     - basis 2 is #NUM!, as are a purchase after the first period, salvage above cost, a negative period, a rate of 0.
-  - `functions-regex.js`, `regex.js`: REGEXTEST, REGEXEXTRACT and REGEXREPLACE. Excel's patterns are PCRE2's with
-    Unicode properties; `regex.js` turns them into JavaScript's (the v flag). Measured on about 190 cases with a hidden
-    Excel, then the probe's 125:
+  - `functions-regex.js`, `pcre.js`, `pcre-match.js`, `regex.js`: REGEXTEST, REGEXEXTRACT and REGEXREPLACE. Excel's
+    patterns are PCRE2's with Unicode properties. `pcre.js` reads a pattern into a tree, `regex.js` turning each
+    escape or class that stands for one character into JavaScript's class syntax (the v flag), and `pcre-match.js`
+    matches it by backtracking, each one-character class a JavaScript test that can't backtrack itself. Measured on
+    about 190 cases with a hidden Excel, then the probe's 125, then 924 more over the features JavaScript hasn't got
+    (`tools/excel-compare/regex-cases.mjs`, Excel's answers in test/regex-excel.json; the last 600 random patterns,
+    held out): 916 of the 924 as Excel's, where 287 of the 917 that finished were before (the other 7 didn't finish):
     - \w, \d, \s and \b are Unicode's (é is a letter, a no-break space a space, ٣ a digit). $ matches before a final
       newline too, . anything but a newline. (?i), (?s), (?m) and (?x) at the start apply to the whole pattern.
     - Read too: [[:alpha:]] and the other POSIX classes, \Q...\E, (?P<name>...) and (?P=name), \g1 and \g{-1},
-      \x{..}, \o{..}, octal, \cJ, \h, \R, \N, a{,2}, comments (?#...). Atomic groups and possessive quantifiers are
-      made from a lookahead and a reference to it (^a++a matches nothing in "aaa", as in Excel).
-    - An unknown escape (\i), an unclosed group or a bad repeat is #VALUE!. case_sensitivity is 0 or 1, else #VALUE!.
+      \x{..}, \o{..}, octal, \cJ, \h, \R, \N, \N{U+41}, a{,2}, comments (?#...), atomic groups and possessive
+      quantifiers (^a++a matches nothing in "aaa", as in Excel), \p{Greek}, \p{Script=Latin}, \p{Xwd}, \p{Xan},
+      \p{Xsp}, \p{Xuc}.
+    - PCRE2's own, as Excel has them: \K (=REGEXEXTRACT("price: 42","price: \K\d+") is "42"; REGEXREPLACE replaces
+      from \K on); recursion and subroutine calls ((?R), (?1), (?-1), (?+1), (?&name), (?P>name), \g<1>), each call's
+      captures put back afterwards, backtracking into it allowed; conditionals on a group ((?(1)..|..), (?(<name>)..)),
+      on recursion ((?(R)..), (?(R1)..)), on a lookaround, and (?(DEFINE)..); \G, where the search began; \X, a
+      grapheme cluster (an emoji ZWJ family, a flag); branch reset (?|..); options anywhere, for the rest of the group
+      ("a(?i)b" matches "aB", not "AB"; (?i:..), (?-i), (?^), (?n), (?U), (?J), (?xx)); the verbs (*FAIL), (*ACCEPT),
+      (*COMMIT), (*PRUNE), (*SKIP), (*THEN), (*MARK:x); the start options (*UTF), (*UCP), (*LIMIT_MATCH=n) and the
+      newline conventions (*CR), (*LF), (*CRLF), (*ANYCRLF), (*ANY), (*NUL); lookbehind of bounded length
+      ((?<=a{1,3})b). A backreference to a group that took no part matches nothing.
+    - Case-insensitive, \p{Lu}, \p{Ll} and \p{Lt} match any cased letter (REGEXTEST("a","\p{Lu}",1) is TRUE), but
+      [[:upper:]] and [[:lower:]] keep their case (REGEXTEST("a","[[:upper:]]",1) is FALSE).
+    - After an empty match the next search starts there and may not be empty where it starts; finding nothing, it
+      starts again a character on: =REGEXREPLACE("abc","\G","-") is "-a-b-c-", =REGEXREPLACE("abc","(?!\G)","-")
+      "a-b-c-".
+    - **A limit on the work**: a match taking more than 5,000,000 steps, or recursions 2,000 deep, is #VALUE!, as
+      Excel gives at PCRE2's match limit (=REGEXTEST(REPT("a",30)&"b","^(a+)+$") and
+      =REGEXTEST(REPT("ab",20)&"c","^(ab|a|b)*$") are #VALUE! in Excel, and here in well under a second). A plain
+      character every match needs, missing from the text, is no match at once, as PCRE2 finds it
+      (=REGEXEXTRACT(REPT("a",25)&"x","(a*)*b") is #N/A). So no pattern a workbook brings can hold the sheet up.
+    - #VALUE!, as PCRE2 refuses them: an unknown escape (\i), \C, \u0061, \U, \L, an unclosed group, a bad repeat, a
+      repeat past 65535 or of nothing (after (?i) or |, or of a repeat: "c{2}(?R)?*?"), a lookbehind of unbounded
+      length ((?<=a+)b), \K in a lookaround, a name used twice without (?J), a conditional with three branches, one
+      on a group the pattern hasn't got, callouts (?C), [[.a.]] and [[=a=]], a range from or to a set ([\d-z],
+      [a-\d]), \p{IsLatin}, \8, a recursion that would loop ((?R) alone). case_sensitivity is 0 or 1, else #VALUE!.
     - REGEXEXTRACT: mode 0 the first match (#N/A if none); 1 every match, in a row; 2 the first match's groups, in a
-      row, a group that took no part #N/A, and #VALUE! where there is no match or no group. An array given it is cut
+      row, a group that took no part #N/A; #VALUE! where the pattern has no group, #N/A where it has and nothing
+      matches. ARRAYTOTEXT writes an error in an array as its text ("1, #N/A"), an error alone is that error. An array
+      given it is cut
       to its first value. REGEXTEST and REGEXREPLACE work out each value of an array.
     - REGEXREPLACE: occurrence 0 every match, n the nth, -n the nth from the end. The replacement is PCRE2's extended
       one: $1, ${1}, ${name}, $name, $0 and $&, $$; \1; \n, \t, \x41; \u, \l, \U...\E, \L...\E; ${2:-default}
@@ -477,7 +525,53 @@ Measured in Excel 365 in English, 96 cases (`src/calc/charsets.js`):
   control characters U+0080 to U+009F keep their own numbers.
 - **UNICHAR refuses what isn't a character** with #N/A: the surrogates (U+D800 to U+DFFF), U+FDD0 to U+FDEF and the last
   two code points of every plane (U+FFFE, U+FFFF, U+1FFFF ... U+10FFFF). Out of range is #VALUE!, as before.
-- **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it.
+- **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it. How LEN,
+  MID, FIND, SEARCH and REPLACE count one depends on the workbook: see the next section.
+
+## February 29, 1900
+
+Excel's calendar keeps Lotus's leap day, serial 60, but not everywhere alike. Measured in Excel 365 over COM, 513
+formulas (`tools/excel-compare/date1900-cases.mjs`, Excel's answers in test/date1900-excel.json, 508 as Excel's; 384
+before):
+
+- **DATE counts the days on from the month's first in a calendar with the 29th**: DATE(1900,2,29) is 60,
+  DATE(1900,2,30) and DATE(1900,1,61) 61, DATE(1900,3,0) 60. A month before January 1900 is #NUM! whatever the day
+  (DATE(1900,0,64)), while DATE(1900,1,0) is 0.
+- **DAYS360 reads serials in that calendar too**, February 1900's last day the 29th: DAYS360(59,61) is 3,
+  DAYS360(60,61) 1, DAYS360(31,60,TRUE) 29 (each a day off here before, the serials below 61 read a day early).
+- **EDATE, EOMONTH and the coupon dates step over a February 1900 of 28 days**: EDATE(31,1) and EOMONTH(40,0) are
+  59, EDATE(244,-6) 59; serial 60 still reads as February 29 (MONTH(60) is 2).
+- **Not yet: coupon dates before 1900.** COUPDAYS(100,244,2,1) is 185 in Excel (182 here), COUPPCD(61,1000,4,0) 0
+  (-5 here), COUPDAYBS(50,881,4,0) 49 (79 here): Excel seems to take a coupon date before 1900 as serial 0; not
+  worked out.
+
+## Emoji: the function compatibility version
+
+Measured in Excel 365 in English over COM, 1972 formulas built with UNICHAR (`tools/excel-compare/emoji-cases.mjs`,
+`excel-formulas.ps1`; Excel's answers in test/emoji-excel.json), each in basic.xlsx as this editor writes it and in the
+same workbook with the version added. The last 600 are random strings of other characters, a held-out check: **1972
+of 1972 as Excel in both** (`src/ooxml/calcmode.js` `compatVersion`, `src/calc/functions-text.js`).
+
+- **What decides it** is workbook.xml's `<extLst><ext uri="{D14903EA-33C4-47F7-8F05-3474C54BE107}">` holding
+  `<xlwcv:version setVersion="2"/>` (namespace `.../spreadsheetml/2024/workbookCompatibilityVersion`), which Excel 365
+  writes into every workbook it makes. With setVersion 2 (or 3), LEN(UNICHAR(128512)) is 1; with 1 or none, 2. Nothing
+  else in the workbook matters (calcId, fileVersion, app.xml, the theme, styles, calcChain and the calcFeatures list
+  were each tried before and after).
+- **Version 2 counts code points, not what a reader sees as one character**: a ZWJ family (man, ZWJ, woman, ZWJ,
+  girl) is 5, a flag 2, an emoji with a skin tone 2, a letter and a combining accent 2, ❤ and its variation selector 2.
+  Only LEN, MID, REPLACE, FIND and SEARCH change. LEFT and RIGHT keep a pair whole either way; LENB, MIDB, FINDB,
+  SEARCHB, REPLACEB, LEFTB and RIGHTB count UTF-16 units either way; CODE, UNICODE, SUBSTITUTE, EXACT, TEXTBEFORE,
+  TEXTAFTER and TEXTSPLIT don't count.
+- **SEARCH's ? is one UTF-16 unit in both**, so SEARCH("??",emoji) is 1 with version 2; but there a match starts only
+  where a code point does: SEARCH("?b","a"&emoji&"b") is 3 without the version, #VALUE! with it.
+- **Half an emoji** (its first unit alone, made with MIDB): with version 2 not counted at the very end of a text
+  (LEN of it alone is 0, of it and "y" 2). UNICODE of it is #VALUE! in both; UNICODE of the second unit alone is its
+  number (56832).
+- **FIND may start just past the end, SEARCH may not**: FIND("","abc",4) is 4, SEARCH("","abc",4) and SEARCH("","")
+  #VALUE!, in both.
+- **UPPER and LOWER leave letters past U+FFFF alone**: UPPER of Deseret's small long i (U+10428) is itself.
+- A workbook this editor makes has no version, as before, so it counts as Excel counts it in that workbook; one Excel
+  made keeps its extLst byte for byte and is worked out as Excel works it out.
 
 ## CELL and INFO
 
@@ -561,24 +655,26 @@ timeline of 1 to n and seasonality 0 (no season), so it needn't be measured agai
 
 ## Not yet
 
-- **ACCRINT at the ends of Excel's dates**: a date past 9999-12-31 (serial 2958465) is #NUM!, as in Excel (measured).
-  Nearer the ends Excel gives #NUM! where this works it out: an issue date of serial 1 (1900-01-01) with the first
-  interest date years later, and some first interest dates in the last weeks of 9999 (ACCRINT(2958000,2958440,2958450,
-  0.1,1000,4) is #NUM! in Excel, 123.33 here); their rule isn't found yet.
-- **ACCRINT with first_interest on the 29th, 30th or 31st of a month whose coupon dates pass a shorter February**: 13
-  of the 400 cases checked differ from Excel's in the third or fourth digit (ACCRINT(DATE(2006,3,13),DATE(2006,8,29),
-  DATE(2008,3,28),0.06,100,2,0) is 12.2809 in Excel, 12.25 here); kept out of the probe.
+- **ACCRINT with a date on the 29th, 30th or 31st, or in February, whose coupon dates pass a shorter February**:
+  13 of the 400 cases first checked, and 25 of the 3951 near the ends of Excel's dates, differ from Excel's in the
+  third or fourth digit (ACCRINT(DATE(2006,3,13),DATE(2006,8,29),DATE(2008,3,28),0.06,100,2,0) is 12.2809 in Excel,
+  12.25 here; ACCRINT(2958065,2958434,2958100,0.1,1000,4,0) 9.44 in Excel, 10.28 here); kept out of the probe.
+  Tried and dropped: stepping on from first_interest by whole multiples of the period instead of from the date before
+  (one case better, two worse), and February 29, 1900 as February's last in the 30/360 days (six worse).
+- **ACCRINT with issue on a coupon date, settlement before first_interest and basis 1, 2 or 3**: 13 of the 300
+  differ (ACCRINT(DATE(2007,6,14),DATE(2010,6,14),DATE(2009,10,13),0.1,1000,2,3,TRUE) is 233.0137 in Excel, 4 periods
+  and 120.5 days of 182.5, where the days are 121; 233.1507 here).
 - **ODDLPRICE and ODDLYIELD from a last interest date at a month's end into a February 29 settlement** (August 31,
   2019 and February 29, 2020 measured): 1e-4 from Excel's for some frequencies and bases. Kept out of the probe.
 - **AMORDEGRC bought on the first period's last day with a life of 3 years or less**: the rule here (declining, no
   halves, up to the life's periods) fits the two such assets measured, not more.
-- **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
-  through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
-  pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
-- **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
-  units) as 2 in a workbook such as this editor writes (the probe's, 1926 of 1926 as Excel), but as 1 in a workbook it
-  made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
-  fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
+- **Regular expressions: 8 of the 924 cases measured** aren't Excel's. \G in an alternation after an empty match
+  (=REGEXREPLACE("xxa","a|\G","<$0>") is "<>x<>x<a><>" in Excel, "<>xx<a><>" here: Excel seems to start that search
+  a character on, as it doesn't for (?!\G)); and three random patterns repeating groups with conditionals, \K and
+  \G inside, one of which Excel answers with a number 0. (*SKIP:name) is #VALUE! here (marks aren't kept). Where
+  Excel stops for its match limit isn't the same step as here: a pattern needing between about 5 and 10 million
+  steps may be worked out in Excel and #VALUE! here. A repeated group of 10,000s of iterations that isn't plain
+  characters can run out of the stack, #VALUE! here.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.

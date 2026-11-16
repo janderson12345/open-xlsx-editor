@@ -9,7 +9,7 @@ import { readTables, tableArea } from '../ooxml/tables.js';
 import { runWithCircles } from './iterate.js';
 import { cellInfo } from './cellinfo.js';
 import { pivotData } from '../ooxml/pivotdata.js';
-import { calcMode } from '../ooxml/calcmode.js';
+import { calcMode, compatVersion } from '../ooxml/calcmode.js';
 import { contentsHidden } from '../ooxml/protection.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
@@ -284,6 +284,8 @@ export class Calc {
     const ctx = {
       here: { si: e.si, r: e.r, c: e.c },
       date1904: book.date1904,
+      // (The text functions count code points from compatibility version 2 on, UTF-16 units before: calcmode.js.)
+      codePoints: !!book.doc && compatVersion(book) >= 2,
       volatile: false,
       cellValue: (si, r, c) => cellValue(book.sheet(si).cells.get(r)?.get(c)),
       spillOf: (si, r, c) => spillOf(this, si, r, c),

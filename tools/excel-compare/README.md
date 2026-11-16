@@ -37,6 +37,19 @@ Approximate lookups over 400 unsorted lists (the same lists each time, from a fi
 MATCH -1 and VLOOKUP TRUE for each in a new workbook in an invisible instance, closed without saving. On a list that
 isn't sorted, Excel's binary search gives its own answer, which `test/lookups.test.js` expects of the engine.
 
+```sh
+node tools/excel-compare/emoji-cases.mjs <formulas.json>
+pwsh tools/excel-compare/excel-formulas.ps1 <formulas.json> <units.json> -Book test/fixtures/basic.xlsx
+pwsh tools/excel-compare/excel-formulas.ps1 <formulas.json> <points.json> -Book <basic.xlsx with setVersion 2>
+node tools/excel-compare/formula-results.mjs test/emoji-excel.json units=<units.json> points=<points.json>
+```
+
+`excel-formulas.ps1` has Excel work out a list of formulas: each is written into a cell of a sheet added to a new
+workbook (or to `-Book`, opened read-only), its Value2 read, and the workbook closed without saving. A text result
+keeps its UTF-16 units, so half an emoji survives. `formula-results.mjs` puts runs over the same formulas into one
+test file. The emoji cases (docs/CALC.md) are worked out once in basic.xlsx and once in a copy whose workbook.xml asks
+for function compatibility version 2 (as `test/emoji.test.js` builds it).
+
 ## Editing steps
 
 ```sh

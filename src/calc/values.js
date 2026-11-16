@@ -121,8 +121,10 @@ const RE_TIME = /^(\d{1,2}):(\d{2})(?::(\d{2}(?:\.\d+)?))?\s*([AaPp][Mm])?$/;
 export function dateSerial(y, m, d, date1904 = false) {
   const ms = Date.UTC(y, m - 1, 1) + (d - 1) * 86400000;
   if (date1904) return Math.round((ms - Date.UTC(1904, 0, 1)) / 86400000);
-  const n = Math.round((ms - Date.UTC(1899, 11, 31)) / 86400000);
-  return n >= 60 ? n + 1 : n;
+  // (The days run on from the month's first in Excel's calendar, where February 1900 has a 29th, serial 60: so
+  // DATE(1900,2,29) is 60, DATE(1900,2,30) and DATE(1900,1,61) 61, DATE(1900,3,0) 60, as Excel gives them.)
+  const first = Math.round((Date.UTC(y, m - 1, 1) - Date.UTC(1899, 11, 31)) / 86400000);
+  return (first >= 60 ? first + 1 : first) + d - 1;
 }
 
 /** The number some text reads as, or null. */

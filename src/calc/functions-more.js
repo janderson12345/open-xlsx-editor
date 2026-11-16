@@ -407,7 +407,8 @@ lifted('DOLLAR', (a, ctx) => {
   const s = fixed(Math.abs(x), given(a[1]) ? Math.trunc(num(a[1], ctx)) : 2, true);
   return x < 0 ? `($${s})` : `$${s}`;
 });
-lifted('UNICODE', (a, ctx) => { const s = text(a[0], ctx); if (!s) throw E.value; return s.codePointAt(0); });
+// (Half an emoji, its first UTF-16 unit alone, is #VALUE!; its second unit alone is its number: measured.)
+lifted('UNICODE', (a, ctx) => { const s = text(a[0], ctx); const n = s.codePointAt(0); if (!s || (n >= 0xd800 && n <= 0xdbff)) throw E.value; return n; });
 lifted('UNICHAR', (a, ctx) => { const n = Math.trunc(num(a[0], ctx)); if (n < 1 || n > 0x10ffff) throw E.value; if (notACharacter(n)) throw E.na; return String.fromCodePoint(n); });
 
 // ---- Trigonometry, GCD and LCM, rounding to a multiple

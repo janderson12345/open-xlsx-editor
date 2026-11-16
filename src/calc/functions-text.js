@@ -50,11 +50,21 @@ function clampArea(a, ctx) {
   return new Area(a.si, a.r0, a.c0, Math.max(a.r0, Math.min(a.r1, ext.maxRow)), Math.max(a.c0, Math.min(a.c1, ext.maxCol)));
 }
 // (How Excel 365 counts an emoji, two UTF-16 units: LEFT and RIGHT keep it whole; LEN, MID, FIND, SEARCH and REPLACE
-// count it as 2 in a workbook such as this editor writes, as their byte versions do, but as 1 in one Excel made itself,
-// for a reason not yet found (docs/CALC.md). The probe's: `byUnits`.)
+// count it as 2 in a workbook such as this editor writes, as their byte versions do, but as 1, a code point a
+// character, where the workbook asks for function compatibility version 2, as one Excel made does (calcmode.js,
+// docs/CALC.md). `byUnits` null: as the workbook says, ctx.codePoints.)
 const seq = (s, byUnits) => (byUnits ? s : pointsOf(s) ?? s);
+const units = (byUnits, ctx) => byUnits ?? !ctx.codePoints;
 const cut = (q, from, to) => (typeof q === 'string' ? q.slice(from, to) : q.slice(from, to).join(''));
-const len = (byUnits) => (a, ctx) => seq(text(a[0], ctx), byUnits).length;
+const len = (byUnits) => (a, ctx) => {
+  const s = text(a[0], ctx);
+  if (units(byUnits, ctx)) return s.length;
+  // (Half an emoji, its first unit alone, at the very end isn't counted where characters are code points: LEN of it
+  // is 0, of it and "y" 2 (measured).)
+  return seq(s, false).length - (/[\ud800-\udbff]$/.test(s) ? 1 : 0);
+};
+// (UPPER and LOWER leave letters past U+FFFF as they are: UPPER of Deseret's small long i, U+10428, is itself.)
+const cased = (s, f) => (/[\ud800-\udfff]/.test(s) ? s.replace(/[^\ud800-\udfff]+/g, f) : f(s));
 const left = (a, ctx) => { const n = opt(a, 1, ctx, 1); if (n < 0) throw E.value; return cut(seq(text(a[0], ctx)), 0, Math.trunc(n)); };
 const right = (a, ctx) => {
   const n = Math.trunc(opt(a, 1, ctx, 1));
@@ -63,18 +73,18 @@ const right = (a, ctx) => {
   return n === 0 ? '' : cut(q, Math.max(0, q.length - n));
 };
 const mid = (byUnits) => (a, ctx) => {
-  const q = seq(text(a[0], ctx), byUnits);
+  const q = seq(text(a[0], ctx), units(byUnits, ctx));
   const start = Math.trunc(num(a[1], ctx));
   const n = Math.trunc(num(a[2], ctx));
   if (start < 1 || n < 0) throw E.value;
   return cut(q, start - 1, start - 1 + n);
 };
-lifted('LEN', len(true));
+lifted('LEN', len(null));
 lifted('LEFT', left);
 lifted('RIGHT', right);
-lifted('MID', mid(true));
-lifted('UPPER', (a, ctx) => text(a[0], ctx).toUpperCase());
-lifted('LOWER', (a, ctx) => text(a[0], ctx).toLowerCase());
+lifted('MID', mid(null));
+lifted('UPPER', (a, ctx) => cased(text(a[0], ctx), (x) => x.toUpperCase()));
+lifted('LOWER', (a, ctx) => cased(text(a[0], ctx), (x) => x.toLowerCase()));
 lifted('PROPER', (a, ctx) => {
   let after = false;
   let out = '';
@@ -107,31 +117,43 @@ lifted('SUBSTITUTE', (a, ctx) => {
   return s.slice(0, at) + to + s.slice(at + from.length);
 });
 const replace = (byUnits) => (a, ctx) => {
-  const q = seq(text(a[0], ctx), byUnits);
+  const q = seq(text(a[0], ctx), units(byUnits, ctx));
   const start = Math.trunc(num(a[1], ctx));
   const n = Math.trunc(num(a[2], ctx));
   if (start < 1 || n < 0) throw E.value;
   return cut(q, 0, start - 1) + text(a[3], ctx) + cut(q, start - 1 + n);
 };
-lifted('REPLACE', replace(true));
-const finder = (insensitive, byUnits) => (a, ctx) => {
+lifted('REPLACE', replace(null));
+const finder = (insensitive, mode) => (a, ctx) => {
+  const byUnits = units(mode, ctx);
   const what = text(a[0], ctx);
   const s = text(a[1], ctx);
   const start = Math.trunc(opt(a, 2, ctx, 1));
-  if (start < 1 || start > seq(s, byUnits).length + 1) throw E.value;
+  // (FIND may start just past the end, SEARCH not: FIND("","abc",4) is 4, SEARCH("","abc",4) and SEARCH("","")
+  // #VALUE!, measured.)
+  if (start < 1 || start > seq(s, byUnits).length + (insensitive ? 0 : 1)) throw E.value;
   const from = byUnits ? start - 1 : unitAt(s, start - 1);
   let at;
   if (!insensitive) at = s.indexOf(what, from);
   else {
-    const re = new RegExp(wildcard(what, byUnits ? '[\\s\\S]' : '[^\\ud800-\\udfff]').source.slice(1, -1), 'i');
-    const m = re.exec(s.slice(from));
-    at = m ? from + m.index : -1;
+    // (? is one UTF-16 unit either way: where characters are code points, "??" finds an emoji at 1 (measured).)
+    // A match starts only where a character does, so "?b" isn't found in "a"&emoji&"b" there (measured).
+    const re = new RegExp(wildcard(what).source.slice(1, -1), byUnits ? 'i' : 'iy');
+    if (byUnits) { const m = re.exec(s.slice(from)); at = m ? from + m.index : -1; } else at = boundaryMatch(re, s, from);
   }
   if (at < 0) throw E.value;
   return (byUnits ? at : pointsBefore(s, at)) + 1;
 };
-lifted('FIND', finder(false, true));
-lifted('SEARCH', finder(true, true));
+/** Where sticky `re` first matches `s` from UTF-16 index `from` on, trying only the starts of code points; -1 if none. */
+function boundaryMatch(re, s, from) {
+  for (let u = from; u <= s.length; u += s.codePointAt(u) > 0xffff ? 2 : 1) {
+    re.lastIndex = u;
+    if (re.test(s)) return u;
+  }
+  return -1;
+}
+lifted('FIND', finder(false, null));
+lifted('SEARCH', finder(true, null));
 // (The byte versions, as an English Excel 365 has them (measured, docs/CALC.md): LENB, MIDB, FINDB, SEARCHB and REPLACEB
 // count UTF-16 units, an emoji 2; LEFTB and RIGHTB are LEFT and RIGHT, keeping a character whole; ASC and DBCS give the
 // text as it is, full-width letters staying full-width.)
@@ -183,7 +205,11 @@ lifted('DATE', (a, ctx) => {
   if (y < 0 || y > 9999) throw E.num;
   if (y < 1900 && !ctx.date1904) y += 1900;
   else if (y < 1904 && ctx.date1904) y += 1900;
-  const n = dateSerial(y, Math.trunc(num(a[1], ctx)), Math.trunc(num(a[2], ctx)), ctx.date1904);
+  const m = Math.trunc(num(a[1], ctx));
+  // (A month before the system's first is #NUM! whatever the day: DATE(1900,0,64) is, though January 1900 and 63
+  // days would be serial 32; measured.)
+  if (y * 12 + m - 1 < (ctx.date1904 ? 1904 : 1900) * 12) throw E.num;
+  const n = dateSerial(y, m, Math.trunc(num(a[2], ctx)), ctx.date1904);
   if (n < 0) throw E.num;
   return n;
 });

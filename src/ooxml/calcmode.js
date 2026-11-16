@@ -4,9 +4,25 @@
 // entered; what reads the change waits for Calculate Now (F9) or Calculate Sheet (Shift+F9), as in Excel, and the
 // status bar says Calculate meanwhile. Going back to Automatic works the waiting formulas out, and saving does too
 // unless calcOnSave is off. There are no data tables here, so autoNoTable is Automatic.
-import { kid, attr } from './xml.js';
+import { kids, kid, attr } from './xml.js';
 
 export const CALC_MODES = ['auto', 'autoNoTable', 'manual'];
+
+const COMPAT = '{D14903EA-33C4-47F7-8F05-3474C54BE107}';
+const compatSeen = new WeakMap();
+/** The function compatibility version a workbook asks for: workbook.xml's extLst <ext uri={D14903EA-...}> holding
+ *  <xlwcv:version setVersion="2"/> (2024's workbookCompatibilityVersion namespace), as Excel 365 writes into a
+ *  workbook it makes; 1 where there is none, as in a workbook this editor writes. From 2 on LEN, MID, REPLACE, FIND
+ *  and SEARCH count an emoji as one character (measured: LEN(UNICHAR(128512)) is 1 with setVersion 2 or 3, 2 with 1
+ *  or none, the same workbook otherwise). */
+export function compatVersion(wb) {
+  if (compatSeen.has(wb.doc)) return compatSeen.get(wb.doc);
+  const ext = kids(kid(wb.doc.documentElement, 'extLst', wb.ns), 'ext', wb.ns).find((e) => attr(e, 'uri') === COMPAT);
+  const el = ext && [...ext.childNodes].find((n) => n.nodeType === 1 && n.localName === 'version');
+  const v = Math.trunc(Number(el?.getAttribute('setVersion'))) || 1;
+  compatSeen.set(wb.doc, v);
+  return v;
+}
 
 /** workbook.xml's calcPr, made where there is none (after definedNames, before oleSize and the rest). */
 function calcPr(wb, make) {

@@ -4,6 +4,7 @@
 // Standards mode asserted.
 // Run after `npm run build`: node test/editing.mjs [outDir]
 import fs from 'node:fs';
+import { unzipSync, zipSync, strToU8, strFromU8 } from 'fflate';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { openFixture } from './browser.mjs';
 import { editingPage } from './editing-kit.mjs';
@@ -503,6 +504,32 @@ check(wb.styles.fills[wb.styles.cellXfs[sh.cells.get(19).get(7).s].fillId].fg.rg
 check(!wb.pkg.has('xl/calcChain.xml'), 'saved: calcChain.xml left out (Excel works the order out again)');
 check(wb.sheet(1).cells.get(1).get(1).v === -3.5, 'saved: the change on the second sheet undone');
 check(wb.sheets.map((s) => `${s.name}:${s.state}`).join() === 'Data:visible,Notes:visible,Hidden:hidden' && !Object.keys(wb.pkg.files).some((p) => /sheet[45]\.xml/.test(p)), 'saved: the sheets as left (Summary and Sheet2 gone with their parts)', wb.sheets.map((s) => s.name).join());
+
+// Formulas typed into a workbook as Excel makes it (function compatibility version 2 in workbook.xml): an emoji counts
+// as one character, \K and recursion in a pattern, ACCRINT stepping back past 1900, February 29, 1900, and a pattern
+// that backtracks without end, each as Excel gives it (docs/CALC.md).
+{
+  const files = unzipSync(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const compat = '<extLst><ext uri="{D14903EA-33C4-47F7-8F05-3474C54BE107}" xmlns:xlwcv="http://schemas.microsoft.com/office/spreadsheetml/2024/workbookCompatibilityVersion"><xlwcv:version setVersion="2"/></ext></extLst>';
+  files['xl/workbook.xml'] = strToU8(strFromU8(files['xl/workbook.xml']).replace('</workbook>', `${compat}</workbook>`));
+  fs.writeFileSync(`${outDir}/compat2.xlsx`, zipSync(files));
+  await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+  await page.setInputFiles('input[type=file]', `${outDir}/compat2.xlsx`);
+  await page.waitForFunction(() => window.oxe.fileName === 'compat2.xlsx');
+  const typed = [['G2', '=LEN(UNICHAR(128512)&"a")'], ['G3', '=REGEXEXTRACT("price: 42","price: \\K\\d+")'],
+    ['G4', '=REGEXEXTRACT("x(a(b)c)y","\\((?:[^()]|(?R))*\\)")'], ['G5', '=ACCRINT(1,731,731,0.1,1000,4,1,FALSE)'],
+    ['G6', '=DATE(1900,3,0)'], ['G7', '=REGEXTEST(REPT("a",30)&"b","^(a+)+$")']];
+  for (const [ref, f] of typed) {
+    // (Selected, not clicked: G5's error button sits over G6.)
+    await page.evaluate((r) => window.oxe.select(r), ref);
+    await page.focus('.oxe-grid');
+    await page.keyboard.type(f);
+    await page.keyboard.press('Enter');
+  }
+  const got = [];
+  for (const [ref] of typed) got.push(await value(ref));
+  check(JSON.stringify(got) === JSON.stringify([2, '42', '(a(b)c)', '#NUM!', 60, '#VALUE!']), 'typed in a workbook Excel made: LEN of an emoji and "a" 2, \\K, (?R), ACCRINT #NUM!, DATE(1900,3,0) 60, a runaway pattern #VALUE!', JSON.stringify(got));
+}
 
 
 await finish();
