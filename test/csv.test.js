@@ -66,3 +66,16 @@ test("a sheet saved as a CSV as Excel's Save As writes one, byte for byte: CSV U
   assert.deepEqual([...csvBytes(wb, si)], [...fs.readFileSync('test/csv-excel-utf8.csv')]);
   assert.deepEqual([...csvBytes(wb, si, { utf8: false })], [...fs.readFileSync('test/csv-excel-ansi.csv')]);
 });
+
+test("a sheet saved as Excel's Save As writes Text (Tab delimited), Unicode Text, CSV UTF-8 and CSV, byte for byte (a tab, a comma and quotes quoted in each)", async () => {
+  const { csvBytes } = await import('../src/ooxml/csv.js');
+  const { saveSheet } = await import('./savetext-sheet.js');
+  const { wb, si } = saveSheet();
+  for (const [kind, file] of [['txt', 'text.txt'], ['unicode', 'unicode.txt'], ['csv-utf8', 'utf8.csv'], ['csv', 'ansi.csv']]) {
+    assert.deepEqual([...csvBytes(wb, si, { kind })], [...fs.readFileSync(`test/savetext-excel-${file}`)], kind);
+  }
+  // (Another separator: a field holding it quoted; UTF-8 without a mark when asked.)
+  const semi = new TextDecoder().decode(csvBytes(wb, si, { sep: ';', encoding: 'utf-8', bom: false }));
+  assert.ok(semi.startsWith('plain;"has, comma";'));
+  assert.ok(semi.includes('"semi;colon";'));
+});

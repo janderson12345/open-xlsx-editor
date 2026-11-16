@@ -52,21 +52,24 @@ settings; 108 of 108 cells the same value, type and number format here (`test/te
 | Date column, MDY, DMY or YMD | numbers split by `/`, `-` or `.`; a four-digit year first read year first in any order; m/d/yyyy, or d-mmm when there is no year (this year); a day the month hasn't (`31/2/2024`), another order (`13/5/2024` in MDY) or a word stays text |
 | Skip | the column left out, the next one moving left |
 
-## Saving a sheet as a CSV
+## Saving a sheet as a CSV or a text file
 
-`saveCsv({ utf8 })` gives the sheet shown as Excel's Save As writes it (`csvBytes` in `src/ooxml/csv.js`), byte for
-byte: test/csv-excel-utf8.csv (CSV UTF-8) and test/csv-excel-ansi.csv (CSV) are Excel's own saves of a sheet made
-the same way in test/csv.test.js.
+`saveCsv({ kind, sep, encoding, bom })` gives the sheet shown as Excel's Save As writes it (`csvBytes` in
+`src/ooxml/csv.js`), byte for byte: `kind` 'csv-utf8' (CSV UTF-8, the default), 'csv' (CSV), 'txt' (Text (Tab
+delimited)) or 'unicode' (Unicode Text), or a separator and an encoding ('utf-8', 'utf-16le', 'windows-1252') of
+one's own. test/csv-excel-utf8.csv and test/csv-excel-ansi.csv, and the four test/savetext-excel-* files, are Excel's
+own saves of sheets made the same way in test/csv.test.js and test/savetext-sheet.js (4 of 4 the same). The cells
+are written as the editor's locale shows them (docs/LOCALE.md), as Excel's are in the computer's.
 
 | Rule | Seen |
 |---|---|
 | Each cell as it shows, formatted. | `"1,234.50"`, `25%`, `3/5/2024`, `(5.00)`, `TRUE`, `#N/A`; a formula its value |
 | A General number in 11 characters, whatever its column's width (no #s). | `0.333333333`, `1.23457E+12`, `0.000001`; 12345 in a column 3 wide |
 | Text as it is; a typed apostrophe isn't written. | `'007`: `007`; `  lead` keeps its spaces |
-| In quotes only with a comma, a quote or a line break; quotes doubled. | `"has, comma"`, `"say ""hi"""`, `"quote""mid"`; `semi;colon` bare |
+| In quotes only with a comma, a quote, a tab or a line break (or the separator); quotes doubled. The same in a tab-delimited file. | `"has, comma"`, `"say ""hi"""`, `"quote""mid"`, `"tab` TAB `in"`; `semi;colon` bare |
 | Rows end in CR LF; a line break in a cell is written as it is (LF). | `"two` LF `lines"` CR LF |
 | The used range: each row as wide as it, empty cells empty fields. | `,x,,` |
-| CSV UTF-8: a byte order mark, then UTF-8. CSV: code page 1252. | `café ü €`: `EF BB BF ... C3 A9`; `E9 FC 80` |
+| CSV UTF-8: a byte order mark, then UTF-8. CSV and Text: code page 1252, ? for what it hasn't. Unicode Text: UTF-16 LE with its mark. | `café ü €`: `EF BB BF ... C3 A9`; `E9 FC 80`; `日本` as `??` in 1252 |
 
 ## Not yet
 

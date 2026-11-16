@@ -5,3 +5,4 @@
 test/csv-excel.csv binary
 test/csv-excel-ansi.csv binary
 test/csv-excel-utf8.csv binary
+test/savetext-excel-* binary
