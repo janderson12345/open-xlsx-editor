@@ -98,6 +98,17 @@ export class OpcPackage {
     return id;
   }
 
+  /** Take relationship `id` out of a part's relationships, the rest of the text as it was. (The id comes from the
+   *  file, so it is escaped before it goes into the pattern: an Id of "(a+)+" must not become a regular expression.) */
+  removeRel(partPath, id) {
+    const dir = partPath.slice(0, partPath.lastIndexOf('/') + 1);
+    const relsPath = `${dir}_rels/${partPath.slice(dir.length)}.rels`;
+    const text = this.text(relsPath);
+    if (!text) return;
+    const safe = String(id).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    this.setText(relsPath, text.replace(new RegExp(`<Relationship\\b[^>]*\\sId="${safe}"[^>]*/>`), ''));
+  }
+
   /** Register a content-type override for a new part. */
   addOverride(partName, contentType) {
     const doc = this.xml('[Content_Types].xml');

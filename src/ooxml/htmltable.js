@@ -65,7 +65,10 @@ export function parseDecls(text) {
     const colon = part.indexOf(':');
     if (colon > 0) {
       const name = part.slice(0, colon).trim().toLowerCase();
-      const value = part.slice(colon + 1).trim().replace(/\s*!important$/i, '');
+      // (!important cut off with endsWith, not /\s*!important$/: that regex is quadratic on a long run of spaces in
+      // clipboard text from any web page.)
+      let value = part.slice(colon + 1).trim();
+      if (value.toLowerCase().endsWith('!important')) value = value.slice(0, -'!important'.length).trimEnd();
       if (name) out[name] = value;
     }
     i = j + 1;

@@ -198,12 +198,7 @@ export function moveDrawings(wb, si, axis, at, n, sizes = null) {
 }
 
 /** Remove relationship `id` from a part's relationships. */
-function dropRel(pkg, partPath, id) {
-  const dir = partPath.slice(0, partPath.lastIndexOf('/') + 1);
-  const relsPath = `${dir}_rels/${partPath.slice(dir.length)}.rels`;
-  const text = pkg.text(relsPath);
-  if (text) pkg.setText(relsPath, text.replace(new RegExp(`<Relationship\\b[^>]*\\sId="${id}"[^>]*/>`), ''));
-}
+const dropRel = (pkg, partPath, id) => pkg.removeRel(partPath, id);
 
 // --- Tables ----------------------------------------------------------------------------------------------------------
 // As Excel does it (tools/excel-compare/excel-anchors.ps1 on anchor-cases.mjs): lines inserted strictly inside a

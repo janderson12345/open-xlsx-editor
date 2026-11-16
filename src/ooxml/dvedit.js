@@ -40,11 +40,13 @@ export function storedFormula(type, typed, date1904 = false) {
  *  ('any', 'whole', 'decimal', 'list', 'date', 'time', 'length', 'custom'), op, f1, f2 (as typed), ignoreBlank, dropDown,
  *  prompt: { show, title, text }, error: { show, style ('stop', 'warning', 'information'), title, text } }. */
 export function validationXml(rule, ranges, date1904 = false) {
-  const type = TYPES[rule.type] ?? null;
-  const op = OPERATORS[rule.op] || 'between';
+  // (Looked up as own keys and the error style checked: a rule read from a file brings its own text for these, which
+  // would otherwise be written into the attribute as it came, quotes and all.)
+  const type = Object.hasOwn(TYPES, rule.type) ? TYPES[rule.type] : null;
+  const op = Object.hasOwn(OPERATORS, rule.op) ? OPERATORS[rule.op] : 'between';
   const a = [];
   if (type) a.push(`type="${type}"`);
-  if (rule.error?.style && rule.error.style !== 'stop') a.push(`errorStyle="${rule.error.style}"`);
+  if (rule.error?.style === 'warning' || rule.error?.style === 'information') a.push(`errorStyle="${rule.error.style}"`);
   const ranged = type && type !== 'list' && type !== 'custom';
   if (ranged && op !== 'between') a.push(`operator="${op}"`);
   if (rule.ignoreBlank !== false) a.push('allowBlank="1"');

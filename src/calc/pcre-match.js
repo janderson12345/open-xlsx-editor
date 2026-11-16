@@ -10,6 +10,8 @@ import { WORD } from './regex.js';
 
 /** The most steps one match (one try from each start) may take; PCRE2's own default match limit is 10,000,000. */
 export const STEPS = 5000000;
+/** The most steps all the searches of one REGEXEXTRACT or REGEXREPLACE call (Pattern.all) may take together. */
+export const TOTAL_STEPS = 4 * STEPS;
 const DEPTH = 2000; // (recursions in progress at once)
 const IS_WORD = new RegExp(`[${WORD}]`, 'v');
 const NEWLINES = { LF: ['\n'], CR: ['\r'], CRLF: ['\r\n'], ANYCRLF: ['\r\n', '\r', '\n'], NUL: ['\0'],
@@ -361,16 +363,22 @@ export class Pattern {
     const out = [];
     let from = 0;
     let notEmpty = false;
+    // (STEPS bounds one search; a pattern just under it on each of thousands of matches would still hold the sheet up,
+    // so all the searches of one call share TOTAL_STEPS, past which it is #VALUE! as one search past STEPS is.)
+    let total = 0;
+    const spent = () => { total += this.S.steps; if (total > TOTAL_STEPS) throw E.value; };
     while (from <= s.length) {
       // (After an empty match: a search from there on that can't be empty where it starts, and if that finds nothing,
       // a new one a character on, where \G holds again: =REGEXREPLACE("abc","\G","-") is "-a-b-c-" and
       // =REGEXREPLACE("abc","(?!\G)","-") "a-b-c-", measured.)
       let m = this.exec(s, from, notEmpty);
+      spent();
       if (!m && notEmpty) {
         if (from >= s.length) break;
         from += cpLen(s, from);
         notEmpty = false;
         m = this.exec(s, from);
+        spent();
       }
       if (!m) break;
       out.push(m);

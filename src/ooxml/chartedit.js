@@ -170,9 +170,7 @@ export function deleteChart(wb, si, k) {
   if (!part) throw new Error('No such chart');
   const pkg = wb.pkg;
   pkg.setText(part.drawing, pkg.text(part.drawing).replace(part.anchor, ''));
-  const dir = part.drawing.slice(0, part.drawing.lastIndexOf('/') + 1);
-  const relsPath = `${dir}_rels/${part.drawing.slice(dir.length)}.rels`;
-  pkg.setText(relsPath, pkg.text(relsPath).replace(new RegExp(`<Relationship\\b[^>]*\\sId="${part.rid}"[^>]*/>`), ''));
+  pkg.removeRel(part.drawing, part.rid);
   pkg.removeTree(part.path);
   return part;
 }
