@@ -66,6 +66,20 @@ $CASES = [ordered]@{
   'outline symbols off without an outline' = { param($ws) Numbers $ws; $ws.Parent.Windows.Item(1).DisplayOutline = $false }
   'outline symbols off then on' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); $ws.Parent.Windows.Item(1).DisplayOutline = $false; $ws.Parent.Windows.Item(1).DisplayOutline = $true }
   'auto outline' = { param($ws) Sums $ws; [void]$ws.Range('A1').AutoOutline() }
+  # (Rows and columns inserted (Range.Insert on whole lines) inside, at the edges of and next to a group.)
+  'insert row inside a group' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Rows.Item(3).Insert() }
+  'insert row at a group''s first row' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Rows.Item(2).Insert() }
+  'insert row at the summary row' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Rows.Item(5).Insert() }
+  'insert row under the summary row' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Rows.Item(6).Insert() }
+  'insert two rows in nested groups' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A7').EntireRow.Group(); [void]$ws.Range('A3:A4').EntireRow.Group(); [void]$ws.Range('A4:A5').EntireRow.Insert() }
+  'insert row at the inner summary' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A7').EntireRow.Group(); [void]$ws.Range('A3:A4').EntireRow.Group(); [void]$ws.Rows.Item(5).Insert() }
+  'insert row in a collapsed group' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Outline.ShowLevels(1); [void]$ws.Rows.Item(3).Insert() }
+  'insert row at a collapsed summary' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Outline.ShowLevels(1); [void]$ws.Rows.Item(5).Insert() }
+  'insert row summary above' = { param($ws) Numbers $ws; $ws.Outline.SummaryRow = 0; [void]$ws.Range('A3:A5').EntireRow.Group(); [void]$ws.Rows.Item(3).Insert() }
+  'insert row summary above after the group' = { param($ws) Numbers $ws; $ws.Outline.SummaryRow = 0; [void]$ws.Range('A3:A5').EntireRow.Group(); [void]$ws.Rows.Item(6).Insert() }
+  'insert column inside a group' = { param($ws) Numbers $ws; [void]$ws.Range('B1:D1').EntireColumn.Group(); [void]$ws.Columns.Item(3).Insert() }
+  'insert column at a group''s first column' = { param($ws) Numbers $ws; [void]$ws.Range('B1:D1').EntireColumn.Group(); [void]$ws.Columns.Item(2).Insert() }
+  'insert column at the summary column' = { param($ws) Numbers $ws; [void]$ws.Range('B1:D1').EntireColumn.Group(); [void]$ws.Columns.Item(5).Insert() }
   # (The Settings box's Automatic styles (Outline.AutomaticStyles), its Apply Styles (Range.ApplyOutlineStyles) and
   # Create (AutoOutline with the styles on), and Group and Subtotal with them on.)
   'automatic styles on' = { param($ws) Numbers $ws; $ws.Outline.AutomaticStyles = $true }

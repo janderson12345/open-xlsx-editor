@@ -286,6 +286,29 @@ export function setOutlineSymbols(wb, si, on) {
   return setSummary(wb, si, { symbols: on });
 }
 
+/** Columns inserted right of a hidden or collapsed column (rowcol.js moveCols): a copy of its element for columns at to
+ *  at+n-1, shown (the default width when it had none) and not collapsed. */
+export function insertedLines(el, at, n, defaultWidth) {
+  const x = el.cloneNode(true);
+  x.setAttribute('min', String(at + 1));
+  x.setAttribute('max', String(at + n));
+  x.removeAttribute('collapsed');
+  if (on(attr(x, 'hidden'))) { x.removeAttribute('hidden'); if (Number(attr(x, 'width') || 0) === 0) x.setAttribute('width', String(defaultWidth)); }
+  return x;
+}
+
+/** Lines at to at+n-1 just inserted (rowcol.js changeLines): the groups they are part of no longer collapsed, as Excel
+ *  leaves them ("insert row in a collapsed group": the new row shown, row 6 without collapsed). */
+export function openJoined(doc, axis, at, n, format) {
+  const lines = axisLines(doc, axis, format);
+  if (!lines.levels().length) return;
+  const pr = readOutlinePr(doc.documentElement, doc.documentElement.namespaceURI);
+  for (const g of outlineGroups(lines.levels(), after(axis, pr))) {
+    if (g.end >= at && g.start <= at + n - 1 && g.summary != null && lines.get(g.summary).collapsed) lines.set(g.summary, { collapsed: false });
+  }
+  lines.finish();
+}
+
 /** Lines' levels set: `levels` [[i, level]] (Subtotal's outline, subtotal.js); the current ones as [[i, level]] with
  *  none given. */
 export function lineLevels(wb, si, axis, levels = null) {

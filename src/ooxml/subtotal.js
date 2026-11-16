@@ -131,6 +131,8 @@ export function subtotal(wb, si, area, { by, fn = 'sum', cols, replace = true, p
     for (const r of g.rows) levels.push([place.get(r), rows]);
     levels.push([order.find((x) => x.group === g).at, sub]);
   }
+  // (The grand total outside the outline, though inserted rows take the level of the row above.)
+  for (const x of order) if (x.grand) levels.push([x.at, 0]);
   lineLevels(wb, si, 'row', levels);
   setSummary(wb, si, { below });
   if (styled) styleSummaryLines(wb, si, 'row', order.filter((x) => !('r' in x)).map((x) => x.at));
