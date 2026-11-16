@@ -5,6 +5,8 @@
 import { normalizeFormula, displayFormula } from '../calc/fileform.js';
 import { parseFormula } from '../calc/parse.js';
 import { BUILTIN_FORMATS as B, formatValue, isDateFormat } from './format.js';
+import { EN_US, currentLocale, localDecimal, isSpaceGroup } from './locale.js';
+import { fromLocalFormula, toLocalFormula } from '../calc/localform.js';
 
 const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
 
@@ -41,17 +43,31 @@ function dayOrYear(m, text, thisYear) {
   return Number.isNaN(y) ? null : [y, m, 1, B[17]];
 }
 
-/** A date typed alone: [y, m, d, format] or null. */
-function readDate(s, thisYear) {
-  let m = /^(\d{1,4})([/-])(\d{1,4})(?:\2(\d{1,4}))?$/.exec(s);
+/** Two numbers typed as a date where the day comes before the month (13/5 the 13th of May this year; 5/2024 May
+ *  2024): [y, m, d, format] or null. */
+function dayMonth(a, b, thisYear) {
+  const [d, mo] = [Number(a), Number(b)];
+  if (a.length <= 2 && b.length <= 2 && mo >= 1 && mo <= 12 && d >= 1 && d <= daysIn(thisYear, mo)) return [thisYear, mo, d, B[16]];
+  const y = fullYear(b);
+  return a.length <= 2 && d >= 1 && d <= 12 && !Number.isNaN(y) ? [y, d, 1, B[17]] : null;
+}
+
+/** A date typed alone: [y, m, d, format] or null. `order`: the locale's ('MDY', 'DMY' or 'YMD'); `dot`: a dot is a
+ *  date separator too (5.3.2024, where the locale's dates have dots). */
+function readDate(s, thisYear, order = 'MDY', dot = false) {
+  let m = (dot ? /^(\d{1,4})([/.-])(\d{1,4})(?:\2(\d{1,4}))?$/ : /^(\d{1,4})([/-])(\d{1,4})(?:\2(\d{1,4}))?$/).exec(s);
   if (m) {
     if (m[4] != null) {
       if (m[3].length > 2) return null;
-      const [y, mo, d] = m[1].length === 4 ? [Number(m[1]), Number(m[3]), Number(m[4])] : [fullYear(m[4]), Number(m[1]), Number(m[3])];
+      // (A four-digit year first is year, month, day whatever the locale; else in the locale's order.)
+      const ymd = m[1].length === 4 || (order === 'YMD' && m[4].length <= 2);
+      const [y, mo, d] = ymd ? [m[1].length === 4 ? Number(m[1]) : fullYear(m[1]), Number(m[3]), Number(m[4])]
+        : order === 'DMY' ? [fullYear(m[4]), Number(m[3]), Number(m[1])] : [fullYear(m[4]), Number(m[1]), Number(m[3])];
       if (m[1].length === 4 && m[4].length > 2) return null;
       return Number.isNaN(y) ? null : [y, mo, d, B[14]];
     }
     if (m[1].length > 2) return null;
+    if (order === 'DMY') return dayMonth(m[1], m[3], thisYear);
     const mo = Number(m[1]);
     return mo >= 1 && mo <= 12 ? dayOrYear(mo, m[3], thisYear) : null;
   }
@@ -98,8 +114,20 @@ function readTime(s) {
   return { value, format: c == null ? B[20] : B[21] };
 }
 
+const reEscape = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const numberRes = new Map();
+/** The pattern of a number's digits in a locale: thousands groups, a decimal part, an exponent. */
+function numberRe(loc) {
+  const key = `${loc.decimal}${loc.group}`;
+  if (!numberRes.has(key)) {
+    const g = isSpaceGroup(loc.group) ? `[ ${String.fromCharCode(0xa0, 0x202f)}]` : reEscape(loc.group);
+    numberRes.set(key, new RegExp(`^(\\d+(?:${g}\\d{3,})*)?(${reEscape(loc.decimal)}\\d*)?(?:[eE]([+-]?\\d+))?$`));
+  }
+  return numberRes.get(key);
+}
+
 /** A number typed with its decoration: { value, format } or null. */
-function readNumber(s) {
+function readNumber(s, loc = EN_US) {
   let t = s;
   let neg = false;
   let paren = false;
@@ -115,10 +143,12 @@ function readNumber(s) {
     return null;
   }
   if (t.startsWith('%')) { pct = true; t = t.slice(1); } else if (t.endsWith('%')) { pct = true; t = t.slice(0, -1); }
-  // (A comma wants at least three digits after it: "1,2345" is 12345, "1,23" isn't a number.)
-  const m = /^(\d+(?:,\d{3,})*)?(\.\d*)?(?:[eE]([+-]?\d+))?$/.exec(t);
+  // (A comma wants at least three digits after it: "1,2345" is 12345, "1,23" isn't a number. Elsewhere the locale's
+  // separators, the same way: 1.234,5 in Germany.)
+  const m = (loc.decimal === '.' && loc.group === ',' ? /^(\d+(?:,\d{3,})*)?(\.\d*)?(?:[eE]([+-]?\d+))?$/ : numberRe(loc)).exec(t);
   if (!m || !(m[1] || (m[2] && m[2].length > 1))) return null;
-  let value = Number(`${(m[1] || '0').replace(/,/g, '')}${m[2] || ''}${m[3] ? `e${m[3]}` : ''}`);
+  const grouped = !!m[1] && /\D/.test(m[1]);
+  let value = Number(`${(m[1] || '0').replace(/\D/g, '')}${m[2] ? `.${m[2].slice(1)}` : ''}${m[3] ? `e${m[3]}` : ''}`);
   if (!Number.isFinite(value)) return null;
   if (pct) value /= 100;
   if (neg) value = -value;
@@ -127,7 +157,7 @@ function readNumber(s) {
   if (money === '$') format = decimals ? B[8] : B[6];
   else if (pct) format = decimals ? B[10] : B[9];
   else if (m[3]) format = B[11];
-  else if (m[1] && m[1].includes(',')) format = decimals ? B[4] : B[3];
+  else if (grouped) format = decimals ? B[4] : B[3];
   return { value, format };
 }
 
@@ -140,16 +170,17 @@ const TYPED_ERRORS = /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#N\/A|#GETTI
  * 'number' or 'error'), { formula }
  * (as the file has it, without "=": normalizeFormula) or { error } when it isn't a formula Excel would take. `today`
  * gives the year of a date typed without one; `date1904`, the workbook's date system; `asText`, a cell formatted as
- * Text (@), where Excel keeps whatever is typed as it is (a formula too).
+ * Text (@), where Excel keeps whatever is typed as it is (a formula too). `locale` (locale.js; en-US unless given): the
+ * separators numbers are typed with, the order of a date's day and month, a formula's argument separator.
  */
-export function parseInput(text, { today = new Date(), date1904 = false, asText = false } = {}) {
+export function parseInput(text, { today = new Date(), date1904 = false, asText = false, locale = EN_US } = {}) {
   const s = String(text ?? '');
   if (s === '') return { value: null };
   if (asText) return { value: s };
   if (s.startsWith("'")) return { value: s.slice(1) };
   if (s.startsWith('=')) {
     try {
-      const formula = normalizeFormula(s.slice(1));
+      const formula = normalizeFormula(fromLocalFormula(s.slice(1), locale));
       parseFormula(formula);
       // (=@A1:A3, all @, is kept as the old kind of formula, which doesn't spill: as Excel saves it.)
       return /^\s*@/.test(s.slice(1)) && !/^_xlfn\.SINGLE\(/i.test(formula) ? { formula, legacy: true } : { formula };
@@ -162,7 +193,7 @@ export function parseInput(text, { today = new Date(), date1904 = false, asText 
   if (TYPED_ERRORS.test(s)) return { value: { code: s.toUpperCase() }, kind: 'error' };
   const t = s.trim();
   if (/^(true|false)$/i.test(t)) return { value: t.toLowerCase() === 'true' };
-  const n = readNumber(t);
+  const n = readNumber(t, locale);
   if (n) return { value: n.value, format: n.format === 'General' ? undefined : n.format, kind: 'number' };
   const frac = /^([+-]?)(\d+)\s+(\d+)\/(\d+)$/.exec(t);
   if (frac && Number(frac[4]) > 0) {
@@ -170,7 +201,8 @@ export function parseInput(text, { today = new Date(), date1904 = false, asText 
     return { value: frac[1] === '-' ? -v : v, format: Number(frac[4]) < 10 ? B[12] : B[13], kind: 'number' };
   }
   const thisYear = today.getFullYear();
-  const date = readDate(t, thisYear);
+  const dot = locale.dateSep === '.';
+  const date = readDate(t, thisYear, locale.dateOrder, dot);
   if (date) {
     const serial = dateSerial(date[0], date[1], date[2], date1904);
     return serial == null ? { value: s } : { value: serial, format: date[3], kind: 'date' };
@@ -182,7 +214,7 @@ export function parseInput(text, { today = new Date(), date1904 = false, asText 
   const gap = t.search(/\s/);
   const both = gap > 0 && t.slice(gap).trim() ? [t, t.slice(0, gap), t.slice(gap).trimStart()] : null;
   if (both) {
-    const d = readDate(both[1], thisYear);
+    const d = readDate(both[1], thisYear, locale.dateOrder, dot);
     const tm = d && (/:/.test(both[2]) || /\s(am|pm)$/i.test(both[2])) && readTime(both[2]);
     const serial = tm && dateSerial(d[0], d[1], d[2], date1904);
     if (serial != null && tm) return { value: serial + tm.value, format: tm.value >= 1 || tm.format === 'General' ? undefined : B[22], kind: 'datetime' };
@@ -215,18 +247,20 @@ export function formatAfterEntry(current, parsed) {
 /**
  * A cell's value as the text to edit it from, as Excel's formula bar has it: a formula with its "=", a date as m/d/yyyy
  * (with its time as h:mm:ss AM/PM), a time alone as h:mm:ss AM/PM, a percentage as a percentage, other numbers in full,
- * booleans as TRUE and FALSE. Typed back, each gives the same value.
+ * booleans as TRUE and FALSE. Typed back, each gives the same value. `locale` (the page's unless given): a date as its
+ * short date with a four-digit year, a time on a 24-hour clock where it keeps one, its decimal separator, a formula in
+ * its form (calc/localform.js).
  */
-export function editText(cell, code = 'General', date1904 = false, at = null) {
+export function editText(cell, code = 'General', date1904 = false, at = null, locale = currentLocale()) {
   if (!cell) return '';
   if (cell.f) {
     // (A formula of the old kind works by implicit intersection: Excel 365 shows an @ where it cuts a range to one value.
     // `at` puts them in (calc/legacyat.js, which needs the cell's place); without it, a formula that is a whole range,
     // A1:A3, gets its @.)
     const old = !cell.dynamic && !cell.array;
-    if (old && at) return `=${at(displayFormula(cell.f))}`;
+    if (old && at) return `=${toLocalFormula(at(displayFormula(cell.f)), locale)}`;
     const whole = old && /^('[^']+'|[^!(]+!)?\$?[A-Z]{1,3}\$?\d+:\$?[A-Z]{1,3}\$?\d+$/i.test(cell.f);
-    return `=${whole ? '@' : ''}${displayFormula(cell.f)}`;
+    return `=${whole ? '@' : ''}${toLocalFormula(displayFormula(cell.f), locale)}`;
   }
   if (cell.v == null) return '';
   if (cell.t === 'b') return cell.v ? 'TRUE' : 'FALSE';
@@ -234,11 +268,11 @@ export function editText(cell, code = 'General', date1904 = false, at = null) {
   if (code && code !== 'General' && isDateFormat(code) && cell.v >= 0) {
     const whole = Math.floor(cell.v);
     const frac = cell.v - whole;
-    const time = formatValue(cell.v, 'h:mm:ss AM/PM', { date1904 }).text;
+    const time = formatValue(cell.v, locale.hour12 ? 'h:mm:ss AM/PM' : 'h:mm:ss', { date1904 }).text;
     if (whole === 0 && !date1904) return time;
-    const date = formatValue(whole, 'm/d/yyyy', { date1904 }).text;
+    const date = formatValue(whole, locale.shortDate.replace(/y+/, 'yyyy'), { date1904 }).text;
     return frac ? `${date} ${time}` : date;
   }
-  if (code && PERCENT.test(code)) return `${Number((cell.v * 100).toPrecision(15))}%`;
-  return String(cell.v);
+  if (code && PERCENT.test(code)) return `${localDecimal(String(Number((cell.v * 100).toPrecision(15))), locale)}%`;
+  return localDecimal(String(cell.v), locale);
 }

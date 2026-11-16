@@ -6,6 +6,7 @@ import { formatCodeOf } from './styles.js';
 import { spanSheetRefs, mapRefs } from '../calc/tokens.js';
 import { FUNCTIONS } from '../calc/functions.js';
 import { topLevelHyperlink } from '../calc/hyperlinkcell.js';
+import { currentLocale } from './locale.js';
 
 /** A typed formula's 3D references as Excel takes them (measured): in the workbook's order, Apr:Jan!A1 as Jan:Apr!A1,
  *  and one sheet's, Jan:Jan!A1, as Jan!A1; the sheets named as the workbook names them. */
@@ -39,12 +40,12 @@ function namesAsWritten(wb, si, formula) {
 /**
  * The changes for `text` entered into cell (r, c) of sheet si: { content: { r, c, value } or { r, c, formula }, style:
  * { r, c, s } or null }, or { error } (a formula Excel wouldn't take). `today` gives the year of a date typed without
- * one.
+ * one; `locale` (locale.js) the separators and date order it is read in, the page's unless given.
  */
-export function entryChanges(wb, si, r, c, text, today = new Date()) {
+export function entryChanges(wb, si, r, c, text, today = new Date(), locale = currentLocale()) {
   const s = wb.sheet(si).cells.get(r)?.get(c)?.s || 0;
   const code = formatCodeOf(wb.styles, s);
-  const parsed = parseInput(text, { today, date1904: wb.date1904, asText: code === '@' });
+  const parsed = parseInput(text, { today, date1904: wb.date1904, asText: code === '@', locale });
   if (parsed.error) return { error: parsed.error };
   const content = parsed.formula != null ? { r, c, formula: namesAsWritten(wb, si, inOrder(wb, parsed.formula)), ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
   const format = formatAfterEntry(code, parsed);

@@ -1,0 +1,2501 @@
+{
+  "excel": "Excel.Application, UseSystemSeparators off, Range.Text (United States settings otherwise)",
+  "shown": [
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 1234.5,
+      "text": "1234,5"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": -0.5,
+      "text": "-0,5"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 1234567.891,
+      "text": "1234567,891"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 0.000123,
+      "text": "0,000123"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 1.5E+20,
+      "text": "1,5E+20"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 45356.75,
+      "text": "45356,75"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 0.0,
+      "text": "0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "General",
+      "value": 12.25,
+      "text": "12,25"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 1234.5,
+      "text": "1234,50"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": -0.5,
+      "text": "-0,50"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 1234567.891,
+      "text": "1234567,89"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 0.000123,
+      "text": "0,00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 1.5E+20,
+      "text": "150000000000000000000,00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 45356.75,
+      "text": "45356,75"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 0.0,
+      "text": "0,00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00",
+      "value": 12.25,
+      "text": "12,25"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 1234.5,
+      "text": "1.235"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": -0.5,
+      "text": "-1"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 1234567.891,
+      "text": "1.234.568"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 0.000123,
+      "text": "0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 1.5E+20,
+      "text": "150.000.000.000.000.000.000"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 45356.75,
+      "text": "45.357"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 0.0,
+      "text": "0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0",
+      "value": 12.25,
+      "text": "12"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 1234.5,
+      "text": "1.234,50"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": -0.5,
+      "text": "-0,50"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 1234567.891,
+      "text": "1.234.567,89"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 0.000123,
+      "text": "0,00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 1.5E+20,
+      "text": "150.000.000.000.000.000.000,00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 45356.75,
+      "text": "45.356,75"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 0.0,
+      "text": "0,00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00",
+      "value": 12.25,
+      "text": "12,25"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 1234.5,
+      "text": "123450,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": -0.5,
+      "text": "-50,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 1234567.891,
+      "text": "123456789,1%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 0.000123,
+      "text": "0,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 1.5E+20,
+      "text": "15000000000000000000000,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 45356.75,
+      "text": "4535675,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 0.0,
+      "text": "0,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.0%",
+      "value": 12.25,
+      "text": "1225,0%"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 1234.5,
+      "text": "1,23E+03"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": -0.5,
+      "text": "-5,00E-01"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 1234567.891,
+      "text": "1,23E+06"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 0.000123,
+      "text": "1,23E-04"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 1.5E+20,
+      "text": "1,50E+20"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 45356.75,
+      "text": "4,54E+04"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 0.0,
+      "text": "0,00E+00"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "0.00E+00",
+      "value": 12.25,
+      "text": "1,23E+01"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1234.5,
+      "text": "1.234,50 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": -0.5,
+      "text": "-0,50 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1234567.891,
+      "text": "1.234.567,89 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 0.000123,
+      "text": "0,00 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1.5E+20,
+      "text": "150.000.000.000.000.000.000,00 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 45356.75,
+      "text": "45.356,75 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 0.0,
+      "text": "0,00 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00 \"kr\"",
+      "value": 12.25,
+      "text": "12,25 kr"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 1234.5,
+      "text": "1k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": -0.5,
+      "text": "0k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 1234567.891,
+      "text": "1.235k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 0.000123,
+      "text": "0k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 1.5E+20,
+      "text": "150.000.000.000.000.000k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 45356.75,
+      "text": "45k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 0.0,
+      "text": "0k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0,\"k\"",
+      "value": 12.25,
+      "text": "0k"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 1234.5,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": -0.5,
+      "text": "############################################################"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 1234567.891,
+      "text": "23:02,4"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 0.000123,
+      "text": "00:10,6"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 1.5E+20,
+      "text": "############################################################"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 45356.75,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 0.0,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "mm:ss.0",
+      "value": 12.25,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 1234.5,
+      "text": "1234 1/2"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": -0.5,
+      "text": "- 1/2"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 1234567.891,
+      "text": "1234567 8/9"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 0.000123,
+      "text": "0    "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 1.5E+20,
+      "text": "150000000000000000000    "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 45356.75,
+      "text": "45356 3/4"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 0.0,
+      "text": "0    "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "# ?/?",
+      "value": 12.25,
+      "text": "12 1/4"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 1234.5,
+      "text": "v1.5 1234,5"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": -0.5,
+      "text": "-v1.5 0,5"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 1234567.891,
+      "text": "v1.5 1234567,9"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 0.000123,
+      "text": "v1.5 0,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 1.5E+20,
+      "text": "v1.5 150000000000000000000,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 45356.75,
+      "text": "v1.5 45356,8"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 0.0,
+      "text": "v1.5 0,0"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "\"v1.5 \"0.0",
+      "value": 12.25,
+      "text": "v1.5 12,3"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 1234.5,
+      "text": "5/18/1903"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": -0.5,
+      "text": "############################################################"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 1234567.891,
+      "text": "2/15/5280"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 0.000123,
+      "text": "1/0/1900"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 1.5E+20,
+      "text": "############################################################"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 45356.75,
+      "text": "3/5/2024"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 0.0,
+      "text": "1/0/1900"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "m/d/yyyy",
+      "value": 12.25,
+      "text": "1/12/1900"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1234.5,
+      "text": "1.234,50 "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": -0.5,
+      "text": "(0,50)"
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1234567.891,
+      "text": "1.234.567,89 "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 0.000123,
+      "text": "0,00 "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1.5E+20,
+      "text": "150.000.000.000.000.000.000,00 "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 45356.75,
+      "text": "45.356,75 "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 0.0,
+      "text": "0,00 "
+    },
+    {
+      "setting": "de",
+      "decimal": ",",
+      "group": ".",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 12.25,
+      "text": "12,25 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 1234.5,
+      "text": "1234,5"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": -0.5,
+      "text": "-0,5"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 1234567.891,
+      "text": "1234567,891"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 0.000123,
+      "text": "0,000123"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 1.5E+20,
+      "text": "1,5E+20"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 45356.75,
+      "text": "45356,75"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 0.0,
+      "text": "0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "General",
+      "value": 12.25,
+      "text": "12,25"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 1234.5,
+      "text": "1234,50"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": -0.5,
+      "text": "-0,50"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 1234567.891,
+      "text": "1234567,89"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 0.000123,
+      "text": "0,00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 1.5E+20,
+      "text": "150000000000000000000,00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 45356.75,
+      "text": "45356,75"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 0.0,
+      "text": "0,00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00",
+      "value": 12.25,
+      "text": "12,25"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 1234.5,
+      "text": "1 235"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": -0.5,
+      "text": "-1"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 1234567.891,
+      "text": "1 234 568"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 0.000123,
+      "text": "0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 1.5E+20,
+      "text": "150 000 000 000 000 000 000"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 45356.75,
+      "text": "45 357"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 0.0,
+      "text": "0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0",
+      "value": 12.25,
+      "text": "12"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 1234.5,
+      "text": "1 234,50"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": -0.5,
+      "text": "-0,50"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 1234567.891,
+      "text": "1 234 567,89"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 0.000123,
+      "text": "0,00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 1.5E+20,
+      "text": "150 000 000 000 000 000 000,00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 45356.75,
+      "text": "45 356,75"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 0.0,
+      "text": "0,00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00",
+      "value": 12.25,
+      "text": "12,25"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 1234.5,
+      "text": "123450,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": -0.5,
+      "text": "-50,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 1234567.891,
+      "text": "123456789,1%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 0.000123,
+      "text": "0,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 1.5E+20,
+      "text": "15000000000000000000000,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 45356.75,
+      "text": "4535675,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 0.0,
+      "text": "0,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.0%",
+      "value": 12.25,
+      "text": "1225,0%"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 1234.5,
+      "text": "1,23E+03"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": -0.5,
+      "text": "-5,00E-01"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 1234567.891,
+      "text": "1,23E+06"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 0.000123,
+      "text": "1,23E-04"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 1.5E+20,
+      "text": "1,50E+20"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 45356.75,
+      "text": "4,54E+04"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 0.0,
+      "text": "0,00E+00"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "0.00E+00",
+      "value": 12.25,
+      "text": "1,23E+01"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1234.5,
+      "text": "1 234,50 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": -0.5,
+      "text": "-0,50 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1234567.891,
+      "text": "1 234 567,89 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 0.000123,
+      "text": "0,00 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1.5E+20,
+      "text": "150 000 000 000 000 000 000,00 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 45356.75,
+      "text": "45 356,75 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 0.0,
+      "text": "0,00 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00 \"kr\"",
+      "value": 12.25,
+      "text": "12,25 kr"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 1234.5,
+      "text": "1k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": -0.5,
+      "text": "0k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 1234567.891,
+      "text": "1 235k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 0.000123,
+      "text": "0k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 1.5E+20,
+      "text": "150 000 000 000 000 000k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 45356.75,
+      "text": "45k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 0.0,
+      "text": "0k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0,\"k\"",
+      "value": 12.25,
+      "text": "0k"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 1234.5,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": -0.5,
+      "text": "############################################################"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 1234567.891,
+      "text": "23:02,4"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 0.000123,
+      "text": "00:10,6"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 1.5E+20,
+      "text": "############################################################"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 45356.75,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 0.0,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "mm:ss.0",
+      "value": 12.25,
+      "text": "00:00,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 1234.5,
+      "text": "1234 1/2"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": -0.5,
+      "text": "- 1/2"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 1234567.891,
+      "text": "1234567 8/9"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 0.000123,
+      "text": "0    "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 1.5E+20,
+      "text": "150000000000000000000    "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 45356.75,
+      "text": "45356 3/4"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 0.0,
+      "text": "0    "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "# ?/?",
+      "value": 12.25,
+      "text": "12 1/4"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 1234.5,
+      "text": "v1.5 1234,5"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": -0.5,
+      "text": "-v1.5 0,5"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 1234567.891,
+      "text": "v1.5 1234567,9"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 0.000123,
+      "text": "v1.5 0,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 1.5E+20,
+      "text": "v1.5 150000000000000000000,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 45356.75,
+      "text": "v1.5 45356,8"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 0.0,
+      "text": "v1.5 0,0"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "\"v1.5 \"0.0",
+      "value": 12.25,
+      "text": "v1.5 12,3"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 1234.5,
+      "text": "5/18/1903"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": -0.5,
+      "text": "############################################################"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 1234567.891,
+      "text": "2/15/5280"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 0.000123,
+      "text": "1/0/1900"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 1.5E+20,
+      "text": "############################################################"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 45356.75,
+      "text": "3/5/2024"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 0.0,
+      "text": "1/0/1900"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "m/d/yyyy",
+      "value": 12.25,
+      "text": "1/12/1900"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1234.5,
+      "text": "1 234,50 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": -0.5,
+      "text": "(0,50)"
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1234567.891,
+      "text": "1 234 567,89 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 0.000123,
+      "text": "0,00 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1.5E+20,
+      "text": "150 000 000 000 000 000 000,00 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 45356.75,
+      "text": "45 356,75 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 0.0,
+      "text": "0,00 "
+    },
+    {
+      "setting": "fr",
+      "decimal": ",",
+      "group": " ",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 12.25,
+      "text": "12,25 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 1234.5,
+      "text": "1234.5"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": -0.5,
+      "text": "-0.5"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 1234567.891,
+      "text": "1234567.891"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 0.000123,
+      "text": "0.000123"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 1.5E+20,
+      "text": "1.5E+20"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 45356.75,
+      "text": "45356.75"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 0.0,
+      "text": "0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "General",
+      "value": 12.25,
+      "text": "12.25"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 1234.5,
+      "text": "1234.50"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": -0.5,
+      "text": "-0.50"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 1234567.891,
+      "text": "1234567.89"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 0.000123,
+      "text": "0.00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 1.5E+20,
+      "text": "150000000000000000000.00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 45356.75,
+      "text": "45356.75"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 0.0,
+      "text": "0.00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00",
+      "value": 12.25,
+      "text": "12.25"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 1234.5,
+      "text": "1'235"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": -0.5,
+      "text": "-1"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 1234567.891,
+      "text": "1'234'568"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 0.000123,
+      "text": "0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 1.5E+20,
+      "text": "150'000'000'000'000'000'000"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 45356.75,
+      "text": "45'357"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 0.0,
+      "text": "0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0",
+      "value": 12.25,
+      "text": "12"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 1234.5,
+      "text": "1'234.50"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": -0.5,
+      "text": "-0.50"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 1234567.891,
+      "text": "1'234'567.89"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 0.000123,
+      "text": "0.00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 1.5E+20,
+      "text": "150'000'000'000'000'000'000.00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 45356.75,
+      "text": "45'356.75"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 0.0,
+      "text": "0.00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00",
+      "value": 12.25,
+      "text": "12.25"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 1234.5,
+      "text": "123450.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": -0.5,
+      "text": "-50.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 1234567.891,
+      "text": "123456789.1%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 0.000123,
+      "text": "0.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 1.5E+20,
+      "text": "15000000000000000000000.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 45356.75,
+      "text": "4535675.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 0.0,
+      "text": "0.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.0%",
+      "value": 12.25,
+      "text": "1225.0%"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 1234.5,
+      "text": "1.23E+03"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": -0.5,
+      "text": "-5.00E-01"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 1234567.891,
+      "text": "1.23E+06"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 0.000123,
+      "text": "1.23E-04"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 1.5E+20,
+      "text": "1.50E+20"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 45356.75,
+      "text": "4.54E+04"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 0.0,
+      "text": "0.00E+00"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "0.00E+00",
+      "value": 12.25,
+      "text": "1.23E+01"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1234.5,
+      "text": "1'234.50 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": -0.5,
+      "text": "-0.50 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1234567.891,
+      "text": "1'234'567.89 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 0.000123,
+      "text": "0.00 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 1.5E+20,
+      "text": "150'000'000'000'000'000'000.00 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 45356.75,
+      "text": "45'356.75 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 0.0,
+      "text": "0.00 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00 \"kr\"",
+      "value": 12.25,
+      "text": "12.25 kr"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 1234.5,
+      "text": "1k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": -0.5,
+      "text": "0k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 1234567.891,
+      "text": "1'235k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 0.000123,
+      "text": "0k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 1.5E+20,
+      "text": "150'000'000'000'000'000k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 45356.75,
+      "text": "45k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 0.0,
+      "text": "0k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0,\"k\"",
+      "value": 12.25,
+      "text": "0k"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 1234.5,
+      "text": "00:00.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": -0.5,
+      "text": "############################################################"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 1234567.891,
+      "text": "23:02.4"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 0.000123,
+      "text": "00:10.6"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 1.5E+20,
+      "text": "############################################################"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 45356.75,
+      "text": "00:00.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 0.0,
+      "text": "00:00.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "mm:ss.0",
+      "value": 12.25,
+      "text": "00:00.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 1234.5,
+      "text": "1234 1/2"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": -0.5,
+      "text": "- 1/2"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 1234567.891,
+      "text": "1234567 8/9"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 0.000123,
+      "text": "0    "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 1.5E+20,
+      "text": "150000000000000000000    "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 45356.75,
+      "text": "45356 3/4"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 0.0,
+      "text": "0    "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "# ?/?",
+      "value": 12.25,
+      "text": "12 1/4"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 1234.5,
+      "text": "v1.5 1234.5"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": -0.5,
+      "text": "-v1.5 0.5"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 1234567.891,
+      "text": "v1.5 1234567.9"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 0.000123,
+      "text": "v1.5 0.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 1.5E+20,
+      "text": "v1.5 150000000000000000000.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 45356.75,
+      "text": "v1.5 45356.8"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 0.0,
+      "text": "v1.5 0.0"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "\"v1.5 \"0.0",
+      "value": 12.25,
+      "text": "v1.5 12.3"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 1234.5,
+      "text": "5/18/1903"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": -0.5,
+      "text": "############################################################"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 1234567.891,
+      "text": "2/15/5280"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 0.000123,
+      "text": "1/0/1900"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 1.5E+20,
+      "text": "############################################################"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 45356.75,
+      "text": "3/5/2024"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 0.0,
+      "text": "1/0/1900"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "m/d/yyyy",
+      "value": 12.25,
+      "text": "1/12/1900"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1234.5,
+      "text": "1'234.50 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": -0.5,
+      "text": "(0.50)"
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1234567.891,
+      "text": "1'234'567.89 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 0.000123,
+      "text": "0.00 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 1.5E+20,
+      "text": "150'000'000'000'000'000'000.00 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 45356.75,
+      "text": "45'356.75 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 0.0,
+      "text": "0.00 "
+    },
+    {
+      "setting": "ch",
+      "decimal": ".",
+      "group": "'",
+      "code": "#,##0.00_);[Red](#,##0.00)",
+      "value": 12.25,
+      "text": "12.25 "
+    }
+  ]
+}
