@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.8.1
+
+- **Pictures, shapes and icons are drawn** on the grid, in print and in PDF, at Excel's place and size. They can be
+  selected, moved, sized and deleted as charts can, and Go To Special > Objects selects them all.
+- **Rich text.** Format Cells (Ctrl+1) for the selected characters while a cell is edited, and copy and paste keep a
+  cell's runs.
+- **Cell Styles:** Duplicate, Delete and Merge Styles.
+- **Several selected ranges.** Fill, AutoSum, row and column sizes, hiding, Print Selection and the other commands
+  that take a selection now act on each range as Excel does, or refuse with Excel's message.
+- **Fill > Across Worksheets**, with sheets grouped on the tabs.
+- **Hyperlinks:** Browse for File, and Create New Document through the new `onCreateDocument` option.
+- **Queries & Connections.** A pane listing the workbook's connections and Power Query queries; Refresh and Refresh
+  All through the new `onRefreshQuery` option; a query's M text shown and edited.
+- **Display.**
+  - East Asian built-in date formats are shown as Excel shows them, not as General.
+  - Column widths follow the Normal style font's own digit width, not always Calibri's.
+  - Gridlines are hidden under text that runs on into empty cells.
+- **Fix:** a merged range is drawn with only its outline's borders. The covered cells' own borders no longer show
+  inside it.
+- **Macros.** VBA is not supported, by decision: macros are never run, shown or edited. An .xlsm keeps its VBA
+  project byte for byte, so Excel still has it.
+
 ## 0.8.0
 
 - **Co-editing piece by piece.** Formats, row and column settings, inserted and deleted rows and columns, the sheet
