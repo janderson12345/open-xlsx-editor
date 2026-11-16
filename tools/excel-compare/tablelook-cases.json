@@ -1,0 +1,18 @@
+[
+  { "name": "medium2-default", "style": "TableStyleMedium2" },
+  { "name": "medium2-noheader", "style": "TableStyleMedium2", "header": false },
+  { "name": "medium2-totals-only", "style": "TableStyleMedium2", "totals": true, "rowStripes": false },
+  { "name": "medium2-first", "style": "TableStyleMedium2", "first": true },
+  { "name": "medium2-last-cols", "style": "TableStyleMedium2", "last": true, "colStripes": true, "rowStripes": false },
+  { "name": "medium2-none", "style": "TableStyleMedium2", "header": false, "rowStripes": false },
+  { "name": "light1-default", "style": "TableStyleLight1", "totals": true },
+  { "name": "light8-noheader-totals", "style": "TableStyleLight8", "header": false, "totals": true },
+  { "name": "light15-first-last", "style": "TableStyleLight15", "first": true, "last": true, "totals": true },
+  { "name": "dark1-cols", "style": "TableStyleDark1", "colStripes": true, "totals": true },
+  { "name": "no-style", "style": "" },
+  { "name": "medium2-own", "style": "TableStyleMedium2", "totals": true, "own": [
+    { "cell": "B2", "fill": 255 }, { "cell": "C3", "font": 16711680 }, { "cell": "D2", "bold": false },
+    { "cell": "E4", "border": true }, { "cell": "F3", "font": 0 }, { "cell": "C2", "font": 0 }, { "cell": "D4", "fill": 16777215 } ] },
+  { "name": "light9-own", "style": "TableStyleLight9", "own": [
+    { "cell": "C2", "font": 0 }, { "cell": "D3", "border": true }, { "cell": "E2", "bold": true } ] }
+]

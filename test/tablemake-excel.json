@@ -1,0 +1,1250 @@
+[
+  {
+    "name": "add",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{45AC832C-FE59-424A-919B-4CC8EEB37183}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{45AC832C-FE59-424A-919B-4CC8EEB37183}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{1846F22B-A0A7-4102-BB73-14A91E5B844D}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{5F36DA92-67BF-4473-A4CB-D573344E63F4}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{CBF05918-DBC6-4F3D-88C9-E3E115206481}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{6C4A3384-13D0-406B-B8EC-29A087E0A107}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-noheaders",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B3:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Column1",
+        "Column2",
+        "Column3",
+        "Column4"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>13</v></c><c r=\"C3\" t=\"s\"><v>14</v></c><c r=\"D3\" t=\"s\"><v>15</v></c><c r=\"E3\" t=\"s\"><v>16</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>4</v></c><c r=\"C4\" t=\"s\"><v>5</v></c><c r=\"D4\"><v>30</v></c><c r=\"E4\"><v>1.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>6</v></c><c r=\"C5\" t=\"s\"><v>7</v></c><c r=\"D5\"><v>10</v></c><c r=\"E5\"><v>0.5</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>8</v></c><c r=\"C6\" t=\"s\"><v>9</v></c><c r=\"D6\"><v>20</v></c><c r=\"E6\"><v>2</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>10</v></c><c r=\"C7\" t=\"s\"><v>11</v></c><c r=\"D7\"><v>50</v></c><c r=\"E7\"><v>3</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>4</v></c><c r=\"C8\" t=\"s\"><v>12</v></c><c r=\"D8\"><v>40</v></c><c r=\"E8\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{8BE3433F-B2F2-4A7A-9EB6-22C1BBBDEB87}\" name=\"Table1\" displayName=\"Table1\" ref=\"B3:E8\" totalsRowShown=\"0\"><autoFilter ref=\"B3:E8\" xr:uid=\"{8BE3433F-B2F2-4A7A-9EB6-22C1BBBDEB87}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{4D9C89FA-42FB-47C3-9B41-CCEC4BFBAF2E}\" name=\"Column1\"/><tableColumn id=\"2\" xr3:uid=\"{F9D092BD-9FD7-47AF-B8E5-873FB2E0C56E}\" name=\"Column2\"/><tableColumn id=\"3\" xr3:uid=\"{DE4AEF9C-8E03-49D3-A1D7-7F0A6082C879}\" name=\"Column3\"/><tableColumn id=\"4\" xr3:uid=\"{37A5934E-E44F-441C-9158-30BD0F221C9A}\" name=\"Column4\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-numbers-guess",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:D5",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Column1",
+        "Column2",
+        "Column3"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c></row><row r=\"3\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B3\"><v>1</v></c><c r=\"C3\"><v>2</v></c><c r=\"D3\"><v>3</v></c></row><row r=\"4\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B4\"><v>4</v></c><c r=\"C4\"><v>5</v></c><c r=\"D4\"><v>6</v></c></row><row r=\"5\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B5\"><v>7</v></c><c r=\"C5\"><v>8</v></c><c r=\"D5\"><v>9</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{51D234D0-DFB7-41F0-A207-C9CA6ED7609F}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:D5\" totalsRowShown=\"0\"><autoFilter ref=\"B2:D5\" xr:uid=\"{51D234D0-DFB7-41F0-A207-C9CA6ED7609F}\"/><tableColumns count=\"3\"><tableColumn id=\"1\" xr3:uid=\"{5761F7A5-E619-4482-9010-F5A0DBF8AFCD}\" name=\"Column1\"/><tableColumn id=\"2\" xr3:uid=\"{650E784B-C384-4D22-9DF9-16CC5B8B3D13}\" name=\"Column2\"/><tableColumn id=\"3\" xr3:uid=\"{795A771F-7A23-40C3-B7FD-941252F8580A}\" name=\"Column3\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-numbers-no",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:D5",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Column1",
+        "Column2",
+        "Column3"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c></row><row r=\"3\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B3\"><v>1</v></c><c r=\"C3\"><v>2</v></c><c r=\"D3\"><v>3</v></c></row><row r=\"4\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B4\"><v>4</v></c><c r=\"C4\"><v>5</v></c><c r=\"D4\"><v>6</v></c></row><row r=\"5\" spans=\"2:4\" x14ac:dyDescent=\"0.25\"><c r=\"B5\"><v>7</v></c><c r=\"C5\"><v>8</v></c><c r=\"D5\"><v>9</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{6F374B14-25B2-416A-A9E8-F921A929F1B0}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:D5\" totalsRowShown=\"0\"><autoFilter ref=\"B2:D5\" xr:uid=\"{6F374B14-25B2-416A-A9E8-F921A929F1B0}\"/><tableColumns count=\"3\"><tableColumn id=\"1\" xr3:uid=\"{FC0F2565-4067-4AB9-9DC3-B7E84F10D83E}\" name=\"Column1\"/><tableColumn id=\"2\" xr3:uid=\"{82F35913-0E22-4CB6-895E-A7B5D4C6922E}\" name=\"Column2\"/><tableColumn id=\"3\" xr3:uid=\"{1EB6F6D8-0E72-4DFA-92FF-4AC28B52DF18}\" name=\"Column3\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-heads",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:F4",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Qty",
+        "2024",
+        "Column1",
+        "Qty2",
+        "2"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>3</v></c><c r=\"D2\" t=\"s\"><v>4</v></c><c r=\"E2\" t=\"s\"><v>5</v></c><c r=\"F2\" t=\"s\"><v>6</v></c></row><row r=\"3\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>1</v></c><c r=\"C3\"><v>1</v></c><c r=\"D3\"><v>2</v></c><c r=\"E3\"><v>3</v></c><c r=\"F3\"><v>4</v></c></row><row r=\"4\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>2</v></c><c r=\"C4\"><v>5</v></c><c r=\"D4\"><v>6</v></c><c r=\"E4\"><v>7</v></c><c r=\"F4\"><v>8</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{C0C9309C-1F74-45CB-8A97-F763669602A2}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:F4\" totalsRowShown=\"0\"><autoFilter ref=\"B2:F4\" xr:uid=\"{C0C9309C-1F74-45CB-8A97-F763669602A2}\"/><tableColumns count=\"5\"><tableColumn id=\"1\" xr3:uid=\"{E558C86B-9D29-4B69-A52B-70208BB58F95}\" name=\"Qty\"/><tableColumn id=\"2\" xr3:uid=\"{1C4E808C-5182-4833-B9B2-CCA9F9437B24}\" name=\"2024\"/><tableColumn id=\"3\" xr3:uid=\"{4B7A486F-3504-405A-8B37-95BF0D84378B}\" name=\"Column1\"/><tableColumn id=\"4\" xr3:uid=\"{6BDE34A1-DE37-4742-B8BB-637C81A754D8}\" name=\"Qty2\"/><tableColumn id=\"5\" xr3:uid=\"{03F92E70-1AC1-496C-8817-E925FC4690FB}\" name=\"2\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-one-row",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E3",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>4</v></c><c r=\"C4\" t=\"s\"><v>5</v></c><c r=\"D4\"><v>30</v></c><c r=\"E4\"><v>1.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>6</v></c><c r=\"C5\" t=\"s\"><v>7</v></c><c r=\"D5\"><v>10</v></c><c r=\"E5\"><v>0.5</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>8</v></c><c r=\"C6\" t=\"s\"><v>9</v></c><c r=\"D6\"><v>20</v></c><c r=\"E6\"><v>2</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>10</v></c><c r=\"C7\" t=\"s\"><v>11</v></c><c r=\"D7\"><v>50</v></c><c r=\"E7\"><v>3</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>4</v></c><c r=\"C8\" t=\"s\"><v>12</v></c><c r=\"D8\"><v>40</v></c><c r=\"E8\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{D3547E13-7A94-40B1-BAFF-41835376CDD9}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E3\" insertRow=\"1\" insertRowShift=\"1\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E3\" xr:uid=\"{D3547E13-7A94-40B1-BAFF-41835376CDD9}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{805C333A-6843-48A0-B8E4-9F0333D55E3F}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{FE0E5C59-E143-47DC-8F59-C3C45AD618FD}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{2E3B005C-943A-47E0-A561-D4472A51448D}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{272E8BC6-1448-4B07-A439-526F80B4A5A9}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-empty",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "H2:J5",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Column1",
+        "Column2",
+        "Column3"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c><c r=\"H2\" t=\"s\"><v>13</v></c><c r=\"I2\" t=\"s\"><v>14</v></c><c r=\"J2\" t=\"s\"><v>15</v></c></row><row r=\"3\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{4CD99455-455D-4B7B-9021-1824C92B1C6D}\" name=\"Table1\" displayName=\"Table1\" ref=\"H2:J5\" totalsRowShown=\"0\"><autoFilter ref=\"H2:J5\" xr:uid=\"{4CD99455-455D-4B7B-9021-1824C92B1C6D}\"/><tableColumns count=\"3\"><tableColumn id=\"1\" xr3:uid=\"{54213DA5-B75A-45E5-8EFF-C5548DCE3BB0}\" name=\"Column1\"/><tableColumn id=\"2\" xr3:uid=\"{90294F51-74F4-4179-8428-FABB11C63153}\" name=\"Column2\"/><tableColumn id=\"3\" xr3:uid=\"{9A75D1D0-F811-45E3-BB8E-DB7882FC75C8}\" name=\"Column3\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "add-empty-no",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "H2:J6",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Column1",
+        "Column2",
+        "Column3"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c><c r=\"H2\" t=\"s\"><v>13</v></c><c r=\"I2\" t=\"s\"><v>14</v></c><c r=\"J2\" t=\"s\"><v>15</v></c></row><row r=\"3\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:10\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{BFE72B0E-5E70-4DE8-BC92-1C519E90D7F7}\" name=\"Table1\" displayName=\"Table1\" ref=\"H2:J6\" totalsRowShown=\"0\"><autoFilter ref=\"H2:J6\" xr:uid=\"{BFE72B0E-5E70-4DE8-BC92-1C519E90D7F7}\"/><tableColumns count=\"3\"><tableColumn id=\"1\" xr3:uid=\"{089FE615-3E4B-42CB-B59F-EB8FBE41C1B5}\" name=\"Column1\"/><tableColumn id=\"2\" xr3:uid=\"{9A22D869-3DC8-48C4-9DC6-F66C404DF72C}\" name=\"Column2\"/><tableColumn id=\"3\" xr3:uid=\"{A7F33253-3992-4FD7-BDE3-F5AE608DFECE}\" name=\"Column3\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "style-light9",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleLight9",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{F7563325-3800-43D4-8BD2-2282A105B487}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{F7563325-3800-43D4-8BD2-2282A105B487}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{9FC3ADF8-ED41-414A-84A5-9AE18055269C}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{126E0818-9FE6-4A7E-BB64-9E0876F381E2}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{658C679C-9473-46CB-BE2C-0C962CEFE825}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{DC8FDFD5-CC1D-43AF-9F26-DF42368E5DA8}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleLight9\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "style-none",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{1D8E2C4A-0AE9-4F86-834B-1A8B15472BEE}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{1D8E2C4A-0AE9-4F86-834B-1A8B15472BEE}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{3623D239-6810-4D68-B572-C5C60D5A5AC1}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{6262532B-5F3E-4E43-9C19-9C8C34BF2DA1}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{339E8D46-ACB2-425A-A8D5-86491CBE824B}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{8531B141-A7FE-4CC0-A857-FECA56935B17}\" name=\"Price\"/></tableColumns><tableStyleInfo showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "two-tables",
+    "errors": [],
+    "com": {
+      "name": "Table2",
+      "range": "H2:I4",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Column1",
+        "Column2"
+      ],
+      "totalsCalc": [
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:9\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c><c r=\"H2\" t=\"s\"><v>13</v></c><c r=\"I2\" t=\"s\"><v>14</v></c></row><row r=\"3\" spans=\"2:9\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:9\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:9\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:9\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:9\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"2\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table2.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>",
+      "<Override PartName=\"/xl/tables/table2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{029F9D14-A15D-4661-AC0A-6D54D67A0697}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:C7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:C7\" xr:uid=\"{029F9D14-A15D-4661-AC0A-6D54D67A0697}\"/><tableColumns count=\"2\"><tableColumn id=\"1\" xr3:uid=\"{ED9F00E3-9458-4B1F-8B92-BCEFCD58B481}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{5691F67E-27A3-424A-9EB2-BD335D7DB947}\" name=\"Item\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      },
+      {
+        "path": "xl/tables/table2.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"2\" xr:uid=\"{54AA6591-0BAD-4B00-92CD-1F385D30FE24}\" name=\"Table2\" displayName=\"Table2\" ref=\"H2:I4\" totalsRowShown=\"0\"><autoFilter ref=\"H2:I4\" xr:uid=\"{54AA6591-0BAD-4B00-92CD-1F385D30FE24}\"/><tableColumns count=\"2\"><tableColumn id=\"1\" xr3:uid=\"{6997FF3E-9F75-4E2D-AC58-78FF48394E14}\" name=\"Column1\"/><tableColumn id=\"2\" xr3:uid=\"{81BFBFC5-D760-4AC6-80D2-B9179EC21C40}\" name=\"Column2\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "totals",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>13</v></c><c r=\"E8\"><f>SUBTOTAL(109,Table1[Price])</f><v>9.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{684D08C1-9160-42F1-A4F2-E1F1FA6CCB40}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{684D08C1-9160-42F1-A4F2-E1F1FA6CCB40}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{021D9627-CBD5-468D-937F-4313D567F988}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{1256A907-A43B-4AFA-9E67-1E9FDCBAC465}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{EBEF2404-7D87-45EE-BFC3-8BAA7A6E0529}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{5BE4DAFA-1C02-4252-9506-F227B4DB19DC}\" name=\"Price\" totalsRowFunction=\"sum\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "totals-text-last",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:C8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item"
+      ],
+      "totalsCalc": [
+        0,
+        3
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>13</v></c><c r=\"C8\"><f>SUBTOTAL(103,Table1[Item])</f><v>5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{FACF1DCB-7441-4D52-A715-21A24139B066}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:C8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:C7\" xr:uid=\"{FACF1DCB-7441-4D52-A715-21A24139B066}\"/><tableColumns count=\"2\"><tableColumn id=\"1\" xr3:uid=\"{759BF4E0-B6D1-450C-9317-79ABE2EE523F}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{28D5FD5B-2B38-49AE-B425-D5BB803EE442}\" name=\"Item\" totalsRowFunction=\"count\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "totals-off",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{E9D2BBC7-9851-4CD1-9E5D-D8CB13A01379}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\"><autoFilter ref=\"B2:E7\" xr:uid=\"{E9D2BBC7-9851-4CD1-9E5D-D8CB13A01379}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{0F5C6B1A-347F-447A-8109-1259C33289C4}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{CE8687B6-C174-47FE-9CE1-865468253933}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{0D0D5A0F-BCBA-4159-84C2-5D16EB187049}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{D798D287-7921-409A-B395-0BC0195401BB}\" name=\"Price\" totalsRowFunction=\"sum\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "totals-off-on",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        2,
+        1
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>13</v></c><c r=\"D8\"><f>SUBTOTAL(101,Table1[Qty])</f><v>30</v></c><c r=\"E8\"><f>SUBTOTAL(109,Table1[Price])</f><v>9.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{885467B0-6B21-4048-B3A7-67B5FED8617E}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{885467B0-6B21-4048-B3A7-67B5FED8617E}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{36877670-D226-4AC2-8D1C-D148E09FC7C4}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{2F91B97C-5E8D-4AB6-8AAF-27CE6E91A846}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{D81A0D24-441C-45AF-9EC6-D874182A3DC4}\" name=\"Qty\" totalsRowFunction=\"average\"/><tableColumn id=\"4\" xr3:uid=\"{5B187D04-5583-44CB-92D3-7EDB3A99C243}\" name=\"Price\" totalsRowFunction=\"sum\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "totals-below-filled",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>14</v></c><c r=\"E8\"><f>SUBTOTAL(109,Table1[Price])</f><v>9.5</v></c></row><row r=\"9\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"C9\" t=\"s\"><v>13</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{35293A10-F499-484E-8ACB-4E44F9B48FEC}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{35293A10-F499-484E-8ACB-4E44F9B48FEC}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{BA759FAE-1F50-4D40-96BA-17E2A1D3CED3}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{F0E42221-BC9C-4567-A5D2-A1D3BC92C978}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{6C49E97C-2095-4AF5-BEBC-4937C46F1456}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{4C113CDD-AD11-48B3-9690-3845BB675024}\" name=\"Price\" totalsRowFunction=\"sum\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "calc-each",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        3,
+        4,
+        2,
+        6
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\"><f>SUBTOTAL(103,Table1[Region])</f><v>5</v></c><c r=\"C8\"><f>SUBTOTAL(102,Table1[Item])</f><v>0</v></c><c r=\"D8\"><f>SUBTOTAL(101,Table1[Qty])</f><v>30</v></c><c r=\"E8\"><f>SUBTOTAL(104,Table1[Price])</f><v>3</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{E609C71D-2B0C-4DF1-82AC-DA73516E9AC0}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{E609C71D-2B0C-4DF1-82AC-DA73516E9AC0}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{AF97B554-F063-4A30-8E2F-AD1205666EB0}\" name=\"Region\" totalsRowFunction=\"count\"/><tableColumn id=\"2\" xr3:uid=\"{F5AB9C2A-9FE7-4A51-B3A0-8F2765707FC2}\" name=\"Item\" totalsRowFunction=\"countNums\"/><tableColumn id=\"3\" xr3:uid=\"{1A08CA4C-2BA3-4491-AE98-DF64A033A070}\" name=\"Qty\" totalsRowFunction=\"average\"/><tableColumn id=\"4\" xr3:uid=\"{C3DF08F7-4927-45F4-B8FC-04D9E8198BB5}\" name=\"Price\" totalsRowFunction=\"max\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "calc-rest",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        5,
+        7,
+        8,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\"><f>SUBTOTAL(105,Table1[Region])</f><v>0</v></c><c r=\"C8\" t=\"e\"><f>SUBTOTAL(107,Table1[Item])</f><v>#DIV/0!</v></c><c r=\"D8\"><f>SUBTOTAL(110,Table1[Qty])</f><v>250</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{F08A840B-575E-4125-A56B-0E09C23C1DC1}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{F08A840B-575E-4125-A56B-0E09C23C1DC1}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{3D0D5DB9-F62A-440E-A67F-063299F83226}\" name=\"Region\" totalsRowFunction=\"min\"/><tableColumn id=\"2\" xr3:uid=\"{43AC7252-26D0-46D4-829B-D8AD5D6D4D2F}\" name=\"Item\" totalsRowFunction=\"stdDev\"/><tableColumn id=\"3\" xr3:uid=\"{C5F9CFDF-340C-4ADE-9983-C966521A4241}\" name=\"Qty\" totalsRowFunction=\"var\"/><tableColumn id=\"4\" xr3:uid=\"{135DE476-9751-4FBB-B94C-1D9F6F7DB638}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "calc-sum",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>13</v></c><c r=\"D8\"><f>SUBTOTAL(109,Table1[Qty])</f><v>150</v></c><c r=\"E8\"><f>SUBTOTAL(109,Table1[Price])</f><v>9.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{D33C52A9-ED80-4FE3-8CC8-FA6525DBFC1C}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{D33C52A9-ED80-4FE3-8CC8-FA6525DBFC1C}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{5EBB11BD-BE76-4A35-9044-ACF8AA07C681}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{2FF5002C-6128-4F29-9D02-9E34C49A501A}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{1ACC7C11-112E-4BA8-85E0-6863F096971A}\" name=\"Qty\" totalsRowFunction=\"sum\"/><tableColumn id=\"4\" xr3:uid=\"{05A2625D-2ADB-43FE-B230-3D0FE30870B3}\" name=\"Price\" totalsRowFunction=\"sum\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "calc-custom",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        9,
+        1
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>13</v></c><c r=\"D8\"><f>MAX(Table1[Qty])*2</f><v>100</v></c><c r=\"E8\"><f>SUBTOTAL(109,Table1[Price])</f><v>9.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{71B013F6-C4B5-44A1-BCE4-9F8458E639DF}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{71B013F6-C4B5-44A1-BCE4-9F8458E639DF}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{B3F1B2F5-F94F-4E98-B858-F4B7D7F0F11C}\" name=\"Region\" totalsRowLabel=\"All\"/><tableColumn id=\"2\" xr3:uid=\"{A237F077-4554-4FDC-9699-D1AA06674782}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{52718BF1-4325-4872-841D-27FB813B2F95}\" name=\"Qty\" totalsRowFunction=\"custom\"><totalsRowFormula>MAX(Table1[Qty])*2</totalsRowFormula></tableColumn><tableColumn id=\"4\" xr3:uid=\"{2761909C-CFA1-40BA-9288-67B1DC70FDDF}\" name=\"Price\" totalsRowFunction=\"sum\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "headers-off",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B3:E7",
+      "style": "TableStyleMedium2",
+      "headers": false,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>0</v></c><c r=\"C3\" t=\"s\"><v>1</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>2</v></c><c r=\"C4\" t=\"s\"><v>3</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>4</v></c><c r=\"C5\" t=\"s\"><v>5</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>6</v></c><c r=\"C6\" t=\"s\"><v>7</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>0</v></c><c r=\"C7\" t=\"s\"><v>8</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{E7A71AE9-DD6C-4EBA-9456-BBB0DF8F6977}\" name=\"Table1\" displayName=\"Table1\" ref=\"B3:E7\" headerRowCount=\"0\" totalsRowShown=\"0\"><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{9A40742B-46C3-4B1F-979B-BEB5C0521AD3}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{93FF2F12-414B-460A-8FDE-496ECE1999A4}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{F841E6C6-AF13-4EB9-9737-E7CA35CDF2ED}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{02CE1709-62E7-4A5A-8772-EB5F2E1B72C0}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "headers-off-on",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{DB764621-8859-49E9-BDAD-CA67ABD369E1}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{DB764621-8859-49E9-BDAD-CA67ABD369E1}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{93806CE3-6490-4B21-88B7-253EEFAFC0A4}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{C5B7BF67-EEE8-4B69-8EDA-127D800AAAB3}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{C786F3A9-B10C-44B0-B18D-F4316CE360B3}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{CB72C9C0-6F81-4282-A60B-35B7FD09E64B}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "options",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{DAAA6807-2A75-4A94-BD51-D8698FD21DB3}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{DAAA6807-2A75-4A94-BD51-D8698FD21DB3}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{89A18AB6-360C-4062-8724-2C72672B7150}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{B6FAE79C-8178-4F2B-9C78-C91BECB91654}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{DE00DDF3-5B3E-46A4-9181-6E672725D3D2}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{C93F8440-491A-49C0-B477-CE612CA78EA5}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"1\" showLastColumn=\"1\" showRowStripes=\"0\" showColumnStripes=\"1\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "no-filter-button",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{C725789D-2753-4C8F-80F1-23B36FF1AA9F}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{C725789D-2753-4C8F-80F1-23B36FF1AA9F}\"><filterColumn colId=\"0\" hiddenButton=\"1\"/><filterColumn colId=\"1\" hiddenButton=\"1\"/><filterColumn colId=\"2\" hiddenButton=\"1\"/><filterColumn colId=\"3\" hiddenButton=\"1\"/></autoFilter><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{59F8830C-23EC-463A-B0BB-A7CFA6EF75BC}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{C3A897C1-0F5B-4B99-B21F-59A3571F82A6}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{F44FAE3C-4F2A-47F5-BB1D-E2ED4C55D66B}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{8160AC1A-99C1-42A8-81EA-76F48A32BE47}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "no-autofilter",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{81F1CE36-4E6D-42EE-9988-4FCE662C5F50}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{B5008058-126D-49AA-A309-121066F2BEA1}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{917C688C-3DE2-4E80-B927-317B9517B9EA}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{783C5BEE-48DE-4410-AA5D-34C4174DD8F8}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{8F1268A9-FFAF-4B75-A71A-1C33CD9596C1}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "rename",
+    "errors": [],
+    "com": {
+      "name": "Sales",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c><c r=\"G3\"><f>SUM(Sales[Qty])</f><v>150</v></c></row><row r=\"4\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{8580DF6F-4FC1-4B87-BE04-C2E32AF974DF}\" name=\"Sales\" displayName=\"Sales\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{8580DF6F-4FC1-4B87-BE04-C2E32AF974DF}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{404B1EBC-4031-406F-A944-9330070E2B76}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{2CBBE897-D828-4611-A5BC-F4E2C07331F7}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{59EC707F-D264-4DB9-9DDA-BE46464B94EB}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{8A0EF2B6-8A09-45F2-AA83-087B2ACFDB3A}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "rename-bad",
+    "errors": [],
+    "com": {
+      "name": "Ok_name",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{2D1E9D77-0C37-4B55-AA98-A62483648792}\" name=\"Ok_name\" displayName=\"Ok_name\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{2D1E9D77-0C37-4B55-AA98-A62483648792}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{E48B8CEF-E28C-4CA1-AC50-00967EA1623E}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{FFAD7519-E50B-49B5-9F14-354B04C4AA12}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{7FD8E71A-962B-409A-95BA-FF4201F9DC24}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{3C78E970-08DA-4DAB-9379-C43954F0010F}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "resize-grow",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{7E07188B-D88D-40AF-BB07-5A136CE5F481}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{7E07188B-D88D-40AF-BB07-5A136CE5F481}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{68782C88-A771-47B1-98CD-0D7FE6080A22}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{3505254D-30F6-4C56-B3C7-C787A0C2A04D}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{EC924D45-2CC9-4069-A2FF-2D595D82FA4D}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{15438E50-E5D3-45CF-A490-4A8AF9400169}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "resize-shrink",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:C4",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item"
+      ],
+      "totalsCalc": [
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{FA11B202-D15C-43CB-BB4A-801D71DADBB6}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:C4\" totalsRowShown=\"0\"><autoFilter ref=\"B2:C4\" xr:uid=\"{FA11B202-D15C-43CB-BB4A-801D71DADBB6}\"/><tableColumns count=\"2\"><tableColumn id=\"1\" xr3:uid=\"{0E8E47FE-A3B0-4398-AB59-2D9DA56C27D8}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{D0C3CD51-9E56-4B83-B52B-D55763D300D2}\" name=\"Item\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "resize-totals",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": true,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" t=\"s\"><v>13</v></c><c r=\"D8\"><f>SUBTOTAL(109,Table1[Qty])</f><v>150</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{4B0A3896-4488-4506-8513-BE6D24F1DDF0}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowCount=\"1\"><autoFilter ref=\"B2:E7\" xr:uid=\"{4B0A3896-4488-4506-8513-BE6D24F1DDF0}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{1B2A37C8-C5C2-4881-A5FD-CBF31AA14DC0}\" name=\"Region\" totalsRowLabel=\"Total\"/><tableColumn id=\"2\" xr3:uid=\"{5796DD0D-765E-4F5C-AB54-CF68CC3448C6}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{C3D99161-41C3-4C57-A528-1B615A7D3903}\" name=\"Qty\" totalsRowFunction=\"sum\"/><tableColumn id=\"4\" xr3:uid=\"{B9663EFE-7969-43F7-BB25-A0901544EA25}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "unlist",
+    "errors": [],
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" s=\"4\" t=\"s\"><v>0</v></c><c r=\"C2\" s=\"5\" t=\"s\"><v>1</v></c><c r=\"D2\" s=\"5\" t=\"s\"><v>2</v></c><c r=\"E2\" s=\"6\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" s=\"7\" t=\"s\"><v>4</v></c><c r=\"C3\" s=\"8\" t=\"s\"><v>5</v></c><c r=\"D3\" s=\"8\"><v>30</v></c><c r=\"E3\" s=\"9\"><v>1.5</v></c><c r=\"G3\"><f>SUM(Sheet1!$D$3:$D$7)</f><v>150</v></c></row><row r=\"4\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" s=\"10\" t=\"s\"><v>6</v></c><c r=\"C4\" s=\"11\" t=\"s\"><v>7</v></c><c r=\"D4\" s=\"11\"><v>10</v></c><c r=\"E4\" s=\"12\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" s=\"7\" t=\"s\"><v>8</v></c><c r=\"C5\" s=\"8\" t=\"s\"><v>9</v></c><c r=\"D5\" s=\"8\"><v>20</v></c><c r=\"E5\" s=\"9\"><v>2</v></c></row><row r=\"6\" spans=\"2:7\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" s=\"10\" t=\"s\"><v>10</v></c><c r=\"C6\" s=\"11\" t=\"s\"><v>11</v></c><c r=\"D6\" s=\"11\"><v>50</v></c><c r=\"E6\" s=\"12\"><v>3</v></c></row><row r=\"7\" spans=\"2:7\" ht=\"15.75\" thickBot=\"1\" x14ac:dyDescent=\"0.3\"><c r=\"B7\" s=\"7\" t=\"s\"><v>4</v></c><c r=\"C7\" s=\"8\" t=\"s\"><v>12</v></c><c r=\"D7\" s=\"8\"><v>40</v></c><c r=\"E7\" s=\"9\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:7\" ht=\"15.75\" thickTop=\"1\" x14ac:dyDescent=\"0.25\"><c r=\"B8\" s=\"1\" t=\"s\"><v>13</v></c><c r=\"C8\" s=\"2\"/>",
+    "tableParts": null,
+    "sheetRels": null,
+    "contentTypes": [],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"13\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"1\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"2\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"2\" fillId=\"0\" borderId=\"3\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"1\" fillId=\"3\" borderId=\"4\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"1\" fillId=\"3\" borderId=\"5\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"1\" fillId=\"3\" borderId=\"6\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"2\" borderId=\"4\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"2\" borderId=\"5\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"2\" borderId=\"6\" xfId=\"0\" applyFont=\"1\" applyFill=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"4\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"5\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\"/><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"6\" xfId=\"0\" applyFont=\"1\" applyBorder=\"1\"/></cellXfs>",
+    "tables": []
+  },
+  {
+    "name": "rename-header",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E7",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Count",
+        "Column1"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>11</v></c><c r=\"E2\" t=\"s\"><v>12</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>2</v></c><c r=\"C3\" t=\"s\"><v>3</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>4</v></c><c r=\"C4\" t=\"s\"><v>5</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>6</v></c><c r=\"C5\" t=\"s\"><v>7</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>8</v></c><c r=\"C6\" t=\"s\"><v>9</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>2</v></c><c r=\"C7\" t=\"s\"><v>10</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{36698C66-A9BA-486C-92C9-CE3A484008BD}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E7\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E7\" xr:uid=\"{36698C66-A9BA-486C-92C9-CE3A484008BD}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{EB19367F-8B9C-4F1D-9039-15CDED33ED2D}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{21AC9BA9-19C2-496A-86B9-2F0F203E0B48}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{AADDC0CD-E0EB-4F5E-9E94-FC2F79367883}\" name=\"Count\"/><tableColumn id=\"4\" xr3:uid=\"{EC1C50AA-CFEA-41A9-A8D5-91E3467914CD}\" name=\"Column1\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  },
+  {
+    "name": "type-below",
+    "errors": [],
+    "com": {
+      "name": "Table1",
+      "range": "B2:E8",
+      "style": "TableStyleMedium2",
+      "headers": true,
+      "totals": false,
+      "columns": [
+        "Region",
+        "Item",
+        "Qty",
+        "Price"
+      ],
+      "totalsCalc": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "sheetData": "<sheetData><row r=\"2\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B2\" t=\"s\"><v>0</v></c><c r=\"C2\" t=\"s\"><v>1</v></c><c r=\"D2\" t=\"s\"><v>2</v></c><c r=\"E2\" t=\"s\"><v>3</v></c></row><row r=\"3\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B3\" t=\"s\"><v>4</v></c><c r=\"C3\" t=\"s\"><v>5</v></c><c r=\"D3\"><v>30</v></c><c r=\"E3\"><v>1.5</v></c></row><row r=\"4\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B4\" t=\"s\"><v>6</v></c><c r=\"C4\" t=\"s\"><v>7</v></c><c r=\"D4\"><v>10</v></c><c r=\"E4\"><v>0.5</v></c></row><row r=\"5\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B5\" t=\"s\"><v>8</v></c><c r=\"C5\" t=\"s\"><v>9</v></c><c r=\"D5\"><v>20</v></c><c r=\"E5\"><v>2</v></c></row><row r=\"6\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B6\" t=\"s\"><v>10</v></c><c r=\"C6\" t=\"s\"><v>11</v></c><c r=\"D6\"><v>50</v></c><c r=\"E6\"><v>3</v></c></row><row r=\"7\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"B7\" t=\"s\"><v>4</v></c><c r=\"C7\" t=\"s\"><v>12</v></c><c r=\"D7\"><v>40</v></c><c r=\"E7\"><v>2.5</v></c></row><row r=\"8\" spans=\"2:5\" x14ac:dyDescent=\"0.25\"><c r=\"C8\" t=\"s\"><v>13</v></c></row></sheetData>",
+    "tableParts": "<tableParts count=\"1\"><tablePart r:id=\"rId1\"/>",
+    "sheetRels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/table\" Target=\"../tables/table1.xml\"/></Relationships>",
+    "contentTypes": [
+      "<Override PartName=\"/xl/tables/table1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml\"/>"
+    ],
+    "definedNames": null,
+    "dxfs": "<dxfs count=\"0\"/>",
+    "tableStyles": "<tableStyles count=\"0\" defaultTableStyle=\"TableStyleMedium2\" defaultPivotStyle=\"PivotStyleLight16\"/>",
+    "cellXfs": "<cellXfs count=\"1\"><xf numFmtId=\"0\" fontId=\"0\" fillId=\"0\" borderId=\"0\" xfId=\"0\"/></cellXfs>",
+    "tables": [
+      {
+        "path": "xl/tables/table1.xml",
+        "xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{B51792AF-1751-4777-BD59-ADDF10BD0F62}\" name=\"Table1\" displayName=\"Table1\" ref=\"B2:E8\" totalsRowShown=\"0\"><autoFilter ref=\"B2:E8\" xr:uid=\"{B51792AF-1751-4777-BD59-ADDF10BD0F62}\"/><tableColumns count=\"4\"><tableColumn id=\"1\" xr3:uid=\"{1701593C-EEBA-428B-9AE2-C5739DE11BE7}\" name=\"Region\"/><tableColumn id=\"2\" xr3:uid=\"{41E9FED4-B89E-4E3D-AFAF-93A35C2AC599}\" name=\"Item\"/><tableColumn id=\"3\" xr3:uid=\"{4D5BC0A1-E2A2-44C2-8819-6AE4A83F7CDB}\" name=\"Qty\"/><tableColumn id=\"4\" xr3:uid=\"{9EA8D1F9-6C1C-444C-9621-7EC0812D1C2D}\" name=\"Price\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium2\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>"
+      }
+    ]
+  }
+]
