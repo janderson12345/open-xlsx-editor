@@ -59,7 +59,8 @@ function refersText(wb, refersTo) {
   if (!typed) throw new Error(NAME_MESSAGES.formula);
   try {
     const text = normalizeFormula(typed);
-    parseFormula(text);
+    // (Several ranges apart by commas, =Sheet1!$A$2:$B$3,Sheet1!$D$6:$E$7: a union, written as Excel writes it.)
+    try { parseFormula(text); } catch { parseFormula(`(${text})`); }
     return bookIndexes(wb, text);
   } catch {
     throw new Error(NAME_MESSAGES.formula);

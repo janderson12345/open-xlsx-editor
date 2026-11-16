@@ -1,7 +1,8 @@
 // The selection as the grid shows it: the selected range shaded, the active cell outlined, both in an overlay above
 // the cells and below the sticky headings. View state only: nothing here reaches the workbook or its undo history.
 import { setVars, div } from './dom.js';
-import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
+import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
+import { sheetPrefix } from '../calc/tokens.js';
 
 /** A selection: the active cell (ar, ac) and the range (r0..r1, c0..c1) it extends over, 0-based. With Ctrl, more
  *  than one range (Excel's areas): `more`, the others in the order they were added, the active range last. */
@@ -22,6 +23,21 @@ export function areasSelection(areas, active = null) {
   const sel = { ar: at.r, ac: at.c, r0: last.r0, c0: last.c0, r1: last.r1, c1: last.c1 };
   if (areas.length > 1) sel.more = areas.slice(0, -1).map((a) => ({ r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 }));
   return sel;
+}
+
+/** The areas Find and Replace look in ({ si, areas }): the selection's, when it is more than one cell (a merged
+ *  range alone counts as one cell, as in Excel); null otherwise, for the whole sheet. */
+export function withinSelection(sheet, sel, si) {
+  const one = (a) => (a.r0 === a.r1 && a.c0 === a.c1) || sheet.merges.some((m) => m.r0 === a.r0 && m.c0 === a.c0 && m.r1 === a.r1 && m.c1 === a.c1);
+  return sel.more?.length || !one(sel) ? { si, areas: areasOf(sel).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 })) } : null;
+}
+
+/** What a name for selection `sel` of sheet si refers to, as Excel's New Name box and Name Box write it: each range
+ *  absolute, with its sheet, several apart by commas (=Sheet1!$A$2:$B$3,Sheet1!$D$6:$E$7). */
+export function selectionRefers(wb, si, sel) {
+  const abs = (r, c) => `$${colName(c)}$${r + 1}`;
+  const one = (a) => `${sheetPrefix(wb.sheets[si].name)}${abs(a.r0, a.c0)}${a.r0 === a.r1 && a.c0 === a.c1 ? '' : `:${abs(a.r1, a.c1)}`}`;
+  return `=${areasOf(sel).map(one).join(',')}`;
 }
 
 /** Whether cell (r, c) is in any range of the selection. */

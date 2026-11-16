@@ -20,7 +20,8 @@ import { entryChanges } from '../ooxml/entry.js';
 import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { SheetError } from '../ooxml/sheetops.js';
 import * as fmt from '../ooxml/formatops.js';
-import { mergeChange } from '../ooxml/mergeops.js';
+import { mergeAreasChange } from '../ooxml/mergeops.js';
+import { overlapping, lineSpans, shiftOrder, OVERLAP_MESSAGE } from '../ooxml/multiarea.js';
 import { shiftCells } from '../ooxml/rowcol.js';
 import { clearChanges } from '../ooxml/clearops.js';
 import { partsClear, PARTS_ONLY, hyperlinksIn } from '../ooxml/clearparts.js';
@@ -165,10 +166,9 @@ export function createCommands(ctx) {
     state.redo = [];
     return true;
   }
-  /** The selection's rows or columns, [first, last] (past the used range cut to it, as formatting is), or just line
-   *  `index` when it isn't one of the selected whole lines. */
-  function linesOf(axis, index = null) {
-    const s = state.sel;
+  /** The selection's rows or columns (or area `s`'s), [first, last] (past the used range cut to it, as formatting
+   *  is), or just line `index` when it isn't one of the selected whole lines. */
+  function linesOf(axis, index = null, s = state.sel) {
     const sh = sheet();
     const rows = axis === 'row';
     const whole = rows ? s.c0 === 0 && s.c1 >= MAX_COLS - 1 : s.r0 === 0 && s.r1 >= MAX_ROWS - 1;
@@ -176,6 +176,15 @@ export function createCommands(ctx) {
     if (index != null && !(whole && index >= a && index <= b)) return [index, index];
     const last = rows ? (b - a > 10000 ? Math.max(a, Math.min(b, sh.maxRow)) : b) : (b - a > 1000 ? Math.max(a, Math.min(b, sh.maxCol)) : b);
     return [a, last];
+  }
+  /** Each area's rows or columns, [[first, last]] (Excel sized, hid and showed the lines of every area); with
+   *  `index`, a heading edge dragged, every selected whole line's when it is one of them, else just that line. */
+  function linesEach(axis, index = null) {
+    const areas = areasOf(state.sel);
+    if (index == null) return areas.map((a) => linesOf(axis, null, a));
+    const whole = areas.filter((a) => (axis === 'row' ? a.c0 === 0 && a.c1 >= MAX_COLS - 1 : a.r0 === 0 && a.r1 >= MAX_ROWS - 1));
+    const among = whole.some((a) => (axis === 'row' ? a.r0 <= index && index <= a.r1 : a.c0 <= index && index <= a.c1));
+    return among ? whole.map((a) => linesOf(axis, null, a)) : [[index, index]];
   }
   /** Sizes changed by `apply(wb, si)`, as one step of the history (a snapshot of the workbook before and after);
    *  `kind`, what a protected sheet must allow ('formatColumns' or 'formatRows'). */
@@ -203,6 +212,8 @@ export function createCommands(ctx) {
       change(wb, ctx.sheetIndex());
     } catch (e) {
       if (!(e instanceof SheetError)) throw e;
+      // (Several areas: what the ones before it did is put back.)
+      wb.restore(before);
       if (e.ask) return 'unmerge';
       ctx.alert(e.message);
       return false;
@@ -356,11 +367,12 @@ export function createCommands(ctx) {
      *  first one (rowcol.js), as one step of the history; Excel's refusals said in its words. */
     lines(axis, dir) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const s = state.sel;
       const rows = axis === 'row';
-      const count = rows ? s.r1 - s.r0 + 1 : s.c1 - s.c0 + 1;
+      // (Several areas: the lines of each, the last first so the others stay where they were, multiarea.js.)
+      const spans = lineSpans(areasOf(state.sel), axis, dir > 0);
+      const count = spans.reduce((n, [a, b]) => n + b - a + 1, 0);
       if (count >= (rows ? MAX_ROWS : MAX_COLS)) return false;
-      const done = moved((wb, si) => wb.changeLines(si, axis, rows ? s.r0 : s.c0, dir * count), `${dir > 0 ? 'insert' : 'delete'}${rows ? 'Rows' : 'Columns'}`);
+      const done = moved((wb, si) => { for (const [a, b] of spans) wb.changeLines(si, axis, a, dir * (b - a + 1)); }, `${dir > 0 ? 'insert' : 'delete'}${rows ? 'Rows' : 'Columns'}`);
       if (done === true) show(state.sel, state.focus, `${dir > 0 ? 'Inserted' : 'Deleted'} ${count} ${rows ? 'row' : 'column'}${count > 1 ? 's' : ''}, `);
       return done;
     },
@@ -369,8 +381,10 @@ export function createCommands(ctx) {
      *  merged cells would be split: asked first, as Excel asks, and done again with `unmerge`. */
     cells(dir, axis, { unmerge = false } = {}) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const s = state.sel;
-      const done = moved((wb, si) => shiftCells(wb, si, s, dir, axis, { unmerge }), `${dir > 0 ? 'insert' : 'delete'}${axis === 'row' ? 'Rows' : 'Columns'}`);
+      // (Several areas: each one's cells, the lowest or rightmost first; refused where they overlap, as Excel refuses.)
+      const areas = areasOf(state.sel);
+      if (overlapping(areas)) { ctx.alert(OVERLAP_MESSAGE); return false; }
+      const done = moved((wb, si) => { for (const a of shiftOrder(areas, axis)) shiftCells(wb, si, a, dir, axis, { unmerge }); }, `${dir > 0 ? 'insert' : 'delete'}${axis === 'row' ? 'Rows' : 'Columns'}`);
       if (done !== true) return done;
       // (Excel keeps the inserted cells selected; after a delete, the cells that took their place.)
       const way = dir > 0 ? (axis === 'row' ? 'shifted down' : 'shifted right') : (axis === 'row' ? 'shifted up' : 'shifted left');
@@ -398,7 +412,8 @@ export function createCommands(ctx) {
      *  selection (mergeops.js), as one step of the history. */
     merge(kind) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const change = mergeChange(ctx.workbook(), ctx.sheetIndex(), state.sel, kind);
+      // (Several areas: each merged as alone; overlapping ones left as they are, as Excel left them.)
+      const change = mergeAreasChange(ctx.workbook(), ctx.sheetIndex(), areasOf(state.sel), kind);
       if (!change || !runSteps([{ si: ctx.sheetIndex(), ...change }])) return false;
       // (The selection becomes the merged area it is in, as the grid shows it.)
       show(state.sel, state.focus);
@@ -468,7 +483,7 @@ export function createCommands(ctx) {
 
   // (The other commands, from modules sharing this state and these helpers: sheets first, whose sheetOp the parts
   // use.)
-  const env = { allowed, commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
+  const env = { allowed, commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, linesEach, sizeStep, moved, formatting };
   Object.assign(commands, sheetCommands(env));
   Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env), borderCommands(env), lineCommands(env), outlineCommands(env), styleCommands(env));
 

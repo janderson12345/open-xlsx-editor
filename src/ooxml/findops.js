@@ -56,12 +56,19 @@ function matchesIn(wb, si, re, opts) {
       for (const [c, cell] of line) if (filledCell(cell) && re.test(searchText(wb, si, cell, opts.lookIn)) && formatMatches(wb, cell, opts.findFormat)) out.push({ si, r, c });
     }
   }
+  // (More than one cell selected: only the selection, every area of it, as Excel's Find and Replace look.)
+  if (opts.areas && si === opts.areasSheet) {
+    const kept = out.filter(({ r, c }) => opts.areas.some((a) => r >= a.r0 && r <= a.r1 && c >= a.c0 && c <= a.c1));
+    out.length = 0;
+    out.push(...kept);
+  }
   return out.sort(opts.byColumns ? (a, b) => a.c - b.c || a.r - b.r : (a, b) => a.r - b.r || a.c - b.c);
 }
 
 /**
  * Every matching cell, from the sheet `si` on (opts: { matchCase, whole, lookIn: 'formulas' | 'values' | 'notes' | 'comments', byColumns,
- * within: 'sheet' | 'workbook' }): [{ si, r, c }].
+ * within: 'sheet' | 'workbook', areas: the selection's areas on sheet `areasSheet`, when more than one cell is
+ * selected: only there }): [{ si, r, c }].
  */
 export function findAll(wb, si, what, opts = {}) {
   // (Nothing to find but a format: every filled cell of it, as Excel's Find All does.)

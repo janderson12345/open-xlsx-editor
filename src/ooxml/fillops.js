@@ -226,3 +226,41 @@ export function autoFill(wb, si, from, to, type = 'default') {
   }
   return [out];
 }
+
+/**
+ * Fill Down, Right, Up or Left over several areas ([{ r0, c0, r1, c1 }]), as Excel did it (test/multirange-excel.json):
+ * each column (Down, Up) or row (Right, Left) filled over the cells selected in it, from its first one (the topmost
+ * for Down): A2:B4 and A7:B9 down fill A7:B9 from A2:B2 too, A2:B4 and B3:C5 fill B3:B5 from B2 and C4:C5 from C3. A
+ * line with one cell selected in it fills from the cell before, as one area does. One step, as fillCopy's.
+ */
+export function fillCopyAreas(wb, si, areas, dir) {
+  if (areas.length < 2) return fillCopy(wb, si, areas[0], dir);
+  const sheet = wb.sheet(si);
+  const rows = dir === 'down' || dir === 'up';
+  const back = dir === 'up' || dir === 'left';
+  // (Each line's cells selected, along the way the fill goes: { line: Set of positions }.)
+  const lines = new Map();
+  for (const a of areas) {
+    for (let r = a.r0; r <= a.r1; r++) {
+      for (let c = a.c0; c <= a.c1; c++) {
+        const [line, at] = rows ? [c, r] : [r, c];
+        if (!lines.has(line)) lines.set(line, new Set());
+        lines.get(line).add(at);
+      }
+    }
+  }
+  const out = { si, contents: [], styles: [], merges: sheet.merges };
+  for (const [line, set] of lines) {
+    const list = [...set].sort((x, y) => x - y);
+    let src = back ? list.at(-1) : list[0];
+    if (list.length === 1) { if (back || src === 0) continue; src -= 1; }
+    for (const at of list) {
+      if (at === src) continue;
+      const [r, c] = rows ? [at, line] : [line, at];
+      const [fr, fc] = rows ? [src, line] : [line, src];
+      out.contents.push(copyOf(sheet, fr, fc, r - fr, c - fc, { r, c }));
+      out.styles.push({ r, c, s: sheet.cells.get(fr)?.get(fc)?.s || 0 });
+    }
+  }
+  return [out];
+}

@@ -12,7 +12,7 @@ import { cellText } from './numfmt.js';
  * selection holds an error or no number).
  */
 export function selectionStats(wb, si, sel) {
-  if (sel.r0 === sel.r1 && sel.c0 === sel.c1) return null;
+  if (!sel.more?.length && sel.r0 === sel.r1 && sel.c0 === sel.c1) return null;
   const sheet = wb.sheet(si);
   const hiddenCol = (c) => sheet.cols.some((x) => x.hidden && c >= x.min && c <= x.max);
   let count = 0;
@@ -22,10 +22,12 @@ export function selectionStats(wb, si, sel) {
   let max = -Infinity;
   let error = false;
   let first = null;
-  for (const [r, line] of sheet.cells) {
-    if (r < sel.r0 || r > sel.r1 || sheet.rows.get(r)?.hidden) continue;
+  // (Several areas: each one's cells, a cell in two of them counted twice, as Excel's SUM((A2:B3,B3:C4)) and its
+  // COUNTA count it, test/multirange-excel.json.)
+  for (const area of [...(sel.more || []), sel]) for (const [r, line] of sheet.cells) {
+    if (r < area.r0 || r > area.r1 || sheet.rows.get(r)?.hidden) continue;
     for (const [c, cell] of line) {
-      if (c < sel.c0 || c > sel.c1 || cell.v == null || cell.v === '' || hiddenCol(c)) continue;
+      if (c < area.c0 || c > area.c1 || cell.v == null || cell.v === '' || hiddenCol(c)) continue;
       count++;
       if (cell.t === 'e') error = true;
       else if (typeof cell.v === 'number') {

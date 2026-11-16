@@ -5,11 +5,12 @@ import { readPivots, refreshPivot, pivotAt } from '../ooxml/pivot.js';
 import { readQueries, refreshQueryTable, setQueryFormula } from '../ooxml/queries.js';
 import { addHyperlink } from '../ooxml/links.js';
 import { SheetError } from '../ooxml/sheetops.js';
+import { areasOf, areasSelection, withinSelection } from './selection.js';
 import { setCalcMode, calculateNow, calculateSheet, calculateFull, setIteration } from '../ooxml/calcmode.js';
 
 /** These commands: `env` is createCommands's shared state and helpers (commands.js). */
 export function partCommands(env) {
-  const { allowed, commands, ctx, state, idOf, runSteps, sheetOp } = env;
+  const { allowed, commands, ctx, state, idOf, runSteps, sheetOp, show } = env;
   /** After a calculation: the grid and the status bar drawn again, circular references said. */
   const calculated = (out) => {
     ctx.grid.refresh();
@@ -18,9 +19,14 @@ export function partCommands(env) {
     return true;
   };
   return {
-    /** Go to a found cell ({ si, r, c }): its sheet shown, the cell selected. */
-    goTo(hit) {
+    /** Go to a found cell ({ si, r, c }): its sheet shown, the cell selected; with `within`, a cell inside a
+     *  selection of more than one cell made the active cell, the selection kept (Find Next in a selection). */
+    goTo(hit, { within = false } = {}) {
       if (hit.si !== ctx.sheetIndex() && !commands.showSheet(hit.si)) return false;
+      const areas = areasOf(state.sel);
+      const k = within && withinSelection(ctx.workbook().sheet(hit.si), state.sel, hit.si) ? areas.findIndex((a) => hit.r >= a.r0 && hit.r <= a.r1 && hit.c >= a.c0 && hit.c <= a.c1) : -1;
+      // (Its area becomes the active one, the last.)
+      if (k >= 0) { show(areasSelection([...areas.slice(0, k), ...areas.slice(k + 1), areas[k]], { r: hit.r, c: hit.c }), null); return true; }
       commands.select(hit.r, hit.c);
       return true;
     },

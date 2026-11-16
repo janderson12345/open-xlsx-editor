@@ -62,7 +62,8 @@ export class Calc {
     if (!n) return null;
     if (!this._names.has(n)) {
       let tree = null;
-      try { tree = parseFormula(n.text); } catch { /* (kept as null: #NAME?) */ }
+      // (Several ranges apart by commas, as Excel writes a name of several areas: read as their union.)
+      try { tree = parseFormula(n.text); } catch { try { tree = parseFormula(`(${n.text})`); } catch { /* (kept as null: #NAME?) */ } }
       this._names.set(n, tree);
     }
     return this._names.get(n);
