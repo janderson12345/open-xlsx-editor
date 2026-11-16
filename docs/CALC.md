@@ -498,6 +498,23 @@ Measured in Excel 365 in English, 96 cases (`src/calc/charsets.js`):
 - **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it. How LEN,
   MID, FIND, SEARCH and REPLACE count one depends on the workbook: see the next section.
 
+## February 29, 1900
+
+Excel's calendar keeps Lotus's leap day, serial 60, but not everywhere alike. Measured in Excel 365 over COM, 513
+formulas (`tools/excel-compare/date1900-cases.mjs`, Excel's answers in test/date1900-excel.json, 508 as Excel's; 384
+before):
+
+- **DATE counts the days on from the month's first in a calendar with the 29th**: DATE(1900,2,29) is 60,
+  DATE(1900,2,30) and DATE(1900,1,61) 61, DATE(1900,3,0) 60. A month before January 1900 is #NUM! whatever the day
+  (DATE(1900,0,64)), while DATE(1900,1,0) is 0.
+- **DAYS360 reads serials in that calendar too**, February 1900's last day the 29th: DAYS360(59,61) is 3,
+  DAYS360(60,61) 1, DAYS360(31,60,TRUE) 29 (each a day off here before, the serials below 61 read a day early).
+- **EDATE, EOMONTH and the coupon dates step over a February 1900 of 28 days**: EDATE(31,1) and EOMONTH(40,0) are
+  59, EDATE(244,-6) 59; serial 60 still reads as February 29 (MONTH(60) is 2).
+- **Not yet: coupon dates before 1900.** COUPDAYS(100,244,2,1) is 185 in Excel (182 here), COUPPCD(61,1000,4,0) 0
+  (-5 here), COUPDAYBS(50,881,4,0) 49 (79 here): Excel seems to take a coupon date before 1900 as serial 0; not
+  worked out.
+
 ## Emoji: the function compatibility version
 
 Measured in Excel 365 in English over COM, 1972 formulas built with UNICHAR (`tools/excel-compare/emoji-cases.mjs`,

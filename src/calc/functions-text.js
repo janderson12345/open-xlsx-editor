@@ -205,7 +205,11 @@ lifted('DATE', (a, ctx) => {
   if (y < 0 || y > 9999) throw E.num;
   if (y < 1900 && !ctx.date1904) y += 1900;
   else if (y < 1904 && ctx.date1904) y += 1900;
-  const n = dateSerial(y, Math.trunc(num(a[1], ctx)), Math.trunc(num(a[2], ctx)), ctx.date1904);
+  const m = Math.trunc(num(a[1], ctx));
+  // (A month before the system's first is #NUM! whatever the day: DATE(1900,0,64) is, though January 1900 and 63
+  // days would be serial 32; measured.)
+  if (y * 12 + m - 1 < (ctx.date1904 ? 1904 : 1900) * 12) throw E.num;
+  const n = dateSerial(y, m, Math.trunc(num(a[2], ctx)), ctx.date1904);
   if (n < 0) throw E.num;
   return n;
 });

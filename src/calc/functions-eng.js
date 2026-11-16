@@ -7,6 +7,7 @@
 import { Area, Union, E, finite, scalar, toText, matrix } from './values.js';
 import { def, given, num, text, numbers } from './functions.js';
 import { erfc } from './functions-stats.js';
+import { dateParts } from '../ooxml/format.js';
 
 // ---- Bits
 
@@ -115,11 +116,13 @@ def('SQRTPI', (a, ctx) => { const x = num(a[0], ctx); if (x < 0) throw E.num; re
 
 // ---- DAYS360
 
-const ymd = (serial) => { const d = new Date(Date.UTC(1899, 11, 30) + Math.floor(serial) * 86400000); return [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()]; };
-const lastOfFeb = (y, m, d) => m === 2 && d === new Date(Date.UTC(y, 2, 0)).getUTCDate();
+// (Read in Excel's calendar, February 1900 with its 29th, serial 60, its last: DAYS360(59,61) is 3, DAYS360(60,61)
+// 1, DAYS360(31,60,TRUE) 29, measured.)
+const ymd = (serial, ctx) => { const p = dateParts(Math.floor(serial), ctx.date1904); return [p.y, p.m, p.d]; };
+const lastOfFeb = (y, m, d) => m === 2 && d === (y === 1900 ? 29 : new Date(Date.UTC(y, 2, 0)).getUTCDate());
 def('DAYS360', (a, ctx) => {
-  let [y1, m1, d1] = ymd(num(a[0], ctx));
-  let [y2, m2, d2] = ymd(num(a[1], ctx));
+  let [y1, m1, d1] = ymd(num(a[0], ctx), ctx);
+  let [y2, m2, d2] = ymd(num(a[1], ctx), ctx);
   const european = given(a[2]) && !!scalar(a[2], ctx);
   if (european) { if (d1 === 31) d1 = 30; if (d2 === 31) d2 = 30; }
   else {
