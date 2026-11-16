@@ -82,6 +82,24 @@ the 15th digit takes its last digit from the JavaScript engine's Math.pow: IMPOW
       (August 31 to February 28: 178 days of 180 in 30/360). With calc_method FALSE, issue's part and the days from
       the start of the period ending at first_interest to settlement over L: negative when settlement is before that
       start (ACCRINT(DATE(2006,11,1),DATE(2008,1,15),DATE(2007,6,1),0.06,100,4,1,FALSE) is -0.99 in Excel).
+    - ACCRINT at the ends of Excel's dates (4251 more cases over COM, `tools/excel-compare/accrint-cases.mjs`, Excel's
+      answers in test/accrint-excel.json; 1911 of them #NUM!, every one as Excel's, 4213 as Excel's in all): **#NUM!
+      where the coupon walk steps to a date before 1900-01-01 or past 9999-12-31**, whichever dates the case walks
+      through. Back from first_interest to issue, on from issue's period to first_interest and on past it to the
+      period holding settlement, and with basis 1 the period ending at first_interest. With calc_method FALSE and issue
+      on or after first_interest Excel steps back from first_interest once too, whatever the basis. So
+      ACCRINT(1,731,731,0.1,1000,4,1,FALSE) is #NUM! (back from 1902-01-01 past 1900), ACCRINT(2958000,2958440,
+      2958450,0.1,1000,4) too (the period after 9999-12-06 ends in 10000), but ACCRINT(2958065,2958281,2958464,0.1,
+      1000,2,0,TRUE) is worked out (the period after 9999-06-30 ends on 9999-12-31). Before this rule 2091 of the 3951
+      near the ends were as Excel's.
+    - The coupon walk steps over a February 1900 of 28 days, as EDATE and EOMONTH do (EDATE(31,1) is 59, EOMONTH(40,0)
+      59), though serial 60 still reads as February 29, 1900; DATE treats 1900 as a leap year (DATE(1900,2,30) is 61).
+      ACCRINT's 30/360 days take February 28, 1900 as the month's last (taking the 29th made 6 more cases wrong).
+    - Issue exactly on a coupon date: with calc_method FALSE (and two or more periods to first_interest) issue's
+      period counts nothing, the answer the days from the period ending at first_interest's start to settlement over
+      L; with TRUE it counts 1, not its days over L, and with settlement before first_interest each period ended
+      before settlement counts 1 and the rest its days over L (ACCRINT(DATE(2010,12,20),DATE(2011,12,20),
+      DATE(2011,10,18),0.1,1000,2,2,TRUE) is 83.33: 1 and 120/180). 287 of 300 such cases as Excel's (121 before).
     - DISC and its kin with basis 1 take YEARFRAC's year (366 over a February 29); PRICEMAT and YIELDMAT the year up
       to settlement's. DISC is (1 - pr/redemption) x (year / days), to Excel's last digit.
   - `functions-complex.js`: the complex numbers, text such as "3+4i" or "3+4j". COMPLEX, IMREAL, IMAGINARY, IMABS,
@@ -590,13 +608,15 @@ timeline of 1 to n and seasonality 0 (no season), so it needn't be measured agai
 
 ## Not yet
 
-- **ACCRINT at the ends of Excel's dates**: a date past 9999-12-31 (serial 2958465) is #NUM!, as in Excel (measured).
-  Nearer the ends Excel gives #NUM! where this works it out: an issue date of serial 1 (1900-01-01) with the first
-  interest date years later, and some first interest dates in the last weeks of 9999 (ACCRINT(2958000,2958440,2958450,
-  0.1,1000,4) is #NUM! in Excel, 123.33 here); their rule isn't found yet.
-- **ACCRINT with first_interest on the 29th, 30th or 31st of a month whose coupon dates pass a shorter February**: 13
-  of the 400 cases checked differ from Excel's in the third or fourth digit (ACCRINT(DATE(2006,3,13),DATE(2006,8,29),
-  DATE(2008,3,28),0.06,100,2,0) is 12.2809 in Excel, 12.25 here); kept out of the probe.
+- **ACCRINT with a date on the 29th, 30th or 31st, or in February, whose coupon dates pass a shorter February**:
+  13 of the 400 cases first checked, and 25 of the 3951 near the ends of Excel's dates, differ from Excel's in the
+  third or fourth digit (ACCRINT(DATE(2006,3,13),DATE(2006,8,29),DATE(2008,3,28),0.06,100,2,0) is 12.2809 in Excel,
+  12.25 here; ACCRINT(2958065,2958434,2958100,0.1,1000,4,0) 9.44 in Excel, 10.28 here); kept out of the probe.
+  Tried and dropped: stepping on from first_interest by whole multiples of the period instead of from the date before
+  (one case better, two worse), and February 29, 1900 as February's last in the 30/360 days (six worse).
+- **ACCRINT with issue on a coupon date, settlement before first_interest and basis 1, 2 or 3**: 13 of the 300
+  differ (ACCRINT(DATE(2007,6,14),DATE(2010,6,14),DATE(2009,10,13),0.1,1000,2,3,TRUE) is 233.0137 in Excel, 4 periods
+  and 120.5 days of 182.5, where the days are 121; 233.1507 here).
 - **ODDLPRICE and ODDLYIELD from a last interest date at a month's end into a February 29 settlement** (August 31,
   2019 and February 29, 2020 measured): 1e-4 from Excel's for some frequencies and bases. Kept out of the probe.
 - **AMORDEGRC bought on the first period's last day with a life of 3 years or less**: the rule here (declining, no

@@ -163,13 +163,17 @@ function accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx) {
   const step = 12 / freq;
   const fp = dateParts(first, ctx.date1904);
   const keepDay = fp.d !== monthDays(fp.y, fp.m);
-  const back = (d) => addMonths(d, -step, ctx, keepDay);
-  const on = (d) => addMonths(d, step, ctx, keepDay);
+  // (A coupon date the walk steps to before 1900-01-01 or past 9999-12-31 is #NUM!, as in Excel: measured on 2000
+  // cases near both ends, every one as Excel's. So ACCRINT(1,731,...) is #NUM!, its walk stepping back past 1900.)
+  const inRange = (d) => { if (d < 1 || d > LAST_DATE) throw E.num; return d; };
+  const back = (d) => inRange(addMonths(d, -step, ctx, keepDay));
+  const on = (d) => inRange(addMonths(d, step, ctx, keepDay));
   const days = (s, e) => daysBetween(s, e, basis, ctx);
   const L = basis === 1 ? first - back(first) : basis === 3 ? 365 / freq : 360 / freq;
   if (first <= issue) {
     // (Issue on or after first_interest: the periods from it on, issue's a part.)
-    if (!byPeriod) return days(issue, settle) / L;
+    // (Here too Excel steps back from first_interest once, whatever the basis: #NUM! when that's before 1900.)
+    if (!byPeriod) { back(first); return days(issue, settle) / L; }
     let p0 = first;
     while (on(p0) <= issue) p0 = on(p0);
     let total = 0;
@@ -184,6 +188,9 @@ function accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx) {
     while (B[B.length - 1] > issue) B.push(back(B[B.length - 1]));
     const n = B.length;
     if (n === 2) return days(issue, settle) / L;
+    // (Issue on a coupon date: its period counts nothing, ACCRINT(DATE(1900,1,29),DATE(1901,1,29),DATE(1900,5,30),
+    // 0.1,1000,4,1,FALSE) a whole period less than issue's part and the rest would make it: measured.)
+    if (B[n - 1] === issue) return days(B[1], settle) / L;
     return days(issue, B[n - 2]) / (basis === 1 ? B[n - 2] - B[n - 1] : L) + days(B[1], settle) / L;
   }
   let start = first;
@@ -191,20 +198,28 @@ function accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx) {
   const P = [start];
   while (P[P.length - 1] < first) P.push(on(P[P.length - 1]));
   const last = P.length - 1;
+  // (Issue on a coupon date: its period counts 1, not its days over L: measured.)
+  const whole = start === issue;
   if (last === 1) {
     if (settle <= first) return days(issue, settle) / L;
-    let total = days(issue, P[1]) / L;
+    let total = whole ? 1 : days(issue, P[1]) / L;
     for (let p0 = P[1]; p0 < settle; p0 = on(p0)) total += on(p0) < settle ? 1 : days(p0, settle) / L;
     return total;
   }
   const own = basis === 1 ? P[1] - P[0] : L;
   const dIssue = days(issue, P[1]);
+  if (settle <= first && whole) {
+    // (1 for each period ended before settlement, then the days from the last coupon date over L.)
+    let k = 0;
+    while (P[k + 1] < settle) k++;
+    return k + days(P[k], settle) / L;
+  }
   if (settle <= first) {
     let middle = 0;
     for (let i = 1; i < last - 1; i++) middle += days(P[i], P[i + 1]);
     return dIssue / own + (last - 2) + (days(issue, settle) - dIssue - middle) / L;
   }
-  let total = dIssue / own + (last - 1);
+  let total = (whole ? 1 : dIssue / own) + (last - 1);
   for (let p0 = P[last]; p0 < settle; p0 = on(p0)) total += on(p0) < settle ? 1 : days(p0, settle) / L;
   return total;
 }
