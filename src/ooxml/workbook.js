@@ -392,7 +392,7 @@ export class Workbook {
   }
 
   /** The workbook as it is now, to go back to (restore), and back to it: workbookstate.js. */
-  snapshot() { return snapshotOf(this); }
+  snapshot(opts) { return snapshotOf(this, opts); }
   restore(snap) { restoreTo(this, snap); }
 
   /** A dynamic array formula's cell in the file's form (spillxml.js), and a cell its spill no longer reaches emptied. */

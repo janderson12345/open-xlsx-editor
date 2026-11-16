@@ -101,7 +101,22 @@ edge, a number in row 2 at its right edge) and 20 row heights (text in column A)
   both ways as far as the nearer side allows; numbers and wrapped text never. Wrapped lines step by the font's
   default row height (Calibri 11: 15pt, 19.36px in print), not its line height, and break where Excel's do (text
   widths already match). Run 17: align.xlsx 32 of 32 pieces matched, 30 within 1px both ways. Fill, justify and
-  distributed are drawn left, rotation and shrink-to-fit not yet.
+  distributed are drawn left.
+- **Turned, stacked and shrunk text** (*measured* in print, `test/fixtures/rotate.xlsx`: 37 samples, Excel's PDF in
+  `..\excel-pdfsotate`, runs in `..unsotate`). General alignment of turned text goes by the angle, not the
+  value: 1 to 89 degrees up on the left, 90 up and every angle down on the right, 90 down on the left (a number
+  too); stacked letters are centred. Stacked letters are a line each, stepping by the font's default row height as
+  wrapped lines do (19.36px for Calibri 11; 17.96 with the vertical writing mode used before), each centred, and set
+  left or right each centred in a column as wide as a line is tall. Text turned short of 90 degrees keeps 0.23 em more
+  from the cell's sides than its line box turned would (1.7px at 89, 1.1 at 45, 0.5 at 15); at the bottom it sits
+  0.18 em times the angle's cosine lower and 0.04 em higher, at the top 0.14 em lower (`cells.js` placeTurned).
+  Shrink to fit sizes the text for the room less 1.7px and down to a whole printer pixel at 600 dpi (Excel printed
+  11pt's 92 dots as 76, 67, 75 and 28 for four texts), keeping the full-size baseline. A row Excel sizes for text
+  turned 90 degrees is its width times 1.0645 plus 7px (130.5pt for a 26-letter line; 1.14 times gave 134.25).
+  Runs 1 -> 8: rotate.xlsx within 1px both ways 11/67 -> 64/68 (x 34 -> 67, y 18 -> 65), width 58 -> 63. Left:
+  'Row sized at 45' (Excel's row 63pt, here 66: the rows below it 4.6px lower), down 89 degrees 1.4px low, a number
+  turned down 45 1.1px low, down 90 set right 1.6px right, the long shrunk text 1.3px right. On screen the same rules
+  are used but not measured, and shrink to fit isn't stepped there. PDF export (src/pdf.js) draws turned text flat.
 - **General format** (*measured*). Probe `test/fixtures/general.xlsx`: 43 values in columns of 30, 8.43, 6, 4 and 2.5
   characters, all 215 as Excel shows them (`test/general-excel.json`, checked by `npm test`). The room is the
   characters of the digit width that fit the cell less its 5px padding (`colChars`: 64px holds 8), at most 11 plus a

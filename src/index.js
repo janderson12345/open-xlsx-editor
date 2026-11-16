@@ -241,8 +241,9 @@ export function mountXlsxEditor(host, options = {}) {
         'Table Design': (kit) => tableTab(kit, { act, workbook: () => state.workbook }),
         Sparkline: (kit) => sparklineTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
       },
-      // (Not while a cell is being edited: a function from the Function Library was just typed into it.)
-      home: () => { if (!state.editing?.editorOpen) state.grid?.el.focus({ preventScroll: true }); },
+      // (Not while a cell is being edited: a function from the Function Library was just typed into it; nor while part of
+      // the formula bar's text is selected, which the Font group has just formatted.)
+      home: () => { if (!state.editing?.editorOpen && !state.editing?.textSelected) state.grid?.el.focus({ preventScroll: true }); },
       // (The layout the page asked for, then the user's switch kept when the ribbon is made again.)
       mode: state.ribbonMode,
       onMode: (m) => { state.ribbonMode = m; },

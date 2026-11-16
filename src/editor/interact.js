@@ -36,9 +36,10 @@ export function attachEditing(root, ctx) {
   // (A formula carried to the bar while another sheet is shown: { si, r, c }, the cell it is for.)
   let carried = null;
   const bar = createFormulaBar(root, {
-    onEnter: (text) => {
+    onEnter: (text, runs) => {
       if (carried) { finishCarried(text); return; }
-      commit(text, null, () => view.focus());
+      // (A cell of rich text keeps its runs, and part of it formatted in the bar takes it: richtrack.js.)
+      commit(text, null, () => view.focus(), runs);
     },
     onCancel: () => {
       if (carried) { const o = carried; carried = null; pointing.attach(null); cmd.run('showSheet', o.si); }
@@ -168,7 +169,8 @@ export function attachEditing(root, ctx) {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
     // (The selection's name when it has one, as Excel reports it for the selection: goto.js selectionName.)
     const named = cmd ? selectionName(ctx.workbook(), ctx.sheetIndex(), areasOf(s)) : null;
-    bar.show(named || refName(s.ar, s.ac), barText(cellAt(s.ar, s.ac), s.ar, s.ac));
+    const cell = cellAt(s.ar, s.ac);
+    bar.show(named || refName(s.ar, s.ac), barText(cell, s.ar, s.ac), cell?.runs);
   }
   const reopen = (text) => {
     const s = cmd.selection;
@@ -430,8 +432,14 @@ export function attachEditing(root, ctx) {
     /** Insert Function's choice: typed at the caret of the cell being edited, or the active cell opened with
      *  "=NAME(" (`open` after it: '' for a defined name). `hold` keeps the editor open while the box is up. */
     get editorOpen() { return editor.isOpen; },
-    /** The Font group's Bold, Italic, Underline or Strikethrough on part of the text being edited (richmarks.js). */
-    markEditor(key) { return editor.mark(key); },
+    /** The Font group's Bold, Italic, Underline or Strikethrough on part of the text being edited, in the cell or the
+     *  formula bar (richmarks.js). */
+    markEditor(key) { return editor.isOpen ? editor.mark(key) : bar.mark(key); },
+    /** The Font group's font, size or colour (`patch`, or a function of the first selected character's size, `base`
+     *  the cell's) on part of the text being edited. */
+    markEditorFont(patch, base) { return editor.isOpen ? editor.markFont(patch, base) : bar.markFont(patch, base); },
+    /** Whether part of a cell's text is selected in the cell editor or the formula bar. */
+    get textSelected() { return editor.isOpen ? editor.selecting : bar.selecting; },
     holdEditor(on) { editor.hold(on); },
     /** Function Arguments' formula for the cell being edited, or the active cell: entered (refused, back into the
      *  editor), or with `wait` (one Excel refuses as it stands) left being edited with it. */

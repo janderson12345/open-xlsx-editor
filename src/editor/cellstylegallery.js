@@ -1,7 +1,8 @@
 // The cell style gallery (Home > Cell Styles): the workbook's own styles under Custom, then Excel's built-in ones under
 // its gallery's headings (Good, Bad and Neutral; Data and Model; Titles and Headings; Themed Cell Styles; Number
 // Format), each named and shown in its fill, font colour, weight and bottom line as the workbook's theme gives them.
-// Picked, the selection takes it (ooxml/cellstyleedit.js, as Excel applies one).
+// Picked, the selection takes it (ooxml/cellstyleedit.js, as Excel applies one); its menu (a right click, or the menu
+// key) offers Modify..., and New Cell Style... ends the gallery, as in Excel (acts-styles.js).
 import { el } from './ribbonkit.js';
 import { parseXml, NS } from '../ooxml/xml.js';
 import { readFont, readFill, readBorder } from '../ooxml/styles.js';
@@ -38,14 +39,21 @@ function lookCss(name, wb) {
   return out.join(';');
 }
 
-/** The gallery's menu items; picking one calls `onPick(name)`. */
-export function cellStyleGallery(kit, { wb, onPick }) {
-  const { run } = kit;
+/** The gallery's menu items; picking one calls `onPick(name)`, its Modify... `onModify(name)`, New Cell Style...
+ *  `onNew()`. */
+export function cellStyleGallery(kit, { wb, onPick, onModify = null, onNew = null }) {
+  const { run, item, openMenu } = kit;
   if (!wb) return [];
-  const chip = (name) => el('button', { type: 'button', class: 'oxe-cstyle', title: name, style: lookCss(name, wb), onmousedown: run(() => onPick(name)) }, name);
+  const chip = (name) => {
+    const b = el('button', { type: 'button', class: 'oxe-cstyle', title: name, style: lookCss(name, wb), 'aria-haspopup': onModify ? 'menu' : null, onmousedown: (e) => { if (e.button !== 2) run(() => onPick(name))(e); } }, name);
+    // (A right click opens its menu instead of applying it, as in Excel.)
+    if (onModify) b.addEventListener('contextmenu', (e) => { e.preventDefault(); openMenu(b, () => [item('Apply', () => onPick(name)), item('Modify...', () => onModify(name))]); });
+    return b;
+  };
   const own = customCellStyles(wb);
   return [
     ...(own.length ? [el('div', { class: 'oxe-cap' }, 'Custom'), el('div', { class: 'oxe-cstyles' }, ...own.map(chip))] : []),
     ...CELL_STYLE_GALLERY.flatMap(([label, names]) => [el('div', { class: 'oxe-cap' }, label), el('div', { class: 'oxe-cstyles' }, ...names.map(chip))]),
+    ...(onNew ? [el('hr'), item('New Cell Style...', onNew)] : []),
   ];
 }

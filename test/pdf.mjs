@@ -31,6 +31,22 @@ const words = (await texts(one)).join(' ');
 const shown = await page.evaluate(() => window.oxe.grid.shownText(0, 0));
 t.check(words.includes(shown) && /\d/.test(words), `real text: A1's "${shown}" and the numbers are in it`, words.slice(0, 200));
 
+// (basic.xlsx's E12, "Rich bold" with its second word a bold run: printed as its runs, and in the PDF each run is its
+// own text in its own font.)
+const printedRuns = await page.evaluate(async () => {
+  await window.oxe.preparePrint();
+  return [...document.querySelectorAll('.oxe-print .oxe-runs > span')].map((x) => [x.textContent, getComputedStyle(x).fontWeight]);
+});
+t.check(printedRuns.some(([text, w]) => text === 'bold' && Number(w) >= 600), 'print: a rich cell drawn as its runs, the bold run bold', JSON.stringify(printedRuns));
+{
+  const pdfDoc = await pdfjs.getDocument({ data: new Uint8Array(one), disableFontFace: true, verbosity: 0 }).promise;
+  const items = (await (await pdfDoc.getPage(1)).getTextContent()).items;
+  const rich = items.find((x) => x.str.trim() === 'Rich');
+  const bold = items.find((x) => x.str.trim() === 'bold');
+  t.check(rich && bold && rich.fontName !== bold.fontName && Math.abs(rich.transform[5] - bold.transform[5]) < 0.5 && bold.transform[4] > rich.transform[4],
+    'PDF: the rich cell’s runs on one line, the bold run after the plain one in a font of its own', JSON.stringify([rich, bold]));
+}
+
 const all = await exported({ sheets: 'all' });
 const allDoc = await PDFDocument.load(new Uint8Array(all));
 const sheetsShown = await page.evaluate(() => window.oxe.workbook.sheets.filter((s, i) => window.oxe.workbook.canShow(i)).length);

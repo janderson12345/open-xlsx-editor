@@ -13,6 +13,7 @@ import { colName, rangeName } from '../ooxml/refs.js';
 import { areasOf } from './selection.js';
 import { CF_PRESETS, CF_PERIODS, CF_GALLERY } from '../ooxml/cfedit.js';
 import { formatCellsBox } from './formatbox.js';
+import { createStyleActs, STYLE_ACTS } from './acts-styles.js';
 import { threadBox } from './threadbox.js';
 import { addThread, replyThread, editThread, resolveThread } from '../ooxml/threadedit.js';
 import { insertChart } from '../ooxml/chartnew.js';
@@ -58,6 +59,7 @@ export function createMoreActs(env) {
   const { root, state, options, editing, act } = env;
   const chartData = createChartDataActs(env);
   const chartActs = createChartActs(env, FONT_NAMES);
+  const styleActs = createStyleActs(env, FONT_NAMES);
   return (name, args, i) => {
     // (A chart's data, Select Data: acts-chartdata.js; its formatting: chartacts.js.)
     const data = chartData(name, args);
@@ -327,6 +329,8 @@ export function createMoreActs(env) {
         return change ? act('chartEdit', args[0], change) : false;
       });
     }
+    // (New Cell Style... and a style's Modify...: acts-styles.js.)
+    if (STYLE_ACTS.has(name)) return styleActs(name, args);
     if (name === 'formatCellsBox') {
       // (Ctrl+1: the active cell's format in Excel's box; what was changed there given to the selection.)
       const wb = state.workbook;

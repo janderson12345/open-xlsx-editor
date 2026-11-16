@@ -14,6 +14,7 @@ import { pivotCommands } from './commands-pivot.js';
 import { viewCommands } from './commands-view.js';
 import { lineCommands } from './commands-lines.js';
 import { outlineCommands } from './commands-outline.js';
+import { styleCommands } from './commands-styles.js';
 import { step, jump, lastCell } from './navigate.js';
 import { entryChanges } from '../ooxml/entry.js';
 import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
@@ -445,6 +446,8 @@ export function createCommands(ctx) {
     if (at !== ctx.sheetIndex() && !commands.showSheet(at)) { from.push(entry); return false; }
     if (entry.snap) {
       ctx.workbook().restore(entry[side]);
+      // (A cell style changed: the cell formats' CSS again, commands-styles.js.)
+      if (entry[side].styles) ctx.restyled?.();
       ctx.edited?.({ book: true });
       ctx.reloaded?.();
       ctx.changed?.();
@@ -465,7 +468,7 @@ export function createCommands(ctx) {
   // use.)
   const env = { allowed, commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
   Object.assign(commands, sheetCommands(env));
-  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env), borderCommands(env), lineCommands(env), outlineCommands(env));
+  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env), borderCommands(env), lineCommands(env), outlineCommands(env), styleCommands(env));
 
   return {
     commands,

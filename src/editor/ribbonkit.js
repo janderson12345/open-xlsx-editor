@@ -121,15 +121,19 @@ export function ribbonKit(container, home) {
   /** Opens the menu under `owner` with the elements `build()` returns (a second press on the owner closes it). */
   function openMenu(owner, build) {
     if (popOwner === owner) return closeMenu();
+    // (Where the owner is, and whether it had focus, before the menu is filled: the owner may be an item of the menu
+    // it replaces, as a cell style's Modify... is.)
+    const r = owner.getBoundingClientRect();
+    const focused = owner.contains(document.activeElement) || owner === document.activeElement;
     pop.replaceChildren(...build());
     iconize(pop);
     pop.hidden = false;
+    popOwner?.setAttribute('aria-expanded', 'false');
     popOwner = owner;
     owner.setAttribute('aria-expanded', 'true');
     pop.setAttribute('aria-label', owner.getAttribute('aria-label') || owner.textContent);
     pop.querySelectorAll('button').forEach((b) => { if (!b.getAttribute('role')) b.setAttribute('role', 'menuitem'); if (!b.getAttribute('aria-label') && b.title && !b.textContent.trim()) b.setAttribute('aria-label', b.title); });
-    if (owner.contains(document.activeElement) || owner === document.activeElement) setTimeout(() => pop.querySelector('button:not([disabled]), input, select')?.focus(), 300); // after the reader has said "expanded"
-    const r = owner.getBoundingClientRect();
+    if (focused) setTimeout(() => pop.querySelector('button:not([disabled]), input, select')?.focus(), 300); // after the reader has said "expanded"
     const host = container.getBoundingClientRect();
     pop.style.left = `${Math.max(0, Math.min(r.left - host.left, host.width - 240))}px`;
     pop.style.top = `${r.bottom - host.top + 2}px`;

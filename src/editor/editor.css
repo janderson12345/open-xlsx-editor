@@ -362,8 +362,10 @@
 .oxe-indent-r {
   padding-right: calc(var(--oxe-pad-r) + var(--oxe-pad-x, 0px) + var(--oxe-indent));
 }
-/* Wrapped text: lines step by the font's default row height, broken within the cell's width. */
-.oxe-wrap > .oxe-tx {
+/* Wrapped text: lines step by the font's default row height, broken within the cell's width. Stacked text's letters
+   (each a line of its own, cells.js) step the same way (Excel's PDF of test/fixtures/rotate.xlsx). */
+.oxe-wrap > .oxe-tx,
+.oxe-stack > .oxe-tx {
   flex: 1 1 auto;
   min-width: 0;
   white-space: pre-wrap;
@@ -371,21 +373,35 @@
   line-height: var(--oxe-wrap-lh);
   top: var(--oxe-wrap-bottom);
 }
-.oxe-wrap.oxe-v-top > .oxe-tx {
+.oxe-wrap.oxe-v-top > .oxe-tx,
+.oxe-stack.oxe-v-top > .oxe-tx {
   top: var(--oxe-wrap-top);
 }
-.oxe-wrap.oxe-v-center > .oxe-tx {
+.oxe-wrap.oxe-v-center > .oxe-tx,
+.oxe-stack.oxe-v-center > .oxe-tx {
   top: var(--oxe-wrap-mid);
 }
-.oxe-wrap.oxe-h-center > .oxe-tx {
+.oxe-wrap.oxe-h-center > .oxe-tx,
+.oxe-stack.oxe-h-center > .oxe-tx {
   text-align: center;
 }
 .oxe-wrap.oxe-h-right > .oxe-tx {
   text-align: right;
 }
+/* Stacked letters set left or right: each centred in a column as wide as a line is tall, at that side (Excel's PDF
+   of rotate.xlsx: right-set letters centred 9.4px in from where right-aligned text ends; left-set not measured). */
+.oxe-stack.oxe-h-left > .oxe-tx,
+.oxe-stack.oxe-h-right > .oxe-tx {
+  flex: 0 0 var(--oxe-wrap-lh);
+  text-align: center;
+}
+.oxe-page-cells .oxe-stack.oxe-h-left > .oxe-tx,
+.oxe-page-cells .oxe-stack.oxe-h-right > .oxe-tx {
+  flex-basis: var(--oxe-pwrap-lh);
+}
 /* Text orientation (Format Cells > Alignment): turned about its middle by Excel's angle, or its letters stacked one
-   above the other; either may reach past the cell. Superscript and subscript raise or lower the text a third of a
-   line. (Drawn from the settings; not yet measured against Excel's own drawing.) */
+   above the other (above); either may reach past the cell. Superscript and subscript raise or lower the text a third
+   of a line. (Measured in print against Excel's PDF of test/fixtures/rotate.xlsx: docs/LAYOUT.md.) */
 .oxe-cell.oxe-rot,
 .oxe-cell.oxe-stack {
   overflow: visible;
@@ -395,9 +411,10 @@
   transform: translate(var(--oxe-rot-dx, 0px), var(--oxe-rot-dy, 0px)) rotate(calc(var(--oxe-rot) * -1));
   transform-origin: center;
 }
-.oxe-stack > .oxe-tx {
-  writing-mode: vertical-lr;
-  text-orientation: upright;
+/* Shrunk to fit: lowered to keep the full-size text's baseline (cells.js fitNumbers; in print with the page's own
+   shift, below). */
+.oxe-cell[data-oxe-shrink] > .oxe-tx {
+  translate: 0 var(--oxe-shrink-dy, 0px);
 }
 .oxe-sup > .oxe-tx {
   top: -0.33em;
@@ -550,14 +567,17 @@
   --oxe-pad-r: 1.9px;
   height: var(--oxe-h);
 }
-.oxe-page-cells .oxe-wrap > .oxe-tx {
+.oxe-page-cells .oxe-wrap > .oxe-tx,
+.oxe-page-cells .oxe-stack > .oxe-tx {
   line-height: var(--oxe-pwrap-lh);
   top: var(--oxe-pwrap-bottom);
 }
-.oxe-page-cells .oxe-wrap.oxe-v-top > .oxe-tx {
+.oxe-page-cells .oxe-wrap.oxe-v-top > .oxe-tx,
+.oxe-page-cells .oxe-stack.oxe-v-top > .oxe-tx {
   top: var(--oxe-pwrap-top);
 }
-.oxe-page-cells .oxe-wrap.oxe-v-center > .oxe-tx {
+.oxe-page-cells .oxe-wrap.oxe-v-center > .oxe-tx,
+.oxe-page-cells .oxe-stack.oxe-v-center > .oxe-tx {
   top: var(--oxe-pwrap-mid);
 }
 /* The page's cells at the print scale (print.js): a box zoomed by it, holding the title and body blocks, each clipped
@@ -591,10 +611,10 @@
 .oxe-hf .oxe-hf-s { text-decoration: line-through; }
 .oxe-hf .oxe-hf-pic { width: var(--oxe-hf-pw); height: var(--oxe-hf-ph); vertical-align: var(--oxe-hf-drop, 0px); }
 .oxe-page-zoom .oxe-tx {
-  translate: 0 var(--oxe-pshift, 0px);
+  translate: 0 calc(var(--oxe-pshift, 0px) + var(--oxe-shrink-dy, 0px));
 }
 .oxe-page-zoom .oxe-cell:not(.oxe-h-right) > .oxe-tx {
-  translate: var(--oxe-pshift-x, 0px) var(--oxe-pshift, 0px);
+  translate: var(--oxe-pshift-x, 0px) calc(var(--oxe-pshift, 0px) + var(--oxe-shrink-dy, 0px));
 }
 /* Printed headings (print.js drawHeadings): the row numbers and column letters, their rules. */
 .oxe-print-heads { position: absolute; left: 0; top: 0; }
@@ -2562,3 +2582,24 @@
 .oxe-page-setup .oxe-dialog-row .oxe-dialog-label { min-width: 13em; }
 .oxe-page-setup .oxe-dialog-field { width: 14em; }
 .oxe-iteration-box .oxe-dialog-field { width: 8em; }
+
+/* The Style box (stylebox.js): New Cell Style and Modify. Each part's check box with what it is beside it. */
+.oxe-style-includes {
+  margin: 8px 0 10px;
+  padding: 6px 10px 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+}
+.oxe-style-includes legend {
+  padding: 0 4px;
+}
+.oxe-style-row {
+  display: grid;
+  grid-template-columns: minmax(7em, auto) 1fr;
+  align-items: baseline;
+  column-gap: 12px;
+}
+.oxe-style-part {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}

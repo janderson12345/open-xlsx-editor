@@ -48,6 +48,7 @@ insides:
 | `src/ooxml/tables.js` | The workbook's tables (range, header and total rows, columns and their totals, style and options, filter buttons), and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
 | `src/ooxml/tableedit.js`, `tableconvert.js`, `tablefilter.js` | Tables made and changed as Excel writes them: Insert Table and Format as Table, the style and options, the total row and its functions, the header row, filter buttons, the name, Resize Table, typing in and below a table; Convert to Range; a table's own filter (docs/TABLES.md). |
 | `src/ooxml/cellstyleedit.js`, `src/editor/cellstylegallery.js` | Home > Cell Styles: Excel's 47 built-in cell styles (`src/engine/cellstyles.js`, measured) added and applied as Excel does, and their gallery (docs/FORMATS.md). |
+| `src/ooxml/cellstyledefine.js`, `src/editor/stylebox.js`, `acts-styles.js`, `commands-styles.js` | New Cell Style and Modify as Excel makes them (the style by example, changed in place with the cell formats that use it), Excel's Style box, its acts and the newCellStyle and modifyCellStyle commands. |
 | `src/ooxml/tablestyle.js` | A table's look in its table style: Excel's built-in styles (`src/engine/tablestyles.js`, measured) or the workbook's own, laid on in Excel's order with the Table Style Options, under the cells' own formats (docs/TABLES.md). |
 | `src/ooxml/cfb.js` | Compound files (MS-CFB): every stream read by its path; written as version 3, small streams in the mini stream. |
 | `src/ooxml/encryption.js` | Workbooks saved with a password (MS-OFFCRYPTO agile): decrypted and encrypted with @noble/hashes and @noble/ciphers; PasswordError; docs/ENCRYPTION.md. |
@@ -188,7 +189,8 @@ insides:
 | `src/calc/functions-words.js`, `xpath.js` | ENCODEURL, BAHTTEXT (Thai number words), PHONETIC and FILTERXML, with an XPath 1.0 reader. |
 | `src/calc/charsets.js` | Characters as Excel counts and codes them: code points for LEFT and RIGHT, code page 1252 for CHAR and CODE, the code points UNICHAR refuses. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
-| `src/editor/richmarks.js` | Rich text while a cell is edited: one font per character, toggled, kept through edits (typed text in the font before the caret, as Excel's insert), turned into runs. |
+| `src/editor/richmarks.js` | Rich text while a cell is edited: one font per character, toggled or given a font, size or colour, kept through edits (typed text in the font before the caret, as Excel's insert), turned into runs. |
+| `src/editor/richtrack.js` | Those fonts kept in step with a text box as it is typed in: the cell editor's and the formula bar's. |
 | `src/editor/richview.js` | The cell editor's text drawn as its runs while part of it is formatted, with the caret and selection placed by the drawn text. |
 | `src/editor/autocorrect.js`, `autocorrect-list.js` | AutoCorrect as a cell or the formula bar is typed in (Excel's options and entries of its list), and the spelling underlines. |
 | `src/editor/formulabar.js` | The active cell's name (or the selection's name) and contents; Enter there enters into the cell. |

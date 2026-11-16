@@ -11,5 +11,5 @@ const FEATURE_OF = { toggleFont: 'font', stepFont: 'font', borders: 'font', draw
   stepDecimal: 'number', clearFormats: 'editing', clearAs: 'editing', fill: 'editing', autoFill: 'editing',
   sort: 'editing', sortAsc: 'editing', sortDesc: 'editing', sortBox: 'editing', autoSum: 'editing',
   filterToggle: 'editing', filterBy: 'editing', filterClear: 'editing', filterReapply: 'editing', filterAll: 'editing', filterSort: 'editing',
-  formatAsTable: 'styles', tableInsert: 'tables' };
+  formatAsTable: 'styles', newCellStyle: 'styles', modifyCellStyle: 'styles', newCellStyleBox: 'styles', modifyCellStyleBox: 'styles', tableInsert: 'tables' };
 export const groupOf = (name, change) => (name !== 'format' ? FEATURE_OF[name] : change.cellStyle ? 'styles' : change.numFmt != null || change.style ? 'number' : change.align ? 'alignment' : 'font');

@@ -5,10 +5,14 @@ import { readSheet } from './sheet.js';
 import { withEl } from './sheetops.js';
 import { setResultXml } from './sheetedit.js';
 import { RICH_ERRORS } from './spillxml.js';
+import { readStyles } from './styles.js';
+import { forgetFormats } from './stylesedit.js';
 
-/** The workbook as it is now, to go back to (restore): the parts, the sheets read so far and the workbook part. */
-export function snapshotOf(wb) {
+/** The workbook as it is now, to go back to (restore): the parts, the sheets read so far and the workbook part; with
+ *  `styles`, the styles part too (a cell style changed in place, cellstyledefine.js, which cells' formats don't undo). */
+export function snapshotOf(wb, { styles = false } = {}) {
   return {
+    ...(styles && wb.stylesDoc ? { styles: serializeXml(wb.stylesDoc) } : {}),
     files: { ...wb.pkg.files }, rels: wb.pkg.rels, book: serializeXml(wb.doc), dirty: new Set(wb.dirty), bookDirty: wb.bookDirty,
     // (The sheets as they were, names, order and all, and the parsed ones by their ids: sheets added, renamed, moved
     // or deleted since are put back too.)
@@ -36,6 +40,12 @@ export function restoreTo(wb, snap) {
     text: el.textContent,
   }, el));
   wb.dirty = new Set(snap.dirty);
+  if (snap.styles) {
+    wb.stylesDoc = parseXml(snap.styles);
+    Object.assign(wb.styles, readStyles(wb.stylesDoc), { palette: wb.styles.palette });
+    forgetFormats(wb);
+    wb.dirty.add(wb.stylesPath);
+  }
   wb._dynamicCm = null;
   wb.bookDirty = true;
   wb.edited = true;

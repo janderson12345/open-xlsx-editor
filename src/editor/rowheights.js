@@ -53,8 +53,10 @@ export function rowDescents(sheet, deco) {
 /** The height (pt) Excel gives a row for turned text (Format Cells > Alignment > Orientation), measured over COM with
  *  Calibri 11 (Rows.AutoFit after Range.Orientation): stacked letters (255) a line each and 1.5pt more ('ab' 31.5,
  *  'Stack' 76.5, 'Hello world text' 241.5); text at an angle its width up the angle and a line's height across it,
- *  the width 1.14 times the canvas's (Excel's GDI widths are wider): 'Hello world text' at 15, 30, 45, 60 and 90
- *  degrees 36, 52.5, 66, 76.5 and 81pt, worked out here within 2pt. Without a canvas (Node) only stacked text grows. */
+ *  the width 1.0645 times the canvas's and 7px more (Excel's GDI widths are wider): 'Hello world text' at 15, 30,
+ *  45, 60 and 90 degrees 36, 52.5, 66, 76.5 and 81pt, worked out here within 2pt; 'Rotated row sized by Excel' at 90
+ *  130.5pt (Excel's own height of test/fixtures/rotate.xlsx's row 46: the 1.14 times the canvas used before gave
+ *  134.25), 'Row sized at 45' 63pt (66 here). Without a canvas (Node) only stacked text grows. */
 export function turnedPt(text, rotation, font, linePt) {
   const plain = text.replace(/[\r\n]/g, '');
   if (rotation === 255) return linePt * [...plain].length + 1.5;
@@ -62,7 +64,7 @@ export function turnedPt(text, rotation, font, linePt) {
   ctx = ctx || document.createElement('canvas').getContext('2d');
   ctx.font = font;
   const a = (Math.abs(rotation > 90 ? 90 - rotation : rotation) * Math.PI) / 180;
-  const px = ctx.measureText(plain).width * 1.14 * Math.sin(a) + (linePt / 0.75) * Math.cos(a);
+  const px = (ctx.measureText(plain).width * 1.0645 + 7) * Math.sin(a) + (linePt / 0.75) * Math.cos(a);
   return Math.max(linePt, px * 0.75);
 }
 

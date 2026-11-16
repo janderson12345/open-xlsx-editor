@@ -30,6 +30,7 @@ import { shapeShift, ROWCOL_MESSAGES } from '../ooxml/rowcol.js';
 import { boxRule } from '../ooxml/dvedit.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { mergeLoss } from '../ooxml/mergeops.js';
+import { stepSize } from '../ooxml/formatops.js';
 import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
 
 /** The Paste menu's choices, as Paste Special options. */
@@ -86,13 +87,34 @@ export function createActs(env) {
   let tables = null;
   let outline = null;
   const moreAct = (name, args, i) => (more ??= createMoreActs({ ...env, act }))(name, args, i);
+  /** Bold, Italic, Underline, Strikethrough, the font, its size, Grow and Shrink Font and the font colour on the part
+   *  of a cell's text selected while it is edited (richmarks.js), as Excel's Font group does then; false when no text
+   *  is selected (the cells are formatted). Automatic is theme colour 1, as a cell's own Automatic is written. */
+  const partOfText = (name, args) => {
+    const ed = state.editing;
+    if (!ed?.textSelected) return false;
+    if (name === 'toggleFont') return ed.markEditor(args[0]);
+    if (name === 'format' && args[0]?.font && Object.keys(args[0]).length === 1) {
+      const f = { ...args[0].font };
+      if ('color' in f && !f.color) f.color = { theme: 1 };
+      return ed.markEditorFont(f);
+    }
+    if (name === 'stepFont') {
+      const s = ed.commands.selection;
+      const cell = state.workbook.sheet(state.sheetIndex).cells.get(s.ar)?.get(s.ac);
+      const { styles } = state.workbook;
+      const base = styles.fonts[(styles.cellXfs[cell?.s || 0] || styles.cellXfs[0]).fontId]?.size ?? 11;
+      return ed.markEditorFont((size) => ({ size: stepSize(size, args[0]) }), base);
+    }
+    return false;
+  };
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
     if (name === 'painting') return painter.active();
     if (DRAW_ACTS.has(name)) return drawing.act(name, ...args);
     if (!state.workbook) return false;
-    // (Bold, Italic, Underline or Strikethrough while part of a cell's text is selected in the editor: that part.)
-    if (name === 'toggleFont' && state.editing?.editorOpen && state.editing.markEditor?.(args[0])) return true;
+    // (The Font group while part of a cell's text is selected in the cell editor or the formula bar: that part.)
+    if (partOfText(name, args)) return true;
     if (!allowed(name, args[0])) return false;
     const i = state.sheetIndex;
     // (Insert > Sparklines and the Sparkline tab: acts-sparklines.js.)

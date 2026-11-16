@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { fontsFromRuns, editAt, applyEdit, toggleFont, runsOf } from '../src/editor/richmarks.js';
+import { fontsFromRuns, editAt, applyEdit, toggleFont, setFont, sizeAt, runsOf } from '../src/editor/richmarks.js';
 
 /** `fonts` after `before` was edited into `after` (the selection before it `sel`, the caret after it `caret`). */
 const typed = (fonts, before, after, sel, caret) => applyEdit(fonts, editAt(before, after, sel, caret));
@@ -68,4 +68,21 @@ test('the font typed text takes is the one Excel\'s own insert gives it (test/ri
     checked++;
   }
   assert.equal(checked, cases.length - 1);
+});
+
+test('a size, colour or font set on part of the text: those characters only, runs kept apart, a new font losing the old scheme', () => {
+  const fonts = fontsFromRuns([{ text: 'ab', font: null }, { text: 'cd', font: { b: true, name: 'Aptos Narrow', scheme: 'minor', family: 2 } }]);
+  let next = setFont(fonts, 1, 3, { size: 16 });
+  assert.deepEqual(runsOf('abcd', next), [{ text: 'a', font: null }, { text: 'b', font: { size: 16 } },
+    { text: 'c', font: { b: true, name: 'Aptos Narrow', scheme: 'minor', family: 2, size: 16 } }, { text: 'd', font: { b: true, name: 'Aptos Narrow', scheme: 'minor', family: 2 } }]);
+  next = setFont(next, 0, 4, { color: { rgb: 'FFFF0000' } });
+  assert.ok(next.every((f) => f.color.rgb === 'FFFF0000'));
+  next = setFont(next, 2, 4, { name: 'Courier New' });
+  assert.deepEqual([next[2].name, next[2].scheme, next[2].family, next[2].b], ['Courier New', null, null, true]);
+  assert.equal(next[0].name, undefined);
+  // (Grow Font steps from the first selected character's size, the cell's where it has none.)
+  assert.equal(sizeAt(next, 1, 11), 16);
+  assert.equal(sizeAt(next, 0, 11), 11);
+  // (Nothing selected: nothing changes.)
+  assert.equal(setFont(fonts, 2, 2, { size: 9 }), fonts);
 });

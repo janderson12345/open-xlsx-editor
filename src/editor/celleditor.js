@@ -6,7 +6,8 @@
 // as it is typed (richview.js); a formula, or text with nothing formatted, is the text box's own plain text.
 import { setVars } from './dom.js';
 import { autoCorrect } from './autocorrect.js';
-import { fontsFromRuns, anyFormatted, editAt, applyEdit, toggleFont, runsOf } from './richmarks.js';
+import { anyFormatted, toggleFont, setFont, sizeAt } from './richmarks.js';
+import { trackRich, keepsEdit } from './richtrack.js';
 import { createRichView } from './richview.js';
 
 const MOVES = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
@@ -22,36 +23,26 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   const corrector = autoCorrect(box);
   let open = null; // { r, c, mode }
   let held = null; // (a box over it, Insert Function's: losing focus doesn't finish; the caret kept: [start, end])
-  // (Part of the text formatted: one font per character, richmarks.js; `seen` the text they were last placed in,
-  // `sel` the selection before the edit being made, `kept` the fonts of texts the box's own undo can bring back.)
-  const rich = { fonts: [], seen: '', sel: null, kept: new Map(), view: createRichView(box, (f) => runStyle()?.(f) || '') };
+  // (Part of the text formatted: one font per character, richtrack.js.)
+  const rich = { track: trackRich(box), view: createRichView(box, (f) => runStyle()?.(f) || '') };
+  // (Focus gone to the Font group's font or size list while text is selected: the edit kept open for it.)
+  let parked = false;
 
   /** The fonts brought up to the box's text (after an edit, `e` its input event), and the view drawn. */
   const sync = (e = null) => {
-    const text = box.value;
-    if (text !== rich.seen) {
-      const undo = e && /^history/.test(e.inputType || '') && rich.kept.get(text);
-      rich.fonts = undo || applyEdit(rich.fonts, editAt(rich.seen, text, rich.sel, box.selectionEnd));
-      rich.seen = text;
-      keep();
-    }
-    rich.sel = null;
+    rich.track.sync(e);
     show();
-  };
-  const keep = () => {
-    rich.kept.set(rich.seen, rich.fonts);
-    if (rich.kept.size > 200) rich.kept.delete(rich.kept.keys().next().value);
   };
   /** Drawn formatted (the box's text hidden, the view under it) when part of it is and it isn't a formula. */
   const show = () => {
-    const on = !!open && !box.value.startsWith('=') && anyFormatted(rich.fonts);
+    const on = !!open && !box.value.startsWith('=') && anyFormatted(rich.track.fonts);
     box.classList.toggle('oxe-editor-rich', on);
     rich.view.el.className = `oxe-editor oxe-edit-view ${open?.cls || ''}`;
     if (on) {
       // (The browser's spelling underlines would be under the box's own, differently placed, characters.)
       box.spellcheck = false;
       if (!rich.view.el.isConnected) box.before(rich.view.el);
-      rich.view.draw(box.value, rich.fonts);
+      rich.view.draw(box.value, rich.track.fonts);
     } else rich.view.el.remove();
     if (open) size();
     if (on) rich.view.place();
@@ -71,17 +62,18 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     const text = corrector.finish();
     sync();
     // (Its runs, when part of it is formatted and it isn't a formula.)
-    const runs = text.startsWith('=') ? null : runsOf(text, rich.fonts);
+    const runs = rich.track.runs(text);
     close();
     onFinish(text, move, runs);
   };
   /** The selection's part of the text given bold ('b'), italic ('i'), underline ('u') or strikethrough ('strike'),
    *  or not; true when there was a selection to format. */
-  const mark = (key) => {
-    if (!open || box.selectionEnd <= box.selectionStart || box.value.startsWith('=')) return false;
-    sync();
-    rich.fonts = toggleFont(rich.fonts, box.selectionStart, box.selectionEnd, key);
-    keep();
+  const mark = (key) => change((fonts, a, b) => toggleFont(fonts, a, b, key));
+  /** `fn(fonts, start, end)` on the selection's part of the text; true when there was a selection to format. Focus
+   *  comes back to the box from a font list that had it (parked). */
+  const change = (fn) => {
+    if (!open || !rich.track.change(fn)) return false;
+    if (parked) { parked = false; box.focus({ preventScroll: true }); }
     show();
     return true;
   };
@@ -96,7 +88,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     if (e.key === 'Escape') { e.preventDefault(); close(); onCancel(); return; }
     if (e.key === 'Enter' && e.altKey) {
       e.preventDefault();
-      rich.sel = [box.selectionStart, box.selectionEnd];
+      rich.track.before();
       box.setRangeText('\n', box.selectionStart, box.selectionEnd, 'end');
       sync();
       return;
@@ -105,11 +97,25 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     if (e.key === 'Tab') { e.preventDefault(); finish(e.shiftKey ? [0, -1, 'tab'] : [0, 1, 'tab']); return; }
     if (open.mode === 'enter' && MOVES[e.key]) { e.preventDefault(); finish(MOVES[e.key]); }
   });
-  box.addEventListener('beforeinput', () => { if (open) rich.sel = [box.selectionStart, box.selectionEnd]; });
+  box.addEventListener('beforeinput', () => { if (open) rich.track.before(); });
   box.addEventListener('input', (e) => { if (open) sync(e); });
   // (The drawn caret and selection follow the box's.)
   for (const ev of ['keydown', 'keyup', 'select', 'selectionchange', 'focus']) box.addEventListener(ev, placeMarks);
-  box.addEventListener('blur', () => { if (!held) finish(null); });
+  box.addEventListener('blur', (e) => {
+    if (held) return;
+    // (To the Font group's font or size list with text selected, as Excel's in-cell editor allows: kept open until
+    // that list lets focus go somewhere other than back here.)
+    if (open && keepsEdit(e.relatedTarget) && box.selectionEnd > box.selectionStart) {
+      parked = true;
+      e.relatedTarget.addEventListener('focusout', (ev) => {
+        if (!parked) return;
+        parked = false;
+        if (ev.relatedTarget !== box) finish(null);
+      }, { once: true });
+      return;
+    }
+    finish(null);
+  });
   box.addEventListener('mousedown', (e) => pointAt(e));
 
   /** A click or a drag in drawn text: the caret put by the drawn characters, not the box's hidden ones (a double
@@ -154,11 +160,7 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     open(r, c, text, mode, cls, runs = null) {
       close();
       // (A cell of rich text keeps its formatting while edited, one font per character.)
-      rich.fonts = runs && runs.map((x) => x.text).join('') === text ? fontsFromRuns(runs) : Array(text.length).fill(null);
-      rich.seen = text;
-      rich.sel = null;
-      rich.kept.clear();
-      keep();
+      rich.track.reset(text, runs);
       const rect = grid.cellRect(r, c);
       open = { r, c, mode, x: rect.x, y: rect.y, w: rect.w, h: rect.h, cls: cls || '' };
       box.className = `oxe-editor ${cls || ''}`;
@@ -174,6 +176,11 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     commit: () => finish(null),
     get isOpen() { return !!open; },
     mark,
+    /** Font properties ({ name, size, color }) set on the selection's part of the text (richmarks.js setFont);
+     *  false when nothing is selected. `size` may be a function of the selection's first size (Grow Font). */
+    markFont: (patch, base = null) => change((fonts, a, b) => setFont(fonts, a, b, typeof patch === 'function' ? patch(sizeAt(fonts, a, base)) : patch)),
+    /** Whether part of the text is selected (the Font group then formats it). */
+    get selecting() { return !!open && box.selectionEnd > box.selectionStart && !box.value.startsWith('='); },
     /** Kept open while a box is over it (`on`), or no longer. */
     hold(on) { held = on && open ? [box.selectionStart, box.selectionEnd] : null; },
     /** `text` typed at the caret (in place of what is selected), as edit mode. */

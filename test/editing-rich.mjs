@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import { editingPage } from './editing-kit.mjs';
 import { openFixture } from './browser.mjs';
 
-const { page, check, finish, openFixtureFrom } = await editingPage();
+const { page, check, finish, openFixtureFrom, ribbon } = await editingPage();
 await openFixture(page, 'basic.xlsx');
 
 /** The editor's drawn runs: [text, weight, style, decoration, colour, size, family] each, or null when not drawn. */
@@ -196,5 +196,66 @@ const back = Workbook.fromBytes(new Uint8Array(bytes)).sheet(0).cells.get(11).ge
 const red = back.runs?.[1];
 check(back.v === 'Plain redder漢' && back.runs?.length === 2 && red.text === 'redder漢' && red.font.i && red.font.size === 16 && red.font.name === 'Courier New' && red.font.color?.rgb === 'FFFF0000',
   'saved and read back: the run as it was drawn, its typed text red 16pt Courier New italic', JSON.stringify(back.runs));
+
+// The Font group's size list, Increase Font Size and Font Color on part of the text being edited: that part only, the
+// edit kept open (as Excel's in-cell editor), and entered as runs of their own.
+/** A font list of the Home tab picked as a person does: focus moves to it (the editor kept open), then the choice. */
+const pickList = async (cls, value) => {
+  const sel = `.oxe-toolbar select.${cls}`;
+  const more = !(await page.isVisible(sel)) && await page.isVisible('.oxe-more');
+  if (more) await page.click('.oxe-more');
+  await page.focus(sel);
+  await page.selectOption(sel, value);
+  if (more && await page.isVisible('.oxe-more')) await page.click('.oxe-more');
+};
+await page.evaluate(() => window.oxe.select('J14'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('Big red end');
+await page.keyboard.press('F2');
+for (let k = 0; k < 4; k++) await page.keyboard.press('ArrowLeft');
+for (let k = 0; k < 3; k++) await page.keyboard.press('Shift+ArrowLeft');
+await pickList('oxe-size', '16');
+d = await drawn();
+const focused = await page.evaluate(() => document.activeElement?.classList.contains('oxe-editor'));
+check(focused && d?.length === 3 && d[1][0] === 'red' && d[1][5] === '21.3333px' && d[0][5] !== '21.3333px',
+  'the size list on the selected word while editing: that word 16pt, the editor still open with focus', JSON.stringify({ focused, d }));
+await ribbon('Font Color');
+await ribbon('Increase Font Size');
+d = await drawn();
+check(d?.[1]?.[4] === 'rgb(255, 0, 0)' && d[1][5] === '24px' && d[0][4] !== 'rgb(255, 0, 0)',
+  'Font Color and Increase Font Size on the same selection: red, 16 grown to 18pt, the rest as it was', JSON.stringify(d));
+await page.keyboard.press('Home');
+for (let k = 0; k < 3; k++) await page.keyboard.press('Shift+ArrowRight');
+await pickList('oxe-font', 'Courier New');
+d = await drawn();
+check(d?.[0]?.[0] === 'Big' && d[0][6] === 'Courier New' && d[2][6] !== 'Courier New', 'the font list on "Big": Courier New there only', JSON.stringify(d));
+await page.keyboard.press('Enter');
+const sized = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(13).get(9).runs?.map((x) => [x.text, x.font?.size ?? null, x.font?.color?.rgb ?? null, x.font?.name ?? null]));
+// (Read back from the cell's XML, a formatted run gives every property, the cell's own size and font where it kept them.)
+check(JSON.stringify(sized) === JSON.stringify([['Big', 11, null, 'Courier New'], [' ', null, null, null], ['red', 18, 'FFFF0000', 'Calibri'], [' end', null, null, null]]),
+  'entered: the runs with their own font, size and colour', JSON.stringify(sized));
+
+// The formula bar: a rich cell edited there keeps its runs (shown plain, as Excel's bar shows them), and Ctrl+B on
+// part of its text there makes that part bold.
+await page.evaluate(() => window.oxe.select('J14'));
+const barBox = '.oxe-formula';
+await page.click(barBox);
+await page.keyboard.press('End');
+await page.keyboard.type('!');
+await page.keyboard.press('Shift+ArrowLeft');
+await page.keyboard.press('Shift+ArrowLeft');
+await page.keyboard.press('Shift+ArrowLeft');
+await page.keyboard.press('Control+b');
+await page.keyboard.press('Enter');
+const barRuns = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(13).get(9).runs?.map((x) => [x.text, !!x.font?.b, x.font?.size ?? null]));
+check(JSON.stringify(barRuns) === JSON.stringify([['Big', false, 11], [' ', false, null], ['red', false, 18], [' e', false, null], ['nd!', true, 11]]),
+  'edited in the formula bar: the runs kept, the typed "!" in the font before it, Ctrl+B there on "nd!" bold', JSON.stringify(barRuns));
+{
+  const bytes = await page.evaluate(() => [...window.oxe.save()]);
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  const runs = Workbook.fromBytes(new Uint8Array(bytes)).sheet(0).cells.get(13).get(9).runs;
+  check(runs?.length === 5 && runs[2].font.size === 18 && runs[2].font.color?.rgb === 'FFFF0000' && runs[0].font.name === 'Courier New' && runs[4].font.b,
+    'saved and read back: the size, colour, font and bold runs as entered', JSON.stringify(runs));
+}
 
 await finish();

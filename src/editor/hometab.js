@@ -89,6 +89,9 @@ export function homeTab(kit, { act, color, workbook = () => null }) {
 
   const fontSel = pick('Font', 'oxe-font', [], (v) => act('format', { font: { name: v } }));
   const sizeSel = pick('Font Size', 'oxe-size', [], (v) => act('format', { font: { size: Number(v) } }));
+  // (Picked while part of a cell's text is selected in the cell editor or the formula bar: that part, the edit kept
+  // open while the list has focus, richtrack.js keepsEdit.)
+  for (const sel of [fontSel, sizeSel]) sel.dataset.oxeKeepsEdit = '';
   const numSel = pick('Number Format', 'oxe-numfmt', NUMBER_FORMATS.map(([n, code]) => el('option', { value: code }, n)), (v) => { if (v) act('format', { numFmt: v }); });
   const b = {
     bold: toggle('B', 'Bold (Ctrl+B)', f('toggleFont', 'b'), { cls: 'oxe-b' }),
@@ -140,7 +143,7 @@ export function homeTab(kit, { act, color, workbook = () => null }) {
       // (Format as Table: Excel's gallery, the selection made a table in the style picked; acts-tables.js.)
       menu('▤', 'Format as Table', () => [el('div', { class: 'oxe-tstyle-menu' }, ...tableGallery(kit, { wb: workbook(), onPick: (n) => act('formatAsTable', n) }))], { label: 'Format as Table', big: true }),
       // (Cell Styles: Excel's gallery, the selection given the style picked; cellstyleedit.js.)
-      menu('▧', 'Cell Styles', () => [el('div', { class: 'oxe-tstyle-menu' }, ...cellStyleGallery(kit, { wb: workbook(), onPick: (n) => act('format', { cellStyle: n }) }))], { label: 'Cell Styles', big: true })),
+      menu('▧', 'Cell Styles', () => [el('div', { class: 'oxe-tstyle-menu' }, ...cellStyleGallery(kit, { wb: workbook(), onPick: (n) => act('format', { cellStyle: n }), onModify: (n) => act('modifyCellStyleBox', n), onNew: () => act('newCellStyleBox') }))], { label: 'Cell Styles', big: true })),
     grp('Cells', col(
       sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Cells...', f('insertCells'), { hint: 'Ctrl++' }), item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),
         item('Insert Sheet', f('insertSheet'), { hint: 'Shift+F11' })]),

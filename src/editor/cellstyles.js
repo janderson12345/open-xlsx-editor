@@ -64,6 +64,8 @@ function runCss(font, theme, palette) {
   if (font.u === 'double' || font.u === 'doubleAccounting') out.push('text-decoration-style: double');
   const color = font.color ? resolveColor(font.color, theme, palette) : null;
   if (color) out.push(`color: ${color}`);
+  // (Automatic, set on part of a cell in another colour: the sheet's own text colour, not the cell's.)
+  else if (font.color?.auto) out.push('color: var(--oxe-fg)');
   // (Raised or lowered as a cell's superscript and subscript are: editor.css .oxe-sup.)
   if (font.vertAlign === 'superscript') out.push('position: relative', 'top: -0.33em');
   if (font.vertAlign === 'subscript') out.push('position: relative', 'top: 0.25em');
