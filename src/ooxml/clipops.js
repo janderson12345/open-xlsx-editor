@@ -31,7 +31,9 @@ export function snapshot(wb, si, sel, cut = false) {
     cells: cells.map(({ r, c }) => {
       const cell = sheet.cells.get(r)?.get(c);
       // (`result`: what a formula worked out to, for Paste Special's Values.)
-      return { dr: r - rect.r0, dc: c - rect.c0, f: cell?.f || null, v: cell?.f ? null : cell?.v ?? null, t: cell?.t, s: cell?.s || 0, result: cell?.v ?? null };
+      // (`runs`: a cell of rich text's, which Paste, a cut and Paste Special's All bring, as Excel's do.)
+      const runs = !cell?.f && typeof cell?.v === 'string' && cell.runs ? cell.runs : null;
+      return { dr: r - rect.r0, dc: c - rect.c0, f: cell?.f || null, v: cell?.f ? null : cell?.v ?? null, t: cell?.t, s: cell?.s || 0, result: cell?.v ?? null, ...(runs ? { runs } : {}) };
     }),
     // (Each column's width when it isn't the standard one, for Paste Special's Column widths.)
     widths: Array.from({ length: rect.c1 - rect.c0 + 1 }, (_, dc) => sheet.cols.find((x) => x.min <= rect.c0 + dc && x.max >= rect.c0 + dc && x.width != null)?.width ?? null),
@@ -167,6 +169,32 @@ export function pasteArea(sel, rows, cols) {
 }
 
 const valueOf = (cell) => (cell.t === 'e' ? { code: String(cell.v) } : cell.v);
+/** A copied cell's value as a change, with its rich text's runs (measured over COM, test/richruns-excel.json: Paste,
+ *  All, All except borders, Transpose, a cut and a paste into another workbook keep a cell's runs; Values and Formulas
+ *  give its text alone; Formats the cell format alone, the destination keeping its own runs). */
+const contentOf = (cell, runs = true) => ({ value: valueOf(cell), ...(runs && cell.runs ? { runs: cell.runs } : {}) });
+
+/** The font change (stylesedit.js) that gives the cell format `s` its rich text's first run's font, or null. In Excel a
+ *  cell's font is its first character's (its first run is written bare), so Paste Special's Formats from a cell whose
+ *  first word is italic gives an italic cell (measured, test/richruns-excel.json); here a run of the cell's own font
+ *  can come first, so the difference is made up when only the formats are pasted. */
+function firstRunFont(wb, s, runs) {
+  const f = runs?.[0]?.font;
+  if (!f) return null;
+  const base = wb.styles.fonts[(wb.styles.cellXfs[s] || wb.styles.cellXfs[0]).fontId] || {};
+  const change = {};
+  for (const k of ['b', 'i', 'strike']) if (!!f[k] !== !!base[k]) change[k] = !!f[k];
+  if ((f.u || null) !== (base.u || null)) change.u = f.u || null;
+  if ((f.vertAlign || null) !== (base.vertAlign || null)) change.vertAlign = f.vertAlign || null;
+  if (f.size != null && f.size !== base.size) change.size = f.size;
+  if (f.name && f.name !== base.name) change.name = f.name;
+  const colorKey = (c) => (!c ? 'auto' : typeof c === 'string' ? c.toUpperCase() : c.rgb ? c.rgb.toUpperCase() : c.theme != null ? `t${c.theme}:${c.tint || 0}` : 'auto');
+  if (f.color && colorKey(f.color) !== colorKey(base.color)) {
+    const c = f.color;
+    change.color = typeof c === 'string' ? { rgb: c } : c.rgb ? { rgb: c.rgb } : c.theme != null ? { theme: c.theme, ...(c.tint ? { tint: c.tint } : {}) } : null;
+  }
+  return Object.keys(change).length ? change : null;
+}
 
 /** Paste a copy (not a cut) into sheet si at `sel`: values, formulas moved as their cells are (relative references
  *  follow, $ ones stay, one off the sheet is #REF!), formats and merged ranges. A copy from another workbook brings
@@ -184,7 +212,7 @@ export function pasteCopy(wb, si, sel, clip) {
         const c = tc + cell.dc;
         const dr = r - (clip.rect.r0 + cell.dr);
         const dc = c - (clip.rect.c0 + cell.dc);
-        out.contents.push(cell.f ? { r, c, formula: shiftFormula(cell.f, dr, dc) } : { r, c, value: valueOf(cell) });
+        out.contents.push(cell.f ? { r, c, formula: shiftFormula(cell.f, dr, dc) } : { r, c, ...contentOf(cell) });
         if (sameBook) out.styles.push({ r, c, s: cell.s });
       }
       for (const m of clip.merges) out.merges.push({ r0: tr + m.r0, c0: tc + m.c0, r1: tr + m.r1, c1: tc + m.c1 });
@@ -241,7 +269,7 @@ export function pasteCut(wb, si, sel, clip) {
     const r = area.r0 + cell.dr;
     const c = area.c0 + cell.dc;
     const f = cell.f && moveRefs(cell.f, { here: clip.sheetName, home: to.sheet, from, to });
-    dst.contents.set(key(r, c), f ? { r, c, formula: f } : { r, c, value: valueOf(cell) });
+    dst.contents.set(key(r, c), f ? { r, c, formula: f } : { r, c, ...contentOf(cell) });
     dst.styles.set(key(r, c), { r, c, s: cell.s });
   }
   dst.merges = [...dst.merges.filter((m) => !overlaps(m, area)), ...clip.merges.map((m) => ({ r0: area.r0 + m.r0, c0: area.c0 + m.c0, r1: area.r0 + m.r1, c1: area.c0 + m.c1 }))];
@@ -364,7 +392,8 @@ export function pasteSpecial(wb, si, sel, clip, { paste = 'all', op = null, skip
         if (what.contents) {
           const from = { r: clip.rect.r0 + cell.dr, c: clip.rect.c0 + cell.dc };
           let src;
-          if (!cell.f) src = { value: valueOf(cell) };
+          // (The runs with the whole of the contents and the format, as Excel's All and All except borders.)
+          if (!cell.f) src = contentOf(cell, what.contents === 'formulas' && (what.format === 'all' || what.format === 'noBorders') && !operation);
           else if (what.contents === 'values') src = { value: cell.t === 'e' ? { code: String(cell.result) } : cell.result };
           else if (transpose) src = { formula: transposeFormula(cell.f, { here: clip.sheetName, from: { sheet: clip.sheetName, ...clip.rect }, src: from, dst: { r, c }, to: { r: tr, c: tc } }) };
           else src = { formula: shiftFormula(cell.f, r - from.r, c - from.c) };
@@ -373,7 +402,10 @@ export function pasteSpecial(wb, si, sel, clip, { paste = 'all', op = null, skip
         }
         if (!sameBook || !what.format) continue;
         const was = dest?.s || 0;
-        if (what.format === 'all') out.styles.push({ r, c, s: cell.s });
+        if (what.format === 'all') {
+          const first = !what.contents && firstRunFont(wb, cell.s, cell.runs);
+          out.styles.push({ r, c, s: first ? wb.styleWith(cell.s, { font: first }) : cell.s });
+        }
         else if (what.format === 'number') out.styles.push({ r, c, s: wb.styleWith(was, { numFmt: formatCodeOf(wb.styles, cell.s) }) });
         else {
           // (All except borders: the copy's format with the destination's borders.)

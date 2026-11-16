@@ -232,7 +232,8 @@ check(d?.[0]?.[0] === 'Big' && d[0][6] === 'Courier New' && d[2][6] !== 'Courier
 await page.keyboard.press('Enter');
 const sized = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(13).get(9).runs?.map((x) => [x.text, x.font?.size ?? null, x.font?.color?.rgb ?? null, x.font?.name ?? null]));
 // (Read back from the cell's XML, a formatted run gives every property, the cell's own size and font where it kept them.)
-check(JSON.stringify(sized) === JSON.stringify([['Big', 11, null, 'Courier New'], [' ', null, null, null], ['red', 18, 'FFFF0000', 'Calibri'], [' end', null, null, null]]),
+// (A later run in the cell's own font is written with that font too, as Excel writes it: test/richruns-excel.json.)
+check(JSON.stringify(sized) === JSON.stringify([['Big', 11, null, 'Courier New'], [' ', 11, null, 'Calibri'], ['red', 18, 'FFFF0000', 'Calibri'], [' end', 11, null, 'Calibri']]),
   'entered: the runs with their own font, size and colour', JSON.stringify(sized));
 
 // The formula bar: a rich cell edited there keeps its runs (shown plain, as Excel's bar shows them), and Ctrl+B on
@@ -248,7 +249,7 @@ await page.keyboard.press('Shift+ArrowLeft');
 await page.keyboard.press('Control+b');
 await page.keyboard.press('Enter');
 const barRuns = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(13).get(9).runs?.map((x) => [x.text, !!x.font?.b, x.font?.size ?? null]));
-check(JSON.stringify(barRuns) === JSON.stringify([['Big', false, 11], [' ', false, null], ['red', false, 18], [' e', false, null], ['nd!', true, 11]]),
+check(JSON.stringify(barRuns) === JSON.stringify([['Big', false, 11], [' ', false, 11], ['red', false, 18], [' e', false, 11], ['nd!', true, 11]]),
   'edited in the formula bar: the runs kept, the typed "!" in the font before it, Ctrl+B there on "nd!" bold', JSON.stringify(barRuns));
 {
   const bytes = await page.evaluate(() => [...window.oxe.save()]);
@@ -256,6 +257,80 @@ check(JSON.stringify(barRuns) === JSON.stringify([['Big', false, 11], [' ', fals
   const runs = Workbook.fromBytes(new Uint8Array(bytes)).sheet(0).cells.get(13).get(9).runs;
   check(runs?.length === 5 && runs[2].font.size === 18 && runs[2].font.color?.rgb === 'FFFF0000' && runs[0].font.name === 'Courier New' && runs[4].font.b,
     'saved and read back: the size, colour, font and bold runs as entered', JSON.stringify(runs));
+}
+
+// Ctrl+1 with characters selected in the cell editor: Format Cells with its Font tab alone, and what is set there
+// (superscript, a size, a colour) given to those characters only, as Excel's box does (test/richruns-excel.json).
+const runFonts = (r, c) => page.evaluate(([r, c]) => (window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(r)?.get(c)?.runs || null)
+  ?.map((x) => [x.text, !!x.font?.b, !!x.font?.i, x.font?.vertAlign ?? null, x.font?.size ?? null, x.font?.color?.rgb ?? null]), [r, c]);
+const fcBox = '.oxe-format-box';
+await page.evaluate(() => window.oxe.select('L20'));
+await page.focus('.oxe-grid');
+await page.keyboard.type('Hello brave world');
+await page.keyboard.press('F2');
+await page.keyboard.press('Home');
+for (let k = 0; k < 6; k++) await page.keyboard.press('ArrowRight');
+for (let k = 0; k < 5; k++) await page.keyboard.press('Shift+ArrowRight');
+await page.keyboard.press('Control+1');
+await page.waitForSelector(fcBox);
+const tabs = await page.evaluate((sel) => [...document.querySelectorAll(`${sel} .oxe-fc-tab`)].map((t) => t.textContent), fcBox);
+check(JSON.stringify(tabs) === '["Font"]', 'Ctrl+1 on selected characters: Format Cells with the Font tab alone', JSON.stringify(tabs));
+await page.getByLabel('Superscript').check();
+await page.getByLabel('Size:').fill('16');
+await page.locator(`${fcBox} .oxe-fc-color select`).selectOption('FFFF0000');
+await page.getByRole('button', { name: 'OK', exact: true }).click();
+await page.waitForSelector(fcBox, { state: 'detached' });
+d = await drawn();
+check(d?.length === 3 && d[1][0] === 'brave' && d[1][4] === 'rgb(255, 0, 0)' && Math.abs(parseFloat(d[1][5]) - (16 * 4) / 3) < 0.1 && d[0][4] !== 'rgb(255, 0, 0)',
+  'OK: "brave" drawn red at 16pt while still editing, the rest as it was', JSON.stringify(d));
+const stillOpen = await page.evaluate(() => !!document.querySelector('.oxe-editor:not(.oxe-edit-view)')?.isConnected);
+check(stillOpen, 'the cell is still being edited after the box', String(stillOpen));
+await page.keyboard.press('Enter');
+let rf = await runFonts(19, 11);
+check(rf?.length === 3 && JSON.stringify(rf[1]) === JSON.stringify(['brave', false, false, 'superscript', 16, 'FFFF0000']) && rf[0][3] === null && rf[2][3] === null,
+  'entered: "brave" superscript, 16pt and red, "Hello " and " world" not', JSON.stringify(rf));
+
+// The same from the formula bar: "Hello" selected there, Ctrl+1, Bold Italic.
+await page.evaluate(() => window.oxe.select('L20'));
+await page.click(barBox);
+await page.keyboard.press('Home');
+for (let k = 0; k < 5; k++) await page.keyboard.press('Shift+ArrowRight');
+await page.keyboard.press('Control+1');
+await page.waitForSelector(fcBox);
+await page.getByLabel('Font style:').selectOption('bi');
+await page.getByRole('button', { name: 'OK', exact: true }).click();
+await page.waitForSelector(fcBox, { state: 'detached' });
+await page.keyboard.press('Enter');
+rf = await runFonts(19, 11);
+check(rf?.length === 4 && JSON.stringify(rf[0].slice(0, 4)) === JSON.stringify(['Hello', true, true, null]) && rf[2][0] === 'brave' && rf[2][3] === 'superscript',
+  'in the formula bar: "Hello" bold italic, "brave" kept as it was', JSON.stringify(rf));
+
+// Copy and Paste keep the runs (Ctrl+C, Ctrl+V, Undo), Paste Special's Values gives the text alone, and Formats the
+// cell format alone, a destination's own runs kept: as Excel's (test/richruns-excel.json).
+await page.evaluate(() => window.oxe.select('L20'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Control+c');
+await page.evaluate(() => window.oxe.select('L22'));
+await page.keyboard.press('Control+v');
+check(JSON.stringify(await runFonts(21, 11)) === JSON.stringify(rf), 'Ctrl+V: the runs pasted as they were', JSON.stringify(await runFonts(21, 11)));
+await page.keyboard.press('Control+z');
+await page.evaluate(() => window.oxe.select('L22'));
+await page.keyboard.press('Control+v');
+await page.evaluate(() => { window.oxe.select('L23'); return window.oxe.command('pasteSpecial', { paste: 'values' }); });
+const plainValue = await page.evaluate(() => { const c = window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(22).get(11); return [c?.v, !!c?.runs]; });
+check(JSON.stringify(plainValue) === '["Hello brave world",false]', 'Paste Special > Values: the text alone', JSON.stringify(plainValue));
+await page.evaluate(() => { window.oxe.select('L22'); return window.oxe.command('pasteSpecial', { paste: 'all' }); });
+check(JSON.stringify(await runFonts(21, 11)) === JSON.stringify(rf), 'Paste Special > All: the runs as they were', JSON.stringify(await runFonts(21, 11)));
+// (Undo of a paste over a cell of rich text brings its runs back.)
+await page.evaluate(() => { window.oxe.select('L22'); return window.oxe.command('pasteSpecial', { paste: 'values' }); });
+await page.keyboard.press('Control+z');
+check(JSON.stringify(await runFonts(21, 11)) === JSON.stringify(rf), 'Undo of Values pasted over it: the runs back', JSON.stringify(await runFonts(21, 11)));
+{
+  const bytes = await page.evaluate(() => [...window.oxe.save()]);
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  const runs = Workbook.fromBytes(new Uint8Array(bytes)).sheet(0).cells.get(21).get(11).runs;
+  check(runs?.length === 4 && runs[0].font.b && runs[0].font.i && runs[2].font.vertAlign === 'superscript' && runs[2].font.size === 16,
+    'saved and read back: the pasted cell’s runs', JSON.stringify(runs));
 }
 
 await finish();

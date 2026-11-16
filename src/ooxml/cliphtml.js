@@ -119,6 +119,7 @@ function fontChange(css) {
     const c = cssColor(css.color);
     if (c) out.color = colorOf(c);
   }
+  if (css['-oxe-script']) out.vertAlign = css['-oxe-script'] === 'super' ? 'superscript' : 'subscript';
   return out;
 }
 
@@ -180,12 +181,14 @@ function contentOf(cell, code, date1904) {
 }
 
 /** A cell's text as rich text when its pieces aren't all in one font ("Both <b>columns</b>", as Excel keeps it,
- *  measured): [{ text, font }] each font whole (strings.js richRunsXml), from the cell's format `s`; else null. */
-function runsOf(wb, cell, s) {
+ *  measured: test/clip-html-excel.json, test/richruns-excel.json): [{ text, font }] each font whole (strings.js
+ *  richRunsXml), each piece's font what its own CSS gives over the workbook's default font (so the space of
+ *  "<b>all</b> <b>bold</b>" isn't bold, though the cell's format is, as in Excel); else null. */
+function runsOf(wb, cell) {
   const changes = (cell.pieces || []).map((p) => fontChange(p.css));
   if (changes.length < 2 || changes.every((x) => JSON.stringify(x) === JSON.stringify(changes[0]))) return null;
-  const f = wb.styles.fonts[wb.styles.cellXfs[s]?.fontId ?? 0];
-  const base = { b: f.b, i: f.i, u: f.u, strike: f.strike, size: f.size, name: f.name, color: f.color };
+  const f = wb.styles.fonts[wb.styles.cellXfs[0]?.fontId ?? 0];
+  const base = { b: f.b, i: f.i, u: f.u, strike: f.strike, size: f.size, name: f.name, color: f.color, vertAlign: null };
   return cell.pieces.map((p, k) => ({ text: p.text, font: { ...base, ...changes[k], color: changes[k].color || base.color } }));
 }
 
@@ -224,7 +227,7 @@ export function pasteHtml(wb, si, sel, html, { widths = false } = {}) {
     if (!change.numFmt && content.typed) change.numFmt = content.typed;
     const s = Object.keys(change).length ? wb.styleWith(0, change) : 0;
     const { typed: _typed, ...what } = content;
-    const runs = typeof what.value === 'string' ? runsOf(wb, cell, s) : null;
+    const runs = typeof what.value === 'string' ? runsOf(wb, cell) : null;
     contents.push({ r, c, ...what, ...(runs ? { runs } : {}) });
     for (let y = r; y <= r1; y++) {
       for (let x = c; x <= c1; x++) {

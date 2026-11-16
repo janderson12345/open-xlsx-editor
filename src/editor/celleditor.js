@@ -72,6 +72,8 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
   /** `fn(fonts, start, end)` on the selection's part of the text; true when there was a selection to format. Focus
    *  comes back to the box from a font list that had it (parked). */
   const change = (fn) => {
+    // (Held for a box, Format Cells': the selection it was opened on, which focus coming back loses.)
+    if (open && held) box.setSelectionRange(held[0], held[1]);
     if (!open || !rich.track.change(fn)) return false;
     if (parked) { parked = false; box.focus({ preventScroll: true }); }
     show();
@@ -181,8 +183,13 @@ export function createCellEditor({ grid, onFinish, onCancel, onKey = null, onClo
     markFont: (patch, base = null) => change((fonts, a, b) => setFont(fonts, a, b, typeof patch === 'function' ? patch(sizeAt(fonts, a, base)) : patch)),
     /** Whether part of the text is selected (the Font group then formats it). */
     get selecting() { return !!open && box.selectionEnd > box.selectionStart && !box.value.startsWith('='); },
-    /** Kept open while a box is over it (`on`), or no longer. */
-    hold(on) { held = on && open ? [box.selectionStart, box.selectionEnd] : null; },
+    /** The font of the selection's first character (richmarks.js: null, the cell's own), for Format Cells. */
+    get selectedFont() { return open ? rich.track.fonts[box.selectionStart] ?? null : null; },
+    /** Kept open while a box is over it (`on`), or no longer (`restore`: the selection put back as it was). */
+    hold(on, restore = false) {
+      if (!on && restore && held && open) box.setSelectionRange(held[0], held[1]);
+      held = on && open ? [box.selectionStart, box.selectionEnd] : null;
+    },
     /** `text` typed at the caret (in place of what is selected), as edit mode. */
     insert(text) {
       if (!open) return;

@@ -25,6 +25,8 @@ import { selectionName, goToNames } from '../ooxml/goto.js';
 
 const FONT_KEYS = { b: 'b', 2: 'b', i: 'i', 3: 'i', u: 'u', 4: 'u', 5: 'strike' };
 const ARROWS = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
+/** Ctrl+1, Format Cells (by the key's code, as Ctrl+Shift+1 is "!"). */
+const formatKey = (e) => (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.code === 'Digit1';
 
 /** Make the grid in `root` editable. `ctx` = { workbook(), sheetIndex(), showSheet(i), grid, looks(), readOnly() }. */
 export function attachEditing(root, ctx) {
@@ -51,7 +53,10 @@ export function attachEditing(root, ctx) {
       if (cmd.run('nameBox', text) !== false) view.focus();
     },
     names: () => goToNames(ctx.workbook(), ctx.sheetIndex()),
-    onKey: (e) => pointing.key(e),
+    onKey: (e) => {
+      if (formatKey(e) && bar.selecting && ctx.formatCells) { ctx.formatCells(); return true; }
+      return pointing.key(e);
+    },
     onFocus: () => pointing.attach(bar.input),
     onBlur: () => {
       // (Leaving the bar while a formula is carried enters it, as leaving the cell editor does.)
@@ -67,6 +72,8 @@ export function attachEditing(root, ctx) {
       if (e.key === 'F3' && !e.ctrlKey && !e.altKey && (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)) { (e.shiftKey ? ctx.insertFunction : ctx.pasteNames)(); return true; }
       // (Ctrl+A after a function's name: Function Arguments for it, as in Excel; anywhere else it selects the text.)
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'a' && ctx.functionArguments?.()) return true;
+      // (Ctrl+1 with part of the text selected: Format Cells' Font tab for those characters, as in Excel.)
+      if (formatKey(e) && editor.selecting && ctx.formatCells) { ctx.formatCells(); return true; }
       return pointing.key(e);
     },
     onClose: () => { if (pointing.control === editor.el) pointing.attach(null); },
@@ -447,7 +454,12 @@ export function attachEditing(root, ctx) {
     markEditorFont(patch, base) { return editor.isOpen ? editor.markFont(patch, base) : bar.markFont(patch, base); },
     /** Whether part of a cell's text is selected in the cell editor or the formula bar. */
     get textSelected() { return editor.isOpen ? editor.selecting : bar.selecting; },
+    /** The font of the first character selected there (null: the cell's own), for Format Cells. */
+    get selectedFont() { return editor.isOpen ? editor.selectedFont : bar.selectedFont; },
     holdEditor(on) { editor.hold(on); },
+    /** The cell editor or the formula bar kept open, its selection as it is, while Format Cells formats part of its
+     *  text (`on`), or no longer. */
+    holdText(on) { if (editor.isOpen) editor.hold(on, true); else bar.hold(on); },
     /** Function Arguments' formula for the cell being edited, or the active cell: entered (refused, back into the
      *  editor), or with `wait` (one Excel refuses as it stands) left being edited with it. */
     /** A Function Arguments box (`el`, for cell `at`) pointed from as a formula is (pointing.js); null: back to the
