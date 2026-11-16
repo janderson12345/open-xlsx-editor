@@ -36,6 +36,7 @@ const setup = (page) => page.evaluate(async () => {
       emit();
     },
   };
+  window.aware = aware;
   window.applyAware = (id, s) => { if (s === null) states.delete(id); else states.set(id, s); emit(); };
   window.connect = async (user) => { window.room = await m.connectWorkbook(window.oxe, doc, { awareness: aware, user }); };
 });
@@ -191,7 +192,14 @@ const peer = (page) => page.evaluate(() => {
 });
 const waitPeer = (page, gone = false) => page.waitForFunction((g) => !document.querySelector('.oxe-grid > .oxe-sheet > .oxe-overlay .oxe-peer-active') === g, gone, { timeout: 5000 }).then(() => true, () => false);
 await a.page.evaluate(() => { window.oxe.command('select', 4, 2); window.oxe.command('extendTo', 5, 3); });
-await b.page.waitForFunction(() => document.querySelector('.oxe-overlay .oxe-peer-range'), null, { timeout: 5000 }).catch(() => {});
+// (Waited for until the second has the first's C5:D6 in its awareness and has drawn it: not just for any shaded range,
+// which the first's A21:C21 from the merge above can still be when the select is sent, the moves coalesced.)
+await b.page.waitForFunction(() => {
+  const me = window.aware.clientID;
+  const cur = [...window.aware.getStates()].find(([id]) => id !== me)?.[1]?.cursor;
+  const range = document.querySelector('.oxe-grid > .oxe-sheet > .oxe-overlay .oxe-peer-range');
+  return cur?.ar === 4 && cur.ac === 2 && cur.areas?.length === 1 && cur.areas[0].r1 === 5 && cur.areas[0].c1 === 3 && range;
+}, null, { timeout: 5000 }).catch(() => {});
 const seen = await peer(b.page);
 t.check(seen?.name === 'Avery Lin' && seen.flag === 'Avery Lin' && seen.flagShown && seen.border === 'rgb(192, 57, 43)' && seen.dx === 0 && seen.dy === 0 && seen.ranges === 1,
   'C5:D6 selected in the first: the second outlines C5 and shades the range in the first’s colour, its name on a flag', JSON.stringify(seen));
