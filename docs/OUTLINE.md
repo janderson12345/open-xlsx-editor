@@ -5,7 +5,7 @@ How rows and columns are grouped into an outline, collapsed and expanded, and ho
 hidden Excel (`tools/excel-compare/excel-outline.ps1`: `Range.Group`, `Ungroup`, `Outline.ShowLevels`,
 `Range.ShowDetail`, `ClearOutline`, `AutoOutline`, `Outline.SummaryRow` and `SummaryColumn`, `Range.Subtotal`,
 `RemoveSubtotal`, `Outline.AutomaticStyles`, `Range.ApplyOutlineStyles`, each on a new workbook of made-up cells, saved and read back). `npm test` (`test/outline.test.js`, 51
-cases; `test/subtotal.test.js`, 11 cases; `test/outlinestyles.test.js`, 9 cases) expects what Excel wrote, to the attribute; `test/outline.mjs` clicks the
+cases; `test/subtotal.test.js`, 11 cases; `test/subtotalformats.test.js`, 4 cases; `test/outlinestyles.test.js`, 9 cases) expects what Excel wrote, to the attribute; `test/outline.mjs` clicks the
 outline bar's buttons and the Subtotal box in a browser.
 
 ## In the editor
@@ -18,7 +18,8 @@ outline bar's buttons and the Subtotal box in a browser.
   otherwise the rows when the active cell's row is in a row group, the columns when not. Clear Outline with one cell
   selected clears the sheet's whole outline.
 - The outline bar: left of the row headings and over the column headings, the level buttons 1, 2, 3... in the corner, and
-  for each group a line along its rows (columns) and a − at its summary row, a + while its rows are hidden.
+  for each group a line along its rows (columns) and a − at its summary row, a + while its rows are hidden. With frozen
+  panes, the frozen rows' and columns' part of the bar stays in place with them, as the headings do.
 - Ctrl+8 hides the outline symbols (the bar goes, the outline stays) and shows them again: a view setting saved with the
   file, as Gridlines is, so not a step of the history.
 - Every other action is one step of the undo history, and every one is a named command (`group`, `ungroup`,
@@ -51,6 +52,7 @@ outline bar's buttons and the Subtotal box in a browser.
 | Rule | Seen |
 |---|---|
 | At each change in the chosen column a row is inserted under the group holding "<value> Total" in that column (bold, a format with the bold font) and `SUBTOTAL(n,C2:C3)` over the group's own rows in each column chosen; a Grand Total row under the list over all its rows. | Region East, East, North, West...: row 4 "East Total", C4 `=SUBTOTAL(9,C2:C3)`; row 11 "Grand Total", `=SUBTOTAL(9,C2:C9)`. |
+| A subtotal row takes the formats of the list row next to it, as an inserted row does: the one over it with Summary below data, the one under it with the summaries above (the headings' format never); its own format and height, and each cell whose format isn't the row's (an empty cell made for it). The label adds bold to its cell's format. | Region filled yellow, Units 0.00, Item italic: A4 bold and yellow, B4 italic (empty), C4 0.00. Above: the Grand row italic as the first row of data, not bold as the headings. A bold 30pt row: East Total's row bold, 30pt. |
 | SUBTOTAL's numbers and the words: Sum 9 Total, Count 3 Count, Average 1 Average, Max 4 Max, Min 5 Min, Product 6 Product, Count Numbers 2 Count, StdDev 7, StdDevp 8, Var 10, Varp 11 (each its own name). | "East Product", "East Count" (Count Numbers), "Grand StdDevp". |
 | The list is outlined: its rows at level 2, the subtotal rows at 1, the grand total at none. | `outlineLevelRow="2"`. |
 | Summary below data off: the subtotal rows go over their groups, the Grand row under the headings, and `summaryBelow="0"` is written. | Row 2 Grand Average over C4:C11, row 3 East Average over C4:C5. |
@@ -82,9 +84,8 @@ used, which looks the same.
 | The bar takes 19 pixels for each level button (levels + 1) and 5 more, beside the row headings and over the column headings alike; none without an outline or with its symbols off (sheetView `showOutlineSymbols="0"`). | `Window.PointsToScreenPixelsX(0)` and `Y(0)` at 100% and 96 dpi: 43px with one level, 62, 81, 100, 119, 138, 157 with up to seven; 0 with DisplayOutline off. |
 
 Not measured (Excel's glyphs aren't in its PDF, and COM doesn't reach them): the buttons' own size (15px here, in a
-19px slot), the line's look and the tick at its far end. The bar isn't drawn over frozen rows or columns.
+19px slot), the line's look and the tick at its far end.
 
 ## Not yet
 
-- Subtotal's cells take the formats of the row above them (Excel's own formats there weren't measured, the probe's cells
-  had none); Excel's message for a list without headings.
+- Excel's message for a list without headings.
