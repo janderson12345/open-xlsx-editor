@@ -177,6 +177,19 @@ export interface SaveAsChoice {
 
 export interface SavedFile { fileName: string; type: string; bytes: Uint8Array; mime: string }
 
+/** What onRefreshQuery is asked for: a Power Query query ('query') or another connection ('connection') loaded to a
+ *  table, its connection, its M (a query's) and the table it loads to (docs/QUERIES.md). */
+export interface QueryRefreshRequest {
+  name: string;
+  kind: 'query' | 'connection';
+  connection: { name: string; description: string; type: string; connection: string; command: string } | null;
+  m: string | null;
+  target: { sheet: string; ref: string; table: string } | null;
+}
+/** The rows a refresh gives: arrays (the first the column names), objects (their keys the columns), or
+ *  { columns, rows }. A value is a number, text, true/false, a Date or null (an empty cell). */
+export type QueryRows = unknown[][] | Record<string, unknown>[] | { columns: string[]; rows: unknown[][] };
+
 export declare function mountXlsxEditor(
   host: HTMLElement,
   options?: {
@@ -216,6 +229,10 @@ export declare function mountXlsxEditor(
     locale?: string | Partial<LocaleSettings>;
     /** Save As's file; without it, the browser downloads it. */
     onSave?: (file: SavedFile) => void;
+    /** Data > Refresh and Refresh All for a query or connection loaded to a table: the host gets its rows (a page can't
+     *  reach a database or run Power Query's M); the editor writes them into the table as Excel does. Without it,
+     *  Excel's words that the connection can't be refreshed. A rejection's message is shown after them. */
+    onRefreshQuery?: (request: QueryRefreshRequest) => QueryRows | Promise<QueryRows>;
     /** A PDF export for Save As to offer: open-xlsx-editor/pdf's exportPdf. */
     exportPdf?: (editor: XlsxEditor) => Promise<Uint8Array>;
     onChange?: () => void;

@@ -117,6 +117,7 @@ const editor = mountXlsxEditor(el, {
   people: [{ name: 'Sam Lee', userId: 'sam.lee@example.com' }], // whom @ offers in a comment, besides the workbook's
   locale: 'de-DE',                      // country settings for numbers and dates; without it, the browser's language
   onSave: ({ fileName, bytes }) => {},  // Save As's file; without it, the browser downloads it
+  onRefreshQuery: async ({ name, kind, connection, m, target }) => rows, // Data > Refresh: a query's rows (docs/QUERIES.md)
   exportPdf,                            // from 'open-xlsx-editor/pdf': Save As then offers PDF
   onChange: () => {},                   // the workbook changed
 });
@@ -267,7 +268,7 @@ Each of the others says how a part was matched to Excel, what was measured, and 
   (Protect Sheet and Protect Workbook).
 - **Data and objects:** `docs/SORT.md`, `docs/FILTER.md`, `docs/DATATOOLS.md` (Flash Fill, Remove Duplicates, Text
   to Columns...), `docs/PIVOT.md`, `docs/CHARTS.md`, `docs/NOTES.md` (notes and comments), `docs/LINKS.md`
-  (hyperlinks).
+  (hyperlinks), `docs/QUERIES.md` (Power Query queries and connections, refreshed through the host).
 - **Working with others:** `docs/COLLAB.md` (co-editing), `docs/AGENT.md` (the agent interface and MCP server).
 
 ## Contributing, security, licence

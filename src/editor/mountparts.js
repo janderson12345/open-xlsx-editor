@@ -54,6 +54,7 @@ export function createParts(env, wb, i, sheet) {
       askInvalid: (info) => askInvalid(info),
       selectionShown: () => { for (const f of [...state.onSelect]) f(); return showValidation(); },
       goToBox: () => act('goToBox'),
+      refreshData: (all) => act('refreshData', all),
       nameManager: () => act('nameManager'),
       createNames: () => act('createNames'),
       insertFunction: () => act('insertFunction'),

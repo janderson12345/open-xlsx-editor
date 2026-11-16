@@ -11,7 +11,10 @@ const input = document.querySelector('input[type=file]');
 const params = new URLSearchParams(location.search);
 // (People a comment's @ offers, made up, as a host would give them from its directory.)
 const people = [{ name: 'Avery Chen', userId: 'avery.chen@example.com' }, { name: 'Sam Lee', userId: 'sam.lee@example.com' }, { name: 'Robin Park', userId: 'robin.park@example.com' }];
-const editor = mountXlsxEditor(host, { people, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
+// (Data > Refresh for a query: this page has no data source of its own, so it asks window.oxeRefreshQuery when a page
+// script (the browser tests, test/queries.mjs) gives one; docs/QUERIES.md.)
+const onRefreshQuery = (request) => (window.oxeRefreshQuery ? window.oxeRefreshQuery(request) : Promise.reject(new Error('This page has no data source for queries.')));
+const editor = mountXlsxEditor(host, { people, onRefreshQuery, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
   ...(params.get('locale') ? { locale: params.get('locale') } : {}) });
 window.oxe = editor;
 // (For the browser tests: a second editor on the page, as two workbooks open at once; test/editing-clip.mjs.)

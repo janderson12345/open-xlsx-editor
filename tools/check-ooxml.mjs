@@ -7,6 +7,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { unzipSync, strFromU8 } from 'fflate';
+
+/** A part's text: UTF-16 when its BOM says so (Excel writes the DataMashup's customXml item so), else UTF-8. */
+const partText = (u8) => (u8[0] === 0xff && u8[1] === 0xfe ? new TextDecoder('utf-16le').decode(u8.subarray(2))
+  : u8[0] === 0xfe && u8[1] === 0xff ? new TextDecoder('utf-16be').decode(u8.subarray(2)) : strFromU8(u8));
 import { DOMParser } from '@xmldom/xmldom';
 
 const files = process.argv.slice(2).filter((a) => fs.existsSync(a)).flatMap((a) => (fs.statSync(a).isDirectory() ? fs.readdirSync(a).filter((f) => /\.xls[xm]$/i.test(f)).map((f) => path.join(a, f)) : [a]));
@@ -104,7 +108,7 @@ for (const file of files) {
   try { zip = unzipSync(bytes); } catch (e) { zip = null; problems.push(`not a zip: ${e.message}`); }
   const names = zip ? Object.keys(zip) : [];
   const xml = new Map();
-  for (const n of names) if (/\.(xml|rels|vml)$/i.test(n)) { const d = parse(strFromU8(zip[n]), n, problems); if (d) xml.set(n, d); }
+  for (const n of names) if (/\.(xml|rels|vml)$/i.test(n)) { const d = parse(partText(zip[n]), n, problems); if (d) xml.set(n, d); }
   const types = xml.get('[Content_Types].xml');
   if (zip && !types) problems.push('[Content_Types].xml missing');
   else if (types) {
