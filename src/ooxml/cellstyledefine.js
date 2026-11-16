@@ -39,6 +39,7 @@ export function styleInfo(wb, name) {
   const f = formatsOf(wb);
   const found = cellStyleEls(f).find((el) => attr(el, 'name') === name || (def && attr(el, 'builtinId') === String(def.builtinId)));
   if (!found && !def) return null;
+  if (found && attr(found, 'hidden') === '1') return null;
   // (A built-in style the workbook hasn't got: as Excel would add it, without adding it yet.)
   const el = found ? styleXfEls(f)[Number(attr(found, 'xfId') || 0)] : null;
   const includes = Object.fromEntries(STYLE_PARTS.map(([k, p]) => [k, el ? attr(el, `apply${p}`) !== '0' : !def.off.includes(p)]));
@@ -47,7 +48,7 @@ export function styleInfo(wb, name) {
 
 /** The include flags written on a style's xf: none for a part included, applyX="0" for one left out, in Excel's order
  *  (NumberFormat, Font, Fill, Border, Alignment, Protection). */
-function setIncludes(el, includes) {
+export function setIncludes(el, includes) {
   const key = Object.fromEntries(STYLE_PARTS.map(([k, p]) => [p, k]));
   for (const p of ['NumberFormat', 'Font', 'Fill', 'Border', 'Alignment', 'Protection']) {
     el.removeAttribute(`apply${p}`);
@@ -132,15 +133,23 @@ export function modifyCellStyle(wb, name, change = null, includes = null, rename
   }
   const f = formatsOf(wb);
   const { xfId, el: styleEl } = namedStyle(f, name);
-  const before = styleEl.cloneNode(true);
   const now = f.changed(styleEl.cloneNode(true), readXf(styleEl, f.ns, wb.styles), oneCell(change));
   // (The changed() marks applied what it changed, as a cell's format does; a style's xf marks only what it leaves out.)
   setIncludes(now, includes || info.includes);
-  replaceAt(f, 'cellStyleXfs', xfId, now);
   const cs = cellStyleEls(f).find((el) => Number(attr(el, 'xfId') || 0) === xfId);
   if (cs && info.builtin && attr(cs, 'customBuiltin') !== '1') cs.setAttribute('customBuiltin', '1');
   if (cs && rename && rename !== name) cs.setAttribute('name', String(rename).trim());
-  // (Each part of the style that changed, or that it now includes, given to the cell formats that follow it.)
+  const formats = putStyleXf(f, xfId, now);
+  wb.dirty.add(wb.stylesPath);
+  return { xfId, formats };
+}
+
+/** Style entry `xfId` replaced by `now` in place, and every cell format of the style given each part of it that changed,
+ *  or that the style now includes, and that the format doesn't hold as its own (applyX="1"): Modify's, and Merge
+ *  Styles' for a style of the same name (cellstylemanage.js). Returns the cell formats changed, by index. */
+export function putStyleXf(f, xfId, now) {
+  const before = styleXfEls(f)[xfId].cloneNode(true);
+  replaceAt(f, 'cellStyleXfs', xfId, now);
   const moved = STYLE_PARTS.filter(([, p, id]) => {
     if (attr(now, `apply${p}`) === '0') return false;
     if (attr(before, `apply${p}`) === '0') return true;
@@ -168,6 +177,6 @@ export function modifyCellStyle(wb, name, change = null, includes = null, rename
     replaceAt(f, 'cellXfs', i, next);
     formats.push(i);
   });
-  wb.dirty.add(wb.stylesPath);
-  return { xfId, formats };
+  f.wb.dirty.add(f.wb.stylesPath);
+  return formats;
 }

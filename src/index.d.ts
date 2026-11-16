@@ -218,6 +218,9 @@ export declare function mountXlsxEditor(
     onSave?: (file: SavedFile) => void;
     /** A PDF export for Save As to offer: open-xlsx-editor/pdf's exportPdf. */
     exportPdf?: (editor: XlsxEditor) => Promise<Uint8Array>;
+    /** Workbooks Home > Cell Styles > Merge Styles offers to take styles from, besides the others open on the page:
+     *  an .xlsx file's bytes or a Workbook, by name, or a function giving them when the box opens. */
+    styleBooks?: Array<{ fileName: string; bytes?: Uint8Array | ArrayBuffer; workbook?: Workbook }> | (() => Array<{ fileName: string; bytes?: Uint8Array | ArrayBuffer; workbook?: Workbook }> | Promise<Array<{ fileName: string; bytes?: Uint8Array | ArrayBuffer; workbook?: Workbook }>>);
     onChange?: () => void;
   },
 ): XlsxEditor;

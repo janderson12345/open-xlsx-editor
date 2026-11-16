@@ -1,7 +1,9 @@
-// Home > Cell Styles' New Cell Style and Modify as commands (commands.js shares its state and helpers as `env`): each
+// Home > Cell Styles' New Cell Style, Modify, Duplicate, Delete and Merge Styles as commands (commands.js shares its state and helpers as `env`): each
 // one step of the history, a snapshot of the workbook with its styles part before and after, since a style changed
 // in place changes the cell formats that use it (ooxml/cellstyledefine.js).
 import { newCellStyle, modifyCellStyle } from '../ooxml/cellstyledefine.js';
+import { deleteCellStyle, duplicateCellStyle, mergeCellStyles } from '../ooxml/cellstylemanage.js';
+import { Workbook } from '../ooxml/workbook.js';
 
 export function styleCommands(env) {
   const { ctx, state, allowed, idOf } = env;
@@ -34,6 +36,28 @@ export function styleCommands(env) {
      *  change with it. */
     modifyCellStyle(name, change = null, includes = null, rename = null) {
       return styleStep((wb) => modifyCellStyle(wb, name, change, includes, rename), `Style ${rename || name} changed`);
+    },
+    /** Duplicate: style `newName` made a copy of style `name`, with `includes` and `change` as the Style box gives them
+     *  (null: as the style's). */
+    duplicateCellStyle(name, newName, includes = null, change = null) {
+      return styleStep((wb) => duplicateCellStyle(wb, name, newName, includes, change), `Style ${newName} made`);
+    },
+    /** Delete: style `name` taken out (a built-in one kept hidden, as Excel keeps it); the cells using it back to
+     *  Normal but for the parts they hold as their own. Normal is refused. */
+    deleteCellStyle(name) {
+      return styleStep((wb) => deleteCellStyle(wb, name), `Style ${name} deleted`);
+    },
+    /** Merge Styles: the styles of `source` (another workbook: a Workbook, or an .xlsx file's bytes) taken into this
+     *  one; `replace`: Yes to "Merge styles that have the same names?" (false: this workbook's kept). */
+    mergeCellStyles(source, replace = true) {
+      let from = source;
+      if (!(from instanceof Workbook)) {
+        try { from = Workbook.fromBytes(source instanceof ArrayBuffer ? new Uint8Array(source) : source); } catch { ctx.announce('That workbook could not be read'); return false; }
+      }
+      return styleStep((wb) => {
+        const out = mergeCellStyles(wb, from, replace);
+        return out.added.length || out.replaced.length ? out : { error: 'No styles to merge' };
+      }, 'Styles merged');
     },
   };
 }
