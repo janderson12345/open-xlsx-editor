@@ -67,3 +67,18 @@ test('a chart wholly deleted goes with its part; the saved workbook is whole', (
   const again = Workbook.fromBytes(wb.toBytes());
   assert.equal(again.sheets.length, 1);
 });
+
+test('a rectangle that doesn\'t move with cells keeps its place: its corners worked out again from the line sizes', () => {
+  // (anchors.xlsx's rectangle M5 to P9 made absolute, column B 145px wide: column B deleted, the rectangle stays 849px
+  // from the sheet's left, now in N with 17px over (13, 161925); its end the same. The rule as excel-slicers.ps1
+  // measured it on a slicer, docs/ROWCOL.md.)
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/anchors.xlsx')));
+  const path = 'xl/drawings/drawing1.xml';
+  wb.pkg.setText(path, wb.pkg.text(path).replace(/<xdr:twoCellAnchor>(<xdr:from><xdr:col>12<)/, '<xdr:twoCellAnchor editAs="absolute">$1'));
+  wb.setLines(0, 'col', 1, 1, { width: 20.7109375 });
+  wb.changeLines(0, 'col', 1, -1);
+  const rect = /<xdr:twoCellAnchor editAs="absolute">[\s\S]*?<\/xdr:twoCellAnchor>/.exec(wb.pkg.text(path))[0];
+  const corner = (side) => [...new RegExp(`<xdr:${side}><xdr:col>(\\d+)</xdr:col><xdr:colOff>(-?\\d+)</xdr:colOff>`).exec(rect)].slice(1).join(',');
+  assert.equal(corner('from'), '13,161925');
+  assert.equal(corner('to'), '16,161925');
+});

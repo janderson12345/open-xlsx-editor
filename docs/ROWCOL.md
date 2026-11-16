@@ -70,7 +70,7 @@ columns inserted and deleted around, inside and across each object, and cells sh
 | A note or threaded comment | Moves with its cell, also when cells shift, and is deleted with it. |
 | A picture, chart or shape (a two-cell anchor) | Each corner after the change moves with it. An end corner on the boundary where lines are inserted stays, so the object doesn't grow. Lines deleted inside it shrink it. One whose whole extent is deleted is deleted, a chart with its part. |
 | The same when cells shift | Not moved. |
-| One that moves but doesn't size (`editAs="oneCell"`), or doesn't move (`absolute`) | Moved by its start, or left where it is. Not measured. |
+| One that moves but doesn't size (`editAs="oneCell"`), or doesn't move (`absolute`) | Moved by its start; or kept at its place on the sheet, its corners worked out again from the lines' sizes. Measured with slicers (below). |
 
 Results: all 20 steps put the chart, the rectangle and the notes where Excel did (`test/anchors.test.js` against
 `test/anchors-excel.json`). The editor's 20 results were saved (`anchors-ours.mjs`) and opened in Excel

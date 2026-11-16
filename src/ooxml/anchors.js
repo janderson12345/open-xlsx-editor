@@ -4,7 +4,11 @@
 // - pictures, charts and shapes (a drawing's anchors) move and stretch with whole rows and columns: a corner after the
 //   change moves with it, an end corner on the boundary where lines are inserted stays, and one whose whole extent is
 //   deleted is deleted; shifting cells doesn't move them.
+// - one that doesn't move with cells (editAs absolute: Excel's table slicers made over COM) keeps its place in the
+//   sheet: its corners' lines and offsets worked out again from the line sizes (excel-slicers.ps1: the slicer at G2,
+//   column B 73px wide, was at F2 plus 55px after a column was inserted at C, the new one taking B's width).
 // Each part is edited where it says so; the rest of it stays byte for byte.
+import { EMU_PER_PX, rowHeightToPx, colWidthToPx, defaultColPx } from './units.js';
 
 const REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
 const THREADED = 'http://schemas.microsoft.com/office/2017/10/relationships/threadedComment';
@@ -27,6 +31,46 @@ export function wholeDeleted(from, to, at, n) {
   if (n >= 0) return false;
   const after = at - n; // (the first line after those deleted)
   return from.line >= at && (to.line < after || (to.line === after && to.off === 0));
+}
+
+/**
+ * A sheet's line sizes in EMUs (rows, axis 'row', or columns) before and after inserting n lines at `at` (n > 0) or
+ * deleting -n from it, for anchors that keep their place: lines inserted take the size of the line before them (the
+ * default at the sheet's start), as rowcol.js formats them; hidden lines are 0.
+ */
+export function lineSizes(model, axis, at, n) {
+  const px = axis === 'row'
+    ? (i) => { const row = model.rows.get(i); return row?.hidden ? 0 : rowHeightToPx(row?.ht ?? model.format.defaultRowHeight); }
+    : (i) => {
+      const col = model.cols.find((x) => i >= x.min && i <= x.max);
+      if (col?.hidden) return 0;
+      return col?.width != null ? colWidthToPx(col.width, 7) : defaultColPx(model.format, 7);
+    };
+  const fresh = axis === 'row' ? rowHeightToPx(model.format.defaultRowHeight) : defaultColPx(model.format, 7);
+  const before = (i) => px(i) * EMU_PER_PX;
+  const after = (i) => {
+    if (i < at) return before(i);
+    if (n > 0 && i < at + n) return at > 0 ? before(at - 1) : fresh * EMU_PER_PX;
+    return before(i - n);
+  };
+  return { before, after };
+}
+
+/**
+ * A corner kept at its place in EMUs (editAs absolute): moved as a cell-anchored corner is (shiftPoint), then its
+ * offset put right for the place to stay, past the ends of lines as far as it takes; on a line's end, the start of
+ * the next (a row inserted above, or deleted inside it: Excel kept 11, 0). With G:I deleted under a slicer's
+ * columns its end went 64px into the 99px-wide column that came to be I: 8, 609600, as in Excel.
+ */
+function keepPlace({ line, off }, end, { before, after }, at, n) {
+  let next = shiftPoint(line, off, end, at, n).line;
+  // (Its place from the start of the line it moved to: where it was, less where that line now starts.)
+  let x = off;
+  for (let i = 0; i < line; i++) x += before(i);
+  for (let i = 0; i < next; i++) x -= after(i);
+  while (x < 0 && next > 0) x += after(--next);
+  while (x >= after(next) && after(next) > 0) x -= after(next++);
+  return { line: next, off: x };
 }
 
 const relsOf = (wb, path, type) => wb.pkg.readRels(path).filter((r) => r.type === type || r.type.endsWith(`/${type}`));
@@ -95,9 +139,10 @@ export function moveNotes(wb, si, move) {
 
 /**
  * Pictures, charts and shapes of sheet si after whole rows (axis 'row') or columns ('col') are inserted (n > 0) or
- * deleted (n < 0) at `at`. An object wholly deleted goes, with its chart part when it is a chart.
+ * deleted (n < 0) at `at`. An object wholly deleted goes, with its chart part when it is a chart. `sizes`
+ * (lineSizes), for those that keep their place.
  */
-export function moveDrawings(wb, si, axis, at, n) {
+export function moveDrawings(wb, si, axis, at, n, sizes = null) {
   const pkg = wb.pkg;
   const tag = axis === 'row' ? ['row', 'rowOff'] : ['col', 'colOff'];
   for (const rel of relsOf(wb, wb.sheets[si].path, `${REL}/drawing`)) {
@@ -119,10 +164,14 @@ export function moveDrawings(wb, si, axis, at, n) {
       .replace(`<${pt.p}${tag[1]}>${pt.off}</${pt.p}${tag[1]}>`, `<${pt.p}${tag[1]}>${next.off}</${pt.p}${tag[1]}>`));
     const out = text.replace(/<(\w+:)?(twoCellAnchor|oneCellAnchor)\b([^>]*)>[\s\S]*?<\/\1?\2>/g, (el, _p, kind, attrs) => {
       const edit = /editAs="(\w+)"/.exec(attrs)?.[1] || (kind === 'oneCellAnchor' ? 'oneCell' : 'twoCell');
-      if (edit === 'absolute') return el;
       const from = point(el, 'from');
       if (!from) return el;
       const to = kind === 'twoCellAnchor' ? point(el, 'to') : null;
+      if (edit === 'absolute') {
+        if (!sizes) return el;
+        const next = put(el, from, keepPlace(from, false, sizes, at, n));
+        return to ? put(next, to, keepPlace(to, true, sizes, at, n)) : next;
+      }
       if (to && edit === 'twoCell' && wholeDeleted(from, to, at, n)) {
         for (const m of el.matchAll(/r:(?:id|embed)="([^"]+)"/g)) gone.push(m[1]);
         return '';

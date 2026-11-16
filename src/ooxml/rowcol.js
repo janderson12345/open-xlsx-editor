@@ -16,7 +16,7 @@ import { readSheet } from './sheet.js';
 import { pinRefs, forgetRows, setCellXml } from './sheetedit.js';
 import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tokens.js';
 import { SheetError, mapFormulas } from './sheetops.js';
-import { moveNotes, moveDrawings, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
+import { moveNotes, moveDrawings, lineSizes, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
 import { prepareRules, moveExtRanges, extendRules, dropDeadSparklines } from './rulemoves.js';
 import { readPivots } from './pivot.js';
 import { insertedLines, openJoined } from './outline.js';
@@ -360,7 +360,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
     const next = shiftRange({ r0: r, c0: c, r1: r, c1: c }, axis, at, n, band);
     return next && { r: next.r0, c: next.c0 };
   });
-  if (!band) moveDrawings(wb, si, axis, at, n);
+  if (!band) moveDrawings(wb, si, axis, at, n, lineSizes(wb.sheet(si), axis, at, n));
   // Tables: their ranges, columns and header names; references to what was deleted of them made #REF!.
   const dead = applyTables(wb, si, axis, tables, doc, setCellXml);
   for (const name of new Set(dead.map((d) => d.table))) mapFormulas(wb, (text) => deadTableRefs(text, dead, tokenize), { name });
