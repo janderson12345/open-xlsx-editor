@@ -125,11 +125,40 @@ Excel did them. Excel's own refresh of each moved pivot left it where it was.
 One step Excel takes its own way: a cell inserted inside the pivot, shifting down, leaves Excel's pivot with an empty
 cell in it. The editor refuses it, as it refuses any cells shifted through part of a pivot.
 
+## Sparklines and data validation
+
+Measured by `tools/excel-compare/excel-refmoves.ps1` on `refmove-cases.mjs`: a sheet with a group of line sparklines
+O2:O5 over B2:M5, a column sparkline at O7, one at Q2 over another sheet's B2:M2, four validation rules on B10:E15 (a
+list of $H$10:$H$12, whole numbers 1 to $I$10, a custom `D10>C10`, a list of `Data!$A$1:$A$3`, which Excel writes in
+the Excel 2010 form, `x14:dataValidation` in the sheet's extLst), notes at B12 and F20 and a threaded comment
+at C13. Forty-two steps (whole lines, cells shifting each way, lines on the other sheet, sorts) were
+done in Excel and the workbook it saved compared (`src/ooxml/rulemoves.js`; `test/fixtures/refmoves.xlsx`).
+
+| What | As Excel does it |
+|---|---|
+| A sparkline | Its cell moves with it, and its data as a reference does (the data on another sheet follows that sheet's lines). Deleted with its cell, or when all of its data is deleted (column B:M deleted: O2:O5 and O7 went though their cells stayed). |
+| Sparklines and new lines | Lines and cells inserted take the sparklines of the line or cell before them, in the same group, their data moved as a copy moves it: column P inserted after O gives P2 over C2:N2; rows 3:4 inserted give O3 over B3:M3 and O4 over B4:M4, Q3 and Q4 over Data!B3:M3 and B4:M4. |
+| A validation rule's ranges | Move, grow and shrink as ranges do, the Excel 2010 form's too. Lines and cells inserted take the rules of the line or cell before them: B10:B15 is B10:C15 after a column is inserted at C; all four end at row 16 after a row is inserted there; D10:D15 gets E12:E13 when E12:E13 is inserted shifting right. |
+| A rule's formulas | Stay relative to its first cell: references move as references do; when the first cell is deleted they read from the first cell left (D10:D15's `D10>C10` stays `D10>C10` after rows 10:12 go, the rule now D10:D12). |
+| Cells shifted through part of a rule | The part that moves is cut from it: a rule of its own when its formulas have relative references (D12, shifted left to C12: `C12>#REF!`), else it stays in the rule (E10:E11 E13:E15 D12). A part deleted is taken out when the formulas are relative (D10:D11 D13:D15), and left in when they are absolute (C10:C15 kept C12). |
+| A sort | Sparklines, validation rules and conditional formats stay where they are, also when the sparklines' cells are sorted. |
+
+Results: the sparklines and rules after 41 of the 42 steps match Excel's (`test/refmoves.test.js` against `test/refmoves-excel.json`); the other is
+below. The editor's 43 results (the start and each step) opened in Excel without a repair and read back 42 of 43 as
+Excel had made them (`excel-refmoves.ps1 -Books test/out/refmoves`), leaving out the threaded comment's placeholder
+box, which Excel lays out again itself when it opens any workbook.
+
+The one difference: with B12:C12 deleted shifting left, Excel took B12 out of B10:B15's list rule, whose formula is
+absolute, though it left C12 in C10:C15's and, with C12:E12 deleted, E12 in E10:E15's. The editor leaves an absolute
+rule whole each time. Excel also leaves rules overlapping there (C12 is in two), as the editor does.
+
 ## Not yet
 
-A sheet with slicers or timelines is refused ("Rows and columns can't be inserted or
-deleted yet on a sheet with...", or "Cells can't..."): their ranges aren't moved yet. Also missing: page
-breaks and the Insert Options button (format from below, clear
-formatting). One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is
-`=SUM(A3:A3)` in Excel after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to
-`=SUM(D3:D3)`.
+A sheet with slicers or timelines is refused ("Rows and columns can't be inserted or deleted yet on a sheet with...",
+or "Cells can't..."): their positions aren't moved yet. Also missing: page breaks and the Insert Options button (format
+from below, clear formatting). Rules of the Excel 2010 form are moved
+but not read: their cells aren't checked, shown a list or circled (E12 above). Conditional formats' ranges move as
+before; whether new lines take them as they take validation rules isn't measured.
+
+One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is `=SUM(A3:A3)` in Excel
+after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to `=SUM(D3:D3)`.

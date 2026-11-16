@@ -66,6 +66,19 @@ PivotTables when rows and columns move: `excel-pivot-lines.ps1 <pivot-cases.json
 `pivot-lines-ours.mjs <folder>` with `excel-pivot-lines-check.ps1 <folder> <out.json>` for Excel reading back the
 editor's results.
 
+Sparklines, data validation rules, notes and Circle Invalid Data's ovals when rows, columns and cells move or are
+sorted:
+
+```sh
+node tools/excel-compare/refmove-cases.mjs > tools/excel-compare/refmove-cases.json
+pwsh tools/excel-compare/excel-refmoves.ps1 tools/excel-compare/refmove-cases.json <out.json>
+node tools/excel-compare/refmove-results.mjs refmoves tools/excel-compare/refmove-cases.json <out.json> > test/refmoves-excel.json
+```
+
+Each case's workbook is saved to %TEMP%, its parts read and the file deleted (the books carry Excel's user name). After
+`npm test` has saved the editor's results in `test/out/refmoves`, `excel-refmoves.ps1 ... -Books test/out/refmoves`
+reads those back the same way, `repaired` saying whether Excel had to repair one (a repair log appeared in %TEMP%).
+
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and
 `pivot-ours.mjs <folder>` with `excel-pivot-check.ps1 <folder>` has Excel open and refresh the editor's refreshes (docs/PIVOT.md);

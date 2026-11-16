@@ -118,6 +118,6 @@ every group with a sparkline selected (which groups Excel's gallery takes when s
 
 ## Not yet
 
-Sparklines don't follow rows and columns
-inserted or deleted, and a group's source on another sheet isn't renamed with it. Not measured: an axis when the least
+A group's source on another sheet isn't renamed with it. (Sparklines do follow rows, columns and cells inserted and
+deleted, as Excel moves, copies and deletes them: docs/ROWCOL.md.) Not measured: an axis when the least
 value is exactly 0, a column sparkline of one value repeated, error values in the data (treated as empty).

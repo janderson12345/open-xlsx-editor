@@ -6,6 +6,7 @@
 // out again. Notes and threaded comments go with their cells, pictures, charts and shapes with whole rows and
 // columns, tables grown, narrowed, moved or deleted, pivot tables moved or deleted and pivot caches' sources followed
 // (anchors.js). A sheet with slicers or timelines is refused for now: their positions aren't moved yet.
+// Data validation rules and sparklines follow as Excel moves them (rulemoves.js).
 //
 // Inserting and deleting cells (the rest of their columns shifting down or up, or of their rows right or left) is the
 // same change limited to a band of columns (or rows): changeLines's `band`, docs/ROWCOL.md.
@@ -16,6 +17,7 @@ import { pinRefs, forgetRows, setCellXml } from './sheetedit.js';
 import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tokens.js';
 import { SheetError, mapFormulas } from './sheetops.js';
 import { moveNotes, moveDrawings, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
+import { prepareRules, moveExtRanges, extendRules, dropDeadSparklines } from './rulemoves.js';
 import { readPivots } from './pivot.js';
 import { insertedLines, openJoined } from './outline.js';
 import { pxWidth } from './sizes.js';
@@ -339,12 +341,18 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   const pivots = planPivots(wb, si, axis, at, n, band, (message) => { throw new SheetError(message); }, readPivots(wb));
   const info = wb.sheets[si];
   const { doc } = wb._part(si);
+  // (Data validation rules split where cells shifting cut them, their formulas read from their first cell to be.)
+  prepareRules(doc, axis, at, n, band, (range) => shiftRange(range, axis, at, n, band));
   // Formulas first, while every cell is where it was (shared ones on this sheet written out cell by cell).
   mapFormulas(wb, (text, here) => shiftRefs(text, { here, sheet: info.name, axis, at, n, band }), { name: info.name, target: si, shared: true });
   if (band) moveBandCells(doc, axis, at, n, band); else moveCells(doc, axis, at, n);
   const format = wb.sheet(si).format;
   if (axis === 'col' && !band) moveCols(doc, at, n, pxWidth(defaultColPx(format, 7)));
   moveRanges(doc, axis, at, n, band, split);
+  moveExtRanges(doc, axis, at, n, band, (text) => shiftSqref(text, axis, at, n, band));
+  extendRules(doc, axis, at, n, band);
+  // (Sparklines whose data is all deleted go, on any sheet.)
+  for (const [other, part] of wb._parsed) if (dropDeadSparklines(part.doc)) wb.dirty.add(other.path);
   // (Lines inserted into a collapsed group open it: its summary's collapsed goes, as Excel's does.)
   if (n > 0 && !band) openJoined(doc, axis, at, n, format);
   // Notes with their cells; pictures, charts and shapes with whole lines (not when cells shift, as in Excel).
