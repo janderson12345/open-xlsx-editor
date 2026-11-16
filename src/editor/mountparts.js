@@ -60,6 +60,7 @@ export function createParts(env, wb, i, sheet) {
       commentBox: () => act('commentBox'),
       outline: (dir) => act(dir > 0 ? 'groupBox' : 'ungroupBox'),
       flashFill: () => act('flashFill'),
+      saveAs: () => act('saveAsBox'),
       chartKey: (e) => state.picker?.onKey(e),
       formatCells: () => act('formatCellsBox'),
       painted: () => act('paintFormats'),

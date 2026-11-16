@@ -2,6 +2,7 @@
 // thousands and scaling commas, percent, scientific, fractions, dates and times, text, literals, colours, padding and
 // fill. Checked against Excel's own PDF of test/fixtures/numfmt.xlsx (57 formats x 14 values, test/numfmt-excel.json).
 import { decimal, roundTo, formatGeneral } from './numfmt.js';
+import { EN_US, localDecimal, isSpaceGroup } from './locale.js';
 
 /** Built-in formats by id, as Excel shows them in an en-US locale (ids 5-8, 41-44 are locale currency and accounting
  *  formats; the East Asian ids 27-36 and 50-58 fall back to General). 37-40 pad positives with _) as Excel does (its
@@ -153,6 +154,7 @@ function fillInt(tokens, int, grouping, zeroShows) {
     // Separators go between groups of the digits shown, zero padding included.
     const padded = digits.padStart(Math.max(digits.length, minDigits), '0');
     digits = padded.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (grouping !== true && grouping !== ',') digits = digits.replace(/,/g, grouping);
   }
   const out = [];
   let k = digits.length;
@@ -165,7 +167,7 @@ function fillInt(tokens, int, grouping, zeroShows) {
     if (k > 0) {
       // Commas from grouping ride with the digit before them.
       let take = 1;
-      while (k - take > 0 && digits[k - take] === ',') take++;
+      while (k - take > 0 && /\D/.test(digits[k - take])) take++;
       s = digits.slice(k - take, k);
       if (placesLeft === 0) s = digits.slice(0, k);
       k -= placesLeft === 0 ? k : take;
@@ -209,7 +211,7 @@ function bestFraction(x, maxDen) {
 }
 
 /** Format the numeric part of a section (digit placeholders, literals, percent, scaling, exponent, fraction). */
-function formatNumber(tokens, a) {
+function formatNumber(tokens, a, loc = EN_US) {
   let v = a;
   // Percent multiplies; commas right after the last digit placeholder (before the point or at the end) divide by 1000.
   v *= 100 ** tokens.filter((t) => t.t === '%').length;
@@ -225,7 +227,7 @@ function formatNumber(tokens, a) {
   const E = clean.findIndex((t) => t.t === 'E');
   const slash = clean.findIndex((t) => t.t === '/');
   const pct = (list) => list.map((t) => (t.t === '%' ? { t: 'lit', s: '%' } : t)).filter((t) => t.t !== ',');
-  if (E >= 0) return formatScientific(pct(clean), E, v);
+  if (E >= 0) return formatScientific(pct(clean), E, v, loc);
   if (slash >= 0) return formatFraction(pct(clean), slash, v);
   const list = pct(clean);
   const p = list.findIndex((t) => t.t === '.');
@@ -233,10 +235,12 @@ function formatNumber(tokens, a) {
   const fracToks = p >= 0 ? list.slice(p + 1) : [];
   const decimals = fracToks.filter((t) => t.t === 'd').length;
   const { int, frac } = digitsOf(v, decimals);
-  return [...fillInt(intToks, int, grouping, false), ...(p >= 0 ? ['.'] : []), ...fillFrac(fracToks, frac)];
+  // (A no-break space as the thousands separator is shown as a plain space: Excel's Range.Text with it set, measured.)
+  const group = isSpaceGroup(loc.group) ? ' ' : loc.group;
+  return [...fillInt(intToks, int, grouping && group, false), ...(p >= 0 ? [loc.decimal] : []), ...fillFrac(fracToks, frac)];
 }
 
-function formatScientific(list, E, v) {
+function formatScientific(list, E, v, loc) {
   const mant = list.slice(0, E);
   const expToks = list.slice(E + 1);
   const p = mant.findIndex((t) => t.t === '.');
@@ -258,7 +262,7 @@ function formatScientific(list, E, v) {
   const expDigits = expToks.filter((t) => t.t === 'd').length;
   const sign = exp < 0 ? '-' : list[E].s === '+' ? '+' : '';
   // (Excel shows a zero mantissa with every integer place filled: 0 in ##0.0E+0 is 000.0E+0.)
-  return [...fillInt(intToks, int, false, v === 0), ...(p >= 0 ? ['.'] : []), ...fillFrac(fracToks, frac), 'E', sign, String(Math.abs(exp)).padStart(expDigits, '0'),
+  return [...fillInt(intToks, int, false, v === 0), ...(p >= 0 ? [loc.decimal] : []), ...fillFrac(fracToks, frac), 'E', sign, String(Math.abs(exp)).padStart(expDigits, '0'),
     ...expToks.filter((t) => t.t !== 'd').map((t) => (t.t === 'lit' ? t.s : ''))];
 }
 
@@ -320,7 +324,7 @@ export function dateParts(serial, date1904, fracDigits = 0) {
   return { y, m, d, weekday, H: Math.floor(whole / 3600), M: Math.floor((whole % 3600) / 60), S: whole % 60, frac: secs - whole, total: total / unit, day };
 }
 
-function formatDate(tokens, v, date1904) {
+function formatDate(tokens, v, date1904, loc = EN_US) {
   const fracTok = tokens.find((t) => t.t === 'date' && t.s.startsWith('.'));
   const p = dateParts(v, date1904, fracTok ? fracTok.s.length - 1 : 0);
   const ampm = tokens.some((t) => t.t === 'date' && (t.s === 'AM/PM' || t.s === 'A/P'));
@@ -355,7 +359,7 @@ function formatDate(tokens, v, date1904) {
       case '[m]': case '[mm]': return String(Math.floor(p.total / 60)).padStart(s.length - 2, '0');
       case '[s]': case '[ss]': return String(Math.floor(p.total)).padStart(s.length - 2, '0');
       default:
-        if (s.startsWith('.')) return '.' + String(Math.round(p.frac * 10 ** (s.length - 1))).padStart(s.length - 1, '0');
+        if (s.startsWith('.')) return loc.decimal + String(Math.round(p.frac * 10 ** (s.length - 1))).padStart(s.length - 1, '0');
         if (/^m{4,}$/.test(s)) return MONTHS[p.m - 1];
         if (/^d{4,}$/.test(s)) return DAYS[p.weekday];
         if (/^y+$/.test(s)) return String(p.y);
@@ -383,8 +387,10 @@ function finish(pieces, color) {
 
 /** A value in a format code: { text, parts, color, hashes }. `text` with padding as spaces and fill left out; `parts`
  *  for the view; `color` from the section ('#RRGGBB' or { indexed }); `hashes` when the cell must show #s (a negative
- *  date). `width` is the cell's room in characters, for General inside a code. */
-export function formatValue(v, code, { date1904 = false, width = Infinity } = {}) {
+ *  date). `width` is the cell's room in characters, for General inside a code. `locale` (locale.js) gives the decimal
+ *  and thousands separators the number is drawn with (the code's own are en-US's, as in the file); en-US unless given,
+ *  as TEXT() works. */
+export function formatValue(v, code, { date1904 = false, width = Infinity, locale = EN_US } = {}) {
   const sections = compileFormat(code || 'General');
   if (typeof v === 'string') {
     const sec = sections[3] || (sections.length === 1 && sections[0].isText ? sections[0] : null);
@@ -398,11 +404,11 @@ export function formatValue(v, code, { date1904 = false, width = Infinity } = {}
   const toks = sec.tokens;
   if (sec.isDate) {
     if (v < 0) return { text: '', parts: [], color: sec.color, hashes: true };
-    return finish(formatDate(toks, a, date1904), sec.color);
+    return finish(formatDate(toks, a, date1904, locale), sec.color);
   }
   if (toks.some((t) => t.t === 'general') || (sec.isText && !toks.some((t) => t.t === 'd'))) {
     // General inside a code, or a text format (@) given a number: the number as General, literals around it.
-    const g = formatGeneral(a, width - (neg ? 1 : 0));
+    const g = localDecimal(formatGeneral(a, width - (neg ? 1 : 0)), locale);
     const body = toks.some((t) => t.t === 'general') ? toks.map((t) => (t.t === 'general' ? g : t.t === 'lit' ? t.s : t.t === 'pad' ? { pad: t.s } : t.t === 'fill' ? { fill: t.s } : '')) : [g];
     return finish([neg ? '-' : '', ...body], sec.color);
   }
@@ -410,7 +416,7 @@ export function formatValue(v, code, { date1904 = false, width = Infinity } = {}
     // Only literals ("big", or an empty section: ;;; hides the value).
     return finish([neg ? '-' : '', ...toks.map((t) => (t.t === 'lit' ? t.s : t.t === 'pad' ? { pad: t.s } : t.t === 'fill' ? { fill: t.s } : ''))], sec.color);
   }
-  const pieces = formatNumber(toks, a);
+  const pieces = formatNumber(toks, a, locale);
   // A minus goes first, before any literal ("-Total: 1", "-$1.00"), and not at all when the digits shown are all zero
   // (-1 in #,##0.0,,"M" is 0.0M; General keeps it: -0.12 in two characters is -0).
   const shown = pieces.flat().filter((x) => typeof x === 'string').join('');

@@ -5,7 +5,8 @@
 // Excel's Save As CSV (UTF-8) and CSV write one.
 import { zipSync, strToU8 } from 'fflate';
 import { Workbook } from './workbook.js';
-import { entryChanges } from './entry.js';
+import { decodeText, splitDelimited, detectSeparator, importCells } from './textimport.js';
+import { currentLocale } from './locale.js';
 import { cellText } from './numfmt.js';
 import { formatCodeOf } from './styles.js';
 import { ansiCode } from '../calc/charsets.js';
@@ -18,38 +19,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 
 /** The fields of a CSV text, row by row: a field in quotes may hold the separator, line breaks (kept as they are,
  *  CR LF in a file from Windows) and "" for a quote; outside quotes a line ends at CR LF, LF or CR. A last empty line
- *  isn't a row. */
-export function parseCsv(text, sep = ',') {
-  const rows = [];
-  let row = [];
-  let field = '';
-  let quoted = false;
-  let i = 0;
-  const end = () => { row.push(field); field = ''; };
-  while (i < text.length) {
-    const ch = text[i];
-    if (quoted) {
-      if (ch === '"' && text[i + 1] === '"') { field += '"'; i += 2; continue; }
-      if (ch === '"') { quoted = false; i++; continue; }
-      field += ch;
-      i++;
-      continue;
-    }
-    if (ch === '"') { quoted = true; i++; continue; }
-    if (ch === sep) { end(); i++; continue; }
-    if (ch === '\r' || ch === '\n') {
-      end();
-      rows.push(row);
-      row = [];
-      i += ch === '\r' && text[i + 1] === '\n' ? 2 : 1;
-      continue;
-    }
-    field += ch;
-    i++;
-  }
-  if (field !== '' || row.length) { end(); rows.push(row); }
-  return rows;
-}
+ *  isn't a row. (textimport.js splitDelimited, with one separator.) */
+export const parseCsv = (text, sep = ',') => splitDelimited(text, { seps: sep, quote: '"' });
 
 /** Excel's sheet name for a file: its name without the extension, cut to 31 characters, the characters a sheet's
  *  name can't hold (\ / ? * [ ] :) made _. */
@@ -71,21 +42,18 @@ function blankBytes(name) {
   return zipSync(Object.fromEntries(Object.entries(files).map(([k, v]) => [k, strToU8(v)])));
 }
 
-/** A workbook from a CSV file's bytes (UTF-8; a byte order mark left out) and its name, as Excel opens it. */
-export function csvWorkbook(bytes, fileName, today = new Date()) {
-  let text = new TextDecoder('utf-8').decode(bytes);
-  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
-  const wb = Workbook.fromBytes(blankBytes(sheetNameOf(fileName)));
-  const contents = [];
-  const styles = [];
-  parseCsv(text).forEach((fields, r) => fields.forEach((field, c) => {
-    if (field === '') return;
-    const ch = entryChanges(wb, 0, r, c, field, today);
-    // (What Excel wouldn't take as a formula is the text itself, as a CSV's field is.)
-    if (ch.error) { contents.push({ r, c, value: field }); return; }
-    contents.push(ch.content);
-    if (ch.style) styles.push(ch.style);
-  }));
+/** An empty workbook of one sheet named `name`. */
+export const blankWorkbook = (name = 'Sheet1') => Workbook.fromBytes(blankBytes(name));
+
+/** A workbook from a CSV file's bytes and its name, as Excel opens it. `encoding`: textimport.js decodeText's ('auto':
+ *  a byte order mark, else UTF-8 when the bytes are, else Windows-1252); `sep`: the field separator, else the one the
+ *  file seems written with (the locale's list separator on a tie: Excel takes the computer's); `locale` (locale.js):
+ *  the numbers' separators and the dates' order, the page's unless given. */
+export function csvWorkbook(bytes, fileName, today = new Date(), { locale = currentLocale(), sep = null, encoding = 'auto', quote = '"' } = {}) {
+  const { text } = decodeText(bytes, encoding);
+  const wb = blankWorkbook(sheetNameOf(fileName));
+  const rows = splitDelimited(text, { seps: sep ?? detectSeparator(text, { quote, prefer: locale.listSep }), quote });
+  const { contents, styles } = importCells(wb, 0, 0, 0, rows, { locale, today });
   if (contents.length) wb.apply(0, contents);
   if (styles.length) wb.setStyles(0, styles);
   wb.edited = false;
@@ -95,15 +63,51 @@ export function csvWorkbook(bytes, fileName, today = new Date()) {
 /** Whether bytes are a CSV rather than a workbook: not a zip (PK) or an encrypted workbook's compound file. */
 export const isCsv = (bytes, fileName) => /\.csv$/i.test(fileName || '') && !(bytes[0] === 0x50 && bytes[1] === 0x4b) && !(bytes[0] === 0xd0 && bytes[1] === 0xcf);
 
-/** A field as Excel writes it: in quotes when it holds a comma, a quote or a line break, its quotes doubled. */
-const field = (text) => (/[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text);
+const TAB = String.fromCharCode(9);
+
+/** A field as Excel writes it: in quotes when it holds a comma, a quote, a tab, a line break or the separator, its
+ *  quotes doubled (a tab cell quoted in a CSV, a comma one in a tab-delimited file: Excel's saves of
+ *  test/savetext-sheet.js). */
+const field = (text, sep) => (/[",\t\r\n]/.test(text) || text.includes(sep) ? `"${text.replace(/"/g, '""')}"` : text);
+
+/** Text in an encoding: 'utf-8' (with a byte order mark when `bom`), 'utf-16le' (with one when `bom`) or
+ *  'windows-1252' (? for a character it hasn't, as Excel writes one). */
+export function encodeText(text, encoding = 'utf-8', bom = true) {
+  if (encoding === 'utf-16le') {
+    const out = new Uint8Array((bom ? 2 : 0) + text.length * 2);
+    let k = 0;
+    if (bom) { out[k++] = 0xff; out[k++] = 0xfe; }
+    for (let i = 0; i < text.length; i++) { const u = text.charCodeAt(i); out[k++] = u & 255; out[k++] = u >> 8; }
+    return out;
+  }
+  if (encoding === 'windows-1252') return Uint8Array.from([...text].map((ch) => ansiCode(ch)));
+  const body = new TextEncoder().encode(text);
+  return bom ? new Uint8Array([0xef, 0xbb, 0xbf, ...body]) : body;
+}
+
+/** The kinds of text file Save As writes (Excel's names): separator and encoding. */
+export const TEXT_KINDS = {
+  'csv-utf8': { sep: ',', encoding: 'utf-8', bom: true },
+  csv: { sep: ',', encoding: 'windows-1252', bom: false },
+  txt: { sep: TAB, encoding: 'windows-1252', bom: false },
+  unicode: { sep: TAB, encoding: 'utf-16le', bom: true },
+};
 
 /** Sheet si as Excel's Save As writes a CSV (measured over COM, SaveAs CSV and CSV UTF-8): each cell as it shows
  *  ("1,234.50", "25%", "3/5/2024", "(5.00)"; a General number in 11 characters, 1/3 as 0.333333333, whatever its
  *  column's width; '007 as 007), the used range's rows from its first column, each as wide as the used range, rows
  *  ending in CR LF (a line break in a cell kept as it is). `utf8`: UTF-8 with a byte order mark, as CSV UTF-8; else
- *  code page 1252, ? for what it hasn't, as CSV. */
-export function csvBytes(wb, si, { utf8 = true } = {}) {
+ *  code page 1252, ? for what it hasn't, as CSV. `kind` (TEXT_KINDS: 'csv-utf8', 'csv', 'txt' as Text (Tab
+ *  delimited), 'unicode' as Unicode Text), or `sep`, `encoding` and `bom` given, over it. Cells show as the page's
+ *  locale shows them (locale.js), as Excel's CSV has the computer's separators. */
+export function csvBytes(wb, si, { utf8 = true, kind = null, sep = null, encoding = null, bom = null } = {}) {
+  const base = TEXT_KINDS[kind || (utf8 ? 'csv-utf8' : 'csv')];
+  const how = { sep: sep ?? base.sep, encoding: encoding ?? base.encoding, bom: bom ?? base.bom };
+  return encodeText(sheetText(wb, si, how.sep), how.encoding, how.bom);
+}
+
+/** Sheet si's used range as delimited text (csvBytes' rules), rows ending in CR LF. */
+export function sheetText(wb, si, sep = ',') {
   const sh = wb.sheet(si);
   let c0 = Infinity;
   for (const line of sh.cells.values()) for (const [c, cell] of line) if (cell.v != null && c < c0) c0 = c;
@@ -116,12 +120,10 @@ export function csvBytes(wb, si, { utf8 = true } = {}) {
       for (let c = c0; c <= sh.maxCol; c++) {
         const cell = sh.cells.get(r)?.get(c);
         const code = formatCodeOf(wb.styles, cell?.s || 0);
-        out.push(field(cell ? cellText(cell, !code || code === 'General' ? 11 : Infinity, code, wb.date1904) : ''));
+        out.push(field(cell ? cellText(cell, !code || code === 'General' ? 11 : Infinity, code, wb.date1904) : '', sep));
       }
-      lines.push(out.join(','));
+      lines.push(out.join(sep));
     }
   }
-  const text = lines.map((x) => `${x}\r\n`).join('');
-  if (utf8) return new Uint8Array([0xef, 0xbb, 0xbf, ...new TextEncoder().encode(text)]);
-  return Uint8Array.from([...text].map((ch) => ansiCode(ch)));
+  return lines.map((x) => `${x}\r\n`).join('');
 }

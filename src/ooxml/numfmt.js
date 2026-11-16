@@ -1,5 +1,6 @@
 // Turning a cell's value into the text a sheet shows: Excel's General format here, format codes in format.js.
 import { formatValue } from './format.js';
+import { currentLocale, localCode, localDecimal } from './locale.js';
 
 /** The most characters General uses, not counting a minus sign ("0.333333333", "-0.666666667"). */
 const GENERAL_MAX = 11;
@@ -87,17 +88,18 @@ export function formatGeneral(n, width = Infinity) {
 
 /** What a cell shows, from what the reader stored ({ t, v }), in a cell `width` characters wide, in format `code`
  *  (format.js; General when none): { text, parts, color, fit }. `fit`: a formatted number, which the view replaces
- *  with #s when it is wider than its cell (General fits itself to the width). */
-export function cellDisplay(cell, width = Infinity, code = 'General', date1904 = false) {
+ *  with #s when it is wider than its cell (General fits itself to the width). `locale` (locale.js; the page's unless
+ *  given) gives the separators a number is shown with, and the short date built-in format 14 shows. */
+export function cellDisplay(cell, width = Infinity, code = 'General', date1904 = false, locale = currentLocale()) {
   if (!cell || cell.v == null) return { text: '', parts: [], color: null, fit: false };
   const plain = (text) => ({ text, parts: [text], color: null, fit: false });
   if (cell.t === 'b') return plain(cell.v ? 'TRUE' : 'FALSE');
   if (cell.t === 'e') return plain(String(cell.v));
   if (cell.t === 'n') {
-    if (!code || code === 'General') return plain(formatGeneral(cell.v, width));
+    if (!code || code === 'General') return plain(localDecimal(formatGeneral(cell.v, width), locale));
     // A number in a text format (@) is shown as General, and to the left as text is (Excel's PDF of numfmt.xlsx).
-    if (code === '@') return { ...plain(formatGeneral(cell.v, width)), textFormat: true };
-    const r = formatValue(cell.v, code, { date1904, width });
+    if (code === '@') return { ...plain(localDecimal(formatGeneral(cell.v, width), locale)), textFormat: true };
+    const r = formatValue(cell.v, localCode(code, locale), { date1904, width, locale });
     if (r.hashes) return { text: '#'.repeat(Number.isFinite(width) ? width : 1), parts: ['#'.repeat(Number.isFinite(width) ? width : 1)], color: r.color, fit: false, hashes: true };
     return { ...r, fit: true };
   }
@@ -107,4 +109,4 @@ export function cellDisplay(cell, width = Infinity, code = 'General', date1904 =
 }
 
 /** The text a cell shows (cellDisplay's, padding as spaces). */
-export const cellText = (cell, width = Infinity, code = 'General', date1904 = false) => cellDisplay(cell, width, code, date1904).text;
+export const cellText = (cell, width = Infinity, code = 'General', date1904 = false, locale = currentLocale()) => cellDisplay(cell, width, code, date1904, locale).text;

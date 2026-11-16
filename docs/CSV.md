@@ -22,26 +22,59 @@ number format and formula read back; 32 of 32 cells the same here (test/csv.test
 
 A field Excel wouldn't take as a formula is the text itself.
 
-## Saving a sheet as a CSV
+## Encoding, separator and locale
 
-`saveCsv({ utf8 })` gives the sheet shown as Excel's Save As writes it (`csvBytes` in `src/ooxml/csv.js`), byte for
-byte: test/csv-excel-utf8.csv (CSV UTF-8) and test/csv-excel-ansi.csv (CSV) are Excel's own saves of a sheet made
-the same way in test/csv.test.js.
+A CSV's bytes are read as UTF-16 or UTF-8 when a byte order mark says so, as UTF-8 when they are valid UTF-8, else as
+Windows-1252 (Excel reads a file without a mark in the computer's code page, 1252 here; valid UTF-8 is read as such
+here, so `café` in a UTF-8 file without a mark comes out right). The field separator is the one that splits most lines
+into the same number of fields among comma, semicolon, tab and pipe, the locale's list separator on a tie (Excel takes
+the computer's list separator only). Numbers and dates are read in the editor's locale (docs/LOCALE.md): in Germany
+`1.234,5` is 1234.5 and `05.03.2024` the 5th of March. `csvWorkbook(bytes, name, today, { locale, sep, encoding, quote })`
+takes each of them given.
+
+## Text Import
+
+The Text Import box (Excel's Text Import Wizard in one box; Data > From Text/CSV, and opening a .txt) reads a file with
+settings chosen (`src/ooxml/textimport.js`). Measured over COM: Workbooks.OpenText of eleven made-up files
+(`test/textimport-cases.js`, `tools/excel-compare/excel-textimport.ps1`, `test/textimport-excel.json`), each with its
+settings; 108 of 108 cells the same value, type and number format here (`test/textimport.test.js`).
+
+| Setting | Excel's rule, as seen |
+|---|---|
+| Encoding: UTF-8, UTF-16 (with its mark), Windows-1252 | `café`, `日本` in UTF-16; `€5` in 1252 |
+| Delimited: tab, semicolon, comma, space, another character, several at once | a pipe as Other splits at each pipe |
+| Text qualifier: `"`, `'` or none; doubled inside a field for one | `'it''s'`: it's; with `'`, `"q"` keeps its quotes; with none, `"b,c"` is `"b` and `c"` |
+| Consecutive delimiters as one | `one   two` two fields; a delimiter first still makes an empty first field |
+| Fixed width, columns starting where the breaks are | each field without the spaces around it: `Widget  ` is Widget |
+| Start import at row | rows before it left out |
+| General column | as if typed (`=1+2` a formula, `TRUE`, `#N/A`, `1e3`, `$12`, `50%`, `10:30`, `1/2`), with the decimal and thousands separators given: `1.234,5` is 1234.5 `#,##0.00`, `3,5%` 0.035 `0.00%`, `1.5` text; `€5` gets a euro format, `[$€-2] #,##0` (typed, it is a plain 5) |
+| Text column | as it is, formatted `@` (`007`, the header too) |
+| Date column, MDY, DMY or YMD | numbers split by `/`, `-` or `.`; a four-digit year first read year first in any order; m/d/yyyy, or d-mmm when there is no year (this year); a day the month hasn't (`31/2/2024`), another order (`13/5/2024` in MDY) or a word stays text |
+| Skip | the column left out, the next one moving left |
+
+## Saving a sheet as a CSV or a text file
+
+`saveCsv({ kind, sep, encoding, bom })` gives the sheet shown as Excel's Save As writes it (`csvBytes` in
+`src/ooxml/csv.js`), byte for byte: `kind` 'csv-utf8' (CSV UTF-8, the default), 'csv' (CSV), 'txt' (Text (Tab
+delimited)) or 'unicode' (Unicode Text), or a separator and an encoding ('utf-8', 'utf-16le', 'windows-1252') of
+one's own. test/csv-excel-utf8.csv and test/csv-excel-ansi.csv, and the four test/savetext-excel-* files, are Excel's
+own saves of sheets made the same way in test/csv.test.js and test/savetext-sheet.js (4 of 4 the same). The cells
+are written as the editor's locale shows them (docs/LOCALE.md), as Excel's are in the computer's.
 
 | Rule | Seen |
 |---|---|
 | Each cell as it shows, formatted. | `"1,234.50"`, `25%`, `3/5/2024`, `(5.00)`, `TRUE`, `#N/A`; a formula its value |
 | A General number in 11 characters, whatever its column's width (no #s). | `0.333333333`, `1.23457E+12`, `0.000001`; 12345 in a column 3 wide |
 | Text as it is; a typed apostrophe isn't written. | `'007`: `007`; `  lead` keeps its spaces |
-| In quotes only with a comma, a quote or a line break; quotes doubled. | `"has, comma"`, `"say ""hi"""`, `"quote""mid"`; `semi;colon` bare |
+| In quotes only with a comma, a quote, a tab or a line break (or the separator); quotes doubled. The same in a tab-delimited file. | `"has, comma"`, `"say ""hi"""`, `"quote""mid"`, `"tab` TAB `in"`; `semi;colon` bare |
 | Rows end in CR LF; a line break in a cell is written as it is (LF). | `"two` LF `lines"` CR LF |
 | The used range: each row as wide as it, empty cells empty fields. | `,x,,` |
-| CSV UTF-8: a byte order mark, then UTF-8. CSV: code page 1252. | `café ü €`: `EF BB BF ... C3 A9`; `E9 FC 80` |
+| CSV UTF-8: a byte order mark, then UTF-8. CSV and Text: code page 1252, ? for what it hasn't. Unicode Text: UTF-16 LE with its mark. | `café ü €`: `EF BB BF ... C3 A9`; `E9 FC 80`; `日本` as `??` in 1252 |
 
 ## Not yet
 
-- The file is read as UTF-8 (a byte order mark left out); Excel reads a CSV without one in the system's code page, so
-  text beyond ASCII can differ.
-- Only commas separate fields (Excel uses the system's list separator); Text Import (Data > From Text/CSV) isn't here.
-- `save()` still writes an .xlsx (a file opened from a CSV too); `saveCsv()` is the host's to call, and there is no
-  File > Save As box. A character code page 1252 hasn't is written as ?, as Excel's CSV does (not measured).
+- `save()` still writes an .xlsx (a file opened from a CSV too); the Save As box (F12, `saveAs()`) writes the other
+  types. Excel's own Save As of a CSV with another list separator (the computer's) isn't measured: a field holding a
+  comma is quoted whatever the separator, as Excel's tab-delimited file quotes one.
+- The Text Import box has no "Trailing minus for negative numbers" (3- read as -3) and no date orders beyond MDY, DMY
+  and YMD; Excel's newer Power Query import (Data > From Text/CSV in Excel 365) isn't modelled, only the wizard.

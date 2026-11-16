@@ -37,6 +37,6 @@ three: a boolean's spelling in the comparison, a format the test set up first, a
 
 ## Not yet
 
-Other countries' settings (day before month, a comma for the decimal point, other currencies), and `1E+400`: too big
+Other currencies (other countries' separators and date order are in docs/LOCALE.md), and `1E+400`: too big
 for a number, Excel keeps it as text but gives the cell the scientific format; here it stays General. A fraction with
 a denominator of 10 or more is given # ??/?? (not measured).

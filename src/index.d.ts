@@ -141,8 +141,41 @@ export interface XlsxEditor {
   readonly sheetIndex: number;
   readonly fileName: string | null;
   setTheme(theme: 'light' | 'dark' | null): void;
+  /** The sheet shown as a CSV or text file, as Excel's Save As writes it (docs/CSV.md). */
+  saveCsv(options?: { utf8?: boolean; kind?: 'csv-utf8' | 'csv' | 'txt' | 'unicode'; sep?: string; encoding?: 'utf-8' | 'utf-16le' | 'windows-1252'; bom?: boolean }): Uint8Array;
+  /** A text file through the Text Import box: into a new workbook ('new') or at the active cell ('sheet'); `ask`
+   *  false takes `settings` without the box. Resolves to null if cancelled. */
+  importText(bytes: Uint8Array | ArrayBuffer, fileName?: string, options?: { into?: 'new' | 'sheet'; settings?: Partial<TextImportSettings>; ask?: boolean }): Promise<unknown>;
+  /** Save As (F12): the box (or `choice` as it would answer), the file given to onSave or downloaded. */
+  saveAs(choice?: SaveAsChoice): Promise<SavedFile | null>;
+  /** The page's country settings (docs/LOCALE.md): a tag ('de-DE') or settings over one. */
+  setLocale(locale: string | Partial<LocaleSettings>): LocaleSettings;
+  readonly locale: LocaleSettings;
   destroy(): void;
 }
+
+export interface LocaleSettings {
+  tag: string; decimal: string; group: string; dateOrder: 'MDY' | 'DMY' | 'YMD'; dateSep: string;
+  /** Built-in format 14's code in this locale ('dd.mm.yyyy'). */
+  shortDate: string; hour12: boolean; listSep: string; arrayCol: string; arrayRow: string;
+}
+
+export interface TextImportSettings {
+  encoding: 'utf-8' | 'utf-16le' | 'utf-16be' | 'windows-1252'; kind: 'delimited' | 'fixed';
+  /** The delimiter characters. */
+  seps: string; quote: '"' | "'" | ''; consecutive: boolean;
+  /** Fixed width: where each column after the first starts, in characters. */
+  breaks: number[]; startRow: number;
+  columns: ('general' | 'text' | 'MDY' | 'DMY' | 'YMD' | 'skip')[];
+  locale: string; decimal: string; group: string;
+}
+
+export interface SaveAsChoice {
+  fileName: string; type: 'xlsx' | 'xlsm' | 'csv' | 'txt' | 'pdf';
+  sep?: string | null; encoding?: 'utf-8' | 'utf-16le' | 'windows-1252' | null; bom?: boolean | null;
+}
+
+export interface SavedFile { fileName: string; type: string; bytes: Uint8Array; mime: string }
 
 export declare function mountXlsxEditor(
   host: HTMLElement,
@@ -178,6 +211,13 @@ export declare function mountXlsxEditor(
     people?: Array<{ name: string; userId?: string; providerId?: string }> | (() => Array<{ name: string; userId?: string; providerId?: string }>);
     /** A hyperlink to a web address clicked: the host page opens it (otherwise the editor opens a new tab). */
     onLink?: (url: string) => void;
+    /** Country settings for showing and typing numbers and dates: a tag or settings over one (navigator.language
+     *  without it). */
+    locale?: string | Partial<LocaleSettings>;
+    /** Save As's file; without it, the browser downloads it. */
+    onSave?: (file: SavedFile) => void;
+    /** A PDF export for Save As to offer: open-xlsx-editor/pdf's exportPdf. */
+    exportPdf?: (editor: XlsxEditor) => Promise<Uint8Array>;
     onChange?: () => void;
   },
 ): XlsxEditor;

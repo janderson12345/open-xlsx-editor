@@ -48,6 +48,8 @@ import { fillOptionChoices } from './editor/fillopts.js';
 import { parseRef } from './ooxml/refs.js';
 import { namesOnSheet } from './ooxml/names.js';
 import { AgentWorkbook } from './agent.js';
+import { createFiles } from './editor/files.js';
+import { setLocale, currentLocale, browserLocale } from './ooxml/locale.js';
 
 export { Workbook };
 export { openWorkbook } from './agent.js';
@@ -75,6 +77,10 @@ export { OMF_VERSION } from './editor/omf.js';
  *   browser opens it in a new tab.
  * - `fonts: { omf }`: the URL of an open-metric-fonts web bundle folder the site serves (each package as
  *   <package>/files/, release OMF_VERSION), for the metric twins of the Microsoft fonts the computer lacks (README, Fonts).
+ * - `locale`: the country settings numbers and dates are shown and typed in ('de-DE', or { tag, decimal, group,
+ *   dateOrder, ... }: ooxml/locale.js, docs/LOCALE.md); the browser's language without it. `setLocale()` changes it.
+ * - `onSave({ fileName, type, bytes, mime })`: Save As's file (F12, `saveAs()`); without it, the browser downloads it.
+ *   `exportPdf(editor)`: a PDF export (open-xlsx-editor/pdf's exportPdf) for Save As to offer PDF.
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
  *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean | Record<string, boolean>, calculateOnOpen?: boolean,
@@ -87,6 +93,8 @@ export function mountXlsxEditor(host, options = {}) {
   if (options.fonts?.omf) root.dataset.omf = useOmf(options.fonts.omf);
   if (options.theme) root.dataset.theme = options.theme;
   host.appendChild(root);
+  // (The page's country settings, as Excel takes the computer's: ooxml/locale.js.)
+  setLocale(options.locale ?? browserLocale());
   const state = { onEdit: new Set(), onSelect: new Set(), circles: new WeakMap(), workbook: null, grid: null, tabs: null, ribbon: null, sheetIndex: 0, fileName: null, looks: {}, readOnly: !!options.readOnly, editing: null,
     features: { ...(options.features || {}) }, toolbar: options.toolbar !== false, ribbonMode: options.ribbon ?? null };
   const at = (ref) => {
@@ -316,7 +324,9 @@ export function mountXlsxEditor(host, options = {}) {
     if (options.onLink) options.onLink(to.url);
     else window.open(to.url, '_blank', 'noopener,noreferrer');
   };
-  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink });
+  // (Text Import, Save As and the locale: editor/files.js.)
+  const files = createFiles({ root, state, options, editing, api: () => api });
+  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink, files });
   const api = {
     /** Open a workbook (or a .csv, by its `fileName`) and show the sheet it opens on (its active tab, or the first
      *  visible worksheet). One saved
@@ -374,13 +384,22 @@ export function mountXlsxEditor(host, options = {}) {
       if (calculateBeforeSave(state.workbook)) { state.grid.refresh(); showStats(); }
       return state.workbook.toBytes();
     },
-    /** The sheet shown as a CSV, as Excel's Save As CSV UTF-8 writes one (`utf8: false`: as CSV, code page 1252):
+    /** The sheet shown as a CSV, as Excel's Save As CSV UTF-8 writes one (`utf8: false`: as CSV, code page 1252;
+     *  `kind` 'txt' or 'unicode' as Text (Tab delimited) or Unicode Text; or `sep`, `encoding` and `bom`):
      *  ooxml/csv.js csvBytes. */
-    saveCsv({ utf8 = true } = {}) {
+    saveCsv(how = {}) {
       if (!state.workbook) throw new Error('no workbook open');
       if (calculateBeforeSave(state.workbook)) { state.grid.refresh(); showStats(); }
-      return csvBytes(state.workbook, state.sheetIndex, { utf8 });
+      return csvBytes(state.workbook, state.sheetIndex, how);
     },
+    /** A text file through the Text Import box, into a new workbook (`into: 'new'`) or at the active cell ('sheet'):
+     *  editor/files.js importText. */
+    importText: (bytes, fileName, how) => files.importText(bytes, fileName, how),
+    /** Save As (F12): the box, then the file to `onSave` or downloaded; resolves to { fileName, type, bytes, mime }. */
+    saveAs: (choice) => files.saveAs(choice),
+    /** The page's country settings (docs/LOCALE.md), the sheet drawn again in them. */
+    setLocale: (spec) => files.setLocale(spec),
+    get locale() { return currentLocale(); },
     /** Select a cell ("B2" or { r, c }, 0-based). */
     select(ref) { const p = at(ref); editing().run('select', p.r, p.c); },
     /** Enter text into a cell as if typed there ("12", "TRUE", "50%", "'007", "=SUM(A1:A3)"); false if refused. */
