@@ -179,7 +179,7 @@ changes); one typed here shows #NAME? until Excel opens the file. Excel's saved 
 | Workbook Views (`workbook-views`) | Normal, Page Break Preview, Page Layout | Partly | Normal only. |
 | Show (`show`) | Gridlines, formula bar, headings | Done | Gridlines, Formula Bar and Headings switched on and off; gridlines and headings saved with the sheet as Excel saves them, the formula bar the editor's own, as Excel's is (docs/VIEW.md). Excel's Ruler only works in Page Layout view, which isn't here. |
 | Zoom (`zoom`) | Zoom, 100%, zoom to selection | Done | 10% to 400%, as Excel allows; saved with the sheet. |
-| Window (`window`) | Freeze Panes | Done | Freeze Panes, Top Row, First Column, Unfreeze, written as Excel writes them; frozen panes in a file shown frozen (docs/VIEW.md). |
+| Window (`window`) | Freeze Panes | Done | Freeze Panes, Top Row, First Column, Unfreeze, written as Excel writes them, counted from the cell first in view (scrolled, split or partly hidden windows as Excel, 26 of 26); frozen panes in a file shown frozen from where they start, opened where the file left them (docs/VIEW.md). |
 | | Split, new window | Missing | |
 
 ## File (`file`)

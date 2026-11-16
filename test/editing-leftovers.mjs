@@ -3,7 +3,7 @@
 import { openFixture } from './browser.mjs';
 import { editingPage } from './editing-kit.mjs';
 
-const { page, check, finish, sel, clickCell } = await editingPage();
+const { page, check, finish, sel, clickCell, menu } = await editingPage();
 await openFixture(page, 'basic.xlsx');
 
 // Find by format: B2 made bold, Ctrl+F, Find Format's From Cell... and a click on B2: the bar says whose format;
@@ -70,6 +70,33 @@ await page.waitForSelector(`${box} .oxe-mention-list:not([hidden])`);
 await page.keyboard.press('Escape');
 check(await page.isVisible(box) && await page.isHidden(`${box} .oxe-mention-list`), 'Esc with the list open: the list closed, the box still open');
 await page.click(`${box} >> button:text-is("Close")`);
+
+// Freeze Panes while scrolled, as Excel freezes it (test/freeze-excel.json): the window at C10, E15 active: rows 10-14
+// and columns C-D frozen, the sheet view starting at C10; the window can't go above or left of it; a click just under
+// the headings selects C10. Unfreeze: the window back at C10, nothing frozen.
+await page.evaluate(() => { window.oxe.select('E15'); window.oxe.grid.scrollToCell(9, 2); });
+await page.waitForTimeout(50);
+await page.click('.oxe-rtab >> text="View"');
+await menu('Freeze Panes', 'Freeze Panes');
+const frozenNow = await page.evaluate(() => ({ grid: window.oxe.grid.view().freeze, file: window.oxe.workbook.sheet(0).freeze }));
+check(JSON.stringify(frozenNow.grid) === '{"rows":5,"cols":2,"top":9,"left":2}' && JSON.stringify(frozenNow.file) === JSON.stringify(frozenNow.grid),
+  'scrolled to C10, Freeze Panes at E15: rows 10-14 and columns C-D, from C10', JSON.stringify(frozenNow));
+const viewXml = await page.evaluate(() => { const wb = window.oxe.workbook; const p = wb._part(0); return new XMLSerializer().serializeToString(p.doc).match(/<sheetView\b[\s\S]*?<\/sheetView>/)[0]; });
+check(/topLeftCell="C10"/.test(viewXml) && /<pane xSplit="2" ySplit="5" topLeftCell="E15" activePane="bottomRight" state="frozen"\/>/.test(viewXml), 'written as Excel: the sheet view from C10, the pane from E15', viewXml);
+await page.evaluate(() => { window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
+await page.waitForTimeout(100);
+const clamped = await page.evaluate(() => { const g = window.oxe.grid; const geo = g.geometry(); return [g.el.scrollTop >= geo.rows.start(9) - 1, g.el.scrollLeft >= geo.cols.start(2) - 1]; });
+check(clamped.join() === 'true,true', 'scrolled to the top: kept at where the freeze starts', clamped.join());
+const c10 = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); return { x: v.left + geo.rowHeadW + 6, y: v.top + geo.colHeadH + 6 }; });
+await page.mouse.click(c10.x, c10.y);
+const picked = await sel();
+check(picked.ar === 9 && picked.ac === 2, 'a click just under the headings: C10, the frozen corner’s first cell', JSON.stringify(picked));
+const paneRows = await page.evaluate(() => [...document.querySelectorAll('.oxe-pane-top .oxe-rowhead')].map((x) => x.textContent).join(','));
+check(paneRows.startsWith('10,11,12,13,14'), 'the top pane shows rows 10 to 14', paneRows);
+await menu('Freeze Panes', 'Unfreeze Panes');
+const back = await page.evaluate(() => ({ freeze: window.oxe.grid.view().freeze, topLeft: window.oxe.grid.view().topLeft }));
+check(back.freeze.rows === 0 && back.freeze.cols === 0 && back.topLeft.r === 9 && back.topLeft.c === 2, 'Unfreeze Panes: the window back at C10, as Excel leaves it', JSON.stringify(back));
+await page.click('.oxe-rtab >> text=Home');
 void sel;
 
 await finish();

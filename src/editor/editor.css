@@ -1144,6 +1144,20 @@
   inset: 0;
   --oxe-colhead-h: 0px;
 }
+/* (A freeze made while scrolled starts further in: the pane's own part of the sheet moved up and left to it.) */
+.oxe-pane-top > .oxe-pane-inner,
+.oxe-pane-corner > .oxe-pane-inner {
+  top: calc(-1 * var(--oxe-pane-y0, 0px));
+}
+.oxe-pane-left > .oxe-pane-inner,
+.oxe-pane-corner > .oxe-pane-inner,
+.oxe-colheads-pin > .oxe-colheads-pin-inner {
+  left: calc(-1 * var(--oxe-pane-x0, 0px));
+}
+/* (The corner sits in the top pane's part, so it is moved back down by as much.) */
+.oxe-pane-top > .oxe-pane-inner > .oxe-pane-corner {
+  margin-top: var(--oxe-pane-y0, 0px);
+}
 .oxe-pane-left > .oxe-pane-inner,
 .oxe-pane-corner > .oxe-pane-inner {
   --oxe-rowhead-w: 0px;

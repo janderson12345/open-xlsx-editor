@@ -20,7 +20,7 @@ test('freezing at C5, the top row and the first column, as Excel writes them', (
   let { wb, si } = fresh();
   wb.setView(si, { freeze: { rows: 4, cols: 2 }, active: { r: 4, c: 2 } });
   assert.equal(views(wb, si), '<pane xSplit="2" ySplit="4" topLeftCell="C5" activePane="bottomRight" state="frozen"/><selection pane="topRight" activeCell="C1" sqref="C1"/><selection pane="bottomLeft" activeCell="A5" sqref="A5"/><selection pane="bottomRight" activeCell="C5" sqref="C5"/>');
-  assert.deepEqual(Workbook.fromBytes(wb.toBytes()).sheet(si).freeze, { rows: 4, cols: 2 });
+  assert.deepEqual(Workbook.fromBytes(wb.toBytes()).sheet(si).freeze, { rows: 4, cols: 2, top: 0, left: 0 });
   ({ wb, si } = fresh());
   wb.setView(si, { freeze: { rows: 1, cols: 0 }, active: { r: 4, c: 2 } });
   assert.equal(views(wb, si), '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="C5" sqref="C5"/>');

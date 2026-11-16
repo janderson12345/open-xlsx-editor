@@ -31,42 +31,69 @@ function sheetView(doc) {
   return { view, ns };
 }
 
+/** CT_SheetView's attributes in the schema's order, as Excel writes them. */
+const VIEW_ATTRS = ['windowProtection', 'showFormulas', 'showGridLines', 'showRowColHeaders', 'showZeros', 'rightToLeft', 'tabSelected', 'showRuler',
+  'showOutlineSymbols', 'defaultGridColor', 'showWhiteSpace', 'view', 'topLeftCell', 'colorId', 'zoomScale', 'zoomScaleNormal', 'zoomScaleSheetLayoutView',
+  'zoomScalePageLayoutView', 'workbookViewId'];
+
+/** The sheet view's topLeftCell set (null: A1, the attribute left out), its attributes kept in Excel's order. */
+function setViewTopLeft(view, at) {
+  const ref = at && (at.r || at.c) ? refName(at.r, at.c) : null;
+  if ((view.getAttribute('topLeftCell') || null) === ref) return;
+  const attrs = [...view.attributes].map((a) => [a.name, a.value]).filter(([n]) => n !== 'topLeftCell');
+  if (ref) attrs.push(['topLeftCell', ref]);
+  const rank = (n) => { const k = VIEW_ATTRS.indexOf(n); return k < 0 ? VIEW_ATTRS.length : k; };
+  for (const [n] of [...view.attributes].map((a) => [a.name])) view.removeAttribute(n);
+  for (const [n, v] of attrs.sort((a, b) => rank(a[0]) - rank(b[0]))) view.setAttribute(n, v);
+}
+
 /**
- * Freeze the rows above and the columns left of a cell ({ rows, cols }: how many), or unfreeze ({ rows: 0, cols: 0 }).
- * `active` is the active cell ({ r, c }), `topLeft` the first cell of the scrolled pane. As Excel writes it: rows and
- * columns, activePane bottomRight with a selection in each of the three panes (the top-right one in row 1 of the
- * first scrolled column, the bottom-left one in column A of the first scrolled row); only rows, bottomLeft; only
- * columns, topRight; the active cell's selection in the active pane.
+ * Freeze { rows, cols } (how many) counted from `top` and `left`, the first row and column in view when it was
+ * frozen, or unfreeze ({ rows: 0, cols: 0 }); `active` is the active cell ({ r, c }). As Excel writes it (measured over
+ * COM, tools/excel-compare/excel-freeze.ps1, test/freeze-excel.json): the cell first in view as the sheet view's
+ * topLeftCell, with a selection of its own; the pane's topLeftCell the first cell past the freeze (column A when only
+ * rows are frozen, row 1 when only columns); rows and columns, activePane bottomRight with a selection in each of the
+ * other panes (the top-right one in the first row in view of the first scrolled column, the bottom-left one in the first
+ * column in view of the first scrolled row); only rows, bottomLeft; only columns, topRight; the active cell's selection
+ * in the active pane, A1 written as a selection with nothing in it. `split`: a split turned into a freeze, written
+ * frozenSplit with the split's own pane selections kept, as Excel's Freeze Panes on a split window writes it.
+ * Unfreezing takes the pane and its selections away and leaves the sheet view's topLeftCell as it was.
  */
-export function setFreeze(doc, { rows, cols }, active = { r: 0, c: 0 }, topLeft = null) {
+export function setFreeze(doc, { rows, cols, top = 0, left = 0, split = false }, active = { r: 0, c: 0 }) {
   const { view, ns } = sheetView(doc);
   const old = kids(view, 'selection', ns).find((s) => !attr(s, 'pane') || attr(s, 'pane') === attr(kid(view, 'pane', ns), 'activePane')) || kids(view, 'selection', ns)[0];
   const sqref = old && attr(old, 'activeCell') === refName(active.r, active.c) ? attr(old, 'sqref') : null;
+  const kept = split ? kids(view, 'selection', ns).filter((s) => ['topRight', 'bottomLeft'].includes(attr(s, 'pane'))) : [];
   for (const n of [...view.childNodes]) if (n.nodeType === 1 && (n.localName === 'pane' || n.localName === 'selection')) view.removeChild(n);
   const first = [...view.childNodes].find((n) => n.nodeType === 1) || null;
   const select = (pane, r, c, ref = null) => {
     const s = make(doc, ns, 'selection');
     if (pane) s.setAttribute('pane', pane);
-    s.setAttribute('activeCell', refName(r, c));
-    s.setAttribute('sqref', ref || refName(r, c));
+    if (r || c || ref) {
+      s.setAttribute('activeCell', refName(r, c));
+      s.setAttribute('sqref', ref || refName(r, c));
+    }
     view.insertBefore(s, first);
   };
   if (!rows && !cols) {
     if (active.r || active.c || sqref) select(null, active.r, active.c, sqref);
     return;
   }
+  setViewTopLeft(view, { r: top, c: left });
   const pane = make(doc, ns, 'pane');
   if (cols) pane.setAttribute('xSplit', String(cols));
   if (rows) pane.setAttribute('ySplit', String(rows));
-  const tl = topLeft || { r: rows, c: cols };
-  pane.setAttribute('topLeftCell', refName(Math.max(rows, tl.r), Math.max(cols, tl.c)));
+  pane.setAttribute('topLeftCell', refName(rows ? top + rows : 0, cols ? left + cols : 0));
   const activePane = rows && cols ? 'bottomRight' : rows ? 'bottomLeft' : 'topRight';
   pane.setAttribute('activePane', activePane);
-  pane.setAttribute('state', 'frozen');
+  pane.setAttribute('state', split ? 'frozenSplit' : 'frozen');
   view.insertBefore(pane, first);
-  if (rows && cols) {
-    select('topRight', 0, cols);
-    select('bottomLeft', rows, 0);
+  // (The top-left pane's selection: only when the window doesn't start at A1, as Excel leaves it out then.)
+  if (top || left) select(null, top, left);
+  if (kept.length) for (const s of kept) view.insertBefore(s, first);
+  else if (rows && cols) {
+    select('topRight', top, left + cols);
+    select('bottomLeft', top + rows, left);
   }
   select(activePane, active.r, active.c, sqref);
 }

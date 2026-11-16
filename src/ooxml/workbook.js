@@ -376,13 +376,21 @@ export class Workbook {
   /** The hidden name Excel keeps a sheet's filter range in: _xlnm._FilterDatabase, local to the sheet (filterops.js). */
   _filterName(i, area, name = '_xlnm._FilterDatabase', hidden = true) { filterName(this, i, area, name, hidden); }
 
-  /** Sheet i's view changed (view.js): { freeze: { rows, cols }, active: { r, c }, topLeft }, { zoom } (percent) or
-   *  { showFormulas }, { showGridLines }, { showHeadings }. */
-  setView(i, { freeze, active, topLeft, zoom, showFormulas, showGridLines, showHeadings }) {
+  /** Sheet i's view changed (view.js): { freeze: { rows, cols, top, left, split }, active: { r, c } }, { zoom }
+   *  (percent) or { showFormulas }, { showGridLines }, { showHeadings }. */
+  setView(i, { freeze, active, zoom, showFormulas, showGridLines, showHeadings }) {
     const part = this._part(i);
-    if (freeze) setFreeze(part.doc, freeze, active, topLeft);
+    if (freeze) setFreeze(part.doc, freeze, active);
     if (zoom != null) setZoom(part.doc, zoom);
-    part.model.freeze = freeze ? { rows: freeze.rows, cols: freeze.cols } : part.model.freeze;
+    if (freeze) {
+      const on = freeze.rows || freeze.cols;
+      // (Unfrozen, the window starts where the freeze did; frozen, the split is gone.)
+      if (on) part.model.viewTopLeft = { r: freeze.top || 0, c: freeze.left || 0 };
+      part.model.freeze = { rows: freeze.rows, cols: freeze.cols, top: freeze.rows ? freeze.top || 0 : 0, left: freeze.cols ? freeze.left || 0 : 0 };
+      part.model.split = null;
+      const vt = part.model.viewTopLeft || { r: 0, c: 0 };
+      part.model.scrolledTo = on ? { r: freeze.rows ? vt.r + freeze.rows : 0, c: freeze.cols ? vt.c + freeze.cols : 0 } : vt;
+    }
     if (zoom != null) part.model.zoom = Math.round(Math.min(400, Math.max(10, zoom)));
     if (showFormulas != null) { setShowFormulas(part.doc, showFormulas); part.model.showFormulas = !!showFormulas; }
     if (showGridLines != null) { setShown(part.doc, 'showGridLines', showGridLines); part.model.showGridLines = !!showGridLines; }

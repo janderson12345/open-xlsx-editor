@@ -171,6 +171,7 @@ insides:
 | `src/editor/ribbon.js` | The ribbon: tabs and panels, groups that don't fit behind More, the one-line simplified ribbon, F6 and Esc, `features`. From open-docx-editor's toolbar.js, with each tab in a file of its own. |
 | `src/editor/hometab.js` | The Home tab: Undo, Font, Alignment, Number, Cells, Editing; its controls set from the active cell. |
 | `src/editor/drawborders.js`, `drawdrag.js`, `colorbox.js` | Draw Borders: its modes, line colour and style (view state) and the grid's drag and gridline click while one is on; the More Colors box (Red, Green, Blue, Hex). |
+| `src/editor/freeze.js` | What Freeze Panes, Top Row and First Column freeze, as Excel's ribbon does: from the cell first in view, the middle of the window, a split's place, past hidden rows (docs/VIEW.md). |
 | `src/editor/viewtab.js` | The View tab: Zoom (Zoom..., 100%, Zoom to Selection) and Window (Freeze Panes, Top Row, First Column, Unfreeze). |
 | `src/editor/commands-sheets.js`, `commands-data.js`, `commands-parts.js` | The rest of the named commands, as factories given `commands.js`'s shared state and helpers as one object: the sheets' (show, insert, rename, move, hide, colour, delete, through sheetOp); data (copy, cut, paste, fill, sort, AutoSum, the Name Box, the filter); and parts beyond the cells (PivotTables, notes and rules, another editor's contents, the agent). |
 | `src/editor/commands-borders.js` | The drawBorders, moreColor and recentColor commands (Draw Borders over a range, a custom colour on the selection, Recent Colors). |
