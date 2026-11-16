@@ -10,6 +10,7 @@ import { shiftFormula } from '../calc/tokens.js';
 import { parseInput, dateSerial, fullYear } from './input.js';
 import { formatCodeOf } from './styles.js';
 import { cellText } from './numfmt.js';
+import { maxOf } from './listmath.js';
 
 const cellAt = (sheet, r, c) => sheet.cells.get(r)?.get(c) || null;
 const DAY_MS = 86400000;
@@ -164,7 +165,7 @@ function orderedDate(text, order, date1904) {
 export function guessBreaks(lines) {
   const texts = lines.filter((t) => t.trim());
   if (!texts.length) return [];
-  const width = Math.max(...texts.map((t) => t.length));
+  const width = maxOf(texts.map((t) => t.length));
   const blank = (k) => texts.every((t) => k >= t.length || t[k] === ' ');
   const out = [];
   for (let k = 1; k < width; k++) if (blank(k) && !blank(k - 1) && texts.some((t) => t.slice(k).trim())) out.push(k);

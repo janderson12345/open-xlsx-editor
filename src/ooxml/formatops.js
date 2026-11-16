@@ -5,6 +5,7 @@
 import { xfOf, formatCodeOf } from './styles.js';
 import { isDateFormat } from './format.js';
 import { lineStyle } from './sheet.js';
+import { maxOf } from './listmath.js';
 
 /** Excel's font sizes, which Grow and Shrink Font step through (no further than 8 and 72). */
 export const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72];
@@ -187,8 +188,8 @@ function drawBorders(wb, si, sel, sidesAt, out = new Map(), { keepSame = true } 
   };
   const cells = cellsOf(sheet, sel, true);
   // (Whole columns or rows: their far edge is the sheet's, not the used range's or the probe's.)
-  const r1 = wholeRows(sel) ? sel.r1 : Math.max(...cells.map((x) => x.r));
-  const c1 = wholeCols(sel) ? sel.c1 : Math.max(...cells.map((x) => x.c));
+  const r1 = wholeRows(sel) ? sel.r1 : maxOf(cells.map((x) => x.r));
+  const c1 = wholeCols(sel) ? sel.c1 : maxOf(cells.map((x) => x.c));
   for (const { r, c } of cells) {
     const at = { top: r === sel.r0, bottom: r === r1, left: c === sel.c0, right: c === c1 };
     const sides = Object.fromEntries(Object.entries(sidesAt(at)).filter(([, v]) => v !== undefined));

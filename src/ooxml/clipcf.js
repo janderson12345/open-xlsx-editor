@@ -24,6 +24,7 @@ import { readDxf } from './styles.js';
 import { coalesce, subtract } from './dvedit.js';
 import { x14Rules } from './cfbarsedit.js';
 import { newId, x14Rule, baseX14Id, setX14Ranges, x14Blocks, addX14Clone } from './clipcfx.js';
+import { maxOf, minOf } from './listmath.js';
 
 const overlaps = (a, b) => a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1;
 const clipTo = (a, b) => (overlaps(a, b) ? { r0: Math.max(a.r0, b.r0), c0: Math.max(a.c0, b.c0), r1: Math.min(a.r1, b.r1), c1: Math.min(a.c1, b.c1) } : null);
@@ -112,7 +113,7 @@ function alongLine(a, to) {
   const covered = (row ? all.map((x) => [x.c0, x.c1]) : all.map((x) => [x.r0, x.r1])).sort((x, y) => x[0] - y[0]);
   let reach = covered[0][1];
   for (const [s, e] of covered.slice(1)) { if (s > reach + 1) return null; reach = Math.max(reach, e); }
-  return { r0: Math.min(...all.map((x) => x.r0)), c0: Math.min(...all.map((x) => x.c0)), r1: Math.max(...all.map((x) => x.r1)), c1: Math.max(...all.map((x) => x.c1)) };
+  return { r0: minOf(all.map((x) => x.r0)), c0: minOf(all.map((x) => x.c0)), r1: maxOf(all.map((x) => x.r1)), c1: maxOf(all.map((x) => x.c1)) };
 }
 
 /** Every rule of the sheet `n` later in priority, base and extLst. */

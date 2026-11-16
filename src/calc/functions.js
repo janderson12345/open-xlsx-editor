@@ -2,6 +2,7 @@
 // Area, arrays as Arr, an argument left out as MISSING) and returns a value or throws an error value. A function the
 // engine doesn't know leaves its cell with the value Excel saved (values.js, Unsupported).
 import { Area, Arr, Union, Ref3D, MISSING, XlError, E, scalar, matrix, toNum, toText, toBool, compare, finite, textToNumber, closeToZero } from './values.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 export const FUNCTIONS = Object.create(null);
 /** `names`, space separated. `lift`: a function of single values, worked element by element when an array formula
@@ -112,8 +113,8 @@ def('SUM', (args, ctx) => numbers(args, ctx).reduce((s, x) => closeToZero(s, x, 
 def('PRODUCT', (args, ctx) => { const n = numbers(args, ctx); return n.length ? finite(n.reduce((p, x) => p * x, 1)) : 0; });
 def('SUMSQ', (args, ctx) => numbers(args, ctx).reduce((s, x) => s + x * x, 0));
 def('AVERAGE', (args, ctx) => { const n = numbers(args, ctx); if (!n.length) throw E.div0; return n.reduce((s, x) => s + x, 0) / n.length; });
-def('MIN', (args, ctx) => { const n = numbers(args, ctx); return n.length ? Math.min(...n) : 0; });
-def('MAX', (args, ctx) => { const n = numbers(args, ctx); return n.length ? Math.max(...n) : 0; });
+def('MIN', (args, ctx) => { const n = numbers(args, ctx); return n.length ? minOf(n) : 0; });
+def('MAX', (args, ctx) => { const n = numbers(args, ctx); return n.length ? maxOf(n) : 0; });
 def('MEDIAN', (args, ctx) => {
   const n = numbers(args, ctx).sort((a, b) => a - b);
   if (!n.length) throw E.num;

@@ -2,6 +2,7 @@
 // a formula copied, rows inserted, a sheet renamed). The file's form and the typed one are in fileform.js.
 import { colIndex, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { PREFIXED, fileName } from './prefixed.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 /** Error values as Excel writes them. */
 export const ERROR_CODES = ['#NULL!', '#DIV/0!', '#VALUE!', '#REF!', '#NAME?', '#NUM!', '#N/A', '#GETTING_DATA', '#SPILL!',
@@ -438,7 +439,7 @@ function partlyMoved(a, cut, to) {
   if (k.c1 < a.c1) left.push({ r0: k.r0, c0: k.c1 + 1, r1: k.r1, c1: a.c1 });
   const pieces = to ? [...left, { r0: k.r0 + to.dr, c0: k.c0 + to.dc, r1: k.r1 + to.dr, c1: k.c1 + to.dc }] : left;
   if (!pieces.length) return null;
-  const box = { r0: Math.min(...pieces.map((x) => x.r0)), c0: Math.min(...pieces.map((x) => x.c0)), r1: Math.max(...pieces.map((x) => x.r1)), c1: Math.max(...pieces.map((x) => x.c1)) };
+  const box = { r0: minOf(pieces.map((x) => x.r0)), c0: minOf(pieces.map((x) => x.c0)), r1: maxOf(pieces.map((x) => x.r1)), c1: maxOf(pieces.map((x) => x.c1)) };
   if (box.r0 < 0 || box.c0 < 0 || unionArea(pieces) !== (box.r1 - box.r0 + 1) * (box.c1 - box.c0 + 1)) return null;
   return box.r0 === a.r0 && box.c0 === a.c0 && box.r1 === a.r1 && box.c1 === a.c1 ? null : box;
 }

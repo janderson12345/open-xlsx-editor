@@ -16,6 +16,7 @@
 import { tokenize, areaText } from '../calc/tokens.js';
 import { namesOnSheet } from './names.js';
 import { colName } from './refs.js';
+import { maxOf, minOf } from './listmath.js';
 
 /** The names Apply Names can use on sheet si: those the sheet sees that refer to one area of it, all $:
  *  [{ name, area }]. */
@@ -101,5 +102,5 @@ export function applyNamesSteps(wb, si, sel, names, opts = {}) {
   if (!contents.length) return { none: true };
   const rs = contents.map((x) => x.r);
   const cs = contents.map((x) => x.c);
-  return { count: contents.length, steps: [{ si, contents, styles: [], area: { r0: Math.min(...rs), c0: Math.min(...cs), r1: Math.max(...rs), c1: Math.max(...cs) } }] };
+  return { count: contents.length, steps: [{ si, contents, styles: [], area: { r0: minOf(rs), c0: minOf(cs), r1: maxOf(rs), c1: maxOf(cs) } }] };
 }

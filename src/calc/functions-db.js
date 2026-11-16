@@ -6,6 +6,7 @@
 import { Area, E, XlError, matrix, toText } from './values.js';
 import { FUNCTIONS, def, given, num, numbers } from './functions.js';
 import { cellTest } from './criteria.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 const isNum = (v) => typeof v === 'number';
 const blank = (v) => v == null || v === '';
@@ -39,8 +40,8 @@ def('DCOUNT', (a, ctx) => {
 });
 def('DCOUNTA', (a, ctx) => { const got = picked(a, ctx, false); return given(a[1]) ? got.filter((v) => !blank(v)).length : got.length; });
 def('DAVERAGE', (a, ctx) => { const v = nums(picked(a, ctx)); if (!v.length) throw E.div0; return v.reduce((s, x) => s + x, 0) / v.length; });
-def('DMAX', (a, ctx) => { const v = nums(picked(a, ctx)); return v.length ? Math.max(...v) : 0; });
-def('DMIN', (a, ctx) => { const v = nums(picked(a, ctx)); return v.length ? Math.min(...v) : 0; });
+def('DMAX', (a, ctx) => { const v = nums(picked(a, ctx)); return v.length ? maxOf(v) : 0; });
+def('DMIN', (a, ctx) => { const v = nums(picked(a, ctx)); return v.length ? minOf(v) : 0; });
 def('DGET', (a, ctx) => {
   const v = picked(a, ctx);
   if (!v.length) throw E.value;

@@ -12,6 +12,7 @@
 import { kids, kid, attr } from './xml.js';
 import { parseRange, rangeName } from './refs.js';
 import { readTables } from './tables.js';
+import { maxOf, minOf } from './listmath.js';
 
 const REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
 
@@ -151,8 +152,8 @@ function aggregate(recs, fld, fn) {
     case 'countNums': return nums.length;
     case 'sum': return nums.reduce((a, b) => a + b, 0);
     case 'product': return nums.length ? nums.reduce((a, b) => a * b, 1) : 0;
-    case 'max': return nums.length ? Math.max(...nums) : 0;
-    case 'min': return nums.length ? Math.min(...nums) : 0;
+    case 'max': return nums.length ? maxOf(nums) : 0;
+    case 'min': return nums.length ? minOf(nums) : 0;
     case 'average': return nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : { error: '#DIV/0!' };
     case 'stdDev': case 'stdDevp': case 'var': case 'varp': {
       const n = nums.length;
@@ -187,13 +188,13 @@ function sharedAttrs(values, shared) {
     if (blank) a.push('containsBlank="1"');
     a.push('containsNumber="1"');
     if (nums.every(Number.isInteger)) a.push('containsInteger="1"');
-    a.push(`minValue="${Math.min(...nums)}"`, `maxValue="${Math.max(...nums)}"`);
+    a.push(`minValue="${minOf(nums)}"`, `maxValue="${maxOf(nums)}"`);
   } else {
     if (blank) a.push('containsBlank="1"');
     if (nums.length && strings.length) {
       a.push('containsMixedTypes="1"', 'containsNumber="1"');
       if (nums.every(Number.isInteger)) a.push('containsInteger="1"');
-      a.push(`minValue="${Math.min(...nums)}"`, `maxValue="${Math.max(...nums)}"`);
+      a.push(`minValue="${minOf(nums)}"`, `maxValue="${maxOf(nums)}"`);
     }
   }
   if (shared) a.push(`count="${shared.length}"`);

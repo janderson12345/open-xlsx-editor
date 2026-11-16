@@ -6,14 +6,15 @@
 import { kids, kid, attr } from './xml.js';
 import { readPivots } from './pivot.js';
 import { parseRange } from './refs.js';
+import { maxOf, minOf } from './listmath.js';
 
 const AGG = {
   sum: (ns) => ns.reduce((a, b) => a + b, 0),
   count: (ns, all) => all.length,
   countNums: (ns) => ns.length,
   average: (ns) => (ns.length ? ns.reduce((a, b) => a + b, 0) / ns.length : 0),
-  max: (ns) => (ns.length ? Math.max(...ns) : 0),
-  min: (ns) => (ns.length ? Math.min(...ns) : 0),
+  max: (ns) => (ns.length ? maxOf(ns) : 0),
+  min: (ns) => (ns.length ? minOf(ns) : 0),
   product: (ns) => (ns.length ? ns.reduce((a, b) => a * b, 1) : 0),
 };
 

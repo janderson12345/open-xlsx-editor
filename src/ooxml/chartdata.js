@@ -24,6 +24,7 @@ import { chartSeries, freshIds } from './chartnew.js';
 import { parseRange, colName } from './refs.js';
 import { formatCodeOf } from './styles.js';
 import { sheetPrefix } from '../calc/tokens.js';
+import { maxOf, minOf } from './listmath.js';
 
 const GROUP = /<c:(barChart|bar3DChart|lineChart|line3DChart|areaChart|area3DChart|pieChart|pie3DChart|doughnutChart|scatterChart)>[\s\S]*?<\/c:\1>/;
 const SER = /<c:ser>[\s\S]*?<\/c:ser>/g;
@@ -117,7 +118,7 @@ function alongRows(wb, list) {
 function rangeOf(wb, list, byRows) {
   const refs = list.flatMap((s) => [s.name?.f, s.cat, s.val]).filter(Boolean).map((f) => refArea(wb, f));
   if (!refs.length || refs.some((x) => !x || x.si !== refs[0].si)) return null;
-  const box = { r0: Math.min(...refs.map((x) => x.area.r0)), c0: Math.min(...refs.map((x) => x.area.c0)), r1: Math.max(...refs.map((x) => x.area.r1)), c1: Math.max(...refs.map((x) => x.area.c1)) };
+  const box = { r0: minOf(refs.map((x) => x.area.r0)), c0: minOf(refs.map((x) => x.area.c0)), r1: maxOf(refs.map((x) => x.area.r1)), c1: maxOf(refs.map((x) => x.area.c1)) };
   const found = chartSeries(wb, refs[0].si, box, byRows);
   const same = found && found.series.length === list.length && found.series.every((s, k) => (s.name?.f ?? null) === (list[k].name?.f ?? null)
     && (s.cat?.f ?? null) === list[k].cat && s.val.f === list[k].val);
@@ -194,7 +195,7 @@ function freshContext(text, list) {
   if (!kind) throw new Error("Series can't be added to this kind of chart here yet.");
   const uids = list.map((s) => uidOf(s.ser)).filter(Boolean);
   const one = list[0]?.ser || '';
-  return { kind, labels: labelled(list), guid: uids[0]?.[2] || freshIds().guid, nextUid: uids.length ? Math.max(...uids.map((u) => parseInt(u[1], 16))) + 1 : list.length,
+  return { kind, labels: labelled(list), guid: uids[0]?.[2] || freshIds().guid, nextUid: uids.length ? maxOf(uids.map((u) => parseInt(u[1], 16))) + 1 : list.length,
     outline: /<c:dPt>/.test(one) ? !/<c:dPt>(?:(?!<\/c:dPt>)[\s\S])*?<a:ln><a:noFill\/><\/a:ln>/.test(one) : undefined,
     hiddenLine: /<c:spPr><a:ln w="(\d+)" cap="rnd"><a:noFill\/>/.exec(one)?.[1] };
 }

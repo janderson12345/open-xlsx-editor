@@ -9,6 +9,7 @@ import { rangeName, parseRange } from './refs.js';
 import { addConditional, addPresetDxf, cfRuleXml, ruleElement } from './cfedit.js';
 import { X14, XM, EXT_CF } from './cfext.js';
 import { x14Rules, dropX14Rules } from './cfbarsedit.js';
+import { maxOf } from './listmath.js';
 
 /** Every rule of the sheet's part, base and extLst-only: [{ el, priority, cf (its conditionalFormatting), x14 }]. */
 function rulesOf(doc) {
@@ -57,7 +58,7 @@ export function moveRule(wb, si, p, to) {
   const all = rulesOf(doc);
   const r = all.find((x) => x.priority === p);
   if (!r) throw new Error('No such rule.');
-  if (to === 'last') { r.el.setAttribute('priority', String(Math.max(...all.map((x) => x.priority)) + 1)); return; }
+  if (to === 'last') { r.el.setAttribute('priority', String(maxOf(all.map((x) => x.priority)) + 1)); return; }
   for (const x of all) if (x !== r && x.priority >= to) x.el.setAttribute('priority', String(x.priority + 1));
   r.el.setAttribute('priority', String(to));
 }

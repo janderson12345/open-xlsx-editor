@@ -9,6 +9,7 @@ import { readColor } from './styles.js';
 import { resolveColor } from './theme.js';
 import { parseRange, parseRef } from './refs.js';
 import { X14, XM } from './cfext.js';
+import { maxOf, minOf } from './listmath.js';
 
 export const EXT_SPARKLINES = '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}';
 const COLORS = ['Series', 'Negative', 'Axis', 'Markers', 'First', 'Last', 'High', 'Low'];
@@ -108,10 +109,10 @@ export function sparklineLooks(wb, si) {
         if (dates) when.push(dates[k].v);
       });
       const shown = values.filter((v) => v != null);
-      lines.push({ s, values, dates: dates ? when : null, lo: shown.length ? Math.min(...shown) : 0, hi: shown.length ? Math.max(...shown) : 0 });
+      lines.push({ s, values, dates: dates ? when : null, lo: shown.length ? minOf(shown) : 0, hi: shown.length ? maxOf(shown) : 0 });
     }
-    const groupLo = Math.min(...lines.map((l) => l.lo));
-    const groupHi = Math.max(...lines.map((l) => l.hi));
+    const groupLo = minOf(lines.map((l) => l.lo));
+    const groupHi = maxOf(lines.map((l) => l.hi));
     const colors = Object.fromEntries(Object.entries(g.colors).map(([k, c]) => [k, color(c)]));
     for (const l of lines) {
       const lo = g.minType === 'custom' ? g.min : g.minType === 'group' ? groupLo : l.lo;

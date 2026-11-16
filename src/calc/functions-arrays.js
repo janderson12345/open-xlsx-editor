@@ -4,6 +4,7 @@
 // formula probe (test/formulas-excel.json). Registered into functions.js's table; evaluate.js imports this file.
 import { Arr, Ref3D, MISSING, XlError, E, scalar, matrix, toText, toBool, Lambda, Lambdas } from './values.js';
 import { def, given, num, text } from './functions.js';
+import { maxOf } from '../ooxml/listmath.js';
 
 const ARRAY = { array: true };
 const rowsOf = (v, ctx) => matrix(v, ctx);
@@ -34,10 +35,10 @@ def('DROP', (a, ctx) => {
 function stack(args, ctx, across) {
   const ms = sheetwise(args).filter((x) => x !== MISSING && x !== undefined).map((x) => rowsOf(x, ctx));
   if (!across) {
-    const width = Math.max(...ms.map((m) => m[0].length));
+    const width = maxOf(ms.map((m) => m[0].length));
     return new Arr(ms.flatMap((m) => m.map((row) => [...row, ...Array(width - row.length).fill(E.na)])));
   }
-  const height = Math.max(...ms.map((m) => m.length));
+  const height = maxOf(ms.map((m) => m.length));
   return new Arr(Array.from({ length: height }, (_, r) => ms.flatMap((m) => (r < m.length ? m[r] : Array(m[0].length).fill(E.na)))));
 }
 def('VSTACK', (a, ctx) => stack(a, ctx, false), ARRAY);
@@ -118,7 +119,7 @@ def('TEXTSPLIT', (a, ctx) => {
   const pad = given(a[5]) ? a[5] : E.na;
   const keep = (xs) => (ignore ? xs.filter((x) => x !== '') : xs);
   const lines = keep(split(s, rows, mode)).map((line) => keep(split(line, cols, mode)));
-  const width = Math.max(...lines.map((l) => l.length));
+  const width = maxOf(lines.map((l) => l.length));
   return out(lines.map((l) => [...l, ...Array(width - l.length).fill(pad)]));
 }, ARRAY);
 

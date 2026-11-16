@@ -5,6 +5,7 @@
 // plot are chartplot.js's. Pictures only: what a screen reader hears is chartFigure's table.
 import { el, paint, seriesColour, accent, fontFor, textAttrs, widthOf, SVG, LINE } from './chartpaint.js';
 import { drawAxes } from './chartplot.js';
+import { maxOf } from '../ooxml/listmath.js';
 
 /** A chart as an <svg> of `width` by `height` pixels. */
 export function chartSvg(chart, { width, height, theme, date1904 = false }) {
@@ -41,7 +42,7 @@ export function chartSvg(chart, { width, height, theme, date1904 = false }) {
       });
       bottom = height - 30;
     } else {
-      const w = Math.max(...entries.map((e) => widthOf(e.name, lf.size, lf.bold) + keyW(e))) + 11;
+      const w = maxOf(entries.map((e) => widthOf(e.name, lf.size, lf.bold) + keyW(e))) + 11;
       const x0 = width - w - 6;
       let y = (top + height) / 2 - (entries.length * 18) / 2 + 12;
       for (const e of entries) {

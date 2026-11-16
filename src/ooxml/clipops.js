@@ -12,6 +12,7 @@ import { moveNamesForCut } from './names.js';
 import { addThread, replyThread, resolveThread } from './threadedit.js';
 import { boxRule, coalesce } from './dvedit.js';
 import { copyConditionals, moveCutConditionals } from './clipcf.js';
+import { maxOf } from './listmath.js';
 
 export { pasteConditionals } from './clipcf.js';
 
@@ -22,7 +23,7 @@ const inside = (a, b) => a.r0 >= b.r0 && a.r1 <= b.r1 && a.c0 >= b.c0 && a.c1 <=
 export function snapshot(wb, si, sel, cut = false) {
   const sheet = wb.sheet(si);
   const cells = cellsOf(sheet, sel);
-  const rect = { r0: sel.r0, c0: sel.c0, r1: Math.max(...cells.map((x) => x.r)), c1: Math.max(...cells.map((x) => x.c)) };
+  const rect = { r0: sel.r0, c0: sel.c0, r1: maxOf(cells.map((x) => x.r)), c1: maxOf(cells.map((x) => x.c)) };
   return {
     wb, si, rect, cut,
     sheetName: wb.sheets[si].name,
@@ -260,7 +261,7 @@ export function pasteText(wb, si, sel, text) {
     contents.push(ch.error ? { r, c, value: t } : ch.content);
     if (ch.style) styles.push(ch.style);
   }));
-  const area = { r0: sel.r0, c0: sel.c0, r1: sel.r0 + lines.length - 1, c1: sel.c0 + Math.max(...lines.map((l) => l.length)) - 1 };
+  const area = { r0: sel.r0, c0: sel.c0, r1: sel.r0 + lines.length - 1, c1: sel.c0 + maxOf(lines.map((l) => l.length)) - 1 };
   return [{ si, contents, styles, merges: wb.sheet(si).merges, area }];
 }
 

@@ -12,6 +12,7 @@
 import { valueAxis, autoScale } from '../ooxml/charts.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { el, paint, seriesColour, fontFor, textAttrs, widthOf, LINE } from './chartpaint.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 const PX = 4 / 3;
 const ticksOf = (axis) => { const out = []; for (let v = axis.min, k = 0; v <= axis.max + axis.major * 1e-9 && k < 200; k++, v = axis.min + k * axis.major) out.push(Number(v.toPrecision(15))); return out; };
@@ -46,13 +47,13 @@ export function drawAxes(svg, chart, theme, { top, right, bottom, width, date190
   const v2F = two?.title && fontFor(chart, two.title.font, 'axisTitle', theme);
   // (A scatter chart's x axis is a value axis too: Excel's automatic scale over the x values.)
   const xs = scatter ? chart.series.flatMap((s) => s.xs || []).filter((x) => typeof x === 'number') : [];
-  const xAxis = scatter ? autoScale(xs.length ? Math.min(...xs) : 0, xs.length ? Math.max(...xs) : 0) : null;
+  const xAxis = scatter ? autoScale(xs.length ? minOf(xs) : 0, xs.length ? maxOf(xs) : 0) : null;
   const xTicks = xAxis ? ticksOf(xAxis) : [];
   const cats = scatter ? xTicks.map((t) => cellText({ t: 'n', v: t }, Infinity, 'General', date1904).trim()) : chart.cats.length ? chart.cats : (chart.series[0]?.values || []).map((_, i) => String(i + 1));
   const n = cats.length || 1;
-  const valueW = chart.axis.hidden ? 0 : Math.max(...ticks.map((t) => widthOf(label(t), vFont.size, vFont.bold)), 0);
-  const catW = chart.catHidden ? 0 : Math.max(...cats.map((c) => widthOf(c ?? '', cFont.size, cFont.bold)), 0);
-  const v2W = two && !two.hidden ? Math.max(...ticks2.map((t) => widthOf(label2(t), v2Font.size, v2Font.bold)), 0) : 0;
+  const valueW = chart.axis.hidden ? 0 : Math.max(maxOf(ticks.map((t) => widthOf(label(t), vFont.size, vFont.bold))), 0);
+  const catW = chart.catHidden ? 0 : Math.max(maxOf(cats.map((c) => widthOf(c ?? '', cFont.size, cFont.bold))), 0);
+  const v2W = two && !two.hidden ? Math.max(maxOf(ticks2.map((t) => widthOf(label2(t), v2Font.size, v2Font.bold))), 0) : 0;
   const left = 12 + bandOf(vF) + (horizontal ? catW + 8 : valueW + 8);
   const rightEdge = right - (two && !two.hidden ? v2W + 5 : 0) - bandOf(v2F);
   const below = horizontal ? (chart.axis.hidden ? 0 : 8 + vFont.size) : (chart.catHidden ? 0 : 10 + cFont.size);

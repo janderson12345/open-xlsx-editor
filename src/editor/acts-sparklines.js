@@ -7,6 +7,7 @@ import { parseRange, rangeName } from '../ooxml/refs.js';
 import { parseSheetRange } from '../ooxml/sparklines.js';
 import { sparkPieces, addSparklines, setGroupOptions, setGroupColor, clearSparklines, groupSparklines, ungroupSparklines, setGroupData, setSparklineData, SparklineError, applyStyle } from '../ooxml/sparkedit.js';
 import { sheetPrefix } from '../calc/tokens.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 const TYPES = { line: 'Line', column: 'Column', stacked: 'Win/Loss' };
 /** A range as Excel's boxes show the location: $O$2:$O$4. */
@@ -64,7 +65,7 @@ export function createSparklineActs(env) {
     sparklineGroupData() {
       const g = groupHere();
       if (!g) return false;
-      const box = (list) => ({ r0: Math.min(...list.map((a) => a.r0)), c0: Math.min(...list.map((a) => a.c0)), r1: Math.max(...list.map((a) => a.r1)), c1: Math.max(...list.map((a) => a.c1)) });
+      const box = (list) => ({ r0: minOf(list.map((a) => a.r0)), c0: minOf(list.map((a) => a.c0)), r1: maxOf(list.map((a) => a.r1)), c1: maxOf(list.map((a) => a.c1)) });
       const sources = g.sparklines.map((s) => parseSheetRange(s.source)).filter(Boolean);
       const data = sources.length ? `${sources[0].sheet === sheetName() ? '' : sheetPrefix(sources[0].sheet)}${rangeName(box(sources.map((p) => p.range)))}` : '';
       const loc = absolute(box(g.sparklines.map((s) => ({ r0: s.r, c0: s.c, r1: s.r, c1: s.c }))));

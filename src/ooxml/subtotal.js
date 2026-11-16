@@ -13,6 +13,7 @@ import { colName, refName, parseRef } from './refs.js';
 import { kids, kid, attr } from './xml.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
 import { styleSummaryLines } from './outlinestyles.js';
+import { maxOf, minOf } from './listmath.js';
 
 /** Excel's Use function list: SUBTOTAL's number and the word its rows are labelled with. */
 export const SUBTOTAL_FUNCTIONS = {
@@ -120,7 +121,7 @@ export function subtotal(wb, si, area, { by, fn = 'sum', cols, replace = true, p
   const grands = [...totals].filter((r) => !levelOf.get(r));
   // The list as it will be, row by row: the rows there ({ r }) and the new ones ({ group } or { grand }).
   const order = [];
-  const firstGrandAt = below ? (grands.length ? Math.min(...grands) : area.r1 + 1) : (grands.length ? Math.max(...grands) + 1 : area.r0 + 1);
+  const firstGrandAt = below ? (grands.length ? minOf(grands) : area.r1 + 1) : (grands.length ? maxOf(grands) + 1 : area.r0 + 1);
   for (let r = area.r0 + 1; r <= area.r1 + 1; r++) {
     if (r === firstGrandAt) order.push({ grand: true });
     for (const g of groups) {

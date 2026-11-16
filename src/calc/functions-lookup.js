@@ -4,6 +4,7 @@ import { Area, Arr, MISSING, Unsupported, XlError, E, compare, textToNumber } fr
 import { tokenize } from './tokens.js';
 import { def, given, one, num, text, opt, cellsIn, grid, vector, bool } from './functions.js';
 import { wildcard } from './functions-text.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 // ---- Lookup and reference
 
@@ -283,5 +284,5 @@ def('AVERAGEIF', (a, ctx) => {
   return mean(gather(given(a[2]) ? sameShape(a[2], a[0]) : a[0], pairsFrom(a, 0, ctx).slice(0, 1), ctx));
 });
 def('AVERAGEIFS', (a, ctx) => mean(gather(a[0], pairsFrom(a, 1, ctx), ctx)));
-def('MAXIFS', (a, ctx) => { const n = gather(a[0], pairsFrom(a, 1, ctx), ctx); return n.length ? Math.max(...n) : 0; });
-def('MINIFS', (a, ctx) => { const n = gather(a[0], pairsFrom(a, 1, ctx), ctx); return n.length ? Math.min(...n) : 0; });
+def('MAXIFS', (a, ctx) => { const n = gather(a[0], pairsFrom(a, 1, ctx), ctx); return n.length ? maxOf(n) : 0; });
+def('MINIFS', (a, ctx) => { const n = gather(a[0], pairsFrom(a, 1, ctx), ctx); return n.length ? minOf(n) : 0; });

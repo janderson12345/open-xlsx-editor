@@ -1,3 +1,4 @@
+import { maxOf, minOf } from '../ooxml/listmath.js';
 // A sparkline's shapes inside its cell, in pixels from the cell's top left, as Excel draws them. No DOM: the grid,
 // print and PDF draw these (sparkview.js), and test/sparklines.test.js compares them with Excel's PDF.
 //
@@ -58,8 +59,8 @@ export function sparkShapes(sp, w, h) {
   let slot = width / n;
   let at = (i) => left + (i + 0.5) * slot;
   if (sp.dates?.length) {
-    const d0 = Math.min(...sp.dates);
-    slot = width / (Math.max(...sp.dates) - d0 + 1);
+    const d0 = minOf(sp.dates);
+    slot = width / (maxOf(sp.dates) - d0 + 1);
     at = (i) => left + (sp.dates[i] - d0 + 0.5) * slot;
   }
   const xOf = sp.rightToLeft ? (i) => 2 * left + width - at(i) : at;
@@ -68,7 +69,7 @@ export function sparkShapes(sp, w, h) {
   const yOf = (v) => (hi === lo ? top : top + ((hi - v) / (hi - lo)) * (bottom - top));
   const clampY = (y) => Math.min(bottom, Math.max(top, y));
   const shown = sp.values.map((v, i) => [v, i]).filter(([v]) => v != null);
-  const ends = { first: shown[0]?.[1], last: shown.at(-1)?.[1], high: Math.max(...shown.map(([v]) => v)), low: Math.min(...shown.map(([v]) => v)) };
+  const ends = { first: shown[0]?.[1], last: shown.at(-1)?.[1], high: maxOf(shown.map(([v]) => v)), low: minOf(shown.map(([v]) => v)) };
   if (sp.type === 'line') {
     // Empty cells break the line (gap), or are passed over (span); a point on its own draws nothing.
     const runs = [];

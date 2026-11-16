@@ -23,6 +23,7 @@ import { createPivot, applyPivot, PIVOT_FUNCTIONS } from './ooxml/pivotnew.js';
 import { readPivots, refreshPivot, pivotAt } from './ooxml/pivot.js';
 import { pivotLayout, movePivotFields } from './ooxml/pivotfields.js';
 import { defineName, editName, deleteName } from './ooxml/names.js';
+import { maxOf } from './ooxml/listmath.js';
 
 /** Opens an .xlsx or .xlsm (bytes) for reading and editing; one saved with a password needs `password`. */
 export function openWorkbook(bytes, { password = null } = {}) {
@@ -236,7 +237,7 @@ export class AgentWorkbook {
       contents.push({ r: a.r0 + dr, c: a.c0 + dc, value });
     }));
     if (!contents.length) return null;
-    const width = Math.max(...rows.map((row) => row.length));
+    const width = maxOf(rows.map((row) => row.length));
     this.edits.cells(a.si, contents, []);
     return this.qualified(a.si, { r0: a.r0, c0: a.c0, r1: a.r0 + rows.length - 1, c1: a.c0 + width - 1 });
   }

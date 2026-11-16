@@ -7,6 +7,7 @@ import { kids, kid, attr, NS } from './xml.js';
 import { parseRange } from './refs.js';
 import { emuToPx } from './units.js';
 import { fontOf, axisTitle, seriesLook, chartLookOf } from './chartlook.js';
+import { maxOf } from './listmath.js';
 
 const C = 'http://schemas.openxmlformats.org/drawingml/2006/chart';
 const A = 'http://schemas.openxmlformats.org/drawingml/2006/main';
@@ -229,7 +230,7 @@ export function valueAxis(chart, secondary = false) {
   groups.forEach((g, gi) => {
     if (!!g.secondary !== secondary) return;
     const list = chart.series.filter((s) => (s.group ?? 0) === gi);
-    const n = Math.max(...list.map((s) => s.values.length), 0);
+    const n = Math.max(maxOf(list.map((s) => s.values.length)), 0);
     if (g.grouping === 'percentStacked') { percent = true; lo = Math.min(lo, 0); hi = Math.max(hi, 1); }
     else if (g.grouping === 'stacked') {
       for (let i = 0; i < n; i++) {

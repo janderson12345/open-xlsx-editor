@@ -11,6 +11,7 @@ import { dateParts } from '../ooxml/format.js';
 import { colName } from '../ooxml/refs.js';
 import { sin, cos, tan, TRIG_LIMIT } from './trig.js';
 import { notACharacter } from './charsets.js';
+import { maxOf, minOf } from '../ooxml/listmath.js';
 
 const sorted = (args, ctx) => numbers(args, ctx).sort((a, b) => a - b);
 
@@ -105,8 +106,8 @@ function valuesA(args, ctx) {
   return out;
 }
 def('AVERAGEA', (a, ctx) => { const n = valuesA(a, ctx); if (!n.length) throw E.div0; return n.reduce((s, x) => s + x, 0) / n.length; });
-def('MAXA', (a, ctx) => { const n = valuesA(a, ctx); return n.length ? Math.max(...n) : 0; });
-def('MINA', (a, ctx) => { const n = valuesA(a, ctx); return n.length ? Math.min(...n) : 0; });
+def('MAXA', (a, ctx) => { const n = valuesA(a, ctx); return n.length ? maxOf(n) : 0; });
+def('MINA', (a, ctx) => { const n = valuesA(a, ctx); return n.length ? minOf(n) : 0; });
 
 // ---- Working days and dates
 
