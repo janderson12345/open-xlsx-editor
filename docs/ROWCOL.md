@@ -70,7 +70,7 @@ columns inserted and deleted around, inside and across each object, and cells sh
 | A note or threaded comment | Moves with its cell, also when cells shift, and is deleted with it. |
 | A picture, chart or shape (a two-cell anchor) | Each corner after the change moves with it. An end corner on the boundary where lines are inserted stays, so the object doesn't grow. Lines deleted inside it shrink it. One whose whole extent is deleted is deleted, a chart with its part. |
 | The same when cells shift | Not moved. |
-| One that moves but doesn't size (`editAs="oneCell"`), or doesn't move (`absolute`) | Moved by its start, or left where it is. Not measured. |
+| One that moves but doesn't size (`editAs="oneCell"`), or doesn't move (`absolute`) | Moved by its start; or kept at its place on the sheet, its corners worked out again from the lines' sizes. Measured with slicers (below). |
 
 Results: all 20 steps put the chart, the rectangle and the notes where Excel did (`test/anchors.test.js` against
 `test/anchors-excel.json`). The editor's 20 results were saved (`anchors-ours.mjs`) and opened in Excel
@@ -125,11 +125,77 @@ Excel did them. Excel's own refresh of each moved pivot left it where it was.
 One step Excel takes its own way: a cell inserted inside the pivot, shifting down, leaves Excel's pivot with an empty
 cell in it. The editor refuses it, as it refuses any cells shifted through part of a pivot.
 
+## Sparklines, data validation, notes in a sort, Circle Invalid Data
+
+Measured by `tools/excel-compare/excel-refmoves.ps1` on `refmove-cases.mjs`: a sheet with a group of line sparklines
+O2:O5 over B2:M5, a column sparkline at O7, one at Q2 over another sheet's B2:M2, four validation rules on B10:E15 (a
+list of $H$10:$H$12, whole numbers 1 to $I$10, a custom `D10>C10`, a list of `Data!$A$1:$A$3`, which Excel writes in
+the Excel 2010 form, `x14:dataValidation` in the sheet's extLst), notes at B12 and F20, a threaded comment at C13, and
+Circle Invalid Data shown. Forty-two steps (whole lines, cells shifting each way, lines on the other sheet, sorts) were
+done in Excel and the workbook it saved compared (`src/ooxml/rulemoves.js`; `test/fixtures/refmoves.xlsx`).
+
+| What | As Excel does it |
+|---|---|
+| A sparkline | Its cell moves with it, and its data as a reference does (the data on another sheet follows that sheet's lines). Deleted with its cell, or when all of its data is deleted (column B:M deleted: O2:O5 and O7 went though their cells stayed). |
+| Sparklines and new lines | Lines and cells inserted take the sparklines of the line or cell before them, in the same group, their data moved as a copy moves it: column P inserted after O gives P2 over C2:N2; rows 3:4 inserted give O3 over B3:M3 and O4 over B4:M4, Q3 and Q4 over Data!B3:M3 and B4:M4. |
+| A validation rule's ranges | Move, grow and shrink as ranges do, the Excel 2010 form's too. Lines and cells inserted take the rules of the line or cell before them: B10:B15 is B10:C15 after a column is inserted at C; all four end at row 16 after a row is inserted there; D10:D15 gets E12:E13 when E12:E13 is inserted shifting right. |
+| A rule's formulas | Stay relative to its first cell: references move as references do; when the first cell is deleted they read from the first cell left (D10:D15's `D10>C10` stays `D10>C10` after rows 10:12 go, the rule now D10:D12). |
+| Cells shifted through part of a rule | The part that moves is cut from it: a rule of its own when its formulas have relative references (D12, shifted left to C12: `C12>#REF!`), else it stays in the rule (E10:E11 E13:E15 D12). A part deleted is taken out when the formulas are relative (D10:D11 D13:D15), and left in when they are absolute (C10:C15 kept C12). |
+| A sort | Notes and threaded comments go with their cells (B12's note to B10, C13's thread to C14, their boxes with them); sparklines, validation rules and conditional formats stay where they are, also when the sparklines' cells are sorted. |
+| Circle Invalid Data's ovals | All gone after any insert or delete on their sheet, whether or not it reaches the circled cells; kept after one on another sheet, and after a sort (left where they were). |
+
+Results: 41 of the 42 steps match Excel (`test/refmoves.test.js` against `test/refmoves-excel.json`); the other is
+below. The editor's 43 results (the start and each step) opened in Excel without a repair and read back 42 of 43 as
+Excel had made them (`excel-refmoves.ps1 -Books test/out/refmoves`), leaving out the threaded comment's placeholder
+box, which Excel lays out again itself when it opens any workbook.
+
+The one difference: with B12:C12 deleted shifting left, Excel took B12 out of B10:B15's list rule, whose formula is
+absolute, though it left C12 in C10:C15's and, with C12:E12 deleted, E12 in E10:E15's. The editor leaves an absolute
+rule whole each time. Excel also leaves rules overlapping there (C12 is in two), as the editor does. After a sort the
+editor keeps only the ovals whose cells still break their rule, where Excel leaves all of them in place.
+
+## Slicers and timelines
+
+Measured by `tools/excel-compare/excel-slicers.ps1` on `slicer-cases.mjs`: a table Sales on B2:E14 with a slicer on its
+Region column (Excel made it "don't move or size with cells" over COM), a pivot table of it at L20 with a slicer on
+Item and a timeline on Date (both "move but don't size"), all on one sheet; 14 steps (`src/ooxml/slicers.js`,
+`src/ooxml/anchors.js`; `test/fixtures/slicers.xlsx`).
+
+| What | As Excel does it |
+|---|---|
+| A slicer's or timeline's place | Its drawing's anchor moves as any drawing's does. One that doesn't move with cells keeps its place on the sheet: its corners worked out again from the lines' sizes (the Region slicer at G2, after a column was inserted at C taking B's 73px, was at F2 and 55px: `5, 523875`). |
+| A table slicer's cache | Names its table by id and its column by the column's id, so a column inserted into the table changes nothing in it. |
+| A table slicer's column deleted, or its table | The slicer is deleted: its place in the drawing, the slicer in its part (the part when it was the last), its cache part, the cache's defined name (`Slicer_Region`) and the workbook's and sheet's lists of them. |
+| A pivot slicer or a timeline | Stays, its field deleted from the pivot's source or not (Excel keeps them until the pivot is refreshed). |
+| Lines through the pivot, or the table's header row without the rest | Refused, as without slicers (above). |
+
+Results: 14 of 14 steps match Excel (`test/slicers.test.js` against `test/slicers-excel.json`); the editor's 15 results
+opened in Excel without a repair and read back 15 of 15 as Excel had made them (`excel-slicers.ps1 -Open
+test/out/slicers`).
+
+## Conditional formats
+
+Measured by `tools/excel-compare/excel-cfmoves.ps1` on `cfmove-cases.mjs`: data bars on B2:B10 (which Excel writes in
+both forms, linked by an `x14:id`), 3 stars on C2:C10 and `=D2>Data!$A$1` on D2:D10 (Excel's 2010 form only,
+`x14:conditionalFormatting` in the extLst), and "greater than 5" on E2:E10; 20 steps (`src/ooxml/rulemoves.js`;
+`test/fixtures/cfmoves.xlsx`).
+
+| What | As Excel does it |
+|---|---|
+| A format's ranges, of either form | Move, grow and shrink as ranges do; a format whose cells are all deleted goes. |
+| New lines and cells | Take the formats of the line or cell before them: B2:C10 after a column is inserted at C; all four go to row 11 after a row is inserted there; C2:C10 gets D5:D6 when D5:D6 is inserted shifting right. |
+| Its formulas | Are relative to the top-left of all of its ranges: after rows 2:3 are deleted, D2:D8 still reads `D2>Data!$A$1`; after D5 is shifted left to C5, `D2:D4 D6:D10 C5` reads `C2>Data!$A$1`. |
+| Cells shifted through part of one | The part that moves stays in the format (`E2:E4 E6:E10 D5`), and so does a part that is deleted (D2:D10 kept D5). The cells a moved part lands on leave the other formats of its form: C5 left the 3 stars when D5's formula rule landed there, but D5 stayed in that rule when the main form's E5 landed on it. |
+| A sort | Leaves them where they are. |
+
+Results: 20 of 20 steps match Excel (`test/cfmoves.test.js` against `test/cfmoves-excel.json`); the editor's 21 results
+opened in Excel without a repair and read back 21 of 21 with the same cells (Excel lists a format's ranges in its own
+order). A main-form formula rule whose first cell was deleted used to read `#REF!`; it now reads from the first cell
+left, as the 2010 form's did in Excel.
+
 ## Not yet
 
-A sheet with slicers or timelines is refused ("Rows and columns can't be inserted or
-deleted yet on a sheet with...", or "Cells can't..."): their ranges aren't moved yet. Also missing: page
-breaks and the Insert Options button (format from below, clear
-formatting). One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is
-`=SUM(A3:A3)` in Excel after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to
-`=SUM(D3:D3)`.
+Page breaks and the Insert Options button (format from below, clear formatting).
+
+One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is `=SUM(A3:A3)` in Excel
+after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to `=SUM(D3:D3)`.

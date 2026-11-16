@@ -1,0 +1,1679 @@
+[
+ {
+  "name": "start",
+  "step": {
+   "do": "none",
+   "range": "A1"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "insert row 1",
+  "step": {
+   "do": "insert",
+   "range": "1:1"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q3 <- Data!B2:M2",
+   "O8 <- Sheet1!B8:M8",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5",
+   "O6 <- Sheet1!B6:M6"
+  ],
+  "rules": [
+   "B11:B16 | $H$11:$H$13",
+   "C11:C16 | 1 | $I$11",
+   "D11:D16 | D11>C11"
+  ],
+  "x14": [
+   "E11:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B13",
+   "C14",
+   "F21"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "12,1: 2, 15, 11, 10, 4, 31, 15, 9",
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "20,5: 6, 15, 19, 10, 8, 31, 23, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert rows 3:4 (inside the sparkline group)",
+  "step": {
+   "do": "insert",
+   "range": "3:4"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "Q3 <- Data!B3:M3",
+   "Q4 <- Data!B4:M4",
+   "O9 <- Sheet1!B9:M9",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5",
+   "O6 <- Sheet1!B6:M6",
+   "O7 <- Sheet1!B7:M7"
+  ],
+  "rules": [
+   "B12:B17 | $H$12:$H$14",
+   "C12:C17 | 1 | $I$12",
+   "D12:D17 | D12>C12"
+  ],
+  "x14": [
+   "E12:E17 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B14",
+   "C15",
+   "F22"
+  ],
+  "threads": [
+   "C15"
+  ],
+  "boxes": [
+   "13,1: 2, 15, 12, 10, 4, 31, 16, 9",
+   "14,2: 3, 15, 13, 10, 5, 31, 17, 9",
+   "21,5: 6, 15, 20, 10, 8, 31, 24, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete row 3 (a sparkline and its data)",
+  "step": {
+   "do": "delete",
+   "range": "3:3"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O6 <- Sheet1!B6:M6",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4"
+  ],
+  "rules": [
+   "B9:B14 | $H$9:$H$11",
+   "C9:C14 | 1 | $I$9",
+   "D9:D14 | D9>C9"
+  ],
+  "x14": [
+   "E9:E14 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B11",
+   "C12",
+   "F19"
+  ],
+  "threads": [
+   "C12"
+  ],
+  "boxes": [
+   "10,1: 2, 15, 9, 10, 4, 31, 13, 9",
+   "11,2: 3, 15, 10, 10, 5, 31, 14, 9",
+   "18,5: 6, 15, 17, 10, 8, 31, 21, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete rows 2:5 (all of the group)",
+  "step": {
+   "do": "delete",
+   "range": "2:5"
+  },
+  "refused": null,
+  "sparklines": [
+   "O3 <- Sheet1!B3:M3"
+  ],
+  "rules": [
+   "B6:B11 | $H$6:$H$8",
+   "C6:C11 | 1 | $I$6",
+   "D6:D11 | D6>C6"
+  ],
+  "x14": [
+   "E6:E11 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B8",
+   "C9",
+   "F16"
+  ],
+  "threads": [
+   "C9"
+  ],
+  "boxes": [
+   "15,5: 6, 15, 14, 10, 8, 31, 18, 9",
+   "7,1: 2, 15, 6, 10, 4, 31, 10, 9",
+   "8,2: 3, 15, 7, 10, 5, 31, 11, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert column C (inside the data)",
+  "step": {
+   "do": "insert",
+   "range": "C:C"
+  },
+  "refused": null,
+  "sparklines": [
+   "R2 <- Data!B2:M2",
+   "P7 <- Sheet1!B7:N7",
+   "P2 <- Sheet1!B2:N2",
+   "P3 <- Sheet1!B3:N3",
+   "P4 <- Sheet1!B4:N4",
+   "P5 <- Sheet1!B5:N5"
+  ],
+  "rules": [
+   "B10:C15 | $I$10:$I$12",
+   "D10:D15 | 1 | $J$10",
+   "E10:E15 | E10>D10"
+  ],
+  "x14": [
+   "F10:F15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "D13",
+   "G20"
+  ],
+  "threads": [
+   "D13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,3: 4, 15, 11, 10, 6, 31, 15, 9",
+   "19,6: 7, 15, 18, 10, 9, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete column C (part of the data, a rule)",
+  "step": {
+   "do": "delete",
+   "range": "C:C"
+  },
+  "refused": null,
+  "sparklines": [
+   "P2 <- Data!B2:M2",
+   "N7 <- Sheet1!B7:L7",
+   "N2 <- Sheet1!B2:L2",
+   "N3 <- Sheet1!B3:L3",
+   "N4 <- Sheet1!B4:L4",
+   "N5 <- Sheet1!B5:L5"
+  ],
+  "rules": [
+   "B10:B15 | $G$10:$G$12",
+   "C10:C15 | C10>#REF!"
+  ],
+  "x14": [
+   "D10:D15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "E20"
+  ],
+  "threads": [],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "19,4: 5, 15, 18, 10, 7, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete columns B:M (all of the data)",
+  "step": {
+   "do": "delete",
+   "range": "B:M"
+  },
+  "refused": null,
+  "sparklines": [
+   "E2 <- Data!B2:M2"
+  ],
+  "rules": [],
+  "x14": [],
+  "notes": [],
+  "threads": [],
+  "boxes": [],
+  "ovals": []
+ },
+ {
+  "name": "delete column O (the group's cells)",
+  "step": {
+   "do": "delete",
+   "range": "O:O"
+  },
+  "refused": null,
+  "sparklines": [
+   "P2 <- Data!B2:M2"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert column A",
+  "step": {
+   "do": "insert",
+   "range": "A:A"
+  },
+  "refused": null,
+  "sparklines": [
+   "R2 <- Data!B2:M2",
+   "P7 <- Sheet1!C7:N7",
+   "P2 <- Sheet1!C2:N2",
+   "P3 <- Sheet1!C3:N3",
+   "P4 <- Sheet1!C4:N4",
+   "P5 <- Sheet1!C5:N5"
+  ],
+  "rules": [
+   "C10:C15 | $I$10:$I$12",
+   "D10:D15 | 1 | $J$10",
+   "E10:E15 | E10>D10"
+  ],
+  "x14": [
+   "F10:F15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "C12",
+   "D13",
+   "G20"
+  ],
+  "threads": [
+   "D13"
+  ],
+  "boxes": [
+   "11,2: 3, 15, 10, 10, 5, 31, 14, 9",
+   "12,3: 4, 15, 11, 10, 6, 31, 15, 9",
+   "19,6: 7, 15, 18, 10, 9, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert rows 11:12 (inside the rules)",
+  "step": {
+   "do": "insert",
+   "range": "11:12"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B17 | $H$10:$H$14",
+   "C10:C17 | 1 | $I$10",
+   "D10:D17 | D10>C10"
+  ],
+  "x14": [
+   "E10:E17 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B14",
+   "C15",
+   "F22"
+  ],
+  "threads": [
+   "C15"
+  ],
+  "boxes": [
+   "13,1: 2, 15, 12, 10, 4, 31, 16, 9",
+   "14,2: 3, 15, 13, 10, 5, 31, 17, 9",
+   "21,5: 6, 15, 20, 10, 8, 31, 24, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete row 12 (invalid cells, a note)",
+  "step": {
+   "do": "delete",
+   "range": "12:12"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B14 | $H$10:$H$11",
+   "C10:C14 | 1 | $I$10",
+   "D10:D14 | D10>C10"
+  ],
+  "x14": [
+   "E10:E14 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "C12",
+   "F19"
+  ],
+  "threads": [
+   "C12"
+  ],
+  "boxes": [
+   "11,2: 3, 15, 10, 10, 5, 31, 14, 9",
+   "18,5: 6, 15, 17, 10, 8, 31, 21, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete rows 10:12 (the rules' first rows)",
+  "step": {
+   "do": "delete",
+   "range": "10:12"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B12 | #REF!",
+   "C10:C12 | 1 | #REF!",
+   "D10:D12 | D10>C10"
+  ],
+  "x14": [
+   "E10:E12 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "C10",
+   "F17"
+  ],
+  "threads": [
+   "C10"
+  ],
+  "boxes": [
+   "16,5: 6, 15, 15, 10, 8, 31, 19, 9",
+   "9,2: 3, 15, 8, 10, 5, 31, 12, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete rows 10:15 (all of the rules)",
+  "step": {
+   "do": "delete",
+   "range": "10:15"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [],
+  "x14": [],
+  "notes": [
+   "F14"
+  ],
+  "threads": [],
+  "boxes": [
+   "13,5: 6, 15, 12, 10, 8, 31, 16, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete column H (a list's source)",
+  "step": {
+   "do": "delete",
+   "range": "H:H"
+  },
+  "refused": null,
+  "sparklines": [
+   "P2 <- Data!B2:M2",
+   "N7 <- Sheet1!B7:L7",
+   "N2 <- Sheet1!B2:L2",
+   "N3 <- Sheet1!B3:L3",
+   "N4 <- Sheet1!B4:L4",
+   "N5 <- Sheet1!B5:L5"
+  ],
+  "rules": [
+   "B10:B15 | #REF!",
+   "C10:C15 | 1 | $H$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert B11:E11 shifting down",
+  "step": {
+   "do": "insert",
+   "range": "B11:E11",
+   "shift": "down"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B16 | $H$10:$H$12",
+   "C10:C16 | 1 | $I$10",
+   "D10:D16 | D10>C10"
+  ],
+  "x14": [
+   "E10:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B13",
+   "C14",
+   "F20"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "12,1: 2, 15, 11, 10, 4, 31, 15, 9",
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert C11 shifting down (part of a rule)",
+  "step": {
+   "do": "insert",
+   "range": "C11",
+   "shift": "down"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C16 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C14",
+   "F20"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete C12 shifting left",
+  "step": {
+   "do": "delete",
+   "range": "C12",
+   "shift": "left"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "C12 | C12>#REF!",
+   "D10:D11 D13:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E11 E13:E15 D12 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete C12:C13 shifting up",
+  "step": {
+   "do": "delete",
+   "range": "C12:C13",
+   "shift": "up"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C13 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "F20"
+  ],
+  "threads": [],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert O3 shifting right (a sparkline's cell)",
+  "step": {
+   "do": "insert",
+   "range": "O3",
+   "shift": "right"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "P3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert B3:M3 shifting down (the data, not the sparklines)",
+  "step": {
+   "do": "insert",
+   "range": "B3:M3",
+   "shift": "down"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B8:M8",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B4:M4",
+   "O4 <- Sheet1!B5:M5",
+   "O5 <- Sheet1!B6:M6"
+  ],
+  "rules": [
+   "B11:B16 | $H$11:$H$13",
+   "C11:C16 | 1 | $I$11",
+   "D11:D16 | D11>C11"
+  ],
+  "x14": [
+   "E11:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B13",
+   "C14",
+   "F21"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "12,1: 2, 15, 11, 10, 4, 31, 15, 9",
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "20,5: 6, 15, 19, 10, 8, 31, 23, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "Data: insert row 1",
+  "step": {
+   "do": "insert",
+   "range": "1:1",
+   "sheet": "Data"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B3:M3",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$2:$A$4"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "Data: insert column A",
+  "step": {
+   "do": "insert",
+   "range": "A:A",
+   "sheet": "Data"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!C2:N2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$B$1:$B$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "Data: delete rows 1:3",
+  "step": {
+   "do": "delete",
+   "range": "1:3",
+   "sheet": "Data"
+  },
+  "refused": null,
+  "sparklines": [
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!#REF!"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "sort B10:E15 by C, largest first",
+  "step": {
+   "do": "sort",
+   "range": "B10:E15",
+   "key": "C10",
+   "desc": true
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B10",
+   "C14",
+   "F20"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9",
+   "9,1: 2, 15, 8, 10, 4, 31, 12, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "sort B10:I15 by B",
+  "step": {
+   "do": "sort",
+   "range": "B10:I15",
+   "key": "B10"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B15",
+   "C14",
+   "F20"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "14,1: 2, 15, 13, 10, 4, 31, 17, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "sort B2:O5 by B (the sparklines' cells in it)",
+  "step": {
+   "do": "sort",
+   "range": "B2:O5",
+   "key": "B2"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "sort B2:M5 by B (their data only)",
+  "step": {
+   "do": "sort",
+   "range": "B2:M5",
+   "key": "B2"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "sort B10:F15 left to right by row 10",
+  "step": {
+   "do": "sort",
+   "range": "B10:F15",
+   "key": "B10",
+   "leftToRight": true
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B13",
+   "D12",
+   "F20"
+  ],
+  "threads": [
+   "B13"
+  ],
+  "boxes": [
+   "11,3: 4, 15, 10, 10, 6, 31, 14, 9",
+   "12,1: 2, 15, 11, 10, 4, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": [
+   "B12",
+   "C12",
+   "C14",
+   "D11",
+   "D14",
+   "E12"
+  ]
+ },
+ {
+  "name": "insert column P (after the group's column)",
+  "step": {
+   "do": "insert",
+   "range": "P:P"
+  },
+  "refused": null,
+  "sparklines": [
+   "R2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "P7 <- Sheet1!C7:N7",
+   "O2 <- Sheet1!B2:M2",
+   "P2 <- Sheet1!C2:N2",
+   "O3 <- Sheet1!B3:M3",
+   "P3 <- Sheet1!C3:N3",
+   "O4 <- Sheet1!B4:M4",
+   "P4 <- Sheet1!C4:N4",
+   "O5 <- Sheet1!B5:M5",
+   "P5 <- Sheet1!C5:N5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert row 6 (under the group)",
+  "step": {
+   "do": "insert",
+   "range": "6:6"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O8 <- Sheet1!B8:M8",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5",
+   "O6 <- Sheet1!B6:M6"
+  ],
+  "rules": [
+   "B11:B16 | $H$11:$H$13",
+   "C11:C16 | 1 | $I$11",
+   "D11:D16 | D11>C11"
+  ],
+  "x14": [
+   "E11:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B13",
+   "C14",
+   "F21"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "12,1: 2, 15, 11, 10, 4, 31, 15, 9",
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "20,5: 6, 15, 19, 10, 8, 31, 23, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert row 8 (under the column sparkline)",
+  "step": {
+   "do": "insert",
+   "range": "8:8"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O8 <- Sheet1!B8:M8",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B11:B16 | $H$11:$H$13",
+   "C11:C16 | 1 | $I$11",
+   "D11:D16 | D11>C11"
+  ],
+  "x14": [
+   "E11:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B13",
+   "C14",
+   "F21"
+  ],
+  "threads": [
+   "C14"
+  ],
+  "boxes": [
+   "12,1: 2, 15, 11, 10, 4, 31, 15, 9",
+   "13,2: 3, 15, 12, 10, 5, 31, 16, 9",
+   "20,5: 6, 15, 19, 10, 8, 31, 23, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert O3 shifting down (a sparkline above)",
+  "step": {
+   "do": "insert",
+   "range": "O3",
+   "shift": "down"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O8 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B3:M3",
+   "O5 <- Sheet1!B4:M4",
+   "O6 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert P2:P3 shifting right (sparklines to the left)",
+  "step": {
+   "do": "insert",
+   "range": "P2:P3",
+   "shift": "right"
+  },
+  "refused": null,
+  "sparklines": [
+   "R2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "P2 <- Sheet1!C2:N2",
+   "O3 <- Sheet1!B3:M3",
+   "P3 <- Sheet1!C3:N3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete O3 shifting up (a sparkline)",
+  "step": {
+   "do": "delete",
+   "range": "O3",
+   "shift": "up"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O6 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B4:M4",
+   "O4 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert row 16 (under the rules)",
+  "step": {
+   "do": "insert",
+   "range": "16:16"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B16 | $H$10:$H$12",
+   "C10:C16 | 1 | $I$10",
+   "D10:D16 | D10>C10"
+  ],
+  "x14": [
+   "E10:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F21"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "20,5: 6, 15, 19, 10, 8, 31, 23, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert column F (after the last rule)",
+  "step": {
+   "do": "insert",
+   "range": "F:F"
+  },
+  "refused": null,
+  "sparklines": [
+   "R2 <- Data!B2:M2",
+   "P7 <- Sheet1!B7:N7",
+   "P2 <- Sheet1!B2:N2",
+   "P3 <- Sheet1!B3:N3",
+   "P4 <- Sheet1!B4:N4",
+   "P5 <- Sheet1!B5:N5"
+  ],
+  "rules": [
+   "B10:B15 | $I$10:$I$12",
+   "C10:C15 | 1 | $J$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:F15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "G20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,6: 7, 15, 18, 10, 9, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert B16:E16 shifting down (under the rules)",
+  "step": {
+   "do": "insert",
+   "range": "B16:E16",
+   "shift": "down"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B16 | $H$10:$H$12",
+   "C10:C16 | 1 | $I$10",
+   "D10:D16 | D10>C10"
+  ],
+  "x14": [
+   "E10:E16 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert B16:C16 shifting down (under two of the rules)",
+  "step": {
+   "do": "insert",
+   "range": "B16:C16",
+   "shift": "down"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B16 | $H$10:$H$12",
+   "C10:C16 | 1 | $I$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert F10:F15 shifting right (after the rules)",
+  "step": {
+   "do": "insert",
+   "range": "F10:F15",
+   "shift": "right"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $I$10:$I$12",
+   "C10:C15 | 1 | $J$10",
+   "D10:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:F15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "insert E12:E13 shifting right (inside a rule)",
+  "step": {
+   "do": "insert",
+   "range": "E12:E13",
+   "shift": "right"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D15 E12:E13 | D10>C10"
+  ],
+  "x14": [
+   "E10:E11 E14:E15 F12:F13 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete C12:E12 shifting left (rules deleted and moved)",
+  "step": {
+   "do": "delete",
+   "range": "C12:E12",
+   "shift": "left"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B15 | $H$10:$H$12",
+   "C10:C15 | 1 | $I$10",
+   "D10:D11 D13:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E15 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "B12",
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "11,1: 2, 15, 10, 10, 4, 31, 14, 9",
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ },
+ {
+  "name": "delete B12:C12 shifting left (one rule deleted, one moved)",
+  "step": {
+   "do": "delete",
+   "range": "B12:C12",
+   "shift": "left"
+  },
+  "refused": null,
+  "sparklines": [
+   "Q2 <- Data!B2:M2",
+   "O7 <- Sheet1!B7:M7",
+   "O2 <- Sheet1!B2:M2",
+   "O3 <- Sheet1!B3:M3",
+   "O4 <- Sheet1!B4:M4",
+   "O5 <- Sheet1!B5:M5"
+  ],
+  "rules": [
+   "B10:B11 B13:B15 | $H$10:$H$12",
+   "B12 | B12>#REF!",
+   "C10:C15 | 1 | $I$10",
+   "D10:D11 D13:D15 | D10>C10"
+  ],
+  "x14": [
+   "E10:E11 E13:E15 C12 | Data!$A$1:$A$3"
+  ],
+  "notes": [
+   "C13",
+   "F20"
+  ],
+  "threads": [
+   "C13"
+  ],
+  "boxes": [
+   "12,2: 3, 15, 11, 10, 5, 31, 15, 9",
+   "19,5: 6, 15, 18, 10, 8, 31, 22, 9"
+  ],
+  "ovals": []
+ }
+]

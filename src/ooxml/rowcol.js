@@ -5,7 +5,8 @@
 // columns the format and width of the column to their left. Afterwards the sheet is read again and the workbook worked
 // out again. Notes and threaded comments go with their cells, pictures, charts and shapes with whole rows and
 // columns, tables grown, narrowed, moved or deleted, pivot tables moved or deleted and pivot caches' sources followed
-// (anchors.js). A sheet with slicers or timelines is refused for now: their positions aren't moved yet.
+// (anchors.js), slicers and timelines with their drawing's anchors, a table slicer deleted with its column (slicers.js).
+// Data validation rules and sparklines follow as Excel moves them (rulemoves.js).
 //
 // Inserting and deleting cells (the rest of their columns shifting down or up, or of their rows right or left) is the
 // same change limited to a band of columns (or rows): changeLines's `band`, docs/ROWCOL.md.
@@ -15,7 +16,9 @@ import { readSheet } from './sheet.js';
 import { pinRefs, forgetRows, setCellXml } from './sheetedit.js';
 import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tokens.js';
 import { SheetError, mapFormulas } from './sheetops.js';
-import { moveNotes, moveDrawings, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
+import { moveNotes, moveDrawings, lineSizes, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
+import { prepareRules, prepareFormats, moveExtRanges, extendRules, finishFormats, dropDeadSparklines } from './rulemoves.js';
+import { dropTableSlicers } from './slicers.js';
 import { readPivots } from './pivot.js';
 import { insertedLines, openJoined } from './outline.js';
 import { pxWidth } from './sizes.js';
@@ -24,12 +27,8 @@ import { defaultColPx } from './units.js';
 export const ROWCOL_MESSAGES = {
   offSheet: 'To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet. Select another location in which to insert new cells, or delete data from the end of your worksheet.',
   array: "You can't change part of an array.",
-  parts: "Rows and columns can't be inserted or deleted yet on a sheet with slicers or timelines.",
-  cellParts: "Cells can't be inserted or deleted yet on a sheet with slicers or timelines.",
   unmerge: 'This operation will cause some merged cells to unmerge. Do you wish to continue?',
 };
-/** Relationships of a sheet whose parts hold positions this doesn't move yet. */
-const ANCHORED = /\/(slicer|timeline)$/;
 
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
@@ -61,8 +60,6 @@ function splitBy(range, axis, at, band) {
 /** Throws Excel's refusal when the change can't be made on sheet si. Returns the merged ranges a shift of cells would
  *  split (Excel unmerges them, asking first). */
 function check(wb, si, axis, at, n, band) {
-  const info = wb.sheets[si];
-  if (wb.pkg.readRels(info.path).some((r) => ANCHORED.test(r.type))) throw new SheetError(band ? ROWCOL_MESSAGES.cellParts : ROWCOL_MESSAGES.parts);
   const model = wb.sheet(si);
   const lines = axis === 'row' ? (a) => [a.r0, a.r1] : (a) => [a.c0, a.c1];
   const inBand = (r, c) => !band || ((axis === 'row' ? c : r) >= band[0] && (axis === 'row' ? c : r) <= band[1]);
@@ -339,12 +336,20 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   const pivots = planPivots(wb, si, axis, at, n, band, (message) => { throw new SheetError(message); }, readPivots(wb));
   const info = wb.sheets[si];
   const { doc } = wb._part(si);
+  // (Data validation rules split where cells shifting cut them, their formulas read from their first cell to be.)
+  prepareRules(doc, axis, at, n, band, (range) => shiftRange(range, axis, at, n, band));
+  const formats = prepareFormats(doc, axis, at, n, band, (range) => shiftRange(range, axis, at, n, band));
   // Formulas first, while every cell is where it was (shared ones on this sheet written out cell by cell).
   mapFormulas(wb, (text, here) => shiftRefs(text, { here, sheet: info.name, axis, at, n, band }), { name: info.name, target: si, shared: true });
   if (band) moveBandCells(doc, axis, at, n, band); else moveCells(doc, axis, at, n);
   const format = wb.sheet(si).format;
   if (axis === 'col' && !band) moveCols(doc, at, n, pxWidth(defaultColPx(format, 7)));
   moveRanges(doc, axis, at, n, band, split);
+  moveExtRanges(doc, axis, at, n, band, (text) => shiftSqref(text, axis, at, n, band));
+  extendRules(doc, axis, at, n, band);
+  finishFormats(doc, formats);
+  // (Sparklines whose data is all deleted go, on any sheet.)
+  for (const [other, part] of wb._parsed) if (dropDeadSparklines(part.doc)) wb.dirty.add(other.path);
   // (Lines inserted into a collapsed group open it: its summary's collapsed goes, as Excel's does.)
   if (n > 0 && !band) openJoined(doc, axis, at, n, format);
   // Notes with their cells; pictures, charts and shapes with whole lines (not when cells shift, as in Excel).
@@ -352,15 +357,20 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
     const next = shiftRange({ r0: r, c0: c, r1: r, c1: c }, axis, at, n, band);
     return next && { r: next.r0, c: next.c0 };
   });
-  if (!band) moveDrawings(wb, si, axis, at, n);
+  if (!band) moveDrawings(wb, si, axis, at, n, lineSizes(wb.sheet(si), axis, at, n));
   // Tables: their ranges, columns and header names; references to what was deleted of them made #REF!.
   const dead = applyTables(wb, si, axis, tables, doc, setCellXml);
   for (const name of new Set(dead.map((d) => d.table))) mapFormulas(wb, (text) => deadTableRefs(text, dead, tokenize), { name });
+  // (A table slicer whose column, or table, was deleted goes with its cache, as Excel deletes it.)
+  dropTableSlicers(wb, dead);
   // Pivot tables on the sheet moved (or gone); every pivot cache reading the sheet, its source range as a reference.
   applyPivots(wb, si, axis, pivots);
   movePivotSources(wb, info.name, (area) => shiftRange(area, axis, at, n, band));
   // The sheet read again from its moved XML, and everything worked out again.
   wb._parsed.set(info, { doc, model: readSheet(doc, wb.sharedStrings) });
+  // (Counted by sheet for what a view holds by position and Excel drops on any insert or delete there: Circle Invalid
+  // Data's ovals, excel-refmoves.ps1, all gone after every step on their sheet, kept after one on another sheet.)
+  wb.lineChanges.set(info.sheetId, (wb.lineChanges.get(info.sheetId) || 0) + 1);
   wb.dirty.add(info.path);
   wb.edited = true;
   wb._dropCalcChain();

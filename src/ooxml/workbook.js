@@ -42,6 +42,8 @@ export class Workbook {
     /** The workbook part, parsed once; written back on save only when changed (`bookDirty`). */
     this.doc = doc;
     this.bookDirty = false;
+    /** How many times each sheet's rows, columns or cells were inserted or deleted, by sheetId (rowcol.js). */
+    this.lineChanges = new Map();
     const root = doc.documentElement;
     this.ns = root.namespaceURI;
     if (this.ns !== NS.x && this.ns !== NS.xStrict) throw new Error('Not a workbook: the main part is ' + root.localName);
@@ -358,7 +360,7 @@ export class Workbook {
   addToValidation(i, match, ranges) { return addToRule(this._part(i).doc, match, ranges) && (this._reread(i, this._part(i)), true); }
   setValidation(i, ranges, rule) {
     const part = this._part(i);
-    setValidationXml(part.doc, ranges, rule, this.date1904);
+    setValidationXml(part.doc, ranges, rule, this.date1904, this.sheets[i].name);
     this._reread(i, part);
   }
 

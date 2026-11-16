@@ -65,13 +65,15 @@ insides:
 | `bin/oxe-mcp.mjs` | The MCP server: the agent interface as tools for an AI assistant, over stdin and stdout, within one folder; docs/AGENT.md. |
 | `src/agentreview.js` | An agent's edits reviewed: the workbook now beside the one opened, cell by cell; docs/AGENT.md. |
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
-| `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes, tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
+| `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes (those that don't move with cells kept at their place), tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
+| `src/ooxml/rulemoves.js` | Data validation rules (both forms) and sparklines moved with inserted and deleted rows, columns and cells as Excel moves them: rules split and extended, their formulas kept relative to their first cell; sparklines copied into new lines and deleted with their cells or data; conditional formats of both forms moved, split and extended, their formulas kept relative to their top-left (docs/ROWCOL.md). |
+| `src/ooxml/slicers.js` | A table slicer deleted with its table column or table, as Excel deletes it: the slicer, its drawing anchor, its cache, the cache's name and lists (docs/ROWCOL.md). |
 | `src/ooxml/applynames.js` | Formulas > Define Name > Apply Names. |
 | `src/ooxml/pivotnew.js` | A new PivotTable (Insert > PivotTable), its parts written as Excel writes a new one, then laid out by pivot.js's refresh; docs/PIVOT.md. |
 | `src/ooxml/pivotfields.js` | A PivotTable's fields moved after it is made, as Excel's field list moves them, then laid out by pivot.js's refresh; docs/PIVOT.md. |
 | `src/ooxml/pivot.js` | PivotTables: read from their parts, refreshed from their source as Excel's Refresh does (cache, records, items, compact layout); docs/PIVOT.md. |
 | `src/ooxml/cfedit.js` | Conditional formatting rules added as Excel's menu adds them, with its preset formats as dxfs; Clear Rules (docs/CONDFORMAT.md). |
-| `src/ooxml/dvedit.js` | Data validation rules written as Excel's Data Validation box writes them; ranges split around a new rule; a rule in the box's terms (docs/VALIDATION.md). |
+| `src/ooxml/dvedit.js` | Data validation rules written as Excel's Data Validation box writes them, one reading another sheet in Excel's 2010 form; ranges of either form split around a new rule; a rule in the box's terms (docs/VALIDATION.md). |
 | `src/ooxml/noteedit.js` | Notes written and deleted as Excel's New Note writes them: the comments part, the VML box, the parts and relationships made when the sheet has none (docs/NOTES.md). |
 | `src/editor/reviewtab.js` | The Review tab: Notes. |
 | `src/editor/datadialogs.js` | Excel's boxes for data: Sort, a filter's list, a list's choices, Data Validation, the Conditional Formatting menu's rule boxes (with `dialogs.js`'s modal and buttons). |

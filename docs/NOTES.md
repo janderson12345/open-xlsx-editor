@@ -59,9 +59,9 @@ Notes > Show All Notes shows every note's box, or hides them again; as Excel's, 
 
 ## Not yet
 
-Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), notes
-following their cells when rows are sorted, and marks in frozen panes' cells drawn twice. Notes do
-follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
+Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), and marks in frozen panes'
+cells drawn twice. Notes and threaded comments follow their cells when rows and columns are inserted or deleted, and
+when they are sorted, as Excel moves them (docs/ROWCOL.md).
 
 ## Writing threaded comments (`src/ooxml/threadedit.js`, `src/editor/threadbox.js`)
 

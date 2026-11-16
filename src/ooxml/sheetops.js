@@ -147,6 +147,8 @@ export function mapFormulas(wb, map, { name, target = -1, shared = false, rename
     let dirty = false;
     for (const name of FORMULA_ELEMENTS) {
       for (const el of [...doc.getElementsByTagNameNS('*', name)]) {
+        // (Only an element of text: an Excel 2010 rule's x14:formula1 holds an xm:f, which is mapped on its own.)
+        if ([...el.childNodes].some((x) => x.nodeType === 1)) continue;
         const text = el.textContent;
         const next = text ? map(text, here) : text;
         if (next !== text) { el.textContent = next; dirty = true; }

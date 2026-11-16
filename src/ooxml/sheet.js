@@ -175,18 +175,32 @@ function readCondFormats(root, ns) {
  * The sheet's data validation rules: [{ ranges, type ('whole', 'decimal', 'list', 'date', 'time', 'textLength',
  * 'custom' or 'none'), operator, formulas (formula1, formula2, as the file has them, relative to the first range's
  * top-left cell), allowBlank, dropDown (a list's in-cell dropdown shown: the file's showDropDown means hidden),
- * errorStyle, errorTitle, error, showError, promptTitle, prompt, showPrompt }].
+ * errorStyle, errorTitle, error, showError, promptTitle, prompt, showPrompt, ext }]. The main rules, then those in
+ * the extLst in Excel's 2010 form (`ext`: x14:dataValidation, its formulas in xm:f and its ranges in xm:sqref), which
+ * Excel writes for a rule whose formulas read another sheet (tools/excel-compare/excel-dv-x14.ps1).
  */
 function readValidations(root, ns) {
+  const X14 = 'http://schemas.microsoft.com/office/spreadsheetml/2009/9/main';
+  const XM = 'http://schemas.microsoft.com/office/excel/2006/main';
+  const ext = [...kids(kid(root, 'extLst', ns), 'ext', ns)].flatMap((e) => kids(kid(e, 'dataValidations', X14), 'dataValidation', X14));
+  const formulaOf = (v, name) => kid(kid(v, name, X14), 'f', XM);
+  return [...kids(kid(root, 'dataValidations', ns), 'dataValidation', ns), ...ext].map((v) => rule(v, v.namespaceURI === X14 ? {
+    sqref: kid(v, 'sqref', XM)?.textContent, formulas: [formulaOf(v, 'formula1'), formulaOf(v, 'formula2')], ext: true,
+  } : { sqref: attr(v, 'sqref'), formulas: [kid(v, 'formula1', ns), kid(v, 'formula2', ns)], ext: false }));
+}
+
+/** One rule of readValidations, from its element and where its ranges and formulas are. */
+function rule(v, { sqref, formulas, ext }) {
   const flag = (el, name) => attr(el, name) === '1' || attr(el, name) === 'true';
-  return kids(kid(root, 'dataValidations', ns), 'dataValidation', ns).map((v) => ({
-    ranges: (attr(v, 'sqref') || '').split(/\s+/).map(parseRange).filter(Boolean),
+  return {
+    ranges: (sqref || '').split(/\s+/).map(parseRange).filter(Boolean),
     type: attr(v, 'type') || 'none', operator: attr(v, 'operator') || 'between',
-    formulas: [kid(v, 'formula1', ns), kid(v, 'formula2', ns)].filter(Boolean).map((f) => f.textContent),
+    formulas: formulas.filter(Boolean).map((f) => f.textContent),
     allowBlank: flag(v, 'allowBlank'), dropDown: !flag(v, 'showDropDown'),
     errorStyle: attr(v, 'errorStyle') || 'stop', errorTitle: attr(v, 'errorTitle') || '', error: attr(v, 'error') || '', showError: flag(v, 'showErrorMessage'),
     promptTitle: attr(v, 'promptTitle') || '', prompt: attr(v, 'prompt') || '', showPrompt: flag(v, 'showInputMessage'),
-  }));
+    ext,
+  };
 }
 
 function readView(view, ns) {

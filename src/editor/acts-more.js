@@ -389,9 +389,13 @@ export function createMoreActs(env) {
     }
     if (name === 'circleInvalid' || name === 'clearCircles') {
       // (Data Validation's menu: a circle round each cell of the sheet shown that breaks its rule, kept with the
-      // sheet, not saved; or none. index.js drops one when its cell is put right.)
-      state.circles.set(state.workbook.sheets[i], name === 'circleInvalid' ? invalidCells(state.workbook, i) : []);
-      state.grid.setCircles(state.circles.get(state.workbook.sheets[i]));
+      // sheet, not saved; or none. index.js drops one when its cell is put right, and all of them once lines or cells
+      // are inserted or deleted on the sheet, as Excel's go: `lines` is the sheet's count of those then.)
+      const info = state.workbook.sheets[i];
+      const cells = name === 'circleInvalid' ? invalidCells(state.workbook, i) : [];
+      cells.lines = state.workbook.lineChanges.get(info.sheetId) || 0;
+      state.circles.set(info, cells);
+      state.grid.setCircles(cells);
       return true;
     }
     if (name === 'fillJustify') {

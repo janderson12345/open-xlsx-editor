@@ -57,7 +57,7 @@ node tools/excel-compare/shift-cases.mjs > tools/excel-compare/shift-cases.json
 pwsh tools/excel-compare/excel-steps.ps1 tools/excel-compare/shift-cases.json test/shift-excel.json
 ```
 
-The same for `paste-cases.mjs` (Paste Special, Paste Link), `fill-cases.mjs` (Fill, AutoFill), `clear-cases.mjs` (Clear) and `sort-cases.mjs` (Sort: Worksheet.Sort, and Range.Sort where headers are guessed). Charts' automatic axis has its own, `excel-axes.ps1` on `axes-cases.mjs`: a chart over each set of numbers, its value axis read. Data validation has its own, `excel-dv.ps1` on `dv-cases.mjs`: each cell judged with Range.Validation.Value, and the rule's XML kept. Conditional formatting has its own, `excel-cf.ps1` on `cf-cases.mjs`: the rules added, each cell's look read with Range.DisplayFormat, and the rules' XML kept. Filter has its own, `excel-filter.ps1` on `filter-cases.mjs`: the filter applied, then the workbook saved by Excel so its autoFilter XML and hidden rows can be compared. AutoSum has its own script, `excel-autosum.ps1` on `autosum-cases.mjs`: the ribbon's command needs a visible Excel, so it attaches to the one open (Windows PowerShell) and works in a workbook of its own; only selections of several cells, since on one cell Excel waits for Enter and answers nothing over COM. Each case is a small sheet built in a new workbook (cells, array formulas, formats, merged ranges, widths, names), one
+The same for `paste-cases.mjs` (Paste Special, Paste Link), `fill-cases.mjs` (Fill, AutoFill), `clear-cases.mjs` (Clear) and `sort-cases.mjs` (Sort: Worksheet.Sort, and Range.Sort where headers are guessed). Charts' automatic axis has its own, `excel-axes.ps1` on `axes-cases.mjs`: a chart over each set of numbers, its value axis read. Data validation has its own, `excel-dv.ps1` on `dv-cases.mjs` (and `excel-dv-x14.ps1 <out.json> [-Open <folder>]` for the rules Excel writes in its 2010 form, those reading another sheet, and for Excel reading back the editor's): each cell judged with Range.Validation.Value, and the rule's XML kept. Conditional formatting has its own, `excel-cf.ps1` on `cf-cases.mjs`: the rules added, each cell's look read with Range.DisplayFormat, and the rules' XML kept. Filter has its own, `excel-filter.ps1` on `filter-cases.mjs`: the filter applied, then the workbook saved by Excel so its autoFilter XML and hidden rows can be compared. AutoSum has its own script, `excel-autosum.ps1` on `autosum-cases.mjs`: the ribbon's command needs a visible Excel, so it attaches to the one open (Windows PowerShell) and works in a workbook of its own; only selections of several cells, since on one cell Excel waits for Enter and answers nothing over COM. Each case is a small sheet built in a new workbook (cells, array formulas, formats, merged ranges, widths, names), one
 or more steps done there by Excel (inserting and deleting cells, Paste Special, Paste Link, Fill, the fill handle), and what came of it
 written out: each cell's formula, value, number format, bold, fill and bottom border, the merged ranges, the column
 widths and the names, or the refusal. An invisible instance, closed without saving.
@@ -78,6 +78,25 @@ editor's results (docs/ROWCOL.md).
 PivotTables when rows and columns move: `excel-pivot-lines.ps1 <pivot-cases.json> <out.json>` (nothing saved), and
 `pivot-lines-ours.mjs <folder>` with `excel-pivot-lines-check.ps1 <folder> <out.json>` for Excel reading back the
 editor's results.
+
+Sparklines, data validation rules, notes and Circle Invalid Data's ovals when rows, columns and cells move or are
+sorted, and slicers and timelines when rows and columns move (and conditional formats of both forms, the same way:
+`cfmove-cases.mjs`, `excel-cfmoves.ps1 <cases> <out.json> [-Books test/out/cfmoves]`, `refmove-results.mjs cfmoves`):
+
+```sh
+node tools/excel-compare/refmove-cases.mjs > tools/excel-compare/refmove-cases.json
+pwsh tools/excel-compare/excel-refmoves.ps1 tools/excel-compare/refmove-cases.json <out.json>
+node tools/excel-compare/refmove-results.mjs refmoves tools/excel-compare/refmove-cases.json <out.json> > test/refmoves-excel.json
+node tools/excel-compare/slicer-cases.mjs > tools/excel-compare/slicer-cases.json
+pwsh tools/excel-compare/excel-slicers.ps1 tools/excel-compare/slicer-cases.json <out.json> [<folder for Excel's books>]
+node tools/excel-compare/refmove-results.mjs slicers tools/excel-compare/slicer-cases.json <out.json> > test/slicers-excel.json
+```
+
+Each case's workbook is saved to %TEMP%, its parts read and the file deleted (Excel's books are kept only when a folder
+is given: they carry Excel's user name, so keep them outside the repository). After `npm test` has saved the editor's
+results in `test/out/refmoves` and `test/out/slicers`, `excel-refmoves.ps1 ... -Books test/out/refmoves` and
+`excel-slicers.ps1 ... -Open test/out/slicers` read those back the same way, `repaired` saying whether Excel had to
+repair one (a repair log appeared in %TEMP%).
 
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and

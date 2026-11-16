@@ -83,5 +83,7 @@ its levels move up (C1:C5); here the sortState moves up with them (A1:C5).
 ## Not yet
 
 Sorting by a conditional format's icon, Excel's question about numbers stored as text
-(sorted as text here, as without it), sorting a table (ListObject) from its own buttons, and the cells' menu's Sort. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Notes, hyperlinks, conditional formats and data validation stay where they are.
+(sorted as text here, as without it), sorting a table (ListObject) from its own buttons, and the cells' menu's Sort. (Within a filter only the rows shown are sorted, as Excel does: docs/FILTER.md.) Hyperlinks stay where they are (not
+measured). Notes and threaded comments go with their cells, and conditional formats, data validation and sparklines
+stay, as Excel does them (measured: docs/ROWCOL.md).
 (Filter, and the Data tab's Sort & Filter group, are done: docs/FILTER.md.)
