@@ -29,7 +29,7 @@ import { errorFlags, ERROR_RULES } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
 import { chartFigure } from './editor/chartview.js';
 import { createRibbon } from './editor/ribbon.js';
-import { createFindBar } from './editor/findbar.js';
+import { createFindBar, pickCell } from './editor/findbar.js';
 import { createWatchWindow } from './editor/watchwindow.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
@@ -256,6 +256,7 @@ export function mountXlsxEditor(host, options = {}) {
       apply: (steps) => editing().run('applyChanges', steps),
       home: () => state.grid?.el.focus({ preventScroll: true }),
       readOnly: () => state.readOnly,
+      pickCell: () => pickCell(state.grid.el, () => { const sel = editing().selection; return { si: state.sheetIndex, r: sel.ar, c: sel.ac }; }),
       root,
     });
     el.after(state.find.el);

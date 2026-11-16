@@ -94,6 +94,7 @@ insides:
 | `src/ooxml/subtotal.js` | Data > Subtotal and Remove All as Excel does them: SUBTOTAL rows at each change, the Grand row, the outline, page breaks (docs/OUTLINE.md). |
 | `src/ooxml/sizes.js` | Column widths, row heights and hidden lines written as Excel writes them: widths in whole pixels over the digit width, col elements split where a range cuts them, AutoFit Row Height as the fixed height taken away (docs/SIZES.md). |
 | `src/ooxml/findops.js` | Find and Replace as Excel does them: the formula bar's text or the shown text searched, Excel's wildcards, the order from the cell after the active one, replacements entered as typed (docs/FIND.md). |
+| `src/ooxml/findformat.js` | Find Format and Replace Format: a cell's format resolved to how it looks (theme colours worked out), compared property by property, or taken whole from a cell (docs/FIND.md). |
 | `src/ooxml/view.js` | The sheet view as Excel writes it: frozen panes (a pane element with a selection for each pane) and the zoom (docs/VIEW.md). |
 | `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults, array formula ranges. Implied `r` positions followed; a shared formula's later cells get their own formula text. |
 | `src/ooxml/input.js` | A typed entry as Excel reads it (numbers with separators, currency, percentages, exponents, fractions; dates and times; 'text; =formulas), the format it gives the cell, and a cell's text as the formula bar shows it (docs/ENTRY.md). |

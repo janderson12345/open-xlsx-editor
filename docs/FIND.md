@@ -37,21 +37,40 @@ They come from Excel's dialog, which COM doesn't reach, so their wording isn't m
 
 ## Formats (Find Format and Replace Format)
 
-Format... beside Find what and Replace with: the format to find (bold, italic, underline, strikethrough, font colour,
-fill, number format) and the format a replacement gives, each shown, Clear to take it off. Measured in Excel's own dialog
-(used in its window; `test/find-format-excel.json`): COM can't, its FindNext dropping the format and an empty Replace
-emptying cells (`excel-find2.ps1`).
+Beside Find what and Replace with: Format... (the format to find, or the one a replacement gives: number format, bold,
+italic, underline, strikethrough, font colour, fill, a border), From Cell... (Excel's Choose Format From Cell: the next
+cell clicked on the sheet, or the one Enter is pressed on, gives its whole format; Esc gives up) and Clear. The format
+chosen is shown beside the box, with its fill, ink and weight. `src/ooxml/findformat.js` resolves each cell's format to
+what it looks like (theme colours and tints worked out, automatic ink as black, the theme's font for a scheme font) and
+compares that.
+
+Measured two ways. Excel's own dialog (used in its window; `test/find-format-excel.json`), as COM can't run a format
+search with FindNext or an empty Replace (`excel-find2.ps1`). And `Application.FindFormat` with `Range.Find`, each
+match found from the one before (`tools/excel-compare/excel-findformat.ps1`, 24 cases, `test/find-format2-excel.json`,
+`test/findformat.test.js`): 19 of them as Excel, the other five not measurable that way (below).
 
 | Rule | Seen |
 |---|---|
-| A cell matches when it has every property the find format sets; the others are free. | Bold alone: the bold cells, whatever else. |
+| A cell matches when it has every property the find format sets; the others are free. | Bold alone: the bold cells, whatever else. Arial: the Arial cells of 11pt and of 14pt. |
 | Nothing in Find what, a find format: every filled cell of that format. | Find All: A1, B1, A3, the bold ones, in rows. |
+| Colours compare as they look: a theme colour and the same RGB match each other, a tint of the theme colour doesn't. | Accent 1 (theme) or 156082 (RGB): both cells, not Accent 1 lighter 40%. Fills the same (Accent 2, E97132). |
+| Automatic ink is black. | Black (RGB 0 or Text 1): the automatic cell, the RGB black one and the Text 1 one. |
+| "General" finds the cells with no number format of their own; a code finds that code only. | `0.00`: not `#,##0.00`. |
+| Alignment and protection compare one property each. | Centred: centred and centred-and-wrapped. Indent 2. Unlocked. |
+| A border line in a colour finds that side drawn so. | Bottom thin red: the red one only. |
 | Replace All replaces in the cells of the find format alone, and gives them the replace format, keeping their own. | apple to fruit, bold ones only, a yellow fill: 2 replaced, still bold; the plain apple and the bold pear as they were. |
 | Nothing in either box: only the format replaced, the text kept. | 3 replaced: the three bold cells yellow, their text as it was. |
 
+Not measurable over COM, so done as Excel's dialog describes them: a border asked for without a colour (COM's
+`FindFormat.Borders` found nothing at all, not even Excel's own thin line) here matches the line in any colour; Choose
+Format From Cell copies every property of the cell (COM has no such call: setting each property from the cell found two
+of the three look-alikes and one that was italic, as COM takes `Italic = False` for "either"), so here only cells that
+look the same in every property match, and as a Replace Format the cell takes that format whole, theme colours kept.
+
 ## Not yet
 
-Choose Format From Cell, and a border in Find Format. (Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
+A find format's font name, size, alignment and protection can be chosen only from a cell, not in the Format... box.
+(Go To Special: docs/GOTOSPECIAL.md.) (Replacing within a date now works as in Excel: docs/ENTRY.md.)
 
 ## Found on the way
 
