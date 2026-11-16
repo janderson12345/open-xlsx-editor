@@ -66,6 +66,17 @@ $CASES = [ordered]@{
   'outline symbols off without an outline' = { param($ws) Numbers $ws; $ws.Parent.Windows.Item(1).DisplayOutline = $false }
   'outline symbols off then on' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); $ws.Parent.Windows.Item(1).DisplayOutline = $false; $ws.Parent.Windows.Item(1).DisplayOutline = $true }
   'auto outline' = { param($ws) Sums $ws; [void]$ws.Range('A1').AutoOutline() }
+  # (The Settings box's Automatic styles (Outline.AutomaticStyles), its Apply Styles (Range.ApplyOutlineStyles) and
+  # Create (AutoOutline with the styles on), and Group and Subtotal with them on.)
+  'automatic styles on' = { param($ws) Numbers $ws; $ws.Outline.AutomaticStyles = $true }
+  'automatic styles on then off' = { param($ws) Numbers $ws; $ws.Outline.AutomaticStyles = $true; $ws.Outline.AutomaticStyles = $false }
+  'group with automatic styles' = { param($ws) Numbers $ws; $ws.Outline.AutomaticStyles = $true; [void]$ws.Range('A2:A4').EntireRow.Group() }
+  'apply styles two levels' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A7').EntireRow.Group(); [void]$ws.Range('A3:A4').EntireRow.Group(); [void]$ws.Range('B1:D1').EntireColumn.Group(); [void]$ws.Range('A1:H12').ApplyOutlineStyles() }
+  'apply styles three levels' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A9').EntireRow.Group(); [void]$ws.Range('A3:A7').EntireRow.Group(); [void]$ws.Range('A4:A5').EntireRow.Group(); [void]$ws.Range('A1:H12').ApplyOutlineStyles() }
+  'apply styles to one cell' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); [void]$ws.Range('A5').ApplyOutlineStyles() }
+  'apply styles summary above' = { param($ws) Numbers $ws; $ws.Outline.SummaryRow = 0; [void]$ws.Range('A3:A5').EntireRow.Group(); [void]$ws.Range('A1:H12').ApplyOutlineStyles() }
+  'auto outline with automatic styles' = { param($ws) Sums $ws; $ws.Outline.AutomaticStyles = $true; [void]$ws.Range('A1').AutoOutline() }
+  'subtotal with automatic styles' = { param($ws) List $ws; $ws.Outline.AutomaticStyles = $true; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $false, 1) }
   'subtotal sum units' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $false, 1) }
   'subtotal count two columns' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4112, [object[]]@(3, 4), $true, $false, 1) }
   'subtotal average above' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4106, [object[]]@(3), $true, $false, 0) }
@@ -91,6 +102,8 @@ function Grab($file) {
     strings = $strings
     fonts = ([regex]::Match($styles, '<fonts\b[\s\S]*?</fonts>')).Value
     cellXfs = ([regex]::Match($styles, '<cellXfs\b[\s\S]*?</cellXfs>')).Value
+    cellStyleXfs = ([regex]::Match($styles, '<cellStyleXfs\b[\s\S]*?</cellStyleXfs>')).Value
+    cellStyles = ([regex]::Match($styles, '<cellStyles\b[\s\S]*?</cellStyles>')).Value
     sheetPr = ([regex]::Match($sheet, '<sheetPr\b[^>]*/>|<sheetPr\b[\s\S]*?</sheetPr>')).Value
     sheetFormatPr = ([regex]::Match($sheet, '<sheetFormatPr\b[^>]*/>')).Value
     sheetView = ([regex]::Match($sheet, '<sheetView\b[^>]*>')).Value

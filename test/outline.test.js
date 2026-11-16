@@ -110,7 +110,7 @@ for (const [name, steps] of Object.entries(STEPS)) {
 }
 
 test('every grouping case of the probe is checked', () => {
-  const left = excel.cases.map((c) => c.name).filter((n) => !/subtotal/.test(n) && !STEPS[n]);
+  const left = excel.cases.map((c) => c.name).filter((n) => !/subtotal|styles/.test(n) && !STEPS[n]);
   assert.deepEqual(left, []);
 });
 

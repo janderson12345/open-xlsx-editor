@@ -4,13 +4,16 @@
 import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { groupLines, ungroupLines, showLevels, hideDetail, showDetail, clearOutline, autoOutline, setSummary, setOutlineSymbols, outlineOf } from '../ooxml/outline.js';
 import { subtotal, removeSubtotals } from '../ooxml/subtotal.js';
+import { applyOutlineStyles } from '../ooxml/outlinestyles.js';
 
 export function outlineCommands(env) {
   const { ctx, state, commands, linesOf, moved } = env;
   const kind = (axis) => (axis === 'col' ? 'formatColumns' : 'formatRows');
   /** `run(wb, si)` as one step, `note` said when it changed something, `refused` when it didn't. */
+  // (Automatic styles can add cell formats: the editor's looks made again before the sheet is drawn, as for formats.)
+  const styled = (run) => (wb, si) => { const r = run(wb, si); if (r !== false) ctx.restyled?.(); return r; };
   const step = (run, note, axis = 'row', refused = null) => {
-    const done = commands.sheetChange(run, kind(axis));
+    const done = commands.sheetChange(styled(run), kind(axis));
     if (done) ctx.announce(note); else if (refused && !ctx.readOnly()) ctx.announce(refused);
     return done;
   };
@@ -64,8 +67,17 @@ export function outlineCommands(env) {
     },
     /** Group > Auto Outline: the outline made from the sheet's formulas. */
     autoOutline() { return step((wb, si) => autoOutline(wb, si), 'Outline made', 'row', 'Cannot create an outline: no formulas sum up rows or columns'); },
-    /** The Outline Settings: summary rows below their detail, summary columns right of theirs. */
-    outlineSettings({ below, right }) { return step((wb, si) => setSummary(wb, si, { below, right }), 'Outline settings changed'); },
+    /** The Outline Settings: summary rows below their detail, summary columns right of theirs, Automatic styles; with
+     *  `then` 'create' its Create (Auto Outline) or 'apply' its Apply Styles (the selection), in the same step. */
+    outlineSettings({ below, right, styles }, then = null) {
+      const s = state.sel;
+      return step((wb, si) => {
+        setSummary(wb, si, { below, right, styles });
+        if (then === 'create') autoOutline(wb, si);
+        if (then === 'apply') applyOutlineStyles(wb, si, s);
+        return true;
+      }, then === 'create' ? 'Outline made' : then === 'apply' ? 'Outline styles applied' : 'Outline settings changed');
+    },
     /** Ctrl+8: the outline symbols shown or hidden (no argument: turned over), on the sheet shown; a view setting saved
      *  with the file, as Gridlines is, outside the history. */
     outlineSymbols(on) {
@@ -82,7 +94,7 @@ export function outlineCommands(env) {
      *  (Rows are inserted: `moved`, which says a refusal in Excel's words.) */
     subtotal(area, opts) {
       if (area.r1 <= area.r0) { ctx.announce('The list has no rows under its headings'); return false; }
-      const done = moved((wb, si) => subtotal(wb, si, area, opts), 'formatRows');
+      const done = moved(styled((wb, si) => subtotal(wb, si, area, opts)), 'formatRows');
       if (done) ctx.announce('Subtotals added');
       return done;
     },

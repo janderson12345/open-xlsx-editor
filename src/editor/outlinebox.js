@@ -10,10 +10,13 @@ export function groupAxisBox(root, title) {
     .then((got) => (got ? (got.choices.axis === 'Columns' ? 'col' : 'row') : null));
 }
 
-/** Settings: Summary rows below detail, Summary columns to right of detail; resolves to { below, right } or null. */
-export function outlineSettingsBox(root, { below, right }) {
-  return optionsBox(root, { title: 'Settings', text: 'Direction', checks: [{ key: 'below', label: 'Summary rows below detail', value: below }, { key: 'right', label: 'Summary columns to right of detail', value: right }] })
-    .then((got) => (got ? { below: got.checks.below, right: got.checks.right } : null));
+/** Settings: Summary rows below detail, Summary columns to right of detail, Automatic styles, and Create and Apply
+ *  Styles beside OK, as Excel's box has them; resolves to { below, right, styles, then } (then null, 'create' or
+ *  'apply') or null. */
+export function outlineSettingsBox(root, { below, right, styles }) {
+  const checks = [{ key: 'below', label: 'Summary rows below detail', value: below }, { key: 'right', label: 'Summary columns to right of detail', value: right }, { key: 'styles', label: 'Automatic styles', value: styles }];
+  return optionsBox(root, { title: 'Settings', text: 'Direction', checks, buttons: ['Create', 'Apply Styles'] })
+    .then((got) => (got ? { below: got.checks.below, right: got.checks.right, styles: got.checks.styles, then: got.button === 'Create' ? 'create' : got.button === 'Apply Styles' ? 'apply' : null } : null));
 }
 
 /** Excel's Use function list, in its order. */

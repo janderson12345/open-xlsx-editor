@@ -10,6 +10,7 @@ import { setColumns, setSheetFormat, pxWidth } from './sizes.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
 import { defaultColPx } from './units.js';
 import { setShown } from './view.js';
+import { styleSummaryLines, summariesOf, applyOutlineStyles } from './outlinestyles.js';
 
 /** Excel's deepest level: Group refuses an eighth (measured: "Unable to get the Group property"). */
 export const MAX_LEVEL = 7;
@@ -21,7 +22,7 @@ const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.pref
 export function readOutlinePr(root, ns, view) {
   const pr = kid(kid(root, 'sheetPr', ns), 'outlinePr', ns);
   const no = (name) => !!pr && (attr(pr, name) === '0' || attr(pr, name) === 'false');
-  return { below: !no('summaryBelow'), right: !no('summaryRight'), symbols: !view || !(attr(view, 'showOutlineSymbols') === '0' || attr(view, 'showOutlineSymbols') === 'false') };
+  return { below: !no('summaryBelow'), right: !no('summaryRight'), styles: !!pr && (attr(pr, 'applyStyles') === '1' || attr(pr, 'applyStyles') === 'true'), symbols: !view || !(attr(view, 'showOutlineSymbols') === '0' || attr(view, 'showOutlineSymbols') === 'false') };
 }
 
 /** The groups of an outline, from `levels` ([[index, level]] of the lines with a level, any order): for each level L
@@ -164,11 +165,14 @@ const after = (axis, pr) => (axis === 'row' ? pr.below : pr.right);
 
 /** Group lines a to b one level deeper; false when one is at the deepest level already (Excel refuses). */
 export function groupLines(wb, si, axis, a, b) {
-  return outlineEdit(wb, si, axis, (lines) => {
+  const done = outlineEdit(wb, si, axis, (lines) => {
     for (let i = a; i <= b; i++) if (lines.get(i).level >= MAX_LEVEL) return false;
     for (let i = a; i <= b; i++) lines.set(i, { level: lines.get(i).level + 1 });
     return true;
   });
+  // (Automatic styles on: the groups' summary lines styled, "group with automatic styles".)
+  if (done && wb.sheet(si).outline?.styles) styleSummaryLines(wb, si, axis, summariesOf(wb.sheet(si), axis, a, b));
+  return done;
 }
 
 /** Ungroup lines a to b one level; false when none is grouped (Excel refuses). Hidden lines and the summary's
@@ -246,10 +250,11 @@ export function clearOutline(wb, si, axis, a = 0, b = Infinity) {
   });
 }
 
-/** The Settings: summary rows below their detail (`below`) and columns right of theirs (`right`), written in sheetPr's
- *  outlinePr as Excel writes it: summaryBelow="0" or summaryRight="0", nothing for the default (setting it back takes
- *  outlinePr away, and sheetPr when it is left empty). */
-export function setSummary(wb, si, { below, right, symbols }) {
+/** The Settings: summary rows below their detail (`below`), columns right of theirs (`right`) and Automatic styles
+ *  (`styles`), written in sheetPr's outlinePr as Excel writes it: summaryBelow="0", summaryRight="0", applyStyles="1",
+ *  nothing for the defaults (setting them back takes outlinePr away, and sheetPr when it is left empty); `symbols`
+ *  for Ctrl+8. */
+export function setSummary(wb, si, { below, right, symbols, styles }) {
   const part = wb._part(si);
   const doc = part.doc;
   const root = doc.documentElement;
@@ -262,6 +267,8 @@ export function setSummary(wb, si, { below, right, symbols }) {
     if (v == null) continue;
     if (v) pr.removeAttribute(name); else pr.setAttribute(name, '0');
   }
+  // (Automatic styles: applyStyles="1", nothing when off, as Excel writes Outline.AutomaticStyles.)
+  if (styles != null) { if (styles) pr.setAttribute('applyStyles', '1'); else pr.removeAttribute('applyStyles'); }
   reorder(pr, ['applyStyles', 'summaryBelow', 'summaryRight', 'showOutlineSymbols']);
   if (!pr.attributes.length) sheetPr.removeChild(pr);
   if (!sheetPr.attributes.length && ![...sheetPr.childNodes].some((n) => n.nodeType === 1)) root.removeChild(sheetPr);
@@ -314,6 +321,8 @@ export function autoOutline(wb, si) {
     for (const [a, b] of unique) for (let i = a; i <= b; i++) depth.set(i, (depth.get(i) || 0) + 1);
     if (depth.size) lineLevels(wb, si, axis, [...depth]);
   }
+  // (Automatic styles on, as the Settings box's Create: the used range's summary cells styled.)
+  if (wb.sheet(si).outline?.styles) applyOutlineStyles(wb, si, { r0: 0, c0: 0, r1: wb.sheet(si).maxRow, c1: wb.sheet(si).maxCol });
   return true;
 }
 

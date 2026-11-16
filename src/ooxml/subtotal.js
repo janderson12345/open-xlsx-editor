@@ -10,6 +10,7 @@
 import { insertBreak } from './pagesetupedit.js';
 import { clearOutline, lineLevels, setSummary } from './outline.js';
 import { colName } from './refs.js';
+import { styleSummaryLines } from './outlinestyles.js';
 
 /** Excel's Use function list: SUBTOTAL's number and the word its rows are labelled with. */
 export const SUBTOTAL_FUNCTIONS = {
@@ -119,7 +120,9 @@ export function subtotal(wb, si, area, { by, fn = 'sum', cols, replace = true, p
   }
   wb.apply(si, contents);
   const now = wb.sheet(si);
-  wb.setStyles(si, bold.map(({ r, c }) => ({ r, c, s: wb.styleWith(now.cells.get(r)?.get(c)?.s || 0, { font: { b: true } }) })));
+  // (Automatic styles on, the rows take their level's style instead of the bold label: "subtotal with automatic styles".)
+  const styled = !!now.outline?.styles;
+  if (!styled) wb.setStyles(si, bold.map(({ r, c }) => ({ r, c, s: wb.styleWith(now.cells.get(r)?.get(c)?.s || 0, { font: { b: true } }) })));
   // The outline: the list's rows a level deeper than their new subtotal rows (level 2 under 1 the first time).
   const levels = [];
   for (const g of groups) {
@@ -130,6 +133,7 @@ export function subtotal(wb, si, area, { by, fn = 'sum', cols, replace = true, p
   }
   lineLevels(wb, si, 'row', levels);
   setSummary(wb, si, { below });
+  if (styled) styleSummaryLines(wb, si, 'row', order.filter((x) => !('r' in x)).map((x) => x.at));
   if (pageBreaks) {
     const ends = groups.map((g) => (below ? order.find((x) => x.group === g).at : place.get(g.rows[g.rows.length - 1])));
     const grand = order.find((x) => x.grand).at;

@@ -1,7 +1,7 @@
 // Browser check of outlines (docs/OUTLINE.md) on a new sheet of test/fixtures/basic.xlsx: Shift+Alt+Right groups the
 // rows selected and draws the outline bar at Excel's size (43px with one level, 19px more for each level after:
 // excel-outline.ps1), its level buttons and the − at the summary row; the − and + hide and show the group, the level
-// buttons show levels, each one step of the history; a range's Group asks Rows or Columns; Ctrl+8 hides and shows the bar; Data > Subtotal's box
+// buttons show levels, each one step of the history; a range's Group asks Rows or Columns; Ctrl+8 hides and shows the bar; the Settings box's Automatic styles and Apply Styles; Data > Subtotal's box
 // inserts Excel's SUBTOTAL rows with their outline, and Remove All takes them away. The result saved and read back.
 // Run after `npm run build`: node test/outline.mjs [outDir]
 import fs from 'node:fs';
@@ -73,6 +73,17 @@ await page.keyboard.press('Control+8');
 const off = [await bar(), await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).outline.symbols), (await row(1)).level];
 await page.keyboard.press('Control+8');
 check(off[0].w === '0px' && off[0].h === '0px' && off[1] === false && off[2] === 1 && (await bar()).w === '62px', 'Ctrl+8 hides the outline bar (the outline kept), Ctrl+8 again shows it', JSON.stringify(off));
+// Data > Outline's Settings: Automatic styles ticked and Apply Styles on A5, the summary of rows 2:4: RowLevel_1, bold.
+await select('A5');
+await page.click('.oxe-rtab >> text="Data"');
+await press('.oxe-toolbar button[title="Outline Settings"]');
+await box().getByLabel('Automatic styles').check();
+await box().getByRole('button', { name: 'Apply Styles' }).click();
+const look = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); const xf = wb.styles.cellXfs[sh.cells.get(4).get(0).s]; return { bold: !!wb.styles.fonts[xf.fontId].b, styles: sh.outline.styles }; });
+await page.keyboard.press('Control+z');
+const undoneStyles = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); return { s: sh.cells.get(4).get(0).s || 0, styles: sh.outline.styles }; });
+check(look.bold && look.styles && undoneStyles.s === 0 && !undoneStyles.styles, 'Settings: Automatic styles and Apply Styles make A5 bold (RowLevel_1), one step of the history', JSON.stringify({ look, undoneStyles }));
+await select('A1');
 await page.evaluate(() => window.oxe.command('clearOutline'));
 check((await bar()).w === '0px' && (await bar()).h === '0px', 'Clear Outline: no outline, no bar');
 

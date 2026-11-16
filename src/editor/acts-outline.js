@@ -22,8 +22,8 @@ export function createOutlineActs(env) {
       return groupAxisBox(root, name === 'groupBox' ? 'Group' : 'Ungroup').then((axis) => { back(); return axis ? editing().run(cmd, axis) : false; });
     }
     if (name === 'outlineSettingsBox') {
-      const o = state.workbook.sheet(i).outline || { below: true, right: true };
-      return outlineSettingsBox(root, o).then((got) => { back(); return got ? editing().run('outlineSettings', got) : false; });
+      const o = state.workbook.sheet(i).outline || { below: true, right: true, styles: false };
+      return outlineSettingsBox(root, o).then((got) => { back(); return got ? editing().run('outlineSettings', got, got.then) : false; });
     }
     if (name === 'subtotalBox') {
       // (The list: the selection, or the table round the active cell; its first row's headings name its columns.)
