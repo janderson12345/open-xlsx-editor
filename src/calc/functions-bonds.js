@@ -143,36 +143,78 @@ function duration(a, ctx) {
 def('DURATION', (a, ctx) => duration(a, ctx).d);
 def('MDURATION', (a, ctx) => { const r = duration(a, ctx); return r.d / r.v; });
 
-/** ACCRINT, as Excel works it out (measured): par x rate / frequency x the coupon periods from issue to settlement,
- *  stepped from first_interest, each whole one (ended before settlement) counting 1 and a part its days (by the
- *  basis) over the period's length:
- *  360 or 365 over the frequency, or with basis 1 the days of the period that ends at first_interest. With calc_method
- *  FALSE, the days from issue to settlement over that length, whole periods or not. (With basis 1 over many periods
- *  Excel's last digits differ from these: docs/CALC.md.) */
+/** ACCRINT's coupon periods, in what Excel was seen to do (measured on 600 cases over the five bases, both
+ *  calc_methods, then 387 of 400 more it wasn't worked out from; docs/CALC.md): par x rate / frequency x the periods
+ *  from issue to settlement.
+ *  - The coupon dates step from first_interest back past issue, each from the one before (from August 30: February
+ *    28, then August 28), at the month's end when first_interest is at one; and on from the earliest the same way, so
+ *    the period issue falls in can end before first_interest (August 28, not August 29).
+ *  - A period's length L: 360 or 365 over the frequency, or with basis 1 the days of the period that ends at
+ *    first_interest; issue's own period, with basis 1, its own days.
+ *  - Issue in the period ending at first_interest: the days from issue over L. Otherwise up to first_interest the
+ *    part of issue's period counts its days over its length, each later whole period before the last 1, and the rest
+ *    from issue to settlement, less those periods' days, over L; so a long first period accrues at L's rate all
+ *    through it (Excel's answer is linear in settlement there, with an offset).
+ *  - Past first_interest: the period ending at it counts 1, each later whole one (ended before settlement) 1, and a
+ *    part its days over L (August 31 to February 28: 178 of 180 in 30/360).
+ *  - calc_method FALSE: issue's part as above, and the days from the start of the period ending at first_interest
+ *    (stepped back from it) to settlement over L, whatever Microsoft's page says. */
+function accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx) {
+  const step = 12 / freq;
+  const fp = dateParts(first, ctx.date1904);
+  const keepDay = fp.d !== monthDays(fp.y, fp.m);
+  const back = (d) => addMonths(d, -step, ctx, keepDay);
+  const on = (d) => addMonths(d, step, ctx, keepDay);
+  const days = (s, e) => daysBetween(s, e, basis, ctx);
+  const L = basis === 1 ? first - back(first) : basis === 3 ? 365 / freq : 360 / freq;
+  if (first <= issue) {
+    // (Issue on or after first_interest: the periods from it on, issue's a part.)
+    if (!byPeriod) return days(issue, settle) / L;
+    let p0 = first;
+    while (on(p0) <= issue) p0 = on(p0);
+    let total = 0;
+    for (; p0 < settle; p0 = on(p0)) {
+      const from = Math.max(p0, issue);
+      total += from === p0 && on(p0) < settle ? 1 : days(from, Math.min(on(p0), settle)) / L;
+    }
+    return total;
+  }
+  if (!byPeriod) {
+    const B = [first];
+    while (B[B.length - 1] > issue) B.push(back(B[B.length - 1]));
+    const n = B.length;
+    if (n === 2) return days(issue, settle) / L;
+    return days(issue, B[n - 2]) / (basis === 1 ? B[n - 2] - B[n - 1] : L) + days(B[1], settle) / L;
+  }
+  let start = first;
+  while (start > issue) start = back(start);
+  const P = [start];
+  while (P[P.length - 1] < first) P.push(on(P[P.length - 1]));
+  const last = P.length - 1;
+  if (last === 1) {
+    if (settle <= first) return days(issue, settle) / L;
+    let total = days(issue, P[1]) / L;
+    for (let p0 = P[1]; p0 < settle; p0 = on(p0)) total += on(p0) < settle ? 1 : days(p0, settle) / L;
+    return total;
+  }
+  const own = basis === 1 ? P[1] - P[0] : L;
+  const dIssue = days(issue, P[1]);
+  if (settle <= first) {
+    let middle = 0;
+    for (let i = 1; i < last - 1; i++) middle += days(P[i], P[i + 1]);
+    return dIssue / own + (last - 2) + (days(issue, settle) - dIssue - middle) / L;
+  }
+  let total = dIssue / own + (last - 1);
+  for (let p0 = P[last]; p0 < settle; p0 = on(p0)) total += on(p0) < settle ? 1 : days(p0, settle) / L;
+  return total;
+}
 def('ACCRINT', (a, ctx) => {
   const issue = day(a[0], ctx); const first = day(a[1], ctx); const settle = day(a[2], ctx);
   const rate = num(a[3], ctx); const par = given(a[4]) ? num(a[4], ctx) : 1000;
   const freq = freqOf(a[5], ctx); const basis = basisOf(a, 6, ctx);
   const byPeriod = !given(a[7]) || !!num(a[7], ctx);
   if (rate <= 0 || par <= 0 || issue >= settle) throw E.num;
-  const step = 12 / freq;
-  const length = basis === 1 ? first - addMonths(first, -step, ctx) : basis === 3 ? 365 / freq : 360 / freq;
-  let total = 0;
-  if (!byPeriod) total = daysBetween(issue, settle, basis, ctx) / length;
-  else {
-    let k = 0;
-    while (addMonths(first, -k * step, ctx) > issue) k += 1;
-    for (let i = -k; ; i++) {
-      const p0 = addMonths(first, i * step, ctx); const p1 = addMonths(first, (i + 1) * step, ctx);
-      if (p0 >= settle) break;
-      const from = Math.max(p0, issue); const to = Math.min(p1, settle);
-      // (Whole: from its start to before settlement. A period ending on settlement is a part, by its days: August 31
-      // to February 28 is 178 days of 180 in 30/360.)
-      const whole = from === p0 && p1 < settle;
-      if (to > from) total += whole ? 1 : daysBetween(from, to, basis, ctx) / length;
-    }
-  }
-  return (par * rate * total) / freq;
+  return (par * rate * accruedPeriods(issue, first, settle, freq, basis, byPeriod, ctx)) / freq;
 });
 
 const yearFrac = (s, e, basis, ctx) => FUNCTIONS.YEARFRAC.fn([s, e, basis], ctx);
