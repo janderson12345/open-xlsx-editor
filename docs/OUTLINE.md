@@ -4,14 +4,15 @@ How rows and columns are grouped into an outline, collapsed and expanded, and ho
 (`src/ooxml/outline.js`, `src/ooxml/subtotal.js`), and what Excel was seen to do. Each rule was measured over COM in a
 hidden Excel (`tools/excel-compare/excel-outline.ps1`: `Range.Group`, `Ungroup`, `Outline.ShowLevels`,
 `Range.ShowDetail`, `ClearOutline`, `AutoOutline`, `Outline.SummaryRow` and `SummaryColumn`, `Range.Subtotal`,
-`RemoveSubtotal`, each on a new workbook of made-up cells, saved and read back). `npm test` (`test/outline.test.js`, 38
-cases; `test/subtotal.test.js`, 11 cases) expects what Excel wrote, to the attribute; `test/outline.mjs` clicks the
+`RemoveSubtotal`, `Outline.AutomaticStyles`, `Range.ApplyOutlineStyles`, each on a new workbook of made-up cells, saved and read back). `npm test` (`test/outline.test.js`, 51
+cases; `test/subtotal.test.js`, 11 cases; `test/outlinestyles.test.js`, 9 cases) expects what Excel wrote, to the attribute; `test/outline.mjs` clicks the
 outline bar's buttons and the Subtotal box in a browser.
 
 ## In the editor
 
 - Data > Outline: Group (Shift+Alt+Right) and its menu's Auto Outline; Ungroup (Shift+Alt+Left) and its menu's Clear
-  Outline; Subtotal; Show Detail; Hide Detail; Settings (Summary rows below detail, Summary columns to right of detail).
+  Outline; Subtotal; Show Detail; Hide Detail; Settings (Summary rows below detail, Summary columns to right of detail, Automatic
+  styles; its Create makes the outline from the formulas, its Apply Styles styles the selection's summary cells).
 - Whole rows or columns selected are grouped at once; any other range asks Rows or Columns, as Excel's Group box does.
 - Show Detail, Hide Detail and Clear Outline go by the selection: whole columns, the columns; whole rows, the rows;
   otherwise the rows when the active cell's row is in a row group, the columns when not. Clear Outline with one cell
@@ -42,6 +43,7 @@ outline bar's buttons and the Subtotal box in a browser.
 | Ungroup takes one level off; hidden lines and the summary's collapsed stay. Ungroup of lines not grouped is refused. | A collapsed 2:4 ungrouped: rows still `hidden="1"`, `<row r="5" collapsed="1">`, no `outlineLevelRow`. |
 | Clear Outline takes the levels away, shows the lines the outline hid and the collapsed marks go; the columns come back at the default width, keeping `customWidth`. | `<col min="2" max="3" width="9.140625" customWidth="1"/>`, no outlineLevelCol. |
 | Ctrl+8 (the window's DisplayOutline) off writes `showOutlineSymbols="0"` on the sheetView and on sheetPr's outlinePr, even on a sheet without an outline; on again takes both away. | `<sheetPr><outlinePr showOutlineSymbols="0"/></sheetPr>`, `<sheetView tabSelected="1" showOutlineSymbols="0" workbookViewId="0"/>`. |
+| A row (column) inserted takes the outline level of the one before it, the row above (column left), as it takes its format; it is shown even inside a collapsed group, and the group it joins is no longer collapsed. | Rows 2:4 grouped, a row inserted at 3: new row 3 level 1; at 2: level 0; at 5 (the summary): level 1. Collapsed, a row inserted at 3: shown, level 1, row 6 without `collapsed`. Column inserted at C in B:D: B:E level 1. |
 | Auto Outline makes the outline from formulas: a formula over its own column's cells just above it groups those rows, one over its own row's cells left of it groups those columns. | SUM(A1:A3) in A4, SUM(A1:B1) in C1 and so on: rows 1:3 and columns A:B at level 1. |
 
 ## Excel's rules: Subtotal
@@ -58,6 +60,21 @@ outline bar's buttons and the Subtotal box in a browser.
 | Remove All deletes the rows holding SUBTOTAL, clears the list's outline and takes its page breaks away. | The list back as typed, no outlineLevelRow, no rowBreaks. |
 | The list is the selection, or the table round the active cell. | B3 selected: the same result as A1:D7. |
 
+## Excel's rules: automatic styles
+
+| Rule | Seen |
+|---|---|
+| Automatic styles is outlinePr's `applyStyles="1"`; off takes it away. | `<sheetPr><outlinePr applyStyles="1"/></sheetPr>`. |
+| A group's summary row takes the built-in style RowLevel_L of its group's level L (`builtinId="1" iLevel="L-1"`), a summary column ColLevel_L (`builtinId="2"`): level 1 bold, level 2 italic, deeper the Normal font. The style's own format: its font, nothing else applied; the cell's: the style's font, no apply flags. | `<cellStyle name="RowLevel_2" xfId="3" builtinId="1" iLevel="1"/>`, `<xf numFmtId="0" fontId="2" fillId="0" borderId="0" applyNumberFormat="0" applyFill="0" applyBorder="0" applyAlignment="0" applyProtection="0"/>`. |
+| Where a styled row and column meet, the lower level wins, the row on a tie. | E5 (row level 2, column level 1): ColLevel_1; E8 (both level 1): RowLevel_1. |
+| Apply Styles styles every cell of the range on a summary row or column, empty ones made; one cell, only it. | A1:H12: A5:H5, A8:H8 and E1:E12; A5 alone: A5. |
+| Group with Automatic styles on gives the new group's summary row the style as its own format (`s` with `customFormat`), and its cells. | Rows 2:4: `<row r="5" s="1" customFormat="1">`, A5 RowLevel_1. |
+| Subtotal with Automatic styles on does the same for its rows, instead of the bold label. | East Total's row RowLevel_2 (italic), Grand Total's RowLevel_1 (bold). |
+| Create (Auto Outline) with Automatic styles on styles the cells of the used range. | A4:C4 RowLevel_1, C1:C3 ColLevel_1. |
+
+Excel writes a new font for RowLevel_3 and deeper even though it is the Normal font; here the Normal font's own entry is
+used, which looks the same.
+
 ## The outline bar
 
 | Rule | Seen |
@@ -69,7 +86,5 @@ Not measured (Excel's glyphs aren't in its PDF, and COM doesn't reach them): the
 
 ## Not yet
 
-- The Settings box's Automatic styles and Create and Apply Styles.
-- Rows inserted inside a group take the format of the row above but not its outline level.
 - Subtotal's cells take the formats of the row above them (Excel's own formats there weren't measured, the probe's cells
   had none); Excel's message for a list without headings.
