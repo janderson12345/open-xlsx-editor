@@ -97,6 +97,43 @@ await menu('Freeze Panes', 'Unfreeze Panes');
 const back = await page.evaluate(() => ({ freeze: window.oxe.grid.view().freeze, topLeft: window.oxe.grid.view().topLeft }));
 check(back.freeze.rows === 0 && back.freeze.cols === 0 && back.topLeft.r === 9 && back.topLeft.c === 2, 'Unfreeze Panes: the window back at C10, as Excel leaves it', JSON.stringify(back));
 await page.click('.oxe-rtab >> text=Home');
+
+// AutoSum: 1, 2, 3 typed into H20:H22 and 7, 8 into J20:J21; Alt+= on H23 opens it with Excel's proposal, its range
+// outlined on the sheet (the range finder), Enter enters it. H20:H22 and J20:J21 selected (Ctrl+drag): AutoSum puts
+// a total under each area at once (Excel's on two areas), both areas grown by it.
+const typeDown = async (ref, values) => {
+  await page.evaluate((r) => window.oxe.select(r), ref);
+  await page.focus('.oxe-grid');
+  for (const v of values) { await page.keyboard.type(v); await page.keyboard.press('Enter'); }
+};
+await typeDown('H20', ['1', '2', '3']);
+await typeDown('J20', ['7', '8']);
+await page.evaluate(() => window.oxe.select('H23'));
+await page.focus('.oxe-grid');
+await page.keyboard.press('Alt+=');
+await page.waitForSelector('.oxe-mark');
+const proposal = await page.evaluate(() => { const e = document.querySelector('.oxe-editor'); return e?.value ?? e?.textContent ?? ''; });
+const marks = await page.evaluate(() => document.querySelectorAll('.oxe-overlay .oxe-mark').length);
+check(proposal === '=SUM(H20:H22)' && marks >= 1, 'Alt+= on H23: =SUM(H20:H22) proposed, its range outlined', JSON.stringify({ proposal, marks }));
+await page.keyboard.press('Enter');
+const h23 = await page.evaluate(() => { const c = window.oxe.workbook.sheet(0).cells.get(22)?.get(7); return [c?.f, c?.v]; });
+check(h23[0] === 'SUM(H20:H22)' && h23[1] === 6, 'Enter: H23 =SUM(H20:H22), 6', JSON.stringify(h23));
+await clickCell(19, 7);
+const h22 = await (async () => { const p = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const { rows, cols, rowHeadW, colHeadH } = g.geometry(); return { x: v.left + rowHeadW + cols.start(7) - g.el.scrollLeft + 6, y: v.top + colHeadH + rows.start(21) - g.el.scrollTop + 6 }; }); return p; })();
+await page.keyboard.down('Shift');
+await page.mouse.click(h22.x, h22.y);
+await page.keyboard.up('Shift');
+const j = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const { rows, cols, rowHeadW, colHeadH } = g.geometry(); const at = (r, c) => ({ x: v.left + rowHeadW + cols.start(c) - g.el.scrollLeft + 6, y: v.top + colHeadH + rows.start(r) - g.el.scrollTop + 6 }); return [at(19, 9), at(20, 9)]; });
+await page.keyboard.down('Control');
+await page.mouse.move(j[0].x, j[0].y);
+await page.mouse.down();
+await page.mouse.move(j[1].x, j[1].y, { steps: 3 });
+await page.mouse.up();
+await page.keyboard.up('Control');
+await page.keyboard.press('Alt+=');
+const totals = await page.evaluate(() => { const at = (r, c) => window.oxe.workbook.sheet(0).cells.get(r)?.get(c)?.f; return [at(22, 7), at(21, 9)]; });
+const areasNow = await page.evaluate(() => { const s = window.oxe.selection; return [...(s.more || []), s].map((a) => `${a.r0},${a.c0}:${a.r1},${a.c1}`).join(' '); });
+check(totals[1] === 'SUM(J20:J21)' && areasNow === '19,7:22,7 19,9:21,9', 'two areas, AutoSum: J22 =SUM(J20:J21), H20:H23 (its total already there) and J20:J22 selected', JSON.stringify({ totals, areasNow }));
 void sel;
 
 await finish();

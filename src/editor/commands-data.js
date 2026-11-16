@@ -7,7 +7,7 @@ import * as clip from '../ooxml/clipops.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { setSortState } from '../ooxml/sortstate.js';
-import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
+import { autoSumAreas } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
 import { validName, defineName, namesOnSheet } from '../ooxml/names.js';
 import { sheetPrefix } from '../calc/tokens.js';
@@ -179,10 +179,13 @@ export function dataCommands(env) {
      *  found to sum) that cell is selected and { edit: text } returned, for the cell editor to open with it. */
     autoSum(fn = 'sum') {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const step = autoSumOf(ctx.workbook(), ctx.sheetIndex(), state.sel, fn);
+      // (Several areas: each summed as alone, all in one step, each area grown by its totals.)
+      const areas = areasOf(state.sel);
+      const step = autoSumAreas(ctx.workbook(), ctx.sheetIndex(), areas.length > 1 ? areas : [state.sel], fn);
       if (step.edit) { commands.select(step.edit.r, step.edit.c); return { edit: step.edit.text }; }
       if (!runSteps([step])) return false;
-      show({ ...state.sel, ...step.area }, state.focus, 'AutoSum, ');
+      if (step.areas) show(areasSelection(step.areas, { r: state.sel.ar, c: state.sel.ac }), state.focus, 'AutoSum, ');
+      else show({ ...state.sel, ...step.area }, state.focus, 'AutoSum, ');
       return true;
     },
     /** The Name Box: go to the reference or name typed (goto.js), on its sheet; Excel's words when it can't. */
