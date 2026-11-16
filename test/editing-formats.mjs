@@ -88,6 +88,28 @@ const row30After = await row30();
 await page.evaluate(() => window.oxe.undo());
 check(row30Before === 20 && row30After === 35 && await row30() === 20, 'a whole row made 20pt: it grows to 26.25pt as Excel’s; Ctrl+Z back', JSON.stringify({ row30Before, row30After }));
 
+// Row 33 selected whole and filled: written as the row's own format (a cell made only where it crosses column L's own
+// format, as Excel makes one), its empty cells drawn filled on screen and in print, a cell typed there later filled.
+{
+  const cellsBefore = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(32)?.size || 0);
+  await page.evaluate(() => { window.oxe.command('selectLines', 'row', 32); window.oxe.command('format', { fill: { rgb: 'FF92D050' } }); });
+  const row = await page.evaluate(() => {
+    const wb = window.oxe.workbook;
+    const sh = wb.sheet(window.oxe.sheetIndex);
+    const text = new XMLSerializer().serializeToString(wb._part(window.oxe.sheetIndex).doc);
+    const el = /<row r="33"[^>]*>/.exec(text)?.[0] || '';
+    const s = Number(/ s="(\d+)"/.exec(el)?.[1] || 0);
+    return { el, fill: wb.styles.fills[wb.styles.cellXfs[s].fillId]?.fg?.rgb || null, cells: [...(sh.cells.get(32)?.keys() || [])], s };
+  });
+  const drawn = await page.evaluate((s) => document.querySelectorAll(`.oxe-row[aria-rowindex="34"] ~ * .oxe-f${s}, .oxe-fills .oxe-f${s}`).length, row.s);
+  const printed = await page.evaluate(async (s) => { await window.oxe.preparePrint(); return document.querySelectorAll(`.oxe-print .oxe-f${s}`).length; }, row.s);
+  await page.evaluate(() => window.oxe.enter('T33', 'later'));
+  const later = await page.evaluate(() => { const wb = window.oxe.workbook; const c = wb.sheet(window.oxe.sheetIndex).cells.get(32).get(19); return wb.styles.fills[wb.styles.cellXfs[c.s].fillId]?.fg?.rgb || null; });
+  check(/customFormat="1"/.test(row.el) && row.fill === 'FF92D050' && cellsBefore === 0 && JSON.stringify(row.cells) === '[11]' && drawn > 5 && printed > 5 && later === 'FF92D050',
+    'a whole row filled: <row s customFormat="1">, one cell made where it crosses column L’s format, its empty cells drawn and printed filled, a cell typed there later filled', JSON.stringify({ row, cellsBefore, drawn, printed, later }));
+  await page.evaluate(() => { window.oxe.undo(); window.oxe.undo(); });
+}
+
 
 // A .csv (test/csv-excel.csv, its cells as Excel opened them: csv.test.js): one sheet named after the file, a
 // percentage, a date, a line break in quotes, a formula.
