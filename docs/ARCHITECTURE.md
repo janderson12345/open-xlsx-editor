@@ -55,7 +55,11 @@ insides:
 | `src/ooxml/headerfooter.js` | Headers and footers: Excel's codes read into sections and runs, fields filled in per page (docs/PRINT.md). |
 | `src/pdf.js` | PDF export from the print layout (pdf-lib, fontkit): fills, borders and cell text at the layout's places, clipped to their cells; docs/PDF.md. |
 | `src/pdfomf.js` | For `pdf.js`: a served open-metric-fonts twin embedded from the editor's `fonts.omf` folder, each alphabet's WOFF2 file as a subset, a piece of text split by the file that holds each character. |
-| `src/collab.js` | Co-editing over Yjs: `connectWorkbook(api, ydoc)`; cell contents shared cell by cell from `api.onEdit`, made with the `remoteContents` command; any other change shared as the workbook's bytes; docs/COLLAB.md. |
+| `src/collab.js` | Co-editing over Yjs: `connectWorkbook(api, ydoc)`; the room's epochs (the workbook's bytes, every change since), opening it and publishing a whole workbook; the others' changes made with the `remoteChange` command; docs/COLLAB.md. |
+| `src/collab-room.js` | A co-edited room's parts (sheet list, props, line operations, each sheet's cells and lines by identity, formats): this editor's sheets compared with their shadow and the differences written, the others' entries, operations and sheet list made in the workbook. |
+| `src/collab-capture.js` | This editor's own changes caught for the room: the workbook's line and sheet methods wrapped to share operations, a journal of what was shared, Undo and Redo of a snapshot step taken back piece by piece. |
+| `src/collab-seq.js` | Rows' and columns' identities in a co-edited sheet: a replicated sequence (RGA) of runs, so concurrent inserts and deletes end in one order. |
+| `src/collab-state.js`, `collab-styles.js`, `collab-check.js` | A sheet's digest (contents, formats, lines' attributes, defaults), the fingerprint of everything else, and their writers; formats by description and key across styles parts; the room's entries checked before they reach the workbook. |
 | `src/collab-peers.js` | Others' cursors in a co-edited workbook: this editor's selection put in the provider's awareness (throttled, from `api.onSelect`), the others' read back for the sheet shown and given to the grid; each person's colour and the flag's text colour by contrast. |
 | `bin/oxe-mcp.mjs` | The MCP server: the agent interface as tools for an AI assistant, over stdin and stdout, within one folder; docs/AGENT.md. |
 | `src/agentreview.js` | An agent's edits reviewed: the workbook now beside the one opened, cell by cell; docs/AGENT.md. |
