@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.8.0
+
+- **Co-editing piece by piece.** Formats, row and column settings, inserted and deleted rows and columns, the sheet
+  list and each sheet's cells are shared as separate changes, not as the whole workbook.
+- **Locale.** The `locale` option and `setLocale()`: numbers, dates and formulas shown and typed with the locale's
+  separators, and the function tip uses the locale's list separator.
+- **Text files.**
+  - The Text Import box: opening a .txt file, and Data > From Text/CSV at the active cell. Encodings, delimited or
+    fixed-width fields, column types and the start row are all handled.
+  - The Save As box (F12): .xlsx, .xlsm, .csv with a separator and encoding, .txt and .pdf. Text files are written
+    byte for byte as Excel writes them.
+- **Clipboard and links.**
+  - Pasting keeps other programs' formatting, read from the clipboard's HTML as Excel's Paste reads it.
+  - Paste Link between open workbooks, Edit Links, and names that refer to other workbooks.
+- **Formatting.**
+  - Part of a cell's text in its own font, size or colour, from the Font group while editing.
+  - New Cell Style and Modify, in Excel's Style box.
+  - @mentions in threaded comments.
+  - Find by format, with Choose Format From Cell.
+  - Rotated, stacked and shrunk text printed as Excel prints it.
+- **Inserting and deleting rows, columns and cells.** These now move what Excel moves:
+  - sparklines and data validation rules;
+  - Excel 2010 conditional formats and validation rules;
+  - pictures and charts that don't move with cells;
+  - slicers and timelines, which no longer block the insert or delete;
+  - Circle Invalid Data's circles.
+- **Other changes.**
+  - Notes and threaded comments go with their cells in a sort.
+  - SUBTOTAL leaves out rows a filter hides.
+  - AutoSum works in filtered lists, in tables and on several areas.
+  - Freeze Panes works on a scrolled or split window.
+  - Validation rules that read another sheet now work.
+- **Formulas.**
+  - Regular expressions are matched as PCRE2, with a limit on how much work one search may take.
+  - Text functions count an emoji as one character in workbooks made by Excel.
+  - DATE and DAYS360 treat February 1900 as Excel does, and ACCRINT and ARRAYTOTEXT give Excel's answers in their
+    edge cases.
+- **Fixes.**
+  - Fonts written with `<u val="none"/>` are no longer drawn underlined.
+  - Rich text keeps font settings the editor doesn't model.
+- **Security.** A review of this release found and fixed:
+  - a relationship id from a file used as a regular-expression pattern;
+  - validation rules from a file that could write unexpected XML;
+  - clipboard CSS that took far too long to read;
+  - regular-expression replaces whose total work had no limit.
+
 ## 0.7.1
 
 - The README shows the latest release, the npm version, CI and the licence as badges, on GitHub and on npm.
