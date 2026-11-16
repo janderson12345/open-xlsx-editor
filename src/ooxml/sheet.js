@@ -2,6 +2,7 @@
 // heights, merged ranges and the sheet's defaults. The part's XML document is kept with the model so that an edit
 // changes only the elements it has to and everything not modelled (conditional formats, validations, extLst...) stays
 // where it was.
+import { readOutlinePr } from './outline.js';
 import { kids, kid, attr } from './xml.js';
 import { parseRef, parseRange } from './refs.js';
 import { stringItemText, stringItemRuns } from './strings.js';
@@ -61,7 +62,10 @@ export function readSheet(doc, sst = []) {
     const hidden = attr(rowEl, 'hidden') === '1' || attr(rowEl, 'hidden') === 'true';
     // (A row's own format: `s` with customFormat, as Excel writes a formatted row.)
     const own = attr(rowEl, 'customFormat') === '1' || attr(rowEl, 'customFormat') === 'true' ? Number(attr(rowEl, 's') || 0) : 0;
-    if (ht != null || hidden || own) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}) });
+    // (Its outline: outlineLevel 1 to 7, and collapsed on a summary row whose group is hidden; outline.js.)
+    const level = Number(attr(rowEl, 'outlineLevel') || 0);
+    const collapsed = attr(rowEl, 'collapsed') === '1' || attr(rowEl, 'collapsed') === 'true';
+    if (ht != null || hidden || own || level || collapsed) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}) });
     let c = -1;
     let line = null;
     for (const cEl of kids(rowEl, 'c', ns)) {
@@ -84,6 +88,8 @@ export function readSheet(doc, sst = []) {
         width: attr(col, 'width') == null ? null : Number(attr(col, 'width')),
         hidden: attr(col, 'hidden') === '1' || attr(col, 'hidden') === 'true',
         style: Number(attr(col, 'style') || 0),
+        level: Number(attr(col, 'outlineLevel') || 0),
+        collapsed: attr(col, 'collapsed') === '1' || attr(col, 'collapsed') === 'true',
       });
     }
   }
@@ -106,6 +112,7 @@ export function readSheet(doc, sst = []) {
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
     showHeadings: !view || attr(view, 'showRowColHeaders') !== '0',
     ...readView(view, ns),
+    outline: readOutlinePr(root, ns, view),
     page: readPageSetup(root, ns),
     autoFilter: readAutoFilter(kid(root, 'autoFilter', ns), ns),
     condFormats: readCondFormats(root, ns),

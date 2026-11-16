@@ -157,7 +157,7 @@ const FORMAT_ORDER = ['baseColWidth', 'defaultColWidth', 'defaultRowHeight', 'cu
 
 /** The sheet's sheetFormatPr given `attrs` ({ name: value, or null to take it away }), made (after sheetViews) when
  *  the sheet has none. */
-function setSheetFormat(doc, attrs) {
+export function setSheetFormat(doc, attrs) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   let el = kid(root, 'sheetFormatPr', ns);
