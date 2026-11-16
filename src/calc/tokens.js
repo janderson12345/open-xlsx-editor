@@ -19,7 +19,10 @@ export class FormulaError extends Error {
 
 // What ends an unquoted sheet name.
 const STOP = String.raw`\s!'"(),;:{}\[\]=<>+\-*/^&%#$`;
-const RE_BOOK = /\[(\d+)\]/y;
+// (An external workbook: [1] as the file writes it, or [Book.xlsx] as a formula is typed and shown; docs/LINKS.md.)
+const RE_BOOK = /\[(\d+|[^[\]\s'!()=,;]+)\]/y;
+// (A defined name of an external workbook: [1]!Rate.)
+const RE_BOOK_NAME = /\[(\d+|[^[\]\s'!()=,;]+)\]!/y;
 const RE_SHEET = new RegExp(`([^${STOP}0-9.][^${STOP}]*)!`, 'y');
 // (A 3D reference's sheets, Jan:Apr!, unless the first reads as a cell: S1:S4!A1 is S1 to S4!A1, as Excel reads it.)
 const RE_SHEETS = new RegExp(`([^${STOP}0-9.][^${STOP}]*):([^${STOP}0-9.][^${STOP}]*)!`, 'y');
@@ -66,14 +69,21 @@ function refAt(text, i) {
   let j = i;
   let sheet = null;
   let book = null;
+  let path = null;
   let m = at(RE_BOOK, text, j);
   if (m) { book = m[1]; j += m[0].length; }
   const quoted = quotedSheetAt(text, j);
   if (quoted) {
     sheet = quoted.raw.replace(/''/g, "'");
     j += quoted.length;
-    const inner = /^\[(\d+)\](.*)$/.exec(sheet);
-    if (inner) { book = inner[1]; sheet = inner[2]; }
+    // ('[1]Data Two'!, '[My Book.xlsx]Sheet1'!, and as Excel shows a closed one, 'C:\Data\[Book.xlsx]Sheet1'!.)
+    const open = sheet.lastIndexOf('[');
+    const close = sheet.lastIndexOf(']');
+    if (book == null && open >= 0 && close > open) {
+      book = sheet.slice(open + 1, close);
+      if (open > 0) path = sheet.slice(0, open);
+      sheet = sheet.slice(close + 1);
+    }
   } else if ((m = at(RE_SHEETS, text, j)) && !/^\$?[A-Za-z]{1,3}\$?[0-9]{1,7}$/.test(m[1])) {
     sheet = `${m[1]}:${m[2]}`;
     j += m[0].length;
@@ -85,7 +95,7 @@ function refAt(text, i) {
   const sheets = sheet != null && sheet.includes(':') ? sheet.split(':') : null;
   if (book != null && sheet == null) return null;
   const prefix = text.slice(i, j);
-  if (sheet != null && text.startsWith('#REF!', j)) return { end: j + 5, sheet, sheets, book, prefix, area: null };
+  if (sheet != null && text.startsWith('#REF!', j)) return { end: j + 5, sheet, sheets, book, path, prefix, area: null };
   let area = null;
   let end = j;
   if ((m = at(RE_AREA, text, j))) {
@@ -116,7 +126,7 @@ function refAt(text, i) {
     }
   }
   if (!area || (end < text.length && RE_AFTER_REF.test(text[end]))) return null;
-  return { end, sheet, sheets, book, prefix, area };
+  return { end, sheet, sheets, book, path, prefix, area };
 }
 
 /** A number written in a formula, as Excel keeps it: to 15 significant digits, the rest cut off (=1234567890123456
@@ -184,6 +194,12 @@ export function tokenize(text) {
       continue;
     }
     if (ch === '[') {
+      // (A reference to another workbook, [1]Sheet1!A1, or one of its names, [1]!Rate; else a table's column.)
+      const ext = refAt(text, i);
+      if (ext) { push('ref', ext.end, ext); continue; }
+      const bm = at(RE_BOOK_NAME, text, i);
+      const id = bm && at(RE_IDENT, text, i + bm[0].length);
+      if (id) { push('name', i + bm[0].length + id[0].length, { book: bm[1], name: id[0] }); continue; }
       const end = bracketsEnd(text, i);
       if (end < 0) throw new FormulaError('A table reference is missing its closing bracket', i);
       push('struct', end, { table: null, spec: text.slice(i + 1, end - 1) });

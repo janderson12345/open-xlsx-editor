@@ -1,0 +1,2478 @@
+[
+  {
+    "name": "excel",
+    "cells": {
+      "B2": {
+        "formula": "Item",
+        "value": "Item",
+        "text": "Item",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "FFC000",
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "right": null
+        }
+      },
+      "C2": {
+        "formula": "Qty",
+        "value": "Qty",
+        "text": "Qty",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "FFC000",
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "right": null
+        }
+      },
+      "D2": {
+        "formula": "Price",
+        "value": "Price",
+        "text": "Price",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "FFC000",
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E2": {
+        "formula": "Share",
+        "value": "Share",
+        "text": "Share",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "FFC000",
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B3": {
+        "formula": "Pears",
+        "value": "Pears",
+        "text": "Pears",
+        "numFmt": "General",
+        "font": {
+          "name": "Georgia",
+          "size": 14.0,
+          "bold": false,
+          "italic": true,
+          "underline": -4142,
+          "strike": false,
+          "color": "FF0000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C3": {
+        "formula": "1234.5",
+        "value": 1234.5,
+        "text": "1,234.50",
+        "numFmt": "#,##0.00",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": 2,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4108,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "bottom": null,
+          "right": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          }
+        }
+      },
+      "D3": {
+        "formula": "3.25",
+        "value": 3.25,
+        "text": "$3.25",
+        "numFmt": "$#,##0.00",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": true,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E3": {
+        "formula": "0.125",
+        "value": 0.125,
+        "text": "12.5%",
+        "numFmt": "0.0%",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": {
+            "style": -4119,
+            "weight": 4,
+            "color": "0000FF"
+          },
+          "right": null
+        }
+      },
+      "B4": {
+        "formula": "Plums, long text",
+        "value": "Plums, long text",
+        "text": "Plums, long text",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4160,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "top": null,
+          "bottom": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "right": null
+        }
+      },
+      "C4": {
+        "formula": "45000",
+        "value": 45000.0,
+        "text": "########",
+        "numFmt": "yyyy-mm-dd",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4108,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          }
+        }
+      },
+      "D4": {
+        "formula": "4012.125",
+        "value": 4012.125,
+        "text": "4012.125",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E4": {
+        "formula": "007",
+        "value": "007",
+        "text": "007",
+        "numFmt": "@",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": {
+            "style": -4119,
+            "weight": 4,
+            "color": "0000FF"
+          },
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B5": {
+        "formula": "Merged across",
+        "value": "Merged across",
+        "text": "Merged across",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": "B5:C5",
+        "border": {
+          "left": null,
+          "top": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C5": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": "B5:C5",
+        "border": {
+          "left": null,
+          "top": {
+            "style": 1,
+            "weight": 2,
+            "color": "000000"
+          },
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D5": {
+        "formula": "Down",
+        "value": "Down",
+        "text": "Down",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": "D5:D6",
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E5": {
+        "formula": "indented",
+        "value": "indented",
+        "text": "indented",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4131,
+        "v": -4107,
+        "wrap": false,
+        "indent": 2,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B6": {
+        "formula": "-7",
+        "value": -7.0,
+        "text": "(7)",
+        "numFmt": "0;[Red](0)",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C6": {
+        "formula": "TRUE",
+        "value": true,
+        "text": "TRUE",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D6": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": "D5:D6",
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E6": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43,
+      8.43,
+      8.43
+    ],
+    "heights": [
+      15.0,
+      18.75,
+      30.75,
+      15.0,
+      15.0
+    ]
+  },
+  {
+    "name": "excel-xnum",
+    "cells": {
+      "B2": {
+        "formula": "2.71828",
+        "value": 2.71828,
+        "text": "2.718",
+        "numFmt": "0.000",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C2": {
+        "formula": "0042",
+        "value": "0042",
+        "text": "0042",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D2": {
+        "formula": "first\nsecond",
+        "value": "first\nsecond",
+        "text": "first\nsecond",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E2": {
+        "formula": "45000",
+        "value": 45000.0,
+        "text": "3/15/2023",
+        "numFmt": "m/d/yyyy",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43,
+      8.43,
+      8.43
+    ],
+    "heights": [
+      15.0
+    ]
+  },
+  {
+    "name": "sheets",
+    "cells": {
+      "B2": {
+        "formula": "Name",
+        "value": "Name",
+        "text": "Name",
+        "numFmt": "General",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "CFE2F3",
+        "h": 1,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "C2": {
+        "formula": "Amount",
+        "value": "Amount",
+        "text": "Amount",
+        "numFmt": "General",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "CFE2F3",
+        "h": -4108,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "D2": {
+        "formula": "Ok",
+        "value": "Ok",
+        "text": "Ok",
+        "numFmt": "General",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "CFE2F3",
+        "h": 1,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "B3": {
+        "formula": "Ann",
+        "value": "Ann",
+        "text": "Ann",
+        "numFmt": "General",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": false,
+          "italic": true,
+          "underline": -4142,
+          "strike": false,
+          "color": "990000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "C3": {
+        "formula": "1234.5",
+        "value": 1234.5,
+        "text": "1,234.50",
+        "numFmt": "#,##0.00",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4152,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "D3": {
+        "formula": "TRUE",
+        "value": true,
+        "text": "TRUE",
+        "numFmt": "General",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4108,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "B4": {
+        "formula": "Bo",
+        "value": "Bo",
+        "text": "Bo",
+        "numFmt": "General",
+        "font": {
+          "name": "Georgia",
+          "size": 14.0,
+          "bold": false,
+          "italic": false,
+          "underline": 2,
+          "strike": true,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "C4": {
+        "formula": "0.25",
+        "value": 0.25,
+        "text": "25%",
+        "numFmt": "0%",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4152,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      },
+      "D4": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Arial",
+          "size": 10.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": 4,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "CCCCCC"
+          }
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43,
+      8.43
+    ],
+    "heights": [
+      15.75,
+      15.75,
+      18.75
+    ]
+  },
+  {
+    "name": "browser",
+    "cells": {
+      "B2": {
+        "formula": "City",
+        "value": "City",
+        "text": "City",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": "DDEBF7",
+        "h": -4108,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "C2": {
+        "formula": "Pop.",
+        "value": "Pop.",
+        "text": "Pop.",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4108,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "B3": {
+        "formula": "Avon",
+        "value": "Avon",
+        "text": "Avon",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "C3": {
+        "formula": "12400",
+        "value": 12400.0,
+        "text": "12,400",
+        "numFmt": "#,##0",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4152,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "B4": {
+        "formula": "Brill",
+        "value": "Brill",
+        "text": "Brill",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 14.0,
+          "bold": false,
+          "italic": true,
+          "underline": -4142,
+          "strike": false,
+          "color": "008000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C4": {
+        "formula": "3.5",
+        "value": 3.5,
+        "text": "3.5",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4108,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B5": {
+        "formula": "Both columns",
+        "value": "Both columns",
+        "text": "Both columns",
+        "numFmt": "General",
+        "font": {
+          "name": "Courier New",
+          "size": 11.0,
+          "bold": "mixed",
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": "B5:C5",
+        "runs": [
+          {
+            "text": "Both ",
+            "font": {
+              "name": "Courier New",
+              "size": 11.0,
+              "bold": false,
+              "italic": false,
+              "underline": -4142,
+              "strike": false,
+              "color": "000000"
+            }
+          },
+          {
+            "text": "columns",
+            "font": {
+              "name": "Courier New",
+              "size": 11.0,
+              "bold": true,
+              "italic": false,
+              "underline": -4142,
+              "strike": false,
+              "color": "000000"
+            }
+          }
+        ],
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C5": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Courier New",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": "B5:C5",
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43
+    ],
+    "heights": [
+      15.75,
+      15.75,
+      18.75,
+      15.75
+    ]
+  },
+  {
+    "name": "word",
+    "cells": {
+      "B2": {
+        "formula": "Task",
+        "value": "Task",
+        "text": "Task",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos",
+          "size": 14.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "C2": {
+        "formula": "Hours",
+        "value": "Hours",
+        "text": "Hours",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos",
+          "size": 12.0,
+          "bold": true,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4152,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "B3": {
+        "formula": "Draft",
+        "value": "Draft",
+        "text": "Draft",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos",
+          "size": 12.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "C00000"
+        },
+        "fill": "FFFF00",
+        "h": 1,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      },
+      "C3": {
+        "formula": "2.5",
+        "value": 2.5,
+        "text": "2.5",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos",
+          "size": 12.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": -4152,
+        "v": -4108,
+        "wrap": true,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "top": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "bottom": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          },
+          "right": {
+            "style": 1,
+            "weight": -4138,
+            "color": "000000"
+          }
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43
+    ],
+    "heights": [
+      19.5,
+      16.5
+    ]
+  },
+  {
+    "name": "excel-values",
+    "cells": {
+      "B2": {
+        "formula": "Item",
+        "value": "Item",
+        "text": "Item",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C2": {
+        "formula": "Qty",
+        "value": "Qty",
+        "text": "Qty",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D2": {
+        "formula": "Price",
+        "value": "Price",
+        "text": "Price",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E2": {
+        "formula": "Share",
+        "value": "Share",
+        "text": "Share",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B3": {
+        "formula": "Pears",
+        "value": "Pears",
+        "text": "Pears",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C3": {
+        "formula": "1234.5",
+        "value": 1234.5,
+        "text": "1,234.50",
+        "numFmt": "#,##0.00",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D3": {
+        "formula": "3.25",
+        "value": 3.25,
+        "text": "$3.25 ",
+        "numFmt": "$#,##0.00_);[Red]($#,##0.00)",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E3": {
+        "formula": "0.125",
+        "value": 0.125,
+        "text": "12.50%",
+        "numFmt": "0.00%",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B4": {
+        "formula": "Plums, long text",
+        "value": "Plums, long text",
+        "text": "Plums, long text",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C4": {
+        "formula": "45000",
+        "value": 45000.0,
+        "text": "3/15/2023",
+        "numFmt": "m/d/yyyy",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D4": {
+        "formula": "4012.125",
+        "value": 4012.125,
+        "text": "4012.125",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E4": {
+        "formula": "7",
+        "value": 7.0,
+        "text": "7",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B5": {
+        "formula": "Merged across",
+        "value": "Merged across",
+        "text": "Merged across",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C5": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D5": {
+        "formula": "Down",
+        "value": "Down",
+        "text": "Down",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E5": {
+        "formula": "indented",
+        "value": "indented",
+        "text": "indented",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B6": {
+        "formula": "-7",
+        "value": -7.0,
+        "text": "-7",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C6": {
+        "formula": "TRUE",
+        "value": true,
+        "text": "TRUE",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D6": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "E6": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43,
+      8.43,
+      8.43
+    ],
+    "heights": [
+      15.0,
+      15.0,
+      15.0,
+      15.0,
+      15.0
+    ]
+  },
+  {
+    "name": "sheets-values",
+    "cells": {
+      "B2": {
+        "formula": "Name",
+        "value": "Name",
+        "text": "Name",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C2": {
+        "formula": "Amount",
+        "value": "Amount",
+        "text": "Amount",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D2": {
+        "formula": "Ok",
+        "value": "Ok",
+        "text": "Ok",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B3": {
+        "formula": "Ann",
+        "value": "Ann",
+        "text": "Ann",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C3": {
+        "formula": "1234.5",
+        "value": 1234.5,
+        "text": "1,234.50",
+        "numFmt": "#,##0.00",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D3": {
+        "formula": "TRUE",
+        "value": true,
+        "text": "TRUE",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "B4": {
+        "formula": "Bo",
+        "value": "Bo",
+        "text": "Bo",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "C4": {
+        "formula": "0.25",
+        "value": 0.25,
+        "text": "25%",
+        "numFmt": "0%",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      },
+      "D4": {
+        "formula": "",
+        "value": null,
+        "text": "",
+        "numFmt": "General",
+        "font": {
+          "name": "Aptos Narrow",
+          "size": 11.0,
+          "bold": false,
+          "italic": false,
+          "underline": -4142,
+          "strike": false,
+          "color": "000000"
+        },
+        "fill": null,
+        "h": 1,
+        "v": -4107,
+        "wrap": false,
+        "indent": 0,
+        "merge": null,
+        "border": {
+          "left": null,
+          "top": null,
+          "bottom": null,
+          "right": null
+        }
+      }
+    },
+    "widths": [
+      8.43,
+      8.43,
+      8.43
+    ],
+    "heights": [
+      15.0,
+      15.0,
+      15.0
+    ]
+  }
+]

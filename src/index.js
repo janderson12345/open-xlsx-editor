@@ -50,6 +50,7 @@ import { namesOnSheet } from './ooxml/names.js';
 import { AgentWorkbook } from './agent.js';
 import { createFiles } from './editor/files.js';
 import { setLocale, currentLocale, browserLocale } from './ooxml/locale.js';
+import { offerBook, openBook } from './editor/pagebooks.js';
 
 export { Workbook };
 export { openWorkbook } from './agent.js';
@@ -350,6 +351,8 @@ export function mountXlsxEditor(host, options = {}) {
       }
       // (Its name, for CELL("address") of another sheet: [name]Sheet!$A$1, as Excel gives it.)
       wb.fileName = fileName;
+      // (The other editors' workbooks on the page, by file name, for links to them: editor/pagebooks.js.)
+      wb.openBook = openBook;
       // (Formulas saved without a result, as some programs save them, worked out now, as Excel does on opening.)
       if (options.calculateOnOpen !== false) wb.calculateMissing();
       const i = wb.activeSheet;
@@ -496,11 +499,13 @@ export function mountXlsxEditor(host, options = {}) {
       menu.close();
       state.ribbon?.destroy();
       state.editing?.destroy();
+      unoffer();
       state.grid?.destroy();
       dropSheet(root);
       root.remove();
     },
   };
+  const unoffer = offerBook({ workbook: () => state.workbook, fileName: () => state.fileName });
   const beforePrint = () => api.preparePrint();
   window.addEventListener('beforeprint', beforePrint);
   // (A web font the page serves, a metric twin among them (fonts.js), arrives after the first drawing: the cells are

@@ -7,6 +7,7 @@ import { spanSheetRefs, mapRefs } from '../calc/tokens.js';
 import { FUNCTIONS } from '../calc/functions.js';
 import { topLevelHyperlink } from '../calc/hyperlinkcell.js';
 import { currentLocale } from './locale.js';
+import { bookIndexes, cacheRefs } from './extlinks.js';
 
 /** A typed formula's 3D references as Excel takes them (measured): in the workbook's order, Apr:Jan!A1 as Jan:Apr!A1,
  *  and one sheet's, Jan:Jan!A1, as Jan!A1; the sheets named as the workbook names them. */
@@ -47,7 +48,11 @@ export function entryChanges(wb, si, r, c, text, today = new Date(), locale = cu
   const code = formatCodeOf(wb.styles, s);
   const parsed = parseInput(text, { today, date1904: wb.date1904, asText: code === '@', locale });
   if (parsed.error) return { error: parsed.error };
-  const content = parsed.formula != null ? { r, c, formula: namesAsWritten(wb, si, inOrder(wb, parsed.formula)), ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
+  // (Another workbook typed by its file's name, [Book.xlsx]Sheet1!A1: its link's number, the link made if there is
+  // none, and the cells it reads kept from that workbook when it is open here; extlinks.js.)
+  const linked = parsed.formula != null && parsed.formula.includes('[') ? bookIndexes(wb, parsed.formula) : parsed.formula;
+  if (linked !== parsed.formula) cacheRefs(wb, linked);
+  const content = parsed.formula != null ? { r, c, formula: namesAsWritten(wb, si, inOrder(wb, linked)), ...(parsed.legacy ? { legacy: true } : {}) } : { r, c, value: parsed.value };
   const format = formatAfterEntry(code, parsed);
   // (HYPERLINK at a formula's top level, typed into a cell of the Normal style: the Hyperlink style, as Excel gives it.)
   if (!format && content.formula != null && wb.styles.cellXfs[s]?.xfId === 0 && topLevelHyperlink(content.formula)) return { content, style: { r, c, s: wb.styleWith(s, { style: 'Hyperlink' }) }, parsed };

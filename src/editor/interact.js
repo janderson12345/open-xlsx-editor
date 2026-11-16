@@ -13,6 +13,7 @@ import { announce } from './live.js';
 import { refName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
+import { bookNames } from '../ooxml/extlinks.js';
 import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { contentsHidden } from '../ooxml/protection.js';
@@ -163,8 +164,10 @@ export function attachEditing(root, ctx) {
   /** A cell's text as Excel's formula bar has it (a date as a date, a percentage as one). */
   // (An old formula with the @s Excel 365 shows where it cuts a range to one value, at its cell: calc/legacyat.js.)
   // (A hidden cell of a protected sheet shows nothing there, as in Excel: ooxml/protection.js contentsHidden.)
-  const barText = (cell, r, c) => (contentsHidden(ctx.workbook(), ctx.sheetIndex(), r, c) ? '' : editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
-    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown)));
+  // (Another workbook's references with its file's name, [Book.xlsx]Sheet1!A1, as typed: ooxml/extlinks.js.)
+  const barText = (cell, r, c) => (contentsHidden(ctx.workbook(), ctx.sheetIndex(), r, c) ? '' : withBooks(editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
+    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown))));
+  const withBooks = (text) => (typeof text === 'string' && text.startsWith('=') && text.includes('[') ? `=${bookNames(ctx.workbook(), text.slice(1))}` : text);
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
     // (The selection's name when it has one, as Excel reports it for the selection: goto.js selectionName.)
@@ -473,14 +476,16 @@ export function attachEditing(root, ctx) {
     /** Format Painter's copy: the selection kept, outlined, as Copy keeps it but leaving the system clipboard
      *  alone. False if it couldn't be copied. */
     pickFormats() { return clipboard.takeClip(false) != null; },
-    /** The ribbon's Paste: the system clipboard's text if the browser lets it be read, else what was copied here. */
-    async pasteIn() {
-      let text = null;
-      try { text = await navigator.clipboard.readText(); } catch { /* not allowed: what was copied here */ }
+    /** The ribbon's Paste: the system clipboard's HTML or text if the browser lets it be read, else what was copied
+     *  here; `opts.widths` for Keep Source Column Widths. */
+    async pasteIn(opts = {}) {
+      const { text, html } = await clipboard.readSystem();
       if (text == null && !cmd.selection) return;
-      if (!clipboard.pasteText(text) && text == null) announce('Use Ctrl+V to paste from another program');
+      if (!clipboard.pasteText(text, html, opts) && text == null) announce('Use Ctrl+V to paste from another program');
       view.focus({ preventScroll: true });
     },
+    /** The system clipboard's text and HTML, where the page may read them (clipevents.js readSystem). */
+    readClipboard: () => clipboard.readSystem(),
     editor,
     bar,
     /** Whether focus should stay where a formula is typed when a sheet tab is pressed (the formula goes on there). */

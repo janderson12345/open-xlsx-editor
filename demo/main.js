@@ -14,6 +14,8 @@ const people = [{ name: 'Avery Chen', userId: 'avery.chen@example.com' }, { name
 const editor = mountXlsxEditor(host, { people, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
   ...(params.get('locale') ? { locale: params.get('locale') } : {}) });
 window.oxe = editor;
+// (For the browser tests: a second editor on the page, as two workbooks open at once; test/editing-clip.mjs.)
+window.mountXlsxEditor = mountXlsxEditor;
 
 async function openFile(file) {
   try {

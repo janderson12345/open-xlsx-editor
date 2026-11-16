@@ -101,7 +101,8 @@ export function parseFormula(text) {
         if (t.sheets) ref.sheets = t.sheets;
         return t.spill ? { k: 'fn', name: 'ANCHORARRAY', args: [ref] } : ref;
       }
-      case 'name': return { k: 'name', name: t.text };
+      // (An external workbook's name, [1]!Rate: its book and the name alone.)
+      case 'name': return t.book != null ? { k: 'name', name: t.name, book: t.book } : { k: 'name', name: t.text };
       case 'struct': return { k: 'struct', table: t.table, spec: t.spec, src: t.text };
       case 'func': return { k: 'fn', name: functionName(t.text), args: argList() };
       case 'punct':

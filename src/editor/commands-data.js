@@ -4,6 +4,8 @@ import { readTables } from '../ooxml/tables.js';
 import { applyTableFilter } from '../ooxml/tablefilter.js';
 import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
+import { pasteHtml } from '../ooxml/cliphtml.js';
+import { linkCopy } from '../ooxml/extlinks.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { setSortState } from '../ooxml/sortstate.js';
@@ -45,6 +47,13 @@ export function dataCommands(env) {
     ctx.changed?.();
     return true;
   }
+  /** The cells copied in an editor on this page (this one, or another: pagebooks.js keeps the last copy) that `text`,
+   *  the system clipboard's, is the text of; with no text to go by, the last copy made. */
+  function copyFor(text) {
+    const last = ctx.sharedClip?.() || null;
+    if (text == null || !text) return last || state.clip;
+    return [last, state.clip].find((c) => c && c.text === text) || null;
+  }
   return {
     /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
      *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
@@ -59,6 +68,7 @@ export function dataCommands(env) {
     /** Let the copy or cut go (Esc): its outline goes. */
     dropClip() {
       if (!state.clip) return false;
+      ctx.dropShared?.(state.clip);
       state.clip = null;
       ctx.clipShown?.(null);
       return true;
@@ -66,14 +76,29 @@ export function dataCommands(env) {
     /** Paste (Ctrl+V) at the selection: the cells copied or cut here, or, when `text` from the system clipboard isn't
      *  what was copied here, that text read cell by cell as if typed. A paste of a cut moves the cells and lets the cut
      *  go. The pasted cells are selected. */
-    paste(text = null) {
+    paste(text = null, html = null, { widths = false } = {}) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
-      const mine = state.clip && (text == null || text === state.clip.text || !text) && (!state.clip.cut || state.clip.wb === wb);
-      const steps = mine ? (state.clip.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, state.clip) : text ? clip.pasteText(wb, si, state.sel, text) : null;
-      if (!steps || !withNotes(steps, mine ? state.clip : null)) return false;
-      if (mine && state.clip.cut) commands.dropClip();
+      const copy = copyFor(text);
+      const mine = copy && (!copy.cut || copy.wb === wb);
+      // (From another program: its HTML with the formats, as Excel pastes it (cliphtml.js), else its text as typed.)
+      const steps = mine ? (copy.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, copy)
+        : html ? pasteHtml(wb, si, state.sel, html, { widths }) || (text ? clip.pasteText(wb, si, state.sel, text) : null)
+          : text ? clip.pasteText(wb, si, state.sel, text) : null;
+      if (!steps) return false;
+      const sizes = widths && (mine ? clip.pasteWidths(state.sel, copy) : steps[0].widths || []);
+      if (sizes?.length) {
+        // (Keep Source Column Widths: the cells and the widths as one step of the history.)
+        const before = wb.snapshot();
+        if (!withNotes(steps, mine ? copy : null)) return false;
+        for (const { c, width } of sizes) wb.setLines(si, 'col', c, c, { width });
+        state.undo.pop();
+        state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+        ctx.reloaded?.();
+        ctx.changed?.();
+      } else if (!withNotes(steps, mine ? copy : null)) return false;
+      if (mine && copy.cut) commands.dropClip();
       const area = steps.find((x) => x.si === si)?.area;
       if (area) show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted, ');
       return true;
@@ -81,9 +106,18 @@ export function dataCommands(env) {
     /** Paste Special (Ctrl+Alt+V) of the cells copied here at the selection (clipops.js pasteSpecial: `paste`, `op`,
      *  `skip`, `transpose`; Column widths, `paste` 'widths'), or Paste Link (`link`), as one step of the history. The
      *  copy stays to be pasted again, as in Excel. Not for cells cut, nor for text from another program. */
-    pasteSpecial({ paste = 'all', op = null, skip = false, transpose = false, link = false } = {}) {
+    pasteSpecial({ paste = 'all', op = null, skip = false, transpose = false, link = false, text = undefined } = {}) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
-      const copy = state.clip;
+      // (The system clipboard's text, when it could be read: another program's cells pasted as values are that text
+      // typed in, as Excel's Paste Values pastes them (measured: no formats, the HTML left aside).)
+      const copy = text === undefined ? (ctx.sharedClip?.() || state.clip) : copyFor(text);
+      if (!copy && text && paste === 'values' && !link && !op) {
+        const steps = clip.pasteText(ctx.workbook(), ctx.sheetIndex(), state.sel, text);
+        if (!runSteps(steps)) return false;
+        const area = steps[0].area;
+        show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted values, ');
+        return true;
+      }
       if (!copy) { ctx.announce('Copy cells first: Paste Special pastes cells copied in this workbook or another one open here'); return false; }
       if (copy.cut) { ctx.announce("Paste Special isn't available for cells that were cut: paste them, or copy them instead"); return false; }
       const wb = ctx.workbook();
@@ -92,7 +126,21 @@ export function dataCommands(env) {
         const widths = clip.pasteWidths(state.sel, copy);
         return sizeStep((book, k) => { for (const { c, width } of widths) book.setLines(k, 'col', c, c, { width }); }, 'Pasted column widths');
       }
-      if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
+      if (link && copy.wb !== wb) {
+        // (Another workbook's cells: a link to it, its copied values kept (extlinks.js), and formulas naming it, as
+        // one step of the history with the link's part.)
+        const before = wb.snapshot();
+        const book = linkCopy(wb, copy, copy.wb.fileName || 'Book1.xlsx');
+        const steps = clip.pasteLink(wb, si, state.sel, copy, { book });
+        if (!runSteps(steps)) { wb.restore(before); return false; }
+        state.undo.pop();
+        state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+        ctx.reloaded?.();
+        ctx.changed?.();
+        const area = steps[0].area;
+        show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted links, ');
+        return true;
+      }
       // (All using Source theme and All merging conditional formats paste the cells as All does: within one workbook
       // the theme is the same; the second leaves the rules already over the pasted cells.)
       const cells = paste === 'theme' || paste === 'merging' ? 'all' : paste;

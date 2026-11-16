@@ -11,6 +11,7 @@ import { cellInfo } from './cellinfo.js';
 import { pivotData } from '../ooxml/pivotdata.js';
 import { calcMode, compatVersion } from '../ooxml/calcmode.js';
 import { contentsHidden } from '../ooxml/protection.js';
+import { externalValue, externalNameFormula, linkOf } from '../ooxml/extlinks.js';
 
 const key = (si, r, c) => `${si}:${r}:${c}`;
 /** References wider than this many columns are checked against every change instead of being indexed by column. */
@@ -73,7 +74,8 @@ export class Calc {
       if (!n) return;
       switch (n.k) {
         case 'ref': {
-          if (n.book != null) { e.unsupported = true; return; }
+          // (Another workbook's cells: read from the link's values, which change only when it is updated.)
+          if (n.book != null) { if (!linkOf(this.book, n.book)) e.unsupported = true; return; }
           // (A 3D reference reads each sheet from its first to its last.)
           if (n.sheets) {
             const [s0, s1] = n.sheets.map((s) => this.book.sheetIndexOf(s));
@@ -90,6 +92,7 @@ export class Calc {
           return;
         }
         case 'name': {
+          if (n.book != null) { if (!linkOf(this.book, n.book)) e.unsupported = true; return; }
           const t = this.nameTree(n.name, si);
           if (t && !seen.has(n.name.toUpperCase())) { seen.add(n.name.toUpperCase()); walk(t); }
           return;
@@ -317,6 +320,12 @@ export class Calc {
         return t ? evaluate(t, ctx, mode) : E.name;
       },
       hasName: (name) => !!this.nameTree(name, e.si),
+      external: (b, sheet, area) => (book.pkg ? externalValue(book, b, sheet, area) : undefined),
+      externalName: (b, name, mode) => {
+        const text = book.pkg ? externalNameFormula(book, b, name) : null;
+        if (text == null) return book.pkg && linkOf(book, b) ? E.ref : undefined;
+        return evaluate(parseFormula(text), ctx, mode);
+      },
     };
     return ctx;
   }

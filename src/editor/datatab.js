@@ -1,5 +1,6 @@
 // The Data tab, Excel's groups in Excel's order as far as they are here: Queries & Connections (Refresh All, its
-// menu Refresh All and Refresh: the workbook's PivotTables, or the one at the active cell, pivot.js) and Sort & Filter
+// menu Refresh All and Refresh: the workbook's PivotTables, or the one at the active cell, pivot.js; Edit Links, the
+// links to other workbooks, linksbox.js) and Sort & Filter
 // (Sort A to Z, Sort Z to A, Sort..., Filter, Clear, Reapply: the commands Home > Editing's menu runs too) and Data
 // Tools (Data Validation..., dvedit.js; Circle Invalid Data, dvcircles.js) and Outline (Group, Ungroup, Subtotal, Show
 // and Hide Detail, Settings: commands-outline.js, acts-outline.js).
@@ -12,7 +13,8 @@ export function dataTab(kit, { act }) {
     // (Get & Transform Data: a text file through the Text Import box, put at the active cell: files.js.)
     grp('Get & Transform Data', btn('🗎', 'From Text/CSV', f('fromTextBox'), { label: 'From Text/CSV', big: true })),
     grp('Queries & Connections', split('⟳', 'Refresh All (Ctrl+Alt+F5)', f('refreshPivots', true), () => [
-      item('Refresh All', f('refreshPivots', true), { hint: 'Ctrl+Alt+F5' }), item('Refresh', f('refreshPivots', false), { hint: 'Alt+F5' })], { label: 'Refresh All', big: true })),
+      item('Refresh All', f('refreshPivots', true), { hint: 'Ctrl+Alt+F5' }), item('Refresh', f('refreshPivots', false), { hint: 'Alt+F5' })], { label: 'Refresh All', big: true }),
+      btn('🔗', 'Edit Links', f('editLinks'), { label: 'Edit Links' })),
     grp('Sort & Filter',
       col(btn('A↓', 'Sort A to Z', f('sortAsc')), btn('Z↓', 'Sort Z to A', f('sortDesc'))),
       btn('⇅', 'Sort...', f('sortBox'), { label: 'Sort', big: true }),

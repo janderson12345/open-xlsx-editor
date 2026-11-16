@@ -12,8 +12,10 @@ with the same formulas and values.
 - What was copied or cut is outlined (a moving dashed line, still when the system asks for less motion) until it is
   pasted (a cut) or let go: Esc, typing in a cell, or a change to the sheets.
 - The system clipboard gets the cells' text as shown, tabs between cells and a line for each row, as Excel puts it,
-  so it pastes into other programs. Pasting it back here pastes the cells themselves (formulas, formats, merged
-  ranges); any other text is read cell by cell as if typed there (`=` starts a formula, `50%` is 0.5).
+  so it pastes into other programs. Pasting it back here, or into another editor on the same page, pastes the cells
+  themselves (formulas, formats, merged ranges). Another program's cells come with their formats, from the HTML it
+  puts on the clipboard (below); plain text is read cell by cell as if typed there (`=` starts a formula, `50%` is
+  0.5; a cell in quotes, as Excel's own copy writes one with a line break, loses its quotes, as Excel reads it).
 - A paste is one step of the undo history, whatever sheets it changed.
 - Browsers send no copy or paste event to a sheet with no text selected, so the keys take the cells themselves; the
   system clipboard is then read and written through the async clipboard, where the page may use it.
@@ -41,8 +43,8 @@ opened in Excel (`excel-readback.ps1`), 30 of 30 read back as Excel made them.
 
 - Ctrl+Alt+V, Home > Paste ▾ > Paste Special..., or a cell's right-click menu: Excel's box (Paste, Operation, Skip
   blanks, Transpose, Paste Link). Paste ▾ also has Formulas, Values, Formatting, Transpose and Paste Link at once.
-- For cells copied in the editor (from this workbook or another open here; formats only within one workbook). Not
-  after a cut, as in Excel; not for text from another program.
+- For cells copied in an editor (this workbook, or another open in an editor on the page; formats only within one
+  workbook). Not after a cut, as in Excel; for text from another program, Values alone (below).
 - One step of the undo history; the copy stays to be pasted again.
 
 | Rule | Seen |
@@ -57,6 +59,7 @@ opened in Excel (`excel-readback.ps1`), 30 of 30 read back as Excel made them.
 | Transpose: rows become columns. A reference to a cell of the copy, $ or not, follows that cell to where it went; one outside keeps its $ parts and its relative parts turn with the copy. | A1:C3 to E1: B2 `=$A$1+B1` is F2 `=$E$1+E2`; B3 `=SUM(A1:B1)` is G2 `=SUM(E1:E2)`; B2 `=B1+D9` is F2 `=E2+M4`; `=$D$9+1` stays. |
 | A selection that is a whole number of copies takes the copy that many times, as Paste does. | A1:C3 values onto E10:G15: twice. |
 | Paste Link: a formula for each cell reading the copied cell as far from the copy's top-left, relative; for one cell, absolute. Over a whole number of copies, the links carry on across the selection rather than repeating. Cells in the General format take the number format of the copy's first cell. | A1:C3 to E1: `=A1` ... `=C3`, each 0.00 as A1. A1 to E5: `=$A$1`. B1:C1 onto E5:H6: `=B1` to `=E2`. |
+| Paste Link of cells copied in another workbook: the same formulas naming it and the sheet, the workbook as a link of its own (docs/LINKS.md), its copied values kept there. | A1:C2 of oxesrc.xlsx to D4: `=[1]Sheet1!A1` ... `=[1]Sheet1!C2` (shown `=[oxesrc.xlsx]Sheet1!A1`); B1 to A1: `=[1]Sheet1!$B$1`; Data Two's A1: `='[1]Data Two'!$A$1`; a blank copied cell reads 0. |
 
 Not measured: an operation with a TRUE or FALSE constant (left as it is here, as text is), Transpose of a reference
 whose $ is on one part only (each part turned as above), column widths onto columns that had their own width (they
@@ -142,8 +145,41 @@ among them; within one workbook the first pastes as All does (its theme is the s
 
 Not yet: a data bar only partly cut stays as it was (not measured); a 2010 icon set partly cut too.
 
+## Pasting from other programs (measured)
+
+Excel, Word, Google Sheets and browsers put HTML on the clipboard beside the text, and a paste here reads it
+(`src/ooxml/htmltable.js` reads the table and works out each cell's CSS; `src/ooxml/cliphtml.js` makes cell formats of
+it). Measured by having a hidden Excel paste made-up tables in each program's form: the HTML and its text put on the
+clipboard as CF_HTML, `Worksheet.Paste` at B2, and each cell read back (font, colour, fill, borders, alignment,
+wrapping, indent, number format, merged area, rich text runs), with the column widths and row heights
+(`tools/excel-compare/excel-clip-paste.ps1` on `clip-html-cases.json`, from `clip-html-cases.mjs`, giving
+`test/clip-html-excel.json`; the HTML of Excel's own copy seen with `excel-clip-html.ps1`). `test/cliphtml.test.js`
+pastes the same HTML here: 7 cases, 74 of 74 cells as Excel's.
+
+| Excel's rule | Excel's example |
+|---|---|
+| The cell's CSS gives its format: the style block's rules (`td`, `.xl63`, `p.MsoNormal`), then the cell's own style; what the table, the row and the elements around all of its text (`<b>`, `<s>`, `<span>`) give pass down. | Excel's `.xl63 {font-weight:700; background:#FFC000}`: bold on orange. Word's `p.MsoNormal {font-family:Aptos; font-size:12pt}` with `<b><span style='font-size:14.0pt'>`: Aptos 14, bold. `<s>$3.25</s>`: struck through. |
+| Text partly formatted is rich text. | `Both <span style="font-weight:700">columns</span>`: "Both " plain, "columns" bold. |
+| A `th` is bold and centred; a cell without `vertical-align` is centred top to bottom; text wraps unless `white-space` says `nowrap`. | A web page's `<th>City</th>`: bold, centred. Google Sheets' and Word's cells: wrapped. Excel's own (its `td` rule says nowrap): not. |
+| `align` and `valign` attributes count for nothing; only CSS does. | Excel's `<td align=right>` under `text-align:general`: General. Word's `valign=top` with no CSS: centred. |
+| Colours: `#RGB`, `#RRGGBB`, `rgb()`, names; black and `windowtext` are the automatic colour; a `<font color>` with `mso-ignore:color` is let go. | `rgb(221, 235, 247)`: DDEBF7. `background:yellow`: FFFF00. Excel's red `(7)`, `<font color="#FF0000" style='mso-ignore:color'>`: black. |
+| Sizes: points as given; pixels at 96 an inch, to whole points. | `14.0pt`: 14. `18px`: 14. |
+| Borders by their width: .5pt thin, 1px to 1pt medium, 1.5pt and up thick; `double` double. | Excel's `.5pt solid windowtext`: thin. Sheets' `1px solid #cccccc`: medium, CCCCCC. `2px solid #000000`: thick. `2.0pt double blue`: double, blue. |
+| The number format: Excel's `mso-number-format` (its CSS escapes undone; Standard is `#,##0.00`, Short Date `m/d/yyyy`), Google Sheets' `data-sheets-numberformat`; else the format typing the text gives. | Excel's escaped `"$"#,##0.00` for $3.25: that format. "12,400" from a web page: 12400 in `#,##0`. |
+| The value: Excel's `x:num`, Sheets' `data-sheets-value`; else the text as typed; text in the `@` format stays text. | `x:num="2.71828"` shown 2.718: 2.71828. `007` in `@`: the text 007. `(7)`: -7. |
+| `colspan` and `rowspan` merge; `<br>` is a line break in the cell; spaces and line breaks in the HTML run together. | `<td colspan=2>`: B5:C5 merged. `first<br>second`: two lines. `Plums,` and `long text` on two lines of HTML: "Plums, long text". |
+| The formats replace the cells' own. Column widths stay; rows fit their text as typed ones do. | Excel's copy with columns 20 and 12 wide: 8.43 everywhere. |
+| Paste Values (Paste Special as text): the text alone, typed in. | "12.5%": 0.125 in 0.00%, no fill or font. |
+
+Here Home > Paste ▾ > Keep Source Column Widths pastes the cells with the table's `<col>` widths (px = chars × 7 + 5;
+*not measured*: Excel's own Keep Source Column Widths isn't reached over COM). Paste ▾ > Values, with another program's
+cells on the clipboard, pastes their text as Excel's Paste Values does, when the browser lets the page read it.
+
+Not measured: a formula's text in the HTML (typed here, so `=A1` is a formula), Google Sheets' formulas
+(`data-sheets-formula`, left aside here), pictures and links in the HTML (left out), a row's background rather than
+its cells' (left out), and a ragged table's missing cells (left as they were).
+
 ## Not yet
 
-Paste
-Link to another workbook; Paste Special of text or HTML from another program; the Format Painter, pasting the formats of another
-program's cells (only its text is read).
+The Format Painter's formats going to another program; this editor's own copy putting HTML on the clipboard (other
+programs get its text only); Excel's paste options button (Keep Source Formatting, Match Destination Formatting).
