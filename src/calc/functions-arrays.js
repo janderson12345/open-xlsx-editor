@@ -127,9 +127,12 @@ def('TEXTSPLIT', (a, ctx) => {
 const asText = (v, strict) => (typeof v === 'string' ? (strict ? `"${v.replace(/"/g, '""')}"` : v) : v == null || v === MISSING ? '' : toText(v));
 def('VALUETOTEXT', (a, ctx) => asText(scalar(a[0], ctx), given(a[1]) && whole(a[1], ctx) === 1));
 def('ARRAYTOTEXT', (a, ctx) => {
-  const m = rowsOf(a[0], ctx);
+  // (An error alone is that error; in an array, its text: ARRAYTOTEXT({1,#N/A}) is "1, #N/A", measured.)
+  if (a[0] instanceof XlError) throw a[0];
+  const m = rowsOf(a[0], ctx).map((row) => row.map((v) => (v instanceof XlError ? { err: v.code } : v)));
   const strict = given(a[1]) && whole(a[1], ctx) === 1;
-  return strict ? `{${m.map((row) => row.map((v) => asText(v, true)).join(',')).join(';')}}` : m.flat().map((v) => asText(v, false)).join(', ');
+  const one = (v, s) => (v?.err ? v.err : asText(v, s));
+  return strict ? `{${m.map((row) => row.map((v) => one(v, true)).join(',')).join(';')}}` : m.flat().map((v) => one(v, false)).join(', ');
 }, ARRAY);
 
 // ---- A LAMBDA called over arrays
