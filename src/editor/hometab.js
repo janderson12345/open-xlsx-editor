@@ -1,5 +1,6 @@
 // The Home tab, Excel's groups in Excel's order: Undo, Font, Alignment, Number, Cells, Editing. Every control runs a
 // named command (commands.js, through `act`); update() sets the controls from the active cell, as Excel's do.
+import { tableGallery } from './tablegallery.js';
 import { CF_GALLERY } from '../ooxml/cfedit.js';
 import { el } from './ribbonkit.js';
 import { STANDARD_COLORS, THEME_COLORS } from './sheetmenu.js';
@@ -39,7 +40,7 @@ export const TINTS = {
 const pct = (t) => `${t > 0 ? 'Lighter' : 'Darker'} ${Math.round(Math.abs(t) * 100)}%`;
 
 /** The Home tab. `act(name, ...args)` runs a command; `color(c)` resolves a colour for a swatch. */
-export function homeTab(kit, { act, color }) {
+export function homeTab(kit, { act, color, workbook = () => null }) {
   const { btn, toggle, grp, col, line, item, menu, split, pick, closeMenu, openMenu, run } = kit;
   const f = (name, ...args) => () => act(name, ...args);
 
@@ -134,7 +135,9 @@ export function homeTab(kit, { act, color }) {
       el('div', { class: 'oxe-cap' }, 'Icon Sets'), ...ICON_MENU.map(([set, label]) => item(label, f('cfAdd', 'iconSet', set))), el('hr'),
       el('div', { class: 'oxe-cap' }, 'Color Scales'), ...CF_GALLERY.map(([name], k) => item(`${name} Color Scale`, f('cfAdd', 'gallery', k))), el('hr'),
       item('New Rule...', f('cfNewRule')), item('Clear Rules from Selected Cells', f('cfClear', 'selection')), item('Clear Rules from Entire Sheet', f('cfClear', 'sheet')), item('Manage Rules...', f('cfManager'))],
-      { label: 'Conditional Formatting', big: true })),
+      { label: 'Conditional Formatting', big: true }),
+      // (Format as Table: Excel's gallery, the selection made a table in the style picked; acts-tables.js.)
+      menu('▤', 'Format as Table', () => [el('div', { class: 'oxe-tstyle-menu' }, ...tableGallery(kit, { wb: workbook(), onPick: (n) => act('formatAsTable', n) }))], { label: 'Format as Table', big: true })),
     grp('Cells', col(
       sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Cells...', f('insertCells'), { hint: 'Ctrl++' }), item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),
         item('Insert Sheet', f('insertSheet'), { hint: 'Shift+F11' })]),

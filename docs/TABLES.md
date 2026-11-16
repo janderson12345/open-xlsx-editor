@@ -86,6 +86,26 @@ compares: 33 of 33 the same table parts (uids aside), cells and formulas, and af
   references to the table made absolute ranges with the sheet's name (`SUM(Sheet1!$D$3:$D$7)`), the total row's too;
   the part, its relationship and content type gone.
 
+## In the editor
+
+- **Insert > Table**, **Ctrl+T** and **Ctrl+L** open Create Table: "Where is the data for your table?" filled with the
+  selection, or with one cell the data round it (its current region), as `=$B$2:$E$7`, and "My table has headers"
+  ticked when the first row is text over a row that isn't (a guess of ours: Excel's own guess is measured only for a
+  first row of numbers, which it takes for data). The table is made in the workbook's default style.
+- **Home > Format as Table** opens the style gallery; outside a table, Create Table, then the table in the style
+  picked; inside one, the style given to it.
+- **Table Design** (shown while the active cell is in a table): Table Name (Enter or leaving the box; refused in
+  Excel's words), Resize Table (its box, with Excel's note and refusal), Convert to Range (after Excel's question),
+  Header Row, Total Row, Banded Rows, First Column, Last Column, Banded Columns, Filter Button, and the gallery with
+  Clear. Each is one step of the history.
+- A total cell shows a drop-down button, as a validation list does (Alt+Down too): None, Average, Count, Count
+  Numbers, Max, Min, Sum, StdDev, Var.
+- A table's filter buttons sort and filter it as the sheet's AutoFilter does (docs/FILTER.md); the filter is kept in
+  the table's part, its sort too (docs/SORT.md).
+- Typing a header renames its column, a total cell its label or custom total, a cell just below a table makes it a
+  row longer: one step of the history with the typing.
+- Tested in the browser: `test/table-tab.mjs`.
+
 ## Against Excel's PDF
 
 `test/fixtures/tables.xlsx` (`test/fixtures/tables.mjs`) has a table in each built-in style with the options in turn,

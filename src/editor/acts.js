@@ -1,12 +1,15 @@
 // The ribbon's actions and the boxes and menus they open (index.js shares the editor's state and helpers with them as
 // one object): the act dispatcher, Insert and Delete, Paste Special, Sort and its warning, the validation question and
 // message, a list's choices, a filter's list, the cell's and the headings' menus, Row Height and Column Width.
+import { readTables } from '../ooxml/tables.js';
+import { tableAt } from '../ooxml/tableedit.js';
 import { messageBox, numberBox, optionsBox, goToBox, noteBox } from './dialogs.js';
 import { protectionRefusal } from '../ooxml/protection.js';
 import { hyperlinkAt } from '../ooxml/links.js';
 import { formulaLink } from '../calc/hyperlinkcell.js';
 import { createMoreActs } from './acts-more.js';
 import { createSparklineActs } from './acts-sparklines.js';
+import { createTableActs } from './acts-tables.js';
 import { borderDrawing, DRAW_ACTS } from './drawborders.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
@@ -37,6 +40,9 @@ const PASTE_CHOICES = { All: 'all', Formulas: 'formulas', Values: 'values', Form
 const OPERATIONS = { None: null, Add: 'add', Subtract: 'subtract', Multiply: 'multiply', Divide: 'divide' };
 
 /** The actions: `env` is mountXlsxEditor's shared state and helpers (index.js). Returns each by name. */
+/** Whether (r, c) of sheet si is a cell of a table's total row. */
+const totalCellAt = (wb, si, r, c) => { const t = tableAt(wb, si, r, c); return !!t && !!t.totals && r === t.r1; };
+
 export function createActs(env) {
   const { root, state, options, editing, menu, sheetActs, allowed, followLink } = env;
   /** Format Painter: the selection's formats copied (outlined as a copy is), then given to the next cells selected by
@@ -76,6 +82,7 @@ export function createActs(env) {
   const drawing = borderDrawing(env);
   let more = null;
   let sparks = null;
+  let tables = null;
   const moreAct = (name, args, i) => (more ??= createMoreActs({ ...env, act }))(name, args, i);
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
@@ -88,6 +95,8 @@ export function createActs(env) {
     const i = state.sheetIndex;
     // (Insert > Sparklines and the Sparkline tab: acts-sparklines.js.)
     if (name.startsWith('sparkline')) return (sparks ??= createSparklineActs({ ...env, act }))(name, args);
+    // (Insert > Table, Format as Table and the Table Design tab: acts-tables.js.)
+    if (name.startsWith('table') || name === 'formatAsTable') return (tables ??= createTableActs({ ...env, act }))(name, args);
     // (Charts, comments, Format Cells and conditional formatting: acts-more.js.)
     const more = moreAct(name, args, i);
     if (more !== undefined) return more;
@@ -320,7 +329,9 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     const s = editing().selection;
     const rule = ruleAt(state.workbook.sheet(state.sheetIndex), s.ar, s.ac);
     const prompt = rule && rule.showPrompt && (rule.promptTitle || rule.prompt) ? { title: rule.promptTitle, text: rule.prompt } : null;
-    state.grid.setValidation(rule ? { r: s.ar, c: s.ac, list: rule.type === 'list' && rule.dropDown && !state.readOnly, prompt } : null);
+    // (A table's total cell: its drop-down of functions, acts-tables.js tableTotalMenu.)
+    const total = !rule && !state.readOnly && totalCellAt(state.workbook, state.sheetIndex, s.ar, s.ac);
+    state.grid.setValidation(rule ? { r: s.ar, c: s.ac, list: rule.type === 'list' && rule.dropDown && !state.readOnly, prompt } : total ? { r: s.ar, c: s.ac, list: true } : null);
     return prompt ? `, ${[prompt.title, prompt.text].filter(Boolean).join(': ')}` : '';
   };
   /** A list's choices for the active cell (Alt+Down, or its button): picked, it is entered as if typed. */
@@ -328,6 +339,7 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     const s = editing().selection;
     const wb = state.workbook;
     const rule = ruleAt(wb.sheet(state.sheetIndex), s.ar, s.ac);
+    if (!rule && totalCellAt(wb, state.sheetIndex, s.ar, s.ac)) return act('tableTotalMenu', rect);
     if (!rule || rule.type !== 'list' || !rule.dropDown || state.readOnly) return false;
     const { items } = listItems(wb, state.sheetIndex, rule, s.ar, s.ac);
     const at = rect || (state.grid.el.querySelector('.oxe-dv-btn') || state.grid.el).getBoundingClientRect();
@@ -339,10 +351,11 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
   };
   /** A filter button's list for column c (dialogs.js filterBox), opened under `rect`: its sort, Clear Filter From, or
    *  the values ticked. */
-  const openFilter = async (c, rect) => {
+  const openFilter = async (c, rect, table = null) => {
     const wb = state.workbook;
     const si = state.sheetIndex;
-    const f = wb.sheet(si).autoFilter;
+    // (A table's own button: its filter, kept in its part, tablefilter.js.)
+    const f = table ? readTables(wb).find((x) => x.name === table)?.filter : wb.sheet(si).autoFilter;
     if (!f || !allowed('filterBy')) return false;
     const title = shownText(wb, wb.sheet(si).cells.get(f.r0)?.get(c)) || `Column ${colName(c)}`;
     const choices = filterChoices(wb, si, f, c);
@@ -366,14 +379,14 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     const got = await filterBox(root, { title, at: { x: rect.left, y: rect.bottom + 2 }, choices, numbers, filtered: f.columns.has(c), kind });
     if (got?.do === 'custom') {
       const col = await customFilterBox(root, { title, kind: kind.toLowerCase(), colors: { fill: [...fills], font: [...fonts] } });
-      if (col && !state.readOnly) editing().run('filterBy', c, col);
+      if (col && !state.readOnly) editing().run('filterBy', c, col, table);
       state.grid.el.focus({ preventScroll: true });
       return true;
     }
     if (got && !state.readOnly) {
-      if (got.do === 'asc' || got.do === 'desc') editing().run('filterSort', c, got.do === 'desc');
-      else if (got.do === 'clear') editing().run('filterBy', c, null);
-      else editing().run('filterBy', c, got.all ? null : { values: got.values, blank: got.blank, ...(got.dates ? { dates: got.dates } : {}) });
+      if (got.do === 'asc' || got.do === 'desc') editing().run('filterSort', c, got.do === 'desc', table);
+      else if (got.do === 'clear') editing().run('filterBy', c, null, table);
+      else editing().run('filterBy', c, got.all ? null : { values: got.values, blank: got.blank, ...(got.dates ? { dates: got.dates } : {}) }, table);
     }
     state.grid.el.focus({ preventScroll: true });
     return true;

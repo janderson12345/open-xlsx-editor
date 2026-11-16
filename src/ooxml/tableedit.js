@@ -474,3 +474,11 @@ export function tableEntry(wb, si, r, c) {
     });
   }
 }
+
+/** Whether cells entered on sheet si ([{ r, c }]) change a table as tableEntry does: a header or total cell, or a
+ *  cell just below a table without a total row, in its columns. */
+export function entryTouchesTable(wb, si, changes) {
+  const tables = readTables(wb).filter((t) => t.si === si);
+  return tables.length > 0 && changes.some(({ r, c }) => tables.some((t) => c >= t.c0 && c <= t.c1
+    && ((t.headers && r === t.r0) || (t.totals && r === t.r1) || (!t.totals && r === t.r1 + 1))));
+}

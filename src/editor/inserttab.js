@@ -1,5 +1,5 @@
 // The Insert tab, Excel's groups as far as they are here: Tables (PivotTable: its boxes, pivotbox.js, and the
-// PivotTable made, pivotnew.js), Charts (a chart of the selection, chartnew.js, by Excel's menus of each kind) and
+// PivotTable made, pivotnew.js; Table: the Create Table box, acts-tables.js), Charts (a chart of the selection, chartnew.js, by Excel's menus of each kind) and
 // Sparklines (Line, Column, Win/Loss: the Create Sparklines box, acts-sparklines.js) and Links (Insert Hyperlink,
 // linkbox.js).
 
@@ -16,7 +16,8 @@ export const CHART_MENUS = [
 export function insertTab(kit, { act }) {
   const { grp, btn, menu, item } = kit;
   const groups = [
-    grp('Tables', btn('▦', 'PivotTable', () => act('pivotBox'), { label: 'PivotTable', big: true })),
+    grp('Tables', btn('▦', 'PivotTable', () => act('pivotBox'), { label: 'PivotTable', big: true }),
+      btn('▤', 'Table (Ctrl+T)', () => act('tableInsert'), { label: 'Table', big: true })),
     grp('Charts', ...CHART_MENUS.map(([icon, title, label, kinds]) => menu(icon, title, () => kinds.map(([kind, name]) => item(name, () => act('insertChart', kind))), { label, big: true }))),
     grp('Sparklines', btn('📈', 'Insert Line Sparkline', () => act('sparklineInsert', 'line'), { label: 'Line', big: true }),
       btn('▥', 'Insert Column Sparkline', () => act('sparklineInsert', 'column'), { label: 'Column', big: true }),

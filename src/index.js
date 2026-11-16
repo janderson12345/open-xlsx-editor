@@ -38,6 +38,7 @@ import { dataTab } from './editor/datatab.js';
 import { reviewTab } from './editor/reviewtab.js';
 import { insertTab } from './editor/inserttab.js';
 import { sparklineTab } from './editor/sparklinetab.js';
+import { tableTab } from './editor/tabletab.js';
 import { formulasTab } from './editor/formulastab.js';
 import { calcMode, calculateBeforeSave } from './ooxml/calcmode.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
@@ -194,7 +195,8 @@ export function mountXlsxEditor(host, options = {}) {
     state.grid.setCharts(charts, state.workbook.theme);
     // (The sheet's sparklines, with their data as it is now.)
     state.grid.setSparklines(sparklineLooks(state.workbook, state.sheetIndex));
-    state.grid.setTables(tableLooks(state.workbook, readTables(state.workbook), state.sheetIndex));
+    const tables = readTables(state.workbook).filter((t) => t.si === state.sheetIndex);
+    state.grid.setTables(tableLooks(state.workbook, tables, state.sheetIndex), tables.filter((t) => t.filter && t.headers).map((t) => ({ name: t.name, filter: t.filter, hidden: t.filter.hidden })));
     let figures = root.querySelector(':scope > .oxe-chart-figures');
     if (!figures && charts.length) { figures = document.createElement('section'); figures.className = 'oxe-chart-figures'; figures.setAttribute('aria-label', 'Charts on this sheet'); root.append(figures); }
     figures?.replaceChildren(...charts.map(chartFigure));
@@ -229,13 +231,14 @@ export function mountXlsxEditor(host, options = {}) {
     root.prepend(el);
     state.ribbon = createRibbon(el, {
       tabs: {
-        Home: (kit) => homeTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
+        Home: (kit) => homeTab(kit, { act, workbook: () => state.workbook, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
         'Page Layout': (kit) => pageLayoutTab(kit, { act, hasPrintArea: () => !!(state.workbook && printAreaOf(state.workbook, state.sheetIndex)), page: () => (state.workbook ? state.workbook.sheet(state.sheetIndex).page : null) }),
         Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook), names: () => (state.workbook ? namesOnSheet(state.workbook, state.sheetIndex).map((n) => n.name) : []) }),
         Data: (kit) => dataTab(kit, { act }),
         Review: (kit) => reviewTab(kit, { act }),
         View: (kit) => viewTab(kit, { act }),
+        'Table Design': (kit) => tableTab(kit, { act, workbook: () => state.workbook }),
         Sparkline: (kit) => sparklineTab(kit, { act, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
       },
       // (Not while a cell is being edited: a function from the Function Library was just typed into it.)

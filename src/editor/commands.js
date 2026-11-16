@@ -4,6 +4,7 @@
 // is touched, as everywhere; the formulas that read a changed cell are worked out again) and into an undo history of
 // cell contents, one for the workbook, as in Excel; the selection, kept for each sheet, is view state and never reaches
 // the history or the file. Sheets are known by their sheetId in both, as indexes change when sheets move.
+import { entryTouchesTable, tableEntry } from '../ooxml/tableedit.js';
 import { cellSelection, extendSelection, addArea, areasOf } from './selection.js';
 import { sheetCommands } from './commands-sheets.js';
 import { dataCommands } from './commands-data.js';
@@ -81,9 +82,14 @@ export function createCommands(ctx) {
     if (!allowed('contents', changes, ctx.sheetIndex(), () => apply(changes, record))) return false;
     if (changes.some((ch) => inArray(ch.r, ch.c))) { ctx.announce("You can't change part of an array"); return false; }
     const before = changes.map((ch) => contents(ch.r, ch.c));
-    const { circular } = ctx.workbook().apply(ctx.sheetIndex(), changes);
-    ctx.edited?.({ cells: [{ si: ctx.sheetIndex(), contents: changes }] });
-    if (record) { state.undo.push({ sheet: idOf(ctx.sheetIndex()), before, after: changes }); state.redo = []; }
+    // (A header, total or the cell below a table typed changes the table too, tableedit.js: one step with it.)
+    const wb = ctx.workbook();
+    const snap = entryTouchesTable(wb, ctx.sheetIndex(), changes) ? wb.snapshot() : null;
+    const { circular } = wb.apply(ctx.sheetIndex(), changes);
+    if (snap) for (const ch of changes) tableEntry(wb, ctx.sheetIndex(), ch.r, ch.c);
+    ctx.edited?.({ cells: [{ si: ctx.sheetIndex(), contents: changes }], ...(snap ? { book: true } : {}) });
+    if (record) { state.undo.push(snap ? { sheet: idOf(ctx.sheetIndex()), snap: true, before: snap, after: wb.snapshot() } : { sheet: idOf(ctx.sheetIndex()), before, after: changes }); state.redo = []; }
+    if (snap) ctx.reloaded?.();
     ctx.grid.refresh();
     ctx.changed?.();
     if (circular.length) ctx.announce(`Circular reference: ${circular.map((e) => refName(e.r, e.c)).join(', ')} read themselves and weren't worked out`);

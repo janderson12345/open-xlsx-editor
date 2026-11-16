@@ -123,7 +123,8 @@ export function readSheet(doc, sst = []) {
  * [shown texts], blank (blanks shown too), other (a kind of filter not read here: custom, top 10, colour, dates) }) },
  * or null.
  */
-function readAutoFilter(el, ns) {
+/** An autoFilter element (the sheet's, or a table part's) as { r0, c0, r1, c1, columns: Map(c -> filter) }. */
+export function readAutoFilter(el, ns) {
   const area = el && parseRange(attr(el, 'ref'));
   if (!area) return null;
   const columns = new Map();

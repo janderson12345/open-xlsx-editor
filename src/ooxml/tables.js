@@ -4,6 +4,7 @@
 // aside; a ' escapes the next character ([, ], # or ').
 import { kids, kid, attr, NS } from './xml.js';
 import { parseRange } from './refs.js';
+import { readAutoFilter } from './sheet.js';
 
 /** Every table of the workbook's worksheets: [{ name, si, r0, c0, r1, c1, headers (rows: 0 or 1), totals (0 or 1),
  *  columns: [names] }]. */
@@ -32,7 +33,8 @@ export function readTables(wb) {
         totalsRow: cols.map((c) => ({ fn: attr(c, 'totalsRowFunction') || null, label: attr(c, 'totalsRowLabel') })),
         style: { name: attr(info, 'name') || null, first: on('showFirstColumn'), last: on('showLastColumn'), rows: on('showRowStripes'), cols: on('showColumnStripes') },
         // (Its filter buttons: an autoFilter, less the columns whose button is hidden.)
-        filter: filter ? { hidden: new Set(kids(filter, 'filterColumn', ns).filter((f) => attr(f, 'hiddenButton') === '1').map((f) => Number(attr(f, 'colId')))) } : null,
+        // (Its filters as the sheet's are read, sheet.js readAutoFilter, with the columns whose button is hidden.)
+        filter: filter ? { ...readAutoFilter(filter, ns), hidden: new Set(kids(filter, 'filterColumn', ns).filter((f) => attr(f, 'hiddenButton') === '1').map((f) => Number(attr(f, 'colId')))) } : null,
       });
     }
   });

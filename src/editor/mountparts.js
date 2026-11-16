@@ -12,7 +12,7 @@ import { createSheetTabs } from './tabs.js';
 export function createParts(env, wb, i, sheet) {
   const { root, state, options, act, openFilter, fillOptionsMenu, listMenu, chartMenu, showConditional, showSheet, sheetsChanged, alert, followLink, editing, lookChanged, restyled, showClip, lines, headerMenu, cellMenu, filterMenu, askInvalid, showValidation, allowed, openMenu, statusMenu, sheetActs } = env;
     state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
-    state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
+    state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect(), button.dataset.table || null));
     state.grid.onErrorButton((point) => act('errorMenu', point));
     state.grid.onFillOptions((point) => fillOptionsMenu(point));
     state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
@@ -43,6 +43,7 @@ export function createParts(env, wb, i, sheet) {
       cellMenu,
       pasteSpecial: () => act('pasteSpecialBox'),
       link: () => act('linkBox'),
+      insertTable: () => act('tableInsert'),
       autoSum: (fn) => act('autoSum', fn),
       filterMenu: () => filterMenu() || listMenu(),
       askInvalid: (info) => askInvalid(info),

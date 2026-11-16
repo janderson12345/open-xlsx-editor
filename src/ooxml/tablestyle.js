@@ -84,14 +84,15 @@ function regions(t, els) {
 /**
  * Table `t`'s look in style elements `els` (tableStyleElements): Map "r,c" -> { fill, color, bold, italic, border:
  * { top, bottom, left, right: { style, color } } } for each cell of the table, colours as '#RRGGBB' through `theme`
- * and `palette`. Each edge is one line, the last element's to set it.
+ * and `palette`. Each edge is one line, the last element's to set it. With `raw`, each look also has `raw`: the
+ * colours as the dxfs give them ({ fill, color, border: { side: colour } }), for formats written from it.
  */
-export function tableLook(t, els, theme, palette) {
+export function tableLook(t, els, theme, palette, { raw = false } = {}) {
   const out = new Map();
   if (!els) return out;
   const color = (c) => (c ? resolveColor(c, theme, palette) : null);
   const edges = new Map();
-  const setEdge = (key, side) => { if (side?.style) edges.set(key, { style: side.style, color: side.color?.auto ? '#000000' : color(side.color) || '#000000' }); };
+  const setEdge = (key, side) => { if (side?.style) edges.set(key, { style: side.style, color: side.color?.auto ? '#000000' : color(side.color) || '#000000', raw: side.color }); };
   for (const { type, areas } of regions(t, els)) {
     const dxf = els[type]?.dxf;
     if (!dxf) continue;
@@ -99,9 +100,9 @@ export function tableLook(t, els, theme, palette) {
       for (let r = a.r0; r <= a.r1; r++) {
         for (let c = a.c0; c <= a.c1; c++) {
           const look = out.get(`${r},${c}`) || {};
-          if (dxf.fill) { const f = color(dxf.fill); if (f) look.fill = f; }
+          if (dxf.fill) { const f = color(dxf.fill); if (f) { look.fill = f; if (raw) look.raw = { ...look.raw, fill: dxf.fill }; } }
           const f = dxf.font;
-          if (f?.color) { const fc = color(f.color); if (fc) look.color = fc; }
+          if (f?.color) { const fc = color(f.color); if (fc) { look.color = fc; if (raw) look.raw = { ...look.raw, color: f.color }; } }
           if (f?.b !== undefined) look.bold = f.b;
           if (f?.i !== undefined) look.italic = f.i;
           out.set(`${r},${c}`, look);
@@ -125,8 +126,9 @@ export function tableLook(t, els, theme, palette) {
   for (let r = t.r0; r <= t.r1; r++) {
     for (let c = t.c0; c <= t.c1; c++) {
       const sides = { top: edges.get(`h${r},${c}`), bottom: edges.get(`h${r + 1},${c}`), left: edges.get(`v${r},${c}`), right: edges.get(`v${r},${c + 1}`) };
-      const border = Object.fromEntries(Object.entries(sides).filter(([, v]) => v));
+      const border = Object.fromEntries(Object.entries(sides).filter(([, v]) => v).map(([k, v]) => [k, { style: v.style, color: v.color }]));
       const look = out.get(`${r},${c}`) || {};
+      if (raw && Object.keys(border).length) look.raw = { ...look.raw, border: Object.fromEntries(Object.entries(sides).filter(([, v]) => v).map(([k, v]) => [k, v.raw])) };
       if (Object.keys(border).length) look.border = border;
       if (Object.keys(look).length) out.set(`${r},${c}`, look);
     }

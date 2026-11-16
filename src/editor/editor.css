@@ -1902,6 +1902,52 @@
   right: 6px;
   top: 14px;
 }
+/* The table style gallery (tablegallery.js): each style a five by five table in it, seven to a row, scrolled when
+   taller than the window. */
+.oxe-tstyle-menu {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.oxe-tstyles {
+  display: grid;
+  grid-template-columns: repeat(7, 44px);
+  gap: 6px;
+  padding: 4px;
+}
+.oxe-tstyle {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  width: 44px;
+  height: 34px;
+  padding: 1px;
+  border: 1px solid var(--oxe-head-line);
+  background: #ffffff;
+  cursor: pointer;
+}
+.oxe-tstyle:hover,
+.oxe-tstyle:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-tstyle-cell {
+  box-sizing: border-box;
+  position: relative;
+}
+.oxe-tstyle-cell::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 40%;
+  height: 1px;
+  background: var(--oxe-tstyle-ink);
+  opacity: 0.6;
+}
+.oxe-table-name {
+  width: 9em;
+  font: inherit;
+}
 .oxe-cell .oxe-cf-icon {
   position: absolute;
   left: 2px;
