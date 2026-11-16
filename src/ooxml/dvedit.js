@@ -150,7 +150,7 @@ function addExtRule(doc, xml) {
 function extXml(main) {
   const sqref = /\ssqref="([^"]*)"/.exec(main)[1];
   return main.replace(/\ssqref="[^"]*"/, '').replace(/<dataValidation\b/, '<x14:dataValidation')
-    .replace(/<formula(\d)>([\s\S]*?)<\/formula\d>/g, '<x14:formula$1><xm:f>$2</xm:f></x14:formula$1>')
+    .replace(/<formula(\d)>([^<]*)<\/formula\d>/g,'<x14:formula$1><xm:f>$2</xm:f></x14:formula$1>')
     .replace(/<\/dataValidation>$/, `<xm:sqref>${sqref}</xm:sqref></x14:dataValidation>`)
     .replace(/\/>$/, `><xm:sqref>${sqref}</xm:sqref></x14:dataValidation>`);
 }
@@ -174,7 +174,8 @@ export function setValidation(doc, ranges, rule, date1904 = false, sheet = null)
   let wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
   if (rule) {
     const main = validationXml(rule, sel, date1904);
-    const stored = [...main.matchAll(/<formula\d>([\s\S]*?)<\/formula\d>/g)].map((m) => unescapeXml(m[1]));
+    // (A formula is escaped in validationXml, so it has no '<': [^<]* takes it in one pass.)
+    const stored = [...main.matchAll(/<formula\d>([^<]*)<\/formula\d>/g)].map((m) => unescapeXml(m[1]));
     if (readsOtherSheet(stored, sheet)) { addExtRule(doc, extXml(main)); return; }
     if (!wrap) {
       wrap = doc.createElementNS(ns, root.prefix ? `${root.prefix}:dataValidations` : 'dataValidations');

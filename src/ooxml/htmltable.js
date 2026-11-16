@@ -78,7 +78,9 @@ export function parseDecls(text) {
 
 /** A style block's rules: [{ tag, cls, specificity, order, decls }] for simple selectors (td, .xl63, p.MsoNormal). */
 function parseRules(css, rules) {
-  const text = css.replace(/<!--|-->/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ');
+  // (A style block's <!-- and --> are CSS's CDO and CDC tokens, dropped; --!> as an HTML comment's end. The text is
+  // only read for declarations, never put into the page.)
+  const text = css.replace(/<!--|--!?>/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ');
   let i = 0;
   while (i < text.length) {
     const open = text.indexOf('{', i);
