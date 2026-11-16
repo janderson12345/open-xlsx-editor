@@ -39,17 +39,25 @@ function dataUrl(bytes, mime) {
   return u;
 }
 
+// (How deep anchors are looked for, and how deep groups may nest: past them a crafted drawing is cut off, not followed
+// until the stack runs out.)
+const ANCHOR_DEPTH = 8;
+export const GROUP_DEPTH = 32;
+
 /** All the anchors of a drawing part in document order, with the content each is drawn by. */
 function anchorsOf(doc) {
   const out = [];
-  const walk = (el, fallback) => {
+  // (Anchors are at the top or a few levels down in mc:AlternateContent; a deeper walk is cut off, so that a crafted
+  // part nested thousands deep can't run the stack out.)
+  const walk = (el, fallback, depth) => {
+    if (depth > ANCHOR_DEPTH) return;
     for (let c = el.firstChild; c; c = c.nextSibling) {
       if (c.nodeType !== 1) continue;
       if (c.namespaceURI === XDR && ANCHORS.has(c.localName)) out.push({ el: c, fallback, top: c.parentNode === doc.documentElement });
-      else walk(c, fallback || (c.namespaceURI === MC && c.localName === 'Fallback'));
+      else walk(c, fallback || (c.namespaceURI === MC && c.localName === 'Fallback'), depth + 1);
     }
   };
-  walk(doc.documentElement, false);
+  walk(doc.documentElement, false, 0);
   return out;
 }
 
@@ -218,6 +226,8 @@ function nvOf(el) {
 function itemOf(el, ctx) {
   const nv = nvOf(el);
   if (el.localName === 'grpSp') {
+    const depth = (ctx.depth || 0) + 1;
+    if (depth > GROUP_DEPTH) return null;
     const xfrm = xfrmOf(kid(kid(el, 'grpSpPr', XDR), 'xfrm', A));
     const fill = fillOf(kid(el, 'grpSpPr', XDR));
     const children = [];
@@ -226,7 +236,7 @@ function itemOf(el, ctx) {
       let d = c;
       if (c.namespaceURI === MC && c.localName === 'AlternateContent') d = [...(kid(c, 'Choice', MC)?.childNodes || [])].find((x) => x.nodeType === 1 && x.namespaceURI === XDR);
       if (!d || d.namespaceURI !== XDR || !CONTENT.has(d.localName) || d.localName === 'graphicFrame' || d.localName === 'contentPart') continue;
-      const it = itemOf(d, { ...ctx, groupFill: fill?.none ? null : fill });
+      const it = itemOf(d, { ...ctx, depth, groupFill: fill?.none ? null : fill });
       if (it) children.push(it);
     }
     return { type: 'group', ...nv, xfrm, children };

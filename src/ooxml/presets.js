@@ -197,8 +197,10 @@ export function customPaths(paths, w, h) {
         const rx = c.wR * sx;
         const ry = c.hR * sy;
         const a0 = (c.stAng / 60000) * (Math.PI / 180);
-        const sw = (c.swAng / 60000) * (Math.PI / 180);
-        if (!rx || !ry || !sw) continue;
+        // (A sweep past one turn draws nothing more, and is cut to one: arcCmds makes a piece per quarter turn, so a
+        // crafted 1e300 would be pieces without end.)
+        const sw = pin(-2 * Math.PI, (c.swAng / 60000) * (Math.PI / 180), 2 * Math.PI);
+        if (!rx || !ry || !sw || ![rx, ry, a0, sw].every(Number.isFinite)) continue;
         const cx = cur[0] - rx * Math.cos(a0);
         const cy = cur[1] - ry * Math.sin(a0);
         const cmds = arcCmds(cx, cy, rx, ry, a0, a0 + sw);

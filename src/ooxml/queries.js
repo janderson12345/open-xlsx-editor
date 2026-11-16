@@ -104,6 +104,8 @@ function readMetadata(md) {
   return out;
 }
 
+export const MASHUP_MAX = 64 * 1024 * 1024;
+
 /** The workbook's DataMashup: { path, enc, bom, before, after, bin pieces, files (its package), section (the
  *  Section1.m text), queries: parseSection's, metadata }, or null when it has none (or none read). */
 export function readMashup(wb) {
@@ -114,7 +116,12 @@ export function readMashup(wb) {
     try {
       const pieces = splitMashup(fromBase64(m[2]));
       if (!pieces) continue;
-      const files = unzipSync(pieces.pkg);
+      // (A query package is a few kilobytes; one that says it unpacks past MASHUP_MAX in all is not read, so that a
+      // crafted one can't take the page's memory. fflate sizes each file by what its header says.)
+      let total = 0;
+      let tooBig = false;
+      const files = unzipSync(pieces.pkg, { filter: (f) => { total += f.originalSize; if (total > MASHUP_MAX) tooBig = true; return !tooBig; } });
+      if (tooBig) continue;
       const name = Object.keys(files).find((k) => /^Formulas\/Section1\.m$/i.test(k));
       const sec = name ? decodeText(files[name]) : { enc: 'utf-8', bom: false, text: '' };
       return { path, enc, bom, before: text.slice(0, m.index + m[1].length), after: text.slice(m.index + m[1].length + m[2].length), ...pieces, files, sectionPath: name, sectionBom: sec.bom,

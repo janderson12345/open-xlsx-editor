@@ -22,7 +22,11 @@ const STAND_INS = {
 const SERIF = /^(cambria|times|georgia|garamond|book antiqua|palatino|constantia|aptos serif|century)/i;
 const MONO = /^(courier|consolas|lucida console|aptos mono|cascadia)/i;
 
-const quote = (name) => (/^[\w-]+$/.test(name) ? name : `'${name.replace(/'/g, '')}'`);
+// (A font name from the file, quoted for CSS: the quotes, backslashes, line breaks and other control characters that
+// could end the string early, and so let the rest of a crafted name be read as CSS of its own, are taken out. No
+// typeface has them in its name.)
+// eslint-disable-next-line no-control-regex
+const quote = (name) => (/^[\w-]+$/.test(name) ? name : `'${String(name).replace(/['"\\\u0000-\u001f\u007f]/g, '')}'`);
 
 /** The CSS font-family for a typeface name: the font, its open-metric-fonts twin where the page serves them
  *  (omffonts.js: drawn only where the font itself is missing), the stand-ins, a generic family. */
