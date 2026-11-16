@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.7.0
+
+- **Tables.**
+  - Drawn in their table style on screen, in print and in PDF: Excel's 60 built-in styles or the workbook's own.
+  - Insert > Table, Ctrl+T and Format as Table, with the Table Design tab: name, resize, convert to range, header and
+    total rows, banding, first and last column, filter buttons and the style gallery.
+  - A table's own buttons filter and sort it. Excel reads back every table the editor makes (33 of 33).
+- **Cell Styles:** Excel's 47 built-in cell styles in the Home tab's gallery.
+- **Outlines.**
+  - The outline bar beside the headings, sized as Excel's, with its level and +/− buttons.
+  - Group and Ungroup (Shift+Alt+Right and Left), Show and Hide Detail, Auto Outline, Clear Outline, the automatic
+    styles and Ctrl+8.
+  - Data > Subtotal and Remove All, as Excel inserts and formats them.
+- **ACCRINT** matches Excel in all 600 measured cases. FORECAST.ETS and its family stay missing: what was found of
+  Excel's method is in docs/CALC.md.
+- **Security.** A review of this release found and fixed:
+  - crafted workbooks that hung the page: a negative table-style stripe size, a whole-sheet table, a huge outline
+    level or column span;
+  - XML that a crafted theme font name could add to a saved file.
+  - Table looks are now worked out a screen at a time.
+  - MAX, MIN and the other places that took the largest of a list no longer fail past 125,000 items.
+  - ACCRINT gives #NUM! past 9999-12-31, as Excel does.
+- **Maintainability:** one shared XML escape, the outline's cell styles declared as data, every module listed in
+  docs/ARCHITECTURE.md, and more robust browser tests.
+
 ## 0.6.0
 
 - **Charts.**
