@@ -3,9 +3,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
-import { fontFamily, fontOfXf } from '../src/ooxml/styles.js';
+import { fontFamily, fontOfXf, readFont, readDxf } from '../src/ooxml/styles.js';
 import { fontStack, cellLineHeight } from '../src/editor/fonts.js';
 import { printRowPx } from '../src/ooxml/units.js';
+import { parseXml, kid, NS } from '../src/ooxml/xml.js';
+import { stringItemRuns } from '../src/ooxml/strings.js';
 import { PROBE_FONTS } from './fixtures/make-fixtures.mjs';
 
 const open = (f) => Workbook.fromBytes(new Uint8Array(fs.readFileSync(`test/fixtures/${f}`)));
@@ -78,4 +80,16 @@ test('alignment from cell formats: horizontal, vertical, wrap, indent (rotation,
   assert.deepEqual(a(8), { horizontal: 'left', vertical: 'top', wrap: false, indent: 0, rotation: 0, shrink: false, readingOrder: 0 });
   assert.equal(a(13).indent, 2);
   assert.deepEqual([a(15).wrap, a(15).vertical], [true, 'top']);
+});
+
+test('<u val="none"/> is no underline: on a font, a conditional format and a run of rich text', () => {
+  const x = (s) => { const root = parseXml(`<r xmlns="${NS.x}">${s}</r>`).documentElement; return kid(root, s.match(/^<(\w+)/)[1], NS.x); };
+  assert.equal(readFont(x('<font><u val="none"/><sz val="9"/></font>'), NS.x).u, null);
+  assert.equal(readFont(x('<font><u/></font>'), NS.x).u, 'single');
+  assert.equal(readFont(x('<font><u val="double"/></font>'), NS.x).u, 'double');
+  assert.equal(readFont(x('<font><sz val="9"/></font>'), NS.x).u, null);
+  assert.equal(readDxf(x('<dxf><font><u val="none"/></font></dxf>'), NS.x).font.u, null);
+  assert.equal(readDxf(x('<dxf><font><b/></font></dxf>'), NS.x).font.u, undefined);
+  const runs = stringItemRuns(x('<si><r><rPr><u val="none"/></rPr><t>a</t></r><r><rPr><u/></rPr><t>b</t></r></si>'), NS.x);
+  assert.deepEqual(runs.map((r) => r.font.u), [null, 'single']);
 });

@@ -50,6 +50,14 @@ export function readColor(el) {
   return out;
 }
 
+/** A `u` element's underline: 'single', 'double', 'singleAccounting' or 'doubleAccounting', null for `val="none"`
+ *  (no underline, as some generators write on every font), undefined with no element. */
+export function underline(u) {
+  if (!u) return undefined;
+  const v = attr(u, 'val') || 'single';
+  return v === 'none' ? null : v;
+}
+
 /** One `font` element. */
 export function readFont(el, ns) {
   const val = (name) => attr(kid(el, name, ns), 'val');
@@ -60,7 +68,7 @@ export function readFont(el, ns) {
     scheme: val('scheme'), // 'minor' (the theme's body font), 'major' (its heading font) or null
     b: !!onOff(kid(el, 'b', ns)),
     i: !!onOff(kid(el, 'i', ns)),
-    u: u ? attr(u, 'val') || 'single' : null,
+    u: underline(u) ?? null,
     strike: !!onOff(kid(el, 'strike', ns)),
     color: readColor(kid(el, 'color', ns)),
     vertAlign: val('vertAlign') || null, // 'superscript', 'subscript' or null
@@ -93,7 +101,7 @@ export function readDxf(el, ns) {
   const numFmt = kid(el, 'numFmt', ns);
   const border = kid(el, 'border', ns);
   return {
-    font: font ? { b: on('b'), i: on('i'), strike: on('strike'), u: u ? attr(u, 'val') || 'single' : undefined, color: readColor(kid(font, 'color', ns)) } : null,
+    font: font ? { b: on('b'), i: on('i'), strike: on('strike'), u: u ? underline(u) : undefined, color: readColor(kid(font, 'color', ns)) } : null,
     fill: p ? readColor(kid(p, 'bgColor', ns)) || readColor(kid(p, 'fgColor', ns)) : null,
     // (A conditional format's number format and borders, as Excel writes them in the dxf.)
     numFmt: numFmt ? attr(numFmt, 'formatCode') : null,

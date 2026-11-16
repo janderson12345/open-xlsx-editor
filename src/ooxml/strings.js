@@ -1,6 +1,6 @@
 // Cell text: the shared string table (xl/sharedStrings.xml) and inline strings, which hold the same `si`-shaped content.
 import { kids, kid, attr, onOff, decodeXstring, outerXml } from './xml.js';
-import { readColor } from './styles.js';
+import { readColor, underline } from './styles.js';
 
 /** The text of an `si` (or a cell's `is`): its own `t`, or the `t` of each rich-text run `r`. Phonetic runs (`rPh`,
  *  the reading guide over Japanese text) are not part of the cell's text and are skipped. */
@@ -31,7 +31,7 @@ function runFont(rPr, ns) {
     scheme: val('scheme') ?? null,
     b: !!onOff(kid(rPr, 'b', ns)),
     i: !!onOff(kid(rPr, 'i', ns)),
-    u: u ? attr(u, 'val') || 'single' : null,
+    u: underline(u) ?? null,
     strike: !!onOff(kid(rPr, 'strike', ns)),
     color: color ? readColor(color) : null,
     vertAlign: val('vertAlign') ?? null,
