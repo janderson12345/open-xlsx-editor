@@ -43,7 +43,11 @@ export function readProtection(el) {
 export function readColor(el) {
   if (!el) return null;
   const num = (name) => (attr(el, name) != null ? Number(attr(el, name)) : null);
-  return { rgb: attr(el, 'rgb'), theme: num('theme'), indexed: num('indexed'), auto: attr(el, 'auto') === '1' || attr(el, 'auto') === 'true', tint: num('tint') || 0 };
+  const out = { rgb: attr(el, 'rgb'), theme: num('theme'), indexed: num('indexed'), auto: attr(el, 'auto') === '1' || attr(el, 'auto') === 'true', tint: num('tint') || 0 };
+  // (The tint as written, kept out of sight for a colour written back: Excel's 0.79998168889431442 has a digit more
+  // than JavaScript prints.)
+  if (out.tint) Object.defineProperty(out, 'tintText', { value: attr(el, 'tint'), enumerable: false });
+  return out;
 }
 
 /** One `font` element. */
@@ -104,8 +108,9 @@ export function readBorder(el, ns) {
     const style = s && attr(s, 'style');
     return style && style !== 'none' ? { style, color: readColor(kid(s, 'color', ns)) } : NO_SIDE;
   };
+  // (vertical and horizontal: the lines inside a range, which only a table style's dxfs use.)
   return { left: side('left') === NO_SIDE ? side('start') : side('left'), right: side('right') === NO_SIDE ? side('end') : side('right'), top: side('top'), bottom: side('bottom'),
-    diagonal: side('diagonal'), diagonalUp: isOn(attr(el, 'diagonalUp')), diagonalDown: isOn(attr(el, 'diagonalDown')) };
+    diagonal: side('diagonal'), diagonalUp: isOn(attr(el, 'diagonalUp')), diagonalDown: isOn(attr(el, 'diagonalDown')), vertical: side('vertical'), horizontal: side('horizontal') };
 }
 
 /** One `xf` of cellXfs or cellStyleXfs: its font, fill, border (indexes kept inside the lists), number format,
@@ -145,7 +150,15 @@ export function readStyles(doc) {
   const numFmts = {};
   for (const el of kids(kid(root, 'numFmts', ns), 'numFmt', ns)) numFmts[Number(attr(el, 'numFmtId'))] = attr(el, 'formatCode') || 'General';
   const dxfs = kids(kid(root, 'dxfs', ns), 'dxf', ns).map((el) => readDxf(el, ns));
-  return { fonts, fills, borders, cellXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette, numFmts, dxfs };
+  // (The workbook's own table styles: each element's dxf and stripe size; docs/TABLES.md.)
+  const ts = kid(root, 'tableStyles', ns);
+  const tableStyles = {};
+  for (const el of kids(ts, 'tableStyle', ns)) {
+    if (attr(el, 'table') !== '0') {
+      tableStyles[attr(el, 'name')] = Object.fromEntries(kids(el, 'tableStyleElement', ns).map((e) => [attr(e, 'type'), { dxfId: Number(attr(e, 'dxfId') ?? -1), size: Number(attr(e, 'size') || 1) }]));
+    }
+  }
+  return { fonts, fills, borders, cellXfs, styleXfs, normal: fonts[(styleXfs[0] || cellXfs[0]).fontId], palette, numFmts, dxfs, tableStyles, defaultTableStyle: attr(ts, 'defaultTableStyle') || null };
 }
 
 /** The cell format `s` (out-of-range indexes take format 0, as Excel does). */

@@ -247,6 +247,8 @@ export function attachEditing(root, ctx) {
     else if (ctrl && !e.shiftKey && !e.altKey && (key.toLowerCase() === 'd' || key.toLowerCase() === 'r')) { if (ctx.allowed?.('fill') !== false) cmd.run('fill', key.toLowerCase() === 'd' ? 'down' : 'right'); }
     else if (ctrl && e.altKey && !e.shiftKey && key.toLowerCase() === 'v') ctx.pasteSpecial?.();
     else if (e.altKey && !ctrl && key === '=') ctx.autoSum?.('sum');
+    // (Ctrl+T or Ctrl+L: Create Table, as Excel's.)
+    else if (ctrl && !e.shiftKey && !e.altKey && (key.toLowerCase() === 't' || key.toLowerCase() === 'l')) ctx.insertTable?.();
     else if (ctrl && e.shiftKey && !e.altKey && key.toLowerCase() === 'l') { if (ctx.allowed?.('filterToggle') !== false) cmd.run('filterToggle'); }
     // (Ctrl+9 hides the rows, Ctrl+0 the columns; with Shift they show again. Taken from the key's code: Shift+9 is "(".)
     else if (ctrl && (e.code === 'Digit9' || e.code === 'Digit0')) cmd.run('hideLines', e.code === 'Digit9' ? 'row' : 'col', !e.shiftKey);

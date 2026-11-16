@@ -1,5 +1,7 @@
 // Commands that move data (commands.js shares its state with them): copy, cut and paste (Paste Special too), fill
 // and AutoFill, sort, AutoSum, the Name Box and the filter.
+import { readTables } from '../ooxml/tables.js';
+import { applyTableFilter } from '../ooxml/tablefilter.js';
 import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
@@ -229,15 +231,18 @@ export function dataCommands(env) {
       if (error) { ctx.alert(error); return false; }
       return moved((wb, si) => wb.setAutoFilter(si, { ...area, columns: new Map() })) === true && (ctx.announce(`Filter on ${refName(area.r0, area.c0)} to ${refName(area.r1, area.c1)}`), true);
     },
-    /** Column c of the filter shows rows with `show` ({ values: shown texts, blank }), or all of them (null). */
-    filterBy(c, show) {
-      const f = sheet().autoFilter;
+    /** Column c of the filter shows rows with `show` ({ values: shown texts, blank }), or all of them (null); with
+     *  `table`, the filter of that table's buttons (tablefilter.js). */
+    filterBy(c, show, table = null) {
+      const t = table && readTables(ctx.workbook()).find((x) => x.name === table);
+      const f = t ? t.filter : sheet().autoFilter;
       if (!f || ctx.readOnly()) return false;
-      const columns = new Map(f.columns);
+      const columns = new Map([...f.columns].filter(([, col]) => !col.other || !t));
       // (A list of values, or filtermore.js's other filters as they come.)
       if (show) columns.set(c, show.values ? { values: show.values, blank: !!show.blank, ...(show.dates?.length ? { dates: show.dates } : {}), other: false } : { ...show, other: false });
       else columns.delete(c);
-      return moved((wb, si) => wb.setAutoFilter(si, { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns }), 'autoFilter') === true;
+      const area = { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1, columns };
+      return moved((wb, si) => (t ? applyTableFilter(wb, t, area) : wb.setAutoFilter(si, area)), 'autoFilter') === true;
     },
     /** Home > Sort & Filter > Clear (every column's filter taken off, the buttons kept), and Reapply (the rows
      *  filtered again, after edits). */
@@ -260,9 +265,9 @@ export function dataCommands(env) {
     },
     /** A filter button's Sort A to Z (or Z to A, `desc`): the filter's range by column c, its heading row kept. Not
      *  yet while rows are filtered out (Excel then sorts only the rows shown). */
-    filterSort(c, desc) {
+    filterSort(c, desc, table = null) {
       const sh = sheet();
-      const f = sh.autoFilter;
+      const f = table ? readTables(ctx.workbook()).find((x) => x.name === table)?.filter : sh.autoFilter;
       if (!f) return false;
       for (let r = f.r0 + 1; r <= f.r1; r++) if (sh.rows.get(r)?.hidden) { ctx.announce("Sorting while rows are filtered out isn't available yet"); return false; }
       return commands.sort({ area: { r0: f.r0, c0: f.c0, r1: f.r1, c1: f.c1 }, keys: [{ at: c, desc }], header: true });

@@ -1902,6 +1902,77 @@
   right: 6px;
   top: 14px;
 }
+/* The table style gallery (tablegallery.js): each style a five by five table in it, seven to a row, scrolled when
+   taller than the window. */
+.oxe-tstyle-menu {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.oxe-tstyles {
+  display: grid;
+  grid-template-columns: repeat(7, 44px);
+  gap: 6px;
+  padding: 4px;
+}
+.oxe-tstyle {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  width: 44px;
+  height: 34px;
+  padding: 1px;
+  border: 1px solid var(--oxe-head-line);
+  background: #ffffff;
+  cursor: pointer;
+}
+.oxe-tstyle:hover,
+.oxe-tstyle:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-tstyle-cell {
+  box-sizing: border-box;
+  position: relative;
+}
+.oxe-tstyle-cell::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 40%;
+  height: 1px;
+  background: var(--oxe-tstyle-ink);
+  opacity: 0.6;
+}
+/* The cell style gallery (cellstylegallery.js): each style a chip named and drawn in it, four to a row. */
+.oxe-cstyles {
+  display: grid;
+  grid-template-columns: repeat(4, 92px);
+  gap: 4px;
+  padding: 4px;
+}
+.oxe-cstyle {
+  height: 24px;
+  padding: 0 4px;
+  overflow: hidden;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border: 1px solid var(--oxe-head-line);
+  background: #ffffff;
+  color: #000000;
+  font-size: 12px;
+  cursor: pointer;
+}
+.oxe-cstyle:hover,
+.oxe-cstyle:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
+.oxe-table-name {
+  width: 9em;
+  font: inherit;
+}
 .oxe-cell .oxe-cf-icon {
   position: absolute;
   left: 2px;
@@ -1938,6 +2009,26 @@
 }
 .oxe-root .oxe-grid .oxe-cell.oxe-cf-strike {
   text-decoration: line-through;
+}
+/* Table styles (ooxml/tablestyle.js): a table's fill, edges and font under the cell's own format (four parts with
+   .oxe-tbl, to outrank the cell format classes; tableLooks leaves out what the cell's own format sets). */
+.oxe-fill.oxe-tbl-fill {
+  background: var(--oxe-tbl);
+}
+.oxe-root .oxe-cell.oxe-tbl.oxe-tbl-color {
+  color: var(--oxe-tbl-color);
+}
+.oxe-root .oxe-cell.oxe-tbl.oxe-tbl-bold {
+  font-weight: 700;
+}
+.oxe-root .oxe-cell.oxe-tbl.oxe-tbl-normal {
+  font-weight: 400;
+}
+.oxe-root .oxe-cell.oxe-tbl.oxe-tbl-italic {
+  font-style: italic;
+}
+.oxe-root .oxe-cell.oxe-tbl.oxe-tbl-upright {
+  font-style: normal;
 }
 
 /* Data validation (dvmarks.js): a list's button beside the active cell, the input message under it. */

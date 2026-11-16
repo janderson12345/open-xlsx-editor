@@ -61,6 +61,10 @@ function hlsToRgb(h, l, s) {
 /** An RRGGBB colour with a tint applied: luminance darkened (tint < 0) or lightened towards white (tint > 0). */
 export function applyTint(rgb, tint) {
   if (!tint) return rgb;
+  // (A file's tint is Excel's to four places: 0.79998168889431442 is its lighter 80%, -0.249977111117893 darker 25%.
+  // Rounded so, 220 of 220 colours as Excel gives them over COM, test/tints-excel.json, and every cell of the 60 table
+  // styles as its DisplayFormat shows them; taken as written, 0.79998 lands a step darker: TableStyleLight7's stripe D9F1CF for Excel's DAF2D0.)
+  tint = Math.round(tint * 10000) / 10000;
   const [h, l, s] = rgbToHls(...[0, 2, 4].map((i) => parseInt(rgb.slice(i, i + 2), 16)));
   const l2 = Math.trunc(tint < 0 ? l * (1 + tint) : l * (1 - tint) + HLS * tint);
   return hlsToRgb(h, l2, s).map((v) => v.toString(16).padStart(2, '0')).join('').toUpperCase();

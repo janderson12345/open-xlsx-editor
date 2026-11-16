@@ -100,10 +100,13 @@ export function partCommands(env) {
       if (kind && !allowed(kind)) return false;
       const wb = ctx.workbook();
       const before = wb.snapshot();
+      const formats = wb.styles.cellXfs.length;
       if (run(wb, ctx.sheetIndex()) === false) return false;
       state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
       state.redo = [];
       ctx.edited?.({ book: true });
+      // (Cell formats added, as Convert to Range adds them: their classes made before the sheet is drawn again.)
+      if (wb.styles.cellXfs.length !== formats) ctx.restyled?.();
       ctx.reloaded?.();
       ctx.changed?.();
       return true;

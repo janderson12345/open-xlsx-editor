@@ -274,6 +274,13 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       st.cond = looks;
       draw(st, true);
     },
+    /** What the sheet's tables draw in their styles (ooxml/tablestyle.js tableLooks: "r,c" => look) and their filter
+     *  buttons ([{ name, filter, hidden }]), drawn. */
+    setTables(looks, filters = []) {
+      st.tables = looks;
+      st.tableFilters = filters;
+      draw(st, true);
+    },
     /** What the sheet's sparklines show (ooxml/sparklines.js sparklineLooks: "r,c" => sparkline), drawn. */
     setSparklines(sparks) {
       st.sparks = sparks;

@@ -1,0 +1,1111 @@
+[
+  {
+    "file": "add-empty-no.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "H2:J6",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Column1",
+          "Column2",
+          "Column3"
+        ],
+        "calc": [
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add-empty.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "H2:J5",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Column1",
+          "Column2",
+          "Column3"
+        ],
+        "calc": [
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add-heads.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:F4",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Qty",
+          "2024",
+          "Column1",
+          "Qty2",
+          "2"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add-noheaders.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B3:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Column1",
+          "Column2",
+          "Column3",
+          "Column4"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add-numbers-guess.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:D5",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Column1",
+          "Column2",
+          "Column3"
+        ],
+        "calc": [
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add-numbers-no.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:D5",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Column1",
+          "Column2",
+          "Column3"
+        ],
+        "calc": [
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add-one-row.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E3",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "add.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "calc-custom.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          9,
+          1
+        ],
+        "totalsText": [
+          "All",
+          "",
+          "",
+          "6.5"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "calc-each.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          3,
+          4,
+          2,
+          6
+        ],
+        "totalsText": [
+          "4",
+          "0",
+          "",
+          "2.5"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "calc-rest.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          5,
+          7,
+          8,
+          0
+        ],
+        "totalsText": [
+          "0",
+          "#DIV/0!",
+          "",
+          ""
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "calc-sum.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          1,
+          1
+        ],
+        "totalsText": [
+          "Total",
+          "",
+          "",
+          "6.5"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "headers-off-on.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "headers-off.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B3:E7",
+        "style": "TableStyleMedium2",
+        "headers": false,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": false,
+        "buttons": false,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "no-autofilter.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": false,
+        "buttons": false,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "no-filter-button.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": false,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "options.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": false,
+        "cols": true,
+        "first": true,
+        "last": true,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "rename-bad.xlsx",
+    "tables": [
+      {
+        "name": "Ok_name",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "rename-header.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Count",
+          "Column1"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "rename.xlsx",
+    "tables": [
+      {
+        "name": "Sales",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": "=SUM(Sales[Qty])"
+  },
+  {
+    "file": "resize-grow.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "resize-shrink.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:C4",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item"
+        ],
+        "calc": [
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "resize-totals.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "totalsText": [
+          "Total",
+          "",
+          "",
+          ""
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "style-light9.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleLight9",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "style-none.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "totals-below-filled.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "totalsText": [
+          "Total",
+          "",
+          "",
+          "6.5"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "totals-off-on.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          2,
+          1
+        ],
+        "totalsText": [
+          "Total",
+          "",
+          "",
+          "6.5"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "totals-off.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "totals-text-last.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:C8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item"
+        ],
+        "calc": [
+          0,
+          3
+        ],
+        "totalsText": [
+          "Total",
+          "4"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "totals.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": true,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "totalsText": [
+          "Total",
+          "",
+          "",
+          "6.5"
+        ]
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "two-tables.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:C7",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item"
+        ],
+        "calc": [
+          0,
+          0
+        ],
+        "totalsText": null
+      },
+      {
+        "name": "Table2",
+        "range": "H2:I4",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Column1",
+          "Column2"
+        ],
+        "calc": [
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "type-below.xlsx",
+    "tables": [
+      {
+        "name": "Table1",
+        "range": "B2:E8",
+        "style": "TableStyleMedium2",
+        "headers": true,
+        "totals": false,
+        "rows": true,
+        "cols": false,
+        "first": false,
+        "last": false,
+        "filter": true,
+        "buttons": true,
+        "columns": [
+          "Region",
+          "Item",
+          "Qty",
+          "Price"
+        ],
+        "calc": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "totalsText": null
+      }
+    ],
+    "b10": "Good",
+    "g3": ""
+  },
+  {
+    "file": "unlist.xlsx",
+    "tables": [],
+    "b10": "Normal",
+    "g3": "=SUM(Sheet1!$D$3:$D$7)"
+  }
+]

@@ -85,6 +85,13 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     if (cf.strike) el.classList.add('oxe-cf-strike');
     if (cf.hideValue) el.classList.add('oxe-cf-novalue');
   }
+  // (A table style's font, under the cell's own and a conditional format's: ooxml/tablestyle.js tableLooks.)
+  const tl = st.tables?.get(`${r},${c}`);
+  if (tl) {
+    if (tl.color && !cf?.color) { el.classList.add('oxe-tbl', 'oxe-tbl-color'); el.style.setProperty('--oxe-tbl-color', tl.color); }
+    if (tl.bold !== undefined && cf?.bold === undefined) el.classList.add('oxe-tbl', tl.bold ? 'oxe-tbl-bold' : 'oxe-tbl-normal');
+    if (tl.italic !== undefined && cf?.italic === undefined) el.classList.add('oxe-tbl', tl.italic ? 'oxe-tbl-italic' : 'oxe-tbl-upright');
+  }
   // (An icon set's icon at the cell's left: put in after the text, which stays the cell's first child.)
   const cfIcon = cf?.icon ? iconElement(cf.icon.set, cf.icon.index) : null;
   if (cfIcon) el.classList.add('oxe-cf-iconed');

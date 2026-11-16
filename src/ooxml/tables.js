@@ -4,6 +4,7 @@
 // aside; a ' escapes the next character ([, ], # or ').
 import { kids, kid, attr, NS } from './xml.js';
 import { parseRange } from './refs.js';
+import { readAutoFilter } from './sheet.js';
 
 /** Every table of the workbook's worksheets: [{ name, si, r0, c0, r1, c1, headers (rows: 0 or 1), totals (0 or 1),
  *  columns: [names] }]. */
@@ -17,11 +18,23 @@ export function readTables(wb) {
       const area = root && parseRange(attr(root, 'ref'));
       if (!area) continue;
       const ns = root.namespaceURI;
+      const cols = kids(kid(root, 'tableColumns', ns), 'tableColumn', ns);
+      // (Its style and Table Style Options: a table without tableStyleInfo, or one without a name, has no style.)
+      const info = kid(root, 'tableStyleInfo', ns);
+      const on = (name) => attr(info, name) === '1' || attr(info, name) === 'true';
+      const filter = kid(root, 'autoFilter', ns);
       out.push({
         name: attr(root, 'displayName') || attr(root, 'name'), si, ...area, path: rel.target,
+        id: Number(attr(root, 'id') || 0),
         headers: attr(root, 'headerRowCount') === '0' ? 0 : 1,
         totals: Number(attr(root, 'totalsRowCount') || 0) > 0 ? 1 : 0,
-        columns: kids(kid(root, 'tableColumns', ns), 'tableColumn', ns).map((c) => attr(c, 'name') || ''),
+        columns: cols.map((c) => attr(c, 'name') || ''),
+        // (Each column's total: totalsRowFunction and totalsRowLabel, kept while the total row is off.)
+        totalsRow: cols.map((c) => ({ fn: attr(c, 'totalsRowFunction') || null, label: attr(c, 'totalsRowLabel') })),
+        style: { name: attr(info, 'name') || null, first: on('showFirstColumn'), last: on('showLastColumn'), rows: on('showRowStripes'), cols: on('showColumnStripes') },
+        // (Its filter buttons: an autoFilter, less the columns whose button is hidden.)
+        // (Its filters as the sheet's are read, sheet.js readAutoFilter, with the columns whose button is hidden.)
+        filter: filter ? { ...readAutoFilter(filter, ns), hidden: new Set(kids(filter, 'filterColumn', ns).filter((f) => attr(f, 'hiddenButton') === '1').map((f) => Number(attr(f, 'colId')))) } : null,
       });
     }
   });
