@@ -477,7 +477,36 @@ Measured in Excel 365 in English, 96 cases (`src/calc/charsets.js`):
   control characters U+0080 to U+009F keep their own numbers.
 - **UNICHAR refuses what isn't a character** with #N/A: the surrogates (U+D800 to U+DFFF), U+FDD0 to U+FDEF and the last
   two code points of every plane (U+FFFE, U+FFFF, U+1FFFF ... U+10FFFF). Out of range is #VALUE!, as before.
-- **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it.
+- **LEFT and RIGHT keep an emoji whole**: LEFT of an emoji and 1 is the emoji, LEFT("ab"&emoji,3) all of it. How LEN,
+  MID, FIND, SEARCH and REPLACE count one depends on the workbook: see the next section.
+
+## Emoji: the function compatibility version
+
+Measured in Excel 365 in English over COM, 1972 formulas built with UNICHAR (`tools/excel-compare/emoji-cases.mjs`,
+`excel-formulas.ps1`; Excel's answers in test/emoji-excel.json), each in basic.xlsx as this editor writes it and in the
+same workbook with the version added. The last 600 are random strings of other characters, a held-out check: **1972
+of 1972 as Excel in both** (`src/ooxml/calcmode.js` `compatVersion`, `src/calc/functions-text.js`).
+
+- **What decides it** is workbook.xml's `<extLst><ext uri="{D14903EA-33C4-47F7-8F05-3474C54BE107}">` holding
+  `<xlwcv:version setVersion="2"/>` (namespace `.../spreadsheetml/2024/workbookCompatibilityVersion`), which Excel 365
+  writes into every workbook it makes. With setVersion 2 (or 3), LEN(UNICHAR(128512)) is 1; with 1 or none, 2. Nothing
+  else in the workbook matters (calcId, fileVersion, app.xml, the theme, styles, calcChain and the calcFeatures list
+  were each tried before and after).
+- **Version 2 counts code points, not what a reader sees as one character**: a ZWJ family (man, ZWJ, woman, ZWJ,
+  girl) is 5, a flag 2, an emoji with a skin tone 2, a letter and a combining accent 2, ❤ and its variation selector 2.
+  Only LEN, MID, REPLACE, FIND and SEARCH change. LEFT and RIGHT keep a pair whole either way; LENB, MIDB, FINDB,
+  SEARCHB, REPLACEB, LEFTB and RIGHTB count UTF-16 units either way; CODE, UNICODE, SUBSTITUTE, EXACT, TEXTBEFORE,
+  TEXTAFTER and TEXTSPLIT don't count.
+- **SEARCH's ? is one UTF-16 unit in both**, so SEARCH("??",emoji) is 1 with version 2; but there a match starts only
+  where a code point does: SEARCH("?b","a"&emoji&"b") is 3 without the version, #VALUE! with it.
+- **Half an emoji** (its first unit alone, made with MIDB): with version 2 not counted at the very end of a text
+  (LEN of it alone is 0, of it and "y" 2). UNICODE of it is #VALUE! in both; UNICODE of the second unit alone is its
+  number (56832).
+- **FIND may start just past the end, SEARCH may not**: FIND("","abc",4) is 4, SEARCH("","abc",4) and SEARCH("","")
+  #VALUE!, in both.
+- **UPPER and LOWER leave letters past U+FFFF alone**: UPPER of Deseret's small long i (U+10428) is itself.
+- A workbook this editor makes has no version, as before, so it counts as Excel counts it in that workbook; one Excel
+  made keeps its extLst byte for byte and is worked out as Excel works it out.
 
 ## CELL and INFO
 
@@ -575,10 +604,6 @@ timeline of 1 to n and seasonality 0 (no season), so it needn't be measured agai
 - **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
-- **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
-  units) as 2 in a workbook such as this editor writes (the probe's, 1926 of 1926 as Excel), but as 1 in a workbook it
-  made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
-  fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
