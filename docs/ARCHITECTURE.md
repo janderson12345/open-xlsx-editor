@@ -242,6 +242,7 @@ insides:
 | `src/editor/rangesbox.js` | Review > Allow Edit Ranges. |
 | `src/editor/textwidth.js` | Text measured as Excel measures it to break lines (Fill > Justify), not as the browser draws it. |
 | `src/editor/threadbox.js` | Excel's comment thread (Review > New Comment, Ctrl+Alt+M; a thread's Reply, Edit and Delete). |
+| `src/editor/mentions.js` | @mentions in a comment box: the people offered on @ (the host's and the workbook's), narrowed as typed, picked by keys or a click (docs/NOTES.md). |
 
 ## Tools and tests
 

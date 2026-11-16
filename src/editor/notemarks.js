@@ -4,6 +4,22 @@
 // technology hears the note as the cell's description.
 import { div, setVars } from './dom.js';
 
+/** A comment's text into `el`, each @mention in it (ooxml/notes.js: start, length) highlighted as Excel shows one. */
+export function mentionText(el, text, mentions = []) {
+  let at = 0;
+  for (const m of [...mentions].sort((a, b) => a.start - b.start)) {
+    if (m.start < at || m.start + m.length > text.length) continue;
+    el.append(text.slice(at, m.start));
+    const s = document.createElement('span');
+    s.className = 'oxe-mention';
+    s.textContent = text.slice(m.start, m.start + m.length);
+    el.append(s);
+    at = m.start + m.length;
+  }
+  el.append(text.slice(at));
+  return el;
+}
+
 /** What a screen reader hears for a note or a thread. */
 export function describeNote(n) {
   if (n.kind === 'thread') return `Comment thread${n.resolved ? ', resolved' : ''}. ${n.items.map((x) => `${x.author}: ${x.text}`).join('. ')}`;
@@ -30,7 +46,7 @@ function noteBox(st, n, r, c) {
       when.className = 'oxe-thread-date';
       when.textContent = item.date ? new Date(item.date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : '';
       const text = div('oxe-thread-text');
-      text.textContent = item.text;
+      mentionText(text, item.text, item.mentions);
       one.append(who, ' ', when, text);
       box.append(one);
     }

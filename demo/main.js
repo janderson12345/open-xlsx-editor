@@ -8,7 +8,9 @@ const input = document.querySelector('input[type=file]');
 // (?fonts: open-metric-fonts served from demo/fonts/omf/, a copy of its web bundle (or of the packages wanted) that isn't in
 // the repository: README, Fonts. ?ribbon=simple or classic: the ribbon's layout to start with.)
 const params = new URLSearchParams(location.search);
-const editor = mountXlsxEditor(host, { ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}) });
+// (People a comment's @ offers, made up, as a host would give them from its directory.)
+const people = [{ name: 'Avery Chen', userId: 'avery.chen@example.com' }, { name: 'Sam Lee', userId: 'sam.lee@example.com' }, { name: 'Robin Park', userId: 'robin.park@example.com' }];
+const editor = mountXlsxEditor(host, { people, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}) });
 window.oxe = editor;
 
 async function openFile(file) {

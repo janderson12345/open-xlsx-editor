@@ -59,10 +59,7 @@ Notes > Show All Notes shows every note's box, or hides them again; as Excel's, 
 
 ## Not yet
 
-@mentions written (threads are written, resolved, replied to, edited and deleted: below). Excel makes a mention from
-the signed-in organisation's directory (a person with a provider and a user id), which COM can't make in a hidden
-instance, so there is nothing to measure them against; a mention already in a file shows, its "@Name" being part of
-the comment's text. Also: Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), notes
+Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), notes
 following their cells when rows are sorted, and marks in frozen panes' cells drawn twice. Notes do
 follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
 
@@ -95,3 +92,31 @@ Replies made within the same hundredth of a second are ordered by id in Excel, s
 one before's id with its third group one more, as Excel's own do. Excel opened the workbook written here
 (`excel-threads-check.ps1`, `test/threads-readback-excel.json`) and read both threads, their authors, texts and replies
 in order, and no placeholder notes.
+
+## @mentions (`src/editor/mentions.js`, `src/ooxml/threadedit.js`)
+
+Typing @ in a comment or reply (or while editing one) offers people: the host's list (the `people` option, a name
+with a directory's `userId` such as an email) and the workbook's own (its persons part), each name once, narrowed by
+what follows the @ (a word of the name starting so first, then the name or user id containing it; eight at most). Up
+and Down move through them, Enter or Tab (or a click) puts "@Name " in the text, Esc closes the list and not the box.
+The box is a combobox for screen readers, the person under the arrow its active option. A mention shows highlighted in
+the thread's box and in the box beside the cell.
+
+Excel makes a mention only from a signed-in organisation's directory, which COM can't reach, so a mention can't be made
+in Excel to measure. It is written as [MS-XLSX] gives it: the text keeps "@Name", and after it a `mentions` element has
+a `mention` for each "@Name" of the people picked still in the text, in the order they come (`mentionpersonId` the
+person, `mentionId` an id of its own, `startIndex` where it starts and `length` with the "@"). A name inside a longer
+one ("@Ann" in "@Anna Bell") isn't a mention. Editing a comment writes its mentions again.
+
+Excel opened a workbook with three mentions written here (`tools/excel-compare/excel-mentions-check.ps1` on
+`test/out/mentions/mentions.xlsx`, `test/mentions-excel.json`): it read the threads, authors and texts, and the copy
+it saved kept all three mentions and the persons part as they were, ids and all. Its first reading of an earlier
+version showed how it keeps people, which is what is written now:
+
+| Rule | Seen |
+|---|---|
+| Someone mentioned is a person of their own, `providerId="PeoplePicker"`, with the directory's `userId` (or the name). | Sam Lee, written with provider AD, came back PeoplePicker with `sam.lee@example.com`. |
+| The same name as an author and as mentioned: two people. | Avery Chen mentioned and replying: Excel added a None person for the reply and kept the PeoplePicker one for the mention. |
+| The persons part is in order of name, then provider (None before PeoplePicker). | Avery Chen None, Avery Chen PeoplePicker, Robin Park None, Robin Park PeoplePicker, Sam Lee. |
+
+Not yet: the e-mail Excel's service sends to someone mentioned (a host can find mentions in the threadedComments part).

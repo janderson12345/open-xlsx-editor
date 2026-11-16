@@ -2566,3 +2566,28 @@
 .oxe-page-setup .oxe-dialog-row .oxe-dialog-label { min-width: 13em; }
 .oxe-page-setup .oxe-dialog-field { width: 14em; }
 .oxe-iteration-box .oxe-dialog-field { width: 8em; }
+
+/* @mentions in comments (mentions.js, notemarks.js mentionText): the name highlighted as Excel shows it, and the list of
+   people @ offers under the comment box. */
+.oxe-mention {
+  color: var(--oxe-mention-ink, #0f5ca8);
+  background: var(--oxe-mention-bg, #e5effa);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+.oxe-root[data-theme="dark"] .oxe-mention { --oxe-mention-ink: #9cc7f5; --oxe-mention-bg: #1e3550; }
+@media (prefers-color-scheme: dark) {
+  .oxe-root:not([data-theme="light"]) .oxe-mention { --oxe-mention-ink: #9cc7f5; --oxe-mention-bg: #1e3550; }
+}
+.oxe-mention-list {
+  margin: 2px 0 6px;
+  padding: 2px 0;
+  max-height: 180px;
+  overflow: auto;
+  list-style: none;
+  border: 1px solid var(--oxe-head-line);
+  background: var(--oxe-bg, #fff);
+}
+.oxe-mention-option { padding: 3px 8px; cursor: pointer; }
+.oxe-mention-option[aria-selected="true"] { background: var(--oxe-head-bg, #e8e8e8); font-weight: 600; }
+.oxe-mention-id { opacity: 0.75; font-size: 11px; }
