@@ -19,7 +19,7 @@ import { drawFilterButtons } from './filterbuttons.js';
 import { drawNoteMarks } from './notemarks.js';
 import { drawValidation } from './dvmarks.js';
 import { circleLayer, drawCircles } from './dvcircles.js';
-import { drawCharts } from './chartview.js';
+import { drawDrawings } from './drawview.js';
 import { drawOutline } from './outlinebar.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colChars } from '../ooxml/units.js';
@@ -61,7 +61,7 @@ function draw(st, force = false) {
   drawFilterButtons(st, win);
   drawErrorButton(st);
   drawNoteMarks(st, win);
-  drawCharts(st, win);
+  drawDrawings(st, win);
   drawValidation(st);
   if (st.panes) drawPanes(st, win);
   const active = st.sel && st.idBase ? document.getElementById(`${st.idBase}-${st.sel.ar}-${st.sel.ac}`) : null;
@@ -116,10 +116,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     const wrap = div(`oxe-pane ${cls}`);
     wrap.setAttribute('aria-hidden', 'true');
     const inner = div('oxe-pane-inner');
-    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer'), filterLayer: div('oxe-filters'), noteLayer: div('oxe-notes') };
+    const layers = { lines: div('oxe-lines'), fills: div('oxe-fills'), body: div('oxe-rows'), edges: div('oxe-edges'), selLayer: div('oxe-layer'), filterLayer: div('oxe-filters'), noteLayer: div('oxe-notes'), objLayer: div('oxe-charts') };
+    layers.objLayer.setAttribute('aria-hidden', 'true');
     const over = div('oxe-overlay');
     over.append(layers.selLayer);
-    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over, layers.noteLayer, layers.filterLayer);
+    inner.append(layers.lines, layers.fills, layers.body, layers.edges, over, layers.objLayer, layers.noteLayer, layers.filterLayer);
     wrap.append(inner);
     return { wrap, inner, ...layers };
   };
@@ -330,11 +331,14 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     },
     /** What runs after the charts are drawn (chartpick.js: the picked one's outline put back). */
     onChartsDrawn(fn) { st.onChartsDrawn = fn; },
-    /** The sheet's charts (ooxml/charts.js readCharts), drawn over the cells in the workbook's theme. */
-    setCharts(charts, theme) {
+    /** The sheet's charts (ooxml/charts.js readCharts) and its other drawing objects (pictures, shapes, groups:
+     *  ooxml/drawobjects.js readObjects), drawn over the cells in the workbook's theme. */
+    setCharts(charts, theme, objects = []) {
       st.charts = charts;
+      st.objects = objects;
       st.theme = theme;
       st.chartCache = new Map();
+      st.objectCache = new Map();
       draw(st, true);
     },
     /** The active cell's data validation ({ r, c, list, prompt: { title, text } }, or null): a list's button beside

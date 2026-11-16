@@ -7,6 +7,7 @@ import { drawSelection } from './selection.js';
 import { drawFilterButtons } from './filterbuttons.js';
 import { drawNoteMarks } from './notemarks.js';
 import { colName } from '../ooxml/refs.js';
+import { drawPaneDrawings } from './drawview.js';
 import { SPILL_BACK, MDW } from './geometry.js';
 
 export function drawColumnHeadings(st, win) {
@@ -36,7 +37,7 @@ export function drawPanes(st, win) {
   const fr = st.freeze?.rows || 0;
   const fc = st.freeze?.cols || 0;
   const paint = (pane, w) => {
-    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer', 'filterLayer', 'noteLayer']) pane[k].replaceChildren(); return; }
+    if (!w) { for (const k of ['lines', 'fills', 'body', 'edges', 'selLayer', 'filterLayer', 'noteLayer', 'objLayer']) pane[k]?.replaceChildren(); return; }
     // (The pane's own layers; no cell ids, which belong to the sheet's own cells.)
     const sub = Object.assign(Object.create(st), { lines: pane.lines, fills: pane.fills, body: pane.body, edges: pane.edges, selLayer: pane.selLayer, filterLayer: pane.filterLayer, noteLayer: pane.noteLayer, noteTexts: null, idBase: null });
     drawGridlines(sub, w);
@@ -47,6 +48,8 @@ export function drawPanes(st, win) {
     drawSelection(sub);
     drawFilterButtons(sub, w);
     drawNoteMarks(sub, w);
+    // (Charts, pictures and shapes in the rows or columns kept in place: drawn there too, drawview.js.)
+    drawPaneDrawings(sub, pane.objLayer, w);
   };
   // (From where the freeze starts: the window's first row and column when it was frozen.)
   const top = st.freeze?.top || 0;

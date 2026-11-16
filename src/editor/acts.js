@@ -119,6 +119,12 @@ export function createActs(env) {
     if (partOfText(name, args)) return true;
     if (!allowed(name, args[0])) return false;
     const i = state.sheetIndex;
+    // (Go To Special > Objects: every chart, picture and shape on the sheet picked, chartpick.js. Excel's message for
+    // none wasn't measured.)
+    if (name === 'goToSpecial' && args[0]?.kind === 'objects') {
+      if (state.picker?.pickAll()) return true;
+      return messageBox(root, 'No objects were found.').then(() => false);
+    }
     // (Insert > Sparklines and the Sparkline tab: acts-sparklines.js.)
     if (name.startsWith('sparkline')) return (sparks ??= createSparklineActs({ ...env, act }))(name, args);
     // (Insert > Table, Format as Table and the Table Design tab: acts-tables.js.)
@@ -229,7 +235,8 @@ export function createActs(env) {
     if (name === 'specialBox') {
       // (Excel's Go To Special box; its choice found and selected.)
       return specialBox(root).then((choice) => {
-        if (choice) editing().run('goToSpecial', choice);
+        if (choice?.kind === 'objects') act('goToSpecial', choice);
+        else if (choice) editing().run('goToSpecial', choice);
         state.grid.el.focus({ preventScroll: true });
       });
     }
@@ -448,6 +455,11 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     menu.open([{ label: 'Edit Chart...', run: () => act('chartBox', k), disabled: ro }, { label: 'Select Data...', run: () => act('chartDataBox', k), disabled: ro }, { label: 'Format Chart...', run: () => act('chartFormatBox', k), disabled: ro }, 'separator', { label: 'Delete', run: () => act('chartDelete', k), disabled: ro }], point,
       { back: () => state.grid.el.focus({ preventScroll: true }) });
   };
+  /** A picture's, shape's or group's menu (right click, Shift+F10), or that of several picked: Delete. */
+  const objectMenu = (point, ords) => {
+    const ro = state.readOnly;
+    menu.open([{ label: 'Delete', run: () => act('drawingsDelete', ords), disabled: ro }], point, { back: () => state.grid.el.focus({ preventScroll: true }) });
+  };
   const cellMenu = (point) => {
     const ro = state.readOnly;
     const run = (name, ...a) => () => act(name, ...a);
@@ -506,5 +518,5 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
     if (n == null) return false;
     return editing().run(rows ? 'rowHeight' : 'columnWidth', n);
   };
-  return { act, lines, pasteSpecialBox, sortWarning, sortQuick, customSort, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu, sizeBox };
+  return { act, lines, pasteSpecialBox, sortWarning, sortQuick, customSort, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, objectMenu, headerMenu, sizeBox };
 }

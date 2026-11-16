@@ -93,6 +93,13 @@ outside the repository). Excel printed each to PDF, and the text of both sets of
   within 0.5px in place and size, print and export; text pieces within 1px both ways, 122 of 122 since the one-line
   rule at a scale above).
 
+- **Pictures, shapes and icons** (`editor/print.js` drawObjectsBlock, `pdf.js`) print over the page's own cells
+  and are clipped to them, as Excel's are: one across a page break prints its part on each page (the turned picture
+  over J and K of drawings.xlsx, on pages 1 and 2 within 0.8px both). The printed range takes in the cells under
+  them (Excel's does: drawings.xlsx's star past the last cell printed on page 2). Not repeated with print titles; an
+  object with fPrintsWithSheet="0" isn't printed. Their place and size follow the printed rows and columns as on
+  screen (docs/LAYOUT.md, Pictures, shapes and icons, for what was measured).
+
 ## Setting them (measured)
 
 Page Layout > Page Setup's Print Area and Breaks set what the rules above read (`ooxml/pagesetupedit.js`), written as

@@ -27,6 +27,8 @@ import { tableLooks } from './ooxml/tablestyle.js';
 import { readTables } from './ooxml/tables.js';
 import { errorFlags, ERROR_RULES } from './ooxml/errorcheck.js';
 import { readCharts } from './ooxml/charts.js';
+import { readObjects } from './ooxml/drawobjects.js';
+import { objectFigure } from './editor/drawview.js';
 import { chartFigure } from './editor/chartview.js';
 import { createRibbon } from './editor/ribbon.js';
 import { createFindBar, pickCell } from './editor/findbar.js';
@@ -203,16 +205,21 @@ export function mountXlsxEditor(host, options = {}) {
     state.grid.setCircles(circled);
     // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)
     // (Each with its place among the sheet's charts, which the chart edits go by: chartedit.js.)
-    const charts = readCharts(state.workbook, state.sheetIndex).map((c, index) => ({ ...c, index })).filter((c) => c.kind);
+    // (With the sheet's pictures, shapes and groups, each known by its place among the drawing's anchors, which the
+    // object edits go by: drawobjects.js; a chart's place too, for the order they are drawn in.)
+    const all = readObjects(state.workbook, state.sheetIndex);
+    const ords = new Map(all.filter((o) => o.kind === 'chart').map((o) => [o.chart, o.k]));
+    const charts = readCharts(state.workbook, state.sheetIndex).map((c, index) => ({ ...c, index, ord: ords.get(index) ?? -1 - index })).filter((c) => c.kind);
     state.charts = charts;
-    state.grid.setCharts(charts, state.workbook.theme);
+    state.objects = all.filter((o) => o.item && !o.hidden && ['picture', 'shape', 'group'].includes(o.kind));
+    state.grid.setCharts(charts, state.workbook.theme, state.objects);
     // (The sheet's sparklines, with their data as it is now.)
     state.grid.setSparklines(sparklineLooks(state.workbook, state.sheetIndex));
     const tables = readTables(state.workbook).filter((t) => t.si === state.sheetIndex);
     state.grid.setTables(tableLooks(state.workbook, tables, state.sheetIndex), tables.filter((t) => t.filter && t.headers).map((t) => ({ name: t.name, filter: t.filter, hidden: t.filter.hidden })));
     let figures = root.querySelector(':scope > .oxe-chart-figures');
-    if (!figures && charts.length) { figures = document.createElement('section'); figures.className = 'oxe-chart-figures'; figures.setAttribute('aria-label', 'Charts on this sheet'); root.append(figures); }
-    figures?.replaceChildren(...charts.map(chartFigure));
+    if (!figures && (charts.length || state.objects.length)) { figures = document.createElement('section'); figures.className = 'oxe-chart-figures'; figures.setAttribute('aria-label', 'Charts, pictures and shapes on this sheet'); root.append(figures); }
+    figures?.replaceChildren(...charts.map(chartFigure), ...state.objects.map(objectFigure));
   };
   /** The ribbon showing what the active cell has. */
   const lookChanged = () => {
@@ -331,7 +338,7 @@ export function mountXlsxEditor(host, options = {}) {
   };
   // (Text Import, Save As and the locale: editor/files.js.)
   const files = createFiles({ root, state, options, editing, api: () => api });
-  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink, files });
+  const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, objectMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink, files });
   const api = {
     /** Open a workbook (or a .csv, by its `fileName`) and show the sheet it opens on (its active tab, or the first
      *  visible worksheet). One saved
@@ -370,7 +377,7 @@ export function mountXlsxEditor(host, options = {}) {
       if (state.grid) { state.grid.setSheet(sheet, wb.sheets[i].name, state.looks); state.grid.setNotes(readNotes(wb, i)); showConditional(); }
       else {
         // (The grid, its editing and the sheet tabs, made with the first workbook: editor/mountparts.js.)
-        createParts({ root, state, options, act, openFilter, fillOptionsMenu, listMenu, chartMenu, showConditional, showSheet,
+        createParts({ root, state, options, act, openFilter, fillOptionsMenu, listMenu, chartMenu, objectMenu, showConditional, showSheet,
           sheetsChanged, alert, followLink, editing, lookChanged, restyled, showClip, lines, headerMenu, cellMenu, filterMenu,
           askInvalid, showValidation, allowed, openMenu, statusMenu, sheetActs }, wb, i, sheet);
       }
@@ -465,7 +472,7 @@ export function mountXlsxEditor(host, options = {}) {
     preparePrint() {
       if (!state.workbook) return 0;
       const wb = state.workbook;
-      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex), sparks: sparklineLooks(wb, state.sheetIndex), tables: tableLooks(wb, readTables(wb), state.sheetIndex) });
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex), sparks: sparklineLooks(wb, state.sheetIndex), tables: tableLooks(wb, readTables(wb), state.sheetIndex), objects: readObjects(wb, state.sheetIndex), theme: wb.theme });
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },

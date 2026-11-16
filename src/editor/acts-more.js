@@ -20,6 +20,7 @@ import { addThread, replyThread, editThread, resolveThread, workbookPeople } fro
 import { insertChart } from '../ooxml/chartnew.js';
 import { BAR_COLORS } from '../ooxml/cfbarsedit.js';
 import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
+import { setObjectAnchor, deleteObjects } from '../ooxml/drawobjects.js';
 import { chartBox } from './chartbox.js';
 import { createChartDataActs } from './acts-chartdata.js';
 import { createChartActs } from './chartacts.js';
@@ -307,6 +308,13 @@ export function createMoreActs(env) {
     }
     if (name === 'chartAnchor') return editing().run('sheetChange', (wb, si) => { setChartAnchor(wb, si, args[0], args[1], args[2]); }, 'objects');
     if (name === 'chartDelete') return editing().run('sheetChange', (wb, si) => { deleteChart(wb, si, args[0]); }, 'objects');
+    // (Pictures, shapes and charts moved or sized together, and deleted together: each one step, drawobjects.js.)
+    if (name === 'drawingsPlace') {
+      return editing().run('sheetChange', (wb, si) => {
+        for (const p of args[0]) if (p.chart != null) setChartAnchor(wb, si, p.chart, p.from, p.to); else setObjectAnchor(wb, si, p.k, p.from, p.to, p.rect);
+      }, 'objects');
+    }
+    if (name === 'drawingsDelete') return editing().run('sheetChange', (wb, si) => { deleteObjects(wb, si, args[0]); }, 'objects');
     if (name === 'chartEdit') {
       // (Edit Chart's answer: each change as Excel writes it, chartedit.js; refused for a chart written otherwise.)
       const [k, change] = args;

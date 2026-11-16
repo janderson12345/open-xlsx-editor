@@ -96,7 +96,10 @@ export function readTheme(doc) {
     const sys = kid(c, 'sysClr', a);
     return srgb ? srgb.getAttribute('val') : sys ? sys.getAttribute('lastClr') : null;
   });
+  // (The line styles' widths in EMU, which shapes' lnRef idx 1, 2, 3 name: drawpaint.js.)
+  const lines = kids(kid(kid(el, 'fmtScheme', a), 'lnStyleLst', a), 'ln', a).map((l) => Number(l.getAttribute('w') || 0));
   return {
+    ...(lines.length ? { lines } : {}),
     fonts: { major: latin('majorFont') || DEFAULT_THEME.fonts.major, minor: latin('minorFont') || DEFAULT_THEME.fonts.minor },
     colors: kids(clr).length ? colors : DEFAULT_THEME.colors,
   };

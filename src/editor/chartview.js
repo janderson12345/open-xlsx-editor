@@ -108,11 +108,10 @@ export function chartFigure(chart) {
   return fig;
 }
 
-/** Draw `st.charts` (charts.js readCharts) that reach into window `win` into `st.chartLayer`, each where its anchor
- *  puts it over the cells; a chart's picture is made again only when its size changes. */
-export function drawCharts(st, win) {
-  const layer = st.chartLayer;
-  if (!layer) return;
+/** The boxes of `st.charts` (charts.js readCharts) that reach into window `win`, each where its anchor puts it over
+ *  the cells: [{ ord (its place in the drawing's order), el }]. A chart's picture is made again only when its size
+ *  changes (`fresh`: a box of its own, for a frozen pane). drawview.js drawDrawings draws them with the objects. */
+export function chartBoxes(st, win, fresh = false) {
   st.chartCache ??= new Map();
   const out = [];
   for (const ch of st.charts || []) {
@@ -123,19 +122,19 @@ export function drawCharts(st, win) {
     const h = Math.round(st.rows.start(ch.to.r) + ch.to.dy - y);
     if (w < 20 || h < 20) continue;
     const key = `${w}x${h}`;
-    let box = st.chartCache.get(ch);
+    let box = fresh ? null : st.chartCache.get(ch);
     if (!box || box.key !== key) {
       const div = document.createElement('div');
       div.className = 'oxe-chart';
       div.dataset.oxeChart = String(ch.index ?? st.charts.indexOf(ch));
+      div.dataset.oxeOrd = String(ch.ord ?? -1 - (ch.index ?? 0));
       div.append(chartSvg(ch, { width: w, height: h, theme: st.theme, date1904: st.date1904 }));
       box = { key, div };
-      st.chartCache.set(ch, box);
+      if (!fresh) st.chartCache.set(ch, box);
     }
     box.div.style.setProperty('--oxe-x', `${x}px`);
     box.div.style.setProperty('--oxe-y', `${y}px`);
-    out.push(box.div);
+    out.push({ ord: ch.ord ?? -1 - (ch.index ?? 0), el: box.div });
   }
-  layer.replaceChildren(...out);
-  st.onChartsDrawn?.();
+  return out;
 }

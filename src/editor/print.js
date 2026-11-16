@@ -11,6 +11,9 @@ import { autoRowHeights, rowDescents } from './rowheights.js';
 import { setSheet } from './sheets.js';
 import { drawHeaderFooter } from './printhf.js';
 import { colName } from '../ooxml/refs.js';
+import { anchorRect } from '../ooxml/drawobjects.js';
+import { objectElement } from './drawview.js';
+import { isLineObject } from './drawpaint.js';
 
 const DPI = 96;
 /** The room Excel paginates into: the printable height, or width, less a point (measured: Calibri rows of 121 dots at
@@ -194,6 +197,34 @@ function drawHeadings(st, heads, colRuns, rowRuns) {
   return out;
 }
 
+/** The pictures, shapes and groups over a page's own cells (drawview.js boxes, at the print geometry), clipped to
+ *  those cells, as Excel prints them: an object across a page break printed in part on each page. */
+function drawObjectsBlock(st, block, x, y) {
+  const w = span(st.cols, block.c0, block.c1);
+  const h = span(st.rows, block.r0, block.r1);
+  const x0 = st.cols.start(block.c0);
+  const y0 = st.rows.start(block.r0);
+  const boxes = [];
+  for (const obj of st.objects || []) {
+    if (obj.hidden || !obj.item || obj.print === false) continue;
+    const r = anchorRect(obj.anchor, st.rows, st.cols, obj.item);
+    if (isLineObject(obj) ? !(r.w > 0 || r.h > 0) : !(r.w >= 1 && r.h >= 1)) continue;
+    const reach = Math.hypot(r.w, r.h) / 2;
+    const cx = r.x + r.w / 2;
+    const cy = r.y + r.h / 2;
+    if (cx + reach <= x0 || cx - reach >= x0 + w || cy + reach <= y0 || cy - reach >= y0 + h) continue;
+    boxes.push(objectElement(obj, r, st.theme));
+  }
+  if (!boxes.length) return null;
+  const clip = div('oxe-page-block oxe-page-objclip');
+  setVars(clip, { '--oxe-bx': x, '--oxe-by': y, '--oxe-bw': w, '--oxe-bh': h });
+  const layer = div('oxe-page-objs');
+  setVars(layer, { '--oxe-ox': x0, '--oxe-oy': y0 });
+  layer.append(...boxes);
+  clip.append(layer);
+  return clip;
+}
+
 function drawPage(st, block, layout, k = 0, hf = {}) {
   const pageEl = div('oxe-page');
   setVars(pageEl, { '--oxe-page-w': layout.paper.w, '--oxe-page-h': layout.paper.h });
@@ -226,6 +257,8 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
   if (withRows) box.appendChild(drawBlock(st, { r0: tr[0], r1: tr[1], c0: block.c0, c1: block.c1 }, tw, hh, layout));
   if (withCols) box.appendChild(drawBlock(st, { r0: block.r0, r1: block.r1, c0: tc[0], c1: tc[1] }, hw, th, layout));
   box.appendChild(drawBlock(st, block, tw, th, layout, true));
+  const objs = drawObjectsBlock(st, block, tw, th);
+  if (objs) box.appendChild(objs);
   if (layout.heads) box.appendChild(drawHeadings(st, layout.heads, [...(withCols ? [[tc[0], tc[1]]] : []), [block.c0, block.c1]], [...(withRows ? [[tr[0], tr[1]]] : []), [block.r0, block.r1]]));
   area.appendChild(box);
   pageEl.appendChild(area);
@@ -238,13 +271,20 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
  *  `looks` gives cell format classes and decorations (cellstyles.js), `normalFamily` the Normal style's typeface (printed
  *  row heights depend on it), `print` its print area and titles (printarea.js printSetup) and, for headers and footers,
  *  `sheet` and `file` (names), `sizePt` (the Normal style's size) and `pictures` (hfpictures.js headerPictures), and
- *  `sparks` (ooxml/sparklines.js sparklineLooks), `tables` (ooxml/tablestyle.js tableLooks). Returns the number of pages. */
+ *  `sparks` (ooxml/sparklines.js sparklineLooks), `tables` (ooxml/tablestyle.js tableLooks), `objects` (ooxml/drawobjects.js
+ *  readObjects) and `theme` for the pictures and shapes. Returns the number of pages. */
 export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, print = {}) {
   const screen = sheetGeometry(sheet);
   const auto = autoRowHeights(sheet, looks.deco, screen.cols);
   const full = sheetGeometry(sheet, { print: true, normalFamily, auto });
   // (Cells holding only a sparkline are printed too, as Excel prints them: sparklines.xlsx's column O.)
   const keys = [...(print.sparks?.keys() || [])].map((k) => k.split(',').map(Number));
+  // (And the cells under pictures and shapes, which Excel prints with the used range: their last row and column.)
+  for (const obj of print.objects || []) {
+    if (obj.hidden || !obj.item || obj.print === false) continue;
+    const r = anchorRect(obj.anchor, full.rows, full.cols, obj.item);
+    keys.push([full.rows.indexAt(Math.max(0, r.y + r.h - 0.5)), full.cols.indexAt(Math.max(0, r.x + r.w - 0.5))]);
+  }
   const range = print.area || { r0: 0, c0: 0, r1: Math.max(0, sheet.maxRow, ...keys.map((k) => k[0])), c1: Math.max(0, sheet.maxCol, ...keys.map((k) => k[1])) };
   const scale = printScale(sheet, full, range);
   const geometry = scale === 1 ? full : sheetGeometry(sheet, { print: true, normalFamily, auto, scale });
@@ -252,7 +292,7 @@ export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, p
   // (A print area of several ranges: each on pages of its own, in the order listed, as Excel prints them (its PDFs:
   // two ranges down or across, three out of order, with print titles over each); the scale is the first range's.)
   if (print.areas?.length > 1) layout.pages = print.areas.flatMap((a) => paginate(sheet, geometry, { ...print, area: a, scale }).pages);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), sparks: print.sparks, tables: print.tables, print: true };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), sparks: print.sparks, tables: print.tables, objects: print.objects, theme: print.theme, print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');

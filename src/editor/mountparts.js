@@ -11,14 +11,14 @@ import { lastCopy, setLastCopy } from './pagebooks.js';
 
 /** Make the grid, its editing and the tabs in `env.root` for workbook `wb` showing sheet `i` (`sheet`, its model). */
 export function createParts(env, wb, i, sheet) {
-  const { root, state, options, act, openFilter, fillOptionsMenu, listMenu, chartMenu, showConditional, showSheet, sheetsChanged, alert, followLink, editing, lookChanged, restyled, showClip, lines, headerMenu, cellMenu, filterMenu, askInvalid, showValidation, allowed, openMenu, statusMenu, sheetActs } = env;
+  const { root, state, options, act, openFilter, fillOptionsMenu, listMenu, chartMenu, objectMenu, showConditional, showSheet, sheetsChanged, alert, followLink, editing, lookChanged, restyled, showClip, lines, headerMenu, cellMenu, filterMenu, askInvalid, showValidation, allowed, openMenu, statusMenu, sheetActs } = env;
     state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
     state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect(), button.dataset.table || null));
     state.grid.onErrorButton((point) => act('errorMenu', point));
     state.grid.onOutline((o) => (o.level ? act('outlineLevel', o.axis, o.level) : act('outlineToggle', o.axis, o.line)));
     state.grid.onFillOptions((point) => fillOptionsMenu(point));
     state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
-    state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], act, menu: (point, k) => chartMenu(point, k), readOnly: () => state.readOnly });
+    state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], objects: () => state.objects || [], act, menu: (point, k) => chartMenu(point, k), objectMenu: (point, ords) => objectMenu(point, ords), readOnly: () => state.readOnly });
     state.grid.onChartsDrawn(() => state.picker?.redrawn());
     state.grid.setNotes(readNotes(wb, i));
     showConditional();

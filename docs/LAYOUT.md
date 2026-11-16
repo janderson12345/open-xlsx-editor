@@ -168,6 +168,50 @@ whole-pixel snapping landing just past the line. Next (GridCraft's `crates/numfm
 against Excel). All of this so far is on generated fixtures; the numbers that matter come from real workbooks
 (`..\samples`).
 
+## Pictures, shapes and icons
+
+Read from the sheet's drawing parts (`src/ooxml/drawobjects.js`), painted as paths, pictures and text boxes in the
+sheet's pixels (`src/editor/drawpaint.js`, the outlines in `src/ooxml/presets.js`) and drawn over the cells
+(`src/editor/drawview.js`), with the charts, in the drawing's order. The same boxes are printed (`print.js`) and
+exported (`pdf.js`). The probe is `test/fixtures/drawings.xlsx` (`drawings.mjs`, everything made in code): Excel
+printed it to PDF (`tools/excel-compare/excel-print.ps1`) and its pictures (`images.cjs`), fills and lines
+(`shapes.cjs`) and text (`cells.cjs`) were compared with ours.
+
+- **Anchors.** A two-cell anchor goes from its first corner to its second whatever its editAs: Excel's PDF drew the
+  editAs="oneCell" picture over hidden row 6 that much shorter (116.16px, six printed rows), though its extent is
+  seven rows. A one-cell anchor is its corner and its extent; an absolute anchor its position and extent, in pixels
+  of the sheet (at print, not scaled with the printed columns: the 120px picture printed 120px). Offsets past a
+  cell's size stop at its edge. Lines (connectors, line) may be 0 one way; anything else of no width or height
+  (all its rows or columns hidden) isn't drawn.
+- **Turned shapes.** Turned 45 to 135 degrees (or 225 to 315) the anchor holds the shape's frame upright, its width
+  and height swapped about the middle: the right arrow at 45 degrees over B18:D22 printed 184.6px square, as an arrow
+  of the anchor's height by its width turned is; not swapped, 201.7px. Under 45 degrees the frame is the anchor's.
+  Flips mirror the outline and the picture; text isn't mirrored (turned over for flipV).
+- **Pictures.** srcRect crops each side by its fraction of the picture (negative: a margin); Excel's PDF has the
+  cropped part at the frame, ours the whole picture placed so that the same part fills the frame, clipped to it: the
+  same picture on the page within 0.4px. A picture's geometry (a rounded or oval frame) clips it. SVG icons draw
+  from their SVG on screen and in browser print, and from their PNG fallback in the PDF export; GIF, BMP and WebP
+  are turned to PNG for the export. EMF, WMF and TIFF draw as a grey box.
+- **Colours.** The file's own, else the theme's through the shape's style (fillRef, lnRef: the theme's line widths,
+  fontRef for text). lumMod and lumOff work on HSL's luminance in fractions, not the integer HLS of cells' tints:
+  accent 2 (ED7D31) at 75% printed C55A11 (integer HLS gives C65911). shade and tint work in linear RGB: accent 1
+  shaded 50% printed 2F528F, as here. alpha is kept; a gradient is drawn in its middle stop's colour.
+- **Arrowheads.** Medium heads (Excel's default) are three times the line's width long and wide, and no less than 8px:
+  on lines of 1.33 and 2px Excel printed 8 by 8px (here within 0.3px).
+- **Text.** Insets 0.1in across and 0.05in down (bodyPr's lIns, tIns...), anchored top, middle or bottom, paragraphs
+  left, centred or right, lines the font's own height apart (18px for 11pt Calibri at 100% spacing, not 1.2em); 11pt
+  in the theme's body font when the file says nothing.
+
+Results (16 November 2026, Excel 365 and Edge): pictures within 0.8px in place and size in browser print, within 0.6px
+in the PDF export; the shapes' text 40 of 40 pieces within 1px across and down, both ways; fills 12 of 18 within 1px
+in browser print (13 in the export), the others Excel's lines written as filled outlines where ours are strokes (their
+ends within 1.1px), its SVG icon drawn as paths, and the cloud.
+
+Not drawn yet, or drawn otherwise: presets other than those in `presets.js` (the cloud, callouts, stars but star5,
+brackets...) are their bounding box; custom geometry's guides are taken as 0; gradients, pattern fills, a shape's
+picture fill, shadows, glow and 3-D are left out; vertical text is turned but not laid out in columns; text in a turned
+box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and form controls aren't drawn.
+
 ## Open differences
 
 - East Asian date formats (built-in ids 27-36 and 50-58) are shown as General (`ooxml/format.js`).
