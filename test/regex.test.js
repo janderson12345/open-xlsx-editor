@@ -34,7 +34,9 @@ test('a pattern that backtracks without end is #VALUE!, as at PCRE2\'s match lim
     'REGEXREPLACE(REPT("a",3000)&"!","(a|aa)+$","#")']) {
     const t = Date.now();
     assert.equal(wb.calc.formulaAt(0, 900, 20, f).code, '#VALUE!', f);
-    assert.ok(Date.now() - t < 3000, `${f} took ${Date.now() - t} ms`);
+    // (About 0.7 s alone; up to 8 times that while the other test files run beside it. Without the step limit these
+    // take minutes, so 15 s still tells the two apart.)
+    assert.ok(Date.now() - t < 15000, `${f} took ${Date.now() - t} ms`);
   }
   // (One that needn't backtrack is worked out, however long.)
   assert.equal(wb.calc.formulaAt(0, 900, 20, 'REGEXTEST(REPT("a",28),"^(a+)+$")'), true);

@@ -22,7 +22,9 @@ const quick = (label, fn) => {
   const t0 = performance.now();
   const result = fn();
   const ms = performance.now() - t0;
-  assert.ok(ms < 500, `${label}: ${ms.toFixed(0)} ms`);
+  // (Well under 0.5 s alone, but several times slower while the other test files run beside it; what these guard
+  // against, a hang or a quadratic walk over a crafted sheet, takes far longer than 3 s.)
+  assert.ok(ms < 3000, `${label}: ${ms.toFixed(0)} ms`);
   return result;
 };
 const tryParse = (f) => { try { return parseFormula(f); } catch (e) { return e; } };
