@@ -67,4 +67,9 @@ was the same file as the workbook saved as .xlsx. So here (`ooxml/filetype.js`):
 - A workbook with macros becomes only a macro kind: Excel would drop the VBA project for .xlsx or .xltx (with a
   warning; not measured), so the editor refuses.
 
+VBA is not supported in this control. This is a decision, not a gap to be filled. Macros are never run, shown or
+edited, and the VBA project (`xl/vbaProject.bin`) is never parsed. It is kept byte for byte, with any signature parts,
+the custom ribbon (customUI) and the macro-enabled content type, so Excel still has the macros when it opens a file
+saved here (test/macros.test.js).
+
 What a host names the file is its own: Excel names a new workbook from a template after it (book.xltx: "book1").
