@@ -15,8 +15,8 @@ import { maxOf, minOf } from '../ooxml/listmath.js';
 
 const sorted = (args, ctx) => numbers(args, ctx).sort((a, b) => a - b);
 
-// ---- SUBTOTAL: the function by number (1 to 11, or 101 to 111 leaving hidden rows out), over cells that aren't
-// themselves SUBTOTAL or AGGREGATE.
+// ---- SUBTOTAL: the function by number (1 to 11 leaving rows a filter hides out, 101 to 111 every hidden row), over
+// cells that aren't themselves SUBTOTAL or AGGREGATE.
 
 const SUBTOTALS = { 1: 'AVERAGE', 2: 'COUNT', 3: 'COUNTA', 4: 'MAX', 5: 'MIN', 6: 'PRODUCT', 7: 'STDEV', 8: 'STDEVP', 9: 'SUM', 10: 'VAR', 11: 'VARP' };
 def('SUBTOTAL', (a, ctx) => {
@@ -30,7 +30,7 @@ def('SUBTOTAL', (a, ctx) => {
     if (!areas) throw E.value;
     for (const x of areas) {
       for (let r = x.r0; r <= x.r1; r++) {
-        if (n > 100 && ctx.rowHidden?.(x.si, r)) continue;
+        if (n > 100 ? ctx.rowHidden?.(x.si, r) : ctx.rowFiltered?.(x.si, r)) continue;
         for (let c = x.c0; c <= x.c1; c++) {
           const f = ctx.formulaOf?.(x.si, r, c);
           if (f && /^\s*(_xlfn\.)?(SUBTOTAL|AGGREGATE)\s*\(/i.test(f)) continue;
