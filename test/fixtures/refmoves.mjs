@@ -1,4 +1,4 @@
-// Two workbooks for what moves when rows, columns and cells are inserted, deleted or sorted, each the sheet the Excel
+// Workbooks for what moves when rows, columns and cells are inserted, deleted or sorted, each the sheet the Excel
 // probe builds (tools/excel-compare/refmove-cases.mjs, slicer-cases.mjs) written as Excel saved it, made-up data:
 // refmoves.xlsx  sparklines (a group over O2:O5, a column sparkline at O7, one at Q2 of another sheet's data),
 //                data validation rules (two lists, a whole number, a custom formula; the list reading the Data sheet
@@ -185,5 +185,34 @@ export function slicerBook() {
     'xl/timelines/timeline1.xml': timeline,
     'xl/drawings/drawing1.xml': drawing,
     'xl/styles.xml': styles,
+  });
+}
+
+/** cfmoves.xlsx: the sheet excel-cfmoves.ps1 builds (cfmove-cases.mjs), its conditional formats as Excel wrote them:
+ *  data bars on B2:B10 (both forms, linked by an x14:id), 3 stars on C2:C10 and =D2>Data!$A$1 on D2:D10 (the 2010 form
+ *  only), greater than 5 on E2:E10 (test/cfmoves.test.js against test/cfmoves-excel.json). */
+export function cfmoves() {
+  const values = {};
+  for (let r = 2; r <= 10; r++) for (let c = 2; c <= 5; c++) values[`${col(c - 1)}${r}`] = ((r * 3 + c * 5) % 9) + 1;
+  const BAR = '{3B5C7D9E-1F2A-4B6C-8D0E-2A4B6C8D0E1F}';
+  const main = '<conditionalFormatting sqref="B2:B10"><cfRule type="dataBar" priority="1"><dataBar><cfvo type="min"/><cfvo type="max"/><color rgb="FF638EC6"/></dataBar>' +
+    `<extLst><ext uri="{B025F937-C7B1-47D3-B67F-A62EFF666E3E}" xmlns:x14="${X14}"><x14:id>${BAR}</x14:id></ext></extLst></cfRule></conditionalFormatting>` +
+    '<conditionalFormatting sqref="E2:E10"><cfRule type="cellIs" dxfId="0" priority="4" stopIfTrue="1" operator="greaterThan"><formula>5</formula></cfRule></conditionalFormatting>';
+  const cf = (rule, sqref) => `<x14:conditionalFormatting xmlns:xm="${XM}">${rule}<xm:sqref>${sqref}</xm:sqref></x14:conditionalFormatting>`;
+  const ext = `<extLst><ext uri="{78C0D931-6437-407d-A8EE-F0AAD7539E65}" xmlns:x14="${X14}"><x14:conditionalFormattings>` +
+    cf(`<x14:cfRule type="dataBar" id="${BAR}"><x14:dataBar minLength="0" maxLength="100" negativeBarColorSameAsPositive="1" axisPosition="none"><x14:cfvo type="min"/><x14:cfvo type="max"/></x14:dataBar></x14:cfRule>`, 'B2:B10') +
+    cf('<x14:cfRule type="iconSet" priority="2" id="{4C6D8E0F-2A3B-4C7D-9E1F-3B5C7D9E1F2A}"><x14:iconSet iconSet="3Stars"><x14:cfvo type="percent"><xm:f>0</xm:f></x14:cfvo><x14:cfvo type="percent"><xm:f>33</xm:f></x14:cfvo><x14:cfvo type="percent"><xm:f>67</xm:f></x14:cfvo></x14:iconSet></x14:cfRule>', 'C2:C10') +
+    cf('<x14:cfRule type="expression" priority="3" stopIfTrue="1" id="{5D7E9F1A-3B4C-4D8E-8F2A-4C6D8E0F2A3B}"><xm:f>D2&gt;Data!$A$1</xm:f><x14:dxf><fill><patternFill><bgColor rgb="FFFFC7CE"/></patternFill></fill></x14:dxf></x14:cfRule>', 'D2:D10') +
+    '</x14:conditionalFormattings></ext></extLst>';
+  write('cfmoves.xlsx', {
+    '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/worksheets/sheet2.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ...PROPS_CT]),
+    '_rels/.rels': ROOT_RELS,
+    ...docProps(),
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Sheet1" sheetId="1" r:id="rId1"/><sheet name="Data" sheetId="2" r:id="rId2"/></sheets></workbook>`,
+    'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('worksheet'), 'worksheets/sheet2.xml'], ['rId3', RT('styles'), 'styles.xml']]),
+    'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><dimension ref="B2:E10"/><sheetData>${sheetData(values)}</sheetData>${main}` +
+      `<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>${ext}</worksheet>`,
+    'xl/worksheets/sheet2.xml': `${DECL}<worksheet xmlns="${X}" xmlns:r="${R}"><dimension ref="A1"/><sheetData>${sheetData({ A1: 4 })}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
+    'xl/styles.xml': STYLES,
   });
 }

@@ -146,6 +146,9 @@ a type (Lowest or Highest Value, Number, Percent, Formula, Percentile), a value 
 Excel numbered a built-in code in a dxf oddly (`numFmtId="14"` for 0.00%); here a rule's number format takes the next
 id from 164, as Excel numbers its own (Excel reads a dxf's number format by its code).
 
+Inserting and deleting rows, columns and cells moves, grows, splits and extends conditional formats of both forms as
+Excel does (docs/ROWCOL.md, measured).
+
 ## Not yet
 
 A data bar's own thresholds and colours in New Rule (and so a data bar's own colours kept when one is edited).

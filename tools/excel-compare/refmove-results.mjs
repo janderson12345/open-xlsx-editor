@@ -1,8 +1,9 @@
-// Excel's results from excel-refmoves.ps1 or excel-slicers.ps1 cut down to what the tests compare, with each case's
-// step: test/refmoves-excel.json and test/slicers-excel.json. (No ids, no names: the parts' revision ids and Excel's
-// user name stay out.)
+// Excel's results from excel-refmoves.ps1, excel-slicers.ps1 or excel-cfmoves.ps1 cut down to what the tests compare,
+// with each case's step: test/refmoves-excel.json, test/slicers-excel.json, test/cfmoves-excel.json. (No ids, no names:
+// the parts' revision ids and Excel's user name stay out.)
 // usage: node tools/excel-compare/refmove-results.mjs refmoves <cases.json> <excel out.json> > test/refmoves-excel.json
 //        node tools/excel-compare/refmove-results.mjs slicers <cases.json> <excel out.json> > test/slicers-excel.json
+//        node tools/excel-compare/refmove-results.mjs cfmoves <cases.json> <excel out.json> > test/cfmoves-excel.json
 import fs from 'node:fs';
 
 const [kind, casesPath, outPath] = process.argv.slice(2);
@@ -55,5 +56,17 @@ function slicer(c, k) {
   };
 }
 
-const out = results.map((c, k) => (kind === 'slicers' ? slicer(c, k) : refmove(c, k)));
+/** What the conditional format tests compare (excel-cfmoves.ps1): each format of each form as "ranges | rule types |
+ *  formulas", sorted (Excel's own order of them shifts). */
+function cfmove(c, step) {
+  const main = [].concat(c.main || []).filter(Boolean).map((x) => [
+    /\ssqref="([^"]*)"/.exec(x)[1], [...x.matchAll(/<cfRule type="(\w+)"/g)].map((m) => m[1]).join('+'), ...[...x.matchAll(/<formula>([^<]*)<\/formula>/g)].map((m) => unescape(m[1])),
+  ].join(' | ')).sort();
+  const ext = [...(c.ext || '').matchAll(/<x14:conditionalFormatting\b[^>]*>([\s\S]*?)<\/x14:conditionalFormatting>/g)].map((m) => [
+    /<xm:sqref>([^<]*)/.exec(m[1])[1], [...m[1].matchAll(/<x14:cfRule type="(\w+)"/g)].map((x) => x[1]).join('+'), ...[...m[1].matchAll(/<xm:f>([^<]*)<\/xm:f>/g)].map((x) => unescape(x[1])),
+  ].join(' | ')).sort();
+  return { name: c.name, step, refused: c.refused, main, ext };
+}
+
+const out = results.map((c, k) => (kind === 'slicers' ? slicer(c, k) : kind === 'cfmoves' ? cfmove(c, cases[k].step) : refmove(c, k)));
 console.log(JSON.stringify(out, null, 1));

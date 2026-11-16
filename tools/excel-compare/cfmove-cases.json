@@ -1,0 +1,161 @@
+{
+ "cases": [
+  {
+   "name": "start",
+   "step": {
+    "do": "none",
+    "range": "A1"
+   }
+  },
+  {
+   "name": "insert row 1",
+   "step": {
+    "do": "insert",
+    "range": "1:1"
+   }
+  },
+  {
+   "name": "insert rows 5:6 (inside the formats)",
+   "step": {
+    "do": "insert",
+    "range": "5:6"
+   }
+  },
+  {
+   "name": "insert row 11 (just below the formats)",
+   "step": {
+    "do": "insert",
+    "range": "11:11"
+   }
+  },
+  {
+   "name": "delete rows 2:3 (their first rows)",
+   "step": {
+    "do": "delete",
+    "range": "2:3"
+   }
+  },
+  {
+   "name": "delete rows 2:10 (all of them)",
+   "step": {
+    "do": "delete",
+    "range": "2:10"
+   }
+  },
+  {
+   "name": "insert column A",
+   "step": {
+    "do": "insert",
+    "range": "A:A"
+   }
+  },
+  {
+   "name": "insert column C (between the bars and the stars)",
+   "step": {
+    "do": "insert",
+    "range": "C:C"
+   }
+  },
+  {
+   "name": "insert column F (just after the last format)",
+   "step": {
+    "do": "insert",
+    "range": "F:F"
+   }
+  },
+  {
+   "name": "delete column B (the bars)",
+   "step": {
+    "do": "delete",
+    "range": "B:B"
+   }
+  },
+  {
+   "name": "delete column C (the stars)",
+   "step": {
+    "do": "delete",
+    "range": "C:C"
+   }
+  },
+  {
+   "name": "delete columns B:E (all of them)",
+   "step": {
+    "do": "delete",
+    "range": "B:E"
+   }
+  },
+  {
+   "name": "insert C5 shifting down (inside the stars)",
+   "step": {
+    "do": "insert",
+    "range": "C5",
+    "shift": "down"
+   }
+  },
+  {
+   "name": "insert B11:E11 shifting down (under all of them)",
+   "step": {
+    "do": "insert",
+    "range": "B11:E11",
+    "shift": "down"
+   }
+  },
+  {
+   "name": "delete C5:C6 shifting up",
+   "step": {
+    "do": "delete",
+    "range": "C5:C6",
+    "shift": "up"
+   }
+  },
+  {
+   "name": "delete C5 shifting left (a star moved onto the formula rule)",
+   "step": {
+    "do": "delete",
+    "range": "C5",
+    "shift": "left"
+   }
+  },
+  {
+   "name": "delete D5 shifting left (a formula cell moved onto the stars)",
+   "step": {
+    "do": "delete",
+    "range": "D5",
+    "shift": "left"
+   }
+  },
+  {
+   "name": "insert D5:D6 shifting right (inside the formula rule)",
+   "step": {
+    "do": "insert",
+    "range": "D5:D6",
+    "shift": "right"
+   }
+  },
+  {
+   "name": "Data: insert row 1",
+   "step": {
+    "do": "insert",
+    "range": "1:1",
+    "sheet": "Data"
+   }
+  },
+  {
+   "name": "Data: delete row 1",
+   "step": {
+    "do": "delete",
+    "range": "1:1",
+    "sheet": "Data"
+   }
+  },
+  {
+   "name": "sort B2:E10 by B, largest first",
+   "step": {
+    "do": "sort",
+    "range": "B2:E10",
+    "key": "B2",
+    "desc": true
+   }
+  }
+ ]
+}

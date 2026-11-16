@@ -12,6 +12,7 @@
 //   moved as a copy moves it (O2's B2:M2 gives the new O3 B3:M3), in the same group, after their source.
 import { shiftFormula } from '../calc/tokens.js';
 import { parseRange, rangeName, MAX_ROWS, MAX_COLS } from './refs.js';
+import { subtract } from './dvedit.js';
 
 const X14 = 'http://schemas.microsoft.com/office/spreadsheetml/2009/9/main';
 const XM = 'http://schemas.microsoft.com/office/excel/2006/main';
@@ -136,7 +137,8 @@ export function prepareRules(doc, axis, at, n, band, move) {
  */
 export function extendRules(doc, axis, at, n, band) {
   if (n <= 0 || at <= 0) return;
-  for (const rule of rulesOf(doc)) {
+  // (Conditional formats the same way: B2:B10's data bars are B2:C10 after a column is inserted at C; excel-cfmoves.ps1.)
+  for (const rule of [...rulesOf(doc), ...formatsOf(doc)]) {
     const ranges = rule.get().split(/\s+/).map(parseRange).filter(Boolean);
     const added = [];
     let changed = false;
@@ -186,6 +188,14 @@ export function moveExtRanges(doc, axis, at, n, band, shift) {
     if (next) s.textContent = next;
     else { const wrap = el.parentNode; remove(el); dropEmpty(wrap, 'dataValidation'); }
   }
+  // (Excel 2010's conditional formats the same way; the main ones are rowcol.js moveRanges's.)
+  for (const el of ALL(doc.documentElement, X14, 'conditionalFormatting')) {
+    const s = child(el, XM, 'sqref');
+    const next = s && shift(s.textContent);
+    if (!s) continue;
+    if (next) s.textContent = next;
+    else { const wrap = el.parentNode; remove(el); dropEmpty(wrap, 'conditionalFormatting'); }
+  }
   for (const sp of sparklinesOf(doc)) {
     const next = sp.sqref && shift(sp.sqref.textContent);
     if (next) sp.sqref.textContent = next; else dropSparkline(sp.el);
@@ -229,4 +239,95 @@ export function dropDeadSparklines(doc) {
   let any = false;
   for (const sp of sparklinesOf(doc)) if (sp.f && sp.f.textContent.includes('#REF!')) { dropSparkline(sp.el); any = true; }
   return any;
+}
+
+// --- Conditional formats ---------------------------------------------------------------------------------------------
+// As Excel moves them (tools/excel-compare/excel-cfmoves.ps1 on cfmove-cases.mjs, test/cfmoves-excel.json), both the
+// main conditionalFormatting and Excel 2010's (x14:conditionalFormatting in the extLst: data bars' own half, icon sets
+// such as 3 stars, rules reading another sheet): their ranges move as ranges do; lines and cells inserted take the
+// formats of the line or cell before them (extendRules); a piece that cells shifting move stays in its format, one they
+// delete stays too, and the cells a moved piece lands on leave the other formats of its form (D5's formula rule moved
+// to C5: C5 left the 3 stars on C2:C10, not the main form's E rule); their formulas are relative to the top-left of
+// all their ranges (D2:D4 D6:D10 C5 reads C2>Data!$A$1). Sorts leave them where they are.
+
+/** The conditional formats of a sheet's XML, each a conditionalFormatting with its ranges and formulas: the main ones
+ *  and the Excel 2010 ones in its extLst (`ext`). */
+export function formatsOf(doc) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const main = [...root.childNodes].filter((x) => x.nodeType === 1 && x.namespaceURI === ns && x.localName === 'conditionalFormatting').map((el) => ({
+    el,
+    ext: false,
+    get: () => el.getAttribute('sqref') || '',
+    set: (text) => el.setAttribute('sqref', text),
+    formulas: () => ALL(el, ns, 'formula'),
+  }));
+  const ext = ALL(root, X14, 'conditionalFormatting').map((el) => ({
+    el,
+    ext: true,
+    get: () => child(el, XM, 'sqref')?.textContent || '',
+    set: (text) => { const s = child(el, XM, 'sqref'); if (s) s.textContent = text; },
+    formulas: () => ALL(el, XM, 'f'),
+  }));
+  return [...main, ...ext];
+}
+
+const rangesOf = (unit) => unit.get().split(/\s+/).map(parseRange).filter(Boolean);
+/** The top-left of all of a format's ranges, which its formulas are written for. */
+const corner = (ranges) => ranges.reduce((a, x) => ({ r: Math.min(a.r, x.r0), c: Math.min(a.c, x.c0) }), { r: Infinity, c: Infinity });
+const rebaseUnit = (unit, from, to) => {
+  if (from.r === to.r && from.c === to.c) return;
+  for (const f of unit.formulas()) f.textContent = shiftFormula(f.textContent, to.r - from.r, to.c - from.c);
+};
+
+/**
+ * Before a change's formulas move: each conditional format cut where cells shifting move part of it (the moved part
+ * kept in it), and its formulas made to read from a cell it keeps. Returns what finishFormats needs afterwards.
+ * `move(range)`: the range after the change, or null (rowcol.js shiftRange).
+ */
+export function prepareFormats(doc, axis, at, n, band, move) {
+  const plans = [];
+  for (const unit of formatsOf(doc)) {
+    const ranges = rangesOf(unit);
+    if (!ranges.length) continue;
+    const kept = [];
+    const moving = [];
+    for (const r of ranges) {
+      const pieces = band && cut(r, axis, at, band);
+      if (!pieces || !move(pieces.inside)) { kept.push(r); continue; }
+      kept.push(...pieces.outside);
+      moving.push(pieces.inside);
+    }
+    if (moving.length) unit.set([...kept, ...moving].map(rangeName).join(' '));
+    const from = [...kept, ...moving].map((r) => firstKept(r, axis, at, n, move)).find(Boolean);
+    if (!from) continue;
+    rebaseUnit(unit, corner(ranges), from);
+    const to = move({ r0: from.r, c0: from.c, r1: from.r, c1: from.c });
+    plans.push({ el: unit.el, ext: unit.ext, at: { r: to.r0, c: to.c0 }, moved: moving.map(move).filter(Boolean) });
+  }
+  return plans;
+}
+
+/** After the change (ranges moved and extended): the cells moved pieces landed on taken out of the other formats of
+ *  their form, and each format's formulas written for the top-left of its ranges now. */
+export function finishFormats(doc, plans) {
+  const units = formatsOf(doc);
+  for (const p of plans) {
+    if (!p.moved.length) continue;
+    for (const u of units) {
+      if (u.ext !== p.ext || u.el === p.el || !u.el.parentNode) continue;
+      const was = rangesOf(u);
+      const left = was.flatMap((r) => p.moved.reduce((acc, m) => acc.flatMap((x) => subtract(x, m)), [r]));
+      if (left.length === was.length && left.every((r, k) => rangeName(r) === rangeName(was[k]))) continue;
+      if (left.length) { u.set(left.map(rangeName).join(' ')); continue; }
+      const wrap = u.el.parentNode;
+      remove(u.el);
+      if (u.ext) dropEmpty(wrap, 'conditionalFormatting');
+    }
+  }
+  for (const p of plans) {
+    const u = units.find((x) => x.el === p.el);
+    const ranges = u && u.el.parentNode ? rangesOf(u) : [];
+    if (ranges.length) rebaseUnit(u, p.at, corner(ranges));
+  }
 }

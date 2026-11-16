@@ -173,11 +173,29 @@ Results: 14 of 14 steps match Excel (`test/slicers.test.js` against `test/slicer
 opened in Excel without a repair and read back 15 of 15 as Excel had made them (`excel-slicers.ps1 -Open
 test/out/slicers`).
 
+## Conditional formats
+
+Measured by `tools/excel-compare/excel-cfmoves.ps1` on `cfmove-cases.mjs`: data bars on B2:B10 (which Excel writes in
+both forms, linked by an `x14:id`), 3 stars on C2:C10 and `=D2>Data!$A$1` on D2:D10 (Excel's 2010 form only,
+`x14:conditionalFormatting` in the extLst), and "greater than 5" on E2:E10; 20 steps (`src/ooxml/rulemoves.js`;
+`test/fixtures/cfmoves.xlsx`).
+
+| What | As Excel does it |
+|---|---|
+| A format's ranges, of either form | Move, grow and shrink as ranges do; a format whose cells are all deleted goes. |
+| New lines and cells | Take the formats of the line or cell before them: B2:C10 after a column is inserted at C; all four go to row 11 after a row is inserted there; C2:C10 gets D5:D6 when D5:D6 is inserted shifting right. |
+| Its formulas | Are relative to the top-left of all of its ranges: after rows 2:3 are deleted, D2:D8 still reads `D2>Data!$A$1`; after D5 is shifted left to C5, `D2:D4 D6:D10 C5` reads `C2>Data!$A$1`. |
+| Cells shifted through part of one | The part that moves stays in the format (`E2:E4 E6:E10 D5`), and so does a part that is deleted (D2:D10 kept D5). The cells a moved part lands on leave the other formats of its form: C5 left the 3 stars when D5's formula rule landed there, but D5 stayed in that rule when the main form's E5 landed on it. |
+| A sort | Leaves them where they are. |
+
+Results: 20 of 20 steps match Excel (`test/cfmoves.test.js` against `test/cfmoves-excel.json`); the editor's 21 results
+opened in Excel without a repair and read back 21 of 21 with the same cells (Excel lists a format's ranges in its own
+order). A main-form formula rule whose first cell was deleted used to read `#REF!`; it now reads from the first cell
+left, as the 2010 form's did in Excel.
+
 ## Not yet
 
-Page breaks and the Insert Options button (format from below, clear formatting). Conditional formats' ranges move as
-before (those of Excel's 2010 form in the extLst don't yet); whether new lines take them as they take validation rules
-isn't measured.
+Page breaks and the Insert Options button (format from below, clear formatting).
 
 One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is `=SUM(A3:A3)` in Excel
 after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to `=SUM(D3:D3)`.

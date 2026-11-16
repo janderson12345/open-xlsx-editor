@@ -17,7 +17,7 @@ import { pinRefs, forgetRows, setCellXml } from './sheetedit.js';
 import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tokens.js';
 import { SheetError, mapFormulas } from './sheetops.js';
 import { moveNotes, moveDrawings, lineSizes, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
-import { prepareRules, moveExtRanges, extendRules, dropDeadSparklines } from './rulemoves.js';
+import { prepareRules, prepareFormats, moveExtRanges, extendRules, finishFormats, dropDeadSparklines } from './rulemoves.js';
 import { dropTableSlicers } from './slicers.js';
 import { readPivots } from './pivot.js';
 import { insertedLines, openJoined } from './outline.js';
@@ -338,6 +338,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   const { doc } = wb._part(si);
   // (Data validation rules split where cells shifting cut them, their formulas read from their first cell to be.)
   prepareRules(doc, axis, at, n, band, (range) => shiftRange(range, axis, at, n, band));
+  const formats = prepareFormats(doc, axis, at, n, band, (range) => shiftRange(range, axis, at, n, band));
   // Formulas first, while every cell is where it was (shared ones on this sheet written out cell by cell).
   mapFormulas(wb, (text, here) => shiftRefs(text, { here, sheet: info.name, axis, at, n, band }), { name: info.name, target: si, shared: true });
   if (band) moveBandCells(doc, axis, at, n, band); else moveCells(doc, axis, at, n);
@@ -346,6 +347,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   moveRanges(doc, axis, at, n, band, split);
   moveExtRanges(doc, axis, at, n, band, (text) => shiftSqref(text, axis, at, n, band));
   extendRules(doc, axis, at, n, band);
+  finishFormats(doc, formats);
   // (Sparklines whose data is all deleted go, on any sheet.)
   for (const [other, part] of wb._parsed) if (dropDeadSparklines(part.doc)) wb.dirty.add(other.path);
   // (Lines inserted into a collapsed group open it: its summary's collapsed goes, as Excel's does.)

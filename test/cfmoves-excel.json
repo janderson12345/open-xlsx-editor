@@ -1,0 +1,352 @@
+[
+ {
+  "name": "start",
+  "step": {
+   "do": "none",
+   "range": "A1"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert row 1",
+  "step": {
+   "do": "insert",
+   "range": "1:1"
+  },
+  "refused": null,
+  "main": [
+   "B3:B11 | dataBar",
+   "E3:E11 | cellIs | 5"
+  ],
+  "ext": [
+   "B3:B11 | dataBar",
+   "C3:C11 | iconSet | 0 | 33 | 67",
+   "D3:D11 | expression | D3>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert rows 5:6 (inside the formats)",
+  "step": {
+   "do": "insert",
+   "range": "5:6"
+  },
+  "refused": null,
+  "main": [
+   "B2:B12 | dataBar",
+   "E2:E12 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B12 | dataBar",
+   "C2:C12 | iconSet | 0 | 33 | 67",
+   "D2:D12 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert row 11 (just below the formats)",
+  "step": {
+   "do": "insert",
+   "range": "11:11"
+  },
+  "refused": null,
+  "main": [
+   "B2:B11 | dataBar",
+   "E2:E11 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B11 | dataBar",
+   "C2:C11 | iconSet | 0 | 33 | 67",
+   "D2:D11 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete rows 2:3 (their first rows)",
+  "step": {
+   "do": "delete",
+   "range": "2:3"
+  },
+  "refused": null,
+  "main": [
+   "B2:B8 | dataBar",
+   "E2:E8 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B8 | dataBar",
+   "C2:C8 | iconSet | 0 | 33 | 67",
+   "D2:D8 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete rows 2:10 (all of them)",
+  "step": {
+   "do": "delete",
+   "range": "2:10"
+  },
+  "refused": null,
+  "main": [],
+  "ext": []
+ },
+ {
+  "name": "insert column A",
+  "step": {
+   "do": "insert",
+   "range": "A:A"
+  },
+  "refused": null,
+  "main": [
+   "C2:C10 | dataBar",
+   "F2:F10 | cellIs | 5"
+  ],
+  "ext": [
+   "C2:C10 | dataBar",
+   "D2:D10 | iconSet | 0 | 33 | 67",
+   "E2:E10 | expression | E2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert column C (between the bars and the stars)",
+  "step": {
+   "do": "insert",
+   "range": "C:C"
+  },
+  "refused": null,
+  "main": [
+   "B2:C10 | dataBar",
+   "F2:F10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:C10 | dataBar",
+   "D2:D10 | iconSet | 0 | 33 | 67",
+   "E2:E10 | expression | E2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert column F (just after the last format)",
+  "step": {
+   "do": "insert",
+   "range": "F:F"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:F10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete column B (the bars)",
+  "step": {
+   "do": "delete",
+   "range": "B:B"
+  },
+  "refused": null,
+  "main": [
+   "D2:D10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | iconSet | 0 | 33 | 67",
+   "C2:C10 | expression | C2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete column C (the stars)",
+  "step": {
+   "do": "delete",
+   "range": "C:C"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "D2:D10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | expression | C2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete columns B:E (all of them)",
+  "step": {
+   "do": "delete",
+   "range": "B:E"
+  },
+  "refused": null,
+  "main": [],
+  "ext": []
+ },
+ {
+  "name": "insert C5 shifting down (inside the stars)",
+  "step": {
+   "do": "insert",
+   "range": "C5",
+   "shift": "down"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C11 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert B11:E11 shifting down (under all of them)",
+  "step": {
+   "do": "insert",
+   "range": "B11:E11",
+   "shift": "down"
+  },
+  "refused": null,
+  "main": [
+   "B2:B11 | dataBar",
+   "E2:E11 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B11 | dataBar",
+   "C2:C11 | iconSet | 0 | 33 | 67",
+   "D2:D11 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete C5:C6 shifting up",
+  "step": {
+   "do": "delete",
+   "range": "C5:C6",
+   "shift": "up"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C8 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete C5 shifting left (a star moved onto the formula rule)",
+  "step": {
+   "do": "delete",
+   "range": "C5",
+   "shift": "left"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E4 E6:E10 D5 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C4 C6:C10 | iconSet | 0 | 33 | 67",
+   "D2:D4 D6:D10 C5 | expression | C2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "delete D5 shifting left (a formula cell moved onto the stars)",
+  "step": {
+   "do": "delete",
+   "range": "D5",
+   "shift": "left"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E4 E6:E10 D5 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "insert D5:D6 shifting right (inside the formula rule)",
+  "step": {
+   "do": "insert",
+   "range": "D5:D6",
+   "shift": "right"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E4 E7:E10 F5:F6 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 D5:D6 | iconSet | 0 | 33 | 67",
+   "D2:D4 D7:D10 E5:E6 | expression | D2>Data!$A$1"
+  ]
+ },
+ {
+  "name": "Data: insert row 1",
+  "step": {
+   "do": "insert",
+   "range": "1:1",
+   "sheet": "Data"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$2"
+  ]
+ },
+ {
+  "name": "Data: delete row 1",
+  "step": {
+   "do": "delete",
+   "range": "1:1",
+   "sheet": "Data"
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!#REF!"
+  ]
+ },
+ {
+  "name": "sort B2:E10 by B, largest first",
+  "step": {
+   "do": "sort",
+   "range": "B2:E10",
+   "key": "B2",
+   "desc": true
+  },
+  "refused": null,
+  "main": [
+   "B2:B10 | dataBar",
+   "E2:E10 | cellIs | 5"
+  ],
+  "ext": [
+   "B2:B10 | dataBar",
+   "C2:C10 | iconSet | 0 | 33 | 67",
+   "D2:D10 | expression | D2>Data!$A$1"
+  ]
+ }
+]

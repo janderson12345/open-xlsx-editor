@@ -67,7 +67,8 @@ PivotTables when rows and columns move: `excel-pivot-lines.ps1 <pivot-cases.json
 editor's results.
 
 Sparklines, data validation rules, notes and Circle Invalid Data's ovals when rows, columns and cells move or are
-sorted, and slicers and timelines when rows and columns move:
+sorted, and slicers and timelines when rows and columns move (and conditional formats of both forms, the same way:
+`cfmove-cases.mjs`, `excel-cfmoves.ps1 <cases> <out.json> [-Books test/out/cfmoves]`, `refmove-results.mjs cfmoves`):
 
 ```sh
 node tools/excel-compare/refmove-cases.mjs > tools/excel-compare/refmove-cases.json
