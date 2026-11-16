@@ -19,7 +19,7 @@ test("rich text as Excel writes it: each run's text and font, the first one the 
   assert.deepEqual([...list.runs.keys()], [0, 1]);
   const [plain, bold, big] = list.runs.get(0);
   assert.deepEqual(plain, { text: 'Plain ', font: null });
-  assert.deepEqual(bold, { text: 'bold', font: { name: 'Aptos Narrow', size: 11, scheme: 'minor', b: true, i: false, u: null, strike: false, color: { rgb: null, theme: 1, indexed: null, auto: false, tint: 0 }, vertAlign: null } });
+  assert.deepEqual(bold, { text: 'bold', font: { name: 'Aptos Narrow', size: 11, scheme: 'minor', b: true, i: false, u: null, strike: false, color: { rgb: null, theme: 1, indexed: null, auto: false, tint: 0 }, vertAlign: null, family: 2 } });
   assert.deepEqual([big.font.name, big.font.size, big.font.scheme, big.font.color.rgb], ['Courier New', 16, null, 'FFFF0000']);
   const h2o = list.runs.get(1);
   assert.deepEqual(h2o.map((r) => [r.text, r.font?.vertAlign ?? null, r.font?.u ?? null]), [['H', null, null], ['2', 'subscript', null], ['O', null, 'single']]);
@@ -50,4 +50,18 @@ test('a run read from a file written back with its own colour and family, as the
   assert.equal(richRunsXml([{ text: 'red', font: red }, { text: 'blue', font: themed }], base),
     '<r><rPr><i/><sz val="16"/><color rgb="FFFF0000"/><rFont val="Courier New"/><family val="3"/></rPr><t>red</t></r>'
     + '<r><rPr><b/><sz val="11"/><color theme="4" tint="0.4"/><rFont val="Calibri"/><family val="2"/><scheme val="minor"/></rPr><t>blue</t></r>');
+});
+
+test("a run's rPr children not modelled (outline, shadow, condense, extend, charset) kept and written back in Excel's order", async () => {
+  const { build } = await import('./steps.js');
+  const { serializeXml } = await import('../src/ooxml/xml.js');
+  const { stringItemRuns } = await import('../src/ooxml/strings.js');
+  const si = parseXml(`<si xmlns="${NS}"><r><t>a</t></r><r><rPr><b/><condense val="0"/><outline/><shadow/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><charset val="161"/><scheme val="minor"/></rPr><t>b</t></r></si>`).documentElement;
+  const runs = stringItemRuns(si, NS);
+  assert.deepEqual(runs[1].font.extra, ['<condense val="0"/>', '<outline/>', '<shadow/>', '<charset val="161"/>']);
+  const { wb, si: sheet } = build({ cells: { A1: 'x' } });
+  wb.apply(sheet, [{ r: 0, c: 0, value: 'ab', runs }]);
+  const el = [...wb._part(sheet).doc.documentElement.getElementsByTagNameNS(NS, 'c')].find((c) => c.getAttribute('r') === 'A1');
+  const written = serializeXml([...el.getElementsByTagNameNS(NS, 'rPr')][0]).replace(/ xmlns="[^"]*"/g, '');
+  assert.equal(written, '<rPr><b/><condense val="0"/><outline/><shadow/><sz val="11"/><color theme="1"/><rFont val="Calibri"/><family val="2"/><charset val="161"/><scheme val="minor"/></rPr>');
 });
