@@ -10,7 +10,8 @@ const items = (xml, tag) => [...(xml || '').replace(new RegExp(`^<${tag}s[^>]*>`
 const out = [];
 for (const st of m.styles) {
   const s = m.saved[st.name];
-  const esc = st.name.replace(/[[\]]/g, '\\$&');
+  // (Every character a regular expression gives meaning to escaped, backslashes too: CodeQL js/incomplete-sanitization.)
+  const esc = st.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const cs = new RegExp(`<cellStyle name="${esc}" xfId="(\\d+)" builtinId="(\\d+)"/>`).exec(s.cellStyles);
   const xfId = Number(cs[1]);
   const xf = items(s.cellStyleXfs, 'xf')[xfId];

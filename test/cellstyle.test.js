@@ -36,7 +36,8 @@ function resolve(xf, parts) {
 function looks(parts, s, name) {
   const lists = { fonts: items(parts.fonts, 'font'), fills: items(parts.fills, 'fill'), borders: items(parts.borders, 'border'), numFmts: parts.numFmts };
   const xf = items(parts.cellXfs, 'xf')[s];
-  const esc = name.replace(/[[\]]/g, '\\$&');
+  // (Every character a regular expression gives meaning to escaped, backslashes too: CodeQL js/incomplete-sanitization.)
+  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const cs = new RegExp(`<cellStyle name="${esc}" xfId="(\\d+)"( builtinId="\\d+")?/>`).exec(parts.cellStyles);
   const styleXf = cs ? items(parts.cellStyleXfs, 'xf')[Number(cs[1])] : null;
   return { cell: resolve(xf, lists), style: styleXf ? resolve(styleXf, lists) : null, builtin: cs?.[2] || null };
