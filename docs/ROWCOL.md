@@ -175,9 +175,9 @@ test/out/slicers`).
 
 ## Not yet
 
-Page breaks and the Insert Options button (format from below, clear formatting). Rules of the Excel 2010 form are moved
-but not read: their cells aren't checked, shown a list or circled (E12 above). Conditional formats' ranges move as
-before; whether new lines take them as they take validation rules isn't measured.
+Page breaks and the Insert Options button (format from below, clear formatting). Conditional formats' ranges move as
+before (those of Excel's 2010 form in the extLst don't yet); whether new lines take them as they take validation rules
+isn't measured.
 
 One reference Excel rewrites its own way: `=SUM(B3:B3)`, B3 being the hidden half of A3:B3, is `=SUM(A3:A3)` in Excel
 after cells are inserted at B3 shifting right (the merged range widening); here it follows B3 to `=SUM(D3:D3)`.

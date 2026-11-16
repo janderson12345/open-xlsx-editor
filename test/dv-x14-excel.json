@@ -1,0 +1,69 @@
+[
+ {
+  "name": "list of another sheet",
+  "main": "",
+  "ext": "<x14:dataValidations count=\"1\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\"><x14:formula1><xm:f>Data!$A$1:$A$3</xm:f></x14:formula1><xm:sqref>B2:B5</xm:sqref></x14:dataValidation></x14:dataValidations>",
+  "uris": [
+   "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}"
+  ]
+ },
+ {
+  "name": "list of this sheet",
+  "main": "<dataValidations count=\"1\"><dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"B2:B5\"><formula1>$H$1:$H$3</formula1></dataValidation></dataValidations>",
+  "ext": "",
+  "uris": []
+ },
+ {
+  "name": "list of a name",
+  "main": "<dataValidations count=\"1\"><dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"B2:B5\"><formula1>Choices</formula1></dataValidation></dataValidations>",
+  "ext": "",
+  "uris": []
+ },
+ {
+  "name": "whole, max from another sheet",
+  "main": "",
+  "ext": "<x14:dataValidations count=\"1\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:dataValidation type=\"whole\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\"><x14:formula1><xm:f>1</xm:f></x14:formula1><x14:formula2><xm:f>Data!$B$1</xm:f></x14:formula2><xm:sqref>B2:B5</xm:sqref></x14:dataValidation></x14:dataValidations>",
+  "uris": [
+   "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}"
+  ]
+ },
+ {
+  "name": "whole, min from another sheet",
+  "main": "",
+  "ext": "<x14:dataValidations count=\"1\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:dataValidation type=\"whole\" operator=\"greaterThan\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\"><x14:formula1><xm:f>Data!$B$1</xm:f></x14:formula1><xm:sqref>B2:B5</xm:sqref></x14:dataValidation></x14:dataValidations>",
+  "uris": [
+   "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}"
+  ]
+ },
+ {
+  "name": "custom reading another sheet",
+  "main": "",
+  "ext": "<x14:dataValidations count=\"1\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:dataValidation type=\"custom\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\"><x14:formula1><xm:f>B2&gt;Data!B1</xm:f></x14:formula1><xm:sqref>B2:B5</xm:sqref></x14:dataValidation></x14:dataValidations>",
+  "uris": [
+   "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}"
+  ]
+ },
+ {
+  "name": "custom reading this sheet",
+  "main": "<dataValidations count=\"1\"><dataValidation type=\"custom\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\" sqref=\"B2:B5\"><formula1>B2&gt;C2</formula1></dataValidation></dataValidations>",
+  "ext": "",
+  "uris": []
+ },
+ {
+  "name": "length from another sheet",
+  "main": "",
+  "ext": "<x14:dataValidations count=\"1\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:dataValidation type=\"textLength\" operator=\"equal\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\"><x14:formula1><xm:f>Data!$B$1</xm:f></x14:formula1><xm:sqref>B2:B5</xm:sqref></x14:dataValidation></x14:dataValidations>",
+  "uris": [
+   "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}"
+  ]
+ },
+ {
+  "name": "list of another sheet, with a sparkline",
+  "main": "",
+  "ext": "<x14:dataValidations count=\"1\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\"><x14:dataValidation type=\"list\" allowBlank=\"1\" showInputMessage=\"1\" showErrorMessage=\"1\"><x14:formula1><xm:f>Data!$A$1:$A$3</xm:f></x14:formula1><xm:sqref>B2:B5</xm:sqref></x14:dataValidation></x14:dataValidations>",
+  "uris": [
+   "{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}",
+   "{05C60535-1F16-4fd2-B633-F4F36F0B64E0}"
+  ]
+ }
+]

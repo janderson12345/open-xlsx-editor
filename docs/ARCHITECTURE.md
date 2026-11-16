@@ -68,7 +68,7 @@ insides:
 | `src/ooxml/pivotfields.js` | A PivotTable's fields moved after it is made, as Excel's field list moves them, then laid out by pivot.js's refresh; docs/PIVOT.md. |
 | `src/ooxml/pivot.js` | PivotTables: read from their parts, refreshed from their source as Excel's Refresh does (cache, records, items, compact layout); docs/PIVOT.md. |
 | `src/ooxml/cfedit.js` | Conditional formatting rules added as Excel's menu adds them, with its preset formats as dxfs; Clear Rules (docs/CONDFORMAT.md). |
-| `src/ooxml/dvedit.js` | Data validation rules written as Excel's Data Validation box writes them; ranges split around a new rule; a rule in the box's terms (docs/VALIDATION.md). |
+| `src/ooxml/dvedit.js` | Data validation rules written as Excel's Data Validation box writes them, one reading another sheet in Excel's 2010 form; ranges of either form split around a new rule; a rule in the box's terms (docs/VALIDATION.md). |
 | `src/ooxml/noteedit.js` | Notes written and deleted as Excel's New Note writes them: the comments part, the VML box, the parts and relationships made when the sheet has none (docs/NOTES.md). |
 | `src/editor/reviewtab.js` | The Review tab: Notes. |
 | `src/editor/datadialogs.js` | Excel's boxes for data: Sort, a filter's list, a list's choices, Data Validation, the Conditional Formatting menu's rule boxes (with `dialogs.js`'s modal and buttons). |

@@ -1,11 +1,19 @@
 // Data validation rules written as Excel's Data Validation box writes them (measured: test/dv-excel.json holds the
 // dataValidation element Excel saved for each of 15 rules; this writes the same, but for Excel's xr:uid). A rule for
 // the selection takes its cells out of any rule they had (those rules' ranges split around them), then is added after
-// the others; Clear All only takes them out.
+// the others; Clear All only takes them out. A rule whose formulas read another sheet goes in Excel's 2010 form, as
+// Excel writes it (excel-dv-x14.ps1, test/dv-x14-excel.json); rules of that form are split, moved and added to too.
 import { parseInput } from './input.js';
 import { parseRange, rangeName, MAX_ROWS, MAX_COLS } from './refs.js';
-import { parseXml } from './xml.js';
-import { shiftFormula } from '../calc/tokens.js';
+import { parseXml, unescapeXml } from './xml.js';
+import { shiftFormula, tokenize } from '../calc/tokens.js';
+import { rulesOf, dropRule } from './rulemoves.js';
+import { EXT_CF } from './cfext.js';
+
+const X14 = 'http://schemas.microsoft.com/office/spreadsheetml/2009/9/main';
+const XM = 'http://schemas.microsoft.com/office/excel/2006/main';
+/** The ext of Excel 2010's data validation rules. */
+const EXT_DV = '{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}';
 
 /** Excel's names for the box's choices. */
 const TYPES = { any: null, whole: 'whole', decimal: 'decimal', list: 'list', date: 'date', time: 'time', length: 'textLength', custom: 'custom' };
@@ -66,61 +74,106 @@ export function subtract(a, b) {
   return out;
 }
 
-const sqrefOf = (el) => (el.getAttribute('sqref') || '').split(/\s+/).map(parseRange).filter(Boolean);
+const sqrefOf = (rule) => rule.get().split(/\s+/).map(parseRange).filter(Boolean);
 
 /** A rule whose first cell moved from `was` to `now` (its sqref changed): its formulas, written for its first cell,
  *  shifted so that each cell's still means the same, as Excel rewrote C2:C4's =C2>B2 as =C4>B4 when C2:C3 were cut. */
-function rebase(el, was, now) {
+function rebase(rule, was, now) {
   if (!was || !now || (was.r0 === now.r0 && was.c0 === now.c0)) return;
-  for (const f of [...el.childNodes].filter((n) => n.localName === 'formula1' || n.localName === 'formula2')) f.textContent = shiftFormula(f.textContent, now.r0 - was.r0, now.c0 - was.c0);
+  for (const f of rule.formulas()) f.textContent = shiftFormula(f.textContent, now.r0 - was.r0, now.c0 - was.c0);
 }
 
 /** The rules' count written, the list gone once empty. */
 function recount(wrap) {
-  if (!wrap) return;
+  if (!wrap || !wrap.parentNode) return;
   const n = [...wrap.childNodes].filter((x) => x.localName === 'dataValidation').length;
   if (n) wrap.setAttribute('count', String(n)); else wrap.parentNode.removeChild(wrap);
 }
 
+/** A rule's new ranges written, its formulas rebased; the rule gone when there are none. */
+function reshape(rule, was, now) {
+  if (!now.length) { dropRule(rule); return; }
+  rule.set(now.map(rangeName).join(' '));
+  rebase(rule, was[0], now[0]);
+}
+
 /** A cut of `rect` moved `dr` rows and `dc` columns on its sheet, as Excel moves validation with it (measured over
  *  COM): each rule's cells there go with them, after its other cells (C2:C4 with C2:C3 cut to F5: C4 F5:F6); the cells
- *  pasted over leave the rules they were in; a rule left with none goes; formulas rebased. Edits `doc`. */
+ *  pasted over leave the rules they were in; a rule left with none goes; formulas rebased. Rules of both forms (the
+ *  Excel 2010 one in the extLst too). Edits `doc`. */
 export function moveValidation(doc, rect, dr, dc) {
-  const root = doc.documentElement;
-  const wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
-  if (!wrap) return;
   const area = { r0: rect.r0 + dr, c0: rect.c0 + dc, r1: rect.r1 + dr, c1: rect.c1 + dc };
   const meet = (a, b) => (a.r0 <= b.r1 && b.r0 <= a.r1 && a.c0 <= b.c1 && b.c0 <= a.c1 ? { r0: Math.max(a.r0, b.r0), c0: Math.max(a.c0, b.c0), r1: Math.min(a.r1, b.r1), c1: Math.min(a.c1, b.c1) } : null);
-  for (const el of [...wrap.childNodes].filter((n) => n.localName === 'dataValidation')) {
-    const was = sqrefOf(el);
+  for (const rule of rulesOf(doc)) {
+    const was = sqrefOf(rule);
     const stay = was.flatMap((p) => subtract(p, rect)).flatMap((p) => subtract(p, area));
     const moved = coalesce(was.map((p) => meet(p, rect)).filter(Boolean).map((p) => ({ r0: p.r0 + dr, c0: p.c0 + dc, r1: p.r1 + dr, c1: p.c1 + dc })));
-    const now = [...stay, ...moved];
-    if (!now.length) { wrap.removeChild(el); continue; }
-    el.setAttribute('sqref', now.map(rangeName).join(' '));
-    rebase(el, was[0], now[0]);
+    reshape(rule, was, [...stay, ...moved]);
   }
-  recount(wrap);
+}
+
+/** Whether a rule's stored formulas read another sheet than `sheet` (then Excel writes it in its 2010 form). */
+function readsOtherSheet(formulas, sheet) {
+  return formulas.some((f) => {
+    if (!f) return false;
+    try {
+      return tokenize(f).some((t) => t.type === 'ref' && t.sheet != null && (sheet == null || String(t.sheet).toLowerCase() !== String(sheet).toLowerCase()));
+    } catch { return false; }
+  });
+}
+
+/** A rule put in the worksheet's extLst as Excel writes one of its 2010 form: an x14:dataValidation (the main one's
+ *  attributes, its formulas as xm:f, its ranges as xm:sqref) in the ext {CCE6A557-...}, after the conditional formats'
+ *  ext and before the others (Excel's order, excel-dv-x14.ps1), made when there is none. */
+function addExtRule(doc, xml) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const p = root.prefix ? `${root.prefix}:` : '';
+  let list = [...root.childNodes].find((n) => n.nodeType === 1 && n.localName === 'extLst');
+  if (!list) { list = doc.createElementNS(ns, `${p}extLst`); root.appendChild(list); }
+  const exts = [...list.childNodes].filter((n) => n.nodeType === 1 && n.localName === 'ext');
+  let ext = exts.find((e) => e.getAttribute('uri') === EXT_DV);
+  if (!ext) {
+    ext = doc.importNode(parseXml(`<w xmlns="${ns}"><${p}ext uri="${EXT_DV}" xmlns:x14="${X14}"><x14:dataValidations count="0" xmlns:xm="${XM}"/></${p}ext></w>`).documentElement.firstChild, true);
+    const cf = exts.find((e) => e.getAttribute('uri') === EXT_CF);
+    list.insertBefore(ext, cf ? cf.nextSibling : list.firstChild);
+  }
+  const wrap = [...ext.childNodes].find((n) => n.nodeType === 1 && n.localName === 'dataValidations');
+  wrap.appendChild(doc.importNode(parseXml(`<w xmlns:x14="${X14}" xmlns:xm="${XM}">${xml}</w>`).documentElement.firstChild, true));
+  wrap.setAttribute('count', String([...wrap.childNodes].filter((n) => n.nodeType === 1).length));
+}
+
+/** validationXml's rule in Excel's 2010 form: the same attributes less sqref, x14:formula1 and 2 holding xm:f, then
+ *  xm:sqref (excel-dv-x14.ps1: a list of Data!$A$1:$A$3, whole numbers 1 to Data!$B$1). */
+function extXml(main) {
+  const sqref = /\ssqref="([^"]*)"/.exec(main)[1];
+  return main.replace(/\ssqref="[^"]*"/, '').replace(/<dataValidation\b/, '<x14:dataValidation')
+    .replace(/<formula(\d)>([\s\S]*?)<\/formula\d>/g, '<x14:formula$1><xm:f>$2</xm:f></x14:formula$1>')
+    .replace(/<\/dataValidation>$/, `<xm:sqref>${sqref}</xm:sqref></x14:dataValidation>`)
+    .replace(/\/>$/, `><xm:sqref>${sqref}</xm:sqref></x14:dataValidation>`);
 }
 
 /**
  * Give sheet si's cells `ranges` the validation `rule` (null: Clear All), as Excel's box does. Edits the sheet's XML
- * (`doc`); the caller reads the sheet again.
+ * (`doc`); the caller reads the sheet again. `sheet`: the sheet's name, for a rule reading another sheet, which goes in
+ * Excel's 2010 form as Excel writes it.
  */
-export function setValidation(doc, ranges, rule, date1904 = false) {
+export function setValidation(doc, ranges, rule, date1904 = false, sheet = null) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const sel = ranges.map((r) => ({ r0: r.r0, c0: r.c0, r1: Math.min(r.r1, MAX_ROWS - 1), c1: Math.min(r.c1, MAX_COLS - 1) }));
-  let wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
-  // The selection's cells out of the rules they were in; a rule left with none goes.
-  for (const el of wrap ? [...wrap.childNodes].filter((n) => n.localName === 'dataValidation') : []) {
-    const was = sqrefOf(el);
+  // The selection's cells out of the rules they were in, of both forms; a rule left with none goes.
+  for (const old of rulesOf(doc)) {
+    const was = sqrefOf(old);
     let parts = was;
     for (const s of sel) parts = parts.flatMap((p) => subtract(p, s));
-    if (!parts.length) wrap.removeChild(el);
-    else { el.setAttribute('sqref', parts.map(rangeName).join(' ')); rebase(el, was[0], parts[0]); }
+    if (parts.length !== was.length || parts.some((p, k) => rangeName(p) !== rangeName(was[k]))) reshape(old, was, parts);
   }
+  let wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
   if (rule) {
+    const main = validationXml(rule, sel, date1904);
+    const stored = [...main.matchAll(/<formula\d>([\s\S]*?)<\/formula\d>/g)].map((m) => unescapeXml(m[1]));
+    if (readsOtherSheet(stored, sheet)) { addExtRule(doc, extXml(main)); return; }
     if (!wrap) {
       wrap = doc.createElementNS(ns, root.prefix ? `${root.prefix}:dataValidations` : 'dataValidations');
       // (After conditionalFormatting, before hyperlinks and what follows them: CT_Worksheet's order.)
@@ -150,17 +203,15 @@ export function coalesce(ranges) {
  *  formula are `type` and `formula1`, as Excel adds pasted cells to the rule they were copied from (its formulas, as
  *  written for its first cell, cover them too). Edits `doc`; false when there is no such rule. */
 export function addToRule(doc, { first, type, formula1 }, ranges) {
-  const root = doc.documentElement;
-  const wrap = [...root.childNodes].find((n) => n.localName === 'dataValidations');
-  const el = wrap && [...wrap.childNodes].find((n) => {
-    if (n.localName !== 'dataValidation' || (n.getAttribute('type') || 'none') !== type) return false;
-    const f = [...n.childNodes].find((x) => x.localName === 'formula1');
-    const a = parseRange((n.getAttribute('sqref') || '').split(/\s+/)[0]);
+  const rule = rulesOf(doc).find((x) => {
+    if ((x.el.getAttribute('type') || 'none') !== type) return false;
+    const f = x.formulas()[0];
+    const a = sqrefOf(x)[0];
     return (f ? f.textContent : null) === (formula1 ?? null) && a && a.r0 === first.r && a.c0 === first.c;
   });
-  if (!el) return false;
-  const now = (el.getAttribute('sqref') || '').split(/\s+/).map(parseRange).filter(Boolean);
-  el.setAttribute('sqref', [...now.slice(0, 1), ...coalesce([...now.slice(1), ...ranges])].map(rangeName).join(' '));
+  if (!rule) return false;
+  const now = sqrefOf(rule);
+  rule.set([...now.slice(0, 1), ...coalesce([...now.slice(1), ...ranges])].map(rangeName).join(' '));
   return true;
 }
 

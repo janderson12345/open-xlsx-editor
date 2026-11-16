@@ -39,8 +39,8 @@ test('the probe\'s sheet: as Excel had it before each step, its invalid cells ci
   const start = EXCEL[0];
   const got = stateOf(wb);
   for (const k of ['sparklines', 'rules', 'x14', 'notes', 'threads', 'boxes']) assert.deepEqual(got[k], start[k], k);
-  // (E12 breaks the rule reading another sheet, kept in the Excel 2010 form the reader leaves aside: not circled here.)
-  assert.deepEqual(invalidCells(wb, 0).map(({ r, c }) => refName(r, c)).sort(), start.ovals.filter((x) => x !== 'E12').sort());
+  // (E12 among them: it breaks the rule reading another sheet, in Excel's 2010 form.)
+  assert.deepEqual(invalidCells(wb, 0).map(({ r, c }) => refName(r, c)).sort(), [...start.ovals].sort());
 });
 
 // Where the editor knowingly differs (docs/ROWCOL.md): with B12:C12 deleted shifting left, Excel took B12 out of

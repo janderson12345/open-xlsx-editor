@@ -31,10 +31,17 @@ const inserted = await parts();
 const afterInsert = await circlesNow();
 await page.evaluate(() => window.oxe.command('undo'));
 const undone = await parts();
-check(circled === 5 && afterInsert === 0, 'Circle Invalid Data: five cells circled (the rule of the Excel 2010 form isn\'t read yet); none after a row is inserted, as Excel\'s go', JSON.stringify({ circled, afterInsert }));
+check(circled === 6 && afterInsert === 0, 'Circle Invalid Data: six cells circled as Excel circles them (E12 by the Excel 2010 form\'s rule); none after a row is inserted, as Excel\'s go', JSON.stringify({ circled, afterInsert }));
 check(inserted.sparklines.includes('O3<-Sheet1!B3:M3') && inserted.sparklines.includes('Q3<-Data!B2:M2') && inserted.rules === 'B11:B16 C11:C16 D11:D16 E11:E16' && inserted.notes === 'B13 C14 F21',
   'a row inserted at 1: sparklines, validation rules (both forms) and notes a row down, the data of another sheet\'s sparkline as it was', JSON.stringify(inserted));
 check(JSON.stringify(undone) === JSON.stringify(start), 'Ctrl+Z: all of them back', JSON.stringify({ start, undone }));
+
+// E10's list of Data!$A$1:$A$3, a rule of Excel's 2010 form: its button beside the cell, its choices p, q, r.
+await page.evaluate(() => window.oxe.select('E10'));
+await page.click('.oxe-dv-btn');
+const choices = await page.evaluate(() => [...document.querySelectorAll('dialog[open] .oxe-dialog-list option')].map((o) => o.textContent).join(' '));
+await page.keyboard.press('Escape');
+check(choices === 'p q r', 'a list from another sheet (Excel 2010 form): its button and the other sheet\'s choices', choices);
 
 // Sort B10:E15 by C, largest first (the Sort box's answer): B12's note to B10 and C13's thread to C14, as in Excel; the
 // rules stay; Ctrl+Z puts the notes back.

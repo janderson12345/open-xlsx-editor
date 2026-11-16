@@ -20,23 +20,35 @@ const child = (el, ns, name) => [...el.childNodes].find((n) => n.nodeType === 1 
 const remove = (el) => el.parentNode && el.parentNode.removeChild(el);
 
 /** The data validation rules of a sheet's XML, each with what holds its ranges and formulas: the main rules and the
- *  Excel 2010 ones in its extLst. */
-function rulesOf(doc) {
+ *  Excel 2010 ones in its extLst (`ext`), in that order. Shared with dvedit.js. */
+export function rulesOf(doc) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const main = ALL(root, ns, 'dataValidation').map((el) => ({
     el,
+    ext: false,
     get: () => el.getAttribute('sqref') || '',
     set: (text) => el.setAttribute('sqref', text),
     formulas: () => ['formula1', 'formula2'].map((n) => child(el, ns, n)).filter(Boolean),
   }));
   const ext = ALL(root, X14, 'dataValidation').map((el) => ({
     el,
+    ext: true,
     get: () => child(el, XM, 'sqref')?.textContent || '',
     set: (text) => { const s = child(el, XM, 'sqref'); if (s) s.textContent = text; },
     formulas: () => ['formula1', 'formula2'].map((n) => child(el, X14, n)).filter(Boolean).map((f) => child(f, XM, 'f')).filter(Boolean),
   }));
   return [...main, ...ext];
+}
+
+/** A rule of rulesOf taken out: its list counted again, or gone once empty (the Excel 2010 one's ext and extLst too). */
+export function dropRule(rule) {
+  const wrap = rule.el.parentNode;
+  remove(rule.el);
+  if (!wrap) return;
+  if (rule.ext) { dropEmpty(wrap, 'dataValidation'); return; }
+  const left = [...wrap.childNodes].filter((x) => x.nodeType === 1 && x.localName === 'dataValidation').length;
+  if (left) wrap.setAttribute('count', String(left)); else remove(wrap);
 }
 
 /** A range cut by a band of cells shifting ([b0, b1]: columns for axis 'row', rows for 'col'), from line `at` on:

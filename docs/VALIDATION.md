@@ -83,10 +83,27 @@ The ovals stay with their sheet when another is shown. One goes when its cell is
 description of the command, not measured (a value changed over COM left Excel's oval where it was). Which 255 of
 more are circled, and the message Excel may show then, are not measured either: here, rule by rule, row by row.
 
+## Rules reading another sheet (Excel's 2010 form)
+
+Measured by `tools/excel-compare/excel-dv-x14.ps1`: nine rules added over COM to B2:B5 of a new workbook with a sheet
+Data and a name Choices, the workbook saved and its rules kept (`test/dv-x14-excel.json`).
+
+| Excel's rule | Excel's example |
+|---|---|
+| A rule with a formula that reads another sheet is written in the sheet's extLst, not in `dataValidations`: an `x14:dataValidation` with the same attributes, its formulas as `x14:formula1` and `x14:formula2` holding an `xm:f`, its ranges as `xm:sqref`, in the ext `{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}`. | A list of `=Data!$A$1:$A$3`; whole numbers 1 to `=Data!$B$1` (its `1` in an `xm:f` too); greater than `=Data!$B$1`; a custom `=B2>Data!B1`; a text length equal to `=Data!$B$1`. |
+| A rule of this sheet's references, or of a defined name (whatever it refers to), stays in the main form. | `=$H$1:$H$3`, `=Choices` (`Data!$A$1:$A$3`), `=B2>C2`. |
+| Its ext comes after the conditional formats' and before the sparklines'. | A sheet with a sparkline: `{CCE6A557-...}`, then `{05C60535-...}`. |
+
+The editor reads both forms (`sheet.js`, each rule's `ext` saying which), so a rule of the 2010 form judges typing,
+shows its list (the other sheet's cells) and is circled by Circle Invalid Data. The Data Validation box, Clear All,
+cut and paste take cells out of, move and add cells to rules of either form; a rule the box writes is put in the form
+Excel would put it in (`dvedit.js`). The nine rules written here are Excel's XML, less its `xr:uid`
+(`test/dvx14.test.js`); Excel opened the nine workbooks without a repair and read each rule back as given: type,
+operator, formulas and B2:B5 (`excel-dv-x14.ps1 -Open test/out/dvx14`).
+
 ## Not yet
 
-"Apply these changes to all other cells with the same settings", a list's choices from a name defined as a formula
-of another kind, and the rules Excel writes in its 2010 form (a list from another sheet, `x14:dataValidation`): they
-are kept, and moved with rows and columns, but not read, so their cells aren't checked, listed or circled. Rules
-follow inserted and deleted rows, columns and cells as Excel moves them, split and extends them, and stay where they
-are in a sort; Circle Invalid Data's ovals go after an insert or delete on their sheet, as Excel's do (docs/ROWCOL.md).
+"Apply these changes to all other cells with the same settings", and a list's choices from a name defined as a
+formula of another kind. Rules follow inserted and deleted rows, columns and cells as Excel moves them, split and
+extends them, and stay where they are in a sort; Circle Invalid Data's ovals go after an insert or delete on their
+sheet, as Excel's do (docs/ROWCOL.md).

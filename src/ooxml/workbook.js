@@ -360,7 +360,7 @@ export class Workbook {
   addToValidation(i, match, ranges) { return addToRule(this._part(i).doc, match, ranges) && (this._reread(i, this._part(i)), true); }
   setValidation(i, ranges, rule) {
     const part = this._part(i);
-    setValidationXml(part.doc, ranges, rule, this.date1904);
+    setValidationXml(part.doc, ranges, rule, this.date1904, this.sheets[i].name);
     this._reread(i, part);
   }
 
