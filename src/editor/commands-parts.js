@@ -119,6 +119,20 @@ export function partCommands(env) {
       ctx.changed?.();
       return true;
     },
+    /** A change another editor of a shared workbook made (collab.js), `run(wb)`: made here outside the history, and
+     *  drawn, with the cell formats it added, and the tabs again when it changed the sheets (`sheets`). */
+    remoteChange(run, { sheets = false } = {}) {
+      const wb = ctx.workbook();
+      const was = ctx.sheetIndex();
+      const shownId = idOf(was);
+      const formats = wb.styles.cellXfs.length;
+      run(wb);
+      if (sheets) env.sheetsMoved(wb, shownId, was);
+      if (wb.styles.cellXfs.length !== formats) ctx.restyled?.();
+      ctx.reloaded?.();
+      ctx.changed?.();
+      return true;
+    },
     /** A change by the agent (agent.js), `run(wb)`: of rows or columns ('lines': one step of the history) or of the
      *  sheets ('sheets', as the tab menu's). A refusal throws, in Excel's words, for the agent to read. */
     agentChange(run, kind) {
