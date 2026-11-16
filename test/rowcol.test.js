@@ -9,6 +9,7 @@ import { parseRef, rangeName } from '../src/ooxml/refs.js';
 import { formatEach } from '../src/ooxml/formatops.js';
 import { shiftRefs } from '../src/calc/tokens.js';
 import { ROWCOL_MESSAGES } from '../src/ooxml/rowcol.js';
+import { parseXml } from '../src/ooxml/xml.js';
 
 // What Excel did with the same sheet over COM (Rows(n).Insert, Range("2:4").Delete, Columns(n).Insert...; docs/ROWCOL.md).
 const range = (text) => { const [a, b = a] = text.split(':').map(parseRef); return { r0: a.r, c0: a.c, r1: b.r, c1: b.c, ar: a.r, ac: a.c }; };
@@ -118,6 +119,22 @@ test('references: whole columns and rows, other sheets\' own references', () => 
   assert.equal(shiftRefs('A5+T!A5', o), 'A6+T!A5');
   assert.equal(shiftRefs('A5', { ...o, here: 'T' }), 'A5');
   assert.equal(shiftRefs("'S'!A5", { ...o, here: null }), "'S'!A6");
+});
+
+test('a rule of the Excel 2010 form reading the sheet: its formula moved once, its xm:f kept', () => {
+  const { wb, si, s2 } = setup();
+  const name = wb.sheets[si].name;
+  // (A list on the next sheet from this one's A1:A3, written as Excel writes a rule reading another sheet.)
+  const doc = wb._part(s2).doc;
+  const X14 = 'http://schemas.microsoft.com/office/spreadsheetml/2009/9/main';
+  const XM = 'http://schemas.microsoft.com/office/excel/2006/main';
+  const ext = parseXml(`<extLst xmlns="${doc.documentElement.namespaceURI}"><ext uri="{CCE6A557-97BC-4b89-ADB6-D9C93CAAB3DF}" xmlns:x14="${X14}"><x14:dataValidations count="1" xmlns:xm="${XM}">` +
+    `<x14:dataValidation type="list" allowBlank="1"><x14:formula1><xm:f>${name}!$A$1:$A$3</xm:f></x14:formula1><xm:sqref>B1</xm:sqref></x14:dataValidation></x14:dataValidations></ext></extLst>`).documentElement;
+  doc.documentElement.appendChild(doc.importNode(ext, true));
+  wb.changeLines(si, 'row', 0, 1);
+  const f = doc.getElementsByTagNameNS(XM, 'f');
+  assert.equal(f.length, 1);
+  assert.equal(f[0].textContent, `${name}!$A$2:$A$4`);
 });
 
 test('refused as Excel refuses; a sheet with parts whose positions aren\'t moved yet is refused', () => {
