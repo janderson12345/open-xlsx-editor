@@ -50,6 +50,7 @@ import { hyperlinkAt } from '../ooxml/links.js';
 import { listNames, namesOnSheet } from '../ooxml/names.js';
 import { sheetProtection, workbookProtection } from '../ooxml/protection.js';
 import { DEFAULT_RECENT } from '../calc/catalog.js';
+import { readPivots, pivotAt } from '../ooxml/pivot.js';
 
 /** The Font tab's list: the theme's fonts first, then these. */
 const FONT_NAMES = ['Aptos', 'Aptos Narrow', 'Arial', 'Calibri', 'Cambria', 'Consolas', 'Courier New', 'Georgia', 'Segoe UI', 'Tahoma', 'Times New Roman', 'Verdana'];
@@ -118,6 +119,20 @@ export function createMoreActs(env) {
     }
     // (Formulas > Watch Window, shown or hidden: watchwindow.js.)
     if (name === 'watchWindow') { state.watch?.toggle(); return true; }
+    // (Data > Queries & Connections, shown or hidden: queriespane.js.)
+    if (name === 'queriesPane') { state.queries?.toggle(); return true; }
+    if (name === 'refreshData') {
+      // (Refresh All (Ctrl+Alt+F5, args[0] true) and Refresh (Alt+F5): the queries and connections loaded to tables,
+      // through the host, then the PivotTables; Refresh, the one at the active cell. Neither there: the PivotTables'
+      // command says so.)
+      const all = !!args[0];
+      const s = editing().selection;
+      const wb = state.workbook;
+      const pivots = all ? readPivots(wb).length > 0 : !!pivotAt(wb, state.sheetIndex, s.ar, s.ac);
+      const tables = state.queries?.refreshTables(all, state.sheetIndex, s.ar, s.ac);
+      if (!tables) return editing().run('refreshPivots', all);
+      return Promise.resolve(tables).then((done) => (pivots ? editing().run('refreshPivots', all) : done));
+    }
     if (name === 'insertFunction' || name === 'functionArguments') {
       // (Formulas > Insert Function, Shift+F3, AutoSum's More Functions, or a function from the Function Library's
       // lists (args[0]): put first in Most Recently Used, then Function Arguments for it, as Excel goes on. Function

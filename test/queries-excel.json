@@ -1,0 +1,77 @@
+{
+  "errors": [],
+  "queries": [
+    {
+      "name": "Sales",
+      "formula": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}})\nin\n    #\"Changed Type\"",
+      "description": ""
+    },
+    {
+      "name": "Big",
+      "formula": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "description": ""
+    },
+    {
+      "name": "Model",
+      "formula": "let\n    Source = Sales\nin\n    Source",
+      "description": ""
+    }
+  ],
+  "connections": [
+    {
+      "name": "Query - Big",
+      "type": 1,
+      "inModel": false,
+      "command": "SELECT * FROM [Big]"
+    },
+    {
+      "name": "Query - Model",
+      "type": 1,
+      "inModel": true,
+      "command": "\"Model\""
+    },
+    {
+      "name": "Query - Sales",
+      "type": 1,
+      "inModel": false,
+      "command": "SELECT * FROM [Sales]"
+    },
+    {
+      "name": "ThisWorkbookDataModel",
+      "type": 7,
+      "inModel": true,
+      "command": ""
+    }
+  ],
+  "table": {
+    "name": "Sales",
+    "range": "A1:C5",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty"
+      ],
+      [
+        "North",
+        "kiwi",
+        30.0
+      ],
+      [
+        "South",
+        "apple",
+        10.0
+      ],
+      [
+        "East",
+        "pear",
+        20.0
+      ],
+      [
+        "West",
+        "date",
+        50.0
+      ]
+    ]
+  }
+}

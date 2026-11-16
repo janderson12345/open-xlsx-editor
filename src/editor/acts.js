@@ -21,6 +21,7 @@ import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor, createNamesFor } from './namesbox.js';
 import { editLinksBox } from './linksbox.js';
+import { readQueries } from '../ooxml/queries.js';
 import { announce } from './live.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
@@ -460,6 +461,13 @@ Continue?`, ['Yes', 'No', 'Cancel']); return b === 'Yes' ? 'force' : b === 'No' 
       ...(() => {
         const s = editing().selection;
         return pivotAt(state.workbook, state.sheetIndex, s.ar, s.ac) ? [{ label: 'Refresh', run: () => editing().run('refreshPivots', false), disabled: ro }, { label: 'Show Field List', run: run('pivotFieldList'), disabled: ro }, 'separator'] : [];
+      })(),
+      // (On a query's table, Excel's Refresh: through the host, queriespane.js.)
+      ...(() => {
+        const s = editing().selection;
+        const { queries, connections } = readQueries(state.workbook);
+        const inIt = (t) => t && t.si === state.sheetIndex && s.ar >= t.r0 && s.ar <= t.r1 && s.ac >= t.c0 && s.ac <= t.c1;
+        return [...queries, ...connections].some((q) => inIt(q.table)) ? [{ label: 'Refresh', run: run('refreshData', false), disabled: ro }, 'separator'] : [];
       })(),
       // (A hyperlink's cell: Excel's Edit Hyperlink..., Open Hyperlink and Remove Hyperlink; another, Link.)
       ...(() => {

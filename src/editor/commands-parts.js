@@ -2,6 +2,7 @@
 // cell, changes of several sheets at once, PivotTables refreshed, notes and rules changed, another editor's contents
 // and the agent's changes.
 import { readPivots, refreshPivot, pivotAt } from '../ooxml/pivot.js';
+import { readQueries, refreshQueryTable, setQueryFormula } from '../ooxml/queries.js';
 import { addHyperlink } from '../ooxml/links.js';
 import { SheetError } from '../ooxml/sheetops.js';
 import { setCalcMode, calculateNow, calculateSheet, calculateFull, setIteration } from '../ooxml/calcmode.js';
@@ -54,6 +55,46 @@ export function partCommands(env) {
       ctx.changed?.();
       ctx.announce(list.length === 1 ? 'PivotTable refreshed' : `${list.length} PivotTables refreshed`);
       return true;
+    },
+    /** Rows a host gave for queries and connections ([{ name, kind: 'query' | 'connection', data }]: queriespane.js
+     *  refreshThrough) written into their tables as Excel's Refresh writes them (queries.js refreshQueryTable), all as
+     *  one step of the history; one that can't be written leaves everything as it was, and says why. */
+    queryRows(results) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      // (A protected sheet: its cells are locked, as for a PivotTable's refresh.)
+      if (!allowed('always')) return false;
+      const wb = ctx.workbook();
+      const before = wb.snapshot();
+      let rows = 0;
+      try {
+        for (const { name, kind, data } of results) {
+          const { queries, connections } = readQueries(wb);
+          const q = kind === 'connection' ? connections.find((c) => c.name === name) : queries.find((x) => x.name === name);
+          const out = q ? refreshQueryTable(wb, q, data) : { error: `There's no ${kind === 'connection' ? 'connection' : 'query'} named ${name}` };
+          if (out.error) throw new Error(out.error);
+          rows += out.rows;
+        }
+      } catch (e) {
+        wb.restore(before);
+        ctx.reloaded?.();
+        ctx.alert(e.message);
+        return false;
+      }
+      state.undo.push({ sheet: idOf(ctx.sheetIndex()), snap: true, before, after: wb.snapshot() });
+      state.redo = [];
+      ctx.edited?.({ book: true });
+      ctx.reloaded?.();
+      ctx.changed?.();
+      ctx.announce(`${rows.toLocaleString('en-US')} row${rows === 1 ? '' : 's'} loaded`);
+      return true;
+    },
+    /** The Advanced Editor's Done: query `name`'s M changed to `m` in the DataMashup (queries.js setQueryFormula), one
+     *  step of the history; Excel's words when it can't be written. */
+    queryFormula(name, m) {
+      let refused = null;
+      const done = commands.sheetChange((wb) => { const out = setQueryFormula(wb, name, m); if (out?.error) { refused = out.error; return false; } return true; });
+      if (refused) ctx.alert(refused);
+      return done;
     },
     /** Formulas > Calculation Options: 'auto', 'autoNoTable' or 'manual' (calcmode.js). Not a step of the history,
      *  as in Excel; to Automatic, the formulas waiting are worked out. */

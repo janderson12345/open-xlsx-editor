@@ -31,6 +31,8 @@ import { chartFigure } from './editor/chartview.js';
 import { createRibbon } from './editor/ribbon.js';
 import { createFindBar, pickCell } from './editor/findbar.js';
 import { createWatchWindow } from './editor/watchwindow.js';
+import { createQueriesPane } from './editor/queriespane.js';
+import { announce } from './editor/live.js';
 import { homeTab } from './editor/hometab.js';
 import { viewTab } from './editor/viewtab.js';
 import { pageLayoutTab } from './editor/pagelayouttab.js';
@@ -195,6 +197,7 @@ export function mountXlsxEditor(host, options = {}) {
     if (!state.grid || !state.workbook) return;
     state.grid.setConditional(conditionalLooks(state.workbook, state.sheetIndex));
     state.watch?.refresh();
+    state.queries?.refresh();
     state.refreshErrors();
     // (Notes too: written, deleted, or moved with rows and columns.)
     state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
@@ -292,6 +295,19 @@ export function mountXlsxEditor(host, options = {}) {
       home: () => state.grid?.el.focus({ preventScroll: true }),
     });
     state.find.el.after(state.watch.el);
+    // (Data > Queries & Connections: docked under the Watch Window; refreshed through the host, onRefreshQuery.)
+    state.queries = createQueriesPane({
+      root,
+      workbook: () => state.workbook,
+      readOnly: () => state.readOnly,
+      host: () => options.onRefreshQuery,
+      run: (name, ...args) => editing().run(name, ...args),
+      alert,
+      announce,
+      go: (hit) => editing().run('goTo', hit),
+      home: () => state.grid?.el.focus({ preventScroll: true }),
+    });
+    state.watch.el.after(state.queries.el);
   };
 
   /** Auto Fill Options' menu: the last fill done again another way (fillopts.js): undone, the cells it started from

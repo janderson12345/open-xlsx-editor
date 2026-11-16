@@ -1,0 +1,165 @@
+[
+  {
+    "name": "both",
+    "errors": [],
+    "formulas": {
+      "Sales": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}})\nin\n    #\"Changed Type\"",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 25)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales,\n    Renamed = Table.RenameColumns(Source, {{\"Item\", \"Fruit\"}})\nin\n    Renamed"
+    },
+    "range": "A1:C5",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty"
+      ],
+      [
+        "North",
+        "kiwi",
+        30.0
+      ],
+      [
+        "South",
+        "apple",
+        10.0
+      ],
+      [
+        "East",
+        "pear",
+        20.0
+      ],
+      [
+        "West",
+        "date",
+        50.0
+      ]
+    ],
+    "kept": {
+      "Sales": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}})\nin\n    #\"Changed Type\"",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 25)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales,\n    Renamed = Table.RenameColumns(Source, {{\"Item\", \"Fruit\"}})\nin\n    Renamed"
+    }
+  },
+  {
+    "name": "rows",
+    "errors": [],
+    "formulas": {
+      "Sales": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50#(lf)North,fig,40#(lf)South,lime,5\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}})\nin\n    #\"Changed Type\"",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales\nin\n    Source"
+    },
+    "range": "A1:C7",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty"
+      ],
+      [
+        "North",
+        "kiwi",
+        30.0
+      ],
+      [
+        "South",
+        "apple",
+        10.0
+      ],
+      [
+        "East",
+        "pear",
+        20.0
+      ],
+      [
+        "West",
+        "date",
+        50.0
+      ],
+      [
+        "North",
+        "fig",
+        40.0
+      ],
+      [
+        "South",
+        "lime",
+        5.0
+      ]
+    ],
+    "kept": {
+      "Sales": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50#(lf)North,fig,40#(lf)South,lime,5\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}})\nin\n    #\"Changed Type\"",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales\nin\n    Source"
+    }
+  },
+  {
+    "name": "steps",
+    "errors": [],
+    "formulas": {
+      "Sales": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    Typed = Table.TransformColumnTypes(Headers,{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}}),\n    // only the big ones\n    Kept = Table.SelectRows(Typed, each [Qty] >= 20)\nin\n    Kept",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales\nin\n    Source"
+    },
+    "range": "A1:C4",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty"
+      ],
+      [
+        "North",
+        "kiwi",
+        30.0
+      ],
+      [
+        "East",
+        "pear",
+        20.0
+      ],
+      [
+        "West",
+        "date",
+        50.0
+      ]
+    ],
+    "kept": {
+      "Sales": "let\n    Source = Csv.Document(\"Region,Item,Qty#(lf)North,kiwi,30#(lf)South,apple,10#(lf)East,pear,20#(lf)West,date,50\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.None]),\n    Headers = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    Typed = Table.TransformColumnTypes(Headers,{{\"Region\", type text}, {\"Item\", type text}, {\"Qty\", Int64.Type}}),\n    // only the big ones\n    Kept = Table.SelectRows(Typed, each [Qty] >= 20)\nin\n    Kept",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales\nin\n    Source"
+    }
+  },
+  {
+    "name": "unicode",
+    "errors": [],
+    "formulas": {
+      "Sales": "let\n    Source = Csv.Document(\"Région,Item,Qty#(lf)Nörth,\"\"kiwi\"\",30#(lf)Süd,äpfel,10\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.Csv]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\nin\n    #\"Promoted Headers\"",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales\nin\n    Source"
+    },
+    "range": "A1:C3",
+    "values": [
+      [
+        "Région",
+        "Item",
+        "Qty"
+      ],
+      [
+        "Nörth",
+        "kiwi",
+        "30"
+      ],
+      [
+        "Süd",
+        "äpfel",
+        "10"
+      ]
+    ],
+    "kept": {
+      "Sales": "let\n    Source = Csv.Document(\"Région,Item,Qty#(lf)Nörth,\"\"kiwi\"\",30#(lf)Süd,äpfel,10\", [Delimiter=\",\", Columns=3, QuoteStyle=QuoteStyle.Csv]),\n    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\nin\n    #\"Promoted Headers\"",
+      "Big": "let\n    Source = Sales,\n    #\"Filtered Rows\" = Table.SelectRows(Source, each [Qty] > 15)\nin\n    #\"Filtered Rows\"",
+      "Model": "let\n    Source = Sales\nin\n    Source"
+    }
+  }
+]

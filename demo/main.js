@@ -13,7 +13,10 @@ const params = new URLSearchParams(location.search);
 const people = [{ name: 'Avery Chen', userId: 'avery.chen@example.com' }, { name: 'Sam Lee', userId: 'sam.lee@example.com' }, { name: 'Robin Park', userId: 'robin.park@example.com' }];
 // (Insert Hyperlink's Create New Document: a host would make the file; the demo says what it would make.)
 const onCreateDocument = (name, { editNow }) => { status.textContent = `New document: ${name} (${editNow ? 'edit now' : 'edit later'})`; };
-const editor = mountXlsxEditor(host, { people, onCreateDocument, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
+// (Data > Refresh for a query: this page has no data source of its own, so it asks window.oxeRefreshQuery when a page
+// script (the browser tests, test/queries.mjs) gives one; docs/QUERIES.md.)
+const onRefreshQuery = (request) => (window.oxeRefreshQuery ? window.oxeRefreshQuery(request) : Promise.reject(new Error('This page has no data source for queries.')));
+const editor = mountXlsxEditor(host, { people, onCreateDocument, onRefreshQuery, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
   ...(params.get('locale') ? { locale: params.get('locale') } : {}) });
 window.oxe = editor;
 // (For the browser tests: a second editor on the page, as two workbooks open at once; test/editing-clip.mjs.)

@@ -1,0 +1,631 @@
+[
+  {
+    "name": "grow",
+    "csv": "Region,Item,Qty|North,kiwi,30|South,apple,10|East,pear,20|West,date,50|North,fig,40|South,lime,5",
+    "cells": {
+      "A7": "below",
+      "E2": "beside"
+    },
+    "errors": [],
+    "range": "A1:C7",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty",
+        null,
+        null
+      ],
+      [
+        "North",
+        "kiwi",
+        "30",
+        null,
+        "beside"
+      ],
+      [
+        "South",
+        "apple",
+        "10",
+        null,
+        null
+      ],
+      [
+        "East",
+        "pear",
+        "20",
+        null,
+        null
+      ],
+      [
+        "West",
+        "date",
+        "50",
+        null,
+        null
+      ],
+      [
+        "North",
+        "fig",
+        "40",
+        null,
+        null
+      ],
+      [
+        "South",
+        "lime",
+        "5",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "below",
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "used": "A1:E9",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c><c r=\"C1\" t=\"s\"><v>2</v></c></row><row r=\"2\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"B2\" s=\"1\" t=\"s\"><v>4</v></c><c r=\"C2\" s=\"1\" t=\"s\"><v>13</v></c><c r=\"E2\" t=\"s\"><v>12</v></c></row><row r=\"3\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" s=\"1\" t=\"s\"><v>5</v></c><c r=\"B3\" s=\"1\" t=\"s\"><v>6</v></c><c r=\"C3\" s=\"1\" t=\"s\"><v>14</v></c></row><row r=\"4\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A4\" s=\"1\" t=\"s\"><v>7</v></c><c r=\"B4\" s=\"1\" t=\"s\"><v>8</v></c><c r=\"C4\" s=\"1\" t=\"s\"><v>15</v></c></row><row r=\"5\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" s=\"1\" t=\"s\"><v>9</v></c><c r=\"B5\" s=\"1\" t=\"s\"><v>10</v></c><c r=\"C5\" s=\"1\" t=\"s\"><v>16</v></c></row><row r=\"6\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A6\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"B6\" s=\"1\" t=\"s\"><v>17</v></c><c r=\"C6\" s=\"1\" t=\"s\"><v>18</v></c></row><row r=\"7\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A7\" s=\"1\" t=\"s\"><v>5</v></c><c r=\"B7\" s=\"1\" t=\"s\"><v>19</v></c><c r=\"C7\" s=\"1\" t=\"s\"><v>20</v></c></row><row r=\"9\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A9\" t=\"s\"><v>11</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Item",
+      "Qty",
+      "North",
+      "kiwi",
+      "South",
+      "apple",
+      "East",
+      "pear",
+      "West",
+      "date",
+      "below",
+      "beside",
+      "30",
+      "10",
+      "20",
+      "50",
+      "fig",
+      "40",
+      "lime",
+      "5"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:C7\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:C7\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"3\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"2\"/><tableColumn id=\"5\" xr3:uid=\"{C6EA40B6-48A6-48D8-AFBD-B034F75A75A8}\" uniqueName=\"5\" name=\"Item\" queryTableFieldId=\"2\" dataDxfId=\"1\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"0\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"4\"><queryTableFields count=\"3\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"2\" name=\"Item\" tableColumnId=\"5\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$7</definedName></definedNames>"
+  },
+  {
+    "name": "shrink",
+    "csv": "Region,Item,Qty|North,kiwi,30|South,apple,10",
+    "cells": {
+      "A7": "below",
+      "E2": "beside"
+    },
+    "errors": [],
+    "range": "A1:C3",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty",
+        null,
+        null
+      ],
+      [
+        "North",
+        "kiwi",
+        "30",
+        null,
+        "beside"
+      ],
+      [
+        "South",
+        "apple",
+        "10",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "below",
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "used": "A1:E5",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c><c r=\"C1\" t=\"s\"><v>2</v></c></row><row r=\"2\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>3</v></c><c r=\"B2\" t=\"s\"><v>4</v></c><c r=\"C2\" s=\"1\" t=\"s\"><v>9</v></c><c r=\"E2\" t=\"s\"><v>8</v></c></row><row r=\"3\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>5</v></c><c r=\"B3\" t=\"s\"><v>6</v></c><c r=\"C3\" s=\"1\" t=\"s\"><v>10</v></c></row><row r=\"5\" spans=\"1:5\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" t=\"s\"><v>7</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Item",
+      "Qty",
+      "North",
+      "kiwi",
+      "South",
+      "apple",
+      "below",
+      "beside",
+      "30",
+      "10"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:C3\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:C3\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"3\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"2\"/><tableColumn id=\"5\" xr3:uid=\"{C6EA40B6-48A6-48D8-AFBD-B034F75A75A8}\" uniqueName=\"5\" name=\"Item\" queryTableFieldId=\"2\" dataDxfId=\"1\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"0\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"4\"><queryTableFields count=\"3\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"2\" name=\"Item\" tableColumnId=\"5\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$3</definedName></definedNames>"
+  },
+  {
+    "name": "columns",
+    "csv": "Region,Qty,Price|North,30,1.5|South,10,0.5|East,20,2|West,50,3",
+    "cells": {
+      "A7": "below"
+    },
+    "errors": [],
+    "range": "A1:C5",
+    "values": [
+      [
+        "Region",
+        "Qty",
+        "Price"
+      ],
+      [
+        "North",
+        "30",
+        "1.5"
+      ],
+      [
+        "South",
+        "10",
+        "0.5"
+      ],
+      [
+        "East",
+        "20",
+        "2"
+      ],
+      [
+        "West",
+        "50",
+        "3"
+      ],
+      [
+        null,
+        null,
+        null
+      ],
+      [
+        "below",
+        null,
+        null
+      ]
+    ],
+    "used": "A1:C7",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c><c r=\"C1\" t=\"s\"><v>7</v></c></row><row r=\"2\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>2</v></c><c r=\"B2\" s=\"1\" t=\"s\"><v>8</v></c><c r=\"C2\" s=\"1\" t=\"s\"><v>9</v></c></row><row r=\"3\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>3</v></c><c r=\"B3\" s=\"1\" t=\"s\"><v>10</v></c><c r=\"C3\" s=\"1\" t=\"s\"><v>11</v></c></row><row r=\"4\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A4\" t=\"s\"><v>4</v></c><c r=\"B4\" s=\"1\" t=\"s\"><v>12</v></c><c r=\"C4\" s=\"1\" t=\"s\"><v>13</v></c></row><row r=\"5\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" t=\"s\"><v>5</v></c><c r=\"B5\" s=\"1\" t=\"s\"><v>14</v></c><c r=\"C5\" s=\"1\" t=\"s\"><v>15</v></c></row><row r=\"7\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A7\" t=\"s\"><v>6</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Qty",
+      "North",
+      "South",
+      "East",
+      "West",
+      "below",
+      "Price",
+      "30",
+      "1.5",
+      "10",
+      "0.5",
+      "20",
+      "2",
+      "50",
+      "3"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:C5\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:C5\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"3\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"2\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"1\"/><tableColumn id=\"1\" xr3:uid=\"{1D2A005E-CDCF-40A6-97AF-2DB3A8AA5E6E}\" uniqueName=\"1\" name=\"Price\" queryTableFieldId=\"4\" dataDxfId=\"0\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"5\"><queryTableFields count=\"3\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/><queryTableField id=\"4\" name=\"Price\" tableColumnId=\"1\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$5</definedName></definedNames>"
+  },
+  {
+    "name": "wider",
+    "csv": "Region,Item,Qty,Price|North,kiwi,30,1.5|South,apple,10,0.5",
+    "cells": {
+      "A7": "below",
+      "G2": "beside"
+    },
+    "errors": [],
+    "range": "A1:D3",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty",
+        "Price",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "North",
+        "kiwi",
+        "30",
+        "1.5",
+        null,
+        null,
+        null,
+        "beside"
+      ],
+      [
+        "South",
+        "apple",
+        "10",
+        "0.5",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "below",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "used": "A1:H5",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c><c r=\"C1\" t=\"s\"><v>2</v></c><c r=\"D1\" t=\"s\"><v>9</v></c></row><row r=\"2\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>3</v></c><c r=\"B2\" t=\"s\"><v>4</v></c><c r=\"C2\" s=\"1\" t=\"s\"><v>10</v></c><c r=\"D2\" s=\"1\" t=\"s\"><v>11</v></c><c r=\"H2\" t=\"s\"><v>8</v></c></row><row r=\"3\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>5</v></c><c r=\"B3\" t=\"s\"><v>6</v></c><c r=\"C3\" s=\"1\" t=\"s\"><v>12</v></c><c r=\"D3\" s=\"1\" t=\"s\"><v>13</v></c></row><row r=\"5\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" t=\"s\"><v>7</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Item",
+      "Qty",
+      "North",
+      "kiwi",
+      "South",
+      "apple",
+      "below",
+      "beside",
+      "Price",
+      "30",
+      "1.5",
+      "10",
+      "0.5"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:D3\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:D3\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"4\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"3\"/><tableColumn id=\"5\" xr3:uid=\"{C6EA40B6-48A6-48D8-AFBD-B034F75A75A8}\" uniqueName=\"5\" name=\"Item\" queryTableFieldId=\"2\" dataDxfId=\"2\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"1\"/><tableColumn id=\"1\" xr3:uid=\"{6C9D94F5-76B0-401D-951A-6155DAF20EDF}\" uniqueName=\"1\" name=\"Price\" queryTableFieldId=\"4\" dataDxfId=\"0\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"5\"><queryTableFields count=\"4\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"2\" name=\"Item\" tableColumnId=\"5\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/><queryTableField id=\"4\" name=\"Price\" tableColumnId=\"1\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$D$3</definedName></definedNames>"
+  },
+  {
+    "name": "narrower",
+    "csv": "Region,Qty|North,30|South,10|East,20|West,50|North,40",
+    "cells": {
+      "G2": "beside",
+      "A7": "below",
+      "C7": "under"
+    },
+    "errors": [],
+    "range": "A1:B6",
+    "values": [
+      [
+        "Region",
+        "Qty",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "North",
+        "30",
+        null,
+        null,
+        null,
+        "beside"
+      ],
+      [
+        "South",
+        "10",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "East",
+        "20",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "West",
+        "50",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "North",
+        "40",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        "under",
+        null,
+        null,
+        null
+      ],
+      [
+        "below",
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "used": "A1:F8",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c></row><row r=\"2\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" s=\"1\" t=\"s\"><v>2</v></c><c r=\"B2\" s=\"1\" t=\"s\"><v>9</v></c><c r=\"F2\" t=\"s\"><v>6</v></c></row><row r=\"3\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"B3\" s=\"1\" t=\"s\"><v>10</v></c></row><row r=\"4\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A4\" s=\"1\" t=\"s\"><v>4</v></c><c r=\"B4\" s=\"1\" t=\"s\"><v>11</v></c></row><row r=\"5\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" s=\"1\" t=\"s\"><v>5</v></c><c r=\"B5\" s=\"1\" t=\"s\"><v>12</v></c></row><row r=\"6\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A6\" s=\"1\" t=\"s\"><v>2</v></c><c r=\"B6\" s=\"1\" t=\"s\"><v>13</v></c></row><row r=\"7\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"C7\" t=\"s\"><v>8</v></c></row><row r=\"8\" spans=\"1:6\" x14ac:dyDescent=\"0.25\"><c r=\"A8\" t=\"s\"><v>7</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Qty",
+      "North",
+      "South",
+      "East",
+      "West",
+      "beside",
+      "below",
+      "under",
+      "30",
+      "10",
+      "20",
+      "50",
+      "40"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:B6\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:B6\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"2\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"1\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"0\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"4\"><queryTableFields count=\"2\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$B$6</definedName></definedNames>"
+  },
+  {
+    "name": "unbound",
+    "csv": "Region,Item,Qty,Price|North,kiwi,30,1.5|South,apple,10,0.5|East,pear,20,2|West,date,50,3|North,fig,40,1|South,lime,5,4",
+    "cells": {
+      "G2": "beside",
+      "A8": "below"
+    },
+    "errors": [],
+    "range": "A1:E7",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty",
+        "Price",
+        "Double",
+        null,
+        null,
+        null
+      ],
+      [
+        "North",
+        "kiwi",
+        "30",
+        "1.5",
+        60.0,
+        null,
+        null,
+        "beside"
+      ],
+      [
+        "South",
+        "apple",
+        "10",
+        "0.5",
+        20.0,
+        null,
+        null,
+        null
+      ],
+      [
+        "East",
+        "pear",
+        "20",
+        "2",
+        40.0,
+        null,
+        null,
+        null
+      ],
+      [
+        "West",
+        "date",
+        "50",
+        "3",
+        100.0,
+        null,
+        null,
+        null
+      ],
+      [
+        "North",
+        "fig",
+        "40",
+        "1",
+        80.0,
+        null,
+        null,
+        null
+      ],
+      [
+        "South",
+        "lime",
+        "5",
+        "4",
+        10.0,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "below",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "used": "A1:H10",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c><c r=\"C1\" t=\"s\"><v>2</v></c><c r=\"D1\" t=\"s\"><v>14</v></c><c r=\"E1\" t=\"s\"><v>11</v></c></row><row r=\"2\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"B2\" s=\"1\" t=\"s\"><v>4</v></c><c r=\"C2\" s=\"1\" t=\"s\"><v>15</v></c><c r=\"D2\" s=\"1\" t=\"s\"><v>16</v></c><c r=\"E2\"><f>Sales[[#This Row],[Qty]]*2</f><v>60</v></c><c r=\"H2\" t=\"s\"><v>12</v></c></row><row r=\"3\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" s=\"1\" t=\"s\"><v>5</v></c><c r=\"B3\" s=\"1\" t=\"s\"><v>6</v></c><c r=\"C3\" s=\"1\" t=\"s\"><v>17</v></c><c r=\"D3\" s=\"1\" t=\"s\"><v>18</v></c><c r=\"E3\"><f>Sales[[#This Row],[Qty]]*2</f><v>20</v></c></row><row r=\"4\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A4\" s=\"1\" t=\"s\"><v>7</v></c><c r=\"B4\" s=\"1\" t=\"s\"><v>8</v></c><c r=\"C4\" s=\"1\" t=\"s\"><v>19</v></c><c r=\"D4\" s=\"1\" t=\"s\"><v>20</v></c><c r=\"E4\"><f>Sales[[#This Row],[Qty]]*2</f><v>40</v></c></row><row r=\"5\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" s=\"1\" t=\"s\"><v>9</v></c><c r=\"B5\" s=\"1\" t=\"s\"><v>10</v></c><c r=\"C5\" s=\"1\" t=\"s\"><v>21</v></c><c r=\"D5\" s=\"1\" t=\"s\"><v>22</v></c><c r=\"E5\"><f>Sales[[#This Row],[Qty]]*2</f><v>100</v></c></row><row r=\"6\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A6\" s=\"1\" t=\"s\"><v>3</v></c><c r=\"B6\" s=\"1\" t=\"s\"><v>23</v></c><c r=\"C6\" s=\"1\" t=\"s\"><v>24</v></c><c r=\"D6\" s=\"1\" t=\"s\"><v>25</v></c><c r=\"E6\"><f>Sales[[#This Row],[Qty]]*2</f><v>80</v></c></row><row r=\"7\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A7\" s=\"1\" t=\"s\"><v>5</v></c><c r=\"B7\" s=\"1\" t=\"s\"><v>26</v></c><c r=\"C7\" s=\"1\" t=\"s\"><v>27</v></c><c r=\"D7\" s=\"1\" t=\"s\"><v>28</v></c><c r=\"E7\"><f>Sales[[#This Row],[Qty]]*2</f><v>10</v></c></row><row r=\"10\" spans=\"1:8\" x14ac:dyDescent=\"0.25\"><c r=\"A10\" t=\"s\"><v>13</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Item",
+      "Qty",
+      "North",
+      "kiwi",
+      "South",
+      "apple",
+      "East",
+      "pear",
+      "West",
+      "date",
+      "Double",
+      "beside",
+      "below",
+      "Price",
+      "30",
+      "1.5",
+      "10",
+      "0.5",
+      "20",
+      "2",
+      "50",
+      "3",
+      "fig",
+      "40",
+      "1",
+      "lime",
+      "5",
+      "4"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:E7\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:E7\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"5\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"3\"/><tableColumn id=\"5\" xr3:uid=\"{C6EA40B6-48A6-48D8-AFBD-B034F75A75A8}\" uniqueName=\"5\" name=\"Item\" queryTableFieldId=\"2\" dataDxfId=\"2\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"1\"/><tableColumn id=\"2\" xr3:uid=\"{CD17F27E-DBEA-46A9-A8AF-63AF0D76758D}\" uniqueName=\"2\" name=\"Price\" queryTableFieldId=\"5\" dataDxfId=\"0\"/><tableColumn id=\"1\" xr3:uid=\"{3A6136FD-7EAA-4BC1-A662-0DB365554473}\" uniqueName=\"1\" name=\"Double\" queryTableFieldId=\"4\"><calculatedColumnFormula>Sales[[#This Row],[Qty]]*2</calculatedColumnFormula></tableColumn></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"6\" unboundColumnsRight=\"1\"><queryTableFields count=\"5\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"2\" name=\"Item\" tableColumnId=\"5\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/><queryTableField id=\"5\" name=\"Price\" tableColumnId=\"2\"/><queryTableField id=\"4\" dataBound=\"0\" tableColumnId=\"1\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$D$7</definedName></definedNames>"
+  },
+  {
+    "name": "same",
+    "csv": "Region,Item,Qty|North,kiwi,30|South,apple,10|East,pear,20|West,date,50",
+    "cells": {},
+    "errors": [],
+    "range": "A1:C5",
+    "values": [
+      [
+        "Region",
+        "Item",
+        "Qty"
+      ],
+      [
+        "North",
+        "kiwi",
+        "30"
+      ],
+      [
+        "South",
+        "apple",
+        "10"
+      ],
+      [
+        "East",
+        "pear",
+        "20"
+      ],
+      [
+        "West",
+        "date",
+        "50"
+      ]
+    ],
+    "used": "A1:C5",
+    "sheetData": "<sheetData><row r=\"1\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c><c r=\"C1\" t=\"s\"><v>2</v></c></row><row r=\"2\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>3</v></c><c r=\"B2\" t=\"s\"><v>4</v></c><c r=\"C2\" s=\"1\" t=\"s\"><v>11</v></c></row><row r=\"3\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>5</v></c><c r=\"B3\" t=\"s\"><v>6</v></c><c r=\"C3\" s=\"1\" t=\"s\"><v>12</v></c></row><row r=\"4\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A4\" t=\"s\"><v>7</v></c><c r=\"B4\" t=\"s\"><v>8</v></c><c r=\"C4\" s=\"1\" t=\"s\"><v>13</v></c></row><row r=\"5\" spans=\"1:3\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" t=\"s\"><v>9</v></c><c r=\"B5\" t=\"s\"><v>10</v></c><c r=\"C5\" s=\"1\" t=\"s\"><v>14</v></c></row></sheetData>",
+    "strings": [
+      "Region",
+      "Item",
+      "Qty",
+      "North",
+      "kiwi",
+      "South",
+      "apple",
+      "East",
+      "pear",
+      "West",
+      "date",
+      "30",
+      "10",
+      "20",
+      "50"
+    ],
+    "table": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<table xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr xr3\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" id=\"1\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\" name=\"Sales\" displayName=\"Sales\" ref=\"A1:C5\" tableType=\"queryTable\" totalsRowShown=\"0\"><autoFilter ref=\"A1:C5\" xr:uid=\"{89937DEA-6CE4-4964-87CE-143268A4EF96}\"/><tableColumns count=\"3\"><tableColumn id=\"4\" xr3:uid=\"{BEA8E901-DA4B-48DC-8C20-E96956430184}\" uniqueName=\"4\" name=\"Region\" queryTableFieldId=\"1\" dataDxfId=\"2\"/><tableColumn id=\"5\" xr3:uid=\"{C6EA40B6-48A6-48D8-AFBD-B034F75A75A8}\" uniqueName=\"5\" name=\"Item\" queryTableFieldId=\"2\" dataDxfId=\"1\"/><tableColumn id=\"6\" xr3:uid=\"{F5B21D5A-B879-4798-A307-E4BDADDFE640}\" uniqueName=\"6\" name=\"Qty\" queryTableFieldId=\"3\" dataDxfId=\"0\"/></tableColumns><tableStyleInfo name=\"TableStyleMedium7\" showFirstColumn=\"0\" showLastColumn=\"0\" showRowStripes=\"1\" showColumnStripes=\"0\"/></table>",
+    "queryTable": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<queryTable xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\" name=\"ExternalData_1\" connectionId=\"3\" xr16:uid=\"{949D26BA-4114-48BA-B413-C3B4E7B4F833}\" autoFormatId=\"16\" applyNumberFormats=\"0\" applyBorderFormats=\"0\" applyFontFormats=\"1\" applyPatternFormats=\"1\" applyAlignmentFormats=\"0\" applyWidthHeightFormats=\"0\"><queryTableRefresh nextId=\"4\"><queryTableFields count=\"3\"><queryTableField id=\"1\" name=\"Region\" tableColumnId=\"4\"/><queryTableField id=\"2\" name=\"Item\" tableColumnId=\"5\"/><queryTableField id=\"3\" name=\"Qty\" tableColumnId=\"6\"/></queryTableFields></queryTableRefresh></queryTable>",
+    "connections": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<connections xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr16\" xmlns:xr16=\"http://schemas.microsoft.com/office/spreadsheetml/2017/revision16\"><connection id=\"1\" xr16:uid=\"{397620FD-9467-4957-AFC3-8488D636804B}\" name=\"Query - Big\" description=\"Connection to the 'Big' query in the workbook.\" type=\"5\" refreshedVersion=\"0\" background=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Big;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Big]\"/></connection><connection id=\"2\" xr16:uid=\"{D3EC01B7-4F20-4B0B-8F04-D58C47B2EB3B}\" name=\"Query - Model\" description=\"Connection to the 'Model' query in the workbook.\" type=\"100\" refreshedVersion=\"8\" minRefreshableVersion=\"5\"><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"f7d420e9-ed73-466c-8d3d-38c712632c66\"><x15:oledbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Model;Extended Properties=&quot;&quot;\"><x15:dbTables><x15:dbTable name=\"Model\"/></x15:dbTables></x15:oledbPr></x15:connection></ext></extLst></connection><connection id=\"3\" xr16:uid=\"{B6CD41AC-5640-4F91-82A5-0ED67C9CCEC0}\" keepAlive=\"1\" name=\"Query - Sales\" description=\"Connection to the 'Sales' query in the workbook.\" type=\"5\" refreshedVersion=\"8\" background=\"1\" saveData=\"1\"><dbPr connection=\"Provider=Microsoft.Mashup.OleDb.1;Data Source=$Workbook$;Location=Sales;Extended Properties=&quot;&quot;\" command=\"SELECT * FROM [Sales]\"/></connection><connection id=\"4\" xr16:uid=\"{1F4861D0-B660-44FE-9FF4-FE5BC2E4D930}\" keepAlive=\"1\" name=\"ThisWorkbookDataModel\" description=\"Data Model\" type=\"5\" refreshedVersion=\"8\" minRefreshableVersion=\"5\" background=\"1\"><dbPr connection=\"Data Model Connection\" command=\"Model\" commandType=\"1\"/><olapPr sendLocale=\"1\" rowDrillCount=\"1000\"/><extLst><ext uri=\"{DE250136-89BD-433C-8126-D09CA5730AF9}\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\"><x15:connection id=\"\" model=\"1\"/></ext></extLst></connection></connections>",
+    "definedNames": "<definedNames><definedName name=\"ExternalData_1\" localSheetId=\"0\" hidden=\"1\">Sheet1!$A$1:$C$5</definedName></definedNames>"
+  }
+]

@@ -1585,6 +1585,62 @@
 .oxe-watch-table tr[aria-selected="true"] {
   background: var(--oxe-sel-fill);
 }
+/* Data > Queries & Connections (queriespane.js): docked under the Watch Window, its two tabs and its list. */
+.oxe-query-tabs {
+  display: flex;
+  gap: 2px;
+}
+.oxe-query-tab {
+  padding: 3px 10px;
+  border: 1px solid transparent;
+  border-radius: 4px 4px 0 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+.oxe-query-tab[aria-selected="true"] {
+  border-color: var(--oxe-head-line);
+  border-bottom-color: var(--oxe-sheet-bg, #ffffff);
+  background: var(--oxe-sheet-bg, #ffffff);
+  font-weight: 600;
+}
+.oxe-query-scroll {
+  max-height: 220px;
+}
+.oxe-query-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.oxe-query-item, .oxe-query-none {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--oxe-head-line);
+}
+.oxe-query-name {
+  font-weight: 600;
+}
+.oxe-query-line {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.oxe-query-btns {
+  display: flex;
+  gap: 6px;
+  margin-top: 3px;
+}
+.oxe-query-btn {
+  padding: 1px 8px;
+}
+.oxe-query-editor {
+  width: min(720px, 92vw);
+}
+.oxe-query-m {
+  box-sizing: border-box;
+  width: 100%;
+  font: 13px/1.4 Consolas, 'Courier New', monospace;
+  white-space: pre;
+  tab-size: 4;
+}
 .oxe-findbar {
   display: flex;
   flex: none;
