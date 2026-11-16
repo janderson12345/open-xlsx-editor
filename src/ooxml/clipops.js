@@ -247,10 +247,46 @@ export function pasteCut(wb, si, sel, clip) {
   return [...bySheet.values()].map((x) => ({ si: x.si, contents: [...x.contents.values()], styles: [...x.styles.values()], merges: x.merges, area: x.si === si ? area : null }));
 }
 
-/** Text from outside (tabs between cells, a line for each row) pasted at `sel`'s top-left cell, each cell read as if it
- *  were typed there (a number, a date, =a formula...), with the format typing would give it. */
+/** Text from the clipboard as rows of cells: tabs between cells, a line for each row, and a cell starting with a
+ *  quote running to its closing quote ("" a quote inside), line breaks and tabs and all, as Excel reads it (measured:
+ *  "Plums, long text" pasted as Plums, long text; Excel's own copy quotes a cell with a line break so). A quote not
+ *  closed, or with more after it, leaves the cell as written. */
+export function tsvRows(text) {
+  const t = text.replace(/\r\n?/g, '\n').replace(/\n$/, '');
+  const rows = [[]];
+  let i = 0;
+  while (i <= t.length) {
+    let cell = null;
+    if (t[i] === '"') {
+      let j = i + 1;
+      let inner = '';
+      for (;;) {
+        const q = t.indexOf('"', j);
+        if (q < 0) { j = -1; break; }
+        if (t[q + 1] === '"') { inner += t.slice(j, q + 1); j = q + 2; continue; }
+        inner += t.slice(j, q);
+        j = q + 1;
+        break;
+      }
+      if (j >= 0 && (j >= t.length || t[j] === '\t' || t[j] === '\n')) { cell = inner; i = j; }
+    }
+    if (cell == null) {
+      let j = i;
+      while (j < t.length && t[j] !== '\t' && t[j] !== '\n') j++;
+      cell = t.slice(i, j);
+      i = j;
+    }
+    rows[rows.length - 1].push(cell);
+    if (t[i] === '\n') rows.push([]);
+    i++;
+  }
+  return rows;
+}
+
+/** Text from outside (tabs between cells, a line for each row; tsvRows) pasted at `sel`'s top-left cell, each cell
+ *  read as if it were typed there (a number, a date, =a formula...), with the format typing would give it. */
 export function pasteText(wb, si, sel, text) {
-  const lines = text.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').map((l) => l.split('\t'));
+  const lines = tsvRows(text);
   const contents = [];
   const styles = [];
   lines.forEach((line, dr) => line.forEach((t, dc) => {

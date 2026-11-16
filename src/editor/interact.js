@@ -461,14 +461,16 @@ export function attachEditing(root, ctx) {
     /** Format Painter's copy: the selection kept, outlined, as Copy keeps it but leaving the system clipboard
      *  alone. False if it couldn't be copied. */
     pickFormats() { return clipboard.takeClip(false) != null; },
-    /** The ribbon's Paste: the system clipboard's text if the browser lets it be read, else what was copied here. */
-    async pasteIn() {
-      let text = null;
-      try { text = await navigator.clipboard.readText(); } catch { /* not allowed: what was copied here */ }
+    /** The ribbon's Paste: the system clipboard's HTML or text if the browser lets it be read, else what was copied
+     *  here; `opts.widths` for Keep Source Column Widths. */
+    async pasteIn(opts = {}) {
+      const { text, html } = await clipboard.readSystem();
       if (text == null && !cmd.selection) return;
-      if (!clipboard.pasteText(text) && text == null) announce('Use Ctrl+V to paste from another program');
+      if (!clipboard.pasteText(text, html, opts) && text == null) announce('Use Ctrl+V to paste from another program');
       view.focus({ preventScroll: true });
     },
+    /** The system clipboard's text and HTML, where the page may read them (clipevents.js readSystem). */
+    readClipboard: () => clipboard.readSystem(),
     editor,
     bar,
     /** Whether focus should stay where a formula is typed when a sheet tab is pressed (the formula goes on there). */

@@ -207,6 +207,11 @@ export function createActs(env) {
       if (done?.edit) { state.editing.editWith(done.edit); return true; }
       return done;
     }
+    if (name === 'pasteAs' && args[0] === 'widths') return state.editing.pasteIn({ widths: true });
+    // (Paste Values with another program's cells on the clipboard: their text, read when the browser lets it be.)
+    if (name === 'pasteAs' && args[0] === 'values') {
+      return state.editing.readClipboard().then(({ text }) => editing().run('pasteSpecial', { paste: 'values', ...(text != null ? { text: text.replace(/\r\n?/g, '\n').replace(/\n$/, '') } : {}) }));
+    }
     if (name === 'pasteAs') return editing().run('pasteSpecial', PASTE_AS[args[0]]);
     if (name === 'merge') {
       // (Excel asks first when values would be discarded.)
