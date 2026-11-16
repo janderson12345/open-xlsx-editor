@@ -193,8 +193,19 @@ function readView(view, ns) {
   const pane = view && kid(view, 'pane', ns);
   const frozen = pane && /^frozen/.test(attr(pane, 'state') || '');
   const zoom = Number(view && attr(view, 'zoomScale')) || 100;
+  // (The sheet view's topLeftCell: where the window starts, so where a freeze made while scrolled starts; the pane's:
+  // where the scrolled part was left. Excel opens a sheet at them, docs/VIEW.md.)
+  const at = (el) => { const p = el && attr(el, 'topLeftCell') ? parseRef(attr(el, 'topLeftCell')) : null; return p ? { r: p.r, c: p.c } : null; };
+  const start = at(view) || { r: 0, c: 0 };
+  const rows = frozen ? Math.trunc(Number(attr(pane, 'ySplit') || 0)) : 0;
+  const cols = frozen ? Math.trunc(Number(attr(pane, 'xSplit') || 0)) : 0;
+  // (A split that isn't frozen: its sizes are in twentieths of a point, the headings included; shown unsplit.)
+  const split = pane && !frozen ? { x: Number(attr(pane, 'xSplit') || 0), y: Number(attr(pane, 'ySplit') || 0) } : null;
   return {
-    freeze: { rows: frozen ? Math.trunc(Number(attr(pane, 'ySplit') || 0)) : 0, cols: frozen ? Math.trunc(Number(attr(pane, 'xSplit') || 0)) : 0 },
+    freeze: { rows, cols, top: rows ? start.r : 0, left: cols ? start.c : 0 },
+    viewTopLeft: start,
+    scrolledTo: (frozen && at(pane)) || start,
+    split,
     zoom: Math.min(400, Math.max(10, zoom)),
     /** Formulas > Show Formulas (Ctrl+`): the sheet shows what its cells hold, not their values. */
     showFormulas: attr(view, 'showFormulas') === '1',

@@ -303,6 +303,13 @@ export class Calc {
       // (For SUBTOTAL: a cell's own formula, and whether its row is hidden.)
       formulaOf: (si, r, c) => book.sheet(si).cells.get(r)?.get(c)?.f || null,
       rowHidden: (si, r) => !!book.sheet(si).rows.get(r)?.hidden,
+      // (A row a filter hides, the sheet's or a table's: left out by SUBTOTAL 1 to 11 too, as Excel's are; its
+      // AutoSum's SUBTOTAL(9) under a list filtered to its apples gave 9 of 15, autosum2-excel.json.)
+      rowFiltered: (si, r) => {
+        if (!book.sheet(si).rows.get(r)?.hidden) return false;
+        const inside = (f) => f && f.columns?.size && r > f.r0 && r <= f.r1;
+        return inside(book.sheet(si).autoFilter) || (this.tables || []).some((t) => t.si === si && inside(t.filter));
+      },
       // (FORMULATEXT: none from a hidden cell of a protected sheet.)
       formulaShown: (si, r, c) => (book._part && contentsHidden(book, si, r, c) ? null : book.sheet(si).cells.get(r)?.get(c)?.f || null),
       name: (name, mode) => {

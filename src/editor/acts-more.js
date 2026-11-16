@@ -15,7 +15,8 @@ import { CF_PRESETS, CF_PERIODS, CF_GALLERY } from '../ooxml/cfedit.js';
 import { formatCellsBox } from './formatbox.js';
 import { createStyleActs, STYLE_ACTS } from './acts-styles.js';
 import { threadBox } from './threadbox.js';
-import { addThread, replyThread, editThread, resolveThread } from '../ooxml/threadedit.js';
+import { mentionPeople } from './mentions.js';
+import { addThread, replyThread, editThread, resolveThread, workbookPeople } from '../ooxml/threadedit.js';
 import { insertChart } from '../ooxml/chartnew.js';
 import { BAR_COLORS } from '../ooxml/cfbarsedit.js';
 import { setChartTitle, setChartLegend, setChartLabels, setChartKind, setChartAnchor, deleteChart } from '../ooxml/chartedit.js';
@@ -238,7 +239,9 @@ export function createMoreActs(env) {
       const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
       if (n?.kind === 'note') return messageBox(root, `${ref} has a note: a cell has a note or a comment, not both.`);
       const box = (root.querySelector('.oxe-sel-active') || state.grid.el).getBoundingClientRect();
-      return threadBox(root, { ref, items: n?.items || [], at: { x: box.right + 8, y: box.top }, readOnly: state.readOnly, resolved: !!n?.resolved }).then((answer) => {
+      // (@ offers the host's people and the workbook's own.)
+      const people = mentionPeople(typeof options.people === 'function' ? options.people() : options.people, workbookPeople(state.workbook));
+      return threadBox(root, { ref, items: n?.items || [], at: { x: box.right + 8, y: box.top }, readOnly: state.readOnly, resolved: !!n?.resolved, people }).then((answer) => {
         state.grid.el.focus({ preventScroll: true });
         if (!answer) return false;
         const who = options.author || 'Author';
@@ -247,9 +250,10 @@ export function createMoreActs(env) {
           try {
             if (answer.removeAll) return deleteNote(wb, si, s.ar, s.ac);
             if (answer.resolve != null) return resolveThread(wb, si, s.ar, s.ac, answer.resolve);
-            if (answer.post != null) { if (n) replyThread(wb, si, s.ar, s.ac, answer.post, who); else addThread(wb, si, s.ar, s.ac, answer.post, who); }
+            const mentions = answer.mentions || [];
+            if (answer.post != null) { if (n) replyThread(wb, si, s.ar, s.ac, answer.post, who, { mentions }); else addThread(wb, si, s.ar, s.ac, answer.post, who, { mentions }); }
             else if (answer.remove != null) editThread(wb, si, s.ar, s.ac, answer.remove, null);
-            else if (answer.edit != null) editThread(wb, si, s.ar, s.ac, answer.edit, answer.text);
+            else if (answer.edit != null) editThread(wb, si, s.ar, s.ac, answer.edit, answer.text, { mentions });
           } catch (e) { refused = e.message; return false; }
           return true;
         });

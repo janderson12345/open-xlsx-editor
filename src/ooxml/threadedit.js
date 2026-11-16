@@ -33,9 +33,17 @@ export const commentTime = (d = new Date()) => {
 const relOf = (pkg, path, type) => pkg.readRels(path).find((r) => r.type === type);
 const freePath = (pkg, base, ext) => { for (let n = 1; ; n++) if (!pkg.has(`${base}${n}.${ext}`)) return `${base}${n}.${ext}`; };
 
-/** The person `name` writes as: the workbook's own with that name, else one added (userId the name, provider None, as
- *  Excel names someone not signed in). Returns their id. */
-function personId(wb, name) {
+/** The person `who` (a name, or { name, userId, providerId } from the host's directory) writes or (`mentioned`) is
+ *  mentioned as: the workbook's own with that name, else one added. An author is userId the name and provider None, as
+ *  Excel names someone not signed in. Someone mentioned is a person of their own, provider PeoplePicker, even when an
+ *  author has the same name: Excel, reading a mention made here, gave it such a person and kept the author apart
+ *  (excel-mentions-check.ps1, test/mentions-excel.json). Returns their id. */
+function personId(wb, who, mentioned = false) {
+  const given = typeof who === 'string' ? { name: who } : who;
+  const name = given.name;
+  const userId = given.userId || name;
+  // (Excel gave the mentioned person PeoplePicker whatever provider the file had for them: AD became PeoplePicker.)
+  const providerId = mentioned ? 'PeoplePicker' : given.providerId || 'None';
   const pkg = wb.pkg;
   let path = pkg.rels.find((r) => r.type === PERSON)?.target;
   if (!path) {
@@ -45,12 +53,47 @@ function personId(wb, name) {
     pkg.addRel(PERSON, 'persons/person.xml');
   }
   const text = pkg.text(path);
-  const found = [...text.matchAll(/<person\b[^>]*>/g)].find((m) => unesc(/displayName="([^"]*)"/.exec(m[0])?.[1] || '') === name);
+  const picked = (el) => /\sproviderId="PeoplePicker"/.test(el);
+  const found = [...text.matchAll(/<person\b[^>]*>/g)].find((m) => unesc(/displayName="([^"]*)"/.exec(m[0])?.[1] || '') === name && picked(m[0]) === (providerId === 'PeoplePicker'));
   if (found) return /\sid="([^"]+)"/.exec(found[0])[1];
   const id = newGuid();
-  const person = `<person displayName="${esc(name)}" id="${id}" userId="${esc(name)}" providerId="None"/>`;
-  pkg.setText(path, /<personList\b[^>]*\/>/.test(text) ? text.replace(/<personList\b([^>]*)\/>/, `<personList$1>${person}</personList>`) : text.replace('</personList>', `${person}</personList>`));
+  const person = `<person displayName="${esc(name)}" id="${id}" userId="${esc(userId)}" providerId="${esc(providerId)}"/>`;
+  // (In Excel's order: by name, then provider, None before PeoplePicker, as Excel saved them back.)
+  const key = (n, p) => `${n.toLowerCase()}\u0000${p}`;
+  const after = [...text.matchAll(/<person\b[^>]*>/g)].find((m) => key(unesc(/displayName="([^"]*)"/.exec(m[0])?.[1] || ''), /providerId="([^"]*)"/.exec(m[0])?.[1] || '') > key(name, providerId));
+  if (after) pkg.setText(path, text.slice(0, after.index) + person + text.slice(after.index));
+  else pkg.setText(path, /<personList\b[^>]*\/>/.test(text) ? text.replace(/<personList\b([^>]*)\/>/, `<personList$1>${person}</personList>`) : text.replace('</personList>', `${person}</personList>`));
   return id;
+}
+
+/** The workbook's people (its persons part): [{ id, name, userId, providerId }], for @mentions. */
+export function workbookPeople(wb) {
+  const path = wb.pkg.rels.find((r) => r.type === PERSON)?.target;
+  const text = path && wb.pkg.has(path) ? wb.pkg.text(path) : '';
+  const at = (el, k) => { const m = new RegExp(`\\s${k}="([^"]*)"`).exec(el); return m ? unesc(m[1]) : ''; };
+  return [...text.matchAll(/<person\b[^>]*>/g)].map((m) => ({ id: at(m[0], 'id'), name: at(m[0], 'displayName'), userId: at(m[0], 'userId'), providerId: at(m[0], 'providerId') }));
+}
+
+/**
+ * A comment's text and its mentions as a threadedComment's children: `<text>`, then `<mentions>` with a `mention`
+ * for each "@Name" of the people mentioned ([{ name, userId, providerId }]) found in the text, in the order they come:
+ * the person's id (added to the persons part when new), a new id of its own, where it starts in the text and its
+ * length with the "@" ([MS-XLSX] CT_Mention, as Excel 365 writes a mention picked from its list).
+ */
+function textAndMentions(wb, text, mentions = []) {
+  const body = crlf(text);
+  const found = [];
+  for (const who of mentions) {
+    const tag = `@${who.name}`;
+    for (let i = body.indexOf(tag); i >= 0; i = body.indexOf(tag, i + tag.length)) {
+      // (Not inside a longer name: "@Ann" in "@Anna".)
+      if (/[\p{L}\p{N}]/u.test(body[i + tag.length] || '')) continue;
+      if (!found.some((f) => i < f.start + f.length && f.start < i + tag.length)) found.push({ who, start: i, length: tag.length });
+    }
+  }
+  found.sort((a, b) => a.start - b.start);
+  const list = found.map((f) => `<mention mentionpersonId="${personId(wb, f.who, true)}" mentionId="${newGuid()}" startIndex="${f.start}" length="${f.length}"/>`).join('');
+  return `<text>${esc(body).replace(/&quot;/g, '"')}</text>${list ? `<mentions>${list}</mentions>` : ''}`;
 }
 
 /** Sheet si's threadedComments part, made (empty) with its relationship when it has none. */
@@ -119,7 +162,7 @@ function writePlaceholder(wb, si, r, c, top, items) {
 
 /** A new thread on cell (r, c) of sheet si by `author` (Review > New Comment). Refused when the cell has a note or a
  *  thread already: Excel's words. Returns its id. */
-export function addThread(wb, si, r, c, text, author = 'Author', { when = new Date() } = {}) {
+export function addThread(wb, si, r, c, text, author = 'Author', { when = new Date(), mentions = [] } = {}) {
   const pkg = wb.pkg;
   const ref = refName(r, c);
   const had = relOf(pkg, wb.sheets[si].path, THREADED)?.target;
@@ -129,7 +172,7 @@ export function addThread(wb, si, r, c, text, author = 'Author', { when = new Da
   const path = threadsPart(wb, si);
   let xml = pkg.text(path);
   const id = newGuid();
-  const el = `<threadedComment ref="${ref}" dT="${commentTime(when)}" personId="${personId(wb, author)}" id="${id}"><text>${esc(crlf(text)).replace(/&quot;/g, '"')}</text></threadedComment>`;
+  const el = `<threadedComment ref="${ref}" dT="${commentTime(when)}" personId="${personId(wb, author)}" id="${id}">${textAndMentions(wb, text, mentions)}</threadedComment>`;
   xml = /<ThreadedComments\b[^>]*\/>/.test(xml) ? xml.replace(/<ThreadedComments\b([^>]*)\/>/, `<ThreadedComments$1>${el}</ThreadedComments>`) : xml.replace('</ThreadedComments>', `${el}</ThreadedComments>`);
   pkg.setText(path, xml);
   writePlaceholder(wb, si, r, c, { id }, [{ text }]);
@@ -138,7 +181,7 @@ export function addThread(wb, si, r, c, text, author = 'Author', { when = new Da
 }
 
 /** A reply to the thread on cell (r, c) of sheet si. */
-export function replyThread(wb, si, r, c, text, author = 'Author', { when = new Date() } = {}) {
+export function replyThread(wb, si, r, c, text, author = 'Author', { when = new Date(), mentions = [] } = {}) {
   const pkg = wb.pkg;
   const ref = refName(r, c);
   const path = relOf(pkg, wb.sheets[si].path, THREADED)?.target;
@@ -151,7 +194,7 @@ export function replyThread(wb, si, r, c, text, author = 'Author', { when = new 
   const prev = items.length > 1 ? items.at(-1).id : null;
   const bump = prev && /^\{([0-9A-F]{8}-[0-9A-F]{4})-([0-9A-F]{4})-([0-9A-F]{4}-[0-9A-F]{12})\}$/.exec(prev);
   const id = bump && bump[2] !== 'FFFF' ? `{${bump[1]}-${(parseInt(bump[2], 16) + 1).toString(16).toUpperCase().padStart(4, '0')}-${bump[3]}}` : newGuid();
-  const el = `<threadedComment ref="${ref}" dT="${commentTime(when)}" personId="${personId(wb, author)}" id="${id}" parentId="${items[0].id}"><text>${esc(crlf(text)).replace(/&quot;/g, '"')}</text></threadedComment>`;
+  const el = `<threadedComment ref="${ref}" dT="${commentTime(when)}" personId="${personId(wb, author)}" id="${id}" parentId="${items[0].id}">${textAndMentions(wb, text, mentions)}</threadedComment>`;
   const last = items.at(-1).el;
   pkg.setText(path, pkg.text(path).replace(last, () => last + el));
   writePlaceholder(wb, si, r, c, items[0], [...items, { text }]);
@@ -161,7 +204,7 @@ export function replyThread(wb, si, r, c, text, author = 'Author', { when = new 
 
 /** Comment k (0 the first, then the replies) of the thread on cell (r, c) given new text, or (text null) a reply
  *  deleted. The placeholder written again. */
-export function editThread(wb, si, r, c, k, text) {
+export function editThread(wb, si, r, c, k, text, { mentions = [] } = {}) {
   const pkg = wb.pkg;
   const ref = refName(r, c);
   const path = relOf(pkg, wb.sheets[si].path, THREADED)?.target;
@@ -169,7 +212,7 @@ export function editThread(wb, si, r, c, k, text) {
   const item = items[k];
   if (!item) throw new Error('No such comment.');
   if (text == null && k === 0) throw new Error('Delete the whole thread instead.');
-  const next = text == null ? '' : item.el.replace(/<text>[\s\S]*?<\/text>/, () => `<text>${esc(crlf(text)).replace(/&quot;/g, '"')}</text>`);
+  const next = text == null ? '' : item.el.replace(/<text>[\s\S]*?<\/text>(?:<mentions>[\s\S]*?<\/mentions>|<mentions\/>)?/, () => textAndMentions(wb, text, mentions));
   pkg.setText(path, pkg.text(path).replace(item.el, () => next));
   const left = text == null ? items.filter((_, i) => i !== k) : items.map((x, i) => (i === k ? { ...x, text } : x));
   writePlaceholder(wb, si, r, c, items[0], left);

@@ -15,7 +15,8 @@ const textOf = (el, ns) => kids(el, 't', ns).map((t) => t.textContent).join('');
 
 /**
  * Sheet i's notes and threaded comments by cell: Map("r,c" => { kind: 'note', author, runs: [{ text, bold }], text }
- * or { kind: 'thread', items: [{ author, text, date }] (the first, then its replies), text }).
+ * or { kind: 'thread', items: [{ author, text, date, mentions: [{ start, length, name }] }] (the first, then its
+ * replies), text }).
  */
 export function readNotes(wb, i) {
   const out = new Map();
@@ -33,11 +34,15 @@ export function readNotes(wb, i) {
     const all = kids(threadDoc.documentElement, 'threadedComment', TC_NS).map((el) => ({
       ref: attr(el, 'ref', null), id: attr(el, 'id', null), parent: attr(el, 'parentId', null), done: attr(el, 'done', null) === '1',
       author: people.get(attr(el, 'personId', null)) || '', date: attr(el, 'dT', null) || '', text: kid(el, 'text', TC_NS)?.textContent ?? '',
+      // (@mentions: where each is in the text, and whom it names.)
+      mentions: kids(kid(el, 'mentions', TC_NS), 'mention', TC_NS).map((m) => ({
+        start: Number(attr(m, 'startIndex', null) || 0), length: Number(attr(m, 'length', null) || 0), name: people.get(attr(m, 'mentionpersonId', null)) || '',
+      })),
     }));
     for (const top of all.filter((x) => !x.parent)) {
       const at = parseRef(top.ref);
       if (!at) continue;
-      const items = [top, ...all.filter((x) => x.parent === top.id)].map(({ author, text, date }) => ({ author, text, date }));
+      const items = [top, ...all.filter((x) => x.parent === top.id)].map(({ author, text, date, mentions }) => ({ author, text, date, mentions }));
       // (Resolved: done="1" on the thread's first comment, as Excel writes it.)
       out.set(`${at.r},${at.c}`, { kind: 'thread', items, resolved: top.done, text: items.map((x) => `${x.author}: ${x.text}`).join('\n') });
     }

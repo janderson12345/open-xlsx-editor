@@ -1,0 +1,542 @@
+[
+ {
+  "name": "filtered list: a column with the blank under it",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B2:B7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: the blank row under it",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: numbers in two columns selected",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B2:C6",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: totals both ways",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B2:D7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: average under it",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "average",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: count under it",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "count",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: max under it",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "max",
+  "read": "A1:F12"
+ },
+ {
+  "name": "filtered list: min under it",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6",
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "min",
+  "read": "A1:F12"
+ },
+ {
+  "name": "a list with a filter that hides nothing",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "autofilter": {
+    "range": "A1:C6"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "rows hidden by hand, no filter",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "hideRows": "3:3"
+  },
+  "select": "B7:C7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "a table under it, filtered",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "table": {
+    "range": "A1:C6",
+    "name": "Fruit"
+   },
+   "tableFilter": {
+    "field": 1,
+    "criteria": "Apple"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "a table under it, not filtered",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "table": {
+    "range": "A1:C6",
+    "name": "Fruit"
+   }
+  },
+  "select": "B7:C7",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "a table: its numbers selected",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   },
+   "table": {
+    "range": "A1:C6",
+    "name": "Fruit"
+   }
+  },
+  "select": "B2:C6",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "two areas of numbers",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50",
+    "E1": "More",
+    "E2": "7",
+    "E3": "8",
+    "E4": "9"
+   }
+  },
+  "select": "B2:B6,E2:E4",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "text among the numbers selected",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "x",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   }
+  },
+  "select": "B2:B6",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "a blank column beside a block",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "3",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "30",
+    "C5": "40",
+    "C6": "50"
+   }
+  },
+  "select": "B2:D6",
+  "fn": "sum",
+  "read": "A1:F12"
+ },
+ {
+  "name": "a blank row inside the numbers selected",
+  "setup": {
+   "cells": {
+    "A1": "Fruit",
+    "B1": "Qty",
+    "C1": "Amt",
+    "A2": "Apple",
+    "A3": "Pear",
+    "A4": "Apple",
+    "A5": "Plum",
+    "A6": "Apple",
+    "B2": "1",
+    "B3": "2",
+    "B4": "",
+    "B5": "4",
+    "B6": "5",
+    "C2": "10",
+    "C3": "20",
+    "C4": "",
+    "C5": "40",
+    "C6": "50"
+   }
+  },
+  "select": "B2:C6",
+  "fn": "sum",
+  "read": "A1:F12"
+ }
+]

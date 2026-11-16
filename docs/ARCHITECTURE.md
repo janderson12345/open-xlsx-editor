@@ -85,7 +85,7 @@ insides:
 | `src/ooxml/special.js` | Go To Special: the cells of a kind Excel's box finds (constants, formulas, blanks, the current region, differences, precedents and dependents, rules), as ranges (docs/GOTOSPECIAL.md). |
 | `src/ooxml/names.js` | Defined names made, changed (formulas following) and deleted as Excel's Name Manager does, with Excel's rules for a name; docs/NAMES.md. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise; the name a selection has (shown in the Name Box). |
-| `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, the proposal left to edit on one cell (docs/AUTOSUM.md). |
+| `src/ooxml/autosumops.js` | AutoSum and its Average, Count Numbers, Max and Min as Excel does them: where the totals go, the run of numbers each takes, subtotals, SUBTOTAL in a filtered list and under a table, several areas, the proposal left to edit on one cell (docs/AUTOSUM.md). |
 | `src/ooxml/validation.js` | Data validation judged as Excel judges it: blanks, types, Excel's comparisons, text length, typed and cell lists, custom formulas; a list's choices (docs/VALIDATION.md). |
 | `src/ooxml/condformat.js` | Conditional formatting worked out as Excel draws it: rules in priority order with Stop If True, Excel's comparisons, range rules, colour scales; each cell's fill and font (docs/CONDFORMAT.md). |
 | `src/ooxml/notes.js` | A sheet's notes and threaded comments read as Excel 365 writes them (the placeholder note of a thread left out); shown by `src/editor/notemarks.js` (docs/NOTES.md). |
@@ -99,6 +99,7 @@ insides:
 | `src/ooxml/subtotal.js` | Data > Subtotal and Remove All as Excel does them: SUBTOTAL rows at each change, the Grand row, the outline, page breaks (docs/OUTLINE.md). |
 | `src/ooxml/sizes.js` | Column widths, row heights and hidden lines written as Excel writes them: widths in whole pixels over the digit width, col elements split where a range cuts them, AutoFit Row Height as the fixed height taken away (docs/SIZES.md). |
 | `src/ooxml/findops.js` | Find and Replace as Excel does them: the formula bar's text or the shown text searched, Excel's wildcards, the order from the cell after the active one, replacements entered as typed (docs/FIND.md). |
+| `src/ooxml/findformat.js` | Find Format and Replace Format: a cell's format resolved to how it looks (theme colours worked out), compared property by property, or taken whole from a cell (docs/FIND.md). |
 | `src/ooxml/view.js` | The sheet view as Excel writes it: frozen panes (a pane element with a selection for each pane) and the zoom (docs/VIEW.md). |
 | `src/ooxml/sheet.js` | A worksheet part to a sparse model: cells by row then column, row heights, column widths, merges, defaults, array formula ranges. Implied `r` positions followed; a shared formula's later cells get their own formula text. |
 | `src/ooxml/input.js` | A typed entry as Excel reads it (numbers with separators, currency, percentages, exponents, fractions; dates and times; 'text; =formulas), the format it gives the cell, and a cell's text as the formula bar shows it (docs/ENTRY.md). |
@@ -175,6 +176,7 @@ insides:
 | `src/editor/ribbon.js` | The ribbon: tabs and panels, groups that don't fit behind More, the one-line simplified ribbon, F6 and Esc, `features`. From open-docx-editor's toolbar.js, with each tab in a file of its own. |
 | `src/editor/hometab.js` | The Home tab: Undo, Font, Alignment, Number, Cells, Editing; its controls set from the active cell. |
 | `src/editor/drawborders.js`, `drawdrag.js`, `colorbox.js` | Draw Borders: its modes, line colour and style (view state) and the grid's drag and gridline click while one is on; the More Colors box (Red, Green, Blue, Hex). |
+| `src/editor/freeze.js` | What Freeze Panes, Top Row and First Column freeze, as Excel's ribbon does: from the cell first in view, the middle of the window, a split's place, past hidden rows (docs/VIEW.md). |
 | `src/editor/viewtab.js` | The View tab: Zoom (Zoom..., 100%, Zoom to Selection) and Window (Freeze Panes, Top Row, First Column, Unfreeze). |
 | `src/editor/commands-sheets.js`, `commands-data.js`, `commands-parts.js` | The rest of the named commands, as factories given `commands.js`'s shared state and helpers as one object: the sheets' (show, insert, rename, move, hide, colour, delete, through sheetOp); data (copy, cut, paste, fill, sort, AutoSum, the Name Box, the filter); and parts beyond the cells (PivotTables, notes and rules, another editor's contents, the agent). |
 | `src/editor/commands-borders.js` | The drawBorders, moreColor and recentColor commands (Draw Borders over a range, a custom colour on the selection, Recent Colors). |
@@ -247,6 +249,7 @@ insides:
 | `src/editor/rangesbox.js` | Review > Allow Edit Ranges. |
 | `src/editor/textwidth.js` | Text measured as Excel measures it to break lines (Fill > Justify), not as the browser draws it. |
 | `src/editor/threadbox.js` | Excel's comment thread (Review > New Comment, Ctrl+Alt+M; a thread's Reply, Edit and Delete). |
+| `src/editor/mentions.js` | @mentions in a comment box: the people offered on @ (the host's and the workbook's), narrowed as typed, picked by keys or a click (docs/NOTES.md). |
 
 ## Tools and tests
 

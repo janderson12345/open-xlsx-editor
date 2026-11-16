@@ -79,8 +79,8 @@ export function drawOutline(st, win) {
   if (st.outlineH) st.colheads.append(st.outlineCols); else st.outlineCols.remove();
   const fr = st.freeze?.rows || 0;
   const fc = st.freeze?.cols || 0;
-  st.outlineRowsPin.replaceChildren(...(o && st.outlineW && fr ? groupsOf(st, 'row', o.rows.groups, 0, fr - 1) : []));
-  st.outlineColsPin.replaceChildren(...(o && st.outlineH && fc ? groupsOf(st, 'col', o.cols.groups, 0, fc - 1) : []));
+  st.outlineRowsPin.replaceChildren(...(o && st.outlineW && fr ? groupsOf(st, 'row', o.rows.groups, st.freeze.top || 0, (st.freeze.top || 0) + fr - 1) : []));
+  st.outlineColsPin.replaceChildren(...(o && st.outlineH && fc ? groupsOf(st, 'col', o.cols.groups, st.freeze.left || 0, (st.freeze.left || 0) + fc - 1) : []));
   if (st.outlineH && fc) st.pinHeads.firstChild.append(st.outlineColsPin); else st.outlineColsPin.remove();
   // (The level buttons: the rows' along the column headings' band, the columns' down the row headings'.)
   const levels = [];

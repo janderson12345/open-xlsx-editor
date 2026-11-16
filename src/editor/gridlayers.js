@@ -7,7 +7,7 @@ import { drawSelection } from './selection.js';
 import { drawFilterButtons } from './filterbuttons.js';
 import { drawNoteMarks } from './notemarks.js';
 import { colName } from '../ooxml/refs.js';
-import { SPILL_BACK } from './geometry.js';
+import { SPILL_BACK, MDW } from './geometry.js';
 
 export function drawColumnHeadings(st, win) {
   const heading = (c, role) => {
@@ -22,7 +22,8 @@ export function drawColumnHeadings(st, win) {
   const fc = st.freeze?.cols || 0;
   if (fc && st.pinHeads) {
     const inner = st.pinHeads.firstChild;
-    inner.replaceChildren(...Array.from({ length: fc }, (_, c) => c).filter((c) => st.cols.size(c)).map((c) => heading(c, null)));
+    const left = st.freeze.left || 0;
+    inner.replaceChildren(...Array.from({ length: fc }, (_, c) => left + c).filter((c) => st.cols.size(c)).map((c) => heading(c, null)));
     kids.push(st.pinHeads);
   }
   for (let c = win.c0; c <= win.c1; c++) if (st.cols.size(c)) kids.push(heading(c, 'columnheader'));
@@ -47,9 +48,12 @@ export function drawPanes(st, win) {
     drawFilterButtons(sub, w);
     drawNoteMarks(sub, w);
   };
-  paint(st.panes.top, fr ? { r0: 0, r1: fr - 1, c0: win.c0, c1: win.c1 } : null);
-  paint(st.panes.left, fc ? { r0: win.r0, r1: win.r1, c0: 0, c1: fc - 1 } : null);
-  paint(st.panes.corner, fr && fc ? { r0: 0, r1: fr - 1, c0: 0, c1: fc - 1 } : null);
+  // (From where the freeze starts: the window's first row and column when it was frozen.)
+  const top = st.freeze?.top || 0;
+  const left = st.freeze?.left || 0;
+  paint(st.panes.top, fr ? { r0: top, r1: top + fr - 1, c0: win.c0, c1: win.c1 } : null);
+  paint(st.panes.left, fc ? { r0: win.r0, r1: win.r1, c0: left, c1: left + fc - 1 } : null);
+  paint(st.panes.corner, fr && fc ? { r0: top, r1: top + fr - 1, c0: left, c1: left + fc - 1 } : null);
 }
 
 export function drawGridlines(st, win) {
@@ -128,3 +132,29 @@ export function drawRows(st, win) {
 }
 
 /** Redraw if the window in view changed (or `force`). */
+
+/** While a heading edge is dragged: a line where the edge will be and Excel's tip ("Width: 20.00 (145 pixels)",
+ *  "Height: 30.00 (40 pixels)"); no axis takes them away. */
+export function drawGuide(st, axis, index, size) {
+  const view = st.view;
+  st.canvas.querySelectorAll(':scope > .oxe-guide, :scope > .oxe-guide-tip').forEach((el) => el.remove());
+  if (axis == null) return;
+  const line = div('oxe-guide');
+  const tip = div('oxe-guide-tip');
+  const z = st.zoom / 100;
+  const top = view.scrollTop / z;
+  const left = view.scrollLeft / z;
+  if (axis === 'col') {
+    // (A frozen column's edge doesn't scroll.)
+    const x = st.rowHeadW + st.cols.start(index) + size + (index >= st.freeze.left && index < st.freeze.left + st.freeze.cols ? left - st.paneX0 : 0);
+    setVars(line, { '--oxe-x': x, '--oxe-y': top, '--oxe-w': 1, '--oxe-h': view.clientHeight / z });
+    setVars(tip, { '--oxe-x': x + 4, '--oxe-y': top + 2 });
+    tip.textContent = `Width: ${(Math.max(0, size - 5) / MDW).toFixed(2)} (${Math.round(size)} pixels)`;
+  } else {
+    const y = st.colHeadH + st.rows.start(index) + size + (index >= st.freeze.top && index < st.freeze.top + st.freeze.rows ? top - st.paneY0 : 0);
+    setVars(line, { '--oxe-x': left, '--oxe-y': y, '--oxe-w': view.clientWidth / z, '--oxe-h': 1 });
+    setVars(tip, { '--oxe-x': left + st.rowHeadW + 4, '--oxe-y': y + 4 });
+    tip.textContent = `Height: ${(Math.round(size) * 0.75).toFixed(2)} (${Math.round(size)} pixels)`;
+  }
+  st.canvas.append(line, tip);
+}

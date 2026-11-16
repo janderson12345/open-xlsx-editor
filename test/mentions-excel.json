@@ -1,0 +1,29 @@
+{
+  "source": "tools/excel-compare/excel-mentions-check.ps1 on test/out/mentions/mentions.xlsx (mentions.test.js)",
+  "opened": "mentions.xlsx",
+  "threads": [
+    {
+      "cell": "B2",
+      "author": "Robin Park",
+      "text": "@Avery Chen please check, @Sam Lee too",
+      "replies": [
+        {
+          "author": "Avery Chen",
+          "text": "Done, @Robin Park"
+        }
+      ]
+    }
+  ],
+  "mentionsKept": [
+    "<mention mentionpersonId=\"{BD3B1C0B-8FB3-4961-938C-39A8DED1D7B8}\" mentionId=\"{EF2767E8-F64D-4166-8EB4-5818C4916002}\" startIndex=\"0\" length=\"11\"/>",
+    "<mention mentionpersonId=\"{504D2FC6-DFD2-43B0-B0C0-4D87BBCA50F2}\" mentionId=\"{1AA5C13B-3AA3-4BF2-9B1F-BCE3574B773D}\" startIndex=\"26\" length=\"8\"/>",
+    "<mention mentionpersonId=\"{FD99F1E4-D33F-4D95-B407-E7409BCB26CF}\" mentionId=\"{68B5A0BB-8A58-473D-BB47-AAD914CFF8A2}\" startIndex=\"6\" length=\"11\"/>"
+  ],
+  "persons": [
+    "<person displayName=\"Avery Chen\" id=\"{58B16247-978B-469A-B36C-7B3CA9BA16DE}\" userId=\"Avery Chen\" providerId=\"None\"/>",
+    "<person displayName=\"Avery Chen\" id=\"{BD3B1C0B-8FB3-4961-938C-39A8DED1D7B8}\" userId=\"Avery Chen\" providerId=\"PeoplePicker\"/>",
+    "<person displayName=\"Robin Park\" id=\"{806F5A83-37E6-41EC-9FD6-986698EA7D53}\" userId=\"Robin Park\" providerId=\"None\"/>",
+    "<person displayName=\"Robin Park\" id=\"{FD99F1E4-D33F-4D95-B407-E7409BCB26CF}\" userId=\"Robin Park\" providerId=\"PeoplePicker\"/>",
+    "<person displayName=\"Sam Lee\" id=\"{504D2FC6-DFD2-43B0-B0C0-4D87BBCA50F2}\" userId=\"sam.lee@example.com\" providerId=\"PeoplePicker\"/>"
+  ]
+}

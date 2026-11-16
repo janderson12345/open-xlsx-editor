@@ -1,0 +1,152 @@
+[
+  {
+    "name": "ink rgb black",
+    "found": [
+      "A2",
+      "A3",
+      "A1"
+    ]
+  },
+  {
+    "name": "ink theme text 1",
+    "found": [
+      "A2",
+      "A3",
+      "A1"
+    ]
+  },
+  {
+    "name": "ink automatic",
+    "found": []
+  },
+  {
+    "name": "ink red",
+    "found": [
+      "A4"
+    ]
+  },
+  {
+    "name": "ink theme accent 1",
+    "found": [
+      "A5",
+      "A6"
+    ]
+  },
+  {
+    "name": "ink accent 1 rgb",
+    "found": [
+      "A5",
+      "A6"
+    ]
+  },
+  {
+    "name": "fill yellow",
+    "found": [
+      "B2"
+    ]
+  },
+  {
+    "name": "fill theme accent 2",
+    "found": [
+      "B3",
+      "B4"
+    ]
+  },
+  {
+    "name": "fill accent 2 rgb",
+    "found": [
+      "B3",
+      "B4"
+    ]
+  },
+  {
+    "name": "fill none",
+    "found": [
+      "B1"
+    ]
+  },
+  {
+    "name": "numfmt 0.00",
+    "found": [
+      "C2"
+    ]
+  },
+  {
+    "name": "numfmt general",
+    "found": [
+      "C1",
+      "C4",
+      "C5",
+      "C6"
+    ]
+  },
+  {
+    "name": "font arial",
+    "found": [
+      "C4",
+      "C6"
+    ]
+  },
+  {
+    "name": "font size 14",
+    "found": [
+      "C5",
+      "C6"
+    ]
+  },
+  {
+    "name": "border bottom thin",
+    "found": []
+  },
+  {
+    "name": "border bottom any",
+    "found": []
+  },
+  {
+    "name": "border bottom red",
+    "found": [
+      "D5"
+    ]
+  },
+  {
+    "name": "border none bottom",
+    "found": []
+  },
+  {
+    "name": "align centre",
+    "found": [
+      "D6",
+      "D8"
+    ]
+  },
+  {
+    "name": "align wrap",
+    "found": [
+      "D7",
+      "D8"
+    ]
+  },
+  {
+    "name": "align indent 2",
+    "found": [
+      "D9"
+    ]
+  },
+  {
+    "name": "unlocked",
+    "found": [
+      "D10"
+    ]
+  },
+  {
+    "name": "whole format of E1",
+    "found": [
+      "E2",
+      "E3"
+    ]
+  },
+  {
+    "name": "whole format of E5 (plain)",
+    "found": []
+  }
+]

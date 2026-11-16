@@ -285,7 +285,7 @@ check(/^Item/.test(String(await value('A3'))), 'Ctrl+Z: every replacement undone
 await page.evaluate(() => { window.oxe.select('C3'); window.oxe.grid.el.scrollTop = 0; window.oxe.grid.el.scrollLeft = 0; });
 await page.click('.oxe-rtab >> text="View"');
 await menu('Freeze Panes', 'Freeze Panes');
-check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":2,"cols":2}' && await page.isVisible('.oxe-pane-top') && await page.isVisible('.oxe-pane-corner'), 'View, Freeze Panes at C3: rows 1-2 and columns A-B frozen');
+check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":2,"cols":2,"top":0,"left":0}' && await page.isVisible('.oxe-pane-top') && await page.isVisible('.oxe-pane-corner'), 'View, Freeze Panes at C3: rows 1-2 and columns A-B frozen');
 await page.evaluate(() => { window.oxe.grid.el.scrollTop = 2000; window.oxe.grid.el.scrollLeft = 600; });
 await page.waitForTimeout(100);
 const a1 = await page.evaluate(() => { const g = window.oxe.grid; const v = g.el.getBoundingClientRect(); const geo = g.geometry(); return { x: v.left + geo.rowHeadW + 10, y: v.top + geo.colHeadH + 6 }; });
@@ -299,7 +299,7 @@ await page.waitForFunction(() => window.oxe.grid.view().zoom === 110);
 check(await page.evaluate(() => window.oxe.workbook.sheet(0).zoom) === 110, 'Ctrl+wheel: zoom 110%, kept for the file');
 await menu('Freeze Panes', 'Unfreeze Panes');
 await ribbon('100%');
-check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":0,"cols":0}' && await page.evaluate(() => window.oxe.grid.view().zoom) === 100 && await page.isHidden('.oxe-pane-top'), 'Unfreeze Panes and 100%: as before');
+check(JSON.stringify(await page.evaluate(() => window.oxe.grid.view().freeze)) === '{"rows":0,"cols":0,"top":0,"left":0}' && await page.evaluate(() => window.oxe.grid.view().zoom) === 100 && await page.isHidden('.oxe-pane-top'), 'Unfreeze Panes and 100%: as before');
 await page.click('.oxe-rtab >> text=Home');
 
 // Entries as Excel reads them: a date typed into G40 is a date, shown and in the formula bar as one; F2 and Enter keep

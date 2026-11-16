@@ -171,6 +171,11 @@ export declare function mountXlsxEditor(
     /** open-metric-fonts' metric twins of 151 Microsoft fonts (Aptos Narrow's, Tahoma's, Verdana's, Garamond's...),
      *  drawn where the computer lacks the font, from the site's own copy: the folder's URL (README, Fonts). */
     fonts?: { omf?: string };
+    /** The name notes and comments are written under. */
+    author?: string;
+    /** The people @ offers in a comment, besides the workbook's own (its persons part), or a function giving them when
+     *  asked; userId (a directory's, such as an email) is written for the person mentioned, as Excel keeps it. */
+    people?: Array<{ name: string; userId?: string; providerId?: string }> | (() => Array<{ name: string; userId?: string; providerId?: string }>);
     /** A hyperlink to a web address clicked: the host page opens it (otherwise the editor opens a new tab). */
     onLink?: (url: string) => void;
     onChange?: () => void;

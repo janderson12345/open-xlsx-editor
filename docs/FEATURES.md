@@ -96,11 +96,11 @@ which is dropped when formulas change (Excel rebuilds it).
 | | Row height, column width (and AutoFit) | Done | Dragging a heading's edge, double-click and Format's AutoFit, the Row Height and Column Width boxes; stored as Excel stores them. AutoFit's width is within a few pixels of Excel's (docs/SIZES.md). |
 | | Hide and unhide rows, columns | Done | |
 | | Rename, hide and unhide sheet | Done | Cells > Format; moving, tab colour and Move or Copy (a copy as Excel copies it, docs/DATATOOLS.md) on the tab menu. |
-| Editing (`editing`) | AutoSum | Done | Sum, Average, Count Numbers, Max, Min and Alt+= as Excel places and fills them; More Functions... opens Insert Function, then Function Arguments (docs/AUTOSUM.md). |
+| Editing (`editing`) | AutoSum | Done | Sum, Average, Count Numbers, Max, Min and Alt+= as Excel places and fills them, SUBTOTAL in filtered lists and under tables, several areas at once (39 of 39 cases); More Functions... opens Insert Function, then Function Arguments (docs/AUTOSUM.md). |
 | | Fill (down, right, series) | Partly | Down, Right, Up, Left (docs/FILL.md); Series... and Flash Fill (Ctrl+E) as Excel (docs/DATATOOLS.md); Justify as Excel's (docs/FILL.md: lines broken as Excel's in 32 of 36 measured paragraphs). Across Worksheets missing. |
 | | Clear (all, formats, contents) | Done | Clear All, Clear Formats, Clear Contents, Clear Comments and Notes, Clear Hyperlinks and Remove Hyperlinks as Excel, notes, comments and hyperlinks taken by Clear All and Clear Contents as Excel takes them (docs/FORMATS.md). |
 | | Sort & Filter | Done | Sort A to Z, Sort Z to A and Custom Sort... (Excel's Sort box: levels, headers, case, left to right, Sort On cell or font colour, a custom list as the order) as Excel sorts (docs/SORT.md), and saved with the sheet as Excel saves the last sort (its sortState, 17 of 17; in a table's part for a table; following inserted and deleted lines); Filter (Ctrl+Shift+L), its buttons and lists, Clear and Reapply as Excel filters (docs/FILTER.md). Text, Number and Date Filters, Top 10, averages and Filter by Color as Excel (31 of 31). |
-| | Find & Select | Partly | Find and Replace (Look in Formulas, Values, Notes or Comments; Find All's list; formats not yet); Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special (Excel's box and Find & Select's shortcuts; every choice but Objects; docs/GOTOSPECIAL.md). |
+| | Find & Select | Partly | Find and Replace (Look in Formulas, Values, Notes or Comments; Find All's list; Find Format and Replace Format, from the Format... box or Choose Format From Cell, docs/FIND.md); Go To (F5 or Ctrl+G: the defined names and tables listed, or a reference typed; src/editor/dialogs.js goToBox). Go To Special (Excel's box and Find & Select's shortcuts; every choice but Objects; docs/GOTOSPECIAL.md). |
 
 ## Insert (`insert`)
 
@@ -169,7 +169,7 @@ changes); one typed here shows #NAME? until Excel opens the file. Excel's saved 
 |---|---|---|---|
 | Proofing (`proofing`) | Spelling | Partly | AutoCorrect as a cell is typed, with Excel's options and entries of its own replacement list (teh to the, (c) to ©, monday to Monday, THe to The); the browser's spelling underlines while text is typed (docs/PROOFING.md). The Spelling box (F7) is missing. |
 | Accessibility (`accessibility`) | Check Accessibility | Missing | |
-| Comments (`comments`) | New, show, delete comments; notes | Done | Notes: New, Edit, Delete, Show/Hide; threaded comments: New, Reply, Edit, Delete (docs/NOTES.md). Resolve thread and Reopen, written as Excel writes them (done="1"). Not yet: @mentions. |
+| Comments (`comments`) | New, show, delete comments; notes | Done | Notes: New, Edit, Delete, Show/Hide; threaded comments: New, Reply, Edit, Delete (docs/NOTES.md). Resolve thread and Reopen, written as Excel writes them (done="1"); @mentions offered on @ from the workbook's people and the host's `people`, written as Excel keeps them (docs/NOTES.md). |
 | Protect (`protect`) | Protect sheet, protect workbook | Done | Protect Sheet and Unprotect Sheet in Excel's boxes, written as Excel writes them (its password hash to the byte; Excel opens the file protected the same way). Locked cells refused in Excel's words; formatting, sizes, inserting and deleting, sorting and filtering refused unless allowed (docs/PROTECT.md). Protect Workbook: its structure, as Excel writes it, sheets' changes refused. Hidden cells (Format Cells > Protection) show no formula while the sheet is protected, as in Excel. Allow Edit Ranges: Excel's box (New, Modify, Delete; a range's password), honoured as Excel does, a password range asking Unlock Range. Notes, charts, conditional formats, validation, hyperlinks and PivotTables refused on a protected sheet as Excel refuses them. Select locked cells and Select unlocked cells honoured as Excel moves and selects (measured in its window). |
 
 ## View (`view`)
@@ -179,7 +179,7 @@ changes); one typed here shows #NAME? until Excel opens the file. Excel's saved 
 | Workbook Views (`workbook-views`) | Normal, Page Break Preview, Page Layout | Partly | Normal only. |
 | Show (`show`) | Gridlines, formula bar, headings | Done | Gridlines, Formula Bar and Headings switched on and off; gridlines and headings saved with the sheet as Excel saves them, the formula bar the editor's own, as Excel's is (docs/VIEW.md). Excel's Ruler only works in Page Layout view, which isn't here. |
 | Zoom (`zoom`) | Zoom, 100%, zoom to selection | Done | 10% to 400%, as Excel allows; saved with the sheet. |
-| Window (`window`) | Freeze Panes | Done | Freeze Panes, Top Row, First Column, Unfreeze, written as Excel writes them; frozen panes in a file shown frozen (docs/VIEW.md). |
+| Window (`window`) | Freeze Panes | Done | Freeze Panes, Top Row, First Column, Unfreeze, written as Excel writes them, counted from the cell first in view (scrolled, split or partly hidden windows as Excel, 26 of 26); frozen panes in a file shown frozen from where they start, opened where the file left them (docs/VIEW.md). |
 | | Split, new window | Missing | |
 
 ## File (`file`)

@@ -7,7 +7,7 @@
 // written for state.
 import { setVars, div } from './dom.js';
 import { sheetGeometry, MDW, OVERSCAN } from './geometry.js';
-import { drawColumnHeadings, drawPanes, drawGridlines, drawRows } from './gridlayers.js';
+import { drawColumnHeadings, drawPanes, drawGridlines, drawRows, drawGuide } from './gridlayers.js';
 import { columnFitWidth } from './cells.js';
 import { decorations } from './decor.js';
 import { drawErrorButton } from './errbutton.js';
@@ -163,13 +163,18 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   };
   /** Frozen rows and columns and the zoom (percent) applied: the panes sized, the sheet scaled. */
   const applyView = (freeze = { rows: 0, cols: 0 }, zoom = 100) => {
-    st.freeze = { rows: freeze.rows || 0, cols: freeze.cols || 0 };
+    // (top and left: where the frozen rows and columns start, the window's first row and column when they were frozen;
+    // those before them can't be scrolled to while frozen, as in Excel.)
+    st.freeze = { rows: freeze.rows || 0, cols: freeze.cols || 0, top: freeze.rows ? freeze.top || 0 : 0, left: freeze.cols ? freeze.left || 0 : 0 };
     st.zoom = zoom || 100;
-    st.paneH = st.freeze.rows ? st.rows.start(st.freeze.rows) : 0;
-    st.paneW = st.freeze.cols ? st.cols.start(st.freeze.cols) : 0;
+    st.paneY0 = st.rows.start(st.freeze.top);
+    st.paneX0 = st.cols.start(st.freeze.left);
+    st.paneH = st.freeze.rows ? st.rows.start(st.freeze.top + st.freeze.rows) - st.paneY0 : 0;
+    st.paneW = st.freeze.cols ? st.cols.start(st.freeze.left + st.freeze.cols) - st.paneX0 : 0;
     view.classList.toggle('oxe-frozen-rows', !!st.freeze.rows);
     view.classList.toggle('oxe-frozen-cols', !!st.freeze.cols);
-    setVars(view, { '--oxe-pane-h': st.paneH, '--oxe-pane-w': st.paneW });
+    setVars(view, { '--oxe-pane-h': st.paneH, '--oxe-pane-w': st.paneW, '--oxe-pane-y0': st.paneY0, '--oxe-pane-x0': st.paneX0 });
+    clampScroll();
     canvas.style.zoom = st.zoom === 100 ? '' : String(st.zoom / 100);
   };
   /** A point of the view in the sheet's own coordinates: x past the row headings and y past the column headings
@@ -178,18 +183,33 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     const z = st.zoom / 100;
     let x = lx / z - st.rowHeadW;
     let y = ly / z - st.colHeadH;
-    if (x >= st.paneW) x += view.scrollLeft / z;
-    if (y >= st.paneH) y += view.scrollTop / z;
+    if (x >= st.paneW) x += view.scrollLeft / z; else if (x >= 0) x += st.paneX0;
+    if (y >= st.paneH) y += view.scrollTop / z; else if (y >= 0) y += st.paneY0;
     return { x, y };
+  };
+  /** Kept from scrolling above or left of where the frozen rows and columns start. */
+  const clampScroll = () => {
+    const z = st.zoom / 100;
+    if (st.paneY0 && view.scrollTop < st.paneY0 * z) view.scrollTop = st.paneY0 * z;
+    if (st.paneX0 && view.scrollLeft < st.paneX0 * z) view.scrollLeft = st.paneX0 * z;
   };
   const setSheet = (next, nextLabel = label, nextLooks = { classOf: st.classOf, deco: st.deco, date1904: st.date1904, color: st.color, hiddenAt: st.hiddenAt, runStyle: st.runStyle }) => {
     measure(next, nextLooks);
     view.setAttribute('aria-label', nextLabel);
     view.scrollTop = 0;
     view.scrollLeft = 0;
+    // (Opened where the file left it, as Excel opens a sheet: the scrolled pane's first cell, or the window's.)
+    const to = next.scrolledTo;
+    if (to && (to.r || to.c)) {
+      const z = st.zoom / 100;
+      view.scrollTop = Math.max(st.paneY0, st.rows.start(to.r) - st.paneH) * z;
+      view.scrollLeft = Math.max(st.paneX0, st.cols.start(to.c) - st.paneW) * z;
+    }
+    clampScroll();
     draw(st, true);
   };
   const onScroll = () => {
+    clampScroll();
     if (st.frame) return;
     st.frame = requestAnimationFrame(() => { st.frame = 0; draw(st); });
   };
@@ -226,8 +246,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** Scroll so that cell (r, c) is at the top left, and draw at once. */
     scrollToCell(r, c) {
       const z = st.zoom / 100;
-      view.scrollTop = Math.max(0, st.rows.start(r) - st.paneH) * z;
-      view.scrollLeft = Math.max(0, st.cols.start(c) - st.paneW) * z;
+      view.scrollTop = Math.max(st.paneY0, st.rows.start(r) - st.paneH) * z;
+      view.scrollLeft = Math.max(st.paneX0, st.cols.start(c) - st.paneW) * z;
       draw(st);
     },
     /** Frozen rows and columns ({ rows, cols }) and the zoom (percent), as the sheet's view has them. */
@@ -378,17 +398,26 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       const h = view.clientHeight / z - st.colHeadH;
       const left = view.scrollLeft / z;
       const top = view.scrollTop / z;
-      if (c >= st.freeze.cols) {
-        if (x - st.paneW < left) view.scrollLeft = (x - st.paneW) * z;
+      if (c >= st.freeze.left + st.freeze.cols) {
+        if (x - st.paneW < left) view.scrollLeft = Math.max(st.paneX0, x - st.paneW) * z;
         else if (x + st.cols.size(c) > left + w) view.scrollLeft = (x + st.cols.size(c) - w) * z;
       }
-      if (r >= st.freeze.rows) {
-        if (y - st.paneH < top) view.scrollTop = (y - st.paneH) * z;
+      if (r >= st.freeze.top + st.freeze.rows) {
+        if (y - st.paneH < top) view.scrollTop = Math.max(st.paneY0, y - st.paneH) * z;
         else if (y + st.rows.size(r) > top + h) view.scrollTop = (y + st.rows.size(r) - h) * z;
       }
       draw(st, true);
     },
     /** Rows in view, for paging. */
+    /** The rows and columns in view from the first one, those partly in view counted (Excel's VisibleRange). */
+    cellsInView: () => {
+      const z = st.zoom / 100;
+      const r0 = st.rows.indexAt(view.scrollTop / z + st.paneH);
+      const c0 = st.cols.indexAt(view.scrollLeft / z + st.paneW);
+      const r1 = st.rows.indexAt(Math.max(0, view.scrollTop / z + view.clientHeight / z - st.colHeadH - 1));
+      const c1 = st.cols.indexAt(Math.max(0, view.scrollLeft / z + view.clientWidth / z - st.rowHeadW - 1));
+      return { rows: Math.max(1, r1 - r0 + 1 + st.freeze.rows), cols: Math.max(1, c1 - c0 + 1 + st.freeze.cols) };
+    },
     rowsInView: () => { const z = st.zoom / 100; return Math.max(1, st.rows.indexAt(view.scrollTop / z + view.clientHeight / z - st.colHeadH) - st.rows.indexAt(view.scrollTop / z + st.paneH)); },
     /** After cells changed: sizes worked out again (row heights follow their fonts), drawn where the view is. */
     refresh() {
@@ -422,28 +451,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     },
     /** While a heading edge is dragged: a line where the edge will be and Excel's tip ("Width: 20.00 (145 pixels)",
      *  "Height: 30.00 (40 pixels)"); no axis takes them away. */
-    showGuide(axis, index, size) {
-      st.canvas.querySelectorAll(':scope > .oxe-guide, :scope > .oxe-guide-tip').forEach((el) => el.remove());
-      if (axis == null) return;
-      const line = div('oxe-guide');
-      const tip = div('oxe-guide-tip');
-      const z = st.zoom / 100;
-      const top = view.scrollTop / z;
-      const left = view.scrollLeft / z;
-      if (axis === 'col') {
-        // (A frozen column's edge doesn't scroll.)
-        const x = st.rowHeadW + st.cols.start(index) + size + (index < st.freeze.cols ? left : 0);
-        setVars(line, { '--oxe-x': x, '--oxe-y': top, '--oxe-w': 1, '--oxe-h': view.clientHeight / z });
-        setVars(tip, { '--oxe-x': x + 4, '--oxe-y': top + 2 });
-        tip.textContent = `Width: ${(Math.max(0, size - 5) / MDW).toFixed(2)} (${Math.round(size)} pixels)`;
-      } else {
-        const y = st.colHeadH + st.rows.start(index) + size + (index < st.freeze.rows ? top : 0);
-        setVars(line, { '--oxe-x': left, '--oxe-y': y, '--oxe-w': view.clientWidth / z, '--oxe-h': 1 });
-        setVars(tip, { '--oxe-x': left + st.rowHeadW + 4, '--oxe-y': y + 4 });
-        tip.textContent = `Height: ${(Math.round(size) * 0.75).toFixed(2)} (${Math.round(size)} pixels)`;
-      }
-      st.canvas.append(line, tip);
-    },
+    showGuide(axis, index, size) { drawGuide(st, axis, index, size); },
     /** The pixels AutoFit gives column c: its widest text as shown (a General number in full, the longest line of
      *  wrapped text), measured in each cell's font, plus 9 of padding (docs/SIZES.md); null when the column is empty. */
     fitWidth(c) { return columnFitWidth(st, c); },

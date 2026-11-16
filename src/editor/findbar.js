@@ -4,14 +4,40 @@ import { el } from './ribbonkit.js';
 import { findAll, findNext, replaceChanges, searchText } from '../ooxml/findops.js';
 import { colName } from '../ooxml/refs.js';
 import { ruleFormatBox } from './cfformatbox.js';
+import { describeFormat, formatFromCell } from '../ooxml/findformat.js';
 
 const NOT_FOUND = "We couldn't find what you were looking for. Select Options for more ways to search.";
 const NOTHING_TO_REPLACE = "We couldn't find anything to replace. Select Options for more ways to search.";
 
+/** A cell picked on the sheet (Choose Format From Cell): the active cell once a click on the grid lets go, or when
+ *  Enter is pressed there; null on Esc. `here()` gives the active cell, { si, r, c }. */
+export function pickCell(grid, here) {
+  return new Promise((resolve) => {
+    const finish = (hit) => {
+      grid.removeEventListener('mouseup', up, true);
+      grid.removeEventListener('keydown', key, true);
+      grid.classList.remove('oxe-picking');
+      resolve(hit);
+    };
+    // (After the click has made the cell the active one.)
+    const up = () => setTimeout(() => finish(here()), 0);
+    const key = (e) => {
+      if (e.key !== 'Enter' && e.key !== 'Escape') return;
+      e.preventDefault();
+      e.stopPropagation();
+      finish(e.key === 'Enter' ? here() : null);
+    };
+    grid.addEventListener('mouseup', up, true);
+    grid.addEventListener('keydown', key, true);
+    grid.classList.add('oxe-picking');
+    grid.focus({ preventScroll: true });
+  });
+}
+
 /**
  * The bar, hidden until opened. `ctx` = { workbook(), from() (the active cell, { si, r, c }), go(hit) (that cell
  * selected, its sheet shown), apply(steps) (replacements as one step of the undo history), home() (focus back to the
- * sheet), readOnly() }. Returns { el, open(replace), close() }.
+ * sheet), readOnly(), pickCell() (a cell picked on the sheet) }. Returns { el, open(replace), close() }.
  */
 export function createFindBar(ctx) {
   let seq = 0;
@@ -37,16 +63,33 @@ export function createFindBar(ctx) {
   const formats = { find: null, replace: null };
   const formatControl = (key, label) => {
     const shown = el('span', { class: 'oxe-find-format', 'aria-live': 'polite' }, 'No Format Set');
-    const clear = el('button', { type: 'button', title: `Clear ${label}`, hidden: true, onmousedown: (e) => { e.preventDefault(); set(null); } }, 'Clear');
     const set = (f) => {
       formats[key] = f && Object.keys(f).length ? f : null;
       const f2 = formats[key];
-      shown.textContent = f2 ? ['bold', 'italic', 'underline', 'strike'].filter((k) => f2[k]).concat(f2.numFmt ? [f2.numFmt] : [], f2.color ? ['font colour'] : [], f2.fill ? ['fill'] : []).join(', ') || 'Format set' : 'No Format Set';
-      if (f2?.fill) shown.style.background = `#${f2.fill.slice(2)}`; else shown.style.background = '';
+      shown.textContent = describeFormat(f2, f2?.from ? `${colName(f2.from.c)}${f2.from.r + 1}` : '');
+      // (A preview of the format, as Excel's box shows one: its fill, ink and weight.)
+      const fill = f2?.from ? (/^[0-9A-F]{6}$/.test(f2.fill) ? f2.fill : null) : f2?.fill && f2.fill !== 'none' ? f2.fill.slice(-6) : null;
+      shown.style.setProperty('--oxe-find-fill', fill ? `#${fill}` : 'transparent');
+      shown.style.setProperty('--oxe-find-ink', f2?.color ? `#${f2.color.slice(-6)}` : 'inherit');
+      shown.classList.toggle('oxe-find-format-set', !!f2);
+      shown.classList.toggle('oxe-find-format-bold', !!f2?.bold);
+      shown.classList.toggle('oxe-find-format-italic', !!f2?.italic);
       clear.hidden = !f2;
     };
-    const pick = el('button', { type: 'button', title: label, onmousedown: (e) => { e.preventDefault(); ctx.hold?.(true); ruleFormatBox(ctx.root).then((f) => { if (f) { delete f.border; set(f); } ctx.hold?.(false); findBox.focus(); }); } }, 'Format...');
-    return el('span', { class: 'oxe-find-formats' }, shown, pick, clear);
+    const clear = el('button', { type: 'button', title: `Clear ${label}`, hidden: true, onmousedown: (e) => { e.preventDefault(); set(null); } }, 'Clear');
+    const pick = el('button', { type: 'button', title: label, onmousedown: (e) => { e.preventDefault(); ctx.hold?.(true); ruleFormatBox(ctx.root).then((f) => { if (f) set(f); ctx.hold?.(false); findBox.focus(); }); } }, 'Format...');
+    // (Choose Format From Cell: the next cell clicked, or the one Enter is pressed on, gives its whole format.)
+    const fromCell = el('button', { type: 'button', title: `Choose Format From Cell (${label})`, onmousedown: (e) => {
+      e.preventDefault();
+      if (!ctx.pickCell) return;
+      say('Click the cell whose format to use, or select it and press Enter (Esc to cancel).');
+      ctx.pickCell().then((hit) => {
+        if (hit) set(formatFromCell(ctx.workbook(), hit.si, hit.r, hit.c));
+        say('');
+        (key === 'replace' ? replBox : findBox).focus();
+      });
+    } }, 'From Cell...');
+    return el('span', { class: 'oxe-find-formats' }, shown, pick, fromCell, clear);
   };
   const opts = (forReplace = false) => ({
     matchCase: matchCase.checked, whole: whole.checked, within: within.value, byColumns: order.value === 'cols',

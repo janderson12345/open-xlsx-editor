@@ -106,6 +106,8 @@ const editor = mountXlsxEditor(el, {
   fillLists: [['North', 'East', 'South', 'West']], // custom lists the fill handle goes round
   errorChecking: false,                 // no green error triangles; { rules: [...] } chooses Excel's rules
   onLink: (url) => window.open(url),    // a hyperlink clicked
+  author: 'Avery Chen',                 // the name notes and comments are written under
+  people: [{ name: 'Sam Lee', userId: 'sam.lee@example.com' }], // whom @ offers in a comment, besides the workbook's
   onChange: () => {},                   // the workbook changed
 });
 editor.setReadOnly(false);              // switch at any time

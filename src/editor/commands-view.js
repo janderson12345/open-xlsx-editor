@@ -5,6 +5,7 @@
 import { setPrintOptions } from '../ooxml/printopts.js';
 import { insertBreak, removeBreak, resetBreaks, setPrintArea, clearPrintArea, setPrintTitles, setPageLayout, MARGINS } from '../ooxml/pagesetupedit.js';
 import { areasOf } from './selection.js';
+import { freezeFor } from './freeze.js';
 
 /** The view commands: `env` is createCommands's shared state and helpers. */
 export function viewCommands(env) {
@@ -23,19 +24,15 @@ export function viewCommands(env) {
     freeze(kind) {
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
-      const now = wb.sheet(si).freeze || { rows: 0, cols: 0 };
+      const sh = wb.sheet(si);
+      const now = sh.freeze || { rows: 0, cols: 0 };
+      const frozen = !!(now.rows || now.cols);
       const s = state.sel;
-      let freeze = { rows: 0, cols: 0 };
-      if (kind === 'topRow') freeze = { rows: 1, cols: 0 };
-      else if (kind === 'firstColumn') freeze = { rows: 0, cols: 1 };
-      else if (kind === 'panes' && !(now.rows || now.cols)) {
-        // (Excel freezes the middle of the window when A1 is active; here that needs another cell.)
-        if (!s.ar && !s.ac) { ctx.announce('Select the cell below and to the right of what should stay in place'); return false; }
-        freeze = { rows: s.ar, cols: s.ac };
-      }
-      const topLeft = ctx.grid.view().topLeft;
-      wb.setView(si, { freeze, active: { r: s.ar, c: s.ac }, topLeft });
-      ctx.grid.setView({ freeze });
+      const freeze = freezeFor(kind, { sheet: sh, frozen, grid: ctx.grid, active: { r: s.ar, c: s.ac } });
+      wb.setView(si, { freeze, active: { r: s.ar, c: s.ac } });
+      ctx.grid.setView({ freeze: wb.sheet(si).freeze });
+      // (Unfrozen, the window goes back to where the frozen part started, as Excel's does.)
+      if (!freeze.rows && !freeze.cols && frozen) ctx.grid.scrollToCell(sh.viewTopLeft?.r || 0, sh.viewTopLeft?.c || 0);
       ctx.changed?.();
       ctx.announce(freeze.rows || freeze.cols ? `Frozen: ${freeze.rows} row${freeze.rows === 1 ? '' : 's'} and ${freeze.cols} column${freeze.cols === 1 ? '' : 's'}` : 'Panes unfrozen');
       return true;
