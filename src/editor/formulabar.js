@@ -43,6 +43,8 @@ export function createFormulaBar(root, { onEnter, onCancel, onGo = null, onKey =
   // here as in the cell editor: richtrack.js. `parked`: focus gone to the Font group's font or size list.)
   const track = trackRich(input);
   let parked = false;
+  // (The selection kept while a box formats part of the text: focus coming back loses it.)
+  let held = null;
   input.addEventListener('beforeinput', () => track.before());
   input.addEventListener('input', (e) => track.sync(e));
   input.addEventListener('blur', (e) => {
@@ -51,6 +53,7 @@ export function createFormulaBar(root, { onEnter, onCancel, onGo = null, onKey =
     e.relatedTarget.addEventListener('focusout', () => { parked = false; }, { once: true });
   });
   const change = (fn) => {
+    if (held) input.setSelectionRange(held[0], held[1]);
     if ((document.activeElement !== input && !parked) || !track.change(fn)) return false;
     if (parked) { parked = false; input.focus({ preventScroll: true }); }
     return true;
@@ -78,8 +81,16 @@ export function createFormulaBar(root, { onEnter, onCancel, onGo = null, onKey =
     mark: (key) => change((fonts, a, b) => toggleFont(fonts, a, b, key)),
     /** Font properties ({ name, size, color }, or a function of the first selected size, `base` the cell's) on it. */
     markFont: (patch, base = null) => change((fonts, a, b) => setFont(fonts, a, b, typeof patch === 'function' ? patch(sizeAt(fonts, a, base)) : patch)),
+    /** The font of the selection's first character here (null: the cell's own), for Format Cells. */
+    get selectedFont() { return track.fonts[held ? held[0] : input.selectionStart] ?? null; },
+    /** Kept as it is while a box formats part of its text (`on`), focus gone to the box, or no longer. */
+    hold(on) {
+      if (!on && held) input.setSelectionRange(held[0], held[1]);
+      parked = !!on;
+      held = on ? [input.selectionStart, input.selectionEnd] : null;
+    },
     /** Whether part of the text is selected here while it is edited. */
-    get selecting() { return (document.activeElement === input || parked) && input.selectionEnd > input.selectionStart && !input.value.startsWith('='); },
+    get selecting() { return (document.activeElement === input || parked) && (held ? held[1] > held[0] : input.selectionEnd > input.selectionStart) && !input.value.startsWith('='); },
     setReadOnly(flag) { input.readOnly = flag; },
     input,
   };

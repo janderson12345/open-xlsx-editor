@@ -192,6 +192,13 @@ Rich text typed into: `excel-richtype.ps1 test/richtype-excel.json` starts its o
 (`Characters(start, length).Font`), adds or replaces text with `Characters(start, length).Insert`, and reads each
 character's font back: which run's font the new text takes (docs/FORMATS.md, Rich text). Nothing saved.
 
+Rich text formatted, copied and pasted: `node tools/excel-compare/richruns-cases.mjs`, then `pwsh -STA
+tools/excel-compare/excel-richruns.ps1 tools/excel-compare/richruns-cases.json test/richruns-excel.json` starts its own
+hidden Excel, sets part of a cell's text's font as Format Cells' Font tab does, copies a cell of rich text with Paste,
+each Paste Special choice, a cut and into another workbook, pastes made-up HTML with mixed formatting in one cell (put
+on the clipboard as CF_HTML, its text put back afterwards), and reads each character's font back with the strings'
+XML of the workbook it saved in a temporary folder, removed after (docs/FORMATS.md, docs/CLIPBOARD.md).
+
 ## The workbooks
 
 Real workbooks are kept out of the repository (`..\samples`), and referred to by label (`sample X014`), never by

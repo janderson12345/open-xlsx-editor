@@ -8,12 +8,13 @@ const VOID = new Set(['br', 'col', 'meta', 'link', 'img', 'hr', 'input', 'wbr', 
 // (Properties that pass from an element to what's inside it: CSS's inherited ones, and text-decoration, which Excel
 // takes from an element around the text, as <s>$3.25</s> struck through, measured.)
 const INHERITED = new Set(['color', 'font-family', 'font-size', 'font-weight', 'font-style', 'text-align', 'white-space',
-  'text-decoration', 'text-decoration-line', 'text-underline-style', 'mso-font-charset', 'mso-char-indent-count']);
+  'text-decoration', 'text-decoration-line', 'text-underline-style', 'mso-font-charset', 'mso-char-indent-count', '-oxe-script']);
 // (What an element means without any CSS, as a browser's own style sheet gives it.)
 const IMPLIED = {
   b: { 'font-weight': '700' }, strong: { 'font-weight': '700' }, i: { 'font-style': 'italic' }, em: { 'font-style': 'italic' },
   u: { 'text-decoration': 'underline' }, ins: { 'text-decoration': 'underline' }, s: { 'text-decoration': 'line-through' },
   strike: { 'text-decoration': 'line-through' }, del: { 'text-decoration': 'line-through' },
+  sup: { 'vertical-align': 'super' }, sub: { 'vertical-align': 'sub' },
   th: { 'font-weight': '700', 'text-align': 'center' }, td: {},
 };
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: String.fromCharCode(160) };
@@ -210,6 +211,10 @@ function ownStyle(el, rules) {
   for (const r of hits) Object.assign(out, r.decls);
   Object.assign(out, parseDecls(el.attrs.style || ''));
   if (el.attrs.bgcolor && !out.background && !out['background-color']) out['background-color'] = el.attrs.bgcolor;
+  // (Text raised or lowered inside a cell, <sup> and <sub> or vertical-align: super and sub, as Excel takes it for
+  // superscript and subscript (measured, test/richruns-excel.json); passed down to the text as `-oxe-script`.)
+  const script = el.tag !== 'td' && el.tag !== 'th' && /^(super|sub)$/i.exec(String(out['vertical-align'] || '').trim());
+  if (script) out['-oxe-script'] = script[1].toLowerCase();
   return out;
 }
 

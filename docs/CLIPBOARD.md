@@ -65,6 +65,27 @@ Not measured: an operation with a TRUE or FALSE constant (left as it is here, as
 whose $ is on one part only (each part turned as above), column widths onto columns that had their own width (they
 keep it here), and merged ranges with Transpose (not pasted).
 
+## Rich text pasted (measured)
+
+A cell of rich text (runs in several fonts, docs/FORMATS.md) copied and pasted keeps its runs as Excel's does. Measured
+by having a hidden Excel copy "Hello brave world" with "brave" bold and red (`Range.Copy`, then `Worksheet.Paste` or
+`PasteSpecial` with each choice, `Range.Cut` with a destination, and a paste into another workbook), each character's
+font read back and the file's strings saved (`tools/excel-compare/excel-richruns.ps1` on `richruns-cases.mjs`, giving
+`test/richruns-excel.json`). `test/richruns.test.js` does the same with `clipops.js` (snapshot keeps a cell's runs;
+pasteCopy, pasteCut and pasteSpecial bring them), 20 of 20 as Excel's; `test/editing-rich.mjs` checks it in the
+browser.
+
+| Excel's rule | Excel's example |
+|---|---|
+| Paste (Ctrl+V), Paste Special's All, All except borders and All with Transpose, a cut, and a paste into another workbook keep the runs. | "brave" bold and red in the pasted cell, "Hello " and " world" plain; pasted over "Plain text here": the same. |
+| Values, Formulas and Values and number formats give the text alone. | "Hello brave world" plain. |
+| Formats gives the cell format alone, and the destination keeps its own text and runs; the destination's first run takes the new font, its later runs keep theirs. | Over "Some other plain text": plain. Underlined "Plain" over the rich cell: "Hello " underlined, "brave" bold red, " world" plain. |
+| A cell's font is its first character's: Formats from a cell whose first word is italic gives an italic cell. | "Hello" italic, "world" 14pt, over plain text: all of it italic, 11pt. |
+
+The last rule: Excel's first run is always the cell's own font, written bare; a run of its own can come first here, so
+Formats alone gives the cell that run's font too (`clipops.js` firstRunFont). An Undo over a cell of rich text brings
+its runs back (`commands.js` contentsOn).
+
 ## Notes pasted
 
 A copy carries its cells' notes (with their authors). Measured over COM (B2:C3 with a note on B2 copied; Paste,
@@ -159,7 +180,7 @@ pastes the same HTML here: 7 cases, 74 of 74 cells as Excel's.
 | Excel's rule | Excel's example |
 |---|---|
 | The cell's CSS gives its format: the style block's rules (`td`, `.xl63`, `p.MsoNormal`), then the cell's own style; what the table, the row and the elements around all of its text (`<b>`, `<s>`, `<span>`) give pass down. | Excel's `.xl63 {font-weight:700; background:#FFC000}`: bold on orange. Word's `p.MsoNormal {font-family:Aptos; font-size:12pt}` with `<b><span style='font-size:14.0pt'>`: Aptos 14, bold. `<s>$3.25</s>`: struck through. |
-| Text partly formatted is rich text. | `Both <span style="font-weight:700">columns</span>`: "Both " plain, "columns" bold. |
+| Text partly formatted is rich text, each piece in the font its own CSS gives (measured too: `test/richruns-excel.json`, 8 of 8 in `test/richruns.test.js`); `<sup>`, `<sub>` and `vertical-align: super` or `sub` are superscript and subscript; text all in one format between pieces in another is still rich. | `Both <span style="font-weight:700">columns</span>`: "Both " plain, "columns" bold. `H<sub>2</sub>O`: "2" subscript. Word's `<b>`, red `<span>` and `<u>` in an Aptos 12 paragraph: runs, each Aptos 12. `<b>all</b> <b>bold</b>`: "all" and "bold" bold, the space between plain. |
 | A `th` is bold and centred; a cell without `vertical-align` is centred top to bottom; text wraps unless `white-space` says `nowrap`. | A web page's `<th>City</th>`: bold, centred. Google Sheets' and Word's cells: wrapped. Excel's own (its `td` rule says nowrap): not. |
 | `align` and `valign` attributes count for nothing; only CSS does. | Excel's `<td align=right>` under `text-align:general`: General. Word's `valign=top` with no CSS: centred. |
 | Colours: `#RGB`, `#RRGGBB`, `rgb()`, names; black and `windowtext` are the automatic colour; a `<font color>` with `mso-ignore:color` is let go. | `rgb(221, 235, 247)`: DDEBF7. `background:yellow`: FFFF00. Excel's red `(7)`, `<font color="#FF0000" style='mso-ignore:color'>`: black. |

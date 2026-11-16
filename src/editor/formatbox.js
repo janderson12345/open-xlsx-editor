@@ -7,13 +7,15 @@ import { numberTab, alignmentTab, fontTab } from './formattabs.js';
 import { borderTab, fillTab, protectionTab } from './formattabs-more.js';
 
 /** The Format Cells box. `look`: { xf, font, fontName, fontNames, fill, border, code, cell, date1904, many (more than
- *  one cell selected) }; `start`: the tab shown first (Number, Alignment, Font, Border, Fill, Protection). */
+ *  one cell selected), part (characters selected in a cell being edited: the Font tab alone, as Excel's box has then) };
+ *  `start`: the tab shown first (Number, Alignment, Font, Border, Fill, Protection). */
 export function formatCellsBox(root, look, start = 'Number') {
   return modal(root, (dlg, done, id) => {
     dlg.setAttribute('aria-labelledby', `${id}-title`);
     dlg.classList.add('oxe-format-box');
     const changed = {};
-    const tabs = [['Number', numberTab], ['Alignment', alignmentTab], ['Font', fontTab], ['Border', borderTab], ['Fill', fillTab], ['Protection', protectionTab]]
+    const all = [['Number', numberTab], ['Alignment', alignmentTab], ['Font', fontTab], ['Border', borderTab], ['Fill', fillTab], ['Protection', protectionTab]];
+    const tabs = all.filter(([name]) => !look.part || name === 'Font')
       .map(([name, build]) => ({ name, ...build(look, (changed[name] = {})) }));
     const list = make('div', { className: 'oxe-fc-tabs', role: 'tablist' });
     const panels = tabs.map((t, k) => {

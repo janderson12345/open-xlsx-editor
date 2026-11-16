@@ -120,7 +120,9 @@ export function createCommands(ctx) {
     const cell = sh.cells.get(r)?.get(c);
     if (cell && cell.f != null && cell.f !== '') return { r, c, formula: cell.f, ...(cell.dynamic || cell.array ? {} : { legacy: true }) };
     if (ctx.workbook().isSpilled(si, r, c)) return { r, c, value: null };
-    return { r, c, value: cell && cell.f == null ? cell.v ?? null : null };
+    // (A cell of rich text with its runs, so an Undo over it brings them back.)
+    const runs = cell && cell.f == null && typeof cell.v === 'string' && cell.runs ? { runs: cell.runs } : {};
+    return { r, c, value: cell && cell.f == null ? cell.v ?? null : null, ...runs };
   }
   /** Values, formats and merged ranges changed together, sheet by sheet ([{ sheet (its sheetId), contents, styles,
    *  merges }]: a merge, a paste, or their undo). Refused, whole, if a cell is part of an array formula. */

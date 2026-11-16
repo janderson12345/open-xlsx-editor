@@ -1,0 +1,2124 @@
+{
+  "part": [
+    {
+      "name": "bold italic",
+      "cell": "A1",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": true,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><i /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "superscript",
+      "cell": "A2",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": true,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><vertAlign val=\"superscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "subscript",
+      "cell": "A3",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": true
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><vertAlign val=\"subscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "superscript then subscript",
+      "cell": "A4",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": true
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><vertAlign val=\"subscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "strikethrough",
+      "cell": "A5",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": true,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><strike /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "double underline",
+      "cell": "A6",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4119,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><u val=\"double\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "single accounting underline",
+      "cell": "A7",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": 4,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><u val=\"singleAccounting\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "double accounting underline",
+      "cell": "A8",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": 5,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><u val=\"doubleAccounting\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "colour",
+      "cell": "A9",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "00B050",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><sz val=\"11\" /><color rgb=\"FF00B050\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "size",
+      "cell": "A10",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 16.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": "mixed"
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><sz val=\"16\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "font name",
+      "cell": "A11",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Courier New",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Courier New\" /><family val=\"3\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "all at once",
+      "cell": "A12",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Georgia",
+            "size": 9.0,
+            "bold": false,
+            "italic": true,
+            "underline": 2,
+            "strike": true,
+            "color": "0070C0",
+            "sup": true,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "",
+        "size": "mixed"
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><i /><strike /><u /><vertAlign val=\"superscript\" /><sz val=\"9\" /><color rgb=\"FF0070C0\" /><rFont val=\"Georgia\" /><family val=\"1\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "the whole text",
+      "cell": "A13",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello brave world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Hello brave world</t>"
+    }
+  ],
+  "paste": [
+    {
+      "name": "all",
+      "cell": "C103",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "ctrl+v",
+      "cell": "C106",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "all over text",
+      "cell": "C109",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "formats over longer text",
+      "cell": "C112",
+      "value": "Some other plain text",
+      "formula": "Some other plain text",
+      "runs": [
+        {
+          "text": "Some other plain text",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Some other plain text</t>"
+    },
+    {
+      "name": "formats over shorter text",
+      "cell": "C115",
+      "value": "Hi there",
+      "formula": "Hi there",
+      "runs": [
+        {
+          "text": "Hi there",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Hi there</t>"
+    },
+    {
+      "name": "formats over the same text",
+      "cell": "C118",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello brave world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Hello brave world</t>"
+    },
+    {
+      "name": "formats over a number",
+      "cell": "C121",
+      "value": 42.0,
+      "formula": "42",
+      "runs": [
+        {
+          "text": "42",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      }
+    },
+    {
+      "name": "formats over empty",
+      "cell": "C124",
+      "value": null,
+      "formula": "",
+      "runs": [],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      }
+    },
+    {
+      "name": "formats from runs at start and end",
+      "cell": "C127",
+      "value": "Some other plain text",
+      "formula": "Some other plain text",
+      "runs": [
+        {
+          "text": "Some other plain text",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": true,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Some other plain text</t>"
+    },
+    {
+      "name": "values",
+      "cell": "C130",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello brave world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Hello brave world</t>"
+    },
+    {
+      "name": "formulas",
+      "cell": "C133",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello brave world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Hello brave world</t>"
+    },
+    {
+      "name": "all except borders",
+      "cell": "C136",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "values and number formats",
+      "cell": "C139",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello brave world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<t>Hello brave world</t>"
+    },
+    {
+      "name": "all transposed",
+      "cell": "C142",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "cut",
+      "cell": "C145",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "to another workbook",
+      "cell": "C148",
+      "other": {
+        "value": "Hello brave world",
+        "formula": "Hello brave world",
+        "runs": [
+          {
+            "text": "Hello ",
+            "font": {
+              "name": "Aptos Narrow",
+              "size": 11.0,
+              "bold": false,
+              "italic": false,
+              "underline": -4142,
+              "strike": false,
+              "color": "000000",
+              "sup": false,
+              "sub": false
+            }
+          },
+          {
+            "text": "brave",
+            "font": {
+              "name": "Aptos Narrow",
+              "size": 11.0,
+              "bold": true,
+              "italic": false,
+              "underline": -4142,
+              "strike": false,
+              "color": "FF0000",
+              "sup": false,
+              "sub": false
+            }
+          },
+          {
+            "text": " world",
+            "font": {
+              "name": "Aptos Narrow",
+              "size": 11.0,
+              "bold": false,
+              "italic": false,
+              "underline": -4142,
+              "strike": false,
+              "color": "000000",
+              "sup": false,
+              "sub": false
+            }
+          }
+        ]
+      },
+      "value": null,
+      "formula": "",
+      "runs": [],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      }
+    },
+    {
+      "name": "all from runs at start and end",
+      "cell": "C151",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": true,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " brave ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 14.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": "mixed"
+      },
+      "xml": "<r><t>Hello</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> brave </t></r><r><rPr><sz val=\"14\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>world</t></r>"
+    },
+    {
+      "name": "formats from plain over rich",
+      "cell": "C154",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": 2,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "formats from a number over rich",
+      "cell": "C157",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><b /><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    },
+    {
+      "name": "superscript run",
+      "cell": "C160",
+      "value": "Hello brave world",
+      "formula": "Hello brave world",
+      "runs": [
+        {
+          "text": "Hello ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "brave",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 8.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": true,
+            "sub": false
+          }
+        },
+        {
+          "text": " world",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": "mixed"
+      },
+      "xml": "<r><t xml:space=\"preserve\">Hello </t></r><r><rPr><vertAlign val=\"superscript\" /><sz val=\"8\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>brave</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> world</t></r>"
+    }
+  ],
+  "html": [
+    {
+      "name": "sup and sub",
+      "cell": "E303",
+      "value": "H2O and x2",
+      "formula": "H2O and x2",
+      "runs": [
+        {
+          "text": "H",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "2",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": true
+          }
+        },
+        {
+          "text": "O and x",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "2",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": true,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t>H</t></r><r><rPr><vertAlign val=\"subscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>2</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>O and x</t></r><r><rPr><vertAlign val=\"superscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>2</t></r>"
+    },
+    {
+      "name": "u, s, i, b",
+      "cell": "E306",
+      "value": "one two three four five",
+      "formula": "one two three four five",
+      "runs": [
+        {
+          "text": "one ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "two",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": 2,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "three",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": true,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "four",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": true,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "five",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">one </t></r><r><rPr><u /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>two</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> </t></r><r><rPr><strike /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>three</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> </t></r><r><rPr><i /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>four</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> </t></r><r><rPr><b /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>five</t></r>"
+    },
+    {
+      "name": "colour and size spans",
+      "cell": "E309",
+      "value": "red here and big",
+      "formula": "red here and big",
+      "runs": [
+        {
+          "text": "red ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "here",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "FF0000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " and ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "big",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 16.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": "mixed"
+      },
+      "xml": "<r><t xml:space=\"preserve\">red </t></r><r><rPr><sz val=\"11\" /><color rgb=\"FFFF0000\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>here</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> and </t></r><r><rPr><sz val=\"16\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>big</t></r>"
+    },
+    {
+      "name": "font family span",
+      "cell": "E312",
+      "value": "mono code end",
+      "formula": "mono code end",
+      "runs": [
+        {
+          "text": "mono ",
+          "font": {
+            "name": "Georgia",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "code",
+          "font": {
+            "name": "Courier New",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " end",
+          "font": {
+            "name": "Georgia",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">mono </t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Courier New\" /><family val=\"3\" /></rPr><t>code</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Georgia\" /><family val=\"1\" /></rPr><t xml:space=\"preserve\"> end</t></r>"
+    },
+    {
+      "name": "vertical-align css",
+      "cell": "E315",
+      "value": "E=mc2 and ai",
+      "formula": "E=mc2 and ai",
+      "runs": [
+        {
+          "text": "E=mc",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "2",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": true,
+            "sub": false
+          }
+        },
+        {
+          "text": " and a",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "i",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": true
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t>E=mc</t></r><r><rPr><vertAlign val=\"superscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>2</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> and a</t></r><r><rPr><vertAlign val=\"subscript\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>i</t></r>"
+    },
+    {
+      "name": "word paragraph",
+      "cell": "E318",
+      "value": "Word bold and red and under",
+      "formula": "Word bold and red and under",
+      "runs": [
+        {
+          "text": "Word ",
+          "font": {
+            "name": "Aptos",
+            "size": 12.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "bold",
+          "font": {
+            "name": "Aptos",
+            "size": 12.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " and ",
+          "font": {
+            "name": "Aptos",
+            "size": 12.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "red",
+          "font": {
+            "name": "Aptos",
+            "size": 12.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "C00000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " and ",
+          "font": {
+            "name": "Aptos",
+            "size": 12.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "under",
+          "font": {
+            "name": "Aptos",
+            "size": 12.0,
+            "bold": false,
+            "italic": false,
+            "underline": 2,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos",
+        "size": 12.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">Word </t></r><r><rPr><b /><sz val=\"12\" /><color theme=\"1\" /><rFont val=\"Aptos\" /><family val=\"2\" /></rPr><t>bold</t></r><r><rPr><sz val=\"12\" /><color theme=\"1\" /><rFont val=\"Aptos\" /><family val=\"2\" /></rPr><t xml:space=\"preserve\"> and </t></r><r><rPr><sz val=\"12\" /><color rgb=\"FFC00000\" /><rFont val=\"Aptos\" /><family val=\"2\" /></rPr><t>red</t></r><r><rPr><sz val=\"12\" /><color theme=\"1\" /><rFont val=\"Aptos\" /><family val=\"2\" /></rPr><t xml:space=\"preserve\"> and </t></r><r><rPr><u /><sz val=\"12\" /><color theme=\"1\" /><rFont val=\"Aptos\" /><family val=\"2\" /></rPr><t>under</t></r>"
+    },
+    {
+      "name": "double underline css",
+      "cell": "E321",
+      "value": "a dbl b",
+      "formula": "a dbl b",
+      "runs": [
+        {
+          "text": "a ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "dbl",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4119,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " b",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t xml:space=\"preserve\">a </t></r><r><rPr><u val=\"double\" /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>dbl</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> b</t></r>"
+    },
+    {
+      "name": "all one format",
+      "cell": "E324",
+      "value": "all bold",
+      "formula": "all bold",
+      "runs": [
+        {
+          "text": "all",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": " ",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": false,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        },
+        {
+          "text": "bold",
+          "font": {
+            "name": "Aptos Narrow",
+            "size": 11.0,
+            "bold": true,
+            "italic": false,
+            "underline": -4142,
+            "strike": false,
+            "color": "000000",
+            "sup": false,
+            "sub": false
+          }
+        }
+      ],
+      "cellFont": {
+        "name": "Aptos Narrow",
+        "size": 11.0
+      },
+      "xml": "<r><t>all</t></r><r><rPr><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t xml:space=\"preserve\"> </t></r><r><rPr><b /><sz val=\"11\" /><color theme=\"1\" /><rFont val=\"Aptos Narrow\" /><family val=\"2\" /><scheme val=\"minor\" /></rPr><t>bold</t></r>"
+    }
+  ]
+}

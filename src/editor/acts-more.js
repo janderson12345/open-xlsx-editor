@@ -335,6 +335,29 @@ export function createMoreActs(env) {
     }
     // (New Cell Style... and a style's Modify...: acts-styles.js.)
     if (STYLE_ACTS.has(name)) return styleActs(name, args);
+    if (name === 'formatCellsBox' && state.editing?.textSelected) {
+      // (Ctrl+1 with characters selected in the cell editor or the formula bar: the box with its Font tab alone, on
+      // the first selected character's font, and what was changed there given to those characters only, as Excel's.)
+      const wb = state.workbook;
+      const ed = state.editing;
+      const s = editing().selection;
+      const cell = wb.sheet(i).cells.get(s.ar)?.get(s.ac) || null;
+      const xf = xfOf(wb.styles, cell?.s || 0);
+      const own = ed.selectedFont || {};
+      const font = { ...wb.styles.fonts[xf.fontId] };
+      for (const [k, v] of Object.entries(own)) if (v != null) font[k] = k === 'color' && typeof v === 'string' ? { rgb: v } : v;
+      const look = { xf, font, fontName: own.name || fontFamily(wb.styles.fonts[xf.fontId], wb.theme), fontNames: [...new Set([wb.theme.fonts.minor, wb.theme.fonts.major, ...FONT_NAMES])],
+        part: true, color: (c) => state.looks?.color(c) };
+      ed.holdText(true);
+      return formatCellsBox(root, look, 'Font').then((change) => {
+        // (Automatic is theme colour 1, as the Font group's Automatic on part of the text.)
+        const f = change?.font ? { ...change.font } : null;
+        if (f && 'color' in f && !f.color) f.color = { theme: 1 };
+        const done = !!f && ed.markEditorFont(f);
+        ed.holdText(false);
+        return done;
+      });
+    }
     if (name === 'formatCellsBox') {
       // (Ctrl+1: the active cell's format in Excel's box; what was changed there given to the selection.)
       const wb = state.workbook;

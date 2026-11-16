@@ -156,9 +156,10 @@ Part of a cell's text is formatted while it is edited, as in Excel: select some 
 Ctrl+B, Ctrl+I, Ctrl+U or Ctrl+5 (or the Font group's Bold, Italic, Underline, Strikethrough); that part takes it when
 the edit is entered (`src/editor/richmarks.js`, one font per character). A cell of rich text keeps all of its runs'
 fonts while edited (bold, italic, underline, strikethrough, size, colour, font, super- and subscript). They are written
-as Excel writes rich text (`strings.js` richRunsXml, `test/richtext.test.js`): a run in the cell's own font bare,
-another with an rPr of what it changes and then the cell's size, colour, rFont, family and scheme; in the cell's inline
-string. A run read from a file keeps its own colour (rgb, theme and tint, or indexed) and, in a font of its own, its
+as Excel writes rich text (`strings.js` richRunsXml, `test/richtext.test.js`): the first run, in the cell's own font,
+bare; another with an rPr of what it changes and then the cell's size, colour, rFont, family and scheme, a later run in
+the cell's own font too (with only those), as Excel writes it (`test/richruns-excel.json`), so that it keeps that font
+when the cell's format changes; in the cell's inline string. A run read from a file keeps its own colour (rgb, theme and tint, or indexed) and, in a font of its own, its
 family. (Excel adds a family number for a run in another font, `family val="3"` for Courier New, which the editor can't
 know for a font chosen in it and leaves out.)
 
@@ -203,12 +204,36 @@ A run's rPr children that aren't modelled (`outline`, `shadow`, `condense`, `ext
 kept as they came and written back with the run, in Excel's order (`strings.js` runFont `extra`; `test/richtext.test.js`).
 A run's `family` is read from the file too.
 
+Format Cells for part of the text (measured): with characters selected in the cell editor or the formula bar, Ctrl+1
+opens Format Cells with its Font tab alone, as Excel's does then, on the first selected character's font (the cell's
+where it has none of its own): font, style, size, underline (single, double and the two accounting ones), colour,
+strikethrough, superscript and subscript. What is changed there goes to the selected characters only and the edit stays
+open (`src/editor/acts-more.js`, `richmarks.js` setFont; Automatic written as theme colour 1). Measured by setting
+`Characters(7, 5).Font` over COM as the box does, one property at a time and all at once, the file saved and each
+character read back (`tools/excel-compare/excel-richruns.ps1` on `richruns-cases.mjs`, giving
+`test/richruns-excel.json`; `test/richruns.test.js` makes each the same way and compares, 13 of 13):
+
+| Set on "brave" of "Hello brave world" | Excel's run (measured) |
+| --- | --- |
+| Bold Italic | `<b/><i/>`, then sz, color, rFont, family, scheme |
+| Superscript; Subscript (the second replaces the first) | `<vertAlign val="superscript"/>`; `subscript` |
+| Double, Single Accounting, Double Accounting underline | `<u val="double"/>`, `singleAccounting`, `doubleAccounting` |
+| A colour, a size | `<color rgb="FF00B050"/>`; `<sz val="16"/>` |
+| Another font | `<rFont val="Courier New"/><family val="3"/>`, no scheme |
+| All at once | `<i/><strike/><u/><vertAlign val="superscript"/><sz val="9"/><color rgb="FF0070C0"/><rFont val="Georgia"/>` |
+| The whole text bold | the cell's font bold, its text plain (no runs) |
+
+The last row isn't followed: all of the text formatted is kept as one run (shown and saved the same; Excel's object
+model makes it the cell's font, and what its box does with every character selected isn't reached over COM).
+
+Copying a cell of rich text keeps its runs as Excel's Copy and Paste do: docs/CLIPBOARD.md.
+
 Printed and exported to PDF, a rich cell is drawn as its runs (print.js draws cells as the grid does; `src/pdf.js`
 takes each run's text node in its own computed font; `test/pdf.mjs`).
 
-Not yet: Format Cells' Font tab for a selection inside the cell (Ctrl+1 while editing), Ctrl+B with nothing selected to
-type on in bold, the Font group's controls showing the selected characters' font, the drawn view's up and down arrows
-across lines of different heights (the caret moves by the text box's own lines), and copying runs.
+Not yet: Ctrl+B or Ctrl+1 with nothing selected to type on in that font, the Font group's controls showing the
+selected characters' font, and the drawn view's up and down arrows across lines of different heights (the caret moves
+by the text box's own lines).
 
 ## Format Painter
 
