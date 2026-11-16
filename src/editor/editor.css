@@ -810,6 +810,10 @@
 .oxe-tab-colored[aria-selected="true"] {
   border-bottom-color: var(--oxe-tab-color);
 }
+/* (A grouped sheet's tab white as the one shown, as Excel marks a group; only the one shown in bold.) */
+.oxe-tab-grouped[aria-selected="true"]:not([tabindex="0"]) {
+  font-weight: 400;
+}
 .oxe-tab[aria-disabled="true"] {
   cursor: default;
   font-style: italic;

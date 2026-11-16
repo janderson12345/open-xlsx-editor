@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { serializeXml } from '../src/ooxml/xml.js';
-import { addHyperlink, readHyperlinks, hyperlinkAt, screenTip, followOf } from '../src/ooxml/links.js';
-import { addressOf, mailtoOf, locationOf } from '../src/editor/linkbox.js';
+import { addHyperlink, readHyperlinks, hyperlinkAt, screenTip, followOf, encodeAddress, decodeAddress } from '../src/ooxml/links.js';
+import { addressOf, mailtoOf, locationOf, newDocumentName } from '../src/editor/linkbox.js';
 
 // (Excel 365 over COM: Hyperlinks.Add on A1:A7 of a new sheet, and the file it saved; the xr:uid Excel adds left out.)
 const book = () => {
@@ -49,6 +49,8 @@ test("following a hyperlink: http, https, mailto and ftp opened; a place in the 
   assert.deepEqual(followOf({ address: 'https://example.com/a', location: null }), { url: 'https://example.com/a' });
   assert.deepEqual(followOf({ address: 'https://example.com/a', location: 'top' }), { url: 'https://example.com/a#top' });
   assert.deepEqual(followOf({ address: 'mailto:someone@example.com', location: null }), { url: 'mailto:someone@example.com' });
+  // (An address read back unescaped, opened escaped again, as its Target has it.)
+  assert.deepEqual(followOf({ address: 'https://example.com/a b?q=100%', location: null }), { url: 'https://example.com/a%20b?q=100%25' });
   assert.deepEqual(followOf({ address: null, location: "'Sheet2'!B5" }), { place: "'Sheet2'!B5" });
   assert.deepEqual(followOf({ address: 'example.com', location: null }), { refused: 'Cannot open the specified file.' });
   assert.deepEqual(followOf({ address: 'javascript:alert(1)', location: null }), { refused: 'Cannot open the specified file.' });
@@ -95,4 +97,31 @@ test("HYPERLINK's cells as Excel's: the Hyperlink style when typed at the formul
   assert.ok(style(typed('=HYPERLINK("https://example.com/a","Shown")')) > 0);
   assert.ok(style(typed('=1+HYPERLINK("https://example.com/c",5)')) > 0);
   assert.equal(typed('=IF(TRUE,HYPERLINK("https://example.com/d","In if"))').style, null);
+});
+
+test('a link to a file as Excel writes it: the name relative to the workbook as its Target, escaped as Excel escapes it, TargetMode External, a place in it as location', () => {
+  // (Excel 365 over COM: tools/excel-compare/excel-filelinks.ps1, Hyperlinks.Add of file names and the file saved;
+  // test/filelinks-excel.json. A full path in the workbook's own folder was saved as the name alone: Browse and
+  // Create New Document here give the name.)
+  const cases = JSON.parse(fs.readFileSync('test/filelinks-excel.json', 'utf8'));
+  const { wb, si } = book();
+  cases.forEach((x, r) => addHyperlink(wb, si, r, 0, { address: x.given.replace(/^<folder>./, ''), location: x.subAddress }));
+  const rels = wb.pkg.readRels(wb.sheets[si].path);
+  const els = [...wb._part(si).doc.getElementsByTagNameNS('*', 'hyperlink')];
+  cases.forEach((x, r) => {
+    const rel = rels.find((y) => y.id === els[r].getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'));
+    assert.equal(rel.rawTarget, x.target, x.ref);
+    assert.equal(rel.external ? 'External' : null, x.mode, x.ref);
+    assert.equal(els[r].getAttribute('location') || null, x.location, x.ref);
+    assert.equal(readHyperlinks(wb, si)[r].address, x.address, x.ref);
+  });
+  assert.equal(encodeAddress('a b%20c%zz'), 'a%20b%20c%25zz');
+  assert.equal(decodeAddress('My%20File%5B1%5D.xlsx'), 'My File[1].xlsx');
+});
+
+test("Create New Document's name as the link's address: .xlsx added when it has no extension; a name a file can't have refused", () => {
+  assert.equal(newDocumentName('Budget'), 'Budget.xlsx');
+  assert.equal(newDocumentName('  Notes.docx '), 'Notes.docx');
+  assert.equal(newDocumentName('Plan 2027.xlsm'), 'Plan 2027.xlsm');
+  for (const bad of ['', '   ', 'a/b', 'a:b', 'what?', '..']) assert.equal(newDocumentName(bad), null, bad);
 });

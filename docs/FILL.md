@@ -81,9 +81,43 @@ Measured over COM as the others (AutoFill's xlFillDays to xlFillYears: `fill2-ca
 
 Upwards and leftwards these choices take Excel's guess, as before (not measured).
 
+## Fill > Across Worksheets (measured)
+
+Home > Editing > Fill > Across Worksheets... copies the selection on the sheet shown to the same cells of each other
+grouped sheet (`src/ooxml/fillacross.js`). Measured over COM: `Sheets(Array("Sheet1", "Sheet2", "Sheet3")).FillAcrossSheets`
+of Sheet1!A1:C4 with xlFillWithAll, xlFillWithContents and xlFillWithFormats, in a new workbook of made-up values in a
+hidden instance (`tools/excel-compare/excel-fillacross.ps1`, `test/fillacross-excel.json`). `npm test`
+(`test/fillacross.test.js`) builds the same sheets and expects Excel's in every cell read (its formula or value,
+number format, bold, italic, fill, bottom border, merge, note, hyperlink, conditional format, validation): 126 of 126
+(14 cells on each of the three sheets, for each choice).
+
+| Rule | Seen |
+|---|---|
+| The cells go to the same addresses; formulas are copied as they are written, not moved. | `=A1*2`, `=$A$1+Sheet2!A1` and `=SUM(A1:B1)` the same on Sheet2 and Sheet3 (Sheet2's own `Sheet2!A1` too). |
+| All: values, formulas and formats; a blank cell of the selection clears its cell there, value and format. | Sheet2's italic `old2` in B2 gone, B2 General. |
+| Contents: values and formulas only; the cells there keep their formats, and a blank cell clears only the value. | A1 1234.5 still italic, without the bold, fill, border or number format; B2 empty and italic. |
+| Formats: formats only; the values there stay. | A1 `old2` bold, yellow, bordered, `#,##0.00`; B1 empty. |
+| All and Formats bring the merged ranges and the conditional formats; Contents neither. | B4:C4 merged on Sheet2 and Sheet3; A4's rule there. |
+| All brings hyperlinks and data validation; Contents and Formats don't. | B3's link and C3's rule on Sheet2 with All only. |
+| Notes, column widths and row heights are never copied. | A3's note, column A's width 20 and row 1's height 30 not on Sheet2. |
+| Cells outside the selection are left alone. | D1 `outside2`, A5 `below2` kept. |
+
+In the editor:
+- **Grouping.** Ctrl+click on a sheet's tab adds it to the group with the sheet shown, or takes it out again; Shift+click
+  groups the tabs from the one shown to the one clicked; the tab menu has Select All Sheets and, with sheets grouped,
+  Ungroup Sheets. Grouped tabs are white as the shown one is (only that one in bold), as Excel marks a group. A click
+  on a grouped tab shows that sheet and keeps the group; showing a sheet outside it ungroups, as a click on its tab
+  does in Excel. Opening another workbook ungroups.
+- **The command.** Fill > Across Worksheets... is greyed until sheets are grouped, as in Excel. Its box offers All,
+  Contents and Formats (All chosen first). It is one step of Undo, and the API's `command('fillAcross', 'contents')`,
+  `command('groupSheets', [0, 2])` and `command('groupedSheets')` do the same.
+- **Only this acts on the group.** In Excel a group also takes whatever is typed or formatted on the sheet shown; here
+  typing, formatting and the other commands change only the sheet shown. Nor is the group saved: Excel writes
+  `tabSelected="1"` on each grouped sheet's view; the file here keeps its own.
+
 ## Not yet
 
-Fill > Across Worksheets (sheets can't be grouped yet), a drag back into the selection (Excel clears those cells), and
-custom lists measured in Excel (adding one over COM would change the user's own Excel settings; they go round as the
+Excel's other edits over grouped sheets (typing, formatting, inserting rows on all of them; [Group] in the title), a
+drag back into the selection (Excel clears those cells), and custom lists measured in Excel (adding one over COM would change the user's own Excel settings; they go round as the
 built-in lists, whose rules were measured).
 Justify's 255-character limit on a line is not checked.

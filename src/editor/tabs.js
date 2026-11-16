@@ -3,7 +3,8 @@
 // Right, Home and End move between the tabs and show the sheet (as a click does); a chart sheet's tab is there but
 // can't be shown yet. Ctrl+Page Up and Page Down in the grid change sheet from there (commands.js). A right click,
 // Shift+F10 or the Menu key on a tab opens its menu (sheetmenu.js); a double click renames it in place; dragging a tab
-// moves the sheet. At the right end, the status bar's figures for the selection (Average, Count, Sum).
+// moves the sheet. Ctrl+click on a tab adds its sheet to the group or takes it out, Shift+click groups the tabs from the
+// one shown to it, as Excel groups sheets; grouped tabs are marked as the one shown is. At the right end, the status bar's figures for the selection (Average, Count, Sum).
 import { div } from './dom.js';
 
 /** Black or white, whichever reads better on `hex` ('#RRGGBB'; WCAG relative luminance). */
@@ -16,12 +17,13 @@ export function textOn(hex) {
   return (l + 0.05) / 0.05 >= 1.05 / (l + 0.05) ? '#000000' : '#ffffff';
 }
 
-/** A strip at the bottom of `root`. `controls` is the id of the grid it shows; `on` = { select(i), menu(i, point,
- *  byKeyboard), rename(i), move(from, to), add() }. */
+/** A strip at the bottom of `root`. `controls` is the id of the grid it shows; `on` = { select(i), group(i, 'toggle'
+ *  or 'range'), menu(i, point, byKeyboard), rename(i), move(from, to), add() }. */
 export function createSheetTabs(root, { controls, on }) {
   const bar = div('oxe-tabbar');
   const strip = div('oxe-tabs', 'tablist');
   strip.setAttribute('aria-label', 'Sheets');
+  strip.setAttribute('aria-multiselectable', 'true');
   const add = document.createElement('button');
   add.type = 'button';
   add.className = 'oxe-tab-add';
@@ -38,11 +40,15 @@ export function createSheetTabs(root, { controls, on }) {
   root.append(bar);
   let tabs = []; // [{ index, el }]
   let dragged = false;
+  let grouped = new Set(); // (the grouped sheets' indices)
+  let active = -1;
 
   const mark = (i) => {
+    active = i;
     for (const t of tabs) {
       const sel = t.index === i;
-      t.el.setAttribute('aria-selected', String(sel));
+      t.el.setAttribute('aria-selected', String(sel || grouped.has(t.index)));
+      t.el.classList.toggle('oxe-tab-grouped', grouped.has(t.index));
       t.el.tabIndex = sel ? 0 : -1;
       if (sel) t.el.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
     }
@@ -50,7 +56,12 @@ export function createSheetTabs(root, { controls, on }) {
   const tabAt = (target) => target.closest?.('.oxe-tab');
   strip.addEventListener('click', (e) => {
     const el = tabAt(e.target);
-    if (el && !dragged) on.select(Number(el.dataset.sheet));
+    if (el && !dragged) {
+      const k = Number(el.dataset.sheet);
+      if ((e.ctrlKey || e.metaKey) && on.group) on.group(k, 'toggle');
+      else if (e.shiftKey && on.group) on.group(k, 'range');
+      else on.select(k);
+    }
     dragged = false;
   });
   strip.addEventListener('dblclick', (e) => { const el = tabAt(e.target); if (el) on.rename(Number(el.dataset.sheet)); });
@@ -151,6 +162,8 @@ export function createSheetTabs(root, { controls, on }) {
     },
     /** Mark sheet i as the one shown. */
     activate: mark,
+    /** Mark the sheets `list` (indices) as grouped; [] for none. */
+    group(list) { grouped = new Set(list); mark(active); },
     /** The status bar's text (empty: nothing shown); `hidden` hides it altogether. */
     status(text, hidden = false) {
       status.textContent = text;

@@ -25,6 +25,15 @@ ScreenTips and the Hyperlink style.
   ScreenTip... (Set Hyperlink ScreenTip). Edit Hyperlink shows the link and adds Remove Link. A place in another
   sheet is written as a formula names it ('Notes & more'!C5, Data!A1). An address starting www. gets http:// before
   it; anything else stays as typed. Each is one step of Undo.
+- **Browse for File...** (under Existing File or Web Page) opens the browser's file picker. A page can't know where a
+  file is, so the file's name alone becomes the address, a link relative to the workbook (as Excel saves a link to a
+  file in the workbook's own folder, measured below), and the text to display when that was empty; nothing of the file
+  is read.
+- **Create New Document**: Name of new document, Full path (the workbook's folder: a page can't say which that is) and
+  When to edit (Edit the new document later, or now, chosen first, as in Excel's box). A name without an extension gets
+  .xlsx, a new workbook; a name a file can't have (`\ / : * ? " < > |`) is refused. The link is written as Excel writes
+  a link to a file, and then the host's `onCreateDocument(name, { editNow })` is called, if it gave one, to make the
+  document (and open it for Edit now): a page can't make files, so without it only the link is written (README).
 - On a protected sheet, a hyperlink is inserted only with Insert hyperlinks allowed and its cell unlocked (measured:
   docs/PROTECT.md).
 - Home > Clear's Clear Hyperlinks and Remove Hyperlinks (docs/FORMATS.md), and hyperlinks following a sheet rename and
@@ -39,13 +48,27 @@ ScreenTips and the Hyperlink style.
 
 | Rule | Seen |
 |---|---|
-| An address: a relationship of the sheet, `TargetMode="External"`, its Target the address as given. | `<hyperlink ref="A1" r:id="rId1"/>` |
+| An address: a relationship of the sheet, `TargetMode="External"`, its Target the address as given, escaped as below. | `<hyperlink ref="A1" r:id="rId1"/>` |
 | A place in the workbook: `location`, and `display` with the text to display. | `<hyperlink ref="A3" location="'Sheet2'!B5" display="Go there"/>` |
 | A ScreenTip: `tooltip`. | `<hyperlink ref="A2" r:id="rId2" tooltip="Tip here"/>` |
 | An empty cell: the text to display becomes its value, else the address. | A1: https://example.com/page; A2: Shown text |
 | A cell with something in it keeps it; `display` then holds the address. | A5 "kept text": `display="https://example.com/"`; A6 42 stays a number |
 | The cell gets the built-in Hyperlink style: underlined, the theme's colour 10, nothing marked applied in the cell's format. | `<cellStyle name="Hyperlink" xfId="1" builtinId="8"/>`, `<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="1"/>` |
 | An address without a scheme is kept as given (a file's path). | `Target="example.com"` |
+
+Links to files, measured over COM (`tools/excel-compare/excel-filelinks.ps1`: Hyperlinks.Add of file names and paths in
+a new workbook saved in a folder outside the repository, its Address read back before and after the save, the saved
+sheet's hyperlinks and relationships; reduced by `filelinks-extract.mjs` to `test/filelinks-excel.json`, without the
+computer's paths; no files were made for the links to go to). `npm test` (`test/links.test.js`) writes the same
+links: 9 of 9 Targets, TargetModes, places and Addresses as Excel's.
+
+| Rule | Seen |
+|---|---|
+| A file's name is kept relative: the Target is the name, `TargetMode="External"`. | `report.xlsx`: `Target="report.xlsx"`. `..\up.xlsx` stays `..\up.xlsx`. |
+| A full path in the workbook's own folder (or near it) is saved relative to the workbook. | `<folder>\New Book.xlsx`: `Target="New%20Book.xlsx"`, its Address `New Book.xlsx` after the save; a folder beside it: `../elsewhere/other.xlsx`. |
+| The Target escapes a space, `[ ] { } ^` (in lower case) and a `%` that doesn't start an escape; `&`, `\` and letters outside ASCII stay. A web address the same. | `My File.xlsx`: `My%20File.xlsx`; `R&D 100%.xlsx`: `R&D%20100%25.xlsx`; `Café [1].xlsx`: `Café%20%5b1%5d.xlsx`; `x%41 {^}.xlsx`: `x%41%20%7b%5e%7d.xlsx`; `https://example.com/a b`: `…/a%20b`. |
+| Excel's Address reads those escapes back. | `My%20File.xlsx`: `My File.xlsx`; `a%20b` typed: `a b`; `x%41` stays. |
+| A place in the file: `location`, beside the file's relationship. | `My File.xlsx` with `Sheet2!B5`: `r:id` and `location="Sheet2!B5"`; the cell shows `My File.xlsx - Sheet2!B5`. |
 
 A HYPERLINK formula, measured over COM (the formula set, the file saved): no `<hyperlink>` is written, its value is
 `friendly_name` (else `link_location`), and the cell gets the Hyperlink style when HYPERLINK is at the top level of
@@ -59,7 +82,12 @@ Excel also writes an `xr:uid` on each hyperlink; it is left out here (Excel does
 
 - The Insert Hyperlink box's words and its http:// before www. were taken from Excel's box, not measured over COM
   (it can't read them); so were its refusals ("You must type a valid cell reference or select a location in this
-  document."). Its Create New Document, Browse for File and Bookmark... aren't here.
+  document."). So were Create New Document's fields, its .xlsx for a name without an extension and its Edit now
+  chosen first (the box can't be driven over COM; what Excel writes for the link was measured, above); its refusals
+  here ("Type a name for the new document.", "The file name is not valid.") are this editor's words. Bookmark...
+  isn't here, nor Browse the Web, Recent Files or Current Folder.
+- A link to a file isn't opened from the grid (a page can't open a file by its name): it is refused in Excel's words,
+  as before.
 - Half a second for a held click is a guess; Excel's own time wasn't measured.
 
 # Links to other workbooks

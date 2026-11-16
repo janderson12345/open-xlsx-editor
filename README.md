@@ -113,6 +113,7 @@ const editor = mountXlsxEditor(el, {
   fillLists: [['North', 'East', 'South', 'West']], // custom lists the fill handle goes round
   errorChecking: false,                 // no green error triangles; { rules: [...] } chooses Excel's rules
   onLink: (url) => window.open(url),    // a hyperlink clicked
+  onCreateDocument: (name, { editNow }) => {}, // Insert Hyperlink > Create New Document: make the file (only the link is written here)
   author: 'Avery Chen',                 // the name notes and comments are written under
   people: [{ name: 'Sam Lee', userId: 'sam.lee@example.com' }], // whom @ offers in a comment, besides the workbook's
   locale: 'de-DE',                      // country settings for numbers and dates; without it, the browser's language
@@ -123,6 +124,12 @@ const editor = mountXlsxEditor(el, {
 editor.setReadOnly(false);              // switch at any time
 editor.setFeatures({ number: true });
 ```
+
+A page can't make files or see where they are, so Insert Hyperlink's **Create New Document** writes the link as Excel
+writes it (the name relative to the workbook, `.xlsx` added when it has no extension) and then calls
+`onCreateDocument(name, { editNow })`, if given, for the host to make the document (and open it when Edit the new
+document now was chosen). **Browse for File** opens the browser's file picker and takes only the chosen file's name, as
+a link relative to the workbook; nothing of the file is read.
 
 Tab names: `home`, `insert`, `page-layout`, `formulas`, `data`, `review`, `view`. Group names are their labels in lower
 case with dashes: `undo`, `clipboard`, `font`, `alignment`, `number`, `cells`, `editing`; on Page Layout,

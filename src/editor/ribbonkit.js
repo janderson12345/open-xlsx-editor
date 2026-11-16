@@ -140,7 +140,7 @@ export function ribbonKit(container, home) {
   }
   const onOutside = (e) => { if (!pop.hidden && !pop.contains(e.target) && !popOwner?.contains(e.target)) closeMenu(); };
   document.addEventListener('mousedown', onOutside);
-  const item = (label, command, { on = false, hint = '', icon = null } = {}) => el('button', { type: 'button', class: `oxe-item${on ? ' on' : ''}`, onmousedown: run(command) },
+  const item = (label, command, { on = false, hint = '', icon = null, disabled = false } = {}) => el('button', { type: 'button', class: `oxe-item${on ? ' on' : ''}`, disabled, onmousedown: run(command) },
     icon && el('span', { class: 'oxe-ctxico', 'aria-hidden': 'true' }, icon), el('span', {}, label), hint && el('small', {}, hint));
   /** A button with a ▾ that opens `items()` (an array of elements). */
   const menu = (icon, title, items, opts = {}) => {

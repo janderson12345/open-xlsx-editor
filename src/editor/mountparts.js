@@ -27,6 +27,8 @@ export function createParts(env, wb, i, sheet) {
       sheetIndex: () => state.sheetIndex,
       showSheet,
       sheetsChanged,
+      // (Sheets grouped on their tabs: marked there, and Fill > Across Worksheets offered.)
+      grouped: (list) => { state.group = list; state.tabs?.group(list); },
       alert,
       // (Excel's Unlock Range, for a change to an Allow Edit Range with a password: rangesbox.js.)
       followLink,
@@ -82,10 +84,24 @@ export function createParts(env, wb, i, sheet) {
       allowed,
     });
     state.editing.setReadOnly(state.readOnly);
+    // (A tab Ctrl+clicked joins the group or leaves it; Shift+clicked, the tabs from the one shown to it are the group,
+    // as Excel groups sheets. The one shown stays shown.)
+    const groupClick = (k, how) => {
+      const now = state.sheetIndex;
+      if (how === 'toggle') {
+        if (k === now) return false;
+        const cur = editing().run('groupedSheets');
+        const list = cur.length ? cur : [now];
+        return editing().run('groupSheets', list.includes(k) ? list.filter((x) => x !== k) : [...list, k]);
+      }
+      const [a, b] = now < k ? [now, k] : [k, now];
+      return editing().run('groupSheets', state.workbook.sheets.map((_, x) => x).filter((x) => x >= a && x <= b));
+    };
     state.tabs = createSheetTabs(root, {
       controls: state.grid.el.id,
       on: {
         select: (k) => editing().run('showSheet', k),
+        group: (k, how) => groupClick(k, how),
         menu: openMenu,
         statusMenu,
         rename: sheetActs.rename,

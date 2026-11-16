@@ -483,6 +483,6 @@ export function createCommands(ctx) {
     canUndo: () => state.undo.length > 0,
     canRedo: () => state.redo.length > 0,
     /** Start again (a new workbook): A1 selected, no history, no sheet's view kept. */
-    reset() { state.undo = []; state.redo = []; state.views.clear(); commands.dropClip(); show(cellSelection(0, 0)); },
+    reset() { state.undo = []; state.redo = []; state.views.clear(); state.group = null; ctx.grouped?.([]); commands.dropClip(); show(cellSelection(0, 0)); },
   };
 }
