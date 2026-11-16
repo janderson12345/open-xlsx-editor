@@ -123,4 +123,16 @@ const font = await page.evaluate(() => {
 const swatch = await page.evaluate(() => getComputedStyle(document.querySelector('.oxe-fontcolor')).getPropertyValue('--oxe-swatch').trim());
 check(font === 'FFABCDEF' && /abcdef|171, 205, 239/i.test(swatch), 'Font Color > More Colors...: abcdef on A1, and the button\'s colour', JSON.stringify({ font, swatch }));
 
+// A merged range draws only its outline: H20:J22 given All Borders (each cell's four sides, 36 edges), then merged,
+// keeps the 12 sides on the range's edge; the covered cells' sides inside it aren't drawn, as in Excel.
+const edgeCount = () => page.evaluate(() => document.querySelectorAll('.oxe-edges > *').length);
+const before = await edgeCount();
+await page.evaluate(() => { window.oxe.command('select', 19, 7); window.oxe.command('extendTo', 21, 9); window.oxe.command('borders', 'all'); });
+await page.waitForTimeout(100);
+const bordered = await edgeCount() - before;
+await page.evaluate(() => window.oxe.command('merge', 'cells'));
+await page.waitForTimeout(100);
+const merged = await edgeCount() - before;
+check(bordered === 36 && merged === 12, 'All Borders then Merge Cells: the 3x3 range\'s 36 edges become its 12 outline edges', JSON.stringify({ bordered, merged }));
+
 await finish();

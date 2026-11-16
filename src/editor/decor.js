@@ -76,11 +76,13 @@ export function decorations(st, win) {
       const d = deco(s || 0);
       if (d.fill && !merge && !cf?.fill) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
       else if (tl?.fill && !merge && !cf?.fill) { const el = rect(st, r, c, r, c, 'oxe-tbl-fill', ox, oy); el.style.setProperty('--oxe-tbl', tl.fill); fills.push(el); }
-      // (A conditional format's border sides over the cell's own: ooxml/condformat.js.)
-      for (const side of d.sides) if (!cf?.border?.[side.name]) edges.push(...edge(st, r, c, side, ox, oy));
-      if (tl?.border) edges.push(...tableEdges(st, r, c, tl.border, cf, ox, oy));
+      // (A conditional format's border sides over the cell's own: ooxml/condformat.js. In a merged range only the sides
+      // on its outline are drawn, as Excel draws them: a covered cell's own sides inside the range aren't.)
+      for (const side of d.sides) if (!cf?.border?.[side.name] && !insideMerge(merge, r, c, side.name)) edges.push(...edge(st, r, c, side, ox, oy));
+      if (tl?.border) edges.push(...tableEdges(st, r, c, tl.border, cf, ox, oy, merge));
       if (cf?.border) {
         for (const [name, b] of Object.entries(cf.border)) {
+          if (insideMerge(merge, r, c, name)) continue;
           for (const el of edge(st, r, c, { name, style: b.style, cls: 'oxe-cf-edge' }, ox, oy)) { el.style.setProperty('--oxe-es', LINE[b.style] || 'solid'); el.style.setProperty('--oxe-ec', b.color); edges.push(el); }
         }
       }
@@ -99,12 +101,22 @@ export function decorations(st, win) {
   return { fills, edges };
 }
 
+/** Whether side `name` of cell (r, c) lies inside merged range `merge` (not on its outline). */
+export function insideMerge(merge, r, c, name) {
+  if (!merge) return false;
+  if (name === 'left') return c > merge.c0;
+  if (name === 'right') return c < merge.c1;
+  if (name === 'top') return r > merge.r0;
+  if (name === 'bottom') return r < merge.r1;
+  return false;
+}
+
 /** A table style's border sides of cell (r, c), each where neither the cell's own format nor a conditional format has
  *  one (the cell's own are drawn already): a side shared with the cell beside is drawn by both, in the same place. */
-function tableEdges(st, r, c, border, cf, ox, oy) {
+function tableEdges(st, r, c, border, cf, ox, oy, merge = null) {
   const out = [];
   for (const [name, b] of Object.entries(border)) {
-    if (cf?.border?.[name]) continue;
+    if (cf?.border?.[name] || insideMerge(merge, r, c, name)) continue;
     for (const el of edge(st, r, c, { name, style: b.style, cls: 'oxe-tbl-edge' }, ox, oy)) {
       el.style.setProperty('--oxe-es', LINE[b.style] || 'solid');
       el.style.setProperty('--oxe-ec', b.color);

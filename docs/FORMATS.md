@@ -43,6 +43,7 @@ which reads back every font, fill, alignment, border, number format and cell sty
 | Merge & Center also centres; Merge Cells and Merge Across leave the alignment. Merge Across merges each row of the selection on its own. | A1:B2 across: A1:B1 and A2:B2, A2 keeping `a2`. |
 | A selection that overlaps a merged range is merged with it into one. | A1:B2 merged, then B2:C3: A1:C3. |
 | Merge & Center on a selection with a merged range in it unmerges, and sets the alignment back to General. Unmerge Cells leaves the alignment. | A1 after Merge & Center, pressed again: not merged, General. Unmerged: still centred. |
+| A merged range is drawn with only the border sides on its outline: the covered cells keep their own borders in the file (and get them back when unmerged), but the sides inside the range aren't drawn, on screen or in print (`editor/decor.js` insideMerge). | A form whose every cell has borders, merged into blocks, shows each block as one box (`test/editing-borders.mjs`). |
 
 ## Clear (`src/ooxml/clearops.js`)
 
