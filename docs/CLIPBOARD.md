@@ -12,7 +12,7 @@ with the same formulas and values.
 - What was copied or cut is outlined (a moving dashed line, still when the system asks for less motion) until it is
   pasted (a cut) or let go: Esc, typing in a cell, or a change to the sheets.
 - The system clipboard gets the cells' text as shown, tabs between cells and a line for each row, as Excel puts it,
-  so it pastes into other programs. Pasting it back here pastes the cells
+  so it pastes into other programs. Pasting it back here, or into another editor on the same page, pastes the cells
   themselves (formulas, formats, merged ranges). Another program's cells come with their formats, from the HTML it
   puts on the clipboard (below); plain text is read cell by cell as if typed there (`=` starts a formula, `50%` is
   0.5; a cell in quotes, as Excel's own copy writes one with a line break, loses its quotes, as Excel reads it).
@@ -59,6 +59,7 @@ opened in Excel (`excel-readback.ps1`), 30 of 30 read back as Excel made them.
 | Transpose: rows become columns. A reference to a cell of the copy, $ or not, follows that cell to where it went; one outside keeps its $ parts and its relative parts turn with the copy. | A1:C3 to E1: B2 `=$A$1+B1` is F2 `=$E$1+E2`; B3 `=SUM(A1:B1)` is G2 `=SUM(E1:E2)`; B2 `=B1+D9` is F2 `=E2+M4`; `=$D$9+1` stays. |
 | A selection that is a whole number of copies takes the copy that many times, as Paste does. | A1:C3 values onto E10:G15: twice. |
 | Paste Link: a formula for each cell reading the copied cell as far from the copy's top-left, relative; for one cell, absolute. Over a whole number of copies, the links carry on across the selection rather than repeating. Cells in the General format take the number format of the copy's first cell. | A1:C3 to E1: `=A1` ... `=C3`, each 0.00 as A1. A1 to E5: `=$A$1`. B1:C1 onto E5:H6: `=B1` to `=E2`. |
+| Paste Link of cells copied in another workbook: the same formulas naming it and the sheet, the workbook as a link of its own (docs/LINKS.md), its copied values kept there. | A1:C2 of oxesrc.xlsx to D4: `=[1]Sheet1!A1` ... `=[1]Sheet1!C2` (shown `=[oxesrc.xlsx]Sheet1!A1`); B1 to A1: `=[1]Sheet1!$B$1`; Data Two's A1: `='[1]Data Two'!$A$1`; a blank copied cell reads 0. |
 
 Not measured: an operation with a TRUE or FALSE constant (left as it is here, as text is), Transpose of a reference
 whose $ is on one part only (each part turned as above), column widths onto columns that had their own width (they

@@ -20,6 +20,8 @@ import { specialBox } from './specialbox.js';
 import { insertPivot, showFieldList } from './pivotbox.js';
 import { pivotAt } from '../ooxml/pivot.js';
 import { nameManager, defineNameFor, createNamesFor } from './namesbox.js';
+import { editLinksBox } from './linksbox.js';
+import { announce } from './live.js';
 import { areasOf } from './selection.js';
 import { filterChoices, shownText } from '../ooxml/filterops.js';
 import { readNotes } from '../ooxml/notes.js';
@@ -183,6 +185,11 @@ export function createActs(env) {
       const newName = () => defineNameFor(root, state.workbook, i, s, run);
       const opened = name === 'nameManager' ? nameManager(root, { workbook: () => state.workbook, run, newName }) : name === 'createNames' ? createNamesFor(root, state.workbook, i, s, run) : newName();
       return opened.then((x) => { state.grid.el.focus({ preventScroll: true }); return x; });
+    }
+    if (name === 'editLinks') {
+      // (Data > Edit Links: the links to other workbooks, each change one step of the history; linksbox.js.)
+      const run = (fn) => editing().run('sheetChange', (wb) => { fn(wb); return true; });
+      return editLinksBox(root, { workbook: () => state.workbook, run, announce }).then((x) => { state.grid.el.focus({ preventScroll: true }); return x; });
     }
     if (name === 'pivotFieldList') {
       // (Show Field List: the PivotTable at the active cell's fields, moved.)

@@ -10,6 +10,8 @@ const input = document.querySelector('input[type=file]');
 const params = new URLSearchParams(location.search);
 const editor = mountXlsxEditor(host, { ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}) });
 window.oxe = editor;
+// (For the browser tests: a second editor on the page, as two workbooks open at once; test/editing-clip.mjs.)
+window.mountXlsxEditor = mountXlsxEditor;
 
 async function openFile(file) {
   try {

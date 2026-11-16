@@ -5,6 +5,7 @@ import { applyTableFilter } from '../ooxml/tablefilter.js';
 import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { pasteHtml } from '../ooxml/cliphtml.js';
+import { linkCopy } from '../ooxml/extlinks.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges } from '../ooxml/sortops.js';
 import { setSortState } from '../ooxml/sortstate.js';
@@ -46,6 +47,13 @@ export function dataCommands(env) {
     ctx.changed?.();
     return true;
   }
+  /** The cells copied in an editor on this page (this one, or another: pagebooks.js keeps the last copy) that `text`,
+   *  the system clipboard's, is the text of; with no text to go by, the last copy made. */
+  function copyFor(text) {
+    const last = ctx.sharedClip?.() || null;
+    if (text == null || !text) return last || state.clip;
+    return [last, state.clip].find((c) => c && c.text === text) || null;
+  }
   return {
     /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
      *  the snapshot (clipops.js), whose `text` the caller sets to what went on the system clipboard. */
@@ -60,6 +68,7 @@ export function dataCommands(env) {
     /** Let the copy or cut go (Esc): its outline goes. */
     dropClip() {
       if (!state.clip) return false;
+      ctx.dropShared?.(state.clip);
       state.clip = null;
       ctx.clipShown?.(null);
       return true;
@@ -71,8 +80,8 @@ export function dataCommands(env) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
-      const copy = state.clip;
-      const mine = copy && (text == null || text === copy.text || !text) && (!copy.cut || copy.wb === wb);
+      const copy = copyFor(text);
+      const mine = copy && (!copy.cut || copy.wb === wb);
       // (From another program: its HTML with the formats, as Excel pastes it (cliphtml.js), else its text as typed.)
       const steps = mine ? (copy.cut ? clip.pasteCut : clip.pasteCopy)(wb, si, state.sel, copy)
         : html ? pasteHtml(wb, si, state.sel, html, { widths }) || (text ? clip.pasteText(wb, si, state.sel, text) : null)
@@ -101,7 +110,7 @@ export function dataCommands(env) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       // (The system clipboard's text, when it could be read: another program's cells pasted as values are that text
       // typed in, as Excel's Paste Values pastes them (measured: no formats, the HTML left aside).)
-      const copy = text === undefined || (state.clip && state.clip.text === text) ? state.clip : null;
+      const copy = text === undefined ? (ctx.sharedClip?.() || state.clip) : copyFor(text);
       if (!copy && text && paste === 'values' && !link && !op) {
         const steps = clip.pasteText(ctx.workbook(), ctx.sheetIndex(), state.sel, text);
         if (!runSteps(steps)) return false;
@@ -117,7 +126,21 @@ export function dataCommands(env) {
         const widths = clip.pasteWidths(state.sel, copy);
         return sizeStep((book, k) => { for (const { c, width } of widths) book.setLines(k, 'col', c, c, { width }); }, 'Pasted column widths');
       }
-      if (link && copy.wb !== wb) { ctx.announce("Paste Link to another workbook isn't available yet"); return false; }
+      if (link && copy.wb !== wb) {
+        // (Another workbook's cells: a link to it, its copied values kept (extlinks.js), and formulas naming it, as
+        // one step of the history with the link's part.)
+        const before = wb.snapshot();
+        const book = linkCopy(wb, copy, copy.wb.fileName || 'Book1.xlsx');
+        const steps = clip.pasteLink(wb, si, state.sel, copy, { book });
+        if (!runSteps(steps)) { wb.restore(before); return false; }
+        state.undo.pop();
+        state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+        ctx.reloaded?.();
+        ctx.changed?.();
+        const area = steps[0].area;
+        show({ ar: area.r0, ac: area.c0, ...area }, null, 'Pasted links, ');
+        return true;
+      }
       // (All using Source theme and All merging conditional formats paste the cells as All does: within one workbook
       // the theme is the same; the second leaves the rules already over the pasted cells.)
       const cells = paste === 'theme' || paste === 'merging' ? 'all' : paste;

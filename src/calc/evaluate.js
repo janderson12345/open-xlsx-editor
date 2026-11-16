@@ -221,7 +221,12 @@ function evaluated(node, ctx, mode) {
     case 'val': return node.v;
     case 'paren': return evaluate(node.a, ctx, mode);
     case 'ref': {
-      if (node.book != null) throw new Unsupported('a link to another workbook');
+      if (node.book != null) {
+        // (Another workbook's cells: the values the link keeps, ooxml/extlinks.js.)
+        const v = ctx.external?.(node.book, node.sheet, node.area);
+        if (v === undefined) throw new Unsupported('a link to another workbook');
+        return v;
+      }
       if (node.sheets) return threeD(node, ctx);
       const si = node.sheet == null ? ctx.here.si : ctx.sheetIndex(node.sheet);
       if (si < 0) return E.ref;
@@ -238,6 +243,12 @@ function evaluated(node, ctx, mode) {
     }
     case 'arr': return new Arr(node.rows.map((row) => row.map((v) => (v && v.err ? errorOf(v.err) : v))));
     case 'name': {
+      // (Another workbook's defined name, [1]!Rate: its formula there, reading the values the link keeps.)
+      if (node.book != null) {
+        const v = ctx.externalName?.(node.book, node.name, mode);
+        if (v === undefined) throw new Unsupported('a link to another workbook');
+        return v;
+      }
       const local = bound(ctx, node.name);
       if (local !== undefined) return local;
       // (A function named on its own, SUM or the file's _xleta.SUM: an eta LAMBDA, unless a defined name is called so.)

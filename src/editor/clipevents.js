@@ -3,6 +3,7 @@
 // Attached by interact.js to the grid's view; returns the keys' handlers and a detach.
 import { announce } from './live.js';
 import { refName } from '../ooxml/refs.js';
+import { setLastCopy } from './pagebooks.js';
 
 /** The clipboard for the grid (`view`, `grid`), its copy, cut and paste run through `run(name, ...)` (the commands). */
 export function attachClipboard({ view, grid, ctx, run }) {
@@ -23,6 +24,7 @@ export function attachClipboard({ view, grid, ctx, run }) {
     if (!clip) return null;
     const text = clipText(clip);
     clip.text = norm(text);
+    setLastCopy(clip);
     announce(`${cut ? 'Cut' : 'Copied'} ${refName(clip.rect.r0, clip.rect.c0)}${clip.rect.r1 > clip.rect.r0 || clip.rect.c1 > clip.rect.c0 ? ` to ${refName(clip.rect.r1, clip.rect.c1)}` : ''}`);
     return text;
   };

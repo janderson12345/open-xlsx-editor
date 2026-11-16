@@ -141,8 +141,25 @@ B2 as Qty (implicit intersection doesn't apply there); here every formula is rea
 Not measured: which names Excel's box starts with chosen (all here); its messages when nothing can be applied (the
 editor's own words); a one-cell range (C2:C2, which Excel made @Price, saved as SINGLE(Price)) is left as it is here.
 
+## Names that refer to another workbook (measured)
+
+A name's formula may read another workbook, through the link to it (docs/LINKS.md, `src/ooxml/extlinks.js`). Measured
+over COM (`excel-extlinks.ps1`: Names.Add with references to another open workbook, the file saved), Excel writes the
+link's number, `[1]Sheet1!$A$1:$B$2`, `'[1]Data Two'!$A$1` for a sheet's own name; `test/extlinks.test.js` makes the
+same four names here (the workbook's ExtRate, ExtBlock and ExtConst, Sheet1's LocalExt) and Excel's `definedNames`
+exactly.
+
+- The Name Manager lists them with the workbook's file name, as typed: `=[oxesrc.xlsx]Sheet1!$A$1`. New Name and Edit
+  Name take them typed so, and write the link's number; a workbook not linked yet becomes a link (read from an editor
+  on the page that has it open, else not read until Update Values).
+- Formulas using them are worked out from the values the link keeps: `=SUM(ExtBlock)` is 17.5, as Excel's.
+- Kept as they are: a workbook opened and saved with such names, not edited, writes its `workbook.xml` and link parts
+  byte for byte; one edited elsewhere (a cell typed) leaves them too (`test/extlinks.test.js`). Break Link leaves them,
+  as Excel's does.
+- Not here: a name's scope in the other workbook (`sheetId` in the link part) is read but not offered, and Excel's own
+  `=Book.xlsx!Name` typing (here `[Book.xlsx]!Name`).
+
 ## Not yet
 
 - The Name Manager's Value column and its filter; a name's scope changed (Excel doesn't either: it is fixed once made).
-- Names that refer to another workbook.
 - A LAMBDA kept in a name and called by it.

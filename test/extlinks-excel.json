@@ -1,0 +1,148 @@
+{
+  "cells": {
+    "A1": {
+      "formula": "[1]Sheet1!$B$1",
+      "value": "2.5",
+      "t": "n"
+    },
+    "H1": {
+      "formula": "[1]Sheet1!A1",
+      "value": "5",
+      "t": "n"
+    },
+    "H2": {
+      "formula": "[1]Sheet1!A2",
+      "value": "text",
+      "t": "str"
+    },
+    "H3": {
+      "formula": "[1]Sheet1!A3",
+      "value": "0",
+      "t": "n"
+    },
+    "D4": {
+      "formula": "[1]Sheet1!A1",
+      "value": "5",
+      "t": "n"
+    },
+    "E4": {
+      "formula": "[1]Sheet1!B1",
+      "value": "2.5",
+      "t": "n"
+    },
+    "F4": {
+      "formula": "[1]Sheet1!C1",
+      "value": "1",
+      "t": "b"
+    },
+    "D5": {
+      "formula": "[1]Sheet1!A2",
+      "value": "text",
+      "t": "str"
+    },
+    "E5": {
+      "formula": "[1]Sheet1!B2",
+      "value": "10",
+      "t": "n"
+    },
+    "F5": {
+      "formula": "[1]Sheet1!C2",
+      "value": "#DIV/0!",
+      "t": "e"
+    },
+    "A10": {
+      "formula": "'[1]Data Two'!$A$1",
+      "value": "7",
+      "t": "n"
+    },
+    "A12": {
+      "formula": "SUM(ExtBlock)",
+      "value": "17.5",
+      "t": "n"
+    },
+    "A13": {
+      "formula": "[1]!SrcRate",
+      "value": "2.5",
+      "t": "n"
+    },
+    "A14": {
+      "formula": "[1]Sheet1!$A$1+1",
+      "value": "6",
+      "t": "n"
+    }
+  },
+  "names": {
+    "ExtBlock": "[1]Sheet1!$A$1:$B$2",
+    "ExtConst": "[1]Sheet1!$A$1*2",
+    "ExtRate": "[1]Sheet1!$A$1",
+    "LocalExt@0": "'[1]Data Two'!$A$1"
+  },
+  "link": {
+    "sheetNames": [
+      "Sheet1",
+      "Data Two",
+      "oxesrc"
+    ],
+    "names": [
+      {
+        "name": "SrcRate",
+        "refersTo": "='Sheet1'!$B$1"
+      }
+    ],
+    "sheetData": [
+      {
+        "sheetId": 0,
+        "refreshError": false,
+        "cells": [
+          {
+            "r": "A1",
+            "t": "n",
+            "v": "5"
+          },
+          {
+            "r": "B1",
+            "t": "n",
+            "v": "2.5"
+          },
+          {
+            "r": "C1",
+            "t": "b",
+            "v": "1"
+          },
+          {
+            "r": "A2",
+            "t": "str",
+            "v": "text"
+          },
+          {
+            "r": "B2",
+            "t": "n",
+            "v": "10"
+          },
+          {
+            "r": "C2",
+            "t": "e",
+            "v": "#DIV/0!"
+          }
+        ]
+      },
+      {
+        "sheetId": 1,
+        "refreshError": false,
+        "cells": [
+          {
+            "r": "A1",
+            "t": "n",
+            "v": "7"
+          }
+        ]
+      },
+      {
+        "sheetId": 2,
+        "refreshError": true,
+        "cells": []
+      }
+    ],
+    "target": "oxesrc.xlsx"
+  }
+}

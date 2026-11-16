@@ -13,6 +13,7 @@ import { announce } from './live.js';
 import { refName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { cellText } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
+import { bookNames } from '../ooxml/extlinks.js';
 import { legacyAt } from '../calc/legacyat.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { contentsHidden } from '../ooxml/protection.js';
@@ -162,8 +163,10 @@ export function attachEditing(root, ctx) {
   /** A cell's text as Excel's formula bar has it (a date as a date, a percentage as one). */
   // (An old formula with the @s Excel 365 shows where it cuts a range to one value, at its cell: calc/legacyat.js.)
   // (A hidden cell of a protected sheet shows nothing there, as in Excel: ooxml/protection.js contentsHidden.)
-  const barText = (cell, r, c) => (contentsHidden(ctx.workbook(), ctx.sheetIndex(), r, c) ? '' : editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
-    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown)));
+  // (Another workbook's references with its file's name, [Book.xlsx]Sheet1!A1, as typed: ooxml/extlinks.js.)
+  const barText = (cell, r, c) => (contentsHidden(ctx.workbook(), ctx.sheetIndex(), r, c) ? '' : withBooks(editText(cell, formatCodeOf(ctx.workbook().styles, cell?.s || 0), ctx.workbook().date1904,
+    (shown) => legacyAt(ctx.workbook().calc, ctx.sheetIndex(), r, c, shown))));
+  const withBooks = (text) => (typeof text === 'string' && text.startsWith('=') && text.includes('[') ? `=${bookNames(ctx.workbook(), text.slice(1))}` : text);
   function refreshBar() {
     const s = cmd ? cmd.selection : { ar: 0, ac: 0 };
     // (The selection's name when it has one, as Excel reports it for the selection: goto.js selectionName.)

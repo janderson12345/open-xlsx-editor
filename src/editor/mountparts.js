@@ -7,6 +7,7 @@ import { readNotes } from '../ooxml/notes.js';
 import { attachEditing } from './interact.js';
 import { unlockRangeBox } from './rangesbox.js';
 import { createSheetTabs } from './tabs.js';
+import { lastCopy, setLastCopy } from './pagebooks.js';
 
 /** Make the grid, its editing and the tabs in `env.root` for workbook `wb` showing sheet `i` (`sheet`, its model). */
 export function createParts(env, wb, i, sheet) {
@@ -38,6 +39,9 @@ export function createParts(env, wb, i, sheet) {
       lookChanged,
       restyled,
       clipShown: (c) => { state.clip = c; showClip(); },
+      // (The last copy made in any editor on the page, and letting one go: pagebooks.js.)
+      sharedClip: () => lastCopy(),
+      dropShared: (c) => setLastCopy(null, c),
       reloaded: () => { state.grid.setModel(state.workbook.sheet(state.sheetIndex)); lookChanged(); },
       lines,
       headerMenu,

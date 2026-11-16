@@ -10,6 +10,7 @@ import { withEl } from './sheetops.js';
 import { tokenize, moveRefs } from '../calc/tokens.js';
 import { normalizeFormula } from '../calc/fileform.js';
 import { parseFormula } from '../calc/parse.js';
+import { bookIndexes, bookNames } from './extlinks.js';
 
 /** Excel's words (its dialogs', which COM doesn't reach: not measured). */
 export const NAME_MESSAGES = {
@@ -51,14 +52,15 @@ function container(wb) {
   return names;
 }
 
-/** What a name refers to, typed with or without "=": its file form, or throws Excel's words. */
-function refersText(refersTo) {
+/** What a name refers to, typed with or without "=": its file form (another workbook's [Book.xlsx]Sheet1!$A$1 as its
+ *  link's [1]Sheet1!$A$1, the link made if there is none: extlinks.js), or throws Excel's words. */
+function refersText(wb, refersTo) {
   const typed = String(refersTo ?? '').trim().replace(/^=/, '');
   if (!typed) throw new Error(NAME_MESSAGES.formula);
   try {
     const text = normalizeFormula(typed);
     parseFormula(text);
-    return text;
+    return bookIndexes(wb, text);
   } catch {
     throw new Error(NAME_MESSAGES.formula);
   }
@@ -75,7 +77,7 @@ export function findName(wb, name, sheet = null) {
 export function defineName(wb, { name, refersTo, sheet = null, comment = '', hidden = false }) {
   if (!validName(name)) throw new Error(NAME_MESSAGES.syntax);
   if (findName(wb, name, sheet)) throw new Error(NAME_MESSAGES.exists);
-  const text = refersText(refersTo);
+  const text = refersText(wb, refersTo);
   const el = wb.doc.createElementNS(wb.ns, 'definedName');
   el.setAttribute('name', name);
   if (comment) el.setAttribute('comment', comment);
@@ -103,7 +105,7 @@ export function editName(wb, { name, sheet = null }, change) {
     if (!validName(next)) throw new Error(NAME_MESSAGES.syntax);
     if (findName(wb, next, sheet)) throw new Error(NAME_MESSAGES.exists);
   }
-  const text = change.refersTo != null ? refersText(change.refersTo) : d.text;
+  const text = change.refersTo != null ? refersText(wb, change.refersTo) : d.text;
   if (change.comment != null) { if (change.comment) d.el.setAttribute('comment', change.comment); else d.el.removeAttribute('comment'); }
   d.text = text;
   d.el.textContent = text;
@@ -181,7 +183,7 @@ function namesChanged(wb, names) {
  *  value as the Name Manager lists them: [{ name, sheet, scope, refersTo, comment }]. */
 export function listNames(wb) {
   return wb.definedNames.filter((d) => !d.name.startsWith('_xlnm.') && d.el?.getAttribute('hidden') !== '1').sort(before).map((d) => ({
-    name: d.name, sheet: d.sheet ?? null, scope: d.sheet == null ? 'Workbook' : wb.sheets[d.sheet]?.name ?? '', refersTo: `=${d.text}`,
+    name: d.name, sheet: d.sheet ?? null, scope: d.sheet == null ? 'Workbook' : wb.sheets[d.sheet]?.name ?? '', refersTo: `=${bookNames(wb, d.text)}`,
     comment: d.el?.getAttribute('comment') || '',
   }));
 }

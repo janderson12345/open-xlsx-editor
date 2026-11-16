@@ -13,6 +13,7 @@ import { addThread, replyThread, resolveThread } from './threadedit.js';
 import { boxRule, coalesce } from './dvedit.js';
 import { copyConditionals, moveCutConditionals } from './clipcf.js';
 import { maxOf } from './listmath.js';
+import { bookPrefix } from './extlinks.js';
 
 export { pasteConditionals } from './clipcf.js';
 
@@ -400,17 +401,20 @@ export function pasteWidths(sel, clip) {
  * Paste Link at `sel` on sheet si, as Excel's: each cell of the paste area (the copy's size, or the selection when it is
  * a whole number of copies) a formula reading the cell of the copy as far from its top-left, relative (=A1, =B1...),
  * or for a single cell one absolute reference (=$A$1); with its sheet's name when the copy is on another. Cells in the
- * General format take the number format of the copy's first cell, as Excel gives them.
+ * General format take the number format of the copy's first cell, as Excel gives them. With `book` (the copy is of
+ * another workbook: extlinks.js linkCopy made the link), each reference names that link and the sheet, as Excel's
+ * did (measured: =[1]Sheet1!A1 ... =[1]Sheet1!C2, one cell =[1]Sheet1!$B$1, '[1]Data Two'!$A$1).
  */
-export function pasteLink(wb, si, sel, clip) {
+export function pasteLink(wb, si, sel, clip, { book = null } = {}) {
   const h = clip.rect.r1 - clip.rect.r0 + 1;
   const w = clip.rect.c1 - clip.rect.c0 + 1;
   const area = pasteArea(sel, h, w);
   const sheet = wb.sheet(si);
-  const prefix = clip.si === si ? '' : sheetPrefix(clip.sheetName);
+  const prefix = book != null ? bookPrefix(book, clip.sheetName) : clip.si === si && clip.wb === wb ? '' : sheetPrefix(clip.sheetName);
   const one = h === 1 && w === 1;
   const first = clip.cells.find((x) => x.dr === 0 && x.dc === 0);
-  const code = formatCodeOf(wb.styles, first?.s || 0);
+  // (Another workbook's number format isn't measured: Excel's copies of General cells came as General.)
+  const code = book != null ? formatCodeOf(clip.wb.styles, first?.s || 0) : formatCodeOf(wb.styles, first?.s || 0);
   const out = { si, contents: [], styles: [], merges: sheet.merges, area };
   for (let r = area.r0; r <= area.r1; r++) {
     for (let c = area.c0; c <= area.c1; c++) {
