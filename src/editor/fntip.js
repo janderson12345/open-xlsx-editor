@@ -2,10 +2,12 @@
 // ("SUM(number1, [number2], ...)") with the argument the caret is in in bold. Only for the functions Insert Function
 // lists (calc/catalog.js).
 import { functionInfo } from '../calc/catalog.js';
+import { currentLocale } from '../ooxml/locale.js';
 
 /** The function call the caret at `caret` is inside in formula `text`, innermost first: { name, arg } (arg from 0),
- *  or null. Text in quotes, sheet names in single quotes and array constants are passed over. */
-export function callAt(text, caret) {
+ *  or null. Text in quotes, sheet names in single quotes and array constants are passed over. `sep`: the argument
+ *  separator, the locale's (; where the decimal is a comma: docs/LOCALE.md). */
+export function callAt(text, caret, sep = currentLocale().listSep) {
   if (!text.startsWith('=')) return null;
   const stack = [];
   for (let i = 1; i < caret; i++) {
@@ -21,7 +23,7 @@ export function callAt(text, caret) {
       stack.push({ name: name ? name.replace(/^_xlfn\.(_xlws\.)?/i, '').toUpperCase() : null, arg: 0 });
     } else if (ch === '{') stack.push({ name: null, arg: 0, array: true });
     else if (ch === ')' || ch === '}') stack.pop();
-    else if (ch === ',' && stack.length) stack[stack.length - 1].arg += 1;
+    else if (ch === sep && stack.length) stack[stack.length - 1].arg += 1;
   }
   for (let k = stack.length - 1; k >= 0; k--) if (stack[k].array) return null; else if (stack[k].name) return { name: stack[k].name, arg: stack[k].arg };
   return null;
@@ -52,7 +54,7 @@ export function attachFunctionTip(textarea, overlay) {
     const at = argIndex(f.args, call.arg);
     tip.replaceChildren(`${f.name}(`, ...f.args.flatMap((a, k) => {
       const part = k === at ? Object.assign(document.createElement('b'), { textContent: a }) : a;
-      return k ? [', ', part] : [part];
+      return k ? [`${currentLocale().listSep} `, part] : [part];
     }), ')');
     tip.style.left = textarea.style.left || `${textarea.offsetLeft}px`;
     tip.style.top = `${textarea.offsetTop + textarea.offsetHeight + 2}px`;

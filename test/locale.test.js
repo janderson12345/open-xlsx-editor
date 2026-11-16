@@ -119,3 +119,10 @@ test('an entry typed in the page locale: entryChanges reads it there, the file k
     setLocale(EN_US);
   }
 });
+
+test("the function tip counts arguments by the locale's separator", async () => {
+  const { callAt } = await import('../src/editor/fntip.js');
+  assert.deepEqual(callAt('=ROUND(1,5;', 11, ';'), { name: 'ROUND', arg: 1 });
+  assert.deepEqual(callAt('=ROUND(1.5,', 11, ','), { name: 'ROUND', arg: 1 });
+  assert.deepEqual(callAt('=ROUND(1,5', 10, ';'), { name: 'ROUND', arg: 0 });
+});

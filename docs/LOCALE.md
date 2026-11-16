@@ -44,5 +44,4 @@ the file's cached values have to be the same wherever it is opened.
 - Function names stay English (German Excel shows `RUNDEN`), as do month and day names, TRUE and FALSE, and the error
   values. Currency formats 5 to 8 and 41 to 44 stay in dollars.
 - Boxes that read a typed value (filters, data validation, conditional formatting rules) read it en-US.
-- The tip that shows a function's arguments while one is typed shows them with commas.
 - Two editors on one page can't have different locales.
