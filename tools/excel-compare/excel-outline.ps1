@@ -21,6 +21,11 @@ function List($ws) {
   $r = 0
   foreach ($line in $rows) { $r++; $c = 0; foreach ($v in $line.Split(',')) { $c++; $ws.Range("$([char](64 + $c))$r").Formula = $v } }
 }
+# (The list's cells formatted: Units 0.00, Price currency, Item italic, Region filled yellow, the headings bold.)
+function Formats($ws) {
+  $ws.Range('C2:C7').NumberFormat = '0.00'; $ws.Range('D2:D7').NumberFormat = '$#,##0.00'
+  $ws.Range('B2:B7').Font.Italic = $true; $ws.Range('A2:A7').Interior.Color = 65535; $ws.Range('A1:D1').Font.Bold = $true
+}
 # (Totals by hand for Auto Outline: SUM rows under their details and a SUM column right of its details.)
 function Sums($ws) {
   for ($r = 1; $r -le 3; $r++) { for ($c = 1; $c -le 2; $c++) { $ws.Cells.Item($r, $c).Value2 = $r + $c } }
@@ -102,6 +107,11 @@ $CASES = [ordered]@{
   'subtotal functions' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4149, [object[]]@(3), $true, $false, 1); [void]$ws.Range('A1:D11').Subtotal(1, -4113, [object[]]@(4), $false, $false, 1) }
   'subtotal stdev var' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4155, [object[]]@(3), $true, $false, 1); [void]$ws.Range('A1:D11').Subtotal(1, -4156, [object[]]@(3), $false, $false, 1); [void]$ws.Range('A1:D15').Subtotal(1, -4164, [object[]]@(3), $false, $false, 1); [void]$ws.Range('A1:D19').Subtotal(1, -4165, [object[]]@(3), $false, $false, 1) }
   'remove subtotals' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $true, 1); [void]$ws.Range('A1:D11').RemoveSubtotal() }
+  # (Subtotal over formatted cells: number formats, a fill, italic, a bold tall row, the headings bold.)
+  'subtotal formatted cells' = { param($ws) List $ws; Formats $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3, 4), $true, $false, 1) }
+  'subtotal formatted cells above' = { param($ws) List $ws; Formats $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3, 4), $true, $false, 0) }
+  'subtotal formatted row' = { param($ws) List $ws; $ws.Rows.Item(3).Font.Bold = $true; $ws.Rows.Item(3).RowHeight = 30; $ws.Range('C5').Interior.Color = 255; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $false, 1) }
+  'subtotal formatted row above' = { param($ws) List $ws; $ws.Rows.Item(1).Font.Bold = $true; $ws.Rows.Item(2).Font.Italic = $true; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $false, 0) }
   'subtotal collapse level 2' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $false, 1); [void]$ws.Outline.ShowLevels(2) }
 }
 function Grab($file) {
@@ -117,6 +127,8 @@ function Grab($file) {
     fonts = ([regex]::Match($styles, '<fonts\b[\s\S]*?</fonts>')).Value
     cellXfs = ([regex]::Match($styles, '<cellXfs\b[\s\S]*?</cellXfs>')).Value
     cellStyleXfs = ([regex]::Match($styles, '<cellStyleXfs\b[\s\S]*?</cellStyleXfs>')).Value
+    numFmts = ([regex]::Match($styles, '<numFmts\b[\s\S]*?</numFmts>')).Value
+    fills = ([regex]::Match($styles, '<fills\b[\s\S]*?</fills>')).Value
     cellStyles = ([regex]::Match($styles, '<cellStyles\b[\s\S]*?</cellStyles>')).Value
     sheetPr = ([regex]::Match($sheet, '<sheetPr\b[^>]*/>|<sheetPr\b[\s\S]*?</sheetPr>')).Value
     sheetFormatPr = ([regex]::Match($sheet, '<sheetFormatPr\b[^>]*/>')).Value

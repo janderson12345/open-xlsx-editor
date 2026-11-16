@@ -9,7 +9,9 @@
 // the rows holding SUBTOTAL and the list's outline and page breaks.
 import { insertBreak } from './pagesetupedit.js';
 import { clearOutline, lineLevels, setSummary } from './outline.js';
-import { colName } from './refs.js';
+import { colName, refName, parseRef } from './refs.js';
+import { kids, kid, attr } from './xml.js';
+import { pinRefs, forgetRows } from './sheetedit.js';
 import { styleSummaryLines } from './outlinestyles.js';
 
 /** Excel's Use function list: SUBTOTAL's number and the word its rows are labelled with. */
@@ -58,6 +60,38 @@ export function removeSubtotals(wb, si, area) {
   return { ...area, r1 };
 }
 
+/** Subtotal's rows over their groups (Summary below data off) take the formats of the row under them, as Excel's do
+ *  ("subtotal formatted cells above", "subtotal formatted row above": the Grand row italic as the first row of data,
+ *  not bold as the headings): its own format and height, and the cells whose format isn't the row's, as an inserted
+ *  row takes the row above's (rowcol.js). `rows`, the new rows (empty yet); bottom up, so each copies a finished one. */
+function formatFromBelow(wb, si, rows) {
+  const part = wb._part(si);
+  const doc = part.doc;
+  const ns = doc.documentElement.namespaceURI;
+  const sheetData = kid(doc.documentElement, 'sheetData', ns);
+  pinRefs(sheetData, ns);
+  forgetRows(doc);
+  const rowEl = (r) => kids(sheetData, 'row', ns).find((x) => Number(attr(x, 'r')) - 1 === r);
+  const make = (name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
+  for (const r of [...rows].sort((a, b) => b - a)) {
+    const source = rowEl(r + 1);
+    let row = rowEl(r);
+    if (!row && !source) continue;
+    if (!row) { row = make('row'); row.setAttribute('r', String(r + 1)); sheetData.insertBefore(row, source); }
+    for (const name of ['s', 'customFormat', 'ht', 'customHeight']) { if (attr(source, name) != null) row.setAttribute(name, attr(source, name)); else row.removeAttribute(name); }
+    for (const c of kids(row, 'c', ns)) row.removeChild(c);
+    const own = attr(source, 'customFormat') === '1' ? Number(attr(source, 's') || 0) : 0;
+    for (const c of kids(source, 'c', ns)) {
+      if (Number(attr(c, 's') || 0) === own) continue;
+      const el = make('c');
+      el.setAttribute('r', refName(r, parseRef(attr(c, 'r')).c));
+      el.setAttribute('s', attr(c, 's'));
+      row.appendChild(el);
+    }
+  }
+  wb._reread(si, part);
+}
+
 /** The text a cell's value is labelled with ("East" for "East Total"). */
 const labelOf = (cell) => (cell?.v == null ? '' : typeof cell.v === 'boolean' ? (cell.v ? 'TRUE' : 'FALSE') : String(cell.v));
 
@@ -103,6 +137,8 @@ export function subtotal(wb, si, area, { by, fn = 'sum', cols, replace = true, p
   }
   const at = (k) => area.r0 + 1 + k;
   order.forEach((x, k) => { if (!('r' in x)) wb.changeLines(si, 'row', at(k), 1); });
+  // (Summaries above: each new row formatted as the row under it, not the one over it, bottom up.)
+  if (!below) formatFromBelow(wb, si, order.map((x, k) => ('r' in x ? null : at(k))).filter((r) => r != null));
   // Each kept row's place after, the new rows written.
   const place = new Map();
   order.forEach((x, k) => { if ('r' in x) place.set(x.r, at(k)); else x.at = at(k); });
