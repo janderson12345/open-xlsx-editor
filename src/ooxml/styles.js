@@ -2,7 +2,7 @@
 // Read once; the editor turns each cell format into CSS.
 import { kids, kid, attr, onOff } from './xml.js';
 import { INDEXED } from './theme.js';
-import { BUILTIN_FORMATS } from './format.js';
+import { builtinFormat } from './format.js';
 
 /** Excel's font when styles.xml is missing or has none: the body font of the theme, 11pt. */
 const FALLBACK_FONT = { name: 'Calibri', size: 11, scheme: 'minor', b: false, i: false, u: null, strike: false, color: null, vertAlign: null };
@@ -179,7 +179,7 @@ export const xfOf = (styles, s) => styles.cellXfs[s] || styles.cellXfs[0];
 /** The format code of cell format `s`: the workbook's own (numFmts), else a built-in one, else General. */
 export const formatCodeOf = (styles, s) => {
   const id = xfOf(styles, s).numFmtId;
-  return styles.numFmts[id] ?? BUILTIN_FORMATS[id] ?? 'General';
+  return styles.numFmts[id] ?? builtinFormat(id) ?? 'General';
 };
 /** The font of cell format `s`. */
 export const fontOfXf = (styles, s) => styles.fonts[xfOf(styles, s).fontId];

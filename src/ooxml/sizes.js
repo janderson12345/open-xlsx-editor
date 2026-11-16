@@ -5,15 +5,18 @@
 // it opens the file); AutoFit Column Width stores the width found, with bestFit.
 import { kids, kid, attr } from './xml.js';
 import { pxToColWidth, defaultColPx } from './units.js';
+import { colPad } from './digitwidth.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
 
-/** The maximum digit width of the Normal font in pixels (Calibri 11 and Aptos Narrow 11: 7, as units.js has it). */
+/** The maximum digit width of the Normal font in pixels when none is given (Calibri 11 and Aptos Narrow 11: 7; a
+ *  workbook's own is its `mdw`, digitwidth.js). */
 const MDW = 7;
 
-/** A width typed in characters as Excel stores it: whole pixels (the characters' width rounded, plus 5 of padding). */
-export const typedWidth = (chars) => pxToColWidth(Math.round(chars * MDW) + 5, MDW);
+/** A width typed in characters as Excel stores it: whole pixels (the characters' width rounded, plus the padding: 5
+ *  up to an mdw of 8, digitwidth.js colPad). */
+export const typedWidth = (chars, mdw = MDW) => pxToColWidth(Math.round(chars * mdw) + colPad(mdw), mdw);
 /** A width in pixels (a drag, an AutoFit) as Excel stores it. */
-export const pxWidth = (px) => pxToColWidth(px, MDW);
+export const pxWidth = (px, mdw = MDW) => pxToColWidth(px, mdw);
 
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
@@ -31,7 +34,8 @@ export function setColumns(doc, c0, c1, change, format = {}) {
     cols = make(doc, ns, 'cols');
     root.insertBefore(cols, kid(root, 'sheetData', ns));
   }
-  const defaultWidth = pxWidth(defaultColPx(format, MDW));
+  const mdw = format.mdw ?? MDW;
+  const defaultWidth = pxWidth(defaultColPx(format, mdw), mdw);
   const pieces = [];
   const piece = (el, min, max) => {
     const p = el.cloneNode(true);
@@ -174,8 +178,8 @@ export function setSheetFormat(doc, attrs) {
 /** Format > Default Width...: the width, typed in characters, of every column without one of its own, as Excel
  *  writes it (excel-sizes2.ps1): sheetFormatPr's defaultColWidth in whole pixels as a typed width (12: 12.7109375,
  *  4.5: 5.28515625); columns with their own width keep it. */
-export function setDefaultWidth(doc, chars) {
-  setSheetFormat(doc, { defaultColWidth: typedWidth(chars) });
+export function setDefaultWidth(doc, chars, mdw = MDW) {
+  setSheetFormat(doc, { defaultColWidth: typedWidth(chars, mdw) });
 }
 
 /** A row height given to the whole sheet (every row selected), as Excel writes it: sheetFormatPr's defaultRowHeight

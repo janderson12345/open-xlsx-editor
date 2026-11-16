@@ -5,7 +5,8 @@ import { fileType, setFileType } from './filetype.js';
 import { kids, kid, attr, serializeXml, NS } from './xml.js';
 import { readSharedStrings, richRunsXml } from './strings.js';
 import { readSheet, readCell } from './sheet.js';
-import { readStyles } from './styles.js';
+import { readStyles, fontFamily } from './styles.js';
+import { digitWidth } from './digitwidth.js';
 import { readTheme, resolveColor } from './theme.js';
 import { setCellXml, setFormulaXml, setStyleXml, setMergesXml, unshareXml } from './sheetedit.js';
 import { setDynamicXml, clearSpilledXml } from './spillxml.js';
@@ -127,9 +128,22 @@ export class Workbook {
     if (!this._parsed.has(info)) {
       if (info.kind !== 'worksheet' || !info.path || !this.pkg.has(info.path)) throw new Error(`sheet "${info.name}" is not a worksheet`);
       const doc = this.pkg.xml(info.path);
-      this._parsed.set(info, { doc, model: readSheet(doc, this.sharedStrings) });
+      this._parsed.set(info, { doc, model: this._withMdw(readSheet(doc, this.sharedStrings)) });
     }
     return this._parsed.get(info);
+  }
+
+  /** The maximum digit width of the Normal style's font in pixels (digitwidth.js), which column widths count in. */
+  get mdw() {
+    const font = this.styles.normal;
+    return font ? digitWidth(fontFamily(font, this.theme), font.size || 11) : 7;
+  }
+
+  /** A sheet model whose format carries the workbook's mdw (`format.mdw`, read when asked: the Normal style can
+   *  change), for everything that turns column widths into pixels from a sheet alone. */
+  _withMdw(model) {
+    Object.defineProperty(model.format, 'mdw', { get: () => this.mdw, enumerable: false, configurable: true });
+    return model;
   }
 
   /** The model of sheet i (see readSheet). */
@@ -293,7 +307,7 @@ export class Workbook {
   /** Format > Default Width... (`chars`), or a row height given to the whole sheet (`rowHeight`, points): sizes.js. */
   setSheetSizes(i, { defaultWidth = null, rowHeight = null }) {
     const part = this._part(i);
-    if (defaultWidth != null) setDefaultWidth(part.doc, defaultWidth);
+    if (defaultWidth != null) setDefaultWidth(part.doc, defaultWidth, this.mdw);
     if (rowHeight != null) setSheetRowHeight(part.doc, rowHeight);
     this._reread(i, part);
     this.resetCalc();
@@ -311,7 +325,7 @@ export class Workbook {
 
   /** Sheet i (its `part`) read again after its XML was changed, and marked changed. */
   _reread(i, part) {
-    this._parsed.set(this.sheets[i], { doc: part.doc, model: readSheet(part.doc, this.sharedStrings) });
+    this._parsed.set(this.sheets[i], { doc: part.doc, model: this._withMdw(readSheet(part.doc, this.sharedStrings)) });
     this.dirty.add(this.sheets[i].path);
     this.edited = true;
   }

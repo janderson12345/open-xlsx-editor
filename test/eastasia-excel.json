@@ -1,0 +1,6069 @@
+{
+  "excel": "Excel.Application (en-US Windows), Range.Text",
+  "ids": [
+    {
+      "id": 27,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 27,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 27,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 27,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 27,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 27,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 27,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 27,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 27,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 27,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 27,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 27,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 27,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 27,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 28,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 28,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 28,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 28,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 28,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 28,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 28,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 28,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 28,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 28,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 28,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 28,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 28,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 28,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 29,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 29,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 29,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 29,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 29,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 29,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 29,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 29,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 29,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 29,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 29,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 29,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 29,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 29,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 30,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 30,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 30,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 30,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 30,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 30,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 30,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 30,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 30,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 30,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 30,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 30,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 30,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 30,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 31,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 31,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 31,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 31,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 31,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 31,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 31,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 31,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 31,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 31,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 31,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 31,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 31,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 31,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 32,
+      "value": 45356.7549652778,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "18:07:09"
+    },
+    {
+      "id": 32,
+      "value": 43586.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 43585.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 32516.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 32515.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 9856.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 9855.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 4595.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 4594.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 4384.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 4383.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 61.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 32,
+      "value": 36526.25,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "6:00:00"
+    },
+    {
+      "id": 32,
+      "value": 0.5625,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "13:30:00"
+    },
+    {
+      "id": 33,
+      "value": 45356.7549652778,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "18:07:09"
+    },
+    {
+      "id": 33,
+      "value": 43586.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 43585.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 32516.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 32515.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 9856.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 9855.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 4595.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 4594.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 4384.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 4383.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 61.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 33,
+      "value": 36526.25,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "6:00:00"
+    },
+    {
+      "id": 33,
+      "value": 0.5625,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "13:30:00"
+    },
+    {
+      "id": 34,
+      "value": 45356.7549652778,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "18:07:09"
+    },
+    {
+      "id": 34,
+      "value": 43586.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 43585.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 32516.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 32515.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 9856.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 9855.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 4595.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 4594.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 4384.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 4383.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 61.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 34,
+      "value": 36526.25,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "6:00:00"
+    },
+    {
+      "id": 34,
+      "value": 0.5625,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "13:30:00"
+    },
+    {
+      "id": 35,
+      "value": 45356.7549652778,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "18:07:09"
+    },
+    {
+      "id": 35,
+      "value": 43586.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 43585.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 32516.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 32515.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 9856.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 9855.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 4595.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 4594.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 4384.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 4383.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 61.0,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "0:00:00"
+    },
+    {
+      "id": 35,
+      "value": 36526.25,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "6:00:00"
+    },
+    {
+      "id": 35,
+      "value": 0.5625,
+      "code": "h:mm:ss",
+      "local": "h:mm:ss",
+      "text": "13:30:00"
+    },
+    {
+      "id": 36,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 36,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 36,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 36,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 36,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 36,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 36,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 36,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 36,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 36,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 36,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 36,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 36,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 36,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 50,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 50,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 50,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 50,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 50,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 50,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 50,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 50,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 50,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 50,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 50,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 50,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 50,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 50,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 51,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 51,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 51,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 51,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 51,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 51,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 51,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 51,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 51,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 51,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 51,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 51,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 51,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 51,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 52,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 52,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 52,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 52,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 52,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 52,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 52,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 52,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 52,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 52,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 52,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 52,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 52,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 52,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 53,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 53,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 53,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 53,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 53,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 53,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 53,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 53,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 53,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 53,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 53,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 53,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 53,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 53,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 54,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 54,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 54,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 54,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 54,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 54,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 54,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 54,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 54,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 54,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 54,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 54,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 54,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 54,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 55,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 55,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 55,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 55,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 55,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 55,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 55,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 55,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 55,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 55,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 55,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 55,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 55,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 55,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 56,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 56,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 56,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 56,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 56,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 56,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 56,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 56,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 56,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 56,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 56,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 56,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 56,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 56,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 57,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 57,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 57,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 57,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 57,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 57,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 57,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 57,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 57,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 57,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 57,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 57,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 57,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 57,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    },
+    {
+      "id": 58,
+      "value": 45356.7549652778,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/5/2024"
+    },
+    {
+      "id": 58,
+      "value": 43586.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "5/1/2019"
+    },
+    {
+      "id": 58,
+      "value": 43585.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "4/30/2019"
+    },
+    {
+      "id": 58,
+      "value": 32516.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/8/1989"
+    },
+    {
+      "id": 58,
+      "value": 32515.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/7/1989"
+    },
+    {
+      "id": 58,
+      "value": 9856.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/25/1926"
+    },
+    {
+      "id": 58,
+      "value": 9855.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/24/1926"
+    },
+    {
+      "id": 58,
+      "value": 4595.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/30/1912"
+    },
+    {
+      "id": 58,
+      "value": 4594.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "7/29/1912"
+    },
+    {
+      "id": 58,
+      "value": 4384.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/1912"
+    },
+    {
+      "id": 58,
+      "value": 4383.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "12/31/1911"
+    },
+    {
+      "id": 58,
+      "value": 61.0,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "3/1/1900"
+    },
+    {
+      "id": 58,
+      "value": 36526.25,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/1/2000"
+    },
+    {
+      "id": 58,
+      "value": 0.5625,
+      "code": "m/d/yyyy",
+      "local": "m/d/yyyy",
+      "text": "1/0/1900"
+    }
+  ],
+  "codes": [
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 45356.7549652778,
+      "text": "R6.3.5"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 43586.0,
+      "text": "R1.5.1"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 43585.0,
+      "text": "H31.4.30"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 32516.0,
+      "text": "H1.1.8"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 32515.0,
+      "text": "S64.1.7"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 9856.0,
+      "text": "S1.12.25"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 9855.0,
+      "text": "T15.12.24"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 4595.0,
+      "text": "T1.7.30"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 4594.0,
+      "text": "M45.7.29"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 4384.0,
+      "text": "M45.1.1"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 4383.0,
+      "text": "M44.12.31"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 61.0,
+      "text": "M33.3.1"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 36526.25,
+      "text": "H12.1.1"
+    },
+    {
+      "code": "[$-411]ge.m.d",
+      "value": 0.5625,
+      "text": "M33.1.0"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "令和6年3月5日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "令和1年5月1日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "平成31年4月30日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "平成1年1月8日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "昭和64年1月7日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "昭和1年12月25日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "大正15年12月24日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "大正1年7月30日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "明治45年7月29日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "明治45年1月1日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "明治44年12月31日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "明治33年3月1日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "平成12年1月1日"
+    },
+    {
+      "code": "[$-411]ggge\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "明治33年1月0日"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 45356.7549652778,
+      "text": "3/5/24"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 43586.0,
+      "text": "5/1/19"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 43585.0,
+      "text": "4/30/19"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 32516.0,
+      "text": "1/8/89"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 32515.0,
+      "text": "1/7/89"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 9856.0,
+      "text": "12/25/26"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 9855.0,
+      "text": "12/24/26"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 4595.0,
+      "text": "7/30/12"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 4594.0,
+      "text": "7/29/12"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 4384.0,
+      "text": "1/1/12"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 4383.0,
+      "text": "12/31/11"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 61.0,
+      "text": "3/1/00"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 36526.25,
+      "text": "1/1/00"
+    },
+    {
+      "code": "m/d/yy",
+      "value": 0.5625,
+      "text": "1/0/00"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 45356.7549652778,
+      "text": "3/5/24"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 43586.0,
+      "text": "5/1/19"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 43585.0,
+      "text": "4/30/19"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 32516.0,
+      "text": "1/8/89"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 32515.0,
+      "text": "1/7/89"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 9856.0,
+      "text": "12/25/26"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 9855.0,
+      "text": "12/24/26"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 4595.0,
+      "text": "7/30/12"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 4594.0,
+      "text": "7/29/12"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 4384.0,
+      "text": "1/1/12"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 4383.0,
+      "text": "12/31/11"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 61.0,
+      "text": "3/1/00"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 36526.25,
+      "text": "1/1/00"
+    },
+    {
+      "code": "[$-411]m/d/yy",
+      "value": 0.5625,
+      "text": "1/0/00"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月5日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "2019年5月1日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "2019年4月30日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1989年1月8日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1989年1月7日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "1926年12月25日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "1926年12月24日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "1912年7月30日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "1912年7月29日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1912年1月1日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "1911年12月31日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "1900年3月1日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "2000年1月1日"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1900年1月0日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月5日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "2019年5月1日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "2019年4月30日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1989年1月8日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1989年1月7日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "1926年12月25日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "1926年12月24日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "1912年7月30日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "1912年7月29日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1912年1月1日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "1911年12月31日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "1900年3月1日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "2000年1月1日"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1900年1月0日"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "18時07分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 43586.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 43585.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 32516.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 32515.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 9856.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 9855.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 4595.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 4594.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 4384.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 4383.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 61.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 36526.25,
+      "text": "6時00分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"",
+      "value": 0.5625,
+      "text": "13時30分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "18時07分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 43586.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 43585.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 32516.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 32515.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 9856.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 9855.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 4595.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 4594.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 4384.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 4383.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 61.0,
+      "text": "0時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 36526.25,
+      "text": "6時00分"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"",
+      "value": 0.5625,
+      "text": "13時30分"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "18時07分09秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "6時00分00秒"
+    },
+    {
+      "code": "h\"時\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "13時30分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "18時07分09秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "0時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "6時00分00秒"
+    },
+    {
+      "code": "[$-411]h\"時\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "13時30分00秒"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 43586.0,
+      "text": "2019年5月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 43585.0,
+      "text": "2019年4月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 32516.0,
+      "text": "1989年1月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 32515.0,
+      "text": "1989年1月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 9856.0,
+      "text": "1926年12月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 9855.0,
+      "text": "1926年12月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 4595.0,
+      "text": "1912年7月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 4594.0,
+      "text": "1912年7月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 4384.0,
+      "text": "1912年1月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 4383.0,
+      "text": "1911年12月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 61.0,
+      "text": "1900年3月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 36526.25,
+      "text": "2000年1月"
+    },
+    {
+      "code": "yyyy\"年\"m\"月\"",
+      "value": 0.5625,
+      "text": "1900年1月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 43586.0,
+      "text": "2019年5月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 43585.0,
+      "text": "2019年4月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 32516.0,
+      "text": "1989年1月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 32515.0,
+      "text": "1989年1月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 9856.0,
+      "text": "1926年12月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 9855.0,
+      "text": "1926年12月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 4595.0,
+      "text": "1912年7月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 4594.0,
+      "text": "1912年7月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 4384.0,
+      "text": "1912年1月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 4383.0,
+      "text": "1911年12月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 61.0,
+      "text": "1900年3月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 36526.25,
+      "text": "2000年1月"
+    },
+    {
+      "code": "[$-411]yyyy\"年\"m\"月\"",
+      "value": 0.5625,
+      "text": "1900年1月"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "3月5日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "5月1日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "4月30日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1月8日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1月7日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "12月25日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "12月24日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "7月30日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "7月29日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1月1日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "12月31日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "3月1日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "1月1日"
+    },
+    {
+      "code": "m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1月0日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "3月5日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "5月1日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "4月30日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1月8日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1月7日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "12月25日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "12月24日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "7月30日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "7月29日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1月1日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "12月31日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "3月1日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "1月1日"
+    },
+    {
+      "code": "[$-411]m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1月0日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 43586.0,
+      "text": "2019年5月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 43585.0,
+      "text": "2019年4月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 32516.0,
+      "text": "1989年1月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 32515.0,
+      "text": "1989年1月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 9856.0,
+      "text": "1926年12月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 9855.0,
+      "text": "1926年12月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 4595.0,
+      "text": "1912年7月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 4594.0,
+      "text": "1912年7月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 4384.0,
+      "text": "1912年1月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 4383.0,
+      "text": "1911年12月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 61.0,
+      "text": "1900年3月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 36526.25,
+      "text": "2000年1月"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"",
+      "value": 0.5625,
+      "text": "1900年1月"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "3月5日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "5月1日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "4月30日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1月8日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1月7日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "12月25日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "12月24日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "7月30日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "7月29日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1月1日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "12月31日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "3月1日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "1月1日"
+    },
+    {
+      "code": "[$-804]m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1月0日"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 45356.7549652778,
+      "text": "3-5-24"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 43586.0,
+      "text": "5-1-19"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 43585.0,
+      "text": "4-30-19"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 32516.0,
+      "text": "1-8-89"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 32515.0,
+      "text": "1-7-89"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 9856.0,
+      "text": "12-25-26"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 9855.0,
+      "text": "12-24-26"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 4595.0,
+      "text": "7-30-12"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 4594.0,
+      "text": "7-29-12"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 4384.0,
+      "text": "1-1-12"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 4383.0,
+      "text": "12-31-11"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 61.0,
+      "text": "3-1-00"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 36526.25,
+      "text": "1-1-00"
+    },
+    {
+      "code": "m-d-yy",
+      "value": 0.5625,
+      "text": "1-0-00"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 45356.7549652778,
+      "text": "3-5-24"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 43586.0,
+      "text": "5-1-19"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 43585.0,
+      "text": "4-30-19"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 32516.0,
+      "text": "1-8-89"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 32515.0,
+      "text": "1-7-89"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 9856.0,
+      "text": "12-25-26"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 9855.0,
+      "text": "12-24-26"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 4595.0,
+      "text": "7-30-12"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 4594.0,
+      "text": "7-29-12"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 4384.0,
+      "text": "1-1-12"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 4383.0,
+      "text": "12-31-11"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 61.0,
+      "text": "3-1-00"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 36526.25,
+      "text": "1-1-00"
+    },
+    {
+      "code": "[$-804]m-d-yy",
+      "value": 0.5625,
+      "text": "1-0-00"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月5日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "2019年5月1日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "2019年4月30日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1989年1月8日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1989年1月7日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "1926年12月25日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "1926年12月24日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "1912年7月30日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "1912年7月29日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1912年1月1日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "1911年12月31日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "1900年3月1日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "2000年1月1日"
+    },
+    {
+      "code": "[$-804]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1900年1月0日"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "18时07分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 43586.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 43585.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 32516.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 32515.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 9856.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 9855.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 4595.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 4594.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 4384.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 4383.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 61.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 36526.25,
+      "text": "6时00分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"",
+      "value": 0.5625,
+      "text": "13时30分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "18时07分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 43586.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 43585.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 32516.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 32515.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 9856.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 9855.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 4595.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 4594.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 4384.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 4383.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 61.0,
+      "text": "0时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 36526.25,
+      "text": "6时00分"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"",
+      "value": 0.5625,
+      "text": "13时30分"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "18时07分09秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "6时00分00秒"
+    },
+    {
+      "code": "h\"时\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "13时30分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "18时07分09秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "0时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "6时00分00秒"
+    },
+    {
+      "code": "[$-804]h\"时\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "13时30分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "下午6时07分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 43586.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 43585.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 32516.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 32515.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 9856.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 9855.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 4595.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 4594.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 4384.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 4383.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 61.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 36526.25,
+      "text": "上午6时00分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"",
+      "value": 0.5625,
+      "text": "下午1时30分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "下午6时07分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 43586.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 43585.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 32516.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 32515.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 9856.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 9855.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 4595.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 4594.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 4384.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 4383.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 61.0,
+      "text": "上午12时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 36526.25,
+      "text": "上午6时00分"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"",
+      "value": 0.5625,
+      "text": "下午1时30分"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "下午6时07分09秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "上午6时00分00秒"
+    },
+    {
+      "code": "上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "下午1时30分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "下午6时07分09秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "上午12时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "上午6时00分00秒"
+    },
+    {
+      "code": "[$-804]上午/下午h\"时\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "下午1时30分00秒"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 45356.7549652778,
+      "text": "2024/3/5"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 43586.0,
+      "text": "2019/5/1"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 43585.0,
+      "text": "2019/4/30"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 32516.0,
+      "text": "1989/1/8"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 32515.0,
+      "text": "1989/1/7"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 9856.0,
+      "text": "1926/12/25"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 9855.0,
+      "text": "1926/12/24"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 4595.0,
+      "text": "1912/7/30"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 4594.0,
+      "text": "1912/7/29"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 4384.0,
+      "text": "1912/1/1"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 4383.0,
+      "text": "1911/12/31"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 61.0,
+      "text": "1900/3/1"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 36526.25,
+      "text": "2000/1/1"
+    },
+    {
+      "code": "[$-404]e/m/d",
+      "value": 0.5625,
+      "text": "1900/1/0"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月5日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "2019年5月1日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "2019年4月30日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1989年1月8日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1989年1月7日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "1926年12月25日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "1926年12月24日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "1912年7月30日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "1912年7月29日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1912年1月1日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "1911年12月31日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "1900年3月1日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "2000年1月1日"
+    },
+    {
+      "code": "[$-404]e\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1900年1月0日"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 45356.7549652778,
+      "text": "3/5/24"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 43586.0,
+      "text": "5/1/19"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 43585.0,
+      "text": "4/30/19"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 32516.0,
+      "text": "1/8/89"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 32515.0,
+      "text": "1/7/89"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 9856.0,
+      "text": "12/25/26"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 9855.0,
+      "text": "12/24/26"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 4595.0,
+      "text": "7/30/12"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 4594.0,
+      "text": "7/29/12"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 4384.0,
+      "text": "1/1/12"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 4383.0,
+      "text": "12/31/11"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 61.0,
+      "text": "3/1/00"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 36526.25,
+      "text": "1/1/00"
+    },
+    {
+      "code": "[$-404]m/d/yy",
+      "value": 0.5625,
+      "text": "1/0/00"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年3月5日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "2019年5月1日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "2019年4月30日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "1989年1月8日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "1989年1月7日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "1926年12月25日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "1926年12月24日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "1912年7月30日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "1912年7月29日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "1912年1月1日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "1911年12月31日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "1900年3月1日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "2000年1月1日"
+    },
+    {
+      "code": "[$-404]yyyy\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "1900年1月0日"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "18時07分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 43586.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 43585.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 32516.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 32515.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 9856.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 9855.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 4595.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 4594.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 4384.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 4383.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 61.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 36526.25,
+      "text": "06時00分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"",
+      "value": 0.5625,
+      "text": "13時30分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "18時07分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 43586.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 43585.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 32516.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 32515.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 9856.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 9855.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 4595.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 4594.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 4384.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 4383.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 61.0,
+      "text": "00時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 36526.25,
+      "text": "06時00分"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"",
+      "value": 0.5625,
+      "text": "13時30分"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "18時07分09秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "06時00分00秒"
+    },
+    {
+      "code": "hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "13時30分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "18時07分09秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "00時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "06時00分00秒"
+    },
+    {
+      "code": "[$-404]hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "13時30分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "下午06時07分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 43586.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 43585.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 32516.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 32515.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 9856.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 9855.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 4595.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 4594.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 4384.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 4383.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 61.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 36526.25,
+      "text": "上午06時00分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"",
+      "value": 0.5625,
+      "text": "下午01時30分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 45356.7549652778,
+      "text": "下午06時07分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 43586.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 43585.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 32516.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 32515.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 9856.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 9855.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 4595.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 4594.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 4384.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 4383.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 61.0,
+      "text": "上午12時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 36526.25,
+      "text": "上午06時00分"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"",
+      "value": 0.5625,
+      "text": "下午01時30分"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "下午06時07分09秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "上午06時00分00秒"
+    },
+    {
+      "code": "上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "下午01時30分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 45356.7549652778,
+      "text": "下午06時07分09秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43586.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 43585.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32516.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 32515.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9856.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 9855.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4595.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4594.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4384.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 4383.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 61.0,
+      "text": "上午12時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 36526.25,
+      "text": "上午06時00分00秒"
+    },
+    {
+      "code": "[$-404]上午/下午hh\"時\"mm\"分\"ss\"秒\"",
+      "value": 0.5625,
+      "text": "下午01時30分00秒"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年 03月 05日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 43586.0,
+      "text": "2019年 05月 01日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 43585.0,
+      "text": "2019年 04月 30日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 32516.0,
+      "text": "1989年 01月 08日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 32515.0,
+      "text": "1989年 01月 07日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 9856.0,
+      "text": "1926年 12月 25日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 9855.0,
+      "text": "1926年 12月 24日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4595.0,
+      "text": "1912年 07月 30日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4594.0,
+      "text": "1912年 07月 29日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4384.0,
+      "text": "1912年 01月 01日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4383.0,
+      "text": "1911年 12月 31日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 61.0,
+      "text": "1900年 03月 01日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 36526.25,
+      "text": "2000年 01月 01日"
+    },
+    {
+      "code": "yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 0.5625,
+      "text": "1900年 01月 00日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 45356.7549652778,
+      "text": "2024年 03月 05日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 43586.0,
+      "text": "2019年 05月 01日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 43585.0,
+      "text": "2019年 04月 30日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 32516.0,
+      "text": "1989年 01月 08日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 32515.0,
+      "text": "1989年 01月 07日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 9856.0,
+      "text": "1926年 12月 25日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 9855.0,
+      "text": "1926年 12月 24日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4595.0,
+      "text": "1912年 07月 30日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4594.0,
+      "text": "1912年 07月 29日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4384.0,
+      "text": "1912年 01月 01日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 4383.0,
+      "text": "1911年 12月 31日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 61.0,
+      "text": "1900年 03月 01日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 36526.25,
+      "text": "2000年 01月 01日"
+    },
+    {
+      "code": "[$-412]yyyy\"年\" mm\"月\" dd\"日\"",
+      "value": 0.5625,
+      "text": "1900年 01月 00日"
+    },
+    {
+      "code": "mm-dd",
+      "value": 45356.7549652778,
+      "text": "03-05"
+    },
+    {
+      "code": "mm-dd",
+      "value": 43586.0,
+      "text": "05-01"
+    },
+    {
+      "code": "mm-dd",
+      "value": 43585.0,
+      "text": "04-30"
+    },
+    {
+      "code": "mm-dd",
+      "value": 32516.0,
+      "text": "01-08"
+    },
+    {
+      "code": "mm-dd",
+      "value": 32515.0,
+      "text": "01-07"
+    },
+    {
+      "code": "mm-dd",
+      "value": 9856.0,
+      "text": "12-25"
+    },
+    {
+      "code": "mm-dd",
+      "value": 9855.0,
+      "text": "12-24"
+    },
+    {
+      "code": "mm-dd",
+      "value": 4595.0,
+      "text": "07-30"
+    },
+    {
+      "code": "mm-dd",
+      "value": 4594.0,
+      "text": "07-29"
+    },
+    {
+      "code": "mm-dd",
+      "value": 4384.0,
+      "text": "01-01"
+    },
+    {
+      "code": "mm-dd",
+      "value": 4383.0,
+      "text": "12-31"
+    },
+    {
+      "code": "mm-dd",
+      "value": 61.0,
+      "text": "03-01"
+    },
+    {
+      "code": "mm-dd",
+      "value": 36526.25,
+      "text": "01-01"
+    },
+    {
+      "code": "mm-dd",
+      "value": 0.5625,
+      "text": "01-00"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 45356.7549652778,
+      "text": "03-05"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 43586.0,
+      "text": "05-01"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 43585.0,
+      "text": "04-30"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 32516.0,
+      "text": "01-08"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 32515.0,
+      "text": "01-07"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 9856.0,
+      "text": "12-25"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 9855.0,
+      "text": "12-24"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 4595.0,
+      "text": "07-30"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 4594.0,
+      "text": "07-29"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 4384.0,
+      "text": "01-01"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 4383.0,
+      "text": "12-31"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 61.0,
+      "text": "03-01"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 36526.25,
+      "text": "01-01"
+    },
+    {
+      "code": "[$-412]mm-dd",
+      "value": 0.5625,
+      "text": "01-00"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 45356.7549652778,
+      "text": "03-05-24"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 43586.0,
+      "text": "05-01-19"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 43585.0,
+      "text": "04-30-19"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 32516.0,
+      "text": "01-08-89"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 32515.0,
+      "text": "01-07-89"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 9856.0,
+      "text": "12-25-26"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 9855.0,
+      "text": "12-24-26"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 4595.0,
+      "text": "07-30-12"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 4594.0,
+      "text": "07-29-12"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 4384.0,
+      "text": "01-01-12"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 4383.0,
+      "text": "12-31-11"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 61.0,
+      "text": "03-01-00"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 36526.25,
+      "text": "01-01-00"
+    },
+    {
+      "code": "mm-dd-yy",
+      "value": 0.5625,
+      "text": "01-00-00"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 45356.7549652778,
+      "text": "03-05-24"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 43586.0,
+      "text": "05-01-19"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 43585.0,
+      "text": "04-30-19"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 32516.0,
+      "text": "01-08-89"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 32515.0,
+      "text": "01-07-89"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 9856.0,
+      "text": "12-25-26"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 9855.0,
+      "text": "12-24-26"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 4595.0,
+      "text": "07-30-12"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 4594.0,
+      "text": "07-29-12"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 4384.0,
+      "text": "01-01-12"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 4383.0,
+      "text": "12-31-11"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 61.0,
+      "text": "03-01-00"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 36526.25,
+      "text": "01-01-00"
+    },
+    {
+      "code": "[$-412]mm-dd-yy",
+      "value": 0.5625,
+      "text": "01-00-00"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 45356.7549652778,
+      "text": "2024년 03월 05일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 43586.0,
+      "text": "2019년 05월 01일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 43585.0,
+      "text": "2019년 04월 30일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 32516.0,
+      "text": "1989년 01월 08일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 32515.0,
+      "text": "1989년 01월 07일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 9856.0,
+      "text": "1926년 12월 25일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 9855.0,
+      "text": "1926년 12월 24일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4595.0,
+      "text": "1912년 07월 30일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4594.0,
+      "text": "1912년 07월 29일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4384.0,
+      "text": "1912년 01월 01일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4383.0,
+      "text": "1911년 12월 31일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 61.0,
+      "text": "1900년 03월 01일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 36526.25,
+      "text": "2000년 01월 01일"
+    },
+    {
+      "code": "yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 0.5625,
+      "text": "1900년 01월 00일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 45356.7549652778,
+      "text": "2024년 03월 05일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 43586.0,
+      "text": "2019년 05월 01일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 43585.0,
+      "text": "2019년 04월 30일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 32516.0,
+      "text": "1989년 01월 08일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 32515.0,
+      "text": "1989년 01월 07일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 9856.0,
+      "text": "1926년 12월 25일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 9855.0,
+      "text": "1926년 12월 24일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4595.0,
+      "text": "1912년 07월 30일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4594.0,
+      "text": "1912년 07월 29일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4384.0,
+      "text": "1912년 01월 01일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 4383.0,
+      "text": "1911년 12월 31일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 61.0,
+      "text": "1900년 03월 01일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 36526.25,
+      "text": "2000년 01월 01일"
+    },
+    {
+      "code": "[$-412]yyyy\"년\" mm\"월\" dd\"일\"",
+      "value": 0.5625,
+      "text": "1900년 01월 00일"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 45356.7549652778,
+      "text": "18시 07분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 43586.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 43585.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 32516.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 32515.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 9856.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 9855.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 4595.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 4594.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 4384.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 4383.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 61.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 36526.25,
+      "text": "6시 00분"
+    },
+    {
+      "code": "h\"시\" mm\"분\"",
+      "value": 0.5625,
+      "text": "13시 30분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 45356.7549652778,
+      "text": "18시 07분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 43586.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 43585.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 32516.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 32515.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 9856.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 9855.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 4595.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 4594.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 4384.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 4383.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 61.0,
+      "text": "0시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 36526.25,
+      "text": "6시 00분"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\"",
+      "value": 0.5625,
+      "text": "13시 30분"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 45356.7549652778,
+      "text": "18시 07분 09초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 43586.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 43585.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 32516.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 32515.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 9856.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 9855.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 4595.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 4594.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 4384.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 4383.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 61.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 36526.25,
+      "text": "6시 00분 00초"
+    },
+    {
+      "code": "h\"시\" mm\"분\" ss\"초\"",
+      "value": 0.5625,
+      "text": "13시 30분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 45356.7549652778,
+      "text": "18시 07분 09초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 43586.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 43585.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 32516.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 32515.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 9856.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 9855.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 4595.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 4594.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 4384.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 4383.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 61.0,
+      "text": "0시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 36526.25,
+      "text": "6시 00분 00초"
+    },
+    {
+      "code": "[$-412]h\"시\" mm\"분\" ss\"초\"",
+      "value": 0.5625,
+      "text": "13시 30분 00초"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 45356.7549652778,
+      "text": "2024-03-05"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 43586.0,
+      "text": "2019-05-01"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 43585.0,
+      "text": "2019-04-30"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 32516.0,
+      "text": "1989-01-08"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 32515.0,
+      "text": "1989-01-07"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 9856.0,
+      "text": "1926-12-25"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 9855.0,
+      "text": "1926-12-24"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 4595.0,
+      "text": "1912-07-30"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 4594.0,
+      "text": "1912-07-29"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 4384.0,
+      "text": "1912-01-01"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 4383.0,
+      "text": "1911-12-31"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 61.0,
+      "text": "1900-03-01"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 36526.25,
+      "text": "2000-01-01"
+    },
+    {
+      "code": "yyyy-mm-dd",
+      "value": 0.5625,
+      "text": "1900-01-00"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 45356.7549652778,
+      "text": "2024-03-05"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 43586.0,
+      "text": "2019-05-01"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 43585.0,
+      "text": "2019-04-30"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 32516.0,
+      "text": "1989-01-08"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 32515.0,
+      "text": "1989-01-07"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 9856.0,
+      "text": "1926-12-25"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 9855.0,
+      "text": "1926-12-24"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 4595.0,
+      "text": "1912-07-30"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 4594.0,
+      "text": "1912-07-29"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 4384.0,
+      "text": "1912-01-01"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 4383.0,
+      "text": "1911-12-31"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 61.0,
+      "text": "1900-03-01"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 36526.25,
+      "text": "2000-01-01"
+    },
+    {
+      "code": "[$-412]yyyy-mm-dd",
+      "value": 0.5625,
+      "text": "1900-01-00"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 45356.7549652778,
+      "text": "令和6年3月5日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 43586.0,
+      "text": "令和元年5月1日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 43585.0,
+      "text": "平成31年4月30日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 32516.0,
+      "text": "平成元年1月8日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 32515.0,
+      "text": "昭和64年1月7日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 9856.0,
+      "text": "昭和元年12月25日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 9855.0,
+      "text": "大正15年12月24日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4595.0,
+      "text": "大正元年7月30日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4594.0,
+      "text": "明治45年7月29日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4384.0,
+      "text": "明治45年1月1日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 4383.0,
+      "text": "明治44年12月31日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 61.0,
+      "text": "明治33年3月1日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 36526.25,
+      "text": "平成12年1月1日"
+    },
+    {
+      "code": "[$-ja-JP-x-gannen]ggge\"年\"m\"月\"d\"日\"",
+      "value": 0.5625,
+      "text": "明治33年1月0日"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 45356.7549652778,
+      "text": "令6.3.5"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 43586.0,
+      "text": "令1.5.1"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 43585.0,
+      "text": "平31.4.30"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 32516.0,
+      "text": "平1.1.8"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 32515.0,
+      "text": "昭64.1.7"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 9856.0,
+      "text": "昭1.12.25"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 9855.0,
+      "text": "大15.12.24"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 4595.0,
+      "text": "大1.7.30"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 4594.0,
+      "text": "明45.7.29"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 4384.0,
+      "text": "明45.1.1"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 4383.0,
+      "text": "明44.12.31"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 61.0,
+      "text": "明33.3.1"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 36526.25,
+      "text": "平12.1.1"
+    },
+    {
+      "code": "[$-411]gge.m.d",
+      "value": 0.5625,
+      "text": "明33.1.0"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 45356.7549652778,
+      "text": "令和6.3.5"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 43586.0,
+      "text": "令和1.5.1"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 43585.0,
+      "text": "平成31.4.30"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 32516.0,
+      "text": "平成1.1.8"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 32515.0,
+      "text": "昭和64.1.7"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 9856.0,
+      "text": "昭和1.12.25"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 9855.0,
+      "text": "大正15.12.24"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 4595.0,
+      "text": "大正1.7.30"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 4594.0,
+      "text": "明治45.7.29"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 4384.0,
+      "text": "明治45.1.1"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 4383.0,
+      "text": "明治44.12.31"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 61.0,
+      "text": "明治33.3.1"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 36526.25,
+      "text": "平成12.1.1"
+    },
+    {
+      "code": "[$-411]ggge.m.d",
+      "value": 0.5625,
+      "text": "明治33.1.0"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 45356.7549652778,
+      "text": "06"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 43586.0,
+      "text": "01"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 43585.0,
+      "text": "31"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 32516.0,
+      "text": "01"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 32515.0,
+      "text": "64"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 9856.0,
+      "text": "01"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 9855.0,
+      "text": "15"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 4595.0,
+      "text": "01"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 4594.0,
+      "text": "45"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 4384.0,
+      "text": "45"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 4383.0,
+      "text": "44"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 61.0,
+      "text": "33"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 36526.25,
+      "text": "12"
+    },
+    {
+      "code": "[$-411]ee",
+      "value": 0.5625,
+      "text": "33"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 45356.7549652778,
+      "text": "2024"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 43586.0,
+      "text": "2019"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 43585.0,
+      "text": "2019"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 32516.0,
+      "text": "1989"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 32515.0,
+      "text": "1989"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 9856.0,
+      "text": "1926"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 9855.0,
+      "text": "1926"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 4595.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 4594.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 4384.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 4383.0,
+      "text": "1911"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 61.0,
+      "text": "1900"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 36526.25,
+      "text": "2000"
+    },
+    {
+      "code": "[$-404]ee",
+      "value": 0.5625,
+      "text": "1900"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 45356.7549652778,
+      "text": "2024"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 43586.0,
+      "text": "2019"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 43585.0,
+      "text": "2019"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 32516.0,
+      "text": "1989"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 32515.0,
+      "text": "1989"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 9856.0,
+      "text": "1926"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 9855.0,
+      "text": "1926"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 4595.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 4594.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 4384.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 4383.0,
+      "text": "1911"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 61.0,
+      "text": "1900"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 36526.25,
+      "text": "2000"
+    },
+    {
+      "code": "[$-404]gge",
+      "value": 0.5625,
+      "text": "1900"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 45356.7549652778,
+      "text": "2024"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 43586.0,
+      "text": "2019"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 43585.0,
+      "text": "2019"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 32516.0,
+      "text": "1989"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 32515.0,
+      "text": "1989"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 9856.0,
+      "text": "1926"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 9855.0,
+      "text": "1926"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 4595.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 4594.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 4384.0,
+      "text": "1912"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 4383.0,
+      "text": "1911"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 61.0,
+      "text": "1900"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 36526.25,
+      "text": "2000"
+    },
+    {
+      "code": "[$-411]yyyy",
+      "value": 0.5625,
+      "text": "1900"
+    }
+  ]
+}

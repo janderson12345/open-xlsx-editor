@@ -76,7 +76,8 @@ function sizes(sheet) {
   const colPx = (c) => {
     const col = sheet.cols.find((x) => c >= x.min && c <= x.max);
     if (col?.hidden) return 0;
-    return col?.width != null ? colWidthToPx(col.width, MDW) : defaultColPx(sheet.format, MDW);
+    const mdw = sheet.format?.mdw ?? MDW;
+    return col?.width != null ? colWidthToPx(col.width, mdw) : defaultColPx(sheet.format, mdw);
   };
   const rowPx = (r) => {
     const info = sheet.rows.get(r);

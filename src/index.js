@@ -40,6 +40,7 @@ import { insertTab } from './editor/inserttab.js';
 import { sparklineTab } from './editor/sparklinetab.js';
 import { tableTab } from './editor/tabletab.js';
 import { formulasTab } from './editor/formulastab.js';
+import { useBrowserDigits } from './editor/digitmeasure.js';
 import { calcMode, calculateBeforeSave } from './ooxml/calcmode.js';
 import { fontFamily, formatCodeOf } from './ooxml/styles.js';
 import { resolveColor } from './ooxml/theme.js';
@@ -88,6 +89,7 @@ export { OMF_VERSION } from './editor/omf.js';
  *   onChange?: () => void, onLink?: (url: string) => void, fonts?: { omf?: string } }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
+  useBrowserDigits();
   const root = document.createElement('div');
   root.className = 'oxe-root';
   // (The metric twins from the site's own copy of open-metric-fonts, omffonts.js; its folder kept for exportPdf.)
@@ -330,7 +332,7 @@ export function mountXlsxEditor(host, options = {}) {
     else window.open(to.url, '_blank', 'noopener,noreferrer');
   };
   // (Text Import, Save As and the locale: editor/files.js.)
-  const files = createFiles({ root, state, options, editing, api: () => api });
+  const files = createFiles({ root, state, options, editing, restyled, api: () => api });
   const { act, lines, askInvalid, showValidation, listMenu, openFilter, filterMenu, cellMenu, chartMenu, headerMenu } = createActs({ root, state, options, at, editing, menu, sheetActs, allowed, followLink, files });
   const api = {
     /** Open a workbook (or a .csv, by its `fileName`) and show the sheet it opens on (its active tab, or the first

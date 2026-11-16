@@ -5,7 +5,7 @@ import { styleBox } from './stylebox.js';
 import { formatCellsBox } from './formatbox.js';
 import { messageBox } from './dialogs.js';
 import { fontFamily, xfOf } from '../ooxml/styles.js';
-import { BUILTIN_FORMATS } from '../ooxml/format.js';
+import { builtinFormat } from '../ooxml/format.js';
 import { styleInfo, styleNameRefusal } from '../ooxml/cellstyledefine.js';
 import { namedStyle } from '../ooxml/cellstyleedit.js';
 import { formatsOf } from '../ooxml/stylesedit.js';
@@ -23,7 +23,7 @@ export function createStyleActs(env, fontNames) {
   const lookOf = (xf, change) => {
     const wb = state.workbook;
     const font = { ...wb.styles.fonts[xf.fontId], ...(change?.font || {}) };
-    const code = change?.numFmt ?? wb.styles.numFmts[xf.numFmtId] ?? BUILTIN_FORMATS[xf.numFmtId] ?? 'General';
+    const code = change?.numFmt ?? wb.styles.numFmts[xf.numFmtId] ?? builtinFormat(xf.numFmtId) ?? 'General';
     return { xf: { ...xf, align: { ...xf.align, ...(change?.align || {}) }, protection: { ...xf.protection, ...(change?.protection || {}) } }, font, fontName: font.name && !change?.font?.name ? fontFamily(font, wb.theme) : font.name,
       fontNames: [...new Set([wb.theme.fonts.minor, wb.theme.fonts.major, ...fontNames])], fill: wb.styles.fills[xf.fillId], border: wb.styles.borders[xf.borderId],
       code, cell: null, date1904: wb.date1904, many: false, color: (c) => state.looks?.color(c) };

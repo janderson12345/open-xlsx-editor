@@ -196,3 +196,21 @@ character's font back: which run's font the new text takes (docs/FORMATS.md, Ric
 
 Real workbooks are kept out of the repository (`..\samples`), and referred to by label (`sample X014`), never by
 name. The generated fixtures in `test/fixtures` can be used freely.
+
+## Display rules: East Asian dates, digit widths, gridlines under running-on text
+
+```powershell
+node tools/excel-compare/eastasia-book.mjs <ids.xlsx>
+pwsh tools/excel-compare/excel-eastasia.ps1 <ids.xlsx> <codes.json> <out.json>
+pwsh tools/excel-compare/excel-digitwidth.ps1 <out.json> [folder for the saved books]
+pwsh tools/excel-compare/excel-runover.ps1 <folder>
+node tools/excel-compare/shapes.cjs <folder> <folder>/shapes
+```
+
+`excel-eastasia.ps1` reads Range.Text of the built-in ids 27-36 and 50-58 given only by id, and of every locale's
+code (`codes.json`: `{ ids, values, codes: [{ code }] }`, from `src/ooxml/eastasia.js`): `test/eastasia-excel.json`.
+`excel-digitwidth.ps1` gives a new workbook's Normal style 41 fonts and sizes and reads its column widths in points (and
+the saved `<col>` widths): `test/digitwidth-excel.json`. `excel-runover.ps1` exports a sheet of text running on with
+Gridlines: Print to PDF; `shapes.cjs` gives its gridline segments: `test/runover-excel.json` and the workbook itself,
+`test/runover-excel.xlsx`. Each opens an invisible Excel with macros off, changes no Excel setting and sends no keys
+(docs/LAYOUT.md).

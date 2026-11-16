@@ -6,7 +6,8 @@ import { cellDisplay } from '../ooxml/numfmt.js';
 import { editText } from '../ooxml/input.js';
 import { ERROR_TEXT } from '../ooxml/errorcheck.js';
 import { colChars } from '../ooxml/units.js';
-import { MDW } from './geometry.js';
+import { mdwOf } from './geometry.js';
+import { colPad } from '../ooxml/digitwidth.js';
 import { wrapLines } from './rowheights.js';
 import { setVars, div } from './dom.js';
 import { iconElement } from './cficons.js';
@@ -45,6 +46,58 @@ function runOn(st, r, c, line, win) {
   return [begin, end];
 }
 
+/** The canvas run-on text is measured with (runGaps). */
+let gapCtx = null;
+/** The width of `text` in a cell format's font (the browser's measure; 0 without a canvas). */
+function textWidth(look, text) {
+  if (typeof document === 'undefined') return 0;
+  if (!gapCtx) gapCtx = document.createElement('canvas').getContext('2d');
+  if (!gapCtx) return 0;
+  gapCtx.font = look ? look.font.css : '14.6667px sans-serif';
+  return gapCtx.measureText(text).width;
+}
+
+/** Text running on over empty cells hides the gridlines it crosses, as Excel's does (its PDF with Gridlines: Print,
+ *  excel-runover.ps1: left text the lines to its right, right text to its left, centred both ways, only as far as the
+ *  text reaches: nine zeros cross an 8.43 column's edge, eight don't). Noted in `st.gaps` (row: set of columns k whose
+ *  left edge's gridline is hidden) for drawGridlines and print's gridlines. The text spans `tw` pixels in its own cell
+ *  (x0, w0), set `h`, `indent` pixels in. */
+function runGaps(st, r, begin, end, h, x0, w0, tw, indent) {
+  if (!tw) return;
+  const pad = st.print ? { l: 3.2, r: 1.9 } : { l: 2, r: 2 };
+  let a;
+  let b;
+  if (h === 'left') { a = x0 + pad.l + indent; b = a + tw; }
+  else if (h === 'right') { b = x0 + w0 - pad.r - indent; a = b - tw; }
+  else { a = x0 + w0 / 2 - tw / 2; b = a + tw; }
+  let set = null;
+  for (let k = begin + 1; k < end; k++) {
+    // (On screen a gridline is the last pixel of the column before; printed, a hairline on the edge.)
+    const line = st.cols.start(k) - (st.print ? 0 : 1);
+    if (a < line + (st.print ? 0 : 1) && b > line) {
+      if (!set) set = st.gaps.get(r) || new Set();
+      set.add(k);
+    }
+  }
+  if (set) st.gaps.set(r, set);
+}
+
+/** Rows r0..r1 of a column edge's gridline as segments [y, height] (`top` its start), the rows `hidden(r)` says text
+ *  runs over left out; on screen (`keep` 1) a row's bottom pixel is kept, where the row's own gridline crosses it. */
+export function lineSegments(rows, r0, r1, hidden, top = rows.start(r0), keep = 1) {
+  const out = [];
+  let from = top;
+  for (let r = r0; r <= r1; r++) {
+    if (!hidden(r) || !rows.size(r)) continue;
+    const y = rows.start(r);
+    if (y > from) out.push([from, y - from]);
+    from = rows.start(r + 1) - keep;
+  }
+  const end = rows.start(r1 + 1);
+  if (end > from) out.push([from, end - from]);
+  return out;
+}
+
 /** One cell's element: its text in an inner span (which carries the line height and the baseline shifts), placed by
  *  the cell format's alignment and indent; text runs on over empty neighbours (left text to the right, right text to
  *  the left, centred text both ways, as far as the nearer side allows), wrapped text and numbers never do. */
@@ -65,7 +118,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const held = formulas ? (cell.f != null && st.hiddenAt?.(r, c) ? '' : editText(cell, 'General')) : null;
   // (A conditional format's number format over the cell's own: ooxml/condformat.js.)
   const cfCode = st.cond?.get(`${r},${c}`)?.numFmt;
-  const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, MDW), cfCode || (look ? look.code : 'General'), st.date1904);
+  const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, mdwOf(st.sheet)), cfCode || (look ? look.code : 'General'), st.date1904);
   // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
   const h = shown.hashes ? 'center' : (shown.textFormat || (formulas && cell.f != null)) && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
   // (Rotated, stacked or shrunk text stays in its own cell, as wrapped text does.)
@@ -119,6 +172,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
     hgt = st.rows.start(merge.r1 + 1) - st.rows.start(r);
   } else if (isText && !wrap && !turn && !stacked && !shrink) {
     const [begin, end] = runOn(st, r, c, line, win);
+    if (st.gaps && end - begin > 1) runGaps(st, r, begin, end, h, x, w, textWidth(look, clean(shown.text)), align.indent && h !== 'center' ? align.indent * (st.print ? INDENT_PX.print : INDENT_PX.screen) : 0);
     const left = st.cols.start(begin);
     const right = st.cols.start(end);
     if (h === 'left') w = right - x;
@@ -310,5 +364,7 @@ export function columnFitWidth(st, c) {
       const parts = look?.align?.wrap ? wrapLines(text, fitCtx.font, st.cols.size(c) - 4) : String(text).split('\n');
       for (const part of parts) widest = Math.max(widest, fitCtx.measureText(part.replace(/\r/g, '')).width);
     }
-    return widest ? Math.ceil(widest) + 9 : null;
+    // (Excel's AutoFit pads the text by the column's padding and 2px more: 7px up to an mdw of 8, 9 to 12, 11 to 16,
+    // excel-digitwidth.ps1; the 9 here was fitted for Calibri 11 on the browser's unhinted widths.)
+    return widest ? Math.ceil(widest) + 9 + colPad(mdwOf(st.sheet)) - 5 : null;
 }

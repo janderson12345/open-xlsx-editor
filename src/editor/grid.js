@@ -6,7 +6,7 @@
 // coordinates. Geometry goes through custom properties (--oxe-x, --oxe-y, --oxe-w, --oxe-h), never through styles
 // written for state.
 import { setVars, div } from './dom.js';
-import { sheetGeometry, MDW, OVERSCAN } from './geometry.js';
+import { sheetGeometry, mdwOf, OVERSCAN } from './geometry.js';
 import { drawColumnHeadings, drawPanes, drawGridlines, drawRows, drawGuide } from './gridlayers.js';
 import { columnFitWidth } from './cells.js';
 import { decorations } from './decor.js';
@@ -48,10 +48,12 @@ function draw(st, force = false) {
   st.win = win;
   drawColumnHeadings(st, win);
   drawOutline(st, win);
-  drawGridlines(st, win);
   const { fills, edges } = decorations(st, win);
   st.fills.replaceChildren(...fills);
+  // (The cells first: text running on over empty cells hides the gridlines it crosses, cells.js runGaps.)
+  st.gaps = new Map();
   drawRows(st, win);
+  drawGridlines(st, win);
   st.edges.replaceChildren(...edges);
   drawPeers(st);
   drawSelection(st);
@@ -482,7 +484,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       const cell = st.sheet.cells.get(r)?.get(c);
       if (!cell) return null;
       const look = st.deco ? st.deco(cell.s || 0) : null;
-      return cellDisplay(cell, colChars(st.cols.size(c), MDW), look ? look.code : 'General', st.date1904).text;
+      return cellDisplay(cell, colChars(st.cols.size(c), mdwOf(st.sheet)), look ? look.code : 'General', st.date1904).text;
     },
     setReadOnly: (flag) => view.setAttribute('aria-readonly', String(flag)),
     /** The overlay element, which an in-cell editor joins. */

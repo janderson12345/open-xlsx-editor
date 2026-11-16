@@ -27,7 +27,7 @@ function download({ fileName, bytes, mime }) {
 }
 
 /** `env`: { root, state, options, editing, api: () => the editor's api }. */
-export function createFiles({ root, state, options, editing, api }) {
+export function createFiles({ root, state, options, editing, restyled, api }) {
   const back = () => state.grid?.el.focus({ preventScroll: true });
   const files = {
     /**
@@ -106,6 +106,8 @@ export function createFiles({ root, state, options, editing, api }) {
     /** The page's locale (ooxml/locale.js) set, and the sheet and formula bar drawn in it. */
     setLocale(spec) {
       const loc = setLocale(spec);
+      // (The cell formats again too: an East Asian built-in format's code is its locale's, ooxml/format.js builtinFormat.)
+      if (state.grid && state.workbook && restyled) restyled();
       if (state.grid) { state.grid.refresh(); state.editing?.refreshBar?.(); }
       return loc;
     },

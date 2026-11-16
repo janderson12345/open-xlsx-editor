@@ -28,7 +28,7 @@ export function pivotCommands(env) {
     ctx.reloaded?.();
     for (let c = area.c0; c <= area.c1; c++) {
       const px = ctx.fitWidth?.(c);
-      if (px) wb.setLines(si, 'col', c, c, { width: pxWidth(px), bestFit: true });
+      if (px) wb.setLines(si, 'col', c, c, { width: pxWidth(px, wb.mdw), bestFit: true });
     }
     ctx.reloaded?.();
   }

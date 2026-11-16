@@ -13,6 +13,7 @@ page shows and reads typing in the last one set.
 |---|---|---|---|---|
 | A number shown (`#,##0.00`, General) | 1,234.50, 1234.5 | 1.234,50, 1234,5 | 1,234.50 | 1 234,50 |
 | Built-in format 14 (and 22) | 3/5/2024 | 05.03.2024 | 05/03/2024 | 05/03/2024 |
+| East Asian built-ins 27-31, 36, 50-58 (32-35) | as 14 (h:mm:ss) | as 14 | as 14 | as 14 |
 | Typed `1.234,5` / `1,5` | text / text | 1234.5 (#,##0.00) / 1.5 | text / text | text / 1.5 |
 | Typed `13/5/2024` | text | 13 May 2024 | 13 May 2024 | 13 May 2024 |
 | Typed `5.3.2024`, `1.5` | text, 1.5 | 5 March 2024, 1 May | text, 1.5 | text, text |
@@ -22,6 +23,9 @@ page shows and reads typing in the last one set.
 
 The file keeps en-US: `ROUND(1.5,0)`, 1234.5, numFmtId 14. The calculation engine keeps en-US too (TEXT, VALUE), as
 the file's cached values have to be the same wherever it is opened.
+
+In ja-JP, zh-CN, zh-TW and ko-KR the East Asian built-ins 27-36 and 50-58 are each locale's own code instead (format
+28 of 2019-05-01: 令和1年5月1日, 5月1日, 2019年5月1日, 05-01; docs/LAYOUT.md).
 
 ## Measured
 

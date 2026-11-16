@@ -102,7 +102,7 @@ function axisLines(doc, axis, format) {
   }
   const colsEl = () => kid(root, 'cols', ns);
   const at = (c) => kids(colsEl(), 'col', ns).find((x) => c >= Number(attr(x, 'min')) - 1 && c <= Number(attr(x, 'max')) - 1);
-  const defaultWidth = String(pxWidth(defaultColPx(format, 7)));
+  const defaultWidth = String(pxWidth(defaultColPx(format, format.mdw ?? 7), format.mdw ?? 7));
   return {
     get: (c) => { const x = at(c); return { level: levelOf(x), collapsed: on(attr(x, 'collapsed')), hidden: on(attr(x, 'hidden')) }; },
     set(c, patch) {

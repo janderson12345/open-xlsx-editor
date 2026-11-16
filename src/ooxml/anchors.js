@@ -44,9 +44,9 @@ export function lineSizes(model, axis, at, n) {
     : (i) => {
       const col = model.cols.find((x) => i >= x.min && i <= x.max);
       if (col?.hidden) return 0;
-      return col?.width != null ? colWidthToPx(col.width, 7) : defaultColPx(model.format, 7);
+      return col?.width != null ? colWidthToPx(col.width, model.format.mdw ?? 7) : defaultColPx(model.format, model.format.mdw ?? 7);
     };
-  const fresh = axis === 'row' ? rowHeightToPx(model.format.defaultRowHeight) : defaultColPx(model.format, 7);
+  const fresh = axis === 'row' ? rowHeightToPx(model.format.defaultRowHeight) : defaultColPx(model.format, model.format.mdw ?? 7);
   const before = (i) => px(i) * EMU_PER_PX;
   const after = (i) => {
     if (i < at) return before(i);
