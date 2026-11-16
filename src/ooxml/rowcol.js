@@ -369,6 +369,9 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   movePivotSources(wb, info.name, (area) => shiftRange(area, axis, at, n, band));
   // The sheet read again from its moved XML, and everything worked out again.
   wb._parsed.set(info, { doc, model: readSheet(doc, wb.sharedStrings) });
+  // (Counted by sheet for what a view holds by position and Excel drops on any insert or delete there: Circle Invalid
+  // Data's ovals, excel-refmoves.ps1, all gone after every step on their sheet, kept after one on another sheet.)
+  wb.lineChanges.set(info.sheetId, (wb.lineChanges.get(info.sheetId) || 0) + 1);
   wb.dirty.add(info.path);
   wb.edited = true;
   wb._dropCalcChain();

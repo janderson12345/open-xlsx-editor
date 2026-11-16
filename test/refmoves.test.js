@@ -53,11 +53,15 @@ const KNOWN = {
 EXCEL.slice(1).map((x) => ({ ...x, ...KNOWN[x.name] })).forEach((excel, k) => {
   test(`${excel.name}: as Excel does it`, () => {
     const wb = book();
+    const before = wb.lineChanges.get(wb.sheets[0].sheetId) || 0;
     doStep(wb, excel.step);
     const got = stateOf(wb);
     // (Sparklines in a group as Excel lists them, which can differ from their order in the file: compared as a set.)
     assert.deepEqual([...got.sparklines].sort(), [...excel.sparklines].sort(), 'sparklines');
     for (const key of ['rules', 'x14', 'notes', 'threads', 'boxes']) assert.deepEqual(got[key], excel[key], key);
+    // Circle Invalid Data's ovals: all gone after a step on their sheet that inserts or deletes, kept otherwise.
+    const changed = (wb.lineChanges.get(wb.sheets[0].sheetId) || 0) !== before;
+    assert.equal(changed, excel.ovals.length === 0, 'ovals');
     // And the workbook saved reads back the same.
     const bytes = wb.toBytes();
     fs.writeFileSync(`${OUT}/${k + 2}.xlsx`, bytes);

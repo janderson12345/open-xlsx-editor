@@ -42,6 +42,8 @@ export class Workbook {
     /** The workbook part, parsed once; written back on save only when changed (`bookDirty`). */
     this.doc = doc;
     this.bookDirty = false;
+    /** How many times each sheet's rows, columns or cells were inserted or deleted, by sheetId (rowcol.js). */
+    this.lineChanges = new Map();
     const root = doc.documentElement;
     this.ns = root.namespaceURI;
     if (this.ns !== NS.x && this.ns !== NS.xStrict) throw new Error('Not a workbook: the main part is ' + root.localName);

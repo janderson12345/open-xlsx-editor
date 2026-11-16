@@ -125,13 +125,13 @@ Excel did them. Excel's own refresh of each moved pivot left it where it was.
 One step Excel takes its own way: a cell inserted inside the pivot, shifting down, leaves Excel's pivot with an empty
 cell in it. The editor refuses it, as it refuses any cells shifted through part of a pivot.
 
-## Sparklines, data validation, notes in a sort
+## Sparklines, data validation, notes in a sort, Circle Invalid Data
 
 Measured by `tools/excel-compare/excel-refmoves.ps1` on `refmove-cases.mjs`: a sheet with a group of line sparklines
 O2:O5 over B2:M5, a column sparkline at O7, one at Q2 over another sheet's B2:M2, four validation rules on B10:E15 (a
 list of $H$10:$H$12, whole numbers 1 to $I$10, a custom `D10>C10`, a list of `Data!$A$1:$A$3`, which Excel writes in
-the Excel 2010 form, `x14:dataValidation` in the sheet's extLst), notes at B12 and F20 and a threaded comment
-at C13. Forty-two steps (whole lines, cells shifting each way, lines on the other sheet, sorts) were
+the Excel 2010 form, `x14:dataValidation` in the sheet's extLst), notes at B12 and F20, a threaded comment at C13, and
+Circle Invalid Data shown. Forty-two steps (whole lines, cells shifting each way, lines on the other sheet, sorts) were
 done in Excel and the workbook it saved compared (`src/ooxml/rulemoves.js`; `test/fixtures/refmoves.xlsx`).
 
 | What | As Excel does it |
@@ -142,6 +142,7 @@ done in Excel and the workbook it saved compared (`src/ooxml/rulemoves.js`; `tes
 | A rule's formulas | Stay relative to its first cell: references move as references do; when the first cell is deleted they read from the first cell left (D10:D15's `D10>C10` stays `D10>C10` after rows 10:12 go, the rule now D10:D12). |
 | Cells shifted through part of a rule | The part that moves is cut from it: a rule of its own when its formulas have relative references (D12, shifted left to C12: `C12>#REF!`), else it stays in the rule (E10:E11 E13:E15 D12). A part deleted is taken out when the formulas are relative (D10:D11 D13:D15), and left in when they are absolute (C10:C15 kept C12). |
 | A sort | Notes and threaded comments go with their cells (B12's note to B10, C13's thread to C14, their boxes with them); sparklines, validation rules and conditional formats stay where they are, also when the sparklines' cells are sorted. |
+| Circle Invalid Data's ovals | All gone after any insert or delete on their sheet, whether or not it reaches the circled cells; kept after one on another sheet, and after a sort (left where they were). |
 
 Results: 41 of the 42 steps match Excel (`test/refmoves.test.js` against `test/refmoves-excel.json`); the other is
 below. The editor's 43 results (the start and each step) opened in Excel without a repair and read back 42 of 43 as
@@ -150,7 +151,8 @@ box, which Excel lays out again itself when it opens any workbook.
 
 The one difference: with B12:C12 deleted shifting left, Excel took B12 out of B10:B15's list rule, whose formula is
 absolute, though it left C12 in C10:C15's and, with C12:E12 deleted, E12 in E10:E15's. The editor leaves an absolute
-rule whole each time. Excel also leaves rules overlapping there (C12 is in two), as the editor does.
+rule whole each time. Excel also leaves rules overlapping there (C12 is in two), as the editor does. After a sort the
+editor keeps only the ovals whose cells still break their rule, where Excel leaves all of them in place.
 
 ## Not yet
 

@@ -183,9 +183,13 @@ export function mountXlsxEditor(host, options = {}) {
     state.refreshErrors();
     // (Notes too: written, deleted, or moved with rows and columns.)
     state.grid.setNotes(readNotes(state.workbook, state.sheetIndex));
-    // (Circle Invalid Data's circles on this sheet, less those whose cells are now put right, as Excel's go.)
+    // (Circle Invalid Data's circles on this sheet, less those whose cells are now put right, as Excel's go; none once
+    // lines or cells were inserted or deleted there since they were drawn, acts-more.js.)
     const key = state.workbook.sheets[state.sheetIndex];
-    const circled = (state.circles.get(key) || []).filter(({ r, c }) => breaksRule(state.workbook, state.sheetIndex, r, c));
+    const held = state.circles.get(key) || [];
+    const lines = state.workbook.lineChanges.get(key.sheetId) || 0;
+    const circled = (held.lines === lines ? held : []).filter(({ r, c }) => breaksRule(state.workbook, state.sheetIndex, r, c));
+    circled.lines = lines;
     state.circles.set(key, circled);
     state.grid.setCircles(circled);
     // (The sheet's charts, read again with their data; and, for a screen reader, each as a figure with its data.)

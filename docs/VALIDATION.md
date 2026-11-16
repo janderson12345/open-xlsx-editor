@@ -85,8 +85,8 @@ more are circled, and the message Excel may show then, are not measured either: 
 
 ## Not yet
 
-Circle Invalid Data's ovals stay where they are when rows or columns are inserted or deleted; "Apply these changes to all other cells with the same settings", a list's choices from a name defined as a formula
+"Apply these changes to all other cells with the same settings", a list's choices from a name defined as a formula
 of another kind, and the rules Excel writes in its 2010 form (a list from another sheet, `x14:dataValidation`): they
 are kept, and moved with rows and columns, but not read, so their cells aren't checked, listed or circled. Rules
 follow inserted and deleted rows, columns and cells as Excel moves them, split and extends them, and stay where they
-are in a sort (docs/ROWCOL.md).
+are in a sort; Circle Invalid Data's ovals go after an insert or delete on their sheet, as Excel's do (docs/ROWCOL.md).
