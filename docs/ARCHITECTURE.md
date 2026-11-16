@@ -6,22 +6,25 @@ insides:
 - `src/ooxml/` reads and writes the file. No DOM rendering; runs in Node too (unit tests use @xmldom/xmldom).
 - `src/calc/` works out formulas: parsing, functions, recalculation (docs/CALC.md). No DOM; runs in Node.
 - `src/editor/` is the view: the ribbon, the grid, selection, editing.
-- `src/engine/` holds measured data: `metrics.js`, the vertical metrics of installed fonts (`tools/fontmetrics.mjs`).
+- `src/engine/` holds measured data: `metrics.js`, the vertical metrics of installed fonts (`tools/fontmetrics.mjs`); `tablestyles.js`, Excel's 60 built-in table styles' dxfs; `cellstyles.js`, its built-in cell styles.
 
 ## Module map
 
 | Module | What it does |
 |---|---|
 | `src/index.js` | `mountXlsxEditor(host, { bytes, fileName, theme })`: opens a workbook and shows the sheet it opens on, with the sheet tabs; `showSheet` changes sheet; `insertSheet`, `renameSheet`, `moveSheet`, `hideSheet`, `setTabColor`, `deleteSheet`; the tab menu's actions; `save()` gives the bytes back. Types in `src/index.d.ts`. |
+| `src/editor/acts-more.js` | More of the ribbon's actions (acts.js). |
 | `src/editor/mountparts.js` | The grid, its editing and the sheet tabs, made with the first workbook opened. |
 | `src/editor/statusbar.js` | The status bar's figures for the selection and Customize Status Bar. |
 | `src/editor/features.js` | The ribbon group each command belongs to, for `features`. |
+| `src/ooxml/advfilter.js` | Data > Advanced (Advanced Filter), as Excel does it (measured over COM. |
 | `src/ooxml/package.js` | The OPC package (the zip): every part kept byte for byte, relationships, content types; only changed parts rewritten. From open-docx-editor. |
 | `src/ooxml/xml.js` | Parsing and serialising XML (injectable DOMParser for Node), namespace-aware lookups defaulting to SpreadsheetML, `_xHHHH_` decoding. From open-docx-editor. |
 | `src/ooxml/units.js` | The one home for unit conversions: EMU, points, pixels, Excel's column width unit. From open-docx-editor, extended. |
 | `src/ooxml/refs.js` | A1 references and ranges; rows and columns are 0-based in code. |
 | `src/ooxml/workbook.js` | `Workbook`: sheets in order (`canShow`, `tabColor` read from the part's start), shared strings, defined names, each sheet's model read on first use, `setCell`, `setFormula` and `apply` (then recalculation), `calculate`, `toBytes` (only dirty sheets serialised, with their XML declaration; calcChain.xml dropped when formulas change; `fullCalcOnLoad` when a formula couldn't be worked out). |
 | `src/ooxml/workbookstate.js` | The workbook's state taken and put back for Undo (snapshot, restore), and a formula's result written into its cell. |
+| `src/ooxml/listmath.js` | The largest and smallest of a list by a loop (`maxOf`, `minOf`): Math.max(...list) fails past about 125,000 items. |
 | `src/ooxml/sheetops.js` | Sheets added, renamed, moved, hidden, coloured and deleted as Excel does it, with Excel's refusals; references rewritten (formulas, names, charts, hyperlinks, pivot sources) or made #REF!, sheet-local names and the active tab kept with their sheets, a deleted sheet's own parts removed (docs/SHEETS.md). |
 | `src/ooxml/stylesedit.js` | Cell formats changed as Excel writes them: a copy of the cell's format, font, fill or border with the change, an equal one reused, a new one at the end; Excel's Percent, Comma and Currency cell styles; a styles part made when there is none (docs/FORMATS.md). |
 | `src/ooxml/formatops.js` | What each Home button does to a selection, as Excel does it (toggles from the active cell, font sizes, indent, border presets and the neighbour's facing side, decimals): the cells' new formats, for the editor to apply and undo. |
@@ -58,6 +61,7 @@ insides:
 | `src/agentreview.js` | An agent's edits reviewed: the workbook now beside the one opened, cell by cell; docs/AGENT.md. |
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes, tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
+| `src/ooxml/applynames.js` | Formulas > Define Name > Apply Names. |
 | `src/ooxml/pivotnew.js` | A new PivotTable (Insert > PivotTable), its parts written as Excel writes a new one, then laid out by pivot.js's refresh; docs/PIVOT.md. |
 | `src/ooxml/pivotfields.js` | A PivotTable's fields moved after it is made, as Excel's field list moves them, then laid out by pivot.js's refresh; docs/PIVOT.md. |
 | `src/ooxml/pivot.js` | PivotTables: read from their parts, refreshed from their source as Excel's Refresh does (cache, records, items, compact layout); docs/PIVOT.md. |
@@ -71,7 +75,8 @@ insides:
 | `src/editor/gridlayers.js` | The grid's layers for the part in view: column headings, frozen panes, gridlines, rows of cells. |
 | `src/editor/dom.js` | Small DOM helpers: CSS custom properties in pixels, a div with a class. |
 | `src/editor/acts.js` | The ribbon's actions (the act dispatcher) and the boxes and menus they open: Insert and Delete, Paste Special, Sort, the validation question, a list's choices, a filter's list, the cell's and headings' menus, Row Height and Column Width; given `index.js`'s state and helpers as one object. |
-| `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter. |
+| `src/editor/advfilterbox.js` | Data > Sort & Filter > Advanced. |
+| `src/editor/datatab.js` | The Data tab: Refresh All and Refresh; Sort & Filter; Outline (Group, Ungroup, Subtotal, Show and Hide Detail, Settings). |
 | `src/ooxml/special.js` | Go To Special: the cells of a kind Excel's box finds (constants, formulas, blanks, the current region, differences, precedents and dependents, rules), as ranges (docs/GOTOSPECIAL.md). |
 | `src/ooxml/names.js` | Defined names made, changed (formulas following) and deleted as Excel's Name Manager does, with Excel's rules for a name; docs/NAMES.md. |
 | `src/ooxml/goto.js` | What the Name Box goes to: a cell, range, whole lines, another sheet's, a defined name or a table (by name or table reference); the names Go To lists; Excel's words otherwise; the name a selection has (shown in the Name Box). |
@@ -81,6 +86,7 @@ insides:
 | `src/ooxml/notes.js` | A sheet's notes and threaded comments read as Excel 365 writes them (the placeholder note of a thread left out); shown by `src/editor/notemarks.js` (docs/NOTES.md). |
 | `src/ooxml/filterops.js` | AutoFilter as Excel does it: its range, the rows a filter hides by shown values, a column's list, the autoFilter element and the _xlnm._FilterDatabase name as Excel writes them (docs/FILTER.md). |
 | `src/ooxml/sortops.js` | Sort as Excel does it: its order of values and of text, the range around a cell, the header guess, formulas moved as a copy moves them, borders left, Excel's refusals (docs/SORT.md). |
+| `src/ooxml/sortstate.js` | The last sort saved with the sheet as Excel saves it (sortState), in the autoFilter or a table's part for those. |
 | `src/ooxml/clipops.js` | Copy, cut and paste as Excel does them: a snapshot of cells, pasted with formulas moved and repeated over the selection, or moved with every formula that reads them; Paste Special (contents, formats, operations, Skip blanks, Transpose) and Paste Link; text from other programs read as typed (docs/CLIPBOARD.md). |
 | `src/ooxml/rowcol.js` | Whole rows and columns, or cells with the rest of their columns or rows shifting, inserted and deleted as Excel does it: the sheet's cells, widths, merges and ranges moved, new lines formatted from the one before, every formula of the workbook following, Excel's refusals (docs/ROWCOL.md). |
 | `src/ooxml/outline.js` | Outlines as Excel writes them: Group, Ungroup, Show Levels, Show Detail, Hide Detail, Clear Outline, Auto Outline, the summary settings, the groups the outline bar draws (docs/OUTLINE.md). |
@@ -124,12 +130,34 @@ insides:
 | `src/ooxml/errorcheck.js` | Excel's error indicators: which cells break its default error-checking rules (docs/CALC.md). |
 | `src/ooxml/trace.js`, `src/editor/tracing.js`, `arrows.js` | Trace Precedents and Trace Dependents: what a formula reads and what reads a cell, a level at a time, drawn as Excel's tracer arrows (docs/CALC.md). |
 | `src/ooxml/calcmode.js` | Calculation Options: Automatic or Manual (changes waiting for F9), Calculate Now and Calculate Sheet, iterative calculation (`iteration`, `setIteration`), saved in calcPr (docs/CALC.md). |
+| `src/ooxml/cfbars.js` | What data bars and icon sets give the cells of their ranges, by Excel's documented rules (Excel draws them but COM can't read a bar's length or a cell's icon back, so these aren't measured). |
+| `src/ooxml/cfbarsedit.js` | Data bars and icon sets added as Home > Conditional Formatting adds them (measured over COM. |
+| `src/ooxml/cfext.js` | Data bars and icon sets as Excel 2010 and later keep them (test/cfbars-excel.json). |
+| `src/ooxml/cfmanage.js` | The Conditional Formatting Rules Manager's changes, as Excel makes them (measured over COM. |
+| `src/ooxml/chartedit.js` | A chart's own edits, as Excel writes them (measured over COM on a clustered column chart. |
+| `src/ooxml/chartnew.js` | Insert > Charts. |
+| `src/ooxml/chartxml.js` | A new chart's part as Excel writes it when Insert > Charts adds one in its default style (measured over COM. |
+| `src/ooxml/clipcf.js` | Conditional formats coming with a paste, as Excel's do. |
+| `src/ooxml/clipcfx.js` | The Excel 2010 half of conditional formats a paste or a cut brings (clipcf.js). |
+| `src/ooxml/createnames.js` | Formulas > Defined Names > Create from Selection (Ctrl+Shift+F3). |
+| `src/ooxml/csv.js` | A .csv file opened as Excel opens one (measured over COM, Workbooks.Open of a CSV, each cell's value, format and formula read back. |
+| `src/ooxml/datatools.js` | Excel's data tools, as Excel does them (measured over COM. |
+| `src/ooxml/editranges.js` | Review > Allow Edit Ranges as Excel writes them (measured over COM, Protection.AllowEditRanges.Add, and the file Excel saved. |
+| `src/ooxml/filetype.js` | What kind of file a workbook is, and saving it as another. |
+| `src/ooxml/filldates.js` | The fill handle's Auto Fill Options for dates. |
+| `src/ooxml/filtermore.js` | AutoFilter's other filters, as Excel does them (measured over COM. |
+| `src/ooxml/flashfill.js` | Data > Flash Fill (Ctrl+E). |
 | `src/calc/engine.js` | `Calc`: what each formula reads, what a change reaches, the order to work them out in, results written back. |
 | `src/ooxml/strings.js` | Shared string table and inline strings; phonetic runs skipped. |
 | `src/ooxml/styles.js` | Fonts, fills, borders and cell formats (cellXfs) from styles.xml; `fontFamily` resolves scheme fonts to the theme's. |
 | `src/ooxml/theme.js` | The theme's fonts and colours (Excel 365's default theme without a theme part); `resolveColor`, the one colour resolver (theme swap, integer-HLS tints, indexed palette). |
 | `src/ooxml/numfmt.js` | What a cell shows (`cellDisplay`): the General format, and format codes through format.js. |
 | `src/ooxml/format.js` | Excel's number format codes: sections, digits, scaling, scientific, fractions, dates and times, text; built-in formats; serial dates (1900 and 1904). |
+| `src/ooxml/hfpictures.js` | Pictures in headers and footers (Page Setup > Header/Footer > Insert Picture, the &G code). |
+| `src/ooxml/justifyops.js` | Home > Editing > Fill > Justify. |
+| `src/ooxml/links.js` | A sheet's hyperlinks as Excel writes them (measured over COM, Hyperlinks.Add, and the file Excel saved. |
+| `src/ooxml/pagesetupedit.js` | Page Layout > Page Setup. |
+| `src/ooxml/passwords.js` | Excel's password hashes, for Protect Sheet, Protect Workbook and Allow Edit Ranges (protection.js, editranges.js). |
 | `src/editor/grid.js` | The virtualised grid: only rows and columns in view (plus overscan) in the DOM; sticky headings; text running on over empty cells; merged ranges; gridlines; frozen panes (their own layers, sticking in place) and zoom. An ARIA grid (rows, row and column headers, gridcells with indexes). |
 | `src/editor/errbutton.js` | Excel's error button beside the active cell, in the layer Auto Fill Options share. |
 | `src/editor/print.js` | The printed sheet: used range split into pages (columns across the printable width, rows down its height, the sheet's page order), each at its paper size with the sheet's margins; `@page` size set. Built by `preparePrint()` and on `beforeprint`. |
@@ -151,6 +179,8 @@ insides:
 | `src/calc/functions-info.js`, `cellinfo.js` | CELL and INFO; a cell's format as CELL's letters (G, F2, C0-, D4...), its prefix, protection and column width. |
 | `src/ooxml/protection.js`, `src/editor/protectbox.js` | Protect Sheet: written and read as Excel writes it (the password's SHA-512 hash), whether a cell is locked, why a change is refused; Excel's boxes. |
 | `src/ooxml/pivotdata.js` | GETPIVOTDATA's lookup: a PivotTable's cache, only what the pivot shows. |
+| `src/ooxml/sheetcopy.js` | Move or Copy > Create a copy, as Excel copies a sheet (measured over COM. |
+| `src/ooxml/threadedit.js` | Threaded comments written as Excel 365 writes them (Review > New Comment, a reply, an edit; measured over COM. |
 | `src/calc/functions-words.js`, `xpath.js` | ENCODEURL, BAHTTEXT (Thai number words), PHONETIC and FILTERXML, with an XPath 1.0 reader. |
 | `src/calc/charsets.js` | Characters as Excel counts and codes them: code points for LEFT and RIGHT, code page 1252 for CHAR and CODE, the code points UNICHAR refuses. |
 | `src/editor/celleditor.js` | Editing in a cell: a text box in the cell's font; enter and edit modes, Enter, Tab, Esc, Alt+Enter. |
@@ -170,7 +200,12 @@ insides:
 | `src/editor/inserttab.js` | The Insert tab: Tables > PivotTable. |
 | `src/editor/formulastab.js`, `src/editor/namesbox.js` | The Formulas tab: Defined Names, Excel's Name Manager and its New / Edit Name box. |
 | `src/calc/catalog.js`, `src/editor/functionbox.js`, `src/editor/fntip.js` | The Function Library: each function's category and syntax, Excel's Insert Function box, and the syntax screen tip under a cell being edited. |
+| `src/calc/describe-*.js` | Each function's and argument's description, in this project's own words, for Insert Function and Function Arguments (`describe-args.js`, `-math`, `-money`, `-stats`, `-text`). |
+| `src/calc/describe.js` | What each listed function and its arguments do, for the Function Arguments box. |
 | `src/calc/fnargs.js`, `src/calc/argkinds.js`, `src/calc/describe*.js`, `src/editor/fnargsbox.js` | Function Arguments: the boxes a function has and the formula written from them (the fewest arguments Excel takes, text quoted), each argument's kind, what each function and argument does, and the box itself (pointing at the sheet from it through `editor/pointing.js`). |
+| `src/calc/functions-more.js` | More of Excel's worksheet functions, as Excel works them out (each checked against Excel's results in test/formulas-excel.json, docs/CALC.md). |
+| `src/calc/hyperlinkcell.js` | A cell whose formula has HYPERLINK in it, as Excel treats one (measured over COM, docs/LINKS.md). |
+| `src/calc/prefixed.js` | The newer functions' names as the file has them. |
 | `src/editor/commands-view.js` | The view commands: Freeze Panes, Show Formulas, the zoom, Zoom to Selection, View > Show (Gridlines, Formula Bar, Headings) and Page Layout > Sheet Options' Print boxes; kept in the file but not in the undo history. |
 | `src/editor/pagelayouttab.js`, `src/ooxml/printopts.js` | The Page Layout tab (Sheet Options), and its Print boxes written as Excel writes them (`printOptions`). |
 | `src/editor/commands-pivot.js` | The newPivot command: a PivotTable made on a new sheet or at a cell, styled and fitted, as one step. |
@@ -184,7 +219,28 @@ insides:
 | `src/editor/tabletab.js`, `acts-tables.js`, `tableboxes.js`, `tablegallery.js` | Insert > Table, Ctrl+T, Home > Format as Table and the contextual Table Design tab, their actions (each one step of the history), the Create Table and Resize Table boxes and the table style gallery. |
 | `src/editor/sparklinetab.js`, `acts-sparklines.js`, `sparkboxes.js` | Insert > Sparklines and the contextual Sparkline tab, their actions (each one step of the history) and boxes (Create Sparklines, Edit Sparklines, Hidden and Empty Cell Settings). |
 | `src/editor/cellstyles.js` | Each cell format as a CSS class (`.oxe-s3`) in a `<style>` scoped to one editor; the Normal font on the root. |
+| `src/editor/cfformatbox.js` | A conditional format's own format (New Formatting Rule's Format..., Excel's Format Cells for a rule). |
+| `src/editor/cficons.js` | Icon sets' icons, drawn as small SVGs in the look of Excel's (not its own pictures). |
+| `src/editor/cfmanager.js` | Home > Conditional Formatting > Manage Rules. |
+| `src/editor/chartbox.js` | The Edit Chart box. |
+| `src/editor/chartpick.js` | Charts picked out on the sheet, as in Excel. |
+| `src/editor/datatoolboxes.js` | The data tools' boxes, as Excel lays them out. |
+| `src/editor/dvcircles.js` | Data > Data Validation > Circle Invalid Data. |
+| `src/editor/dvmarks.js` | A data validation list's dropdown button, beside the active cell's right edge as Excel draws it, and the rule's input message in a box under the cell. |
 | `src/editor/editor.css` | Theme variables (light, dark, host-overridable) and the grid's layout. Geometry through custom properties; no `!important`. |
+| `src/editor/fillopts.js` | Excel's Auto Fill Options button. |
+| `src/editor/filterbuttons.js` | The AutoFilter's buttons and a table's own, one in the bottom-right corner of each heading cell of the filter's range, as Excel draws them; a column with a filter set shows it. |
+| `src/editor/formatbox-kit.js` | The Format Cells box's pieces (formatbox.js). |
+| `src/editor/formatcodes.js` | The Format Cells box's Number tab. |
+| `src/editor/formattabs-more.js` | The Format Cells box's Border, Fill and Protection tabs (formatbox.js), built like formattabs.js's. |
+| `src/editor/iterbox.js` | Excel's iterative calculation settings (its File > Options > Formulas. |
+| `src/editor/linkbox.js` | Insert > Link (Ctrl+K). |
+| `src/editor/linkfollow.js` | Following a hyperlink as Excel. |
+| `src/editor/pagesetupbox.js` | Excel's Page Setup box, its Margins and Sheet tabs. |
+| `src/editor/printhf.js` | Headers and footers on a printed page, as Excel prints them (print.js draws the rest of the page). |
+| `src/editor/rangesbox.js` | Review > Allow Edit Ranges. |
+| `src/editor/textwidth.js` | Text measured as Excel measures it to break lines (Fill > Justify), not as the browser draws it. |
+| `src/editor/threadbox.js` | Excel's comment thread (Review > New Comment, Ctrl+Alt+M; a thread's Reply, Edit and Delete). |
 
 ## Tools and tests
 

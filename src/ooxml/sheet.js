@@ -129,8 +129,6 @@ export function readSheet(doc, sst = []) {
   };
 }
 
-/** The sheet view's frozen rows and columns (a frozen pane's ySplit and xSplit; a split that isn't frozen is
- *  ignored) and its zoom in percent. */
 /**
  * The sheet's AutoFilter: { r0, c0, r1, c1 (its range, the header row first), columns: Map(column index => { values:
  * [shown texts], blank (blanks shown too), other (a kind of filter not read here: custom, top 10, colour, dates) }) },

@@ -32,7 +32,6 @@ export function readTables(wb) {
         // (Each column's total: totalsRowFunction and totalsRowLabel, kept while the total row is off.)
         totalsRow: cols.map((c) => ({ fn: attr(c, 'totalsRowFunction') || null, label: attr(c, 'totalsRowLabel') })),
         style: { name: attr(info, 'name') || null, first: on('showFirstColumn'), last: on('showLastColumn'), rows: on('showRowStripes'), cols: on('showColumnStripes') },
-        // (Its filter buttons: an autoFilter, less the columns whose button is hidden.)
         // (Its filters as the sheet's are read, sheet.js readAutoFilter, with the columns whose button is hidden.)
         filter: filter ? { ...readAutoFilter(filter, ns), hidden: new Set(kids(filter, 'filterColumn', ns).filter((f) => attr(f, 'hiddenButton') === '1').map((f) => Number(attr(f, 'colId')))) } : null,
       });
