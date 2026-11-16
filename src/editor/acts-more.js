@@ -264,7 +264,7 @@ export function createMoreActs(env) {
     if (name === 'cfAdd') {
       // (Excel's Conditional Formatting menu: the rule's box, then the rule for the selection.)
       const s = editing().selection;
-      const sel = [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }];
+      const sel = areasOf(s).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 }));
       const add = (rule) => editing().run('sheetChange', (wb, si) => wb.setConditional(si, sel, rule), 'formatCells');
       const presets = Object.entries(CF_PRESETS).map(([value, p]) => ({ value, label: p.label }));
       const kind = args[0];
@@ -293,12 +293,15 @@ export function createMoreActs(env) {
     }
     if (name === 'cfClear') {
       const s = editing().selection;
-      return editing().run('sheetChange', (wb, si) => wb.setConditional(si, args[0] === 'sheet' ? null : [{ r0: s.r0, c0: s.c0, r1: s.r1, c1: s.c1 }], null), 'formatCells');
+      return editing().run('sheetChange', (wb, si) => wb.setConditional(si, args[0] === 'sheet' ? null : areasOf(s).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 })), null), 'formatCells');
     }
     if (name === 'insertChart') {
       // (Insert > Charts: the selection charted; one cell selected, the table round it, as Excel takes it.)
       const s = editing().selection;
-      const sel = s.r0 === s.r1 && s.c0 === s.c1 ? currentRegion(state.workbook.sheet(i), s.r0, s.c0) : s;
+      // (Several ranges: all of them charted, chartnew.js chartSeriesAreas; the chart beside the box round them.)
+      const areas = areasOf(s);
+      const box = { r0: Math.min(...areas.map((a) => a.r0)), c0: Math.min(...areas.map((a) => a.c0)), r1: Math.max(...areas.map((a) => a.r1)), c1: Math.max(...areas.map((a) => a.c1)) };
+      const sel = areas.length > 1 ? { ...box, areas } : s.r0 === s.r1 && s.c0 === s.c1 ? currentRegion(state.workbook.sheet(i), s.r0, s.c0) : s;
       let made = null;
       // (Excel refused a new chart on a protected sheet, Edit objects allowed or not.)
       const done = editing().run('sheetChange', (wb, si) => { made = insertChart(wb, si, sel, args[0]); return !!made; }, 'always');

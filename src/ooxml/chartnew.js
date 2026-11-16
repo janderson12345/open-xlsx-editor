@@ -28,6 +28,54 @@ const shown = (cell) => (cell?.v == null ? null : cell.t === 'b' ? (cell.v ? 'TR
 /** A range's reference as a series formula has it: Sheet1!$A$2:$A$5. */
 const rangeRef = (name, r0, c0, r1, c1) => `${sheetPrefix(name)}$${colName(c0)}$${r0 + 1}${r0 === r1 && c0 === c1 ? '' : `:$${colName(c1)}$${r1 + 1}`}`;
 
+/** A series' name, categories or values: cells a0..a1, b0..b1 of sheet si as { f, values, numeric, format }. */
+function part(wb, si, a0, b0, a1, b1, numeric) {
+  const sheet = wb.sheet(si);
+  const values = [];
+  for (let r = a0; r <= a1; r++) for (let c = b0; c <= b1; c++) values.push(shown(cellAt(sheet, r, c)));
+  const first = (() => { for (let r = a0; r <= a1; r++) for (let c = b0; c <= b1; c++) if (cellAt(sheet, r, c)?.v != null) return cellAt(sheet, r, c); return null; })();
+  const num = numeric ?? (first ? isNumber(first) : false);
+  return { f: rangeRef(wb.sheets[si].name, a0, b0, a1, b1), values: num ? values.map((v) => (typeof v === 'number' ? v : null)) : values.map((v) => (v == null ? null : String(v))), numeric: num, format: num && first ? formatCodeOf(wb.styles, first.s || 0) : 'General' };
+}
+
+/**
+ * The series a chart of several areas gets (Insert > Charts over a selection of several ranges), as Excel took them
+ * (test/multirange-excel.json): areas over the same rows as one table of their columns (A1:A5 and C1:C5: a series
+ * each, by chartSeries's rule), when its series run down the columns; otherwise each area as alone, its series after
+ * the ones before (A1:B3 and D6:E8: four, A1:A3, B1:B3, D6:D8, E6:E8). Null when there are no numbers.
+ */
+export function chartSeriesAreas(wb, si, areas) {
+  if (areas.length < 2) return chartSeries(wb, si, areas[0]);
+  const { r0, r1 } = areas[0];
+  if (areas.every((a) => a.r0 === r0 && a.r1 === r1)) {
+    const cols = [...new Set(areas.flatMap((a) => Array.from({ length: a.c1 - a.c0 + 1 }, (_, k) => a.c0 + k)))].sort((x, y) => x - y);
+    const got = columnsSeries(wb, si, r0, r1, cols);
+    if (got) return got;
+  }
+  const parts = areas.map((a) => chartSeries(wb, si, a)).filter(Boolean);
+  return parts.length ? { byRows: parts[0].byRows, series: parts.flatMap((p) => p.series) } : null;
+}
+
+/** chartSeries's rule over rows r0..r1 of columns `cols` (not side by side): null when the series would run along
+ *  the rows, which can't be taken as one table. */
+function columnsSeries(wb, si, r0, r1, cols) {
+  const sheet = wb.sheet(si);
+  const corner = cellAt(sheet, r0, cols[0]);
+  const many = r1 > r0 && cols.length > 1;
+  const noNumbers = (cells) => cells.every((cell) => !isNumber(cell));
+  const row = cols.slice(1).map((c) => cellAt(sheet, r0, c));
+  const col = [];
+  for (let r = r0 + 1; r <= r1; r++) col.push(cellAt(sheet, r, cols[0]));
+  const blankCorner = corner?.v == null || corner.v === '';
+  const rowLabels = r1 > r0 && ((many && blankCorner) || (noNumbers(row) && !isNumber(corner)));
+  const colLabels = cols.length > 1 && ((many && blankCorner) || (r1 > r0 && noNumbers(col) && !isNumber(corner)));
+  const dr0 = r0 + (rowLabels ? 1 : 0);
+  const data = cols.slice(colLabels ? 1 : 0);
+  if (dr0 > r1 || !data.length || !(r1 - dr0 > data.length - 1)) return null;
+  const cat = colLabels ? part(wb, si, dr0, cols[0], r1, cols[0]) : null;
+  return { byRows: false, series: data.map((c) => ({ name: rowLabels ? part(wb, si, r0, c, r0, c, false) : null, cat, val: part(wb, si, dr0, c, r1, c, true) })) };
+}
+
 /**
  * The series a chart of `sel` ({ r0, c0, r1, c1 }) on sheet si gets, as Excel takes them: { byRows, series: [{ name,
  * cat, val }] }, each part { f, values, numeric, format } or null. Null when the range has no numbers to chart.
@@ -36,7 +84,6 @@ const rangeRef = (name, r0, c0, r1, c1) => `${sheetPrefix(name)}$${colName(c0)}$
  */
 export function chartSeries(wb, si, sel, byRows = null) {
   const sheet = wb.sheet(si);
-  const name = wb.sheets[si].name;
   const { r0, c0, r1, c1 } = sel;
   const corner = cellAt(sheet, r0, c0);
   const many = r1 > r0 && c1 > c0;
@@ -53,13 +100,7 @@ export function chartSeries(wb, si, sel, byRows = null) {
   const dc0 = c0 + (colLabels ? 1 : 0);
   if (dr0 > r1 || dc0 > c1) return null;
   byRows ??= !(r1 - dr0 > c1 - dc0);
-  const data = (a0, b0, a1, b1, numeric) => {
-    const values = [];
-    for (let r = a0; r <= a1; r++) for (let c = b0; c <= b1; c++) values.push(shown(cellAt(sheet, r, c)));
-    const first = (() => { for (let r = a0; r <= a1; r++) for (let c = b0; c <= b1; c++) if (cellAt(sheet, r, c)?.v != null) return cellAt(sheet, r, c); return null; })();
-    const num = numeric ?? (first ? isNumber(first) : false);
-    return { f: rangeRef(name, a0, b0, a1, b1), values: num ? values.map((v) => (typeof v === 'number' ? v : null)) : values.map((v) => (v == null ? null : String(v))), numeric: num, format: num && first ? formatCodeOf(wb.styles, first.s || 0) : 'General' };
-  };
+  const data = (a0, b0, a1, b1, numeric) => part(wb, si, a0, b0, a1, b1, numeric);
   const series = [];
   if (!byRows) {
     const cat = colLabels ? data(dr0, c0, r1, c0) : null;
@@ -134,7 +175,8 @@ function drawingOf(wb, si) {
  */
 export function insertChart(wb, si, sel, kind, { at = null, ids = freshIds(), size = CHART_SIZE } = {}) {
   if (!CHART_KINDS[kind]) throw new Error(`No chart kind ${kind}`);
-  const found = chartSeries(wb, si, sel);
+  // (Several areas, `sel.areas`: chartSeriesAreas; `sel` itself the box round them.)
+  const found = sel.areas?.length > 1 ? chartSeriesAreas(wb, si, sel.areas) : chartSeries(wb, si, sel);
   if (!found || !found.series.some((s) => s.val.values.some((v) => v != null))) return null;
   const pkg = wb.pkg;
   const chart = freePath(pkg, 'xl/charts/chart', 'xml');

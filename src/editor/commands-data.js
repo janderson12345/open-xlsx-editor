@@ -2,20 +2,20 @@
 // and AutoFill, sort, AutoSum, the Name Box and the filter.
 import { readTables } from '../ooxml/tables.js';
 import { applyTableFilter } from '../ooxml/tablefilter.js';
-import { refName, colName, parseRange } from '../ooxml/refs.js';
+import { refName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { pasteHtml } from '../ooxml/cliphtml.js';
 import { linkCopy } from '../ooxml/extlinks.js';
-import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
+import { fillCopy, fillCopyAreas, autoFill, doubleClickFill } from '../ooxml/fillops.js';
 import { quickSort, sortChanges, sortedNotes } from '../ooxml/sortops.js';
 import { setSortState } from '../ooxml/sortstate.js';
 import { autoSumAreas } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
 import { validName, defineName, namesOnSheet } from '../ooxml/names.js';
-import { sheetPrefix } from '../calc/tokens.js';
 import { specialCells, firstShown } from '../ooxml/special.js';
-import { areasOf, areasSelection } from './selection.js';
+import { areasOf, areasSelection, selectionRefers } from './selection.js';
 import { filterArea } from '../ooxml/filterops.js';
+import { MULTI_RANGE_MESSAGE } from '../ooxml/multiarea.js';
 
 /** These commands: `env` is createCommands's shared state and helpers (commands.js). */
 /** Excel's refusal of Copy and Cut over more than one range. (Excel copies ranges that line up, the same rows or the
@@ -53,6 +53,13 @@ export function dataCommands(env) {
     const last = ctx.sharedClip?.() || null;
     if (text == null || !text) return last || state.clip;
     return [last, state.clip].find((c) => c && c.text === text) || null;
+  }
+  /** Fill over several areas, as Excel's (fillops.js fillCopyAreas): each column filled from its first cell
+   *  selected, one step of the history. */
+  function fillEach(dir) {
+    if (!runSteps(fillCopyAreas(ctx.workbook(), ctx.sheetIndex(), areasOf(state.sel), dir))) return false;
+    show(state.sel, state.focus, `Filled ${dir}, `);
+    return true;
   }
   return {
     /** Copy (Ctrl+C) or Cut (Ctrl+X) the selection: kept to be pasted, outlined until then (Esc lets it go). Returns
@@ -169,6 +176,7 @@ export function dataCommands(env) {
      *  step of the history. */
     fill(dir) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (state.sel.more?.length) return fillEach(dir);
       const steps = fillCopy(ctx.workbook(), ctx.sheetIndex(), state.sel, dir);
       if (!runSteps(steps)) return false;
       const a = steps[0].area;
@@ -201,6 +209,7 @@ export function dataCommands(env) {
     sort(how = 'asc', { expand = false } = {}) {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
       if (!allowed('sort')) return false;
+      if (state.sel.more?.length) { ctx.alert(MULTI_RANGE_MESSAGE); return false; }
       const wb = ctx.workbook();
       const si = ctx.sheetIndex();
       const plan = typeof how === 'string' ? quickSort(wb, si, state.sel, how === 'desc', { expand }) : how;
@@ -243,9 +252,8 @@ export function dataCommands(env) {
       const to = goToTarget(ctx.workbook(), ctx.sheetIndex(), text);
       // (A name that isn't there yet names the selection, workbook-wide, as Excel's Name Box does.)
       if (to.error && to.name && validName(text.trim())) {
-        const s = state.sel;
-        const abs = (r, c) => `$${colName(c)}$${r + 1}`;
-        const refersTo = `=${sheetPrefix(ctx.workbook().sheets[ctx.sheetIndex()].name)}${abs(s.r0, s.c0)}${s.r0 === s.r1 && s.c0 === s.c1 ? '' : `:${abs(s.r1, s.c1)}`}`;
+        // (Several ranges: the name refers to all of them, namesbox.js selectionRefers.)
+        const refersTo = selectionRefers(ctx.workbook(), ctx.sheetIndex(), state.sel);
         const done = commands.sheetChange((wb) => { defineName(wb, { name: text.trim(), refersTo }); });
         if (done) ctx.announce(`${text.trim()} names the selection`);
         return done;
@@ -278,6 +286,7 @@ export function dataCommands(env) {
     /** Filter (Ctrl+Shift+L): the sheet's AutoFilter turned on over what Sort would take, or off (filterops.js). */
     filterToggle() {
       if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      if (state.sel.more?.length) { ctx.alert(MULTI_RANGE_MESSAGE); return false; }
       const sh = sheet();
       if (sh.autoFilter) return moved((wb, si) => wb.setAutoFilter(si, null)) === true && (ctx.announce('Filter off'), true);
       const { area, error } = filterArea(sh, state.sel);

@@ -3,6 +3,7 @@
 import { Workbook } from './ooxml/workbook.js';
 import { renderPrint } from './editor/print.js';
 import { createActs } from './editor/acts.js';
+import { withinSelection, areasOf } from './editor/selection.js';
 import { printSetup } from './ooxml/printarea.js';
 import { headerPictures } from './ooxml/hfpictures.js';
 import { applyCellStyles } from './editor/cellstyles.js';
@@ -266,7 +267,8 @@ export function mountXlsxEditor(host, options = {}) {
     state.find = createFindBar({
       workbook: () => state.workbook,
       from: () => { const s = editing().selection; return { si: state.sheetIndex, r: s.ar, c: s.ac }; },
-      go: (hit) => editing().run('goTo', hit),
+      within: () => withinSelection(state.workbook.sheet(state.sheetIndex), editing().selection, state.sheetIndex),
+      go: (hit) => editing().run('goTo', hit, { within: true }),
       apply: (steps) => editing().run('applyChanges', steps),
       home: () => state.grid?.el.focus({ preventScroll: true }),
       readOnly: () => state.readOnly,
@@ -461,11 +463,15 @@ export function mountXlsxEditor(host, options = {}) {
     /** Run a named command (commands.js) with its arguments. */
     command: (name, ...args) => editing().run(name, ...args),
     get selection() { return state.editing ? state.editing.commands.selection : null; },
-    /** Build the printed pages of the sheet shown (done before the browser prints, too); returns the page count. */
-    preparePrint() {
+    /** Build the printed pages of the sheet shown (done before the browser prints, too); returns the page count. With
+     *  `selection`, Excel's Print Selection: the selection instead of the print area, each of its ranges on pages of
+     *  its own (Excel's PDF of A2:B3 and D6:E7: two pages). */
+    preparePrint({ selection = false } = {}) {
       if (!state.workbook) return 0;
       const wb = state.workbook;
-      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...printSetup(wb, state.sheetIndex), sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex), sparks: sparklineLooks(wb, state.sheetIndex), tables: tableLooks(wb, readTables(wb), state.sheetIndex) });
+      const chosen = selection && state.editing ? areasOf(state.editing.commands.selection).map(({ r0, c0, r1, c1 }) => ({ r0, c0, r1, c1 })) : null;
+      const setup = chosen ? { ...printSetup(wb, state.sheetIndex), area: chosen[0], areas: chosen } : printSetup(wb, state.sheetIndex);
+      return renderPrint(root, wb.sheet(state.sheetIndex), state.looks, fontFamily(wb.styles.normal, wb.theme), { ...setup, sheet: wb.sheets[state.sheetIndex].name, file: state.fileName || '', sizePt: wb.styles.normal?.size || 11, pictures: headerPictures(wb, state.sheetIndex), sparks: sparklineLooks(wb, state.sheetIndex), tables: tableLooks(wb, readTables(wb), state.sheetIndex) });
     },
     get workbook() { return state.workbook; },
     get grid() { return state.grid; },

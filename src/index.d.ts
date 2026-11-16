@@ -134,8 +134,9 @@ export interface XlsxEditor {
   setRibbon(mode: 'simple' | 'classic'): void;
   /** The ribbon's layout now. */
   readonly ribbon: 'simple' | 'classic' | null;
-  /** Build the printed pages of the sheet shown; returns the page count. */
-  preparePrint(): number;
+  /** Build the printed pages of the sheet shown; returns the page count. `selection`: Excel's Print Selection, the
+   *  selection's ranges each on pages of their own instead of the print area. */
+  preparePrint(options?: { selection?: boolean }): number;
   readonly workbook: Workbook | null;
   readonly grid: GridHandle | null;
   readonly sheetIndex: number;

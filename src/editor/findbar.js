@@ -35,8 +35,9 @@ export function pickCell(grid, here) {
 }
 
 /**
- * The bar, hidden until opened. `ctx` = { workbook(), from() (the active cell, { si, r, c }), go(hit) (that cell
- * selected, its sheet shown), apply(steps) (replacements as one step of the undo history), home() (focus back to the
+ * The bar, hidden until opened. `ctx` = { workbook(), from() (the active cell, { si, r, c }), within() (the
+ * selection's areas to look in, { si, areas }, or null with one cell selected), go(hit) (that cell selected, its
+ * sheet shown; inside the selection, the active cell moved there), apply(steps) (replacements as one step of the undo history), home() (focus back to the
  * sheet), readOnly(), pickCell() (a cell picked on the sheet) }. Returns { el, open(replace), close() }.
  */
 export function createFindBar(ctx) {
@@ -94,6 +95,8 @@ export function createFindBar(ctx) {
   const opts = (forReplace = false) => ({
     matchCase: matchCase.checked, whole: whole.checked, within: within.value, byColumns: order.value === 'cols',
     lookIn: forReplace ? 'formulas' : lookIn.value,
+    // (More than one cell selected, Within: Sheet: Find and Replace look there only, every range of it, as Excel's.)
+    ...(() => { const got = within.value === 'sheet' && ctx.within?.(); return got ? { areas: got.areas, areasSheet: got.si } : {}; })(),
     ...(formats.find ? { findFormat: formats.find } : {}), ...(forReplace && formats.replace ? { replaceFormat: formats.replace } : {}),
   });
   const say = (text) => { info.textContent = text; };

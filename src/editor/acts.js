@@ -32,6 +32,7 @@ import { shapeShift, ROWCOL_MESSAGES } from '../ooxml/rowcol.js';
 import { boxRule } from '../ooxml/dvedit.js';
 import { formatCodeOf } from '../ooxml/styles.js';
 import { mergeLoss } from '../ooxml/mergeops.js';
+import { MULTI_RANGE_MESSAGE } from '../ooxml/multiarea.js';
 import { stepSize } from '../ooxml/formatops.js';
 import { MAX_ROWS, MAX_COLS, colName } from '../ooxml/refs.js';
 
@@ -110,6 +111,11 @@ export function createActs(env) {
     }
     return false;
   };
+  /** The ribbon's commands Excel refuses over several ranges ("This can't be done on a multiple range selection.":
+   *  Sort, Custom Sort, Filter, Text to Columns, Remove Duplicates, Fill Justify, Group, Ungroup, Subtotal), and the
+   *  ones it greys out (Insert Table, Format as Table, PivotTable), test/multirange-excel.json. */
+  const MULTI_REFUSED = new Set(['sortAsc', 'sortDesc', 'sortBox', 'filterToggle', 'textToColumnsBox', 'removeDuplicatesBox', 'fillJustify', 'groupBox', 'ungroupBox', 'subtotalBox']);
+  const MULTI_GREYED = new Set(['tableInsert', 'formatAsTable', 'pivotBox']);
   /** The ribbon's commands: the editor's own, and the sheet actions that ask first or edit a tab in place. */
   const act = (name, ...args) => {
     if (name === 'painting') return painter.active();
@@ -119,6 +125,11 @@ export function createActs(env) {
     if (partOfText(name, args)) return true;
     if (!allowed(name, args[0])) return false;
     const i = state.sheetIndex;
+    // (Several ranges selected: what Excel refuses, in its words, before its box opens; what it greys out, nothing.)
+    if (editing().selection.more?.length) {
+      if (MULTI_REFUSED.has(name)) return messageBox(root, MULTI_RANGE_MESSAGE).then(() => { state.grid.el.focus({ preventScroll: true }); return false; });
+      if (MULTI_GREYED.has(name)) { announce('Not available with more than one range selected'); return false; }
+    }
     // (Insert > Sparklines and the Sparkline tab: acts-sparklines.js.)
     if (name.startsWith('sparkline')) return (sparks ??= createSparklineActs({ ...env, act }))(name, args);
     // (Insert > Table, Format as Table and the Table Design tab: acts-tables.js.)
@@ -248,7 +259,7 @@ export function createActs(env) {
     if (name === 'merge') {
       // (Excel asks first when values would be discarded.)
       const sel = editing().selection;
-      if (mergeLoss(state.workbook.sheet(i), sel, args[0])) {
+      if (areasOf(sel).some((a) => mergeLoss(state.workbook.sheet(i), a, args[0]))) {
         return messageBox(root, 'Merging cells only keeps the upper-left value and discards other values.', ['OK', 'Cancel'])
           .then((b) => b === 'OK' && editing().run('merge', args[0]));
       }
@@ -261,8 +272,9 @@ export function createActs(env) {
   const lines = async (dir) => {
     if (state.readOnly || !allowed('lines')) return false;
     const s = editing().selection;
-    if (s.c0 === 0 && s.c1 >= MAX_COLS - 1) return editing().run('lines', 'row', dir);
-    if (s.r0 === 0 && s.r1 >= MAX_ROWS - 1) return editing().run('lines', 'col', dir);
+    const areas = areasOf(s);
+    if (areas.every((a) => a.c0 === 0 && a.c1 >= MAX_COLS - 1)) return editing().run('lines', 'row', dir);
+    if (areas.every((a) => a.r0 === 0 && a.r1 >= MAX_ROWS - 1)) return editing().run('lines', 'col', dir);
     const across = dir > 0 ? 'Shift cells right' : 'Shift cells left';
     const down = dir > 0 ? 'Shift cells down' : 'Shift cells up';
     const got = await optionsBox(root, { title: dir > 0 ? 'Insert' : 'Delete',

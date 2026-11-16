@@ -5,8 +5,7 @@
 import { modal, button, messageBox, optionsBox } from './dialogs.js';
 import { defineName, editName, deleteName, listNames, findName } from '../ooxml/names.js';
 import { namesFromSelection, createNames, guessSides } from '../ooxml/createnames.js';
-import { sheetPrefix } from '../calc/tokens.js';
-import { colName } from '../ooxml/refs.js';
+import { selectionRefers } from './selection.js';
 
 const make = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
 
@@ -94,11 +93,10 @@ export function nameManager(root, { workbook, run, newName }) {
   });
 }
 
-/** Define Name for the selection `sel` of sheet si, as Excel fills its box: the selection (absolute, with its sheet)
- *  as what it refers to, the workbook as its scope. */
+/** Define Name for the selection `sel` of sheet si, as Excel fills its box: the selection (selectionRefers) as what
+ *  it refers to, the workbook as its scope. */
 export function defineNameFor(root, wb, si, sel, run) {
-  const abs = (r, c) => `$${colName(c)}$${r + 1}`;
-  const ref = `=${sheetPrefix(wb.sheets[si].name)}${abs(sel.r0, sel.c0)}${sel.r0 === sel.r1 && sel.c0 === sel.c1 ? '' : `:${abs(sel.r1, sel.c1)}`}`;
+  const ref = selectionRefers(wb, si, sel);
   const scopes = [{ label: 'Workbook', value: null }, ...wb.sheets.map((s, i) => ({ label: s.name, value: i, kind: s.kind })).filter((s) => s.kind === 'worksheet')];
   return nameBox(root, { title: 'New Name', refersTo: ref, scopes, check: (a) => run((book) => defineName(book, a)) });
 }
@@ -108,12 +106,15 @@ export function defineNameFor(root, wb, si, sel, run) {
  *  measured: COM's CreateNames replaced it without one), Cancel stopping it all. The names made as one step of the
  *  history through `run`. Resolves to how many were made, or null. */
 export async function createNamesFor(root, wb, si, sel, run) {
-  const area = { r0: Math.min(sel.r0, sel.r1), c0: Math.min(sel.c0, sel.c1), r1: Math.max(sel.r0, sel.r1), c1: Math.max(sel.c0, sel.c1) };
-  const start = guessSides(wb, si, area);
+  // (Several ranges: the names of each, as Excel's CreateNames made them: A2:B3 and D6:E7 by their top rows named
+  // A3, B3, D7 and E7.)
+  const areas = [...(sel.more || []), sel].map((a) => ({ r0: Math.min(a.r0, a.r1), c0: Math.min(a.c0, a.c1), r1: Math.max(a.r0, a.r1), c1: Math.max(a.c0, a.c1) }));
+  const start = guessSides(wb, si, areas.at(-1));
   const got = await optionsBox(root, { title: 'Create Names from Selection', text: 'Create names from values in the:',
     checks: [['top', 'Top row'], ['left', 'Left column'], ['bottom', 'Bottom row'], ['right', 'Right column']].map(([key, label]) => ({ key, label, value: start[key] })) });
   if (!got) return null;
-  const list = namesFromSelection(wb, si, area, got.checks);
+  const lists = areas.map((a) => namesFromSelection(wb, si, a, got.checks));
+  const list = lists.some((x) => !x) ? null : lists.flat();
   if (!list) { await messageBox(root, "This selection isn't valid."); return null; }
   const keep = [];
   for (const x of list) {

@@ -1,0 +1,438 @@
+[
+ {
+  "name": "fill down, apart",
+  "select": "A2:B4,D6:E8",
+  "mso": "FillDown"
+ },
+ {
+  "name": "fill down, same rows",
+  "select": "A2:B4,D2:E4",
+  "mso": "FillDown"
+ },
+ {
+  "name": "fill right, apart",
+  "select": "A2:B4,D6:E8",
+  "mso": "FillRight"
+ },
+ {
+  "name": "fill down, same columns",
+  "select": "A2:B4,A7:B9",
+  "mso": "FillDown"
+ },
+ {
+  "name": "insert rows, two",
+  "select": "A2:B3,D6:E6",
+  "mso": "SheetRowsInsert"
+ },
+ {
+  "name": "delete rows, two",
+  "select": "A2:B3,D6:E6",
+  "mso": "SheetRowsDelete"
+ },
+ {
+  "name": "delete rows, overlapping",
+  "select": "A2:B4,D3:E5",
+  "mso": "SheetRowsDelete"
+ },
+ {
+  "name": "insert columns, two",
+  "select": "A2:A3,D6:E6",
+  "mso": "SheetColumnsInsert"
+ },
+ {
+  "name": "delete columns, two",
+  "select": "A2:A3,D6:E6",
+  "mso": "SheetColumnsDelete"
+ },
+ {
+  "name": "insert cells dialog",
+  "select": "A2:B3,D6:E6",
+  "mso": "CellsInsertDialog"
+ },
+ {
+  "name": "delete cells dialog",
+  "select": "A2:B3,D6:E6",
+  "mso": "CellsDelete"
+ },
+ {
+  "name": "delete cells up, apart",
+  "select": "A2:B3,D6:E6",
+  "om": "$sel.Delete(-4162)"
+ },
+ {
+  "name": "delete cells up, same rows",
+  "select": "A2:B3,D2:E3",
+  "om": "$sel.Delete(-4162)"
+ },
+ {
+  "name": "insert cells down, apart",
+  "select": "A2:B3,D6:E6",
+  "om": "$sel.Insert(-4121)"
+ },
+ {
+  "name": "insert cells down, same rows",
+  "select": "A2:B3,D2:E3",
+  "om": "$sel.Insert(-4121)"
+ },
+ {
+  "name": "insert cells right, same columns",
+  "select": "A2:B3,A6:B6",
+  "om": "$sel.Insert(-4161)"
+ },
+ {
+  "name": "hide rows",
+  "select": "A2:B3,D6:E6",
+  "mso": "RowsHide"
+ },
+ {
+  "name": "unhide rows",
+  "select": "A1:A4,A6:A9",
+  "setup": {
+   "hideRows": "3:3"
+  },
+  "mso": "RowsUnhide"
+ },
+ {
+  "name": "hide columns",
+  "select": "A2:A3,D6:E6",
+  "mso": "ColumnsHide"
+ },
+ {
+  "name": "unhide columns",
+  "select": "A1:C1,E1:G1",
+  "setup": {
+   "hideCols": "B:B"
+  },
+  "mso": "ColumnsUnhide"
+ },
+ {
+  "name": "row height box",
+  "select": "A2:B3,D6:E6",
+  "mso": "RowHeight"
+ },
+ {
+  "name": "row height set",
+  "select": "A2:B3,D6:E6",
+  "om": "$sel.RowHeight = 30"
+ },
+ {
+  "name": "column width set",
+  "select": "A2:A3,D6:E6",
+  "om": "$sel.ColumnWidth = 20"
+ },
+ {
+  "name": "autofit columns",
+  "select": "A2:A3,D6:E6",
+  "setup": {
+   "cells": {
+    "A2": "a long piece of text here",
+    "D6": "another long text in D"
+   }
+  },
+  "om": "[void]$sel.Columns.AutoFit()"
+ },
+ {
+  "name": "sort ascending, apart",
+  "select": "A2:B4,D6:E8",
+  "mso": "SortAscendingExcel"
+ },
+ {
+  "name": "sort ascending, same rows",
+  "select": "A2:B4,D2:E4",
+  "mso": "SortAscendingExcel"
+ },
+ {
+  "name": "sort box",
+  "select": "A2:B4,D6:E8",
+  "mso": "SortDialog"
+ },
+ {
+  "name": "custom sort",
+  "select": "A2:B4,D6:E8",
+  "mso": "SortCustomExcel"
+ },
+ {
+  "name": "filter, autofilter id",
+  "select": "A2:B4,D6:E8",
+  "mso": "AutoFilterClassic"
+ },
+ {
+  "name": "filter, Filter id",
+  "select": "A2:B4,D6:E8",
+  "mso": "Filter"
+ },
+ {
+  "name": "merge center, apart",
+  "select": "A2:B3,D6:E7",
+  "mso": "MergeCenter"
+ },
+ {
+  "name": "merge cells, apart",
+  "select": "A2:B3,D6:E7",
+  "mso": "MergeCells"
+ },
+ {
+  "name": "merge across, apart",
+  "select": "A2:B3,D6:E7",
+  "mso": "MergeCellsAcross"
+ },
+ {
+  "name": "unmerge, two",
+  "select": "A2:B3,D6:E7",
+  "setup": {
+   "merge": [
+    "A2:B3",
+    "D6:E7"
+   ]
+  },
+  "mso": "UnmergeCells"
+ },
+ {
+  "name": "borders outside",
+  "select": "A2:B3,D6:E7",
+  "mso": "BorderOutside"
+ },
+ {
+  "name": "percent",
+  "select": "A2:B3,D6:E7",
+  "mso": "PercentStyle"
+ },
+ {
+  "name": "replace within",
+  "select": "A2:B3,D6:E7",
+  "om": "$sel.Replace('2', 'x', 2)"
+ },
+ {
+  "name": "find within",
+  "select": "A2:B3,D6:E7",
+  "om": "$f = $sel.Find('6'); $first = $f.Address($false,$false); $acc = @($first); while ($true) { $f = $sel.FindNext($f); if ($f.Address($false,$false) -eq $first) { break }; $acc += $f.Address($false,$false) }; $acc -join ','"
+ },
+ {
+  "name": "special constants within",
+  "select": "A2:B3,D6:E7",
+  "setup": {
+   "cells": {
+    "B2": "=A2",
+    "E7": ""
+   }
+  },
+  "om": "$sel.SpecialCells(2).Address($false,$false)"
+ },
+ {
+  "name": "special blanks within",
+  "select": "A2:B3,D6:E7",
+  "setup": {
+   "cells": {
+    "B2": "",
+    "E7": ""
+   }
+  },
+  "om": "$sel.SpecialCells(4).Address($false,$false)"
+ },
+ {
+  "name": "go to special box",
+  "select": "A2:B3,D6:E7",
+  "mso": "GoToSpecial"
+ },
+ {
+  "name": "remove duplicates",
+  "select": "A2:B4,D6:E8",
+  "mso": "RemoveDuplicates"
+ },
+ {
+  "name": "data validation box",
+  "select": "A2:B3,D6:E7",
+  "mso": "DataValidation"
+ },
+ {
+  "name": "define name box",
+  "select": "A2:B3,D6:E7",
+  "mso": "NameDefine"
+ },
+ {
+  "name": "create from selection",
+  "select": "A2:B3,D6:E7",
+  "mso": "NameCreateFromSelection"
+ },
+ {
+  "name": "names from selection om",
+  "select": "A2:B3,D6:E7",
+  "om": "$sel.CreateNames($true, $false, $false, $false)"
+ },
+ {
+  "name": "cond format greater than",
+  "select": "A2:B3,D6:E7",
+  "mso": "ConditionalFormattingHighlightGreaterThan"
+ },
+ {
+  "name": "cond format om",
+  "select": "A2:B3,D6:E7",
+  "om": "[void]$sel.FormatConditions.AddDatabar()"
+ },
+ {
+  "name": "chart, two columns apart",
+  "select": "A1:A5,C1:C5",
+  "om": "[void]$ws.Shapes.AddChart2(201, 51)"
+ },
+ {
+  "name": "chart, apart",
+  "select": "A1:B3,D6:E8",
+  "om": "[void]$ws.Shapes.AddChart2(201, 51)"
+ },
+ {
+  "name": "table insert",
+  "select": "A2:B3,D6:E7",
+  "mso": "TableInsertExcel"
+ },
+ {
+  "name": "pivot insert",
+  "select": "A2:B3,D6:E7",
+  "mso": "PivotTableInsert"
+ },
+ {
+  "name": "print selection pages",
+  "select": "A2:B3,D6:E7",
+  "om": "$p = Join-Path $tmp 'sel.pdf'; $sel.ExportAsFixedFormat(0, $p); ([regex]::Matches([IO.File]::ReadAllText($p, [Text.Encoding]::Latin1), '/Type\\s*/Page[^s]')).Count"
+ },
+ {
+  "name": "status sum",
+  "select": "A2:B3,B3:C4",
+  "om": "\"sum $($x.WorksheetFunction.Sum($sel)) count $($x.WorksheetFunction.CountA($sel)) avg $($x.WorksheetFunction.Average($sel))\""
+ },
+ {
+  "name": "autosum",
+  "select": "A2:A4,C2:C4",
+  "mso": "AutoSum"
+ },
+ {
+  "name": "clear contents",
+  "select": "A2:B3,D6:E7",
+  "mso": "ClearContents"
+ },
+ {
+  "name": "group rows",
+  "select": "A2:B3,D6:E7",
+  "mso": "OutlineGroup"
+ },
+ {
+  "name": "fill series box",
+  "select": "A2:B4,D6:E8",
+  "mso": "FillSeries"
+ },
+ {
+  "name": "fill justify",
+  "select": "A2:A3,C6:C7",
+  "mso": "FillJustify"
+ },
+ {
+  "name": "autofit columns ribbon",
+  "select": "A2:A3,D6:E6",
+  "mso": "ColumnWidthAutoFit"
+ },
+ {
+  "name": "autofit rows ribbon",
+  "select": "A2:A3,D6:E6",
+  "mso": "RowHeightAutoFit"
+ },
+ {
+  "name": "table om",
+  "select": "A2:B3,D6:E7",
+  "om": "[void]$ws.ListObjects.Add(1, $sel, [Type]::Missing, 1)"
+ },
+ {
+  "name": "fill series om",
+  "select": "A2:B4,D6:E8",
+  "om": "$sel.DataSeries(2, -4132, 1, 1)"
+ },
+ {
+  "name": "text to columns",
+  "select": "A2:A3,C6:C7",
+  "om": "[void]$sel.TextToColumns($sel.Areas.Item(1).Cells.Item(1,1), 1)"
+ },
+ {
+  "name": "delete cells up, columns partly shared",
+  "select": "A2:B3,B6:C6",
+  "om": "$sel.Delete(-4162)"
+ },
+ {
+  "name": "delete cells up, overlapping",
+  "select": "A2:B4,B3:C5",
+  "om": "$sel.Delete(-4162)"
+ },
+ {
+  "name": "delete cells left, rows partly shared",
+  "select": "B2:C3,E3:F4",
+  "om": "$sel.Delete(-4159)"
+ },
+ {
+  "name": "delete cells up, same columns",
+  "select": "A2:B3,A6:B6",
+  "om": "$sel.Delete(-4162)"
+ },
+ {
+  "name": "insert cells down, columns partly shared",
+  "select": "A2:B3,B6:C6",
+  "om": "$sel.Insert(-4121)"
+ },
+ {
+  "name": "delete cells dialog, partly shared",
+  "select": "A2:B3,B6:C6",
+  "mso": "CellsDelete"
+ },
+ {
+  "name": "insert rows, overlapping",
+  "select": "A2:B4,D3:E5",
+  "mso": "SheetRowsInsert"
+ },
+ {
+  "name": "create names with text",
+  "select": "A2:B3,D6:E7",
+  "setup": {
+   "cells": {
+    "A2": "Alpha",
+    "B2": "Beta",
+    "D6": "Gamma",
+    "E6": "Delta"
+   }
+  },
+  "om": "$sel.CreateNames($true, $false, $false, $false)"
+ },
+ {
+  "name": "merge, overlapping",
+  "select": "A2:B3,B3:C4",
+  "mso": "MergeCells"
+ },
+ {
+  "name": "fill down, overlapping",
+  "select": "A2:B4,B3:C5",
+  "mso": "FillDown"
+ },
+ {
+  "name": "sort with whole columns",
+  "select": "A:A,C:C",
+  "mso": "SortAscendingExcel"
+ },
+ {
+  "name": "enabled FormatAsTableGallery",
+  "select": "A2:B3,D6:E7",
+  "mso": "FormatAsTableGallery",
+  "probe": true
+ },
+ {
+  "name": "enabled ChartTypeColumnInsertGallery",
+  "select": "A2:B3,D6:E7",
+  "mso": "ChartTypeColumnInsertGallery",
+  "probe": true
+ },
+ {
+  "name": "enabled OutlineSubtotals",
+  "select": "A2:B3,D6:E7",
+  "mso": "OutlineSubtotals",
+  "probe": true
+ },
+ {
+  "name": "subtotals",
+  "select": "A2:B4,D6:E8",
+  "mso": "OutlineSubtotals"
+ }
+]

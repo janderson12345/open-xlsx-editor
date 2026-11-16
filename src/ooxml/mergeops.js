@@ -81,3 +81,26 @@ export function mergeChange(wb, si, sel, kind) {
   out.merges = merges;
   return out;
 }
+
+/**
+ * The merge over a selection of several areas: each area merged (or unmerged) as alone, all in one change, as Excel
+ * did (Merge & Center over A2:B3 and D6:E7 merged both; Merge Across each one's rows). Areas that overlap: null, as
+ * Excel left them (nothing merged, nothing said).
+ */
+export function mergeAreasChange(wb, si, areas, kind) {
+  if (areas.length < 2) return mergeChange(wb, si, areas[0], kind);
+  for (let i = 0; i < areas.length; i++) for (let j = i + 1; j < areas.length; j++) if (overlaps(areas[i], areas[j])) return null;
+  const sheet = wb.sheet(si);
+  const out = { contents: [], styles: [], merges: sheet.merges.filter((m) => !areas.some((a) => overlaps(m, a))) };
+  let any = false;
+  for (const a of areas) {
+    const one = mergeChange(wb, si, a, kind);
+    if (!one) continue;
+    any = true;
+    out.contents.push(...one.contents);
+    out.styles.push(...one.styles);
+    // (Its own new merged ranges; the ones it touched are gone from out.merges already.)
+    out.merges.push(...one.merges.filter((m) => overlaps(m, a)));
+  }
+  return any ? out : null;
+}

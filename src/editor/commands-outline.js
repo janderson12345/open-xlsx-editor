@@ -5,6 +5,7 @@ import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
 import { groupLines, ungroupLines, showLevels, hideDetail, showDetail, clearOutline, autoOutline, setSummary, setOutlineSymbols, outlineOf } from '../ooxml/outline.js';
 import { subtotal, removeSubtotals } from '../ooxml/subtotal.js';
 import { applyOutlineStyles } from '../ooxml/outlinestyles.js';
+import { MULTI_RANGE_MESSAGE } from '../ooxml/multiarea.js';
 
 export function outlineCommands(env) {
   const { ctx, state, commands, linesOf, moved } = env;
@@ -28,14 +29,18 @@ export function outlineCommands(env) {
     return near(o.rows.groups, s.ar) || !near(o.cols.groups, s.ac) ? 'row' : 'col';
   };
   const lineOf = (axis) => (axis === 'row' ? state.sel.ar : state.sel.ac);
+  /** Several ranges selected: Excel's refusal of Group, Ungroup and Subtotal (true when refused). */
+  const several = () => { if (!state.sel.more?.length) return false; ctx.alert(MULTI_RANGE_MESSAGE); return true; };
   return {
     /** Data > Group (Shift+Alt+Right): the selection's rows or columns one level deeper. */
     group(axis) {
+      if (several()) return false;
       const [a, b] = linesOf(axis);
       return step((wb, si) => groupLines(wb, si, axis, a, b), `${axis === 'col' ? 'Columns' : 'Rows'} grouped`, axis, 'No more than 7 levels can be grouped');
     },
     /** Data > Ungroup (Shift+Alt+Left): the selection's rows or columns one level out. */
     ungroup(axis) {
+      if (several()) return false;
       const [a, b] = linesOf(axis);
       return step((wb, si) => ungroupLines(wb, si, axis, a, b), `${axis === 'col' ? 'Columns' : 'Rows'} ungrouped`, axis, 'The selection isn\'t grouped');
     },
