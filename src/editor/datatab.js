@@ -1,7 +1,8 @@
 // The Data tab, Excel's groups in Excel's order as far as they are here: Queries & Connections (Refresh All, its
 // menu Refresh All and Refresh: the workbook's PivotTables, or the one at the active cell, pivot.js) and Sort & Filter
 // (Sort A to Z, Sort Z to A, Sort..., Filter, Clear, Reapply: the commands Home > Editing's menu runs too) and Data
-// Tools (Data Validation..., dvedit.js; Circle Invalid Data, dvcircles.js).
+// Tools (Data Validation..., dvedit.js; Circle Invalid Data, dvcircles.js) and Outline (Group, Ungroup, Subtotal, Show
+// and Hide Detail, Settings: commands-outline.js, acts-outline.js).
 
 /** The Data tab. `act(name, ...args)` runs a command. */
 export function dataTab(kit, { act }) {
@@ -18,6 +19,10 @@ export function dataTab(kit, { act }) {
     grp('Data Tools', btn('⫼', 'Text to Columns...', f('textToColumnsBox'), { label: 'Text to Columns', big: true }), col(btn('⚡', 'Flash Fill (Ctrl+E)', f('flashFill'), { label: 'Flash Fill' }),
       btn('⊖', 'Remove Duplicates...', f('removeDuplicatesBox'), { label: 'Remove Duplicates' })), split('☑', 'Data Validation...', f('validationBox'), () => [item('Data Validation...', f('validationBox')),
         item('Circle Invalid Data', f('circleInvalid')), item('Clear Validation Circles', f('clearCircles'))], { label: 'Data Validation', big: true })),
+    grp('Outline', split('⊞', 'Group (Shift+Alt+Right)', f('groupBox'), () => [item('Group...', f('groupBox'), { hint: 'Shift+Alt+Right' }), item('Auto Outline', f('autoOutline'))], { label: 'Group', big: true }),
+      split('⊟', 'Ungroup (Shift+Alt+Left)', f('ungroupBox'), () => [item('Ungroup...', f('ungroupBox'), { hint: 'Shift+Alt+Left' }), item('Clear Outline', f('clearOutline'))], { label: 'Ungroup', big: true }),
+      btn('∑', 'Subtotal', f('subtotalBox'), { label: 'Subtotal', big: true }),
+      col(btn('+', 'Show Detail', f('showDetail'), { label: 'Show Detail' }), btn('−', 'Hide Detail', f('hideDetail'), { label: 'Hide Detail' }), btn('⚙', 'Outline Settings', f('outlineSettingsBox'), { label: 'Settings' }))),
   ];
   return { groups, update() {} };
 }

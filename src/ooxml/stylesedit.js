@@ -250,8 +250,9 @@ class Formats {
   /** The cellStyleXfs index of one of Excel's built-in cell styles (CELL_STYLES), added with its cellStyle entry when
    *  the workbook hasn't got it. */
   cellStyle(name) {
-    const { builtinId, numFmtId, font } = CELL_STYLES[name];
-    const found = kids(kid(this.root, 'cellStyles', this.ns), 'cellStyle', this.ns).find((el) => attr(el, 'builtinId') === String(builtinId));
+    const { builtinId, numFmtId, font, iLevel } = CELL_STYLES[name];
+    // (The outline's RowLevel_n and ColLevel_n share a builtinId, told apart by iLevel: outlinestyles.js.)
+    const found = kids(kid(this.root, 'cellStyles', this.ns), 'cellStyle', this.ns).find((el) => attr(el, 'builtinId') === String(builtinId) && (iLevel == null || attr(el, 'iLevel') === String(iLevel)));
     if (found) return Number(attr(found, 'xfId') || 0);
     if (LOCALE_BUILTINS.has(numFmtId) && this.wb.styles.numFmts[numFmtId] == null) this.writeNumFmt(numFmtId, BUILTIN_FORMATS[numFmtId]);
     // (As Excel writes a style's own format: the Normal font, no fill or border, and only its number format applied;
@@ -269,6 +270,7 @@ class Formats {
     cs.setAttribute('name', name);
     cs.setAttribute('xfId', String(xfId));
     cs.setAttribute('builtinId', String(builtinId));
+    if (iLevel != null) cs.setAttribute('iLevel', String(iLevel));
     styles.appendChild(cs);
     styles.setAttribute('count', String(kids(styles, 'cellStyle', this.ns).length));
     this.wb.dirty.add(this.wb.stylesPath);

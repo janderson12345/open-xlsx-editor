@@ -26,6 +26,7 @@ same results as ours: 406 of 406.
 | Formulas on other sheets, defined names and chart series follow the same way. | `Four` (`Sheet1!$A$4`) is `$A$5` after an insert at 3, `#REF!` after rows 2 to 4 go. |
 | Columns follow the same rules. | Column A deleted: `=SUM(A1:A5)` is `=SUM(#REF!)`. |
 | New rows take the row above's height and format, and the cells of that row whose format isn't the row's own. New columns take the width and format of the column to their left, and its cells' formats. | Row 2 bold, 30pt, B2 yellow: the new row 3 is bold, 30pt, B3 yellow. Column B 20 wide: the new C is 20 wide. |
+| New rows and columns take the outline level of the one before them too, shown and never collapsed, and the group they join opens (docs/OUTLINE.md). | Rows 2:4 grouped, a row inserted at 3: level 1; in a collapsed group, shown and the summary no longer collapsed. |
 | Merged ranges move, grow and shrink as ranges do; one whose lines are all deleted goes. | E2:E4: E2:E5 after an insert at 3, E2:E3 after a delete of 3, gone after 2 to 4. |
 | An insert that would push filled cells off the sheet is refused, with Excel's message; so is an insert or delete that would split an array formula. | "To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet..." |
 

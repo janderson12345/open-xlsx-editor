@@ -17,6 +17,9 @@ import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tok
 import { SheetError, mapFormulas } from './sheetops.js';
 import { moveNotes, moveDrawings, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
 import { readPivots } from './pivot.js';
+import { insertedLines, openJoined } from './outline.js';
+import { pxWidth } from './sizes.js';
+import { defaultColPx } from './units.js';
 
 export const ROWCOL_MESSAGES = {
   offSheet: 'To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet. Select another location in which to insert new cells, or delete data from the end of your worksheet.',
@@ -114,7 +117,8 @@ function moveCells(doc, axis, at, n) {
       for (let k = 0; k < n; k++) {
         const row = make(doc, ns, 'row');
         row.setAttribute('r', String(at + k + 1));
-        for (const name of ['s', 'customFormat', 'ht', 'customHeight']) if (attr(source, name) != null) row.setAttribute(name, attr(source, name));
+        // (And its outline level, shown and never collapsed: "insert row inside a group", excel-outline.ps1.)
+        for (const name of ['s', 'customFormat', 'ht', 'customHeight', 'outlineLevel']) if (attr(source, name) != null) row.setAttribute(name, attr(source, name));
         for (const c of cells) {
           const el = make(doc, ns, 'c');
           el.setAttribute('r', refName(at + k, parseRef(attr(c, 'r')).c));
@@ -228,7 +232,7 @@ function colStyles(root, ns) {
 }
 
 /** Column widths and formats (`cols`) after a column insert or delete: new columns take the left one's. */
-function moveCols(doc, at, n) {
+function moveCols(doc, at, n, defaultWidth) {
   const root = doc.documentElement;
   const ns = root.namespaceURI;
   const cols = kid(root, 'cols', ns);
@@ -239,6 +243,11 @@ function moveCols(doc, at, n) {
     // (A column element ending just before an insert takes in the new columns: they get its width and format.)
     const span = n > 0 && max === at - 1 ? [min, max + n] : shiftSpan(min, max, at, n);
     if (!span) { cols.removeChild(el); continue; }
+    // (Its outline level too, but shown and not collapsed, as Excel inserts rows: outline.js insertedLines.)
+    if (n > 0 && max === at - 1 && (attr(el, 'hidden') === '1' || attr(el, 'collapsed') === '1')) {
+      el.parentNode.insertBefore(insertedLines(el, at, n, defaultWidth), el.nextSibling);
+      span[1] = max;
+    }
     el.setAttribute('min', String(span[0] + 1));
     el.setAttribute('max', String(Math.min(span[1], MAX_COLS - 1) + 1));
   }
@@ -333,8 +342,11 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   // Formulas first, while every cell is where it was (shared ones on this sheet written out cell by cell).
   mapFormulas(wb, (text, here) => shiftRefs(text, { here, sheet: info.name, axis, at, n, band }), { name: info.name, target: si, shared: true });
   if (band) moveBandCells(doc, axis, at, n, band); else moveCells(doc, axis, at, n);
-  if (axis === 'col' && !band) moveCols(doc, at, n);
+  const format = wb.sheet(si).format;
+  if (axis === 'col' && !band) moveCols(doc, at, n, pxWidth(defaultColPx(format, 7)));
   moveRanges(doc, axis, at, n, band, split);
+  // (Lines inserted into a collapsed group open it: its summary's collapsed goes, as Excel's does.)
+  if (n > 0 && !band) openJoined(doc, axis, at, n, format);
   // Notes with their cells; pictures, charts and shapes with whole lines (not when cells shift, as in Excel).
   moveNotes(wb, si, (r, c) => {
     const next = shiftRange({ r0: r, c0: c, r1: r, c1: c }, axis, at, n, band);

@@ -199,6 +199,8 @@ export function attachEditing(root, ctx) {
     let handled = true;
     // (Alt+Down on a heading cell of a filter opens its list, as in Excel.)
     if (e.altKey && !ctrl && key === 'ArrowDown' && ctx.filterMenu?.()) { /* opened */ }
+    // (Shift+Alt+Right and Left: Group and Ungroup, as in Excel.)
+    else if (e.altKey && e.shiftKey && !ctrl && (key === 'ArrowRight' || key === 'ArrowLeft') && ctx.outline) ctx.outline(key === 'ArrowRight' ? 1 : -1);
     else if (ARROWS[key]) cmd.run('move', ARROWS[key][0], ARROWS[key][1], { extend: e.shiftKey, jump: ctrl });
     else if (key === 'Tab') cmd.run('move', 0, e.shiftKey ? -1 : 1, { via: 'tab' });
     // (Format Painter waiting: Enter paints the selection, as a click does.)
@@ -252,6 +254,7 @@ export function attachEditing(root, ctx) {
     else if (ctrl && e.shiftKey && !e.altKey && key.toLowerCase() === 'l') { if (ctx.allowed?.('filterToggle') !== false) cmd.run('filterToggle'); }
     // (Ctrl+9 hides the rows, Ctrl+0 the columns; with Shift they show again. Taken from the key's code: Shift+9 is "(".)
     else if (ctrl && (e.code === 'Digit9' || e.code === 'Digit0')) cmd.run('hideLines', e.code === 'Digit9' ? 'row' : 'col', !e.shiftKey);
+    else if (ctrl && !e.shiftKey && !e.altKey && e.code === 'Digit8') cmd.run('outlineSymbols');
     else if (ctrl && (key === 'z' || key === 'Z') && !e.shiftKey) cmd.run('undo');
     else if (ctrl && (key === 'y' || ((key === 'z' || key === 'Z') && e.shiftKey))) cmd.run('redo');
     // (Ctrl+C, X and V: the browser's copy and paste go on after the key, so its default isn't stopped.)
