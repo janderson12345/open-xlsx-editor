@@ -1,0 +1,710 @@
+{
+  "excel": "Excel.Application, Workbooks.OpenText (United States settings)",
+  "today": "2026-11-16",
+  "cases": [
+    {
+      "name": "semicolon-de",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "item",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "amount",
+          "format": "General"
+        },
+        {
+          "ref": "C1",
+          "type": "text",
+          "value": "when",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "text",
+          "value": "alpha",
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1234.5,
+          "format": "#,##0.00"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A3",
+          "type": "text",
+          "value": "beta",
+          "format": "General"
+        },
+        {
+          "ref": "B3",
+          "type": "number",
+          "value": -2.25,
+          "format": "General"
+        },
+        {
+          "ref": "C3",
+          "type": "number",
+          "value": 45273.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A4",
+          "type": "text",
+          "value": "gamma",
+          "format": "General"
+        },
+        {
+          "ref": "B4",
+          "type": "text",
+          "value": "x;y",
+          "format": "General"
+        },
+        {
+          "ref": "C4",
+          "type": "number",
+          "value": 45323.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A5",
+          "type": "text",
+          "value": "delta",
+          "format": "General"
+        },
+        {
+          "ref": "B5",
+          "type": "number",
+          "value": 0.035,
+          "format": "0.00%"
+        },
+        {
+          "ref": "C5",
+          "type": "number",
+          "value": 45322.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A6",
+          "type": "text",
+          "value": "eps",
+          "format": "General"
+        },
+        {
+          "ref": "B6",
+          "type": "text",
+          "value": "1.5",
+          "format": "General"
+        },
+        {
+          "ref": "C6",
+          "type": "number",
+          "value": 46086.0,
+          "format": "d-mmm"
+        }
+      ]
+    },
+    {
+      "name": "tab-us",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "code",
+          "format": "@"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "value",
+          "format": "General"
+        },
+        {
+          "ref": "C1",
+          "type": "text",
+          "value": "date",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "text",
+          "value": "007",
+          "format": "@"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1234.5,
+          "format": "#,##0.00"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A3",
+          "type": "text",
+          "value": "0042",
+          "format": "@"
+        },
+        {
+          "ref": "B3",
+          "type": "number",
+          "value": 12.0,
+          "format": "$#,##0_);[Red]($#,##0)"
+        },
+        {
+          "ref": "C3",
+          "type": "number",
+          "value": 45291.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A4",
+          "type": "text",
+          "value": "A-1",
+          "format": "@"
+        },
+        {
+          "ref": "B4",
+          "type": "number",
+          "value": 0.5,
+          "format": "0%"
+        },
+        {
+          "ref": "C4",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A5",
+          "type": "text",
+          "value": "B 2",
+          "format": "@"
+        },
+        {
+          "ref": "B5",
+          "type": "number",
+          "value": -7.0,
+          "format": "General"
+        },
+        {
+          "ref": "C5",
+          "type": "text",
+          "value": "not a date",
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "pipe-single-quote",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "name",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "note",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "text",
+          "value": "a|b",
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "text",
+          "value": "plain",
+          "format": "General"
+        },
+        {
+          "ref": "A3",
+          "type": "text",
+          "value": "it's",
+          "format": "General"
+        },
+        {
+          "ref": "B3",
+          "type": "text",
+          "value": "quoted",
+          "format": "General"
+        },
+        {
+          "ref": "A4",
+          "type": "text",
+          "value": "x\"y",
+          "format": "General"
+        },
+        {
+          "ref": "B4",
+          "type": "text",
+          "value": "\"q\"",
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "comma-no-quote",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "a",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "\"b",
+          "format": "General"
+        },
+        {
+          "ref": "C1",
+          "type": "text",
+          "value": "c\"",
+          "format": "General"
+        },
+        {
+          "ref": "D1",
+          "type": "text",
+          "value": "d",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "number",
+          "value": 1.0,
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 2.0,
+          "format": "General"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 3.0,
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "consecutive-spaces",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "one",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "two",
+          "format": "General"
+        },
+        {
+          "ref": "C1",
+          "type": "text",
+          "value": "three",
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1.0,
+          "format": "General"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 2.0,
+          "format": "General"
+        },
+        {
+          "ref": "D2",
+          "type": "number",
+          "value": 3.0,
+          "format": "General"
+        },
+        {
+          "ref": "A3",
+          "type": "text",
+          "value": "a b",
+          "format": "General"
+        },
+        {
+          "ref": "B3",
+          "type": "text",
+          "value": "c",
+          "format": "General"
+        },
+        {
+          "ref": "C3",
+          "type": "text",
+          "value": "d",
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "fixed-width",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "ID",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "NAME",
+          "format": "@"
+        },
+        {
+          "ref": "C1",
+          "type": "text",
+          "value": "AMOUNT",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "number",
+          "value": 12.0,
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "text",
+          "value": "Widget",
+          "format": "@"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 15.25,
+          "format": "General"
+        },
+        {
+          "ref": "A3",
+          "type": "number",
+          "value": 13.0,
+          "format": "General"
+        },
+        {
+          "ref": "B3",
+          "type": "text",
+          "value": "Gear",
+          "format": "@"
+        },
+        {
+          "ref": "C3",
+          "type": "number",
+          "value": 1000.0,
+          "format": "#,##0"
+        },
+        {
+          "ref": "A4",
+          "type": "number",
+          "value": 7.0,
+          "format": "General"
+        },
+        {
+          "ref": "B4",
+          "type": "text",
+          "value": "Bolt",
+          "format": "@"
+        },
+        {
+          "ref": "C4",
+          "type": "number",
+          "value": -3.0,
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "start-row-3",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "k",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "v",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "text",
+          "value": "a",
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1.0,
+          "format": "General"
+        },
+        {
+          "ref": "A3",
+          "type": "text",
+          "value": "b",
+          "format": "General"
+        },
+        {
+          "ref": "B3",
+          "type": "number",
+          "value": 2.0,
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "utf16",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "word",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "n",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "text",
+          "value": "café",
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1.0,
+          "format": "General"
+        },
+        {
+          "ref": "A3",
+          "type": "text",
+          "value": "日本",
+          "format": "General"
+        },
+        {
+          "ref": "B3",
+          "type": "number",
+          "value": 2.0,
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "ansi",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "text",
+          "value": "word",
+          "format": "General"
+        },
+        {
+          "ref": "B1",
+          "type": "text",
+          "value": "n",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "text",
+          "value": "café",
+          "format": "General"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1.0,
+          "format": "General"
+        },
+        {
+          "ref": "A3",
+          "type": "number",
+          "value": 5.0,
+          "format": "[$€-2] #,##0;[Red]-[$€-2] #,##0"
+        },
+        {
+          "ref": "B3",
+          "type": "number",
+          "value": 2.0,
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "ymd-dates",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "B1",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "C1",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A2",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "A3",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "B3",
+          "type": "number",
+          "value": 45356.0,
+          "format": "m/d/yyyy"
+        },
+        {
+          "ref": "C3",
+          "type": "text",
+          "value": "13/5/2024",
+          "format": "General"
+        },
+        {
+          "ref": "A4",
+          "type": "text",
+          "value": "x",
+          "format": "General"
+        },
+        {
+          "ref": "B4",
+          "type": "text",
+          "value": "31/2/2024",
+          "format": "General"
+        },
+        {
+          "ref": "C4",
+          "type": "text",
+          "value": "2/30/2024",
+          "format": "General"
+        }
+      ]
+    },
+    {
+      "name": "general-us",
+      "cells": [
+        {
+          "ref": "A1",
+          "type": "number",
+          "value": 3.0,
+          "format": "General",
+          "formula": "=1+2"
+        },
+        {
+          "ref": "B1",
+          "type": "boolean",
+          "value": true,
+          "format": "General"
+        },
+        {
+          "ref": "C1",
+          "type": "error",
+          "value": "#N/A",
+          "format": "General"
+        },
+        {
+          "ref": "A2",
+          "type": "number",
+          "value": 1000.0,
+          "format": "0.00E+00"
+        },
+        {
+          "ref": "B2",
+          "type": "number",
+          "value": 1234.0,
+          "format": "#,##0"
+        },
+        {
+          "ref": "C2",
+          "type": "number",
+          "value": 0.4375,
+          "format": "h:mm"
+        },
+        {
+          "ref": "A3",
+          "type": "number",
+          "value": 46024.0,
+          "format": "d-mmm"
+        },
+        {
+          "ref": "B3",
+          "type": "text",
+          "value": "  pad  ",
+          "format": "General"
+        },
+        {
+          "ref": "C3",
+          "type": "text",
+          "value": "-",
+          "format": "General"
+        }
+      ]
+    }
+  ]
+}

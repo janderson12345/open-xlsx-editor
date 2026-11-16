@@ -5,7 +5,8 @@
 // Excel's Save As CSV (UTF-8) and CSV write one.
 import { zipSync, strToU8 } from 'fflate';
 import { Workbook } from './workbook.js';
-import { entryChanges } from './entry.js';
+import { decodeText, splitDelimited, detectSeparator, importCells } from './textimport.js';
+import { currentLocale } from './locale.js';
 import { cellText } from './numfmt.js';
 import { formatCodeOf } from './styles.js';
 import { ansiCode } from '../calc/charsets.js';
@@ -18,38 +19,8 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 
 /** The fields of a CSV text, row by row: a field in quotes may hold the separator, line breaks (kept as they are,
  *  CR LF in a file from Windows) and "" for a quote; outside quotes a line ends at CR LF, LF or CR. A last empty line
- *  isn't a row. */
-export function parseCsv(text, sep = ',') {
-  const rows = [];
-  let row = [];
-  let field = '';
-  let quoted = false;
-  let i = 0;
-  const end = () => { row.push(field); field = ''; };
-  while (i < text.length) {
-    const ch = text[i];
-    if (quoted) {
-      if (ch === '"' && text[i + 1] === '"') { field += '"'; i += 2; continue; }
-      if (ch === '"') { quoted = false; i++; continue; }
-      field += ch;
-      i++;
-      continue;
-    }
-    if (ch === '"') { quoted = true; i++; continue; }
-    if (ch === sep) { end(); i++; continue; }
-    if (ch === '\r' || ch === '\n') {
-      end();
-      rows.push(row);
-      row = [];
-      i += ch === '\r' && text[i + 1] === '\n' ? 2 : 1;
-      continue;
-    }
-    field += ch;
-    i++;
-  }
-  if (field !== '' || row.length) { end(); rows.push(row); }
-  return rows;
-}
+ *  isn't a row. (textimport.js splitDelimited, with one separator.) */
+export const parseCsv = (text, sep = ',') => splitDelimited(text, { seps: sep, quote: '"' });
 
 /** Excel's sheet name for a file: its name without the extension, cut to 31 characters, the characters a sheet's
  *  name can't hold (\ / ? * [ ] :) made _. */
@@ -71,21 +42,18 @@ function blankBytes(name) {
   return zipSync(Object.fromEntries(Object.entries(files).map(([k, v]) => [k, strToU8(v)])));
 }
 
-/** A workbook from a CSV file's bytes (UTF-8; a byte order mark left out) and its name, as Excel opens it. */
-export function csvWorkbook(bytes, fileName, today = new Date()) {
-  let text = new TextDecoder('utf-8').decode(bytes);
-  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
-  const wb = Workbook.fromBytes(blankBytes(sheetNameOf(fileName)));
-  const contents = [];
-  const styles = [];
-  parseCsv(text).forEach((fields, r) => fields.forEach((field, c) => {
-    if (field === '') return;
-    const ch = entryChanges(wb, 0, r, c, field, today);
-    // (What Excel wouldn't take as a formula is the text itself, as a CSV's field is.)
-    if (ch.error) { contents.push({ r, c, value: field }); return; }
-    contents.push(ch.content);
-    if (ch.style) styles.push(ch.style);
-  }));
+/** An empty workbook of one sheet named `name`. */
+export const blankWorkbook = (name = 'Sheet1') => Workbook.fromBytes(blankBytes(name));
+
+/** A workbook from a CSV file's bytes and its name, as Excel opens it. `encoding`: textimport.js decodeText's ('auto':
+ *  a byte order mark, else UTF-8 when the bytes are, else Windows-1252); `sep`: the field separator, else the one the
+ *  file seems written with (the locale's list separator on a tie: Excel takes the computer's); `locale` (locale.js):
+ *  the numbers' separators and the dates' order, the page's unless given. */
+export function csvWorkbook(bytes, fileName, today = new Date(), { locale = currentLocale(), sep = null, encoding = 'auto', quote = '"' } = {}) {
+  const { text } = decodeText(bytes, encoding);
+  const wb = blankWorkbook(sheetNameOf(fileName));
+  const rows = splitDelimited(text, { seps: sep ?? detectSeparator(text, { quote, prefer: locale.listSep }), quote });
+  const { contents, styles } = importCells(wb, 0, 0, 0, rows, { locale, today });
   if (contents.length) wb.apply(0, contents);
   if (styles.length) wb.setStyles(0, styles);
   wb.edited = false;
