@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { serializeXml } from '../src/ooxml/xml.js';
-import { parseRange, parseRef } from '../src/ooxml/refs.js';
+import { parseRange, parseRef, rangeName } from '../src/ooxml/refs.js';
 import { readTables } from '../src/ooxml/tables.js';
 import { createTable, tableEntry, setTableStyle, setTableOption, setTotalsRow, setTotalFunction, setHeaderRow, renameTable, resizeTable, tableAt } from '../src/ooxml/tableedit.js';
 import { convertToRange } from '../src/ooxml/tableconvert.js';
@@ -93,11 +93,16 @@ function ourCells(wb) {
   return out;
 }
 
+// (Each case's file kept for Excel to read back: tools/excel-compare/excel-tables-check.ps1.)
+fs.mkdirSync('test/out/tablemake', { recursive: true });
+
 for (const c of cases) {
   const x = excel.find((e) => e.name === c.name);
   test(`table ${c.name}: as Excel writes it`, () => {
     const { wb, skip } = run(c);
     if (skip) return assert.fail(`no command for ${skip}`);
+    if (c.name !== 'unlist') wb.setStyles(0, [{ r: 9, c: 1, s: wb.styleWith(0, { cellStyle: 'Good' }) }]);
+    fs.writeFileSync(`test/out/tablemake/${c.name}.xlsx`, wb.toBytes());
     const ours = readTables(wb).map((t) => plain(wb.pkg.text(t.path))).sort();
     const theirs = (x.tables || []).map((t) => plain(t.xml)).sort();
     assert.deepEqual(ours, theirs);
@@ -155,4 +160,20 @@ test("names Excel refuses for a table, in Excel's words", () => {
   for (const bad of ['A1', '1st', 'my table', 'R1C1', '']) assert.ok(renameTable(wb, readTables(wb)[0], bad)?.error, bad);
   assert.equal(renameTable(wb, readTables(wb)[0], 'Ok_name'), null);
   assert.equal(parseRef('B2').r, 1);
+});
+
+test("Excel reads back each table the editor wrote as it was written (test/tablemake-readback-excel.json)", () => {
+  const back = JSON.parse(fs.readFileSync('test/tablemake-readback-excel.json', 'utf8').trim());
+  const CALC_OF = { none: 0, sum: 1, average: 2, count: 3, countNums: 4, min: 5, max: 6, stdDev: 7, var: 8, custom: 9 };
+  const diffs = [];
+  for (const f of back) {
+    if (f.error) { diffs.push(`${f.file}: ${f.error}`); continue; }
+    const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync(`test/out/tablemake/${f.file}`)));
+    const mine = readTables(wb).map((t) => ({ name: t.name, range: rangeName(t), style: t.style.name || '', headers: !!t.headers, totals: !!t.totals, rows: t.style.rows, cols: t.style.cols,
+      first: t.style.first, last: t.style.last, filter: !!t.filter, buttons: !!t.filter && !t.filter.hidden.size, columns: t.columns, calc: t.totalsRow.map((x) => CALC_OF[x.fn || 'none']) }));
+    const theirs = (f.tables || []).map(({ totalsText, ...t }) => t);
+    if (JSON.stringify(mine) !== JSON.stringify(theirs)) diffs.push(`${f.file}: ours ${JSON.stringify(mine)} Excel ${JSON.stringify(theirs)}`);
+    if (f.file !== 'unlist.xlsx' && f.b10 !== 'Good') diffs.push(`${f.file}: B10 ${f.b10}`);
+  }
+  assert.deepEqual(diffs, []);
 });

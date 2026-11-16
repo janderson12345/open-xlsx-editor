@@ -49,6 +49,9 @@ in some table colours (TableStyleLight7's stripe D9F1CF for Excel's DAF2D0).
 (`tools/excel-compare/excel-tables.ps1` on `table-cases.json`: 33 cases on made-up lists, each saved, the table parts,
 cells, relationships and styles kept in `test/tablemake-excel.json`). `test/tableedit.test.js` replays each case and
 compares: 33 of 33 the same table parts (uids aside), cells and formulas, and after Convert to Range the same formats.
+Excel reads back the editor's file of each case (`tools/excel-compare/excel-tables-check.ps1` on `test/out/tablemake`,
+`test/tablemake-readback-excel.json`): 33 of 33 open, every table's name, range, style, options, filter, columns and
+totals as the editor wrote them, and a cell given Good by the editor in Good.
 
 - **Insert > Table, Ctrl+T, Format as Table** (`createTable`, ListObjects.Add): a part `xl/tables/tableN.xml` with
   its relationship from the sheet, a content type override and the sheet's `<tableParts>`. `<table id name

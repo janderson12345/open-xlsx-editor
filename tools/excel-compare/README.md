@@ -104,7 +104,8 @@ saves for them (`test/tablestyles-excel.json`; `node tablestyles-data.mjs` turns
 `excel-tablelook.ps1 <cases.json> <out.json> [-AllStyles]` reads every cell's DisplayFormat of a table in a style with
 the case's options (`tablelook-cases.json`, `test/tablelook-*-excel.json`); `excel-tints.ps1` the colour of 22 colours
 at ten tints (`test/tints-excel.json`); `excel-tables.ps1 table-cases.json <out.json>` makes and changes tables and keeps
-what Excel saves (`test/tablemake-excel.json`); `excel-cellstyles.ps1 <out.json>` the built-in cell styles and what
+what Excel saves (`test/tablemake-excel.json`), and `excel-tables-check.ps1 test/out/tablemake <out.json>` has Excel read back the
+editor's files of the same cases (`test/tablemake-readback-excel.json`); `excel-cellstyles.ps1 <out.json>` the built-in cell styles and what
 applying each one saves (`test/cellstyles-excel.json`). The table drawing is compared with Excel's PDF of
 `test/fixtures/tables.xlsx` by `compare-cover.py <excel shapes> <our shapes>`, which compares the colour showing at
 points inside Excel's filled shapes (docs/TABLES.md).
