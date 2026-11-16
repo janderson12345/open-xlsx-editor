@@ -20,6 +20,8 @@
 // rotate.xlsx   rotated text (angles up and down with each alignment, stacked, rows Excel sizes) and shrink to fit,
 //                for comparing with Excel's PDF (probes-format.mjs; docs/LAYOUT.md).
 // special.xlsx  something for each of Go To Special's choices (special.mjs).
+// drawings.xlsx  pictures (cropped, turned, flipped), an SVG icon, preset shapes with text, connectors, a group, an
+//                absolute anchor, over a hidden row and column (drawings.mjs).
 // sparklines.xlsx  sparklines of each type and option, as Excel writes them (sparklines.mjs).
 // tables.xlsx    a table in each built-in table style, one in a style of its own, one with cells' own formats
 //                (tables.mjs).
@@ -42,6 +44,7 @@ import { widths, general, fonts, fills, align, rotate, numfmts, rowHeights } fro
 import { formulas } from './probes-formulas.mjs';
 import { notes, charts, anchors } from './parts-drawings.mjs';
 import { printProbes } from './probes-print.mjs';
+import { drawings } from './drawings.mjs';
 
 // The tests read the probes' tables from here.
 export * from './probes-format.mjs';
@@ -167,4 +170,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   refmoves();
   slicerBook();
   cfmoves();
+  drawings();
 }

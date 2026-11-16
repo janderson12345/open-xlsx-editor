@@ -11,6 +11,7 @@ of several ranges (`src/editor/selection.js`). Measured over COM: `test/fixtures
 - Home > Find & Select > Go To Special..., or the Go To box (F5, Ctrl+G) and its Special... button: Excel's box, its
   choices in two columns, each with its options. The last choice is kept for the next time.
 - Find & Select's shortcuts as Excel's: Formulas, Notes, Conditional Formatting, Constants, Data Validation.
+- Objects, in the box's left column as in Excel's: the sheet's charts, pictures and shapes picked instead of cells.
 - Ctrl+click (or Ctrl and drag) adds a range to the selection; Shift and the arrows change the range added last. The
   ranges are shaded; there is no fill handle while there are several, as in Excel.
 - Over several ranges, formatting (Home's font, fill, borders, alignment, number format) and Clear go to each range;
@@ -39,5 +40,8 @@ of several ranges (`src/editor/selection.js`). Measured over COM: `test/fixtures
 - Excel lists the ranges found in an order of its own (Constants, Numbers from A1 starts at D4), and selecting them
   makes the first range's top-left cell active, even in a hidden row. Here the ranges go top to bottom, left to right,
   and the first cell found that is in sight is made active. The cells selected are the same.
-- Objects (selecting the sheet's pictures, charts and shapes) isn't offered: drawings can't be selected yet.
+- Objects picks every chart, picture, shape and group on the sheet (`src/editor/chartpick.js` pickAll), drawn as
+  picked; Delete deletes them all and the arrow keys move them all, each one step of the undo history. With none,
+  the message is "No objects were found." (not measured: Excel's box can't be driven over COM). Excel's Select
+  Objects mode and Selection Pane aren't there.
 - Copy over several ranges that line up (the same rows or the same columns), which Excel allows, is refused.

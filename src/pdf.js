@@ -9,7 +9,11 @@
 // (`fonts.omf`: pdfomf.js), embedded as subsets (fontkit); else the PDF standard fonts (Helvetica, Times, Courier and
 // their bold and italic faces), each piece of text drawn at the width the layout measured, so the columns and pages are
 // the layout's in any font. A standard font draws characters it lacks as "?" (it covers Windows-1252's only).
-import { PDFDocument, StandardFonts, rgb, PDFOperator, PDFOperatorNames, PDFNumber, pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize, setTextMatrix, showText, setFillingRgbColor, rectangle, clip, endPath } from 'pdf-lib';
+//
+// Pictures, shapes and icons (editor/drawview.js) over the cells: their paths as vector paths, their pictures as
+// images (PNG and JPEG as they are; an SVG icon by its PNG fallback; GIF, BMP and WebP, and an SVG with none, turned to
+// PNG by the browser), clipped to their frames and to the page's cells, and their text as real text.
+import { PDFDocument, StandardFonts, rgb, PDFOperator, PDFOperatorNames, PDFNumber, pushGraphicsState, popGraphicsState, beginText, endText, setFontAndSize, setTextMatrix, showText, setFillingRgbColor, setStrokingRgbColor, setLineWidth, setDashPattern, setLineCap, setLineJoin, setGraphicsState, LineCapStyle, LineJoinStyle, moveTo, lineTo, appendBezierCurve, closePath, fill, stroke, fillAndStroke, concatTransformationMatrix, drawObject, rectangle, clip, endPath } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { twinFor, twinSegments } from './pdfomf.js';
 
@@ -114,6 +118,7 @@ async function drawPage(pdf, pageEl, ctx) {
   //    paints them (the DOM's: fills, cells, edges).
   page.pushOperators(...clipTo(area));
   for (const el of areaEl.querySelectorAll('*')) {
+    if (el.closest('.oxe-page-objclip')) continue;
     const cs = getComputedStyle(el);
     if (cs.visibility !== 'visible' || cs.display === 'none') continue;
     const r = el.getBoundingClientRect();
@@ -166,17 +171,18 @@ async function drawPage(pdf, pageEl, ctx) {
     return ctx.ascents.get(f);
   };
   // (The page's text: its cells', and its header's and footer's outside the printable area.)
-  const walker = document.createTreeWalker(pageEl, NodeFilter.SHOW_TEXT, { acceptNode: (t) => (t.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
-  for (let t = walker.nextNode(); t; t = walker.nextNode()) {
+  /** One text node, line by line, in its font, clipped as its kind of text is (`within`: to that rectangle). */
+  const drawText = async (t, within = null) => {
     const el = t.parentElement;
     const cs = getComputedStyle(el);
-    if (cs.visibility !== 'visible') continue;
+    if (cs.visibility !== 'visible') return;
     const cell = el.closest('.oxe-cell');
-    // (A cell's text clipped to its cell and the printable area; a header's or footer's to the page.)
-    const bound = cell ? area : pr;
-    const cr = cell ? cell.getBoundingClientRect() : pr;
+    // (A cell's text clipped to its cell and the printable area; a header's or footer's to the page; an object's to
+    // the page's cells, `within`.)
+    const bound = within || (cell ? area : pr);
+    const cr = cell ? cell.getBoundingClientRect() : bound;
     const box = { left: Math.max(cr.left, bound.left), top: Math.max(cr.top, bound.top), right: Math.min(cr.right, bound.right), bottom: Math.min(cr.bottom, bound.bottom) };
-    if (box.right <= box.left || box.bottom <= box.top) continue;
+    if (box.right <= box.left || box.bottom <= box.top) return;
     const got = await fontFor(pdf, cs, ctx);
     const z = el.currentCSSZoom || 1;
     const size = (parseFloat(cs.fontSize) || 16) * z * PT;
@@ -206,7 +212,11 @@ async function drawPage(pdf, pageEl, ctx) {
       if (lines.includes('underline')) page.drawLine({ start: { x: X(piece.r.left), y: y - size * 0.12 }, end: { x: X(piece.r.left) + want, y: y - size * 0.12 }, thickness: thick, color: c.rgb });
       if (lines.includes('line-through')) page.drawLine({ start: { x: X(piece.r.left), y: y + size * 0.3 }, end: { x: X(piece.r.left) + want, y: y + size * 0.3 }, thickness: thick, color: c.rgb });
     }
-  }
+  };
+  const walker = document.createTreeWalker(pageEl, NodeFilter.SHOW_TEXT, { acceptNode: (t) => (t.data.trim() && !t.parentElement.closest('.oxe-page-objclip') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
+  for (let t = walker.nextNode(); t; t = walker.nextNode()) await drawText(t);
+  // 2b. Pictures, shapes and icons, over the cells and their text, in the drawing's order, each with its text.
+  await drawObjects(pdf, page, pageEl, { pr, drawText, ctx, area });
   // 3. Header and footer pictures (&G), PNG or JPEG, where the layout put them.
   for (const img of pageEl.querySelectorAll('.oxe-hf-pic')) {
     const m = /^data:image\/(png|jpeg);base64,(.*)$/.exec(img.src);
@@ -217,6 +227,94 @@ async function drawPage(pdf, pageEl, ctx) {
     const r = img.getBoundingClientRect();
     page.drawImage(ctx.images.get(img.src), { x: X(r.left), y: Y(r.bottom), width: r.width * PT, height: r.height * PT });
   }
+}
+
+/** A page's pictures and shapes (print.js drawObjectsBlock): each object's paint (drawpaint.js, kept on its box by
+ *  drawview.js) mapped from the sheet's pixels to the page, clipped to its block of cells. */
+async function drawObjects(pdf, page, pageEl, { pr, drawText, ctx, area }) {
+  // (The sheet's pixels to the page's points: the object's box is where the page has it, at its zoom.)
+  const toPdf = (r, box, z) => [z * PT, 0, 0, -z * PT, (r.left - box.x * z - pr.left) * PT, (pr.bottom - r.top + box.y * z) * PT];
+  const pathOps = (cmds, q) => cmds.map((c) => {
+    const p = (i) => [q[0] * c[i] + q[2] * c[i + 1] + q[4], q[1] * c[i] + q[3] * c[i + 1] + q[5]];
+    if (c[0] === 'M') return moveTo(...p(1));
+    if (c[0] === 'L') return lineTo(...p(1));
+    if (c[0] === 'C') return appendBezierCurve(...p(1), ...p(3), ...p(5));
+    return closePath();
+  });
+  const rgbOf = (css) => [1, 3, 5].map((i) => parseInt(css.slice(i, i + 2), 16) / 255);
+  ctx.images ||= new Map();
+  for (const clipEl of pageEl.querySelectorAll('.oxe-page-objclip')) {
+    const cr = clipEl.getBoundingClientRect();
+    const bound = { left: Math.max(cr.left, area.left), top: Math.max(cr.top, area.top), right: Math.min(cr.right, area.right), bottom: Math.min(cr.bottom, area.bottom) };
+    if (bound.right <= bound.left || bound.bottom <= bound.top) continue;
+    const clipOps = () => [rectangle((bound.left - pr.left) * PT, (pr.bottom - bound.bottom) * PT, (bound.right - bound.left) * PT, (bound.bottom - bound.top) * PT), clip(), endPath()];
+    for (const objEl of clipEl.querySelectorAll('.oxe-obj')) {
+      const ops = objEl._oxePaint || [];
+      const box = objEl._oxeBox;
+      const z = objEl.currentCSSZoom || 1;
+      const q = toPdf(objEl.getBoundingClientRect(), box, z);
+      const texts = [...objEl.querySelectorAll(':scope > .oxe-obj-text')];
+      let n = 0;
+      for (const op of ops) {
+        if (op.t === 'path') {
+          const out = [pushGraphicsState(), ...clipOps()];
+          const f = op.fill;
+          const l = op.line;
+          if ((f && f.alpha < 1) || (l && l.alpha < 1)) out.push(setGraphicsState(page.maybeEmbedGraphicsState({ opacity: f?.alpha ?? 1, borderOpacity: l?.alpha ?? 1 })));
+          if (f) out.push(setFillingRgbColor(...rgbOf(f.css)));
+          if (l) {
+            const w = l.width * z * PT;
+            out.push(setStrokingRgbColor(...rgbOf(l.css)), setLineWidth(w), setLineJoin(LineJoinStyle.Round), setLineCap(l.cap === 'round' ? LineCapStyle.Round : l.cap === 'square' ? LineCapStyle.Projecting : LineCapStyle.Butt));
+            if (l.dash) out.push(setDashPattern(l.dash.map((d) => d * w), 0));
+          }
+          out.push(...pathOps(op.cmds, q), f && l ? fillAndStroke() : f ? fill() : stroke(), popGraphicsState());
+          page.pushOperators(...out);
+        } else if (op.t === 'image') {
+          const image = await embedPicture(pdf, op, ctx.images);
+          if (!image) continue;
+          const name = page.node.newXObject('Image', image.ref);
+          const m = op.m;
+          // (The picture's unit square, its top at 1 in PDF's space, to the sheet, then to the page.)
+          const u = [m[0], m[1], -m[2], -m[3], m[2] + m[4], m[3] + m[5]];
+          const t = [q[0] * u[0] + q[2] * u[1], q[1] * u[0] + q[3] * u[1], q[0] * u[2] + q[2] * u[3], q[1] * u[2] + q[3] * u[3], q[0] * u[4] + q[2] * u[5] + q[4], q[1] * u[4] + q[3] * u[5] + q[5]];
+          page.pushOperators(pushGraphicsState(), ...clipOps(), ...pathOps(op.clip, q), clip(), endPath(), concatTransformationMatrix(...t), drawObject(name), popGraphicsState());
+        } else if (op.t === 'text') {
+          const el = texts[n++];
+          // (Text in a box that isn't turned: placed where the page has it. A turned one isn't exported yet.)
+          if (!el || Math.abs(op.m[1]) > 1e-6 || Math.abs(op.m[2]) > 1e-6 || op.m[0] < 0 || op.m[3] < 0) continue;
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: (t) => (t.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT) });
+          for (let t = walker.nextNode(); t; t = walker.nextNode()) await drawText(t, bound);
+        }
+      }
+    }
+  }
+}
+
+/** A picture's image, embedded once: PNG and JPEG as they are, others (an SVG with no PNG beside it among them) drawn
+ *  by the browser into a PNG. */
+async function embedPicture(pdf, op, cache) {
+  const src = op.src;
+  if (!src?.bytes) return null;
+  if (cache.has(src.bytes)) return cache.get(src.bytes);
+  let image = null;
+  try {
+    if (src.mime === 'image/png') image = await pdf.embedPng(src.bytes);
+    else if (src.mime === 'image/jpeg') image = await pdf.embedJpg(src.bytes);
+    else {
+      const img = new Image();
+      img.src = src.url;
+      await img.decode();
+      const k = src.mime === 'image/svg+xml' ? 4 : 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round((img.naturalWidth || 300) * k));
+      canvas.height = Math.max(1, Math.round((img.naturalHeight || 150) * k));
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
+      image = blob ? await pdf.embedPng(new Uint8Array(await blob.arrayBuffer())) : null;
+    }
+  } catch { image = null; }
+  cache.set(src.bytes, image);
+  return image;
 }
 
 /** '#RRGGBB' as a pdf-lib colour, or null. */

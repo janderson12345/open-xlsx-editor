@@ -43,7 +43,7 @@ export const ROOT_RELS = rels([['rId1', RT('officeDocument'), 'xl/workbook.xml']
 
 export function write(name, parts) {
   const files = {};
-  for (const [k, v] of Object.entries(parts)) files[k] = [strToU8(v), { mtime: new Date('2026-01-01T00:00:00') }];
+  for (const [k, v] of Object.entries(parts)) files[k] = [typeof v === 'string' ? strToU8(v) : v, { mtime: new Date('2026-01-01T00:00:00') }];
   fs.writeFileSync(path.join(here, name), zipSync(files, { level: 6 }));
   console.log(`wrote test/fixtures/${name}`);
 }

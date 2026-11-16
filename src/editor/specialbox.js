@@ -2,11 +2,11 @@
 // two columns, as Excel lays them out, each with the options it takes under it. The types under Formulas are those of
 // Constants too, Direct only and All levels under Dependents those of Precedents too, and All and Same under Data
 // validation those of Conditional formats too; each is turned off unless its choice is. The last choice is kept for
-// the next time, as Excel keeps it.
+// the next time, as Excel keeps it. Objects picks the sheet's charts, pictures and shapes instead of cells (acts.js).
 import { modal, button } from './dialogs.js';
 import { TYPES } from '../ooxml/special.js';
 
-const LEFT = [['notes', 'Notes'], ['constants', 'Constants'], ['formulas', 'Formulas'], ['blanks', 'Blanks'], ['region', 'Current region'], ['array', 'Current array']];
+const LEFT = [['notes', 'Notes'], ['constants', 'Constants'], ['formulas', 'Formulas'], ['blanks', 'Blanks'], ['region', 'Current region'], ['array', 'Current array'], ['objects', 'Objects']];
 const RIGHT = [['rowDiff', 'Row differences'], ['colDiff', 'Column differences'], ['precedents', 'Precedents'], ['dependents', 'Dependents'], ['lastCell', 'Last cell'],
   ['visible', 'Visible cells only'], ['cf', 'Conditional formats'], ['dv', 'Data validation']];
 const TYPE_LABELS = [['numbers', 'Numbers'], ['text', 'Text'], ['logicals', 'Logicals'], ['errors', 'Errors']];

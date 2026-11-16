@@ -643,7 +643,7 @@
   height: var(--oxe-bh);
   overflow: hidden;
 }
-.oxe-page-cells {
+.oxe-page-cells, .oxe-page-objs {
   position: absolute;
   left: calc(-1 * var(--oxe-ox));
   top: calc(-1 * var(--oxe-oy));
@@ -2282,19 +2282,54 @@
   min-width: 120px;
 }
 
-/* Charts (chartview.js): each a picture over the cells, where its anchor puts it. */
+/* Charts (chartview.js), pictures and shapes (drawview.js): each a picture over the cells, where its anchor puts it;
+   under the row headings and frozen panes, which stay over what scrolls. */
 .oxe-charts {
   position: absolute;
   top: var(--oxe-colhead-h);
   left: 0;
   width: var(--oxe-sheet-w);
   height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
+}
+.oxe-obj {
+  position: absolute;
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
+  top: var(--oxe-y);
+  width: var(--oxe-w);
+  height: var(--oxe-h);
+  line-height: 0;
+  pointer-events: auto;
+  cursor: move;
+}
+.oxe-obj > svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+}
+.oxe-obj-text {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  line-height: normal;
+}
+.oxe-obj-text-ctr { justify-content: center; }
+.oxe-obj-text-b { justify-content: flex-end; }
+.oxe-obj-para { margin: 0; }
+.oxe-obj.oxe-chart-on {
+  outline: 1px solid var(--oxe-accent, #217346);
 }
 .oxe-chart {
   position: absolute;
-  left: var(--oxe-x);
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
   top: var(--oxe-y);
   line-height: 0;
   pointer-events: auto;
@@ -2323,7 +2358,7 @@
 .oxe-chart-h-ne, .oxe-chart-h-sw { cursor: nesw-resize; }
 .oxe-chart-h-n, .oxe-chart-h-s { cursor: ns-resize; }
 .oxe-chart-h-e, .oxe-chart-h-w { cursor: ew-resize; }
-.oxe-chart.oxe-chart-sizing::after {
+.oxe-chart.oxe-chart-sizing::after, .oxe-obj.oxe-chart-sizing::after {
   content: '';
   position: absolute;
   left: var(--oxe-ghost-x);
