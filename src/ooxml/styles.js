@@ -43,7 +43,11 @@ export function readProtection(el) {
 export function readColor(el) {
   if (!el) return null;
   const num = (name) => (attr(el, name) != null ? Number(attr(el, name)) : null);
-  return { rgb: attr(el, 'rgb'), theme: num('theme'), indexed: num('indexed'), auto: attr(el, 'auto') === '1' || attr(el, 'auto') === 'true', tint: num('tint') || 0 };
+  const out = { rgb: attr(el, 'rgb'), theme: num('theme'), indexed: num('indexed'), auto: attr(el, 'auto') === '1' || attr(el, 'auto') === 'true', tint: num('tint') || 0 };
+  // (The tint as written, kept out of sight for a colour written back: Excel's 0.79998168889431442 has a digit more
+  // than JavaScript prints.)
+  if (out.tint) Object.defineProperty(out, 'tintText', { value: attr(el, 'tint'), enumerable: false });
+  return out;
 }
 
 /** One `font` element. */

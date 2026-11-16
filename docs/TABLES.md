@@ -43,6 +43,49 @@ Tints: a file's tint is Excel's to four places (0.79998168889431442 is lighter 8
 `tools/excel-compare/excel-tints.ps1`, `test/tints-excel.json`); without the rounding, 0.79998 came out a step darker
 in some table colours (TableStyleLight7's stripe D9F1CF for Excel's DAF2D0).
 
+## Making and changing tables: what Excel writes
+
+`src/ooxml/tableedit.js` (and `tableconvert.js` for Convert to Range) write what Excel saves; measured over COM
+(`tools/excel-compare/excel-tables.ps1` on `table-cases.json`: 33 cases on made-up lists, each saved, the table parts,
+cells, relationships and styles kept in `test/tablemake-excel.json`). `test/tableedit.test.js` replays each case and
+compares: 33 of 33 the same table parts (uids aside), cells and formulas, and after Convert to Range the same formats.
+
+- **Insert > Table, Ctrl+T, Format as Table** (`createTable`, ListObjects.Add): a part `xl/tables/tableN.xml` with
+  its relationship from the sheet, a content type override and the sheet's `<tableParts>`. `<table id name
+  displayName ref totalsRowShown="0">`, an `<autoFilter>` over the whole range, a `<tableColumn>` per column and
+  `<tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1"
+  showColumnStripes="0"/>` (the workbook's `defaultTableStyle`). The name is the first free Table1, Table2...
+- With headers, the first row's texts name the columns, written back as text: a number as its digits (2024), a formula
+  as its result; a blank is Column1, Column2... (the first free); a name repeated, capitals aside, gets 2, 3 (Qty,
+  Qty2). Without headers (or when Excel guesses there are none, a first row of numbers), a header row of Column1... is
+  put above the range, the cells there moved down across the table's width. A header alone gets an empty data row
+  below, the cells under it moved down, and `insertRow="1" insertRowShift="1"`.
+- **Total Row** (`setTotalsRow`, ShowTotals): the range a row longer, `totalsRowCount="1"`, the autoFilter staying
+  over the header and data; the first time, "Total" in the first column (`totalsRowLabel="Total"`) and in the last
+  `SUBTOTAL(109,Table1[Price])` (`totalsRowFunction="sum"`) for numbers, else `SUBTOTAL(103,...)` (count). A filled
+  row below moves down. Off: the row emptied and the range shorter, each column's total kept in the part, written
+  back when it comes on again.
+- **The total row's drop-down** (`setTotalFunction`, TotalsCalculation): Average 101, Count 103 (COUNTA), Count
+  Numbers 102, Max 104, Min 105, Sum 109, StdDev 107, Var 110 in `SUBTOTAL(n,Table1[Col])`; None empties the cell; a
+  function in the first column takes the place of its label. A formula typed in a total cell is
+  `totalsRowFunction="custom"` with `<totalsRowFormula>`; text typed there its `totalsRowLabel`.
+- **Header Row** off: the header cells emptied, `headerRowCount="0"` (before `totalsRowShown`), no autoFilter; on, the
+  names written back above the data.
+- **Filter Button** off: a `<filterColumn colId hiddenButton="1"/>` for each column; **Data > Filter** in a table takes
+  the autoFilter away altogether.
+- **Banded Rows, Banded Columns, First Column, Last Column**: `showRowStripes`, `showColumnStripes`,
+  `showFirstColumn`, `showLastColumn`; the style **None** is a `tableStyleInfo` without a name.
+- **Table Name**: a defined name's rules (`names.js validName`), not a name a table or defined name has; every formula
+  naming the table renamed (`SUM(Table1[Qty])` is `SUM(Sales[Qty])`). Typing a header cell renames its column (a blank
+  ColumnN). Typing just below a table without a total row makes it a row longer (AutoExpansion).
+- **Resize Table**: the header must stay in its row and the new range overlap the old; columns kept by place, new
+  ones named from their header cells; a total row is taken out (the cells under it moving up) and made again at the
+  new last row.
+- **Convert to Range** (Unlist): the table's look kept as each cell's own format, in the style's theme colours and
+  tints (each line once: a cell's top and left, the right only in the last column, the bottom only in the last row);
+  references to the table made absolute ranges with the sheet's name (`SUM(Sheet1!$D$3:$D$7)`), the total row's too;
+  the part, its relationship and content type gone.
+
 ## Against Excel's PDF
 
 `test/fixtures/tables.xlsx` (`test/fixtures/tables.mjs`) has a table in each built-in style with the options in turn,

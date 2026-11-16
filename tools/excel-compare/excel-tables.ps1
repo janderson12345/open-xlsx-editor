@@ -63,16 +63,19 @@ try {
     $zip = [IO.Compression.ZipFile]::OpenRead($file)
     try {
       $sheet = & $read $zip 'xl/worksheets/sheet1.xml'
-      $a.sheetData = & $pick $sheet '(?s)<sheetData\b.*?(</sheetData>|/>)'
-      $a.tableParts = & $pick $sheet '(?s)<tableParts\b.*?(</tableParts>|/>)'
+      $a.sheetData = & $pick $sheet '(?s)<sheetData\b[^>]*?(/>|>.*?</sheetData>)'
+      # (The shared strings' texts, in order, so the cells' strings read as text.)
+      $a.strings = @([regex]::Matches([string](& $read $zip 'xl/sharedStrings.xml'), '<t[^>]*>([^<]*)</t>') | ForEach-Object { $_.Groups[1].Value })
+      $a.tableParts = & $pick $sheet '(?s)<tableParts\b[^>]*?(/>|>.*?</tableParts>)'
       $a.sheetRels = & $read $zip 'xl/worksheets/_rels/sheet1.xml.rels'
       $types = & $read $zip '[Content_Types].xml'
       $a.contentTypes = @([regex]::Matches($types, '<Override [^>]*table[^>]*/>') | ForEach-Object { $_.Value })
       $a.definedNames = & $pick (& $read $zip 'xl/workbook.xml') '(?s)<definedNames\b.*?</definedNames>'
       $styles = & $read $zip 'xl/styles.xml'
-      $a.dxfs = & $pick $styles '(?s)<dxfs\b.*?(</dxfs>|/>)'
-      $a.tableStyles = & $pick $styles '(?s)<tableStyles\b.*?(</tableStyles>|/>)'
+      $a.dxfs = & $pick $styles '(?s)<dxfs\b[^>]*?(/>|>.*?</dxfs>)'
+      $a.tableStyles = & $pick $styles '(?s)<tableStyles\b[^>]*?(/>|>.*?</tableStyles>)'
       $a.cellXfs = & $pick $styles '(?s)<cellXfs\b.*?</cellXfs>'
+      foreach ($part in 'fonts', 'fills', 'borders') { $a[$part] = & $pick $styles ("(?s)<$part" + '\b.*?</' + "$part>") }
       $a.tables = @($zip.Entries | Where-Object { $_.FullName -like 'xl/tables/*' } | ForEach-Object { [ordered]@{ path = $_.FullName; xml = (& $read $zip $_.FullName) } })
     } finally { $zip.Dispose() }
     $answers.Add($a)

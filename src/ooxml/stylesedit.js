@@ -37,7 +37,7 @@ function setColor(el, color) {
   if (color.rgb) el.setAttribute('rgb', color.rgb.length === 6 ? `FF${color.rgb}` : color.rgb);
   else if (color.theme != null) {
     el.setAttribute('theme', String(color.theme));
-    if (color.tint) el.setAttribute('tint', String(color.tint));
+    if (color.tint) el.setAttribute('tint', color.tintText && Number(color.tintText) === color.tint ? color.tintText : String(color.tint));
   } else if (color.indexed != null) el.setAttribute('indexed', String(color.indexed));
   return el;
 }
