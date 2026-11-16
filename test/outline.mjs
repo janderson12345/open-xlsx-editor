@@ -1,7 +1,7 @@
 // Browser check of outlines (docs/OUTLINE.md) on a new sheet of test/fixtures/basic.xlsx: Shift+Alt+Right groups the
 // rows selected and draws the outline bar at Excel's size (43px with one level, 19px more for each level after:
 // excel-outline.ps1), its level buttons and the − at the summary row; the − and + hide and show the group, the level
-// buttons show levels, each one step of the history; a range's Group asks Rows or Columns; Data > Subtotal's box
+// buttons show levels, each one step of the history; a range's Group asks Rows or Columns; Ctrl+8 hides and shows the bar; Data > Subtotal's box
 // inserts Excel's SUBTOTAL rows with their outline, and Remove All takes them away. The result saved and read back.
 // Run after `npm run build`: node test/outline.mjs [outDir]
 import fs from 'node:fs';
@@ -67,7 +67,12 @@ await box().getByLabel('Columns').check();
 await box().getByRole('button', { name: 'OK' }).click();
 const cols = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cols.filter((x) => x.level).map((x) => [x.min, x.max, x.level]));
 check(JSON.stringify(cols) === '[[1,2,1]]' && (await bar()).h === '43px', 'B1:C1 grouped by Columns from the box: columns B:C level 1, the bar 43px high over the headings', JSON.stringify(cols));
+// Ctrl+8: the outline symbols hidden (the bar gone, the outline kept) and shown again, as Excel's DisplayOutline.
 await select('A1');
+await page.keyboard.press('Control+8');
+const off = [await bar(), await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).outline.symbols), (await row(1)).level];
+await page.keyboard.press('Control+8');
+check(off[0].w === '0px' && off[0].h === '0px' && off[1] === false && off[2] === 1 && (await bar()).w === '62px', 'Ctrl+8 hides the outline bar (the outline kept), Ctrl+8 again shows it', JSON.stringify(off));
 await page.evaluate(() => window.oxe.command('clearOutline'));
 check((await bar()).w === '0px' && (await bar()).h === '0px', 'Clear Outline: no outline, no bar');
 

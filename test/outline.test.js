@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { serializeXml as serialize } from '../src/ooxml/xml.js';
 import { typedWidth } from '../src/ooxml/sizes.js';
-import { groupLines, ungroupLines, showLevels, hideDetail, showDetail, clearOutline, setSummary, outlineOf, autoOutline } from '../src/ooxml/outline.js';
+import { groupLines, ungroupLines, showLevels, hideDetail, showDetail, clearOutline, setSummary, outlineOf, autoOutline, setOutlineSymbols } from '../src/ooxml/outline.js';
 
 // Excel's outlines: test/outline-excel.json holds what Excel wrote for each case (tools/excel-compare/excel-outline.ps1:
 // Range.Group, Ungroup, Outline.ShowLevels, Range.ShowDetail, ClearOutline, Outline.SummaryRow and SummaryColumn, each on
@@ -69,6 +69,9 @@ const STEPS = {
     wb.apply(si, cells);
     assert.equal(autoOutline(wb, si), true);
   },
+  'outline symbols off': (wb, si) => { group(wb, si, R(2, 4)); setOutlineSymbols(wb, si, false); },
+  'outline symbols off without an outline': (wb, si) => setOutlineSymbols(wb, si, false),
+  'outline symbols off then on': (wb, si) => { group(wb, si, R(2, 4)); setOutlineSymbols(wb, si, false); setOutlineSymbols(wb, si, true); },
   'clear outline of part': (wb, si) => { group(wb, si, R(2, 7)); group(wb, si, R(9, 10)); clearOutline(wb, si, ...R(2, 7)); },
 };
 
@@ -90,7 +93,8 @@ function lines(xml) {
   }
   const fmt = attrsOf((xml.match(/<sheetFormatPr\b[^>]*>/) || [''])[0]);
   const pr = (xml.match(/<outlinePr\b[^>]*\/>/) || [''])[0];
-  return { rows, cols, format: pick(fmt, ['outlineLevelRow', 'outlineLevelCol']), outlinePr: attrsOf(pr) };
+  const view = attrsOf((xml.match(/<sheetView\b[^>]*>/) || [''])[0]);
+  return { rows, cols, format: pick(fmt, ['outlineLevelRow', 'outlineLevelCol']), outlinePr: attrsOf(pr), symbols: view.showOutlineSymbols ?? null };
 }
 
 for (const [name, steps] of Object.entries(STEPS)) {
@@ -100,7 +104,7 @@ for (const [name, steps] of Object.entries(STEPS)) {
     const { wb, si } = numbers();
     steps(wb, si);
     const got = lines(serialize(wb._part(si).doc));
-    const exp = lines(want.sheetPr + want.sheetFormatPr + want.cols + want.sheetData);
+    const exp = lines(want.sheetPr + want.sheetView + want.sheetFormatPr + want.cols + want.sheetData);
     assert.deepEqual(got, exp);
   });
 }

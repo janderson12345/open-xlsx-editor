@@ -61,6 +61,10 @@ $CASES = [ordered]@{
   'ninth level refused' = { param($ws) Numbers $ws; for ($k = 0; $k -lt 8; $k++) { [void]$ws.Range("A$(2 + $k):A$(20 - $k)").EntireRow.Group() }; try { [void]$ws.Range('A10:A11').EntireRow.Group() } catch { $ws.Range('J1').Value2 = 'refused' } }
   'clear outline' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A7').EntireRow.Group(); [void]$ws.Range('B1:C1').EntireColumn.Group(); [void]$ws.Outline.ShowLevels(1, 1); [void]$ws.Cells.ClearOutline() }
   'clear outline of part' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A7').EntireRow.Group(); [void]$ws.Range('A9:A10').EntireRow.Group(); [void]$ws.Range('A2:A7').EntireRow.ClearOutline() }
+  # (Ctrl+8 is the window's DisplayOutline: with an outline, without one, and turned off then on again.)
+  'outline symbols off' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); $ws.Parent.Windows.Item(1).DisplayOutline = $false }
+  'outline symbols off without an outline' = { param($ws) Numbers $ws; $ws.Parent.Windows.Item(1).DisplayOutline = $false }
+  'outline symbols off then on' = { param($ws) Numbers $ws; [void]$ws.Range('A2:A4').EntireRow.Group(); $ws.Parent.Windows.Item(1).DisplayOutline = $false; $ws.Parent.Windows.Item(1).DisplayOutline = $true }
   'auto outline' = { param($ws) Sums $ws; [void]$ws.Range('A1').AutoOutline() }
   'subtotal sum units' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4157, [object[]]@(3), $true, $false, 1) }
   'subtotal count two columns' = { param($ws) List $ws; [void]$ws.Range('A1:D7').Subtotal(1, -4112, [object[]]@(3, 4), $true, $false, 1) }
@@ -89,6 +93,7 @@ function Grab($file) {
     cellXfs = ([regex]::Match($styles, '<cellXfs\b[\s\S]*?</cellXfs>')).Value
     sheetPr = ([regex]::Match($sheet, '<sheetPr\b[^>]*/>|<sheetPr\b[\s\S]*?</sheetPr>')).Value
     sheetFormatPr = ([regex]::Match($sheet, '<sheetFormatPr\b[^>]*/>')).Value
+    sheetView = ([regex]::Match($sheet, '<sheetView\b[^>]*>')).Value
     cols = ([regex]::Match($sheet, '<cols>[\s\S]*?</cols>')).Value
     sheetData = ([regex]::Match($sheet, '<sheetData>[\s\S]*?</sheetData>|<sheetData/>')).Value
     rowBreaks = ([regex]::Match($sheet, '<rowBreaks\b[\s\S]*?</rowBreaks>')).Value

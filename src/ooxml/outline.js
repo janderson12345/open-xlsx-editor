@@ -9,6 +9,7 @@ import { kids, kid, attr } from './xml.js';
 import { setColumns, setSheetFormat, pxWidth } from './sizes.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
 import { defaultColPx } from './units.js';
+import { setShown } from './view.js';
 
 /** Excel's deepest level: Group refuses an eighth (measured: "Unable to get the Group property"). */
 export const MAX_LEVEL = 7;
@@ -248,7 +249,7 @@ export function clearOutline(wb, si, axis, a = 0, b = Infinity) {
 /** The Settings: summary rows below their detail (`below`) and columns right of theirs (`right`), written in sheetPr's
  *  outlinePr as Excel writes it: summaryBelow="0" or summaryRight="0", nothing for the default (setting it back takes
  *  outlinePr away, and sheetPr when it is left empty). */
-export function setSummary(wb, si, { below, right }) {
+export function setSummary(wb, si, { below, right, symbols }) {
   const part = wb._part(si);
   const doc = part.doc;
   const root = doc.documentElement;
@@ -257,7 +258,7 @@ export function setSummary(wb, si, { below, right }) {
   if (!sheetPr) { sheetPr = make(doc, ns, 'sheetPr'); root.insertBefore(sheetPr, [...root.childNodes].find((n) => n.nodeType === 1) || null); }
   let pr = kid(sheetPr, 'outlinePr', ns);
   if (!pr) { pr = make(doc, ns, 'outlinePr'); sheetPr.insertBefore(pr, [...sheetPr.childNodes].find((n) => n.nodeType === 1 && n.localName !== 'tabColor') || null); }
-  for (const [name, v] of [['summaryBelow', below], ['summaryRight', right]]) {
+  for (const [name, v] of [['summaryBelow', below], ['summaryRight', right], ['showOutlineSymbols', symbols]]) {
     if (v == null) continue;
     if (v) pr.removeAttribute(name); else pr.setAttribute(name, '0');
   }
@@ -266,6 +267,16 @@ export function setSummary(wb, si, { below, right }) {
   if (!sheetPr.attributes.length && ![...sheetPr.childNodes].some((n) => n.nodeType === 1)) root.removeChild(sheetPr);
   wb._reread(si, part);
   return true;
+}
+
+/** Ctrl+8 (the window's DisplayOutline): the outline symbols shown or hidden, written as Excel writes it, sheetView's
+ *  showOutlineSymbols="0" and sheetPr's outlinePr showOutlineSymbols="0" when hidden (even on a sheet without an
+ *  outline), neither when shown ("outline symbols off",
+ *  "outline symbols off then on"). A view setting kept in the file, as gridlines are: not a step of the history. */
+export function setOutlineSymbols(wb, si, on) {
+  const part = wb._part(si);
+  setShown(part.doc, 'showOutlineSymbols', on);
+  return setSummary(wb, si, { symbols: on });
 }
 
 /** Lines' levels set: `levels` [[i, level]] (Subtotal's outline, subtotal.js); the current ones as [[i, level]] with

@@ -2,7 +2,7 @@
 // and +/- buttons, Show Detail and Hide Detail, Clear Outline, Auto Outline, the Settings, Subtotal and its Remove All;
 // each one step of the history (a snapshot of the workbook, as Excel's Undo takes each back at once).
 import { MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
-import { groupLines, ungroupLines, showLevels, hideDetail, showDetail, clearOutline, autoOutline, setSummary, outlineOf } from '../ooxml/outline.js';
+import { groupLines, ungroupLines, showLevels, hideDetail, showDetail, clearOutline, autoOutline, setSummary, setOutlineSymbols, outlineOf } from '../ooxml/outline.js';
 import { subtotal, removeSubtotals } from '../ooxml/subtotal.js';
 
 export function outlineCommands(env) {
@@ -66,6 +66,18 @@ export function outlineCommands(env) {
     autoOutline() { return step((wb, si) => autoOutline(wb, si), 'Outline made', 'row', 'Cannot create an outline: no formulas sum up rows or columns'); },
     /** The Outline Settings: summary rows below their detail, summary columns right of theirs. */
     outlineSettings({ below, right }) { return step((wb, si) => setSummary(wb, si, { below, right }), 'Outline settings changed'); },
+    /** Ctrl+8: the outline symbols shown or hidden (no argument: turned over), on the sheet shown; a view setting saved
+     *  with the file, as Gridlines is, outside the history. */
+    outlineSymbols(on) {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const sh = ctx.workbook().sheet(ctx.sheetIndex());
+      const now = on ?? sh.outline?.symbols === false;
+      setOutlineSymbols(ctx.workbook(), ctx.sheetIndex(), now);
+      ctx.reloaded?.();
+      ctx.changed?.();
+      ctx.announce(now ? 'Outline symbols shown' : 'Outline symbols hidden');
+      return true;
+    },
     /** Data > Subtotal over the list `area` (subtotal.js's options); refused when it has no rows under its headings.
      *  (Rows are inserted: `moved`, which says a refusal in Excel's words.) */
     subtotal(area, opts) {

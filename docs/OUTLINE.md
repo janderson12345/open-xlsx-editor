@@ -4,7 +4,7 @@ How rows and columns are grouped into an outline, collapsed and expanded, and ho
 (`src/ooxml/outline.js`, `src/ooxml/subtotal.js`), and what Excel was seen to do. Each rule was measured over COM in a
 hidden Excel (`tools/excel-compare/excel-outline.ps1`: `Range.Group`, `Ungroup`, `Outline.ShowLevels`,
 `Range.ShowDetail`, `ClearOutline`, `AutoOutline`, `Outline.SummaryRow` and `SummaryColumn`, `Range.Subtotal`,
-`RemoveSubtotal`, each on a new workbook of made-up cells, saved and read back). `npm test` (`test/outline.test.js`, 35
+`RemoveSubtotal`, each on a new workbook of made-up cells, saved and read back). `npm test` (`test/outline.test.js`, 38
 cases; `test/subtotal.test.js`, 11 cases) expects what Excel wrote, to the attribute; `test/outline.mjs` clicks the
 outline bar's buttons and the Subtotal box in a browser.
 
@@ -18,9 +18,11 @@ outline bar's buttons and the Subtotal box in a browser.
   selected clears the sheet's whole outline.
 - The outline bar: left of the row headings and over the column headings, the level buttons 1, 2, 3... in the corner, and
   for each group a line along its rows (columns) and a − at its summary row, a + while its rows are hidden.
-- Each action is one step of the undo history, and every one is a named command (`group`, `ungroup`, `outlineLevel`,
-  `outlineToggle`, `showDetail`, `hideDetail`, `clearOutline`, `autoOutline`, `outlineSettings`, `subtotal`,
-  `removeSubtotals`).
+- Ctrl+8 hides the outline symbols (the bar goes, the outline stays) and shows them again: a view setting saved with the
+  file, as Gridlines is, so not a step of the history.
+- Every other action is one step of the undo history, and every one is a named command (`group`, `ungroup`,
+  `outlineLevel`, `outlineToggle`, `showDetail`, `hideDetail`, `clearOutline`, `autoOutline`, `outlineSettings`,
+  `outlineSymbols`, `subtotal`, `removeSubtotals`).
 - Rows and columns an outline hides are hidden lines like any other: the status bar, filters, SUBTOTAL(10x), Unhide
   and printing treat them as hidden.
 
@@ -39,6 +41,7 @@ outline bar's buttons and the Subtotal box in a browser.
 | Show Detail at a collapsed summary shows its lines but leaves groups inside it that are collapsed hidden; at a hidden line it changes nothing. | Inner then outer hidden, outer shown: rows 2, 5, 6, 7 shown, 3:4 still hidden, row 5 still collapsed. |
 | Ungroup takes one level off; hidden lines and the summary's collapsed stay. Ungroup of lines not grouped is refused. | A collapsed 2:4 ungrouped: rows still `hidden="1"`, `<row r="5" collapsed="1">`, no `outlineLevelRow`. |
 | Clear Outline takes the levels away, shows the lines the outline hid and the collapsed marks go; the columns come back at the default width, keeping `customWidth`. | `<col min="2" max="3" width="9.140625" customWidth="1"/>`, no outlineLevelCol. |
+| Ctrl+8 (the window's DisplayOutline) off writes `showOutlineSymbols="0"` on the sheetView and on sheetPr's outlinePr, even on a sheet without an outline; on again takes both away. | `<sheetPr><outlinePr showOutlineSymbols="0"/></sheetPr>`, `<sheetView tabSelected="1" showOutlineSymbols="0" workbookViewId="0"/>`. |
 | Auto Outline makes the outline from formulas: a formula over its own column's cells just above it groups those rows, one over its own row's cells left of it groups those columns. | SUM(A1:A3) in A4, SUM(A1:B1) in C1 and so on: rows 1:3 and columns A:B at level 1. |
 
 ## Excel's rules: Subtotal
@@ -67,7 +70,6 @@ Not measured (Excel's glyphs aren't in its PDF, and COM doesn't reach them): the
 ## Not yet
 
 - The Settings box's Automatic styles and Create and Apply Styles.
-- Ctrl+8 (show or hide the outline symbols); a file's `showOutlineSymbols="0"` is honoured.
 - Rows inserted inside a group take the format of the row above but not its outline level.
 - Subtotal's cells take the formats of the row above them (Excel's own formats there weren't measured, the probe's cells
   had none); Excel's message for a list without headings.
