@@ -1,6 +1,7 @@
 // What the editors on one page share, as Excel's open workbooks share one clipboard: the last cells copied in any of
 // them (so another can paste them, or Paste Link to them: an external reference, extlinks.js), and the workbooks
-// open, by file name (so a link to one of them is updated from it, as Excel updates a link to an open workbook).
+// open, by file name (so a link to one of them is updated from it, as Excel updates a link to an open workbook, and
+// Home > Cell Styles > Merge Styles can take the styles of one).
 
 let last = null;
 const open = new Set();
@@ -29,4 +30,9 @@ export function openBook(name) {
     if (n === want) return e.workbook();
   }
   return null;
+}
+
+/** The workbooks open here: [{ name, workbook }] (name: the file's, any folder left out; null for one not named). */
+export function openBooks() {
+  return [...open].map((e) => ({ name: e.fileName() ? String(e.fileName()).replace(/^.*[\\/]/, '') : null, workbook: e.workbook() })).filter((b) => b.workbook);
 }

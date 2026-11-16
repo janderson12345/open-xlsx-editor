@@ -296,4 +296,33 @@ Not measured: whether Excel's box gives the new style to the selection when OK i
 the editor doesn't, which Microsoft's steps for New Cell Style describe). Excel rewrote Normal's font in place (font 0)
 where the editor writes a new font entry, the same look; Excel's own Format... changes also show in its box's
 Format Cells as they are made, where the editor's second Format... shows the font, number format and alignment chosen
-so far but the fill and border as they were. Merge Styles, Duplicate and Delete are not here yet.
+so far but the fill and border as they were.
+
+### Delete, Duplicate and Merge Styles (`src/ooxml/cellstylemanage.js`)
+
+Each style's menu in the gallery has Duplicate... and Delete after Modify... (Normal's has no Delete: Excel refuses it,
+"Unable to get the Delete property of the Style class" over COM), and the gallery ends with Merge Styles..., Excel's box
+listing the other workbooks open on the page (`pagebooks.js`) and those the host gives (`styleBooks`). Measured over
+COM (`Style.Delete`, `Styles.Merge` and the saved `styles.xml`; `tools/excel-compare/excel-stylesmore.ps1`,
+`test/stylesmore-excel.json`; `test/stylesmore.test.js` makes each case here and gets Excel's style entries,
+cellStyles and cell formats, 11 of 11):
+
+| Rule | Seen |
+|---|---|
+| Delete a style of the workbook's own: its `cellStyle` and its `cellStyleXfs` entry go, the entries after it a place down with every `xfId` pointing at them. | Mine deleted: `cellStyleXfs` back to Normal's alone, `<cellStyle name="Mine">` gone; unused, the same. |
+| Each cell format of the deleted style goes back to Normal in place: `xfId="0"`, Normal's number format, font, fill, border, alignment and protection, but for each part it marks as its own (`applyX="1"`), kept. The cells keep their `s`. | D4 (Mine alone): `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>`; D5 (italic of its own, `applyFont="1"`): its bold italic red 14pt font kept, Mine's fill, border, 0.00 and centring gone. |
+| Delete a built-in style: it stays, its `cellStyle` marked `hidden="1"`, its entry as it was; it leaves the gallery and can't be given to a cell again. Its cells go back to Normal as above. One the workbook hasn't got is added as applying it adds it, hidden. | Good deleted: `<cellStyle name="Good" xfId="2" builtinId="26" hidden="1"/>`; B2 Normal, B3 kept its red font; `Range.Style = "Good"` then fails. |
+| Duplicate: Excel's Style box on a copy named "<name> 2" (the first number free after it); OK makes a style of the workbook's own (no `builtinId`), its entry the style's, with each part it leaves out Normal's; its `cellStyle` in name order. A built-in style the workbook hasn't got isn't added: the copy has the entry adding it would write. | Mine (border left out) duplicated: `<xf numFmtId="2" fontId="1" fillId="2" borderId="0" applyBorder="0"><alignment horizontal="center"/></xf>`; Good: "Good 2" with Good's green font and fill, no Good. |
+| Merge Styles takes each style of the other workbook (not a hidden one): its font, fill and border written into this one (an equal one reused), its number format by its code (a new id from 164 up). One this workbook hasn't got is added, its `cellStyle` in name order (a built-in one with its `builtinId`, and `customBuiltin` if the other has it). | Other (bold, `0.0" kg"`, green) and Third (italic, the rest left out) added; `0.0" kg"` as `numFmtId="165"` after the workbook's own 164. |
+| A style of the same name (a built-in one by its `builtinId`) asks Excel's "Merge styles that have the same names?": Yes puts the other's entry in place of this one's as Modify puts a change, the cells using it taking each part they don't hold as their own; a built-in style keeps `customBuiltin="1"` if either had it. No keeps this workbook's; Cancel merges nothing. | Mine replaced by the other's green italic 12pt, dashed, 0%, left: D4 took all of it, D5 kept its own font; Good made bold there: B6 bold; Normal at 14pt there: C3 14pt; Title (customBuiltin here) the other's plain Title, still `customBuiltin="1"`. |
+
+Here the question is asked only when a style of the same name differs (COM's `Styles.Merge` answers it Yes without
+asking, so when Excel asks wasn't seen; No was not measured, as only Excel's own box gives it). Each is one step of
+the history (a snapshot with the styles part), refused on a protected sheet as formatting is. Excel numbers
+`cellStyleXfs` anew when it saves (Normal first, then the styles by name, hidden ones last: the deleted Good moved after
+Title); the editor keeps the entries where they are, the `xfId`s pointing at the same styles. The editor writes no
+`xr:uid` on a `cellStyle`, where Excel gives each style of its own one. Duplicate's box isn't reached over COM: the copy
+was made in Excel as its box makes it, by example from a cell of the style alone (`Styles.Add(name, cell)`) with the
+style's Include... flags. A merged Normal is written as a new font where Excel rewrote font 0 in place, the same look,
+as with Modify; Excel added Bad at 11pt after Normal was made 14pt, where the editor adds a built-in style at Normal's
+size.

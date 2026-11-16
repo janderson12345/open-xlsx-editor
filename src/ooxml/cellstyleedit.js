@@ -47,17 +47,11 @@ export function namedStyle(f, name) {
   const list = kids(kid(f.root, 'cellStyles', f.ns), 'cellStyle', f.ns);
   const found = list.find((el) => (def && attr(el, 'builtinId') === String(def.builtinId)) || attr(el, 'name') === name);
   const xfs = () => kids(kid(f.root, 'cellStyleXfs', f.ns), 'xf', f.ns);
+  // (A built-in style deleted is kept hidden, and can't be given to cells again, as in Excel: cellstylemanage.js.)
+  if (found && attr(found, 'hidden') === '1') return null;
   if (found) { const xfId = Number(attr(found, 'xfId') || 0); return { xfId, el: xfs()[xfId] }; }
   if (!def) return null;
-  const styles = f.wb.styles;
-  const fontId = append(f, 'fonts', parse(f, styleFont(f, def)), (x, i) => { styles.fonts[i] = readFont(x, f.ns); });
-  const fillId = def.fill ? f.add('fills', parse(f, def.fill), (x, i) => { styles.fills[i] = readFill(x, f.ns); }) : 0;
-  const borderId = def.border ? f.add('borders', parse(f, def.border), (x, i) => { styles.borders[i] = readBorder(x, f.ns); }) : 0;
-  if (def.code && LOCALE_BUILTINS.has(def.numFmtId) && styles.numFmts[def.numFmtId] == null) f.writeNumFmt(def.numFmtId, def.code ?? BUILTIN_FORMATS[def.numFmtId]);
-  const xf = make(f, 'xf');
-  for (const [k, v] of [['numFmtId', def.numFmtId], ['fontId', fontId], ['fillId', fillId], ['borderId', borderId]]) xf.setAttribute(k, String(v));
-  for (const p of APPLY) if (def.off.includes(p)) xf.setAttribute(`apply${p}`, '0');
-  const xfId = append(f, 'cellStyleXfs', xf);
+  const { xfId, el: xf } = builtinStyleXf(f, def);
   // (Excel keeps the cellStyles in name order: Good before Normal, Normal before Title.)
   const cs = make(f, 'cellStyle');
   cs.setAttribute('name', name);
@@ -69,6 +63,21 @@ export function namedStyle(f, name) {
   parent.setAttribute('count', String(kids(parent, 'cellStyle', f.ns).length));
   f.wb.dirty.add(f.wb.stylesPath);
   return { xfId, el: xf };
+}
+
+/** Built-in style `def`'s cellStyleXfs entry added as Excel adds it (its font written anew, its fill and border, what it
+ *  doesn't apply marked applyX="0"), without its cellStyle: { xfId, el }. Duplicate's copy of a built-in style the
+ *  workbook hasn't got is this entry (cellstylemanage.js). */
+export function builtinStyleXf(f, def) {
+  const styles = f.wb.styles;
+  const fontId = append(f, 'fonts', parse(f, styleFont(f, def)), (x, i) => { styles.fonts[i] = readFont(x, f.ns); });
+  const fillId = def.fill ? f.add('fills', parse(f, def.fill), (x, i) => { styles.fills[i] = readFill(x, f.ns); }) : 0;
+  const borderId = def.border ? f.add('borders', parse(f, def.border), (x, i) => { styles.borders[i] = readBorder(x, f.ns); }) : 0;
+  if (def.code && LOCALE_BUILTINS.has(def.numFmtId) && styles.numFmts[def.numFmtId] == null) f.writeNumFmt(def.numFmtId, def.code ?? BUILTIN_FORMATS[def.numFmtId]);
+  const xf = make(f, 'xf');
+  for (const [k, v] of [['numFmtId', def.numFmtId], ['fontId', fontId], ['fillId', fillId], ['borderId', borderId]]) xf.setAttribute(k, String(v));
+  for (const p of APPLY) if (def.off.includes(p)) xf.setAttribute(`apply${p}`, '0');
+  return { xfId: append(f, 'cellStyleXfs', xf), el: xf };
 }
 
 /** Cell format `s` given cell style `name` (Formats.xf's `cellStyle` change): the index of its new cell format. */
@@ -97,5 +106,14 @@ export function customCellStyles(wb) {
   const doc = wb.stylesDoc;
   if (!doc) return [];
   const root = doc.documentElement;
-  return kids(kid(root, 'cellStyles', root.namespaceURI), 'cellStyle', root.namespaceURI).filter((el) => attr(el, 'builtinId') == null && attr(el, 'customBuiltin') !== '1').map((el) => attr(el, 'name'));
+  return kids(kid(root, 'cellStyles', root.namespaceURI), 'cellStyle', root.namespaceURI).filter((el) => attr(el, 'builtinId') == null && attr(el, 'customBuiltin') !== '1' && attr(el, 'hidden') !== '1').map((el) => attr(el, 'name'));
+}
+
+/** The built-in styles deleted from the workbook (kept hidden, as Excel keeps them): their builtinIds, for the gallery
+ *  to leave out. */
+export function deletedBuiltins(wb) {
+  const doc = wb.stylesDoc;
+  if (!doc) return new Set();
+  const root = doc.documentElement;
+  return new Set(kids(kid(root, 'cellStyles', root.namespaceURI), 'cellStyle', root.namespaceURI).filter((el) => attr(el, 'hidden') === '1' && attr(el, 'builtinId') != null).map((el) => Number(attr(el, 'builtinId'))));
 }

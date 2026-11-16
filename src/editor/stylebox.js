@@ -1,7 +1,8 @@
 // Excel's Style box, for Home > Cell Styles > New Cell Style... and a style's Modify...: the style's name, what it
 // includes (Number, Alignment, Font, Border, Fill, Protection, each with a line saying what it is) and Format..., the
 // Format Cells box (formatbox.js) for the style's own format. It resolves to { name, includes, change } (change: what
-// Format... changed, the Format Cells box's change, merged over the times it was opened), or null when cancelled.
+// Format... changed, the Format Cells box's change, merged over the times it was opened), or null when cancelled. Also
+// Excel's Merge Styles box: the other workbooks open, to take the styles of one.
 import { modal, button } from './dialogs.js';
 import { make, labelled, check } from './formatbox-kit.js';
 
@@ -76,5 +77,23 @@ export function styleBox(root, { name, rename = true, includes, byExample = fals
     dlg.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') { e.preventDefault(); ok(); } });
     dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Style' }), labelled('Style name:', nameInput), error, group,
       make('div', { className: 'oxe-dialog-buttons' }, formatBtn, button('OK', ok), button('Cancel', () => done(null))));
+  });
+}
+
+/** Excel's Merge Styles box: "Merge styles from:" and the workbooks' names (`names`) in a list; resolves to the index
+ *  in `names` chosen, or null. */
+export function mergeStylesBox(root, names) {
+  return modal(root, (dlg, done, id) => {
+    dlg.setAttribute('aria-labelledby', `${id}-title`);
+    const list = make('select', { id: `${id}-list`, className: 'oxe-dialog-list', size: Math.max(4, Math.min(8, names.length)) },
+      ...names.map((n, i) => make('option', { value: String(i), textContent: n })));
+    list.selectedIndex = 0;
+    list.dataset.first = '';
+    const ok = () => done(list.selectedIndex < 0 ? null : list.selectedIndex);
+    list.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); ok(); } });
+    list.addEventListener('dblclick', ok);
+    dlg.append(make('h2', { id: `${id}-title`, className: 'oxe-dialog-title', textContent: 'Merge Styles' }),
+      make('label', { className: 'oxe-dialog-text', htmlFor: `${id}-list`, textContent: 'Merge styles from:' }), list,
+      make('div', { className: 'oxe-dialog-buttons' }, button('OK', ok), button('Cancel', () => done(null))));
   });
 }

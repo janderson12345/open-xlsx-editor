@@ -82,6 +82,8 @@ export { OMF_VERSION } from './editor/omf.js';
  *   dateOrder, ... }: ooxml/locale.js, docs/LOCALE.md); the browser's language without it. `setLocale()` changes it.
  * - `onSave({ fileName, type, bytes, mime })`: Save As's file (F12, `saveAs()`); without it, the browser downloads it.
  *   `exportPdf(editor)`: a PDF export (open-xlsx-editor/pdf's exportPdf) for Save As to offer PDF.
+ * - `styleBooks`: workbooks Home > Cell Styles > Merge Styles offers besides the others open on the page ([{ fileName,
+ *   bytes }] or [{ fileName, workbook }], or a function giving them when the box opens).
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
  *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean | Record<string, boolean>, calculateOnOpen?: boolean,

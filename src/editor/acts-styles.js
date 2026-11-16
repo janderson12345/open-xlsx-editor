@@ -1,7 +1,12 @@
-// Home > Cell Styles' boxes (acts-more.js routes them here): New Cell Style... and a style's Modify..., Excel's Style
-// box (stylebox.js) with Format... opening the Format Cells box (formatbox.js) on the style's own format; what they
-// give run as the newCellStyle and modifyCellStyle commands (commands-styles.js).
-import { styleBox } from './stylebox.js';
+// Home > Cell Styles' boxes (acts-more.js routes them here): New Cell Style..., a style's Modify... and Duplicate...,
+// Excel's Style box (stylebox.js) with Format... opening the Format Cells box (formatbox.js) on the style's own format,
+// and Merge Styles..., Excel's list of the other workbooks open (pagebooks.js, and those the host gives as
+// `styleBooks`) and its question "Merge styles that have the same names?"; what they give run as the newCellStyle,
+// modifyCellStyle, duplicateCellStyle and mergeCellStyles commands (commands-styles.js).
+import { styleBox, mergeStylesBox } from './stylebox.js';
+import { openBooks } from './pagebooks.js';
+import { Workbook } from '../ooxml/workbook.js';
+import { duplicateName, sameNameStyles } from '../ooxml/cellstylemanage.js';
 import { formatCellsBox } from './formatbox.js';
 import { messageBox } from './dialogs.js';
 import { fontFamily, xfOf } from '../ooxml/styles.js';
@@ -11,13 +16,13 @@ import { namedStyle } from '../ooxml/cellstyleedit.js';
 import { formatsOf } from '../ooxml/stylesedit.js';
 import { readXf } from '../ooxml/styles.js';
 
-export const STYLE_ACTS = new Set(['newCellStyleBox', 'modifyCellStyleBox']);
+export const STYLE_ACTS = new Set(['newCellStyleBox', 'modifyCellStyleBox', 'duplicateCellStyleBox', 'mergeStylesBox']);
 
 /** "Style 1", "Style 2"...: the first one the workbook hasn't got, as Excel's box offers. */
 const freeName = (wb) => { let k = 1; while (styleNameRefusal(wb, `Style ${k}`)) k++; return `Style ${k}`; };
 
 export function createStyleActs(env, fontNames) {
-  const { root, state, editing } = env;
+  const { root, state, editing, options = {} } = env;
   /** formatbox.js's look of format `xf` with `change` (the Style box's Format... so far) shown in it: its font, number
    *  format and alignment (its fill and border as they were). */
   const lookOf = (xf, change) => {
@@ -55,6 +60,51 @@ export function createStyleActs(env, fontNames) {
           return refused(editing().run('modifyCellStyle', styleName, got.change, got.includes, got.name !== styleName ? got.name : null));
         });
     }
+    if (name === 'duplicateCellStyleBox') {
+      const styleName = args[0];
+      const info = styleInfo(wb, styleName);
+      if (!info) return false;
+      // (A built-in style the workbook hasn't got: added only while the box shows it, so a copy cancelled leaves the
+      // workbook as it was; OK's command makes the copy as one step.)
+      const before = info.xf ? null : wb.snapshot({ styles: true });
+      const xf = info.xf || (() => { const f = formatsOf(wb); const { el } = namedStyle(f, styleName); return readXf(el, f.ns, wb.styles); })();
+      return styleBox(root, { name: duplicateName(wb, styleName), includes: info.includes, look: (ch) => lookOf(xf, ch), format: (look) => formatCellsBox(root, look, 'Number'),
+        refusal: (n) => styleNameRefusal(wb, n) })
+        .then((got) => {
+          if (before) wb.restore(before);
+          back();
+          return got ? refused(editing().run('duplicateCellStyle', styleName, got.name, got.includes, got.change)) : false;
+        });
+    }
+    if (name === 'mergeStylesBox') return mergeStyles();
     return undefined;
   };
+
+  /** Merge Styles...: the other workbooks open on the page and the host's (`styleBooks`: [{ fileName, bytes } or
+   *  { fileName, workbook }], or a function giving them), one picked, Excel's question asked when styles of the same
+   *  names differ. */
+  async function mergeStyles() {
+    const wb = state.workbook;
+    let given = [];
+    try { given = (await (typeof options.styleBooks === 'function' ? options.styleBooks() : options.styleBooks)) || []; } catch { given = []; }
+    const books = [...openBooks().filter((b) => b.workbook !== wb).map((b) => ({ name: b.name || 'Book', workbook: b.workbook })),
+      ...given.filter(Boolean).map((b) => ({ name: b.fileName || b.name || 'Book', workbook: b.workbook || null, bytes: b.bytes || null }))];
+    if (!books.length) { await messageBox(root, 'There are no other workbooks open to merge styles from.'); back(); return false; }
+    const k = await mergeStylesBox(root, books.map((b) => b.name));
+    if (k == null) { back(); return false; }
+    let from = books[k].workbook;
+    if (!from) {
+      try { from = Workbook.fromBytes(books[k].bytes instanceof ArrayBuffer ? new Uint8Array(books[k].bytes) : books[k].bytes); } catch {
+        await messageBox(root, `${books[k].name} could not be read.`); back(); return false;
+      }
+    }
+    let replace = true;
+    if (sameNameStyles(wb, from).length) {
+      const answer = await messageBox(root, 'Merge styles that have the same names?', ['Yes', 'No', 'Cancel']);
+      if (answer !== 'Yes' && answer !== 'No') { back(); return false; }
+      replace = answer === 'Yes';
+    }
+    back();
+    return editing().run('mergeCellStyles', from, replace);
+  }
 }
