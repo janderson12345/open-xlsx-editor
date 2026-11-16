@@ -294,8 +294,14 @@ class Formats {
     // (A cell style of Home > Cell Styles: cellstyleedit.js, as Excel applies one.)
     if (change.cellStyle) return withCellStyle(this, s, change.cellStyle);
     const styles = this.wb.styles;
-    const old = styles.cellXfs[s] || styles.cellXfs[0];
-    const el = this.copy('cellXfs', 'xf', s);
+    const el = this.changed(this.copy('cellXfs', 'xf', s), styles.cellXfs[s] || styles.cellXfs[0], change);
+    if (!el.getAttribute('xfId')) el.setAttribute('xfId', '0');
+    return this.add('cellXfs', el, (x, i) => { styles.cellXfs[i] = readXf(x, this.ns, styles); });
+  }
+
+  /** `el`, an xf (read as `old`), with `change` (as xf()'s, but not a cell style) made to it, each part changed
+   *  marked applied; also a cell style's own xf, for Modify (cellstyledefine.js). */
+  changed(el, old, change) {
     const set = (k, v, apply) => { el.setAttribute(k, String(v)); if (apply) el.setAttribute(apply, '1'); };
     if (change.font) set('fontId', this.font(old.fontId, change.font), 'applyFont');
     if ('fill' in change) set('fillId', this.fill(change.fill), 'applyFill');
@@ -339,12 +345,13 @@ class Formats {
       else removeChild(el, 'protection');
       el.setAttribute('applyProtection', '1');
     }
-    if (!el.getAttribute('xfId')) el.setAttribute('xfId', '0');
-    return this.add('cellXfs', el, (x, i) => { styles.cellXfs[i] = readXf(x, this.ns, styles); });
+    return el;
   }
 }
 
 const formats = new WeakMap();
+/** The writer made again on its next use (the styles part was put back: workbookstate.js restoreTo). */
+export const forgetFormats = (wb) => formats.delete(wb);
 /** The format writer of a workbook. */
 export function formatsOf(wb) {
   if (!formats.has(wb)) formats.set(wb, new Formats(wb));

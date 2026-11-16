@@ -267,7 +267,33 @@ style entry, cellStyle and cell format as Excel's):
   1's font and border and keeps Good's fill (`applyFill="1"`). Normal applies every part: the cell back to plain.
 - Each is one step of the history; on a protected sheet refused as formatting is.
 
-## Not yet
+### New Cell Style and Modify (`src/ooxml/cellstyledefine.js`, `src/editor/stylebox.js`)
 
-New Cell Style and Modify (a style of the workbook's own made or changed), and formatting whole rows or columns (a selection past the used range is cut to it: Excel
-gives the row or column itself the format).
+The gallery ends with New Cell Style..., and each style's menu (a right click, or the menu key) has Apply and
+Modify..., as Excel's. Both open Excel's Style box: the style's name (Excel's "Style 1" to start with; a built-in
+style's can't be changed), the six parts it includes (Number, Alignment, Font, Border, Fill, Protection, each with a
+line saying what it is) and Format..., the Format Cells box on the style's own format. Measured over COM
+(`Styles.Add(name, BasedOn)` on a formatted cell, the style's Include..., Font, Interior, NumberFormat and alignment
+set, for a style of the workbook's own, a built-in one and Normal, with cells using them;
+`tools/excel-compare/excel-newstyle.ps1`, `test/newstyle-excel.json`; `test/newstyle.test.js` makes each case here and
+gets Excel's style entry, cellStyle and cell formats, 5 of 5):
+
+| Rule | Seen |
+|---|---|
+| New Cell Style is by example: the style's `cellStyleXfs` entry takes the active cell's number format, font, fill and border ids and its alignment and protection; a part left out is marked `applyX="0"`, in Excel's order. | B2 bold red 14pt, yellow, bottom border, 0.00, centred: `<xf numFmtId="2" fontId="1" fillId="2" borderId="1"><alignment horizontal="center"/></xf>`; border and alignment left out: `applyBorder="0" applyAlignment="0"`. |
+| Its `cellStyle` has a name and no builtinId, among the others in name order. The cell keeps its own style. | `<cellStyle name="Mine" xfId="1"/>` before Normal; B2's style still Normal. |
+| Modify changes the style's entry in place: a part changed is a new font, fill or border (or an equal one found). | Mine not bold, green, 0%, left: `<xf numFmtId="9" fontId="3" fillId="3" borderId="1"><alignment horizontal="left"/></xf>`. |
+| Every cell format of the style then takes, in place, each changed part the style includes and the format doesn't hold as its own (`applyX="1"`). | D4 (style only) took all of it; D5 (italic of its own, `applyFont="1"`) kept its bold italic font and took the fill, format and alignment; B2's own format didn't change. |
+| A part the style leaves out isn't given to its cells, even when changed. A built-in style changed is marked `customBuiltin="1"`. | Good made bold with a border: its cells bold, their border unchanged (`applyBorder="0"` kept). |
+| Normal is changed the same way: every cell of no format of its own with it, a cell's own font kept. | Normal at 14pt: B2 (s 0) 14pt; C3 (bold of its own) 11pt. |
+
+Here a style's name is refused when empty or already a style's (a built-in one's too, in any case: "A style with this
+name already exists."). New and Modify are each one step of the history (a snapshot with the styles part,
+`workbookstate.js`), refused on a protected sheet as formatting is. A file saved after both opened in Excel itself
+without repair, with the styles and cells as written (Mine 16pt, I40 of it 16pt, J40's own italic font kept at 11pt).
+
+Not measured: whether Excel's box gives the new style to the selection when OK is pressed (COM's Styles.Add doesn't;
+the editor doesn't, which Microsoft's steps for New Cell Style describe). Excel rewrote Normal's font in place (font 0)
+where the editor writes a new font entry, the same look; Excel's own Format... changes also show in its box's
+Format Cells as they are made, where the editor's second Format... shows the font, number format and alignment chosen
+so far but the fill and border as they were. Merge Styles, Duplicate and Delete are not here yet.

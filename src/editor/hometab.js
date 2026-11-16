@@ -143,7 +143,7 @@ export function homeTab(kit, { act, color, workbook = () => null }) {
       // (Format as Table: Excel's gallery, the selection made a table in the style picked; acts-tables.js.)
       menu('▤', 'Format as Table', () => [el('div', { class: 'oxe-tstyle-menu' }, ...tableGallery(kit, { wb: workbook(), onPick: (n) => act('formatAsTable', n) }))], { label: 'Format as Table', big: true }),
       // (Cell Styles: Excel's gallery, the selection given the style picked; cellstyleedit.js.)
-      menu('▧', 'Cell Styles', () => [el('div', { class: 'oxe-tstyle-menu' }, ...cellStyleGallery(kit, { wb: workbook(), onPick: (n) => act('format', { cellStyle: n }) }))], { label: 'Cell Styles', big: true })),
+      menu('▧', 'Cell Styles', () => [el('div', { class: 'oxe-tstyle-menu' }, ...cellStyleGallery(kit, { wb: workbook(), onPick: (n) => act('format', { cellStyle: n }), onModify: (n) => act('modifyCellStyleBox', n), onNew: () => act('newCellStyleBox') }))], { label: 'Cell Styles', big: true })),
     grp('Cells', col(
       sheetMenu('⊕', 'Insert', 'Insert', () => [item('Insert Cells...', f('insertCells'), { hint: 'Ctrl++' }), item('Insert Sheet Rows', f('insertRows')), item('Insert Sheet Columns', f('insertColumns')),
         item('Insert Sheet', f('insertSheet'), { hint: 'Shift+F11' })]),

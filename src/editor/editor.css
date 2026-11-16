@@ -2562,3 +2562,24 @@
 .oxe-page-setup .oxe-dialog-row .oxe-dialog-label { min-width: 13em; }
 .oxe-page-setup .oxe-dialog-field { width: 14em; }
 .oxe-iteration-box .oxe-dialog-field { width: 8em; }
+
+/* The Style box (stylebox.js): New Cell Style and Modify. Each part's check box with what it is beside it. */
+.oxe-style-includes {
+  margin: 8px 0 10px;
+  padding: 6px 10px 8px;
+  border: 1px solid var(--oxe-head-line);
+  border-radius: 4px;
+}
+.oxe-style-includes legend {
+  padding: 0 4px;
+}
+.oxe-style-row {
+  display: grid;
+  grid-template-columns: minmax(7em, auto) 1fr;
+  align-items: baseline;
+  column-gap: 12px;
+}
+.oxe-style-part {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}

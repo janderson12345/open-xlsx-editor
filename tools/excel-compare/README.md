@@ -106,7 +106,8 @@ the case's options (`tablelook-cases.json`, `test/tablelook-*-excel.json`); `exc
 at ten tints (`test/tints-excel.json`); `excel-tables.ps1 table-cases.json <out.json>` makes and changes tables and keeps
 what Excel saves (`test/tablemake-excel.json`), and `excel-tables-check.ps1 test/out/tablemake <out.json>` has Excel read back the
 editor's files of the same cases (`test/tablemake-readback-excel.json`); `excel-cellstyles.ps1 <out.json>` the built-in cell styles and what
-applying each one saves (`test/cellstyles-excel.json`). The table drawing is compared with Excel's PDF of
+applying each one saves (`test/cellstyles-excel.json`); `excel-newstyle.ps1 <out.json>` what New Cell Style (Styles.Add by
+example) and a style's Modify save, the cells using it with them (`test/newstyle-excel.json`). The table drawing is compared with Excel's PDF of
 `test/fixtures/tables.xlsx` by `compare-cover.py <excel shapes> <our shapes>`, which compares the colour showing at
 points inside Excel's filled shapes (docs/TABLES.md).
 

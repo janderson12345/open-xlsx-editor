@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import { editingPage } from './editing-kit.mjs';
 import { openFixture } from './browser.mjs';
 
-const { page, check, finish, openFixtureFrom } = await editingPage();
+const { page, check, finish, openFixtureFrom, ribbon } = await editingPage();
 await openFixture(page, 'basic.xlsx');
 fs.mkdirSync('test/out', { recursive: true });
 
@@ -204,5 +204,73 @@ await page.keyboard.press('Escape');
 check(choices === 12 && afterFormats === 'A1:A3,C1:C3' && drawn >= 6 && afterValues === afterFormats && undoneCf === 'A1:A3',
   'conditional formats: Paste Special\'s twelve choices; Formats brings the rule (the pasted cells drawn by it), Values none; Ctrl+Z takes it back',
   JSON.stringify({ choices, afterFormats, drawn, afterValues, undoneCf }));
+
+// Home > Cell Styles > New Cell Style... (by example, the active cell's format) and a style's Modify... (its menu):
+// the Style box and Format..., the style made and changed as Excel makes them (newstyle.test.js), the cells using it
+// changed with it, one step of Undo each.
+{
+  await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+  await openFixture(page, 'basic.xlsx');
+  await page.evaluate(() => { window.oxe.select('H40'); window.oxe.command('format', { font: { b: true } }); window.oxe.command('format', { fill: { rgb: 'FFFFFF00' } }); });
+  const cellS = (ref) => page.evaluate((ref) => { const m = /^([A-Z]+)(\d+)$/.exec(ref); const c = m[1].charCodeAt(0) - 65; return window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(Number(m[2]) - 1)?.get(c)?.s || 0; }, ref);
+  const before = await cellS('H40');
+  await ribbon('Cell Styles', () => page.click('.oxe-pop >> text=New Cell Style...'));
+  await page.waitForSelector('dialog.oxe-style-box[open]');
+  const box = await page.evaluate(() => ({ name: document.querySelector('.oxe-style-box input[type=text]').value, legend: document.querySelector('.oxe-style-box legend').textContent,
+    parts: [...document.querySelectorAll('.oxe-style-part')].map((x) => x.textContent) }));
+  check(box.name === 'Style 1' && box.legend === 'Style Includes (By Example)' && box.parts[3] === 'No Borders' && box.parts[4] === 'Shaded' && /Bold/.test(box.parts[2]),
+    'New Cell Style...: the Style box, "Style 1", what the active cell has by example', JSON.stringify(box));
+  await page.fill('.oxe-style-box input[type=text]', 'Normal');
+  await page.click('.oxe-style-box button:text("OK")');
+  const taken = await page.evaluate(() => document.querySelector('.oxe-style-box .oxe-dialog-note:not([hidden])')?.textContent || null);
+  check(/already exists/.test(taken || ''), 'a name already taken refused in the box', taken);
+  await page.fill('.oxe-style-box input[type=text]', 'Mine');
+  await page.uncheck('.oxe-style-box .oxe-style-row:nth-of-type(4) input');
+  await page.click('.oxe-style-box button:text("OK")');
+  const made = await page.evaluate(() => {
+    const text = new XMLSerializer().serializeToString(window.oxe.workbook.stylesDoc);
+    const id = /<cellStyle name="Mine" xfId="(\d+)"\/>/.exec(text)?.[1];
+    const xfs = /<cellStyleXfs[^>]*>([\s\S]*?)<\/cellStyleXfs>/.exec(text)?.[1] || '';
+    return { styles: id != null, xf: id != null ? xfs.split('<xf').slice(1)[Number(id)] : null };
+  });
+  check(made.styles && /applyBorder="0"/.test(made.xf) && await cellS('H40') === before, 'OK: the style written, its border left out, the cell keeping its own style', JSON.stringify(made));
+  // (Given to I40 from the gallery, under Custom.)
+  await page.evaluate(() => window.oxe.select('I40'));
+  await ribbon('Cell Styles', () => page.click('.oxe-pop button.oxe-cstyle[title="Mine"]'));
+  const look = await page.evaluate(() => { const c = document.querySelector('.oxe-row[aria-rowindex="41"] .oxe-cell[aria-colindex="10"]'); return c ? getComputedStyle(c).fontWeight : null; });
+  await page.evaluate(() => { window.oxe.command('enter', 'styled', { r: 39, c: 8 }); });
+  const weight = await page.evaluate(() => { const c = [...document.querySelectorAll('.oxe-row[aria-rowindex="41"] .oxe-cell')].find((x) => x.textContent === 'styled'); return c ? getComputedStyle(c).fontWeight : null; });
+  check(Number(weight) >= 600, 'the gallery’s Custom: Mine given to I40, drawn bold', JSON.stringify({ look, weight }));
+  // (Modify..., from the style's menu: 16pt through Format..., then OK; I40 drawn larger at once.)
+  await ribbon('Cell Styles', async () => {
+    await page.click('.oxe-pop button.oxe-cstyle[title="Mine"]', { button: 'right' });
+    await page.click('.oxe-pop >> text=Modify...');
+  });
+  await page.waitForSelector('dialog.oxe-style-box[open]');
+  const legend = await page.evaluate(() => document.querySelector('.oxe-style-box legend').textContent);
+  await page.click('.oxe-style-box button:text("Format...")');
+  await page.waitForSelector('dialog.oxe-format-box[open]');
+  await page.click('.oxe-format-box .oxe-fc-tab:text("Font")');
+  await page.fill('.oxe-format-box .oxe-fc-panel:not([hidden]) input[type=number]', '16');
+  await page.click('.oxe-format-box button:text("OK")');
+  const fontLine = await page.evaluate(() => document.querySelectorAll('.oxe-style-part')[2].textContent);
+  await page.click('.oxe-style-box button:text("OK")');
+  const size = () => page.evaluate(() => { const c = [...document.querySelectorAll('.oxe-row[aria-rowindex="41"] .oxe-cell')].find((x) => x.textContent === 'styled'); return c ? getComputedStyle(c).fontSize : null; });
+  const grown = await size();
+  check(legend === 'Style Includes' && /16/.test(fontLine) && grown === '21.3333px', 'Modify...: Format... set 16pt, shown in the box, and the cell using the style drawn at 16pt', JSON.stringify({ legend, fontLine, grown }));
+  await page.evaluate(() => window.oxe.command('undo'));
+  const undone = await size();
+  await page.evaluate(() => window.oxe.command('redo'));
+  const redone = await size();
+  check(undone === '14.6667px' && redone === '21.3333px', 'Undo: the style and its cell as they were; Redo: changed again', JSON.stringify({ undone, redone }));
+  const bytes = await page.evaluate(() => [...window.oxe.save()]);
+  const { Workbook } = await import('../src/ooxml/workbook.js');
+  const back = Workbook.fromBytes(new Uint8Array(bytes));
+  const i40 = back.sheet(back.sheets.findIndex((x) => x.kind === 'worksheet')).cells.get(39).get(8);
+  const xf = back.styles.cellXfs[i40.s];
+  const styleXf = back.styles.styleXfs[xf.xfId];
+  check(back.styles.fonts[xf.fontId].size === 16 && back.styles.fonts[xf.fontId].b && back.styles.fonts[styleXf.fontId].size === 16,
+    'saved and read back: I40 of style Mine, 16pt bold, as the style is', JSON.stringify({ xf, styleXf }));
+}
 
 await finish();
