@@ -93,4 +93,5 @@ export function setAttr(tag, name, value, after = []) {
   return `${tag.slice(0, n)} ${name}="${value}"${tag.slice(n)}`;
 }
 
-export const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// (xml.js's, for the chart modules that take it from here.)
+export { esc } from './xml.js';

@@ -4,10 +4,10 @@
 // part (or its anchor in the sheet's drawing) and nothing else. Charts are found as readCharts lists them (charts.js).
 // Edited here: chart parts written with the c: and a: prefixes, as Excel and the other big editors write them.
 import { chartXml, CHART_KINDS, chartLook } from './chartxml.js';
+import { unescapeXml } from './xml.js';
 
 const REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const unesc = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
 
 /** Sheet si's charts, in readCharts's order: [{ drawing, anchor (its text), rid, path }]. */
 export function chartParts(wb, si) {
@@ -81,7 +81,7 @@ export function setChartLabels(wb, si, k, on) {
 /** A cache's points, by index. */
 const points = (cache, n) => {
   const out = new Array(n).fill(null);
-  for (const m of cache.matchAll(/<c:pt idx="(\d+)"[^>]*><c:v>([\s\S]*?)<\/c:v><\/c:pt>/g)) out[Number(m[1])] = unesc(m[2]);
+  for (const m of cache.matchAll(/<c:pt idx="(\d+)"[^>]*><c:v>([\s\S]*?)<\/c:v><\/c:pt>/g)) out[Number(m[1])] = unescapeXml(m[2]);
   return out;
 };
 /** A series' reference (tx, cat, val, xVal or yVal) as chartxml.js takes it: { f, values, numeric, format }. */
@@ -93,7 +93,7 @@ function refOf(ser, tag) {
   const numeric = /<c:numRef>/.test(el);
   const n = Number(/<c:ptCount val="(\d+)"/.exec(el)?.[1] || 0);
   const values = points(el, n);
-  return { f: unesc(f), numeric, values: numeric ? values.map((v) => (v == null ? null : Number(v))) : values, format: unesc(/<c:formatCode>([\s\S]*?)<\/c:formatCode>/.exec(el)?.[1] || 'General') };
+  return { f: unescapeXml(f), numeric, values: numeric ? values.map((v) => (v == null ? null : Number(v))) : values, format: unescapeXml(/<c:formatCode>([\s\S]*?)<\/c:formatCode>/.exec(el)?.[1] || 'General') };
 }
 
 const GROUP = /<c:(barChart|bar3DChart|lineChart|line3DChart|areaChart|area3DChart|pieChart|pie3DChart|doughnutChart|scatterChart)>[\s\S]*?<\/c:\1>/;

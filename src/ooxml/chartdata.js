@@ -25,14 +25,14 @@ import { parseRange, colName } from './refs.js';
 import { formatCodeOf } from './styles.js';
 import { sheetPrefix } from '../calc/tokens.js';
 import { maxOf, minOf } from './listmath.js';
+import { unescapeXml } from './xml.js';
 
 const GROUP = /<c:(barChart|bar3DChart|lineChart|line3DChart|areaChart|area3DChart|pieChart|pie3DChart|doughnutChart|scatterChart)>[\s\S]*?<\/c:\1>/;
 const SER = /<c:ser>[\s\S]*?<\/c:ser>/g;
-const unesc = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const num = (ser, tag) => Number(new RegExp(`<c:${tag} val="(\\d+)"`).exec(ser)?.[1] ?? 0);
 const inner = (ser, tag) => new RegExp(`<c:${tag}>([\\s\\S]*?)</c:${tag}>`).exec(ser)?.[1] ?? null;
-const formulaIn = (el) => { const f = el == null ? null : /<c:f>([\s\S]*?)<\/c:f>/.exec(el)?.[1]; return f == null ? null : unesc(f); };
+const formulaIn = (el) => { const f = el == null ? null : /<c:f>([\s\S]*?)<\/c:f>/.exec(el)?.[1]; return f == null ? null : unescapeXml(f); };
 
 /** The CHART_KINDS name of a chart part's kind, or null for one Insert > Charts doesn't make. */
 export function kindIn(text) {
@@ -93,7 +93,7 @@ function seriesIn(text) {
   const list = [...g[0].matchAll(SER)].map((m) => {
     const ser = m[0];
     const tx = inner(ser, 'tx');
-    const v = tx != null && /^<c:v>/.test(tx) ? unesc(/<c:v>([\s\S]*?)<\/c:v>/.exec(tx)[1]) : null;
+    const v = tx != null && /^<c:v>/.test(tx) ? unescapeXml(/<c:v>([\s\S]*?)<\/c:v>/.exec(tx)[1]) : null;
     return { ser, idx: num(ser, 'idx'), order: num(ser, 'order'), name: tx == null ? null : v != null ? { text: v } : { f: formulaIn(tx) },
       cat: formulaIn(inner(ser, 'cat') ?? inner(ser, 'xVal')), val: formulaIn(inner(ser, 'val') ?? inner(ser, 'yVal')) };
   });

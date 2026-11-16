@@ -12,7 +12,7 @@
 // - the A to Z and Z to A buttons save one in the same form as the Sort box.
 // - a sort inside a table (its own Sort) is saved in the table's part, after its autoFilter, and none in the sheet;
 // A new sort replaces the last one. A saved sort follows inserted and deleted rows and columns: rowcol.js, anchors.js.
-import { kid, kids, parseXml } from './xml.js';
+import { kid, kids, parseXml, esc } from './xml.js';
 import { rangeName, colName } from './refs.js';
 import { addDxf } from './filterops.js';
 import { AFTER_MERGES } from './sheetedit.js';
@@ -21,7 +21,6 @@ import { readTables } from './tables.js';
 const XLRD2 = 'http://schemas.microsoft.com/office/spreadsheetml/2017/richdata2';
 // (The elements CT_Worksheet puts after sortState: a sheet-level one goes before the first of these there.)
 const AFTER_SORT = ['dataConsolidate', 'customSheetViews', 'mergeCells', ...AFTER_MERGES];
-const escAttr = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** The workbook's body font as a font colour sort's dxf names it (Excel's: every property given, its colour). */
 function fontDxfXml(wb, rgb) {
@@ -30,11 +29,11 @@ function fontDxfXml(wb, rgb) {
   const first = kids(kid(sroot, 'fonts', sroot.namespaceURI), 'font', sroot.namespaceURI)[0];
   const family = first ? kid(first, 'family', sroot.namespaceURI)?.getAttribute('val') : null;
   return `<dxf><font><b val="0"/><i val="0"/><strike val="0"/><condense val="0"/><extend val="0"/><outline val="0"/>`
-    + `<shadow val="0"/><u val="none"/><vertAlign val="baseline"/><sz val="${escAttr(f.size ?? 11)}"/><color rgb="${escAttr(rgb)}"/>`
-    + `<name val="${escAttr(f.name || 'Calibri')}"/>${family ? `<family val="${escAttr(family)}"/>` : ''}`
-    + `${f.scheme ? `<scheme val="${escAttr(f.scheme)}"/>` : ''}</font></dxf>`;
+    + `<shadow val="0"/><u val="none"/><vertAlign val="baseline"/><sz val="${esc(f.size ?? 11)}"/><color rgb="${esc(rgb)}"/>`
+    + `<name val="${esc(f.name || 'Calibri')}"/>${family ? `<family val="${esc(family)}"/>` : ''}`
+    + `${f.scheme ? `<scheme val="${esc(f.scheme)}"/>` : ''}</font></dxf>`;
 }
-const fillDxfXml = (rgb) => `<dxf><fill><patternFill patternType="solid"><fgColor rgb="${escAttr(rgb)}"/><bgColor indexed="65"/></patternFill></fill></dxf>`;
+const fillDxfXml = (rgb) => `<dxf><fill><patternFill patternType="solid"><fgColor rgb="${esc(rgb)}"/><bgColor indexed="65"/></patternFill></fill></dxf>`;
 
 /**
  * The sortState element's XML for a sort of sheet si (`plan`: { area, keys: [{ at, desc, on, color, customOrder }],
@@ -48,7 +47,7 @@ export function sortStateXml(wb, plan) {
     const on = (k.on === 'cellColor' || k.on === 'fontColor') && k.color ? k.on : null;
     const dxf = on ? addDxf(wb, on === 'cellColor' ? fillDxfXml(k.color) : fontDxfXml(wb, k.color)) : null;
     return `<sortCondition${k.desc ? ' descending="1"' : ''}${on ? ` sortBy="${on}"` : ''} ref="${ref}"`
-      + `${Array.isArray(k.customOrder) ? ` customList="${escAttr(k.customOrder.join(','))}"` : ''}${dxf != null ? ` dxfId="${dxf}"` : ''}/>`;
+      + `${Array.isArray(k.customOrder) ? ` customList="${esc(k.customOrder.join(','))}"` : ''}${dxf != null ? ` dxfId="${dxf}"` : ''}/>`;
   }).join('');
   return `<sortState${leftToRight ? ' columnSort="1"' : ''}${matchCase ? ' caseSensitive="1"' : ''} ref="${rangeName(data)}" xmlns:xlrd2="${XLRD2}">${conditions}</sortState>`;
 }

@@ -3,7 +3,7 @@
 // Table (ListObjects.Add), the style and Table Style Options, the total row and each column's total, the header row,
 // the filter buttons, the name and Resize Table (Convert to Range: tableconvert.js). Each takes the workbook and a table of readTables
 // (tables.js) and changes the table part, the sheet and the workbook's formulas.
-import { serializeXml, kids, kid, NS } from './xml.js';
+import { serializeXml, kids, kid, NS, esc } from './xml.js';
 import { readTables } from './tables.js';
 import { rangeName } from './refs.js';
 import { validName } from './names.js';
@@ -79,7 +79,6 @@ function tableXml({ id, name, ref, headers, totals, filterRef, columns, style })
     (filterRef ? `<autoFilter ref="${filterRef}"/>` : '') + `<tableColumns count="${columns.length}">${cols}</tableColumns>` +
     `<tableStyleInfo${style ? ` name="${esc(style)}"` : ''} showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/></table>`;
 }
-const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /** The sheet's <tableParts> with a part for relationship `rid` added, made before extLst when there is none. */
 function addTablePart(doc, rid) {
