@@ -155,12 +155,11 @@ against Excel). All of this so far is on generated fixtures; the numbers that ma
 
 ## Open differences
 
-- Text rotation, shrink-to-fit, conditional formats and East Asian date formats are not drawn yet.
-- Row and column styles (a whole column's fill) are not applied to cells that aren't in the file.
+- East Asian date formats (built-in ids 27-36 and 50-58) are shown as General (`ooxml/format.js`).
 - The maximum digit width is fixed at 7px (right for Calibri 11 and Aptos Narrow 11); other Normal fonts need theirs.
 - Gridlines show under text that runs on into empty cells; Excel hides them there.
 - The grid ends 100 rows and 10 columns past the used range; Excel's goes on to row 1,048,576 and column XFD.
-- Printing: no scaling or fit-to-page, print titles, manual page breaks, print area, headers and footers yet.
+- Printing (print area, print titles, scale, fit to pages, page breaks, headers and footers): docs/PRINT.md.
 
 ## Tried and dropped
 
