@@ -118,7 +118,7 @@ insides:
 | `src/calc/functions-pivotby.js` | PIVOTBY: several row and column fields, subtotals, sorting, relative_to (docs/DYNAMIC.md). |
 | `src/calc/functions-bessel.js` | BESSELJ, BESSELY, BESSELI, BESSELK by the approximations Excel uses (docs/CALC.md). |
 | `src/calc/functions-amort.js` | AMORLINC and AMORDEGRC, the French depreciation, as Excel works them out (docs/CALC.md). |
-| `src/calc/functions-regex.js`, `regex.js` | REGEXTEST, REGEXEXTRACT, REGEXREPLACE: Excel's PCRE2 patterns and replacement text turned into JavaScript's (docs/CALC.md). |
+| `src/calc/functions-regex.js`, `pcre.js`, `pcre-match.js`, `regex.js` | REGEXTEST, REGEXEXTRACT, REGEXREPLACE: Excel's PCRE2 patterns read into a tree and matched by backtracking with a limit on the work (#VALUE! past it, as Excel), one-character classes as JavaScript's; the replacement text (docs/CALC.md). |
 | `src/calc/functions-convert.js` | CONVERT, with Excel's units, factors and prefixes (docs/CALC.md). |
 | `src/calc/functions-complex.js`, `trig.js` | The complex-number functions (COMPLEX, IMSUM and the rest); sine and cosine reduced by the x87's π, as Excel's (docs/CALC.md). |
 | `src/calc/functions-dist.js`, `functions-agg.js`, `functions-eng.js` | The t, chi-squared, F, gamma, beta and other distributions and their tests; AGGREGATE, matrices and LINEST and its kin; bits, bases, hyperbolics and more money (docs/CALC.md). |

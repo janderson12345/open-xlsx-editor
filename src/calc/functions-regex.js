@@ -5,7 +5,7 @@
 // formula probe. Registered into functions.js's table; evaluate.js imports this file.
 import { Arr, E } from './values.js';
 import { lifted, def, given, num, text } from './functions.js';
-import { regex } from './regex.js';
+import { pattern } from './pcre-match.js';
 
 const NAME = /^[A-Za-z_][A-Za-z0-9_]*/;
 
@@ -103,12 +103,20 @@ function replacement(parts, group) {
 }
 
 /** The groups a replacement names, each one the pattern must have. */
-function checkGroups(parts, groups) {
+function checkGroups(parts, re) {
   for (const p of parts) {
     const g = p.g ?? p.if;
-    if (g !== undefined && g !== 0 && !(typeof g === 'number' ? g <= groups.length : groups.includes(g))) throw E.value;
-    if (p.set) { checkGroups(p.set, groups); checkGroups(p.unset, groups); }
+    if (g !== undefined && g !== 0 && !(typeof g === 'number' ? g <= re.count : re.names.has(g))) throw E.value;
+    if (p.set) { checkGroups(p.set, re); checkGroups(p.unset, re); }
   }
+}
+
+/** Group `g` (a number, 0 the match, or a name) of match `m` in `s`; undefined where it took no part. */
+function groupText(re, m, s, g) {
+  if (g === 0) return s.slice(m.start, m.end);
+  const ns = typeof g === 'number' ? [g] : re.names.get(g) || [];
+  const n = ns.find((x) => m.caps[2 * x] >= 0);
+  return n === undefined ? undefined : s.slice(m.caps[2 * n], m.caps[2 * n + 1]);
 }
 
 /** case_sensitivity: 0 (the default) or 1, else #VALUE!. */
@@ -118,45 +126,43 @@ function caseless(a, k, ctx) {
   if (n !== 0 && n !== 1) throw E.value;
   return n === 1;
 }
-const matches = (re, s) => [...s.matchAll(re)];
-
-lifted('REGEXTEST', (a, ctx) => {
-  const { re } = regex(text(a[1], ctx), caseless(a, 2, ctx));
-  re.lastIndex = 0;
-  return re.test(text(a[0], ctx));
-});
+lifted('REGEXTEST', (a, ctx) => !!pattern(text(a[1], ctx), caseless(a, 2, ctx)).exec(text(a[0], ctx), 0));
 
 // (REGEXEXTRACT isn't worked out for each value of an array: =REGEXEXTRACT({"a1","b2"},"\d") is "1".)
 def('REGEXEXTRACT', (a, ctx) => {
   const s = text(a[0], ctx);
   const mode = given(a[2]) ? Math.trunc(num(a[2], ctx)) : 0;
   if (mode < 0 || mode > 2) throw E.value;
-  const { re, groups } = regex(text(a[1], ctx), caseless(a, 3, ctx));
-  const all = matches(re, s);
+  const re = pattern(text(a[1], ctx), caseless(a, 3, ctx));
   if (mode === 2) {
-    // (The groups of the first match, in a row; one that took no part #N/A. No match, or no groups: #VALUE!.)
-    if (!all.length || !groups.length) throw E.value;
-    return new Arr([groups.map((g) => all[0].groups[g] ?? E.na)]);
+    // (The groups of the first match, in a row; one that took no part #N/A. No groups: #VALUE!; groups and no
+    // match: #N/A, measured.)
+    if (!re.count) throw E.value;
+    const m = re.exec(s, 0);
+    if (!m) throw E.na;
+    return new Arr([Array.from({ length: re.count }, (_, k) => groupText(re, m, s, k + 1) ?? E.na)]);
   }
+  if (mode === 0) { const m = re.exec(s, 0); if (!m) throw E.na; return s.slice(m.start, m.end); }
+  const all = re.all(s);
   if (!all.length) throw E.na;
-  return mode === 0 ? all[0][0] : new Arr([all.map((m) => m[0])]);
+  return new Arr([all.map((m) => s.slice(m.start, m.end))]);
 });
 
 lifted('REGEXREPLACE', (a, ctx) => {
   const s = text(a[0], ctx);
-  const { re, groups } = regex(text(a[1], ctx), caseless(a, 4, ctx));
+  const re = pattern(text(a[1], ctx), caseless(a, 4, ctx));
   const [parts] = parseReplacement(text(a[2], ctx));
-  checkGroups(parts, groups);
+  checkGroups(parts, re);
   const occurrence = given(a[3]) ? Math.trunc(num(a[3], ctx)) : 0;
-  const all = matches(re, s);
+  const all = re.all(s);
   const which = occurrence === 0 ? null : occurrence > 0 ? occurrence - 1 : all.length + occurrence;
   let out = '';
   let at = 0;
   all.forEach((m, k) => {
     if (which !== null && k !== which) return;
-    const group = (g) => (g === 0 ? m[0] : m.groups[typeof g === 'number' ? groups[g - 1] : g]);
-    out += s.slice(at, m.index) + replacement(parts, group);
-    at = m.index + m[0].length;
+    // (With \K the match, and what is replaced, starts where \K was.)
+    out += s.slice(at, m.start) + replacement(parts, (g) => groupText(re, m, s, g));
+    at = m.end;
   });
   return out + s.slice(at);
 });

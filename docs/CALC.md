@@ -194,17 +194,47 @@ the 15th digit takes its last digit from the JavaScript engine's Math.pow: IMPOW
       the 28th, over 365, or for basis 1 over the purchase year's days. None (bought on the first period's last day):
       a whole year, and for AMORDEGRC one period fewer.
     - basis 2 is #NUM!, as are a purchase after the first period, salvage above cost, a negative period, a rate of 0.
-  - `functions-regex.js`, `regex.js`: REGEXTEST, REGEXEXTRACT and REGEXREPLACE. Excel's patterns are PCRE2's with
-    Unicode properties; `regex.js` turns them into JavaScript's (the v flag). Measured on about 190 cases with a hidden
-    Excel, then the probe's 125:
+  - `functions-regex.js`, `pcre.js`, `pcre-match.js`, `regex.js`: REGEXTEST, REGEXEXTRACT and REGEXREPLACE. Excel's
+    patterns are PCRE2's with Unicode properties. `pcre.js` reads a pattern into a tree, `regex.js` turning each
+    escape or class that stands for one character into JavaScript's class syntax (the v flag), and `pcre-match.js`
+    matches it by backtracking, each one-character class a JavaScript test that can't backtrack itself. Measured on
+    about 190 cases with a hidden Excel, then the probe's 125, then 924 more over the features JavaScript hasn't got
+    (`tools/excel-compare/regex-cases.mjs`, Excel's answers in test/regex-excel.json; the last 600 random patterns,
+    held out): 916 of the 924 as Excel's, where 287 of the 917 that finished were before (the other 7 didn't finish):
     - \w, \d, \s and \b are Unicode's (é is a letter, a no-break space a space, ٣ a digit). $ matches before a final
       newline too, . anything but a newline. (?i), (?s), (?m) and (?x) at the start apply to the whole pattern.
     - Read too: [[:alpha:]] and the other POSIX classes, \Q...\E, (?P<name>...) and (?P=name), \g1 and \g{-1},
-      \x{..}, \o{..}, octal, \cJ, \h, \R, \N, a{,2}, comments (?#...). Atomic groups and possessive quantifiers are
-      made from a lookahead and a reference to it (^a++a matches nothing in "aaa", as in Excel).
-    - An unknown escape (\i), an unclosed group or a bad repeat is #VALUE!. case_sensitivity is 0 or 1, else #VALUE!.
+      \x{..}, \o{..}, octal, \cJ, \h, \R, \N, \N{U+41}, a{,2}, comments (?#...), atomic groups and possessive
+      quantifiers (^a++a matches nothing in "aaa", as in Excel), \p{Greek}, \p{Script=Latin}, \p{Xwd}, \p{Xan},
+      \p{Xsp}, \p{Xuc}.
+    - PCRE2's own, as Excel has them: \K (=REGEXEXTRACT("price: 42","price: \K\d+") is "42"; REGEXREPLACE replaces
+      from \K on); recursion and subroutine calls ((?R), (?1), (?-1), (?+1), (?&name), (?P>name), \g<1>), each call's
+      captures put back afterwards, backtracking into it allowed; conditionals on a group ((?(1)..|..), (?(<name>)..)),
+      on recursion ((?(R)..), (?(R1)..)), on a lookaround, and (?(DEFINE)..); \G, where the search began; \X, a
+      grapheme cluster (an emoji ZWJ family, a flag); branch reset (?|..); options anywhere, for the rest of the group
+      ("a(?i)b" matches "aB", not "AB"; (?i:..), (?-i), (?^), (?n), (?U), (?J), (?xx)); the verbs (*FAIL), (*ACCEPT),
+      (*COMMIT), (*PRUNE), (*SKIP), (*THEN), (*MARK:x); the start options (*UTF), (*UCP), (*LIMIT_MATCH=n) and the
+      newline conventions (*CR), (*LF), (*CRLF), (*ANYCRLF), (*ANY), (*NUL); lookbehind of bounded length
+      ((?<=a{1,3})b). A backreference to a group that took no part matches nothing.
+    - Case-insensitive, \p{Lu}, \p{Ll} and \p{Lt} match any cased letter (REGEXTEST("a","\p{Lu}",1) is TRUE), but
+      [[:upper:]] and [[:lower:]] keep their case (REGEXTEST("a","[[:upper:]]",1) is FALSE).
+    - After an empty match the next search starts there and may not be empty where it starts; finding nothing, it
+      starts again a character on: =REGEXREPLACE("abc","\G","-") is "-a-b-c-", =REGEXREPLACE("abc","(?!\G)","-")
+      "a-b-c-".
+    - **A limit on the work**: a match taking more than 5,000,000 steps, or recursions 2,000 deep, is #VALUE!, as
+      Excel gives at PCRE2's match limit (=REGEXTEST(REPT("a",30)&"b","^(a+)+$") and
+      =REGEXTEST(REPT("ab",20)&"c","^(ab|a|b)*$") are #VALUE! in Excel, and here in well under a second). A plain
+      character every match needs, missing from the text, is no match at once, as PCRE2 finds it
+      (=REGEXEXTRACT(REPT("a",25)&"x","(a*)*b") is #N/A). So no pattern a workbook brings can hold the sheet up.
+    - #VALUE!, as PCRE2 refuses them: an unknown escape (\i), \C, \u0061, \U, \L, an unclosed group, a bad repeat, a
+      repeat past 65535 or of nothing (after (?i) or |, or of a repeat: "c{2}(?R)?*?"), a lookbehind of unbounded
+      length ((?<=a+)b), \K in a lookaround, a name used twice without (?J), a conditional with three branches, one
+      on a group the pattern hasn't got, callouts (?C), [[.a.]] and [[=a=]], a range from or to a set ([\d-z],
+      [a-\d]), \p{IsLatin}, \8, a recursion that would loop ((?R) alone). case_sensitivity is 0 or 1, else #VALUE!.
     - REGEXEXTRACT: mode 0 the first match (#N/A if none); 1 every match, in a row; 2 the first match's groups, in a
-      row, a group that took no part #N/A, and #VALUE! where there is no match or no group. An array given it is cut
+      row, a group that took no part #N/A; #VALUE! where the pattern has no group, #N/A where it has and nothing
+      matches. ARRAYTOTEXT writes an error in an array as its text ("1, #N/A"), an error alone is that error. An array
+      given it is cut
       to its first value. REGEXTEST and REGEXREPLACE work out each value of an array.
     - REGEXREPLACE: occurrence 0 every match, n the nth, -n the nth from the end. The replacement is PCRE2's extended
       one: $1, ${1}, ${name}, $name, $0 and $&, $$; \1; \n, \t, \x41; \u, \l, \U...\E, \L...\E; ${2:-default}
@@ -638,9 +668,13 @@ timeline of 1 to n and seasonality 0 (no season), so it needn't be measured agai
   2019 and February 29, 2020 measured): 1e-4 from Excel's for some frequencies and bases. Kept out of the probe.
 - **AMORDEGRC bought on the first period's last day with a life of 3 years or less**: the rule here (declining, no
   halves, up to the life's periods) fits the two such assets measured, not more.
-- **Regular expressions JavaScript can't say**: \K, recursion ((?1), (?R)), conditionals, \G, \X, and options partway
-  through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
-  pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
+- **Regular expressions: 8 of the 924 cases measured** aren't Excel's. \G in an alternation after an empty match
+  (=REGEXREPLACE("xxa","a|\G","<$0>") is "<>x<>x<a><>" in Excel, "<>xx<a><>" here: Excel seems to start that search
+  a character on, as it doesn't for (?!\G)); and three random patterns repeating groups with conditionals, \K and
+  \G inside, one of which Excel answers with a number 0. (*SKIP:name) is #VALUE! here (marks aren't kept). Where
+  Excel stops for its match limit isn't the same step as here: a pattern needing between about 5 and 10 million
+  steps may be worked out in Excel and #VALUE! here. A repeated group of 10,000s of iterations that isn't plain
+  characters can run out of the stack, #VALUE! here.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;
   here 0.621518017170429-0.303931001628426i. Other arguments agree.
 - **Spilling** is in docs/DYNAMIC.md (dynamic arrays, LET, LAMBDA, `D1#`, `@`); its own gaps are listed there.
