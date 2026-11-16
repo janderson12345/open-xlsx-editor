@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.1
+
+- The README shows the latest release, the npm version, CI and the licence as badges, on GitHub and on npm.
+
 ## 0.7.0
 
 - **Tables.**

@@ -2,6 +2,11 @@
 
 Open, edit and save Excel workbooks (.xlsx) in the browser. Plain JavaScript, no server, no Office.
 
+[![Latest release](https://img.shields.io/github/v/release/janderson12345/open-xlsx-editor)](https://github.com/janderson12345/open-xlsx-editor/releases)
+[![npm](https://img.shields.io/npm/v/open-xlsx-editor)](https://www.npmjs.com/package/open-xlsx-editor)
+[![CI](https://github.com/janderson12345/open-xlsx-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/janderson12345/open-xlsx-editor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 **[Live demo](https://janderson12345.github.io/open-xlsx-editor/)**: a sample workbook opens; drop your own .xlsx on
 the page (it stays in your browser, nothing is uploaded).
 
