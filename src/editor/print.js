@@ -238,7 +238,7 @@ function drawPage(st, block, layout, k = 0, hf = {}) {
  *  `looks` gives cell format classes and decorations (cellstyles.js), `normalFamily` the Normal style's typeface (printed
  *  row heights depend on it), `print` its print area and titles (printarea.js printSetup) and, for headers and footers,
  *  `sheet` and `file` (names), `sizePt` (the Normal style's size) and `pictures` (hfpictures.js headerPictures), and
- *  `sparks` (ooxml/sparklines.js sparklineLooks). Returns the number of pages. */
+ *  `sparks` (ooxml/sparklines.js sparklineLooks), `tables` (ooxml/tablestyle.js tableLooks). Returns the number of pages. */
 export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, print = {}) {
   const screen = sheetGeometry(sheet);
   const auto = autoRowHeights(sheet, looks.deco, screen.cols);
@@ -252,7 +252,7 @@ export function renderPrint(root, sheet, looks = {}, normalFamily = undefined, p
   // (A print area of several ranges: each on pages of its own, in the order listed, as Excel prints them (its PDFs:
   // two ranges down or across, three out of order, with print titles over each); the scale is the first range's.)
   if (print.areas?.length > 1) layout.pages = print.areas.flatMap((a) => paginate(sheet, geometry, { ...print, area: a, scale }).pages);
-  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), sparks: print.sparks, print: true };
+  const st = { sheet, rows: geometry.rows, cols: geometry.cols, screenCols: screen.cols, classOf: looks.classOf, deco: looks.deco, date1904: looks.date1904, color: looks.color, hiddenAt: looks.hiddenAt, runStyle: looks.runStyle, rowDesc: rowDescents(sheet, looks.deco), sparks: print.sparks, tables: print.tables, print: true };
   let el = root.querySelector(':scope > .oxe-print');
   if (!el) {
     el = div('oxe-print');

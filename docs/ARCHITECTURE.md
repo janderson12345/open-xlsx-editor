@@ -42,7 +42,8 @@ insides:
 | `src/ooxml/sparklines.js` | A sheet's sparkline groups read from its extLst (sheet.sparklines), and what each sparkline shows: its values from the cells, the axis's ends, its colours (docs/SPARKLINES.md). |
 | `src/ooxml/sparkedit.js` | Sparklines inserted and edited as Excel writes them: the data cut into sparklines, a group's settings and colours, Group, Ungroup, Clear, Edit Data (docs/SPARKLINES.md). |
 | `src/ooxml/sparklinestyles.js` | Excel's 36 sparkline styles (the style gallery), each one's eight colours as Excel writes them, measured. |
-| `src/ooxml/tables.js` | The workbook's tables, and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
+| `src/ooxml/tables.js` | The workbook's tables (range, header and total rows, columns and their totals, style and options, filter buttons), and what a table reference (Fruit[Qty], [#Totals], [@Qty]) stands for. |
+| `src/ooxml/tablestyle.js` | A table's look in its table style: Excel's built-in styles (`src/engine/tablestyles.js`, measured) or the workbook's own, laid on in Excel's order with the Table Style Options, under the cells' own formats (docs/TABLES.md). |
 | `src/ooxml/cfb.js` | Compound files (MS-CFB): every stream read by its path; written as version 3, small streams in the mini stream. |
 | `src/ooxml/encryption.js` | Workbooks saved with a password (MS-OFFCRYPTO agile): decrypted and encrypted with @noble/hashes and @noble/ciphers; PasswordError; docs/ENCRYPTION.md. |
 | `src/ooxml/printarea.js` | A sheet's print area and print titles, from the workbook's defined names (docs/PRINT.md). |

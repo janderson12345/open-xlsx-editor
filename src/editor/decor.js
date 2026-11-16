@@ -70,11 +70,15 @@ export function decorations(st, win) {
       const cell = line?.get(c);
       // (An empty cell: its row's or column's own format, ooxml/sheet.js lineStyle.)
       const s = cell ? cell.s : lineStyle(sheet, r, c);
-      if (!s) continue;
-      const d = deco(s);
+      // (A table's style, under the cell's own format and its conditional formats: ooxml/tablestyle.js.)
+      const tl = st.tables?.get(`${r},${c}`);
+      if (!s && !tl) continue;
+      const d = deco(s || 0);
       if (d.fill && !merge && !cf?.fill) fills.push(rect(st, r, c, r, c, d.fillClass, ox, oy));
+      else if (tl?.fill && !merge && !cf?.fill) { const el = rect(st, r, c, r, c, 'oxe-tbl-fill', ox, oy); el.style.setProperty('--oxe-tbl', tl.fill); fills.push(el); }
       // (A conditional format's border sides over the cell's own: ooxml/condformat.js.)
       for (const side of d.sides) if (!cf?.border?.[side.name]) edges.push(...edge(st, r, c, side, ox, oy));
+      if (tl?.border) edges.push(...tableEdges(st, r, c, tl.border, cf, ox, oy));
       if (cf?.border) {
         for (const [name, b] of Object.entries(cf.border)) {
           for (const el of edge(st, r, c, { name, style: b.style, cls: 'oxe-cf-edge' }, ox, oy)) { el.style.setProperty('--oxe-es', LINE[b.style] || 'solid'); el.style.setProperty('--oxe-ec', b.color); edges.push(el); }
@@ -93,6 +97,21 @@ export function decorations(st, win) {
   }
   fills.push(...sparks);
   return { fills, edges };
+}
+
+/** A table style's border sides of cell (r, c), each where neither the cell's own format nor a conditional format has
+ *  one (the cell's own are drawn already): a side shared with the cell beside is drawn by both, in the same place. */
+function tableEdges(st, r, c, border, cf, ox, oy) {
+  const out = [];
+  for (const [name, b] of Object.entries(border)) {
+    if (cf?.border?.[name]) continue;
+    for (const el of edge(st, r, c, { name, style: b.style, cls: 'oxe-tbl-edge' }, ox, oy)) {
+      el.style.setProperty('--oxe-es', LINE[b.style] || 'solid');
+      el.style.setProperty('--oxe-ec', b.color);
+      out.push(el);
+    }
+  }
+  return out;
 }
 
 /** A data bar's elements in cell (r, c): the bar (gradient: its colour fading to white towards its end, as Excel draws

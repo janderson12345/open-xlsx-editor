@@ -17,11 +17,22 @@ export function readTables(wb) {
       const area = root && parseRange(attr(root, 'ref'));
       if (!area) continue;
       const ns = root.namespaceURI;
+      const cols = kids(kid(root, 'tableColumns', ns), 'tableColumn', ns);
+      // (Its style and Table Style Options: a table without tableStyleInfo, or one without a name, has no style.)
+      const info = kid(root, 'tableStyleInfo', ns);
+      const on = (name) => attr(info, name) === '1' || attr(info, name) === 'true';
+      const filter = kid(root, 'autoFilter', ns);
       out.push({
         name: attr(root, 'displayName') || attr(root, 'name'), si, ...area, path: rel.target,
+        id: Number(attr(root, 'id') || 0),
         headers: attr(root, 'headerRowCount') === '0' ? 0 : 1,
         totals: Number(attr(root, 'totalsRowCount') || 0) > 0 ? 1 : 0,
-        columns: kids(kid(root, 'tableColumns', ns), 'tableColumn', ns).map((c) => attr(c, 'name') || ''),
+        columns: cols.map((c) => attr(c, 'name') || ''),
+        // (Each column's total: totalsRowFunction and totalsRowLabel, kept while the total row is off.)
+        totalsRow: cols.map((c) => ({ fn: attr(c, 'totalsRowFunction') || null, label: attr(c, 'totalsRowLabel') })),
+        style: { name: attr(info, 'name') || null, first: on('showFirstColumn'), last: on('showLastColumn'), rows: on('showRowStripes'), cols: on('showColumnStripes') },
+        // (Its filter buttons: an autoFilter, less the columns whose button is hidden.)
+        filter: filter ? { hidden: new Set(kids(filter, 'filterColumn', ns).filter((f) => attr(f, 'hiddenButton') === '1').map((f) => Number(attr(f, 'colId')))) } : null,
       });
     }
   });
