@@ -300,8 +300,10 @@ check(choices === 12 && afterFormats === 'A1:A3,C1:C3' && drawn >= 6 && afterVal
 {
   await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
   await openFixture(page, 'rotate.xlsx');
-  const look = await page.evaluate(() => {
-    const at = (text) => [...document.querySelectorAll('.oxe-grid .oxe-cell')].find((c) => c.textContent.replace(/\n/g, '') === text);
+  // (From the print layout, where every page's cells are drawn; the grid draws only the rows in view.)
+  const look = await page.evaluate(async () => {
+    await window.oxe.preparePrint();
+    const at = (text) => [...document.querySelectorAll('.oxe-print .oxe-cell')].find((c) => c.textContent.replace(/\n/g, '') === text);
     const cls = (text) => { const c = at(text); return c ? ['left', 'center', 'right'].find((h) => c.classList.contains(`oxe-h-${h}`)) : null; };
     const stack = at('Stacked');
     return { up45: cls('Up 45 degrees'), up90: cls('Up 90 degrees'), down45: cls('Down 45 degrees'), down90: cls('Down 90 degrees'), num45: cls('12345'), stacked: cls('Stacked'),
