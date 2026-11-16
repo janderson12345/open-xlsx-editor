@@ -144,7 +144,7 @@ among them, which Excel too leaves out of Insert Function). The 19 missing:
 
 | Kind | Missing | Count | Notes |
 |---|---|---|---|
-| Possible here | FORECAST.ETS, FORECAST.ETS.CONFINT, FORECAST.ETS.SEASONALITY, FORECAST.ETS.STAT | 4 | Excel's AAA exponential smoothing; its exact fitting is to be measured. |
+| Possible here | FORECAST.ETS, FORECAST.ETS.CONFINT, FORECAST.ETS.SEASONALITY, FORECAST.ETS.STAT | 4 | Excel's AAA exponential smoothing. Its model, start values, forecasts, error statistics and confidence interval are measured and match Excel's to 15 digits once alpha and beta are known; how Excel picks those, and its seasonality detection, aren't found yet (docs/CALC.md, FORECAST.ETS). |
 | Need something outside the workbook | CUBEKPIMEMBER, CUBEMEMBER, CUBEMEMBERPROPERTY, CUBERANKEDMEMBER, CUBESET, CUBESETCOUNT, CUBEVALUE | 7 | An OLAP data model or connection. |
 | | RTD, WEBSERVICE, STOCKHISTORY, IMAGE, TRANSLATE, DETECTLANGUAGE | 6 | A server, a web address or Microsoft's online services. |
 | | CALL, REGISTER.ID | 2 | Code in a Windows DLL; off by default in Excel too. |

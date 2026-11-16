@@ -533,6 +533,32 @@ functions.
 - In a formula of the old kind, Excel takes only the first value (as its `@` does with SEQUENCE: docs/DYNAMIC.md);
   here all of them reach the function around it.
 
+## FORECAST.ETS and its family (not yet: what was measured)
+
+FORECAST.ETS, FORECAST.ETS.CONFINT, FORECAST.ETS.SEASONALITY and FORECAST.ETS.STAT aren't here yet: how Excel picks
+the smoothing parameters isn't found. What was measured, in a hidden Excel 365 over COM, on about 60 series with a
+timeline of 1 to n and seasonality 0 (no season), so it needn't be measured again:
+
+- **Matches Excel to 15 digits.** The model is Holt's additive trend in its error-correction form, beta Hyndman's
+  (so at most alpha: Excel reports beta 0.099 with alpha 0.1): forecast f = l + b, error e = y - f, then l = l + b +
+  alpha e and b = b + beta e. The trend starts at the least-squares slope of the values on the timeline, the level at
+  the first value less it, so the first error is 0; for 3 values and for 7 or more (about 30 series). 4, 5 and 6 values
+  start from other fixed weights on the values, measured but not explained: [-8, -3, 2, 9]/28, [-26, -13, -5, 13,
+  31]/140 and [-90, -124, -53, 18, 89, 160]/980. h steps on, l + h b.
+- **The error statistics** (STAT 4 to 7: MASE, SMAPE, MAE, RMSE) are over every one-step error for up to 10 values,
+  and for 11 or more over the last third (rounded up) of the same run's errors only, a validation window. MASE is MAE
+  over the mean of |y_t - y_t-1|. STAT 8 is the timeline's step.
+- **CONFINT** without a season: NORM.S.INV((1 + confidence) / 2) x RMSE x the square root of 1 + the sum over j = 1 to
+  h - 1 of (alpha + j beta)^2.
+- **Not found: how alpha and beta are chosen.** Excel's answers sit on a few values (alpha 0.002, 0.1, 0.126, 1/6,
+  0.25, 0.5, 2/3, 0.75, 0.9, 0.998; beta 0.001, alpha - 0.001, 1/12), and they aren't the least squared or absolute
+  error over a 0.001 grid, whether over all the errors, the validation window or the first two thirds: near it for
+  10 values or fewer, far from it for some longer series. Constant and straight-line data give 0.9 and 0.001.
+- **Not found: a second model.** Some series are forecast as the last value plus the least-squares slope (alpha 1,
+  beta 0), whatever STAT reports for them (10 values with alpha shown as 0.998, 13 with 0.666667).
+- **Not started:** seasonality detection (FORECAST.ETS.SEASONALITY), the seasonal start values, data completion and
+  aggregation.
+
 ## Not yet
 
 - **ACCRINT with first_interest on the 29th, 30th or 31st of a month whose coupon dates pass a shorter February**: 13
