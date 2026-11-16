@@ -1,9 +1,9 @@
 # Calculation
 
 How formulas are worked out (`src/calc/`), and what Excel was seen to do. As with layout, Excel's own results are
-the only measure. `test/fixtures/formulas.xlsx` holds 1914 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
+the only measure. `test/fixtures/formulas.xlsx` holds 1926 formula cells with no saved values, and a table (Fruit) for table references. Excel opened it,
 worked them out (`tools/excel-compare/excel-values.ps1`, COM, read-only, `CalculateFull`) and its results are in
-`test/formulas-excel.json`. `npm test` checks every one: **1914 of 1914 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
+`test/formulas-excel.json`. `npm test` checks every one: **1926 of 1926 as Excel** (to 15 digits; RATE, IRR, YIELD and ODDFYIELD, searches (Excel promises RATE and IRR to 0.0000001), to 1e-9; XIRR, which it promises to 0.000001%, to 1e-8;
 the t, chi-squared, F, gamma, beta, Weibull and negative binomial distributions, their inverses and tests, and VDB, to
 1e-13 of the value: series, continued fractions and searches whose last digits are each one's own, Excel's within
 2e-14 of these; the IM functions' complex results, each part to 2e-15, since a part falling on a rounding boundary in
@@ -69,11 +69,19 @@ the 15th digit takes its last digit from the JavaScript engine's Math.pow: IMPOW
       (February 29 to August 29: 182 days, not the 184 to August 31). PRICE, YIELD and DURATION take the actual period
       (184) instead. COUPDAYSNC counts 30/360 days with basis 4 and takes COUPDAYS - COUPDAYBS with basis 0.
     - PRICE, YIELD and DURATION take the days to the next coupon as COUPDAYS - COUPDAYBS, but for basis 1.
-    - ACCRINT: the coupon periods from issue to settlement, stepped from first_interest. A period that ends before
-      settlement counts 1. A part counts its days (by the basis) over the period's length: 360 or 365 over the
-      frequency, or with basis 1 the days of the period that ends at first_interest. A period ending on settlement is a
-      part (August 31 to February 28: 178 of 180). With calc_method FALSE, the days from issue to settlement over that
-      length, whatever Microsoft's page says about first_interest.
+    - ACCRINT (measured on 600 cases over the five bases and both calc_methods, then on 400 it wasn't worked out from,
+      387 the same): the coupon dates step from first_interest back past issue, each from the one before (August 30,
+      February 28, August 28), at the month's end when first_interest is at one, and on again from the earliest, so the
+      period issue falls in can end before first_interest. A period's length L is 360 or 365 over the frequency, or
+      with basis 1 the days of the period ending at first_interest (issue's own period its own days). Issue in the
+      period ending at first_interest: the days from issue over L. A longer first period accrues at L's rate all
+      through it: issue's part over its length, 1 for each whole period after it but the last, and the days left, from
+      issue to settlement less those periods', over L, so the answer is linear in settlement with an offset (issue
+      October 18, 2005, first_interest February 18, 2007, half-yearly, basis 1: 3 days more than counted, 184 less 181).
+      Past first_interest each whole period counts 1 and a part its days over L; a period ending on settlement is a part
+      (August 31 to February 28: 178 days of 180 in 30/360). With calc_method FALSE, issue's part and the days from
+      the start of the period ending at first_interest to settlement over L: negative when settlement is before that
+      start (ACCRINT(DATE(2006,11,1),DATE(2008,1,15),DATE(2007,6,1),0.06,100,4,1,FALSE) is -0.99 in Excel).
     - DISC and its kin with basis 1 take YEARFRAC's year (366 over a February 29); PRICEMAT and YIELDMAT the year up
       to settlement's. DISC is (1 - pr/redemption) x (year / days), to Excel's last digit.
   - `functions-complex.js`: the complex numbers, text such as "3+4i" or "3+4j". COMPLEX, IMREAL, IMAGINARY, IMABS,
@@ -525,11 +533,37 @@ functions.
 - In a formula of the old kind, Excel takes only the first value (as its `@` does with SEQUENCE: docs/DYNAMIC.md);
   here all of them reach the function around it.
 
+## FORECAST.ETS and its family (not yet: what was measured)
+
+FORECAST.ETS, FORECAST.ETS.CONFINT, FORECAST.ETS.SEASONALITY and FORECAST.ETS.STAT aren't here yet: how Excel picks
+the smoothing parameters isn't found. What was measured, in a hidden Excel 365 over COM, on about 60 series with a
+timeline of 1 to n and seasonality 0 (no season), so it needn't be measured again:
+
+- **Matches Excel to 15 digits.** The model is Holt's additive trend in its error-correction form, beta Hyndman's
+  (so at most alpha: Excel reports beta 0.099 with alpha 0.1): forecast f = l + b, error e = y - f, then l = l + b +
+  alpha e and b = b + beta e. The trend starts at the least-squares slope of the values on the timeline, the level at
+  the first value less it, so the first error is 0; for 3 values and for 7 or more (about 30 series). 4, 5 and 6 values
+  start from other fixed weights on the values, measured but not explained: [-8, -3, 2, 9]/28, [-26, -13, -5, 13,
+  31]/140 and [-90, -124, -53, 18, 89, 160]/980. h steps on, l + h b.
+- **The error statistics** (STAT 4 to 7: MASE, SMAPE, MAE, RMSE) are over every one-step error for up to 10 values,
+  and for 11 or more over the last third (rounded up) of the same run's errors only, a validation window. MASE is MAE
+  over the mean of |y_t - y_t-1|. STAT 8 is the timeline's step.
+- **CONFINT** without a season: NORM.S.INV((1 + confidence) / 2) x RMSE x the square root of 1 + the sum over j = 1 to
+  h - 1 of (alpha + j beta)^2.
+- **Not found: how alpha and beta are chosen.** Excel's answers sit on a few values (alpha 0.002, 0.1, 0.126, 1/6,
+  0.25, 0.5, 2/3, 0.75, 0.9, 0.998; beta 0.001, alpha - 0.001, 1/12), and they aren't the least squared or absolute
+  error over a 0.001 grid, whether over all the errors, the validation window or the first two thirds: near it for
+  10 values or fewer, far from it for some longer series. Constant and straight-line data give 0.9 and 0.001.
+- **Not found: a second model.** Some series are forecast as the last value plus the least-squares slope (alpha 1,
+  beta 0), whatever STAT reports for them (10 values with alpha shown as 0.998, 13 with 0.666667).
+- **Not started:** seasonality detection (FORECAST.ETS.SEASONALITY), the seasonal start values, data completion and
+  aggregation.
+
 ## Not yet
 
-- **ACCRINT with basis 1 over many coupon periods.** Excel's answer differs from the rule above in the fourth digit
-  (ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1) is 23.6307 in Excel, 23.625 here); its own
-  rule for that case isn't found yet. Shorter spans, and every other basis, are Excel's.
+- **ACCRINT with first_interest on the 29th, 30th or 31st of a month whose coupon dates pass a shorter February**: 13
+  of the 400 cases checked differ from Excel's in the third or fourth digit (ACCRINT(DATE(2006,3,13),DATE(2006,8,29),
+  DATE(2008,3,28),0.06,100,2,0) is 12.2809 in Excel, 12.25 here); kept out of the probe.
 - **ODDLPRICE and ODDLYIELD from a last interest date at a month's end into a February 29 settlement** (August 31,
   2019 and February 29, 2020 measured): 1e-4 from Excel's for some frequencies and bases. Kept out of the probe.
 - **AMORDEGRC bought on the first period's last day with a life of 3 years or less**: the rule here (declining, no
@@ -538,7 +572,7 @@ functions.
   through a pattern ("a(?i)b", "(?i:b)"). A formula using them keeps the value Excel saved. And in a case-insensitive
   pattern, \p{Lu} and [[:upper:]] match lower-case letters here too; in Excel they don't.
 - **An emoji in LEN, MID, FIND, SEARCH and REPLACE in a workbook Excel made.** Excel 365 counts an emoji (two UTF-16
-  units) as 2 in a workbook such as this editor writes (the probe's, 1914 of 1914 as Excel), but as 1 in a workbook it
+  units) as 2 in a workbook such as this editor writes (the probe's, 1926 of 1926 as Excel), but as 1 in a workbook it
   made itself, saved or not: LEN(UNICHAR(128512)) is 2 and 1, typed into the same Excel. Here it is always 2. calcId,
   fileVersion, app.xml, the theme, styles and calcChain were each tried in both directions and aren't what decides it.
 - **IMCSC("1+i")**: Excel's last digits there (0.621518017170428-0.303931001628427i) come from neither form tried;

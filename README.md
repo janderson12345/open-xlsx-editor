@@ -9,7 +9,7 @@ the page (it stays in your browser, nothing is uploaded).
   number formats and conditional formatting are drawn as Excel draws them, and printing and PDF export follow Excel's
   page setup. All of this is measured against Excel's own PDFs.
 - **Calculates like Excel.** 500 of Excel's 519 functions, dynamic arrays that spill as Excel 365's do, LET and
-  LAMBDA, table references and 3D references. 1914 of 1914 test formulas give Excel's results.
+  LAMBDA, table references and 3D references. 1926 of 1926 test formulas give Excel's results.
 - **Edits like Excel.** Excel's ribbon (classic or simplified), its keys and its dialog boxes: Format Cells, Find and
   Replace, Sort, Filter, Fill, Paste Special, Conditional Formatting, Data Validation, PivotTables, charts, notes and
   comments, hyperlinks, sheet and workbook protection, password-protected workbooks.

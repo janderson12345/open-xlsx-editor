@@ -548,6 +548,14 @@ export const PROBE_FORMULAS = [
   'COLUMNS(FILTERXML("<a><b>1</b><b>2</b></a>","//b"))', 'FILTERXML("<a>&amp;&lt;</a>","/a")', 'FILTERXML("<a><![CDATA[q]]></a>","/a")',
   'FILTERXML("<a>x<b>y</b>z</a>","/a")', 'FILTERXML("<x:a xmlns:x=\'u\'>1</x:a>","//*")', 'FILTERXML("<a>TRUE</a>","/a")',
   'FILTERXML("<a>#N/A</a>","/a")', 'FILTERXML(12,"/a")', 'FILTERXML("<a b=\'1\'/>","/a/@b")', 'FILTERXML("<a>x</a>","/a/text()")',
+  // ACCRINT: basis 1 over many periods; a long first period (settlement inside it: Excel's offset, each basis); the
+  // coupon dates stepped one from another past a February (August 30, February 28, August 28); calc_method FALSE.
+  'ACCRINT(DATE(2005,7,10),DATE(2006,1,31),DATE(2009,6,20),0.06,100,2,1)', 'ACCRINT(DATE(2005,10,18),DATE(2007,2,18),DATE(2006,1,7),0.06,100,2,1)',
+  'ACCRINT(DATE(2005,10,18),DATE(2007,2,18),DATE(2006,1,7),0.06,100,2,2)', 'ACCRINT(DATE(2005,10,18),DATE(2007,2,18),DATE(2006,5,1),0.06,100,2,3)',
+  'ACCRINT(DATE(2006,11,1),DATE(2008,1,15),DATE(2007,6,1),0.06,100,4,0)', 'ACCRINT(DATE(2006,11,1),DATE(2008,1,15),DATE(2008,5,1),0.06,100,4,2)',
+  'ACCRINT(DATE(2006,11,1),DATE(2008,1,15),DATE(2007,6,1),0.06,100,4,1,FALSE)', 'ACCRINT(DATE(2004,8,3),DATE(2005,8,30),DATE(2008,9,8),0.06,100,2,1)',
+  'ACCRINT(DATE(2004,8,3),DATE(2005,8,30),DATE(2008,9,8),0.06,100,2,1,FALSE)', 'ACCRINT(DATE(2005,6,28),DATE(2005,8,29),DATE(2010,9,5),0.06,100,2,1)',
+  'ACCRINT(DATE(2005,7,1),DATE(2006,7,31),DATE(2005,11,13),0.06,100,2,1)', 'ACCRINT(DATE(2005,2,4),DATE(2006,1,31),DATE(2005,9,8),0.06,100,4,0)',
 ];
 export function formulas() {
   const str = (ref, s) => `<c r="${ref}" t="inlineStr"><is><t${/^\s|\s$/.test(s) ? ' xml:space="preserve"' : ''}>${esc(s)}</t></is></c>`;
