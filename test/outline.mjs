@@ -10,7 +10,7 @@ import { editingPage } from './editing-kit.mjs';
 import { openFixture } from './browser.mjs';
 import { Workbook } from '../src/ooxml/workbook.js';
 
-const { page, check, finish, outDir, value } = await editingPage();
+const { page, check, finish, outDir, value, ribbon } = await editingPage();
 await openFixture(page, 'basic.xlsx');
 check(await page.evaluate(() => document.compatMode) === 'CSS1Compat', 'standards mode');
 await page.evaluate(() => window.oxe.insertSheet({ after: true }));
@@ -77,7 +77,8 @@ check(off[0].w === '0px' && off[0].h === '0px' && off[1] === false && off[2] ===
 // Data > Outline's Settings: Automatic styles ticked and Apply Styles on A5, the summary of rows 2:4: RowLevel_1, bold.
 await select('A5');
 await page.click('.oxe-rtab >> text="Data"');
-await press('.oxe-toolbar button[title="Outline Settings"]');
+// (Through the ribbon's More when the group is folded away, as on a narrower ribbon: editing-kit.mjs.)
+await ribbon('Outline Settings');
 await box().getByLabel('Automatic styles').check();
 await box().getByRole('button', { name: 'Apply Styles' }).click();
 const look = await page.evaluate(() => { const wb = window.oxe.workbook; const sh = wb.sheet(window.oxe.sheetIndex); const xf = wb.styles.cellXfs[sh.cells.get(4).get(0).s]; return { bold: !!wb.styles.fonts[xf.fontId].b, styles: sh.outline.styles }; });
@@ -93,7 +94,7 @@ const list = [['Region', 'Units'], ['East', '4'], ['East', '2'], ['West', '7']];
 for (let r = 0; r < list.length; r++) for (let c = 0; c < 2; c++) { await select(`${'DE'[c]}${r + 1}`); await page.keyboard.type(list[r][c]); await page.keyboard.press('Enter'); }
 await select('D2');
 await page.click('.oxe-rtab >> text="Data"');
-await press('.oxe-toolbar button[title="Subtotal"]');
+await ribbon('Subtotal');
 await box().getByRole('button', { name: 'OK' }).click();
 const made = [await value('D4'), await value('E4'), await value('D6'), await value('E7')];
 const formula = await page.evaluate(() => window.oxe.workbook.sheet(window.oxe.sheetIndex).cells.get(6).get(4).f);
@@ -104,7 +105,7 @@ fs.writeFileSync(`${outDir}/outline.xlsx`, Buffer.from(bytes));
 const back = Workbook.fromBytes(new Uint8Array(bytes));
 const saved = back.sheet(await page.evaluate(() => window.oxe.sheetIndex));
 check(saved.rows.get(1)?.level === 2 && saved.rows.get(3)?.level === 1, 'saved and read back with its outline');
-await press('.oxe-toolbar button[title="Subtotal"]');
+await ribbon('Subtotal');
 await box().getByRole('button', { name: 'Remove All' }).click();
 check(await value('D4') === 'West' && !(await row(1)).level, 'Remove All: the subtotal rows and the outline gone', String(await value('D4')));
 await page.keyboard.press('Control+z');
