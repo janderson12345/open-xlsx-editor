@@ -14,6 +14,7 @@ export function createParts(env, wb, i, sheet) {
     state.grid = createGrid(root, { sheet, label: wb.sheets[i].name, looks: state.looks, readOnly: state.readOnly });
     state.grid.onFilterButton((c, button) => openFilter(c, button.getBoundingClientRect()));
     state.grid.onErrorButton((point) => act('errorMenu', point));
+    state.grid.onOutline((o) => (o.level ? act('outlineLevel', o.axis, o.level) : act('outlineToggle', o.axis, o.line)));
     state.grid.onFillOptions((point) => fillOptionsMenu(point));
     state.grid.onDropdown((button) => listMenu(button.getBoundingClientRect()));
     state.picker = chartPicker({ grid: state.grid, charts: () => state.charts || [], act, menu: (point, k) => chartMenu(point, k), readOnly: () => state.readOnly });
@@ -56,6 +57,7 @@ export function createParts(env, wb, i, sheet) {
       errorMenu: () => { const at = state.grid.errorButtonAt(); return at ? act('errorMenu', at) : false; },
       painting: () => act('painting'),
       commentBox: () => act('commentBox'),
+      outline: (dir) => act(dir > 0 ? 'groupBox' : 'ungroupBox'),
       flashFill: () => act('flashFill'),
       chartKey: (e) => state.picker?.onKey(e),
       formatCells: () => act('formatCellsBox'),

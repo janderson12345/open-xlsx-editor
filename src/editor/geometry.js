@@ -41,7 +41,22 @@ export function sheetGeometry(sheet, { print = false, normalFamily, auto = null,
   const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, MDW)) * (sheet.showFormulas ? 2 : 1), colSizes);
   // (View > Headings off: no room for them, as in Excel; showHeadings is undefined in a model made by hand.)
   const heads = sheet.showHeadings !== false;
-  return { rows, cols, rowHeadW: heads ? Math.max(3, String(rowCount).length) * MDW + 12 : 0, colHeadH: heads ? COLHEAD_H : 0 };
+  // (The outline bar left of the row headings and over the column headings: on screen only, outlinebar.js.)
+  const bar = print ? { w: 0, h: 0 } : outlineRoom(sheet);
+  return { rows, cols, rowHeadW: (heads ? Math.max(3, String(rowCount).length) * MDW + 12 : 0) + bar.w, colHeadH: (heads ? COLHEAD_H : 0) + bar.h, heads, outlineW: bar.w, outlineH: bar.h };
+}
+
+/** The outline bar's room in pixels, as Excel's at 100% (excel-outline.ps1: the cells start 43px further right and
+ *  down with one level of rows and columns grouped, 19px more for each level after; none when the sheet has no
+ *  outline or its symbols are off). */
+export const OUTLINE_SLOT = 19;
+export function outlineRoom(sheet) {
+  if (sheet.outline && !sheet.outline.symbols) return { w: 0, h: 0 };
+  let rows = 0;
+  for (const [, x] of sheet.rows) if (x.level > rows) rows = x.level;
+  const cols = Math.max(0, ...sheet.cols.map((x) => x.level || 0));
+  const room = (n) => (n ? (n + 1) * OUTLINE_SLOT + 5 : 0);
+  return { w: room(rows), h: room(cols), rows, cols };
 }
 
 /** The column headings' height and the room each row heading's digits need (view chrome, not workbook content). */

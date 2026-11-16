@@ -20,6 +20,7 @@ import { drawNoteMarks } from './notemarks.js';
 import { drawValidation } from './dvmarks.js';
 import { circleLayer, drawCircles } from './dvcircles.js';
 import { drawCharts } from './chartview.js';
+import { drawOutline } from './outlinebar.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
 import { colChars } from '../ooxml/units.js';
 
@@ -46,6 +47,7 @@ function draw(st, force = false) {
   if (!force && last && last.r0 === win.r0 && last.r1 === win.r1 && last.c0 === win.c0 && last.c1 === win.c1) return;
   st.win = win;
   drawColumnHeadings(st, win);
+  drawOutline(st, win);
   drawGridlines(st, win);
   const { fills, edges } = decorations(st, win);
   st.fills.replaceChildren(...fills);
@@ -154,8 +156,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     Object.assign(st, { sheet: next, win: null, classOf: nextLooks.classOf, deco: nextLooks.deco, date1904: nextLooks.date1904, color: nextLooks.color, hiddenAt: nextLooks.hiddenAt, runStyle: nextLooks.runStyle, rowDesc: rowDescents(next, nextLooks.deco) }, sheetGeometry(next, { auto }));
     view.setAttribute('aria-rowcount', String(st.rows.count + 1));
     view.setAttribute('aria-colcount', String(st.cols.count + 1));
-    setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': st.colHeadH });
-    view.classList.toggle('oxe-noheads', !st.colHeadH);
+    setVars(view, { '--oxe-rowhead-w': st.rowHeadW, '--oxe-colhead-h': st.colHeadH, '--oxe-outline-w': st.outlineW, '--oxe-outline-h': st.outlineH });
+    view.classList.toggle('oxe-noheads', !st.heads);
     setVars(canvas, { '--oxe-sheet-w': st.rowHeadW + st.cols.end, '--oxe-sheet-h': st.colHeadH + st.rows.end });
     applyView(next.freeze, next.zoom);
   };
@@ -237,7 +239,7 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     /** The view as shown: { freeze, zoom, showFormulas, showGridLines, showHeadings, printGridLines, printHeadings, topLeft } (topLeft: the first cell of the scrolled part). */
     view: () => {
       const z = st.zoom / 100;
-      return { freeze: { ...st.freeze }, zoom: st.zoom, showFormulas: !!st.sheet?.showFormulas, showGridLines: st.sheet?.showGridLines !== false, showHeadings: !!st.colHeadH, printGridLines: !!st.sheet?.page?.gridLines, printHeadings: !!st.sheet?.page?.headings, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
+      return { freeze: { ...st.freeze }, zoom: st.zoom, showFormulas: !!st.sheet?.showFormulas, showGridLines: st.sheet?.showGridLines !== false, showHeadings: !!st.heads, printGridLines: !!st.sheet?.page?.gridLines, printHeadings: !!st.sheet?.page?.headings, topLeft: { r: st.rows.indexAt(view.scrollTop / z + st.paneH), c: st.cols.indexAt(view.scrollLeft / z + st.paneW) } };
     },
     /** Outline the cells copied or cut, dashed, until they are pasted or let go ({ r0, c0, r1, c1 }; null for none). */
     setClip(rect) {
@@ -316,6 +318,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
     },
     /** What a click on a list's button does: `fn(button)`. */
     onDropdown(fn) { st.onDropdown = fn; },
+    /** What a click on the outline bar's buttons does: fn({ axis, level }) or fn({ axis, line }) (outlinebar.js). */
+    onOutline(fn) { st.onOutline = fn; },
     /** What a click on a filter button does: `fn(c, button)`. */
     onFilterButton(fn) { st.onFilter = fn; },
     /** Excel's error button clicked: fn({ x, y }) opens its menu there. */

@@ -12,6 +12,7 @@ import { borderCommands } from './commands-borders.js';
 import { pivotCommands } from './commands-pivot.js';
 import { viewCommands } from './commands-view.js';
 import { lineCommands } from './commands-lines.js';
+import { outlineCommands } from './commands-outline.js';
 import { step, jump, lastCell } from './navigate.js';
 import { entryChanges } from '../ooxml/entry.js';
 import { refName, colName, MAX_ROWS, MAX_COLS } from '../ooxml/refs.js';
@@ -458,7 +459,7 @@ export function createCommands(ctx) {
   // use.)
   const env = { allowed, commands, ctx, state, sheet, limits, show, contents, inArray, idOf, indexOf, apply, restyle, contentsOn, applySteps, runSteps, linesOf, sizeStep, moved, formatting };
   Object.assign(commands, sheetCommands(env));
-  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env), borderCommands(env), lineCommands(env));
+  Object.assign(commands, dataCommands(env), partCommands(env), pivotCommands(env), viewCommands(env), borderCommands(env), lineCommands(env), outlineCommands(env));
 
   return {
     commands,

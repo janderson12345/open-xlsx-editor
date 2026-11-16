@@ -76,6 +76,17 @@
   width: var(--oxe-rowhead-w);
   height: var(--oxe-colhead-h);
   box-sizing: border-box;
+  background: var(--oxe-bg);
+}
+/* (The headings' own corner, below and right of the outline bar's.) */
+.oxe-corner::after {
+  content: '';
+  position: absolute;
+  left: var(--oxe-outline-w, 0px);
+  top: var(--oxe-outline-h, 0px);
+  right: 0;
+  bottom: 0;
+  box-sizing: border-box;
   background: var(--oxe-head-bg);
   border-right: 1px solid var(--oxe-head-line);
   border-bottom: 1px solid var(--oxe-head-line);
@@ -94,10 +105,10 @@
 }
 .oxe-colhead {
   position: absolute;
-  top: 0;
+  top: var(--oxe-outline-h, 0px);
   left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
   width: var(--oxe-w);
-  height: var(--oxe-colhead-h);
+  height: calc(var(--oxe-colhead-h) - var(--oxe-outline-h, 0px));
   border-right: 1px solid var(--oxe-head-line);
   border-bottom: 1px solid var(--oxe-head-line);
 }
@@ -121,9 +132,10 @@
 }
 .oxe-rowhead {
   position: sticky;
-  left: 0;
+  left: var(--oxe-outline-w, 0px);
+  margin-left: var(--oxe-outline-w, 0px);
   z-index: 2;
-  width: var(--oxe-rowhead-w);
+  width: calc(var(--oxe-rowhead-w) - var(--oxe-outline-w, 0px));
   height: 100%;
   border-right: 1px solid var(--oxe-head-line);
   border-bottom: 1px solid var(--oxe-head-line);
@@ -140,6 +152,63 @@
   color: transparent;
   background: transparent;
 }
+
+/* The outline bar (outlinebar.js): the rows' strip stuck to the left under the column headings, the columns' along the
+   top of the column headings, the level buttons in the corner; each button a slot's square, the lines of a group shown
+   along its rows or columns. */
+.oxe-outline-rows {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: var(--oxe-outline-w, 0px);
+  height: calc(var(--oxe-sheet-h) - var(--oxe-colhead-h));
+  margin-bottom: calc(var(--oxe-colhead-h) - var(--oxe-sheet-h));
+  background: var(--oxe-bg);
+}
+.oxe-outline-cols {
+  position: absolute;
+  top: 0;
+  left: var(--oxe-rowhead-w);
+  width: calc(var(--oxe-sheet-w) - var(--oxe-rowhead-w));
+  height: var(--oxe-outline-h, 0px);
+  background: var(--oxe-bg);
+}
+.oxe-outline-levels {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+.oxe-ol-button {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  width: 15px;
+  height: 15px;
+  box-sizing: border-box;
+  border: 1px solid var(--oxe-head-fg);
+  background: var(--oxe-bg);
+  color: var(--oxe-head-fg);
+  font: 11px/13px var(--oxe-ui-font);
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+.oxe-ol-button:hover { background: var(--oxe-head-bg); }
+.oxe-ol-line {
+  position: absolute;
+  left: var(--oxe-x);
+  top: var(--oxe-y);
+  box-sizing: border-box;
+  border: 0 solid var(--oxe-head-fg);
+}
+.oxe-ol-line.oxe-ol-row { width: 5px; height: var(--oxe-h); border-left-width: 1px; }
+.oxe-ol-line.oxe-ol-col { width: var(--oxe-w); height: 5px; border-top-width: 1px; }
+/* (The tick at the end away from the summary line.) */
+.oxe-ol-row.oxe-ol-start { border-top-width: 1px; }
+.oxe-ol-row.oxe-ol-end { border-bottom-width: 1px; }
+.oxe-ol-col.oxe-ol-start { border-left-width: 1px; }
+.oxe-ol-col.oxe-ol-end { border-right-width: 1px; }
 
 /* Gridlines: each cell's right and bottom pixel. */
 .oxe-vline,
