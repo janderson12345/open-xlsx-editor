@@ -224,7 +224,30 @@ Found in passing, not changed here: over a range of several cells the ribbon's p
 line away (the rows above follow it for Draw Borders only), and No Border takes the diagonals off, where the presets
 here keep both.
 
+## Cell Styles (`src/ooxml/cellstyleedit.js`, `src/editor/cellstylegallery.js`)
+
+Home > Cell Styles has Excel's 47 built-in cell styles under its gallery's headings (Good, Bad and Neutral; Data and
+Model; Titles and Headings; Themed Cell Styles; Number Format; the workbook's own under Custom), each named and drawn
+in its look. The styles are measured: each applied in a new workbook over COM (`Range.Style`,
+`tools/excel-compare/excel-cellstyles.ps1`) and what Excel saved kept in `test/cellstyles-excel.json`;
+`tools/excel-compare/cellstyles-data.mjs` writes them into `src/engine/cellstyles.js`. The headings and their order
+are Excel's gallery as it shows them (COM doesn't reach the gallery).
+
+What Excel writes, and the editor with it (`test/cellstyle.test.js`: 47 of 47 styles, and the two cases below, the same
+style entry, cellStyle and cell format as Excel's):
+
+- A style the workbook hasn't got is added: its font written as a new entry (the theme's body font, as the Normal
+  style's font names it; Title in the heading font; Excel's 11pt styles at the Normal style's size), its fill and
+  border, a `cellStyleXfs` entry marking with `applyX="0"` each part it doesn't apply (Good: number format, border,
+  alignment and protection; Currency: all but its number format), and a `cellStyle` with its `builtinId`, the
+  cellStyles kept in name order (Good before Normal, Normal before Title).
+- The cell's format takes from the style each part it applies and keeps its own of the rest; `xfId` is the style's,
+  and each part that isn't the style's is marked `applyX="1"`: Currency over a plain cell keeps the cell's font
+  (`applyFont="1"`); Good over a bold red cell takes Good's font (the bold and red go); Heading 1 over Good takes Heading
+  1's font and border and keeps Good's fill (`applyFill="1"`). Normal applies every part: the cell back to plain.
+- Each is one step of the history; on a protected sheet refused as formatting is.
+
 ## Not yet
 
-Cell styles other than the three above, and formatting whole rows or columns (a selection past the used range is cut to it: Excel
+New Cell Style and Modify (a style of the workbook's own made or changed), and formatting whole rows or columns (a selection past the used range is cut to it: Excel
 gives the row or column itself the format).

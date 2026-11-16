@@ -5,6 +5,7 @@
 import { kids, kid, attr, serializeXml, NS, REL_TYPES } from './xml.js';
 import { readStyles, readFont, readFill, readBorder, readXf } from './styles.js';
 import { BUILTIN_FORMATS } from './format.js';
+import { withCellStyle } from './cellstyleedit.js';
 
 /** Excel's order of a font's children, and of a border's sides. */
 const FONT_ORDER = ['b', 'i', 'strike', 'condense', 'extend', 'outline', 'shadow', 'u', 'vertAlign', 'sz', 'color', 'name', 'family', 'charset', 'scheme'];
@@ -277,10 +278,12 @@ class Formats {
   /**
    * Cell format `s` with a change: { font: {...} (see font()), fill (see fill()), border: { side: ... } (see
    * border()), align: { horizontal, vertical, wrap, indent, rotation, shrink, readingOrder }, protection: { locked,
-   * hidden }, numFmt: code, style: 'Percent' | 'Comma' | 'Currency' }.
+   * hidden }, numFmt: code, style: 'Percent' | 'Comma' | 'Currency' } or { cellStyle: a cell style's name }.
    * Returns the index of the cell format.
    */
   xf(s, change) {
+    // (A cell style of Home > Cell Styles: cellstyleedit.js, as Excel applies one.)
+    if (change.cellStyle) return withCellStyle(this, s, change.cellStyle);
     const styles = this.wb.styles;
     const old = styles.cellXfs[s] || styles.cellXfs[0];
     const el = this.copy('cellXfs', 'xf', s);

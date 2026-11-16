@@ -1944,6 +1944,31 @@
   background: var(--oxe-tstyle-ink);
   opacity: 0.6;
 }
+/* The cell style gallery (cellstylegallery.js): each style a chip named and drawn in it, four to a row. */
+.oxe-cstyles {
+  display: grid;
+  grid-template-columns: repeat(4, 92px);
+  gap: 4px;
+  padding: 4px;
+}
+.oxe-cstyle {
+  height: 24px;
+  padding: 0 4px;
+  overflow: hidden;
+  text-align: left;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border: 1px solid var(--oxe-head-line);
+  background: #ffffff;
+  color: #000000;
+  font-size: 12px;
+  cursor: pointer;
+}
+.oxe-cstyle:hover,
+.oxe-cstyle:focus-visible {
+  outline: 2px solid var(--oxe-focus);
+  outline-offset: 1px;
+}
 .oxe-table-name {
   width: 9em;
   font: inherit;

@@ -2,7 +2,7 @@
 // font, a stripe); Ctrl+T's Create Table box filled from the data round the active cell, the table made in the default
 // style; the Table Design tab shown only in a table, its options, the total row and its drop-down, the style gallery,
 // Table Name and Convert to Range, each one step of the history; a table's own filter button; Home > Format as Table;
-// the result saved (to the output folder) and read back.
+// Home > Cell Styles; the result saved (to the output folder) and read back.
 // Run after `npm run build`: node test/table-tab.mjs [outDir]
 import fs from 'node:fs';
 import { editingPage } from './editing-kit.mjs';
@@ -123,4 +123,20 @@ await page.click('.oxe-pop button[title="Table Style Light 9"]');
 await box().getByRole('button', { name: 'OK' }).click();
 const fmt = await page.evaluate(() => Object.keys(window.oxe.workbook.pkg.files).filter((k) => k.startsWith('xl/tables/')).map((k) => window.oxe.workbook.pkg.text(k)).find((x) => /ref="L20:M22"/.test(x)));
 check(/name="TableStyleLight9"/.test(fmt || ''), 'Home > Format as Table: Create Table, the table in Light 9', fmt || await page.evaluate(() => Object.keys(window.oxe.workbook.pkg.files).filter((k) => k.startsWith('xl/tables/')).map((k) => /ref="[^"]*"/.exec(window.oxe.workbook.pkg.text(k))[0]).slice(-3).join() + ' ' + document.querySelectorAll('dialog[open]').length));
+// Home > Cell Styles: the gallery under Excel's headings, Good given to a cell as Excel gives it.
+await select('N3');
+await page.evaluate(() => document.querySelector('.oxe-toolbar button[title="Cell Styles"]').dispatchEvent(new MouseEvent('mousedown', { bubbles: true })));
+const chips = await page.locator('.oxe-pop button.oxe-cstyle').count();
+await page.screenshot({ path: `${outDir}/cell-styles.png` });
+await page.click('.oxe-pop button.oxe-cstyle[title="Good"]');
+const good = await page.evaluate(() => {
+  const wb = window.oxe.workbook;
+  const xf = wb.styles.cellXfs[wb.sheet(0).cells.get(2).get(13).s];
+  const fill = wb.styles.fills[xf.fillId];
+  return { fill: fill.fg?.rgb, font: wb.styles.fonts[xf.fontId].color?.rgb, style: /<cellStyle name="Good" xfId="\d+" builtinId="26"\/>/.test(new XMLSerializer().serializeToString(wb.stylesDoc)) };
+});
+check(chips === 47 && good.fill === 'FFC6EFCE' && good.font === 'FF006100' && good.style, 'Home > Cell Styles: 47 styles; Good gives the cell its fill, font and the cellStyle Excel writes', JSON.stringify({ chips, good }));
+await page.keyboard.press('Control+z');
+const undone = await page.evaluate(() => window.oxe.workbook.sheet(0).cells.get(2)?.get(13)?.s || 0);
+check(undone === 0, 'one step of the history', String(undone));
 await finish();
