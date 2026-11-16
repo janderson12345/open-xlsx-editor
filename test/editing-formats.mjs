@@ -295,4 +295,25 @@ check(choices === 12 && afterFormats === 'A1:A3,C1:C3' && drawn >= 6 && afterVal
     'saved and read back: I40 of style Mine, 16pt bold, as the style is', JSON.stringify({ xf, styleXf }));
 }
 
+// Turned, stacked and shrunk text (test/fixtures/rotate.xlsx, measured against Excel's PDF: docs/LAYOUT.md): General
+// alignment by the angle, stacked letters a line each and centred, shrunk text printed in whole printer pixels.
+{
+  await page.evaluate(() => { document.querySelector('input[type=file]').value = ''; });
+  await openFixture(page, 'rotate.xlsx');
+  const look = await page.evaluate(() => {
+    const at = (text) => [...document.querySelectorAll('.oxe-grid .oxe-cell')].find((c) => c.textContent.replace(/\n/g, '') === text);
+    const cls = (text) => { const c = at(text); return c ? ['left', 'center', 'right'].find((h) => c.classList.contains(`oxe-h-${h}`)) : null; };
+    const stack = at('Stacked');
+    return { up45: cls('Up 45 degrees'), up90: cls('Up 90 degrees'), down45: cls('Down 45 degrees'), down90: cls('Down 90 degrees'), num45: cls('12345'), stacked: cls('Stacked'),
+      lines: stack?.firstElementChild.textContent.split('\n').length, pitch: stack ? getComputedStyle(stack.firstElementChild).lineHeight : null };
+  });
+  check(JSON.stringify([look.up45, look.up90, look.down45, look.down90, look.num45, look.stacked]) === JSON.stringify(['left', 'right', 'right', 'left', 'left', 'center']) && look.lines === 7,
+    'turned text’s General alignment by its angle (up left, up 90 and down right, down 90 left, a number too), stacked letters centred a line each', JSON.stringify(look));
+  const shrunk = await page.evaluate(async () => {
+    await window.oxe.preparePrint();
+    return [...document.querySelectorAll('.oxe-print .oxe-cell[data-oxe-shrink] > .oxe-tx')].map((x) => parseFloat(x.style.fontSize)).filter(Boolean);
+  });
+  check(shrunk.length >= 4 && shrunk.every((px) => Math.abs(px / 0.16 - Math.round(px / 0.16)) < 0.02), 'shrink to fit in print: sizes in whole printer pixels (600 dpi), as Excel prints them', JSON.stringify(shrunk));
+}
+
 await finish();

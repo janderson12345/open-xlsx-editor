@@ -17,6 +17,8 @@
 //                anchor-cases.mjs's sheet without its table: a stock list on B2:D12, a column chart of Qty
 //                anchored F3 to L15, a rectangle M5 to P9 and notes at A1, B6, D12 and F20 (test/anchors.test.js).
 //
+// rotate.xlsx   rotated text (angles up and down with each alignment, stacked, rows Excel sizes) and shrink to fit,
+//                for comparing with Excel's PDF (probes-format.mjs; docs/LAYOUT.md).
 // special.xlsx  something for each of Go To Special's choices (special.mjs).
 // sparklines.xlsx  sparklines of each type and option, as Excel writes them (sparklines.mjs).
 // tables.xlsx    a table in each built-in table style, one in a style of its own, one with cells' own formats
@@ -33,7 +35,7 @@ import { special } from './special.mjs';
 import { sparklines } from './sparklines.mjs';
 import { tables } from './tables.mjs';
 import { write, contentTypes, rels, RT, CT, DECL, X, R, ROOT_RELS, docProps, PROPS_CT, STYLES, esc, col, stringTable } from './fixture-common.mjs';
-import { widths, general, fonts, fills, align, numfmts, rowHeights } from './probes-format.mjs';
+import { widths, general, fonts, fills, align, rotate, numfmts, rowHeights } from './probes-format.mjs';
 import { formulas } from './probes-formulas.mjs';
 import { notes, charts, anchors } from './parts-drawings.mjs';
 import { printProbes } from './probes-print.mjs';
@@ -143,6 +145,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   rowHeights();
   numfmts();
   align();
+  rotate();
   fills();
   fonts();
   general();

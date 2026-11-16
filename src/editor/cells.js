@@ -22,9 +22,14 @@ export const rotationDegrees = (r) => (!r || r === 255 ? 0 : r <= 90 ? r : 90 - 
 const INDENT_PX = { screen: 9, print: 10.08 };
 
 /** Where a cell's text sits across: general alignment puts numbers right, booleans and errors in the middle and text
- *  left; fill, justify and distributed are drawn left for now, centre-across-selection as centre. */
+ *  left; fill, justify and distributed are drawn left for now, centre-across-selection as centre. Turned or stacked,
+ *  general goes by the angle whatever the value (Excel's PDF of test/fixtures/rotate.xlsx): 1 to 89 degrees up left,
+ *  90 up and every angle down right, 90 down left; stacked letters centred. */
 function horizontalOf(align, cell) {
   const h = align.horizontal;
+  const r = align.rotation;
+  if (h === 'general' && r === 255) return 'center';
+  if (h === 'general' && r) return r >= 90 && r < 180 ? 'right' : 'left';
   if (h === 'general') return cell.t === 'n' ? 'right' : cell.t === 'b' || cell.t === 'e' ? 'center' : 'left';
   if (h === 'center' || h === 'centerContinuous') return 'center';
   return h === 'right' ? 'right' : 'left';
@@ -63,11 +68,13 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   const shown = formulas ? { text: held, parts: [held], color: null, fit: false } : cellDisplay(cell, colChars(screenW, MDW), cfCode || (look ? look.code : 'General'), st.date1904);
   // (A cell full of #s is centred, whatever its alignment: Excel's PDF of numfmt.xlsx, negative dates.)
   const h = shown.hashes ? 'center' : (shown.textFormat || (formulas && cell.f != null)) && align.horizontal === 'general' ? 'left' : horizontalOf(align, cell);
-  // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line.)
-  const clean = (t) => (wrap ? t.replace(/\r/g, '') : t.replace(/[\r\n]/g, ''));
   // (Rotated, stacked or shrunk text stays in its own cell, as wrapped text does.)
   const turn = rotationDegrees(align.rotation);
   const stacked = align.rotation === 255;
+  // (Without wrapping, a line break shows as nothing; wrapped, it breaks the line. Stacked, each character is a line of
+  // its own, stepping by the font's default row height as wrapped lines do: Excel's PDF of rotate.xlsx, 19.36px a
+  // letter in Calibri 11.)
+  const clean = (t) => (stacked ? [...t.replace(/[\r\n]/g, '')].join('\n') : wrap ? t.replace(/\r/g, '') : t.replace(/[\r\n]/g, ''));
   const shrink = align.shrink && !wrap && cell.v != null;
   const el = div(`oxe-cell oxe-h-${h} oxe-v-${align.vertical === 'top' ? 'top' : align.vertical === 'center' ? 'center' : 'bottom'}${wrap ? ' oxe-wrap' : ''}${turn ? ' oxe-rot' : ''}${stacked ? ' oxe-stack' : ''}`, 'gridcell');
   if (align.readingOrder === 2) el.dir = 'rtl';
@@ -135,7 +142,7 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
   }
   // (Rich text: each run in its own font, over the cell's, when the cell shows its text as it is.)
   const runs = !formulas && cell.runs && st.runStyle && shown.text === cell.v ? cell.runs : null;
-  el.appendChild(runs ? runsSpan(runs, clean, st.runStyle) : textSpan(shown, clean));
+  el.appendChild(runs ? runsSpan(runs, clean, st.runStyle, stacked) : textSpan(shown, clean));
   if (cfIcon) el.appendChild(cfIcon);
   const color = shown.color && st.color ? st.color(shown.color) : null;
   if (color) {
@@ -154,12 +161,13 @@ export function cellElement(st, r, c, cell, line, win, rowTop) {
 
 /** The text span: plain text, or for formats with padding (_x: a space as wide as x, drawn as a hidden x) and fill
  *  (*x: x repeated across the room left in the cell) the pieces in a row. */
-function runsSpan(runs, clean, runStyle) {
+function runsSpan(runs, clean, runStyle, stacked = false) {
   const span = document.createElement('span');
   span.className = 'oxe-tx oxe-runs';
-  for (const run of runs) {
+  for (const [k, run] of runs.entries()) {
     const piece = document.createElement('span');
-    piece.textContent = clean(run.text);
+    // (Stacked: a line between one run's last letter and the next one's first, as between its own.)
+    piece.textContent = (stacked && k ? '\n' : '') + clean(run.text);
     if (run.font) piece.style.cssText = runStyle(run.font);
     span.appendChild(piece);
   }
@@ -188,6 +196,16 @@ function textSpan(shown, clean) {
 }
 
 let measure = null;
+/** How much taller than the line here Excel's turned text is, in em: its turned text keeps ~1.7px more from the
+ *  cell's sides at 90 degrees, ~1.1px at 45 and ~0.5px at 15 (Excel's PDF of test/fixtures/rotate.xlsx), a box
+ *  3.4px (0.23 em of Calibri 11) taller turned with the text. */
+const TURN_EXTRA = 0.23;
+/** Where Excel's turned text sits down its cell, in em: at the bottom lower by 0.18 em times the angle's cosine (its
+ *  descent below the baseline, turned, is shorter than the line's here) and higher by 0.04 em (2.0px lower at 15
+ *  degrees, 1.2 at 45, 0.6 higher at 90, in Calibri 11); at the top 0.14 em lower (1.5 to 2.5px) at any angle. */
+const TURN_LOW = 0.18;
+const TURN_UP = 0.04;
+const TURN_TOP = 0.14;
 /** Turned text kept inside its cell: the span turns about its middle, so it is moved by half the difference between
  *  its turned box and its own, towards the cell's inside (up for bottom-aligned text, right for left-aligned). All the
  *  sizes are read before any is set, so the page is laid out once. */
@@ -197,15 +215,38 @@ function placeTurned(container) {
     const a = (parseFloat(el.style.getPropertyValue('--oxe-rot')) * Math.PI) / 180;
     const w = span.offsetWidth;
     const h = span.offsetHeight;
-    const dw = (w * Math.abs(Math.cos(a)) + h * Math.abs(Math.sin(a)) - w) / 2;
+    // (Across, Excel keeps text turned short of 90 degrees TURN_EXTRA em further from the cell's sides; turned 90
+    // either way, and down the cell, it doesn't.)
+    const deg = Math.abs(Math.round((a * 180) / Math.PI));
+    const em = parseFloat(getComputedStyle(span).fontSize);
+    const tall = h + (deg && deg < 90 ? TURN_EXTRA * em : 0);
+    const dw = (w * Math.abs(Math.cos(a)) + tall * Math.abs(Math.sin(a)) - w) / 2;
     const dh = (w * Math.abs(Math.sin(a)) + h * Math.abs(Math.cos(a)) - h) / 2;
     const cl = el.classList;
-    return [span, cl.contains('oxe-h-left') ? dw : cl.contains('oxe-h-right') ? -dw : 0, cl.contains('oxe-v-top') ? dh : cl.contains('oxe-v-center') ? 0 : -dh];
+    // (Down the cell: Excel's turned text sits TURN_LOW em lower at the bottom the flatter it is turned, and TURN_TOP
+    // em lower at the top.)
+    const dy = cl.contains('oxe-v-top') ? dh + TURN_TOP * em : cl.contains('oxe-v-center') ? 0 : -dh + (TURN_LOW * Math.abs(Math.cos(a)) - TURN_UP) * em;
+    return [span, cl.contains('oxe-h-left') ? dw : cl.contains('oxe-h-right') ? -dw : 0, dy];
   });
   for (const [span, dx, dy] of moves) {
     span.style.setProperty('--oxe-rot-dx', `${dx.toFixed(2)}px`);
     span.style.setProperty('--oxe-rot-dy', `${dy.toFixed(2)}px`);
   }
+}
+
+/** A printer pixel at 600 dpi, in CSS pixels: the step of the sizes Excel prints shrunk text in. */
+const PRINT_DOT = 96 / 600;
+/** The room Excel leaves beside shrunk text in print, in CSS pixels. */
+const SHRINK_SLACK = 1.7;
+/**
+ * The font size (CSS px) shrink-to-fit draws `wide` px of text at `px` in, for `room` px. In print, as Excel's PDF of
+ * test/fixtures/rotate.xlsx shows: sized for the room less 1.7px, then down to a whole printer pixel at 600 dpi (Excel
+ * printed four shrunk texts at 76, 67, 75 and 28 dots for 11pt's 92; a room of 148.7 to 149.7px fits all four, 151 was
+ * here before). On screen, to the room itself (not measured).
+ */
+export function shrunkSize(px, room, wide, print) {
+  if (!print) return (px * Math.max(room, 1)) / wide;
+  return Math.max(1, Math.floor((px * Math.max(room - SHRINK_SLACK, 1)) / wide / PRINT_DOT)) * PRINT_DOT;
 }
 
 /** The canvas AutoFit measures text with. */
@@ -230,12 +271,20 @@ export function fitNumbers(container) {
     const text = [...span.childNodes].map((n) => (n.classList && n.classList.contains('oxe-repeat') ? '' : n.textContent)).join('');
     const wide = measure.measureText(text).width;
     if (wide <= room + 0.5) continue;
-    if (el.dataset.oxeShrink) shrinks.push([span, (parseFloat(cs.fontSize) * Math.max(room, 1)) / wide]);
+    if (el.dataset.oxeShrink) {
+      // (The baseline kept where the full-size text's is, as Excel's PDF of rotate.xlsx shows it: the line box here
+      // stays the cell font's, so a smaller font's baseline would rise by half its ascent less descent lost.)
+      const px = shrunkSize(parseFloat(cs.fontSize), room, wide, !!el.closest('.oxe-page-cells'));
+      const m = measure.measureText(text);
+      shrinks.push([span, px, ((m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) * (1 - px / parseFloat(cs.fontSize))) / 2]);
+    }
     else jobs.push([span, Math.max(1, Math.floor(room / measure.measureText('#').width))]);
   }
-  // (Shrink to fit: the font made small enough for the text to fit the cell's width. Not yet measured against the
-  // sizes Excel picks.)
-  for (const [span, px] of shrinks) span.style.fontSize = `${px.toFixed(2)}px`;
+  // (Shrink to fit: the font made small enough for the text to fit the cell's width: shrunkSize.)
+  for (const [span, px, down] of shrinks) {
+    span.style.fontSize = `${px.toFixed(2)}px`;
+    if (down > 0) span.style.setProperty('--oxe-shrink-dy', `${down.toFixed(2)}px`);
+  }
   for (const [span, n] of jobs) {
     span.classList.remove('oxe-parts', 'oxe-parts-fill');
     span.textContent = '#'.repeat(n);

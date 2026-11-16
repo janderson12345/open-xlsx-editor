@@ -147,26 +147,53 @@ export const PROBE_ALIGN = [
   [WRAP_TEXT, { wrapText: 1, vertical: 'center' }], [WRAP_TEXT, { wrapText: 1, horizontal: 'right', vertical: 'bottom' }],
   ['Centred text running both ways', { horizontal: 'center' }, 'D'], ['Right text running to the left', { horizontal: 'right' }, 'D'],
 ];
-export function align() {
+export function align() { alignProbe('align.xlsx', 'Align', PROBE_ALIGN, (a) => (a.wrapText ? 75 : 45)); }
+
+// A probe for rotated and shrunk text, laid out as the alignment probe: angles up and down with each alignment,
+// stacked letters, a rotated number, rows Excel sizes itself (no height given) for rotated text, and text and numbers
+// shrunk to fit, long and short. Each sample is [text or number, alignment attributes, column, row height (null: none
+// given)].
+const ROT = (deg) => (deg < 0 ? 90 - deg : deg);
+export const PROBE_ROTATE = [
+  ['Up 45 degrees', { textRotation: ROT(45) }], ['Up 90 degrees', { textRotation: ROT(90) }], ['Down 45 degrees', { textRotation: ROT(-45) }],
+  ['Down 90 degrees', { textRotation: ROT(-90) }], ['Up 30 centred', { horizontal: 'center', textRotation: ROT(30) }],
+  ['Up 60 right', { horizontal: 'right', textRotation: ROT(60) }], ['Up 90 top', { vertical: 'top', textRotation: ROT(90) }],
+  ['Down 90 middle', { horizontal: 'center', vertical: 'center', textRotation: ROT(-90) }], ['Down 30 top right', { horizontal: 'right', vertical: 'top', textRotation: ROT(-30) }],
+  ['Stacked', { textRotation: 255 }], ['Stack mid', { horizontal: 'center', vertical: 'center', textRotation: 255 }], [12345, { textRotation: ROT(45) }],
+  ['Up 89 degrees', { textRotation: ROT(89) }], ['Down 89 degrees', { textRotation: ROT(-89) }], ['Up 90 left', { horizontal: 'left', textRotation: ROT(90) }],
+  ['Down 90 top', { vertical: 'top', textRotation: ROT(-90) }], ['Down 90 right', { horizontal: 'right', textRotation: ROT(-90) }], [67890, { textRotation: ROT(-45) }],
+  ['Up 15 degrees', { textRotation: ROT(15) }], ['Down 15 degrees', { textRotation: ROT(-15) }], ['Stack right', { horizontal: 'right', textRotation: 255 }],
+  ['Stack top', { vertical: 'top', textRotation: 255 }],
+  ['Rotated row sized by Excel', { textRotation: ROT(90) }, 'B', null], ['Row sized at 45', { textRotation: ROT(45) }, 'B', null], ['Stack auto', { textRotation: 255 }, 'B', null],
+  ['This text is shrunk to fit its cell', { shrinkToFit: 1 }, 'B', 30], ['Centred text shrunk to fit here too', { horizontal: 'center', shrinkToFit: 1 }, 'B', 30],
+  ['Right-aligned text shrunk to fit', { horizontal: 'right', shrinkToFit: 1 }, 'B', 30], [123456789.123456, { shrinkToFit: 1 }, 'B', 30],
+  ['Fits already', { shrinkToFit: 1 }, 'B', 30],
+  ['A very long piece of text that has to be shrunk a great deal to fit in this narrow cell', { shrinkToFit: 1 }, 'B', 30],
+];
+export function rotate() { alignProbe('rotate.xlsx', 'Rotate', PROBE_ROTATE, () => 90); }
+
+/** An alignment probe: `samples` one per row (every other row from 2), column B 20 characters wide; `height(a)` a
+ *  sample's row height when the sample gives none (its fourth item: a number, or null for no height). */
+function alignProbe(file, sheet, samples, height) {
   const attrs = (a) => Object.entries(a).map(([k, v]) => ` ${k}="${v}"`).join('');
   const styles = `${DECL}<styleSheet xmlns="${X}"><fonts count="1"><font><sz val="11"/><color theme="1"/><name val="Calibri"/><family val="2"/><scheme val="minor"/></font></fonts>` +
     '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
     '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
     '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-    `<cellXfs count="${PROBE_ALIGN.length + 1}"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>` +
-    PROBE_ALIGN.map(([, a]) => `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment${attrs(a)}/></xf>`).join('') + '</cellXfs>' +
+    `<cellXfs count="${samples.length + 1}"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>` +
+    samples.map(([, a]) => `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment${attrs(a)}/></xf>`).join('') + '</cellXfs>' +
     '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0"/></styleSheet>';
-  const rows = PROBE_ALIGN.map(([v, a, where = 'B'], i) => {
+  const rows = samples.map(([v, a, where = 'B', given], i) => {
     const r = 2 + 2 * i;
-    const ht = a.wrapText ? 75 : 45;
+    const ht = given === undefined ? height(a) : given;
     const cell = typeof v === 'number' ? `<c r="${where}${r}" s="${i + 1}"><v>${v}</v></c>` : `<c r="${where}${r}" s="${i + 1}" t="inlineStr"><is><t>${esc(v)}</t></is></c>`;
-    return `<row r="${r}" ht="${ht}" customHeight="1">${cell}</row>`;
+    return `<row r="${r}"${ht == null ? '' : ` ht="${ht}" customHeight="1"`}>${cell}</row>`;
   });
-  write('align.xlsx', {
+  write(file, {
     '[Content_Types].xml': contentTypes([['xl/workbook.xml', CT('sheet.main')], ['xl/worksheets/sheet1.xml', CT('worksheet')], ['xl/styles.xml', CT('styles')], ['xl/theme/theme1.xml', 'application/vnd.openxmlformats-officedocument.theme+xml'], ...PROPS_CT]),
     '_rels/.rels': ROOT_RELS,
     ...docProps(),
-    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="Align" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    'xl/workbook.xml': `${DECL}<workbook xmlns="${X}" xmlns:r="${R}"><sheets><sheet name="${sheet}" sheetId="1" r:id="rId1"/></sheets></workbook>`,
     'xl/_rels/workbook.xml.rels': rels([['rId1', RT('worksheet'), 'worksheets/sheet1.xml'], ['rId2', RT('styles'), 'styles.xml'], ['rId3', RT('theme'), 'theme/theme1.xml']]),
     'xl/worksheets/sheet1.xml': `${DECL}<worksheet xmlns="${X}"><sheetFormatPr defaultRowHeight="15"/><cols><col min="2" max="2" width="20.7109375" customWidth="1"/></cols><sheetData>${rows.join('')}</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>`,
     'xl/styles.xml': styles,
