@@ -195,7 +195,9 @@ check(await page.evaluate(() => document.activeElement.textContent) === 'Insert'
 await page.keyboard.press('Escape');
 check(await page.evaluate(() => document.activeElement.textContent) === 'Notes' && !(await page.$('.oxe-menu')), 'Esc closes it, focus back on the tab');
 await page.keyboard.press('Shift+F10');
-for (const k of ['End', 'ArrowUp']) await page.keyboard.press(k);
+// (Up from the last entry to Hide: Select All Sheets and Unhide... come after it.)
+await page.keyboard.press('End');
+for (let k = 0; k < 6 && await page.evaluate(() => document.activeElement.textContent) !== 'Hide'; k++) await page.keyboard.press('ArrowUp');
 await page.keyboard.press('Enter'); // (Hide)
 check(await names() === 'Data,Summary' && await label() === 'Summary', 'Hide from the keyboard: Notes hidden, the next sheet shown', await names());
 await page.click('.oxe-tab >> text=Data', { button: 'right' });

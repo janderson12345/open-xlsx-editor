@@ -114,7 +114,9 @@ export interface XlsxEditor {
   /** Delete a sheet without asking; false if refused (the last sheet shown). */
   deleteSheet(sheet: number | string): boolean;
   /** Run a named command: select, extendTo, move, page, home, end, enter, setValue, clear, undo, redo, showSheet, nextSheet,
-   *  insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet; on the selection, as the Home tab does:
+   *  insertSheet, renameSheet, moveSheet, hideSheet, tabColor, deleteSheet, groupSheets([indices]) (as Ctrl+click on
+   *  tabs; [] ungroups), groupedSheets(); fillAcross('all' | 'contents' | 'formats') (Fill > Across Worksheets over the
+   *  group); on the selection, as the Home tab does:
    *  format(change), toggleFont('b' | 'i' | 'u' | 'strike'), stepFont(1 | -1), toggleWrap, stepIndent(1 | -1),
    *  align('horizontal' | 'vertical', value), borders(preset), stepDecimal(1 | -1), clearFormats,
    *  moreColor('font' | 'fill', 'RRGGBB'); Draw Borders over a range: drawBorders('draw' | 'grid' | 'erase',
@@ -211,6 +213,10 @@ export declare function mountXlsxEditor(
     people?: Array<{ name: string; userId?: string; providerId?: string }> | (() => Array<{ name: string; userId?: string; providerId?: string }>);
     /** A hyperlink to a web address clicked: the host page opens it (otherwise the editor opens a new tab). */
     onLink?: (url: string) => void;
+    /** Insert Hyperlink's Create New Document, after the link to `name` (the file's name, relative to the workbook;
+     *  .xlsx added when it had none) is written: the host makes the document, and opens it when `editNow`. Without it,
+     *  only the link is written. */
+    onCreateDocument?: (name: string, how: { editNow: boolean }) => void;
     /** Country settings for showing and typing numbers and dates: a tag or settings over one (navigator.language
      *  without it). */
     locale?: string | Partial<LocaleSettings>;

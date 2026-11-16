@@ -15,6 +15,12 @@ export function sheetCommands(env) {
     for (const id of state.views.keys()) if (indexOf(id) < 0) state.views.delete(id);
     const now = indexOf(shownId);
     ctx.sheetsChanged(now); // (the tabs again, and the sheet shown at its new index, or -1 if it went)
+    // (A group keeps the sheets still there and shown.)
+    if (state.group) {
+      state.group = state.group.filter((id) => indexOf(id) >= 0 && wb.canShow(indexOf(id)));
+      if (state.group.length < 2) state.group = null;
+      ctx.grouped?.(state.group ? state.group.map(indexOf) : []);
+    }
     let target = show ? show() : now;
     if (target < 0 || !wb.canShow(target)) target = nearest(wb, target < 0 ? Math.min(was, wb.sheets.length - 1) : target);
     if (target !== now || now < 0) commands.showSheet(target);
@@ -65,6 +71,8 @@ export function sheetCommands(env) {
         if (wb.sheets[i]?.kind === 'chartsheet') ctx.announce(`${wb.sheets[i].name} is a chart sheet, which can't be shown yet`);
         return false;
       }
+      // (A sheet outside the group shown, the group goes, as a click on its tab ungroups in Excel.)
+      if (state.group && !state.group.includes(idOf(i))) { state.group = null; ctx.grouped?.([]); }
       const from = ctx.sheetIndex();
       if (i === from) return true;
       const view = ctx.grid.el;
@@ -83,6 +91,22 @@ export function sheetCommands(env) {
       const wb = ctx.workbook();
       for (let i = ctx.sheetIndex() + dir; i >= 0 && i < wb.sheets.length; i += dir) if (wb.canShow(i)) return commands.showSheet(i);
       return false;
+    },
+    /** Sheets grouped, as Excel groups them with Ctrl+click and Shift+click on their tabs and the tab menu's Select All
+     *  Sheets: `list` their indices, the one shown always among them, sheets that can't be shown left out; fewer than
+     *  two ungroups (Ungroup Sheets). Only Home > Fill > Across Worksheets acts on the group here (docs/FILL.md). */
+    groupSheets(list = []) {
+      const wb = ctx.workbook();
+      const keep = [...new Set([ctx.sheetIndex(), ...list])].filter((k) => wb.canShow(k)).sort((a, b) => a - b);
+      const was = !!state.group;
+      state.group = keep.length > 1 ? keep.map(idOf) : null;
+      ctx.grouped?.(commands.groupedSheets());
+      if (state.group || was) ctx.announce(state.group ? `${keep.length} sheets grouped` : 'Sheets ungrouped');
+      return !!state.group;
+    },
+    /** The grouped sheets' indices, in the workbook's order ([] when none are). */
+    groupedSheets() {
+      return (state.group || []).map(indexOf).filter((k) => k >= 0 && ctx.workbook().canShow(k));
     },
     /** A new sheet before the one shown (Insert, Shift+F11), or after it (`after`: the + button), shown. */
     insertSheet({ after = false } = {}) {

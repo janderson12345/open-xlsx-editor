@@ -1,5 +1,5 @@
 // The sheet tab's menu, as Excel's right-click menu on a tab: Insert, Delete, Rename, Move Left, Move Right, Tab
-// Color, Hide, Unhide. A role=menu of buttons: Up, Down, Home and End move; Right (or Enter) on Tab Color opens the
+// Color, Hide, Unhide, Select All Sheets and (sheets grouped) Ungroup Sheets. A role=menu of buttons: Up, Down, Home and End move; Right (or Enter) on Tab Color opens the
 // colours (the theme's ten, ten standard ones, No Color), Left or Esc goes back; Esc in the menu, or Tab, closes it and
 // focus goes back where it was. A click outside closes it.
 
@@ -135,7 +135,7 @@ export function createMenu(root) {
 
 /** The entries of sheet i's tab menu. `act` = { run(command, ...args), rename(i), unhide(), remove(i) (asks first) };
  *  `color({ theme })` gives a theme colour's swatch. Read-only, every entry is there but off. */
-export function tabMenuEntries(wb, i, { act, color, readOnly }) {
+export function tabMenuEntries(wb, i, { act, color, readOnly, grouped = false }) {
   const shown = wb.sheets.map((_, k) => k).filter((k) => wb.sheets[k].state === 'visible');
   const at = shown.indexOf(i);
   const colors = [
@@ -154,5 +154,9 @@ export function tabMenuEntries(wb, i, { act, color, readOnly }) {
     'separator',
     { label: 'Hide', disabled: readOnly, run: () => act.run('hideSheet', i) },
     { label: 'Unhide...', disabled: readOnly || !wb.sheets.some((s) => s.state === 'hidden'), run: () => act.unhide() },
+    'separator',
+    // (Grouping, as Excel's menu has it: Fill > Across Worksheets is what acts on the group here.)
+    { label: 'Select All Sheets', run: () => act.run('groupSheets', wb.sheets.map((_, k) => k)) },
+    ...(grouped ? [{ label: 'Ungroup Sheets', run: () => act.run('groupSheets', []) }] : []),
   ];
 }

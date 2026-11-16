@@ -1,0 +1,83 @@
+[
+ {
+  "ref": "A1",
+  "given": "report.xlsx",
+  "address": "report.xlsx",
+  "subAddress": "",
+  "target": "report.xlsx",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A2",
+  "given": "<folder>\\New Book.xlsx",
+  "address": "New Book.xlsx",
+  "subAddress": "",
+  "target": "New%20Book.xlsx",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A5",
+  "given": "..\\up.xlsx",
+  "address": "..\\up.xlsx",
+  "subAddress": "",
+  "target": "..\\up.xlsx",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A6",
+  "given": "My File.xlsx",
+  "address": "My File.xlsx",
+  "subAddress": "Sheet2!B5",
+  "target": "My%20File.xlsx",
+  "mode": "External",
+  "location": "Sheet2!B5"
+ },
+ {
+  "ref": "A7",
+  "given": "R&D 100%.xlsx",
+  "address": "R&D 100%.xlsx",
+  "subAddress": "",
+  "target": "R&D%20100%25.xlsx",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A8",
+  "given": "Café [1].xlsx",
+  "address": "Café [1].xlsx",
+  "subAddress": "",
+  "target": "Café%20%5b1%5d.xlsx",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A9",
+  "given": "https://example.com/a b",
+  "address": "https://example.com/a b",
+  "subAddress": "",
+  "target": "https://example.com/a%20b",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A10",
+  "given": "https://example.com/a%20b",
+  "address": "https://example.com/a b",
+  "subAddress": "",
+  "target": "https://example.com/a%20b",
+  "mode": "External",
+  "location": null
+ },
+ {
+  "ref": "A11",
+  "given": "x%41 {^}.xlsx",
+  "address": "x%41 {^}.xlsx",
+  "subAddress": "",
+  "target": "x%41%20%7b%5e%7d.xlsx",
+  "mode": "External",
+  "location": null
+ }
+]

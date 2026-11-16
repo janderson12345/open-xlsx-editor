@@ -11,7 +11,9 @@ const input = document.querySelector('input[type=file]');
 const params = new URLSearchParams(location.search);
 // (People a comment's @ offers, made up, as a host would give them from its directory.)
 const people = [{ name: 'Avery Chen', userId: 'avery.chen@example.com' }, { name: 'Sam Lee', userId: 'sam.lee@example.com' }, { name: 'Robin Park', userId: 'robin.park@example.com' }];
-const editor = mountXlsxEditor(host, { people, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
+// (Insert Hyperlink's Create New Document: a host would make the file; the demo says what it would make.)
+const onCreateDocument = (name, { editNow }) => { status.textContent = `New document: ${name} (${editNow ? 'edit now' : 'edit later'})`; };
+const editor = mountXlsxEditor(host, { people, onCreateDocument, ...(params.has('fonts') ? { fonts: { omf: './fonts/omf/' } } : {}), ...(params.get('ribbon') ? { ribbon: params.get('ribbon') } : {}),
   ...(params.get('locale') ? { locale: params.get('locale') } : {}) });
 window.oxe = editor;
 // (For the browser tests: a second editor on the page, as two workbooks open at once; test/editing-clip.mjs.)

@@ -7,6 +7,7 @@ import * as clip from '../ooxml/clipops.js';
 import { pasteHtml } from '../ooxml/cliphtml.js';
 import { linkCopy } from '../ooxml/extlinks.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
+import { fillAcrossSteps, fillAcrossParts } from '../ooxml/fillacross.js';
 import { quickSort, sortChanges, sortedNotes } from '../ooxml/sortops.js';
 import { setSortState } from '../ooxml/sortstate.js';
 import { autoSumAreas } from '../ooxml/autosumops.js';
@@ -173,6 +174,27 @@ export function dataCommands(env) {
       if (!runSteps(steps)) return false;
       const a = steps[0].area;
       show({ ...state.sel, r0: a.r0, c0: a.c0, r1: a.r1, c1: a.c1 }, state.focus, `Filled ${dir}, `);
+      return true;
+    },
+    /** Home > Fill > Across Worksheets: the selection copied to the same cells of each other grouped sheet
+     *  (fillacross.js), 'all', 'contents' or 'formats' as Excel's box offers, as one step of the history. */
+    fillAcross(type = 'all') {
+      if (ctx.readOnly()) { ctx.announce('The workbook is read-only'); return false; }
+      const wb = ctx.workbook();
+      const si = ctx.sheetIndex();
+      const targets = commands.groupedSheets();
+      if (targets.length < 2) { ctx.announce('Group the sheets to fill across first'); return false; }
+      const before = wb.snapshot();
+      if (!runSteps(fillAcrossSteps(wb, si, state.sel, targets, type))) return false;
+      if (fillAcrossParts(wb, si, state.sel, targets, type)) {
+        // (Hyperlinks, validation and conditional formats are parts of the sheets: the whole workbook goes back.)
+        state.undo.pop();
+        state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
+        ctx.edited?.({ book: true });
+        ctx.reloaded?.();
+        ctx.changed?.();
+      }
+      ctx.announce(`Filled across ${targets.length - 1} ${targets.length === 2 ? 'sheet' : 'sheets'}`);
       return true;
     },
     /** The fill handle dragged from the selection out to `to` (fillops.js autoFill): Excel's guess, or with Ctrl held

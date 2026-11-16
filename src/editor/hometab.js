@@ -41,7 +41,7 @@ export const TINTS = {
 const pct = (t) => `${t > 0 ? 'Lighter' : 'Darker'} ${Math.round(Math.abs(t) * 100)}%`;
 
 /** The Home tab. `act(name, ...args)` runs a command; `color(c)` resolves a colour for a swatch. */
-export function homeTab(kit, { act, color, workbook = () => null }) {
+export function homeTab(kit, { act, color, workbook = () => null, grouped = () => false }) {
   const { btn, toggle, grp, col, line, item, menu, split, pick, closeMenu, openMenu, run } = kit;
   const f = (name, ...args) => () => act(name, ...args);
 
@@ -162,7 +162,7 @@ export function homeTab(kit, { act, color, workbook = () => null }) {
         // (More Functions...: Insert Function, then Function Arguments, as Excel's AutoSum menu opens them.)
         el('hr'), item('More Functions...', f('insertFunction'))], { label: 'AutoSum' }),
       sheetMenu('⬇', 'Fill', 'Fill', () => [item('Down', f('fill', 'down'), { hint: 'Ctrl+D' }), item('Right', f('fill', 'right'), { hint: 'Ctrl+R' }),
-        item('Up', f('fill', 'up')), item('Left', f('fill', 'left')), el('hr'), item('Series...', f('seriesBox')), item('Justify', f('fillJustify')), item('Flash Fill', f('flashFill'), { hint: 'Ctrl+E' })]),
+        item('Up', f('fill', 'up')), item('Left', f('fill', 'left')), item('Across Worksheets...', f('fillAcrossBox'), { disabled: !grouped() }), el('hr'), item('Series...', f('seriesBox')), item('Justify', f('fillJustify')), item('Flash Fill', f('flashFill'), { hint: 'Ctrl+E' })]),
       sheetMenu('⌫', 'Clear', 'Clear', () => [item('Clear All', f('clearAs', 'all')), item('Clear Formats', f('clearFormats')), item('Clear Contents', f('clear'), { hint: 'Delete' }),
         item('Clear Comments and Notes', f('clearAs', 'comments')), item('Clear Hyperlinks', f('clearAs', 'hyperlinks')), item('Remove Hyperlinks', f('clearAs', 'removeHyperlinks'))])),
     // (Sort & Filter and Find & Select big beside them, as in Excel: five stacked made the group, and with it the

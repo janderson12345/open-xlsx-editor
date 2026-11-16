@@ -76,6 +76,9 @@ export { OMF_VERSION } from './editor/omf.js';
  *   Excel's Customize Status Bar (the status bar right-clicked) does, over the user's own last choice.
  * - `onLink(url)`: a hyperlink clicked that goes outside the workbook (http, https, mailto, ftp); without it, the
  *   browser opens it in a new tab.
+ * - `onCreateDocument(name, { editNow })`: Insert Hyperlink's Create New Document, after the link to `name` (the file's
+ *   name, relative to the workbook, .xlsx added when it had no extension) is written: the host makes the document, and
+ *   opens it when `editNow` (Edit the new document now). Without it, only the link is written: a page can't make files.
  * - `fonts: { omf }`: the URL of an open-metric-fonts web bundle folder the site serves (each package as
  *   <package>/files/, release OMF_VERSION), for the metric twins of the Microsoft fonts the computer lacks (README, Fonts).
  * - `locale`: the country settings numbers and dates are shown and typed in ('de-DE', or { tag, decimal, group,
@@ -87,7 +90,8 @@ export { OMF_VERSION } from './editor/omf.js';
  * @param {HTMLElement} host
  * @param {{ bytes?: Uint8Array | ArrayBuffer, fileName?: string, theme?: 'light' | 'dark', readOnly?: boolean,
  *   features?: Record<string, boolean>, toolbar?: boolean, ribbon?: 'simple' | 'classic', statusBar?: boolean | Record<string, boolean>, calculateOnOpen?: boolean,
- *   onChange?: () => void, onLink?: (url: string) => void, fonts?: { omf?: string } }} [options]
+ *   onChange?: () => void, onLink?: (url: string) => void,
+ *   onCreateDocument?: (name: string, how: { editNow: boolean }) => void, fonts?: { omf?: string } }} [options]
  */
 export function mountXlsxEditor(host, options = {}) {
   const root = document.createElement('div');
@@ -246,7 +250,7 @@ export function mountXlsxEditor(host, options = {}) {
     root.prepend(el);
     state.ribbon = createRibbon(el, {
       tabs: {
-        Home: (kit) => homeTab(kit, { act, workbook: () => state.workbook, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
+        Home: (kit) => homeTab(kit, { act, workbook: () => state.workbook, grouped: () => (state.group?.length || 0) > 1, color: (c) => resolveColor({ rgb: null, theme: null, indexed: null, auto: false, tint: 0, ...c }, state.workbook?.theme, state.workbook?.styles.palette) }),
         Insert: (kit) => insertTab(kit, { act }),
         'Page Layout': (kit) => pageLayoutTab(kit, { act, hasPrintArea: () => !!(state.workbook && printAreaOf(state.workbook, state.sheetIndex)), page: () => (state.workbook ? state.workbook.sheet(state.sheetIndex).page : null) }),
         Formulas: (kit) => formulasTab(kit, { act, recent: () => state.recentFunctions, calcMode: () => calcMode(state.workbook), names: () => (state.workbook ? namesOnSheet(state.workbook, state.sheetIndex).map((n) => n.name) : []) }),
@@ -314,7 +318,7 @@ export function mountXlsxEditor(host, options = {}) {
   const openMenu = (i, point, byKeyboard) => {
     // (As in Excel, the tab right-clicked becomes the sheet shown.)
     if (state.workbook.canShow(i)) editing().run('showSheet', i);
-    menu.open(tabMenuEntries(state.workbook, i, { act: sheetActs, color: (c) => state.looks.color(c), readOnly: state.readOnly }), point,
+    menu.open(tabMenuEntries(state.workbook, i, { act: sheetActs, color: (c) => state.looks.color(c), readOnly: state.readOnly, grouped: (state.group?.length || 0) > 1 }), point,
       { label: `${state.workbook.sheets[i].name} sheet`, byKeyboard });
   };
   /** The tabs a workbook shows: every sheet that isn't hidden, chart sheets as tabs that can't be shown yet. */

@@ -1,7 +1,7 @@
 // More of the ribbon's actions (acts.js): Insert > Charts and a chart's edits, comment threads, the Format Cells box and
 // Home > Conditional Formatting (its menu's rules, Clear Rules, the Rules Manager). Each runs through the editor's
 // commands as one step of the history.
-import { messageBox, numberBox } from './dialogs.js';
+import { messageBox, numberBox, optionsBox } from './dialogs.js';
 import { iterationBox } from './iterbox.js';
 import { pageSetupBox } from './pagesetupbox.js';
 import { printAreaOf, printTitlesOf } from '../ooxml/pagesetupedit.js';
@@ -189,7 +189,11 @@ export function createMoreActs(env) {
         state.grid.el.focus({ preventScroll: true });
         if (!answer) return false;
         if (answer.remove) return editing().run('clearAs', 'removeHyperlinks');
-        return editing().run('insertHyperlink', s.ar, s.ac, answer);
+        const done = editing().run('insertHyperlink', s.ar, s.ac, answer);
+        // (Create New Document: the link written as Excel writes it; the document itself the host's to make, as a page
+        // can't make files.)
+        if (done && answer.create) options.onCreateDocument?.(answer.create.name, { editNow: answer.create.editNow });
+        return done;
       });
     }
     if (name === 'editRangesBox') {
@@ -436,6 +440,14 @@ export function createMoreActs(env) {
       return go.then((ok) => {
         state.grid.el.focus({ preventScroll: true });
         return ok ? editing().run('runTool', got.steps, 'Justified ') : false;
+      });
+    }
+    if (name === 'fillAcrossBox') {
+      // (Home > Fill > Across Worksheets, sheets grouped: Excel's box, All, Contents or Formats.)
+      if (state.readOnly) return false;
+      return optionsBox(root, { title: 'Fill Across Worksheets', groups: [{ key: 'fill', legend: 'Fill', options: ['All', 'Contents', 'Formats'], value: 'All' }] }).then((got) => {
+        state.grid.el.focus({ preventScroll: true });
+        return got ? editing().run('fillAcross', got.choices.fill.toLowerCase()) : false;
       });
     }
     if (name === 'flashFill') {
