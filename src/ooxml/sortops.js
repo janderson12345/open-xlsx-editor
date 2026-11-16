@@ -4,6 +4,7 @@
 // moves it; cells outside reading the sorted ones aren't changed. Returns a step as clipops.js does: { si, contents, styles, merges }.
 import { shiftFormula } from '../calc/tokens.js';
 import { MAX_ROWS, MAX_COLS } from './refs.js';
+import { moveNotes } from './anchors.js';
 
 export const SORT_MESSAGES = {
   merged: 'To do this, all the merged cells need to be the same size.',
@@ -236,7 +237,8 @@ export function sortChanges(wb, si, area, { keys, header = false, matchCase = fa
     }
     return p.i - q.i;
   });
-  const out = { si, contents: [], styles: [], merges: sheet.merges, area: { ...area } };
+  // (`moves`: each line that moved, [from, to], for the notes, which go with their cells: sortedNotes.)
+  const out = { si, contents: [], styles: [], merges: sheet.merges, area: { ...area }, leftToRight, size, moves: [] };
   const [a0, a1] = leftToRight ? [area.r0, area.r1] : [area.c0, area.c1];
   // (A cell's format moves with it, but not its borders: Excel leaves those where they were, a bottom border seen to
   // stay under the same cell.)
@@ -254,6 +256,7 @@ export function sortChanges(wb, si, area, { keys, header = false, matchCase = fa
   order.forEach((from, i) => {
     const to = units[i].line;
     if (from.line === to) return;
+    for (let k = 0; k < size; k++) out.moves.push([from.line + k, to + k]);
     for (let k = 0; k < size; k++) {
       for (let across = a0; across <= a1; across++) {
         const [r, c] = leftToRight ? [across, to + k] : [to + k, across];
@@ -268,4 +271,25 @@ export function sortChanges(wb, si, area, { keys, header = false, matchCase = fa
     }
   });
   return out;
+}
+
+/**
+ * The notes and threaded comments of a sort's cells moved with them (a step from sortChanges), as Excel moves them:
+ * excel-refmoves.ps1, B10:E15 sorted by C, largest first, took B12's note to B10 and C13's thread to C14, the notes'
+ * boxes with them. Validation rules, conditional formats and sparklines stay where they are (measured the same way).
+ * True when any moved.
+ */
+export function sortedNotes(wb, si, step) {
+  if (!step.moves?.length) return false;
+  const to = new Map(step.moves);
+  const { area, leftToRight } = step;
+  let moved = false;
+  moveNotes(wb, si, (r, c) => {
+    if (r < area.r0 || r > area.r1 || c < area.c0 || c > area.c1) return { r, c };
+    const line = to.get(leftToRight ? c : r);
+    if (line == null) return { r, c };
+    moved = true;
+    return leftToRight ? { r, c: line } : { r: line, c };
+  });
+  return moved;
 }

@@ -125,7 +125,7 @@ Excel did them. Excel's own refresh of each moved pivot left it where it was.
 One step Excel takes its own way: a cell inserted inside the pivot, shifting down, leaves Excel's pivot with an empty
 cell in it. The editor refuses it, as it refuses any cells shifted through part of a pivot.
 
-## Sparklines and data validation
+## Sparklines, data validation, notes in a sort
 
 Measured by `tools/excel-compare/excel-refmoves.ps1` on `refmove-cases.mjs`: a sheet with a group of line sparklines
 O2:O5 over B2:M5, a column sparkline at O7, one at Q2 over another sheet's B2:M2, four validation rules on B10:E15 (a
@@ -141,9 +141,9 @@ done in Excel and the workbook it saved compared (`src/ooxml/rulemoves.js`; `tes
 | A validation rule's ranges | Move, grow and shrink as ranges do, the Excel 2010 form's too. Lines and cells inserted take the rules of the line or cell before them: B10:B15 is B10:C15 after a column is inserted at C; all four end at row 16 after a row is inserted there; D10:D15 gets E12:E13 when E12:E13 is inserted shifting right. |
 | A rule's formulas | Stay relative to its first cell: references move as references do; when the first cell is deleted they read from the first cell left (D10:D15's `D10>C10` stays `D10>C10` after rows 10:12 go, the rule now D10:D12). |
 | Cells shifted through part of a rule | The part that moves is cut from it: a rule of its own when its formulas have relative references (D12, shifted left to C12: `C12>#REF!`), else it stays in the rule (E10:E11 E13:E15 D12). A part deleted is taken out when the formulas are relative (D10:D11 D13:D15), and left in when they are absolute (C10:C15 kept C12). |
-| A sort | Sparklines, validation rules and conditional formats stay where they are, also when the sparklines' cells are sorted. |
+| A sort | Notes and threaded comments go with their cells (B12's note to B10, C13's thread to C14, their boxes with them); sparklines, validation rules and conditional formats stay where they are, also when the sparklines' cells are sorted. |
 
-Results: the sparklines and rules after 41 of the 42 steps match Excel's (`test/refmoves.test.js` against `test/refmoves-excel.json`); the other is
+Results: 41 of the 42 steps match Excel (`test/refmoves.test.js` against `test/refmoves-excel.json`); the other is
 below. The editor's 43 results (the start and each step) opened in Excel without a repair and read back 42 of 43 as
 Excel had made them (`excel-refmoves.ps1 -Books test/out/refmoves`), leaving out the threaded comment's placeholder
 box, which Excel lays out again itself when it opens any workbook.

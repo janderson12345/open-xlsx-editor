@@ -2,7 +2,7 @@
 // probes' steps (refmove-cases.mjs, slicer-cases.mjs) done the editor's way.
 import assert from 'node:assert/strict';
 import { shiftCells } from '../src/ooxml/rowcol.js';
-import { sortChanges } from '../src/ooxml/sortops.js';
+import { sortChanges, sortedNotes } from '../src/ooxml/sortops.js';
 import { parseRange, colIndex } from '../src/ooxml/refs.js';
 
 /** Do one of the probe's steps (insert, delete, sort) the editor's way. */
@@ -21,6 +21,7 @@ export function doStep(wb, s) {
     assert.ok(!step.error, step.error);
     wb.apply(si, step.contents);
     wb.setStyles(si, step.styles);
+    sortedNotes(wb, si, step);
     return;
   }
   shiftCells(wb, si, { ...area, ar: area.r0, ac: area.c0 }, dir, s.shift === 'down' || s.shift === 'up' ? 'row' : 'col');

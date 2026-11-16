@@ -57,8 +57,7 @@ EXCEL.slice(1).map((x) => ({ ...x, ...KNOWN[x.name] })).forEach((excel, k) => {
     const got = stateOf(wb);
     // (Sparklines in a group as Excel lists them, which can differ from their order in the file: compared as a set.)
     assert.deepEqual([...got.sparklines].sort(), [...excel.sparklines].sort(), 'sparklines');
-    // (Notes in a sort don't move with their cells yet: compared after inserts and deletes.)
-    for (const key of excel.step.do === 'sort' ? ['rules', 'x14'] : ['rules', 'x14', 'notes', 'threads', 'boxes']) assert.deepEqual(got[key], excel[key], key);
+    for (const key of ['rules', 'x14', 'notes', 'threads', 'boxes']) assert.deepEqual(got[key], excel[key], key);
     // And the workbook saved reads back the same.
     const bytes = wb.toBytes();
     fs.writeFileSync(`${OUT}/${k + 2}.xlsx`, bytes);

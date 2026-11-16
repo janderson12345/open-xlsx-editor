@@ -5,7 +5,7 @@ import { applyTableFilter } from '../ooxml/tablefilter.js';
 import { refName, colName, parseRange } from '../ooxml/refs.js';
 import * as clip from '../ooxml/clipops.js';
 import { fillCopy, autoFill, doubleClickFill } from '../ooxml/fillops.js';
-import { quickSort, sortChanges } from '../ooxml/sortops.js';
+import { quickSort, sortChanges, sortedNotes } from '../ooxml/sortops.js';
 import { setSortState } from '../ooxml/sortstate.js';
 import { autoSum as autoSumOf } from '../ooxml/autosumops.js';
 import { goToTarget } from '../ooxml/goto.js';
@@ -161,9 +161,11 @@ export function dataCommands(env) {
       const before = wb.snapshot();
       const ran = step.contents.length > 0;
       if (ran && !runSteps([step])) return false;
-      // (The sort saved as the sheet's sortState, as Excel saves it after every sort, sortstate.js: then the step is the
-      // workbook before and after, the cells' own entry giving way to it.)
-      if (setSortState(wb, si, plan)) {
+      // (The sort saved as the sheet's sortState, as Excel saves it after every sort, sortstate.js, and the notes moved
+      // with their cells, sortops.js sortedNotes: then the step is the workbook before and after, the cells' own entry
+      // giving way to it.)
+      const noted = ran && sortedNotes(wb, si, step);
+      if (setSortState(wb, si, plan) || noted) {
         if (ran) state.undo.pop();
         state.undo.push({ sheet: idOf(si), snap: true, before, after: wb.snapshot() });
         state.redo = [];

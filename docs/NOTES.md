@@ -62,9 +62,9 @@ Notes > Show All Notes shows every note's box, or hides them again; as Excel's, 
 @mentions written (threads are written, resolved, replied to, edited and deleted: below). Excel makes a mention from
 the signed-in organisation's directory (a person with a provider and a user id), which COM can't make in a hidden
 instance, so there is nothing to measure them against; a mention already in a file shows, its "@Name" being part of
-the comment's text. Also: Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), notes
-following their cells when rows are sorted, and marks in frozen panes' cells drawn twice. Notes do
-follow their cells when rows and columns are inserted or deleted (docs/ROWCOL.md).
+the comment's text. Also: Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), and
+marks in frozen panes' cells drawn twice. Notes and threaded comments follow their cells when rows and columns are
+inserted or deleted, and when they are sorted, as Excel moves them (docs/ROWCOL.md).
 
 ## Writing threaded comments (`src/ooxml/threadedit.js`, `src/editor/threadbox.js`)
 
