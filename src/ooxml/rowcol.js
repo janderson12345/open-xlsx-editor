@@ -5,7 +5,7 @@
 // columns the format and width of the column to their left. Afterwards the sheet is read again and the workbook worked
 // out again. Notes and threaded comments go with their cells, pictures, charts and shapes with whole rows and
 // columns, tables grown, narrowed, moved or deleted, pivot tables moved or deleted and pivot caches' sources followed
-// (anchors.js). A sheet with slicers or timelines is refused for now: their positions aren't moved yet.
+// (anchors.js), slicers and timelines with their drawing's anchors, a table slicer deleted with its column (slicers.js).
 // Data validation rules and sparklines follow as Excel moves them (rulemoves.js).
 //
 // Inserting and deleting cells (the rest of their columns shifting down or up, or of their rows right or left) is the
@@ -18,6 +18,7 @@ import { shiftLine, shiftSpan, shiftRefs, bandArea, tokenize } from '../calc/tok
 import { SheetError, mapFormulas } from './sheetops.js';
 import { moveNotes, moveDrawings, lineSizes, planTables, applyTables, deadTableRefs, keepTableRow, planPivots, applyPivots, movePivotSources } from './anchors.js';
 import { prepareRules, moveExtRanges, extendRules, dropDeadSparklines } from './rulemoves.js';
+import { dropTableSlicers } from './slicers.js';
 import { readPivots } from './pivot.js';
 import { insertedLines, openJoined } from './outline.js';
 import { pxWidth } from './sizes.js';
@@ -26,12 +27,8 @@ import { defaultColPx } from './units.js';
 export const ROWCOL_MESSAGES = {
   offSheet: 'To prevent possible loss of data, Excel cannot shift nonblank cells off of the worksheet. Select another location in which to insert new cells, or delete data from the end of your worksheet.',
   array: "You can't change part of an array.",
-  parts: "Rows and columns can't be inserted or deleted yet on a sheet with slicers or timelines.",
-  cellParts: "Cells can't be inserted or deleted yet on a sheet with slicers or timelines.",
   unmerge: 'This operation will cause some merged cells to unmerge. Do you wish to continue?',
 };
-/** Relationships of a sheet whose parts hold positions this doesn't move yet. */
-const ANCHORED = /\/(slicer|timeline)$/;
 
 const make = (doc, ns, name) => doc.createElementNS(ns, doc.documentElement.prefix ? `${doc.documentElement.prefix}:${name}` : name);
 
@@ -63,8 +60,6 @@ function splitBy(range, axis, at, band) {
 /** Throws Excel's refusal when the change can't be made on sheet si. Returns the merged ranges a shift of cells would
  *  split (Excel unmerges them, asking first). */
 function check(wb, si, axis, at, n, band) {
-  const info = wb.sheets[si];
-  if (wb.pkg.readRels(info.path).some((r) => ANCHORED.test(r.type))) throw new SheetError(band ? ROWCOL_MESSAGES.cellParts : ROWCOL_MESSAGES.parts);
   const model = wb.sheet(si);
   const lines = axis === 'row' ? (a) => [a.r0, a.r1] : (a) => [a.c0, a.c1];
   const inBand = (r, c) => !band || ((axis === 'row' ? c : r) >= band[0] && (axis === 'row' ? c : r) <= band[1]);
@@ -364,6 +359,8 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   // Tables: their ranges, columns and header names; references to what was deleted of them made #REF!.
   const dead = applyTables(wb, si, axis, tables, doc, setCellXml);
   for (const name of new Set(dead.map((d) => d.table))) mapFormulas(wb, (text) => deadTableRefs(text, dead, tokenize), { name });
+  // (A table slicer whose column, or table, was deleted goes with its cache, as Excel deletes it.)
+  dropTableSlicers(wb, dead);
   // Pivot tables on the sheet moved (or gone); every pivot cache reading the sheet, its source range as a reference.
   applyPivots(wb, si, axis, pivots);
   movePivotSources(wb, info.name, (area) => shiftRange(area, axis, at, n, band));

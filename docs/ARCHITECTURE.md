@@ -62,6 +62,7 @@ insides:
 | `src/agent.js` | The agent interface: a workbook read and edited in plain terms, without a browser (`openWorkbook`) or on the editor's workbook (`api.agent()`, each edit one undo step); docs/AGENT.md. Types in `src/agent.d.ts`. |
 | `src/ooxml/anchors.js` | What sits on a sheet at a place of its own, moved with inserted and deleted rows and columns: notes and threaded comments, the anchors of pictures, charts and shapes (those that don't move with cells kept at their place), tables, pivot tables and their caches' sources (docs/ROWCOL.md). |
 | `src/ooxml/rulemoves.js` | Data validation rules (both forms) and sparklines moved with inserted and deleted rows, columns and cells as Excel moves them: rules split and extended, their formulas kept relative to their first cell; sparklines copied into new lines and deleted with their cells or data (docs/ROWCOL.md). |
+| `src/ooxml/slicers.js` | A table slicer deleted with its table column or table, as Excel deletes it: the slicer, its drawing anchor, its cache, the cache's name and lists (docs/ROWCOL.md). |
 | `src/ooxml/applynames.js` | Formulas > Define Name > Apply Names. |
 | `src/ooxml/pivotnew.js` | A new PivotTable (Insert > PivotTable), its parts written as Excel writes a new one, then laid out by pivot.js's refresh; docs/PIVOT.md. |
 | `src/ooxml/pivotfields.js` | A PivotTable's fields moved after it is made, as Excel's field list moves them, then laid out by pivot.js's refresh; docs/PIVOT.md. |

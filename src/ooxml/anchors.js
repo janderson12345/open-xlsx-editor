@@ -218,7 +218,7 @@ export const TABLE_MESSAGES = {
   totals: "A table's totals row can't be deleted without the rest of the table yet.",
 };
 
-/** The tables of sheet si: [{ path, relId, name, r0, c0, r1, c1, headers, totals, columns }]. */
+/** The tables of sheet si: [{ path, relId, id, name, r0, c0, r1, c1, headers, totals, columns, columnIds }]. */
 function tablesOf(wb, si) {
   return relsOf(wb, wb.sheets[si].path, `${REL}/table`).map((rel) => {
     const text = wb.pkg.text(rel.target) || '';
@@ -226,12 +226,13 @@ function tablesOf(wb, si) {
     if (!ref) return null;
     const col = (s) => [...s].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
     return {
-      path: rel.target, relId: rel.id,
+      path: rel.target, relId: rel.id, id: /<table\b[^>]*\sid="(\d+)"/.exec(text)?.[1] ?? null,
       name: /<table\b[^>]*\sdisplayName="([^"]*)"/.exec(text)?.[1] || /<table\b[^>]*\sname="([^"]*)"/.exec(text)?.[1],
       r0: Number(ref[2]) - 1, c0: col(ref[1]), r1: Number(ref[4]) - 1, c1: col(ref[3]),
       headers: /<table\b[^>]*\sheaderRowCount="0"/.test(text) ? 0 : 1,
       totals: /<table\b[^>]*\stotalsRowCount="[1-9]/.test(text) ? 1 : 0,
       columns: [...text.matchAll(/<tableColumn\b[^>]*\sname="([^"]*)"/g)].map((m) => m[1]),
+      columnIds: [...text.matchAll(/<tableColumn\b[^>]*\sid="(\d+)"/g)].map((m) => m[1]),
     };
   }).filter(Boolean);
 }
@@ -289,7 +290,7 @@ export function planTables(wb, si, axis, at, n, band, refuse) {
 /**
  * Make the plans (planTables) after the sheet's cells moved: each table part's ref, autoFilter and columns; new columns'
  * names in the header cells (`doc`, the sheet's moved XML, through `setCell(doc, r, c, text)`); deleted tables' parts.
- * Returns the table references to make #REF!: [{ table, columns (names, or null for the whole table) }].
+ * Returns the table references to make #REF!: [{ table, id, columns (names, or null for the whole table), columnIds }].
  */
 export function applyTables(wb, si, axis, plans, doc, setCell) {
   const pkg = wb.pkg;
@@ -299,7 +300,7 @@ export function applyTables(wb, si, axis, plans, doc, setCell) {
   for (const plan of plans) {
     const t = plan.t;
     if (plan.gone) {
-      dead.push({ table: t.name, columns: null });
+      dead.push({ table: t.name, id: t.id, columns: null });
       for (const el of [...doc.documentElement.getElementsByTagNameNS('*', 'tablePart')]) {
         if (el.getAttributeNS(REL, 'id') === t.relId || el.getAttribute('r:id') === t.relId) el.parentNode.removeChild(el);
       }
@@ -339,7 +340,7 @@ export function applyTables(wb, si, axis, plans, doc, setCell) {
         c1 -= plan.shrink.length;
         const kept = [...text.matchAll(COLUMN)].map((m) => m[0]).filter((_, k) => !plan.shrink.includes(k));
         text = text.replace(/<tableColumns\b[^>]*>[\s\S]*?<\/tableColumns>/, `<tableColumns count="${kept.length}">${kept.join('')}</tableColumns>`);
-        dead.push({ table: t.name, columns: plan.shrink.map((k) => t.columns[k]) });
+        dead.push({ table: t.name, id: t.id, columns: plan.shrink.map((k) => t.columns[k]), columnIds: plan.shrink.map((k) => t.columnIds[k]) });
       }
     }
     const ref = `${name(r0, c0)}:${name(r1, c1)}`;

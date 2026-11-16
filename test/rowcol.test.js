@@ -137,13 +137,10 @@ test('a rule of the Excel 2010 form reading the sheet: its formula moved once, i
   assert.equal(f[0].textContent, `${name}!$A$2:$A$4`);
 });
 
-test('refused as Excel refuses; a sheet with parts whose positions aren\'t moved yet is refused', () => {
+test('refused as Excel refuses', () => {
   const { wb, si } = setup();
   wb.apply(si, [{ r: 1048575, c: 0, value: 1 }]);
   assert.throws(() => wb.changeLines(si, 'row', 2, 1), { message: ROWCOL_MESSAGES.offSheet });
-  // (A sheet with a slicer: its position isn't moved yet.)
-  wb.pkg.addRel('http://schemas.microsoft.com/office/2007/relationships/slicer', '../slicers/slicer1.xml', false, wb.sheets[si].path);
-  assert.throws(() => wb.changeLines(si, 'row', 0, 1), { message: ROWCOL_MESSAGES.parts });
 });
 
 test('undone through a snapshot; the saved workbook passes the structural check', () => {

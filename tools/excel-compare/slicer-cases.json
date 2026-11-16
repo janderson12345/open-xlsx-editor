@@ -1,0 +1,197 @@
+{
+ "sheet": {
+  "rows": [
+   [
+    "Date",
+    "Region",
+    "Item",
+    "Units"
+   ],
+   [
+    46027,
+    "North",
+    "Bolt",
+    1
+   ],
+   [
+    46041,
+    "South",
+    "Nut",
+    8
+   ],
+   [
+    46055,
+    "East",
+    "Pin",
+    4
+   ],
+   [
+    46069,
+    "West",
+    "Bolt",
+    11
+   ],
+   [
+    46083,
+    "North",
+    "Nut",
+    7
+   ],
+   [
+    46097,
+    "South",
+    "Pin",
+    3
+   ],
+   [
+    46111,
+    "East",
+    "Bolt",
+    10
+   ],
+   [
+    46125,
+    "West",
+    "Nut",
+    6
+   ],
+   [
+    46139,
+    "North",
+    "Pin",
+    2
+   ],
+   [
+    46153,
+    "South",
+    "Bolt",
+    9
+   ],
+   [
+    46167,
+    "East",
+    "Nut",
+    5
+   ],
+   [
+    46181,
+    "West",
+    "Pin",
+    1
+   ]
+  ],
+  "at": "B2",
+  "tableSlicer": "G2:I11",
+  "pivot": "L20",
+  "pivotSlicer": "P2:R11",
+  "timeline": "L2:N9"
+ },
+ "cases": [
+  {
+   "name": "start",
+   "step": {
+    "do": "none",
+    "range": "A1"
+   }
+  },
+  {
+   "name": "insert row 1",
+   "step": {
+    "do": "insert",
+    "range": "1:1"
+   }
+  },
+  {
+   "name": "insert rows 5:6 (inside the table and the slicers)",
+   "step": {
+    "do": "insert",
+    "range": "5:6"
+   }
+  },
+  {
+   "name": "delete row 5 (inside the table and the slicers)",
+   "step": {
+    "do": "delete",
+    "range": "5:5"
+   }
+  },
+  {
+   "name": "delete rows 2:14 (all of the table, the slicers' tops)",
+   "step": {
+    "do": "delete",
+    "range": "2:14"
+   }
+  },
+  {
+   "name": "delete rows 2:11 (all of the slicers)",
+   "step": {
+    "do": "delete",
+    "range": "2:11"
+   }
+  },
+  {
+   "name": "insert column A",
+   "step": {
+    "do": "insert",
+    "range": "A:A"
+   }
+  },
+  {
+   "name": "insert column C (inside the table, before Region)",
+   "step": {
+    "do": "insert",
+    "range": "C:C"
+   }
+  },
+  {
+   "name": "delete column B (the table's Date, the timeline's field)",
+   "step": {
+    "do": "delete",
+    "range": "B:B"
+   }
+  },
+  {
+   "name": "delete column C (the table's Region, the slicer's column)",
+   "step": {
+    "do": "delete",
+    "range": "C:C"
+   }
+  },
+  {
+   "name": "delete column D (the table's Item, the pivot slicer's field)",
+   "step": {
+    "do": "delete",
+    "range": "D:D"
+   }
+  },
+  {
+   "name": "delete columns G:I (all of the table slicer)",
+   "step": {
+    "do": "delete",
+    "range": "G:I"
+   }
+  },
+  {
+   "name": "insert column H (inside the table slicer)",
+   "step": {
+    "do": "insert",
+    "range": "H:H"
+   }
+  },
+  {
+   "name": "insert G5 shifting down (under the slicer's top)",
+   "step": {
+    "do": "insert",
+    "range": "G5",
+    "shift": "down"
+   }
+  },
+  {
+   "name": "delete rows 21:22 (inside the pivot)",
+   "step": {
+    "do": "delete",
+    "range": "21:22"
+   }
+  }
+ ]
+}

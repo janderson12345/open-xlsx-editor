@@ -67,17 +67,22 @@ PivotTables when rows and columns move: `excel-pivot-lines.ps1 <pivot-cases.json
 editor's results.
 
 Sparklines, data validation rules, notes and Circle Invalid Data's ovals when rows, columns and cells move or are
-sorted:
+sorted, and slicers and timelines when rows and columns move:
 
 ```sh
 node tools/excel-compare/refmove-cases.mjs > tools/excel-compare/refmove-cases.json
 pwsh tools/excel-compare/excel-refmoves.ps1 tools/excel-compare/refmove-cases.json <out.json>
 node tools/excel-compare/refmove-results.mjs refmoves tools/excel-compare/refmove-cases.json <out.json> > test/refmoves-excel.json
+node tools/excel-compare/slicer-cases.mjs > tools/excel-compare/slicer-cases.json
+pwsh tools/excel-compare/excel-slicers.ps1 tools/excel-compare/slicer-cases.json <out.json> [<folder for Excel's books>]
+node tools/excel-compare/refmove-results.mjs slicers tools/excel-compare/slicer-cases.json <out.json> > test/slicers-excel.json
 ```
 
-Each case's workbook is saved to %TEMP%, its parts read and the file deleted (the books carry Excel's user name). After
-`npm test` has saved the editor's results in `test/out/refmoves`, `excel-refmoves.ps1 ... -Books test/out/refmoves`
-reads those back the same way, `repaired` saying whether Excel had to repair one (a repair log appeared in %TEMP%).
+Each case's workbook is saved to %TEMP%, its parts read and the file deleted (Excel's books are kept only when a folder
+is given: they carry Excel's user name, so keep them outside the repository). After `npm test` has saved the editor's
+results in `test/out/refmoves` and `test/out/slicers`, `excel-refmoves.ps1 ... -Books test/out/refmoves` and
+`excel-slicers.ps1 ... -Open test/out/slicers` read those back the same way, `repaired` saying whether Excel had to
+repair one (a repair log appeared in %TEMP%).
 
 PivotTables have their own: `pivot-cases.mjs` makes the cases, `excel-pivot.ps1 <cases> <out.json> <books folder>` has Excel build,
 change and refresh each, `pivot-parts.mjs` takes the three pivot parts into `test/pivot-excel.json` (without the user's name), and

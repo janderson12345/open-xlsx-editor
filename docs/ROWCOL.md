@@ -154,11 +154,28 @@ absolute, though it left C12 in C10:C15's and, with C12:E12 deleted, E12 in E10:
 rule whole each time. Excel also leaves rules overlapping there (C12 is in two), as the editor does. After a sort the
 editor keeps only the ovals whose cells still break their rule, where Excel leaves all of them in place.
 
+## Slicers and timelines
+
+Measured by `tools/excel-compare/excel-slicers.ps1` on `slicer-cases.mjs`: a table Sales on B2:E14 with a slicer on its
+Region column (Excel made it "don't move or size with cells" over COM), a pivot table of it at L20 with a slicer on
+Item and a timeline on Date (both "move but don't size"), all on one sheet; 14 steps (`src/ooxml/slicers.js`,
+`src/ooxml/anchors.js`; `test/fixtures/slicers.xlsx`).
+
+| What | As Excel does it |
+|---|---|
+| A slicer's or timeline's place | Its drawing's anchor moves as any drawing's does. One that doesn't move with cells keeps its place on the sheet: its corners worked out again from the lines' sizes (the Region slicer at G2, after a column was inserted at C taking B's 73px, was at F2 and 55px: `5, 523875`). |
+| A table slicer's cache | Names its table by id and its column by the column's id, so a column inserted into the table changes nothing in it. |
+| A table slicer's column deleted, or its table | The slicer is deleted: its place in the drawing, the slicer in its part (the part when it was the last), its cache part, the cache's defined name (`Slicer_Region`) and the workbook's and sheet's lists of them. |
+| A pivot slicer or a timeline | Stays, its field deleted from the pivot's source or not (Excel keeps them until the pivot is refreshed). |
+| Lines through the pivot, or the table's header row without the rest | Refused, as without slicers (above). |
+
+Results: 14 of 14 steps match Excel (`test/slicers.test.js` against `test/slicers-excel.json`); the editor's 15 results
+opened in Excel without a repair and read back 15 of 15 as Excel had made them (`excel-slicers.ps1 -Open
+test/out/slicers`).
+
 ## Not yet
 
-A sheet with slicers or timelines is refused ("Rows and columns can't be inserted or deleted yet on a sheet with...",
-or "Cells can't..."): their positions aren't moved yet. Also missing: page breaks and the Insert Options button (format
-from below, clear formatting). Rules of the Excel 2010 form are moved
+Page breaks and the Insert Options button (format from below, clear formatting). Rules of the Excel 2010 form are moved
 but not read: their cells aren't checked, shown a list or circled (E12 above). Conditional formats' ranges move as
 before; whether new lines take them as they take validation rules isn't measured.
 

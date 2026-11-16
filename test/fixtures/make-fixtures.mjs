@@ -23,7 +23,8 @@
 //                (tables.mjs).
 // print-*.xlsx   probes for the print model: print area, titles and breaks; scale; fit to a page wide; headers and
 //                footers (probes-print.mjs).
-// refmoves.xlsx  sparklines, validation rules and notes: what moves with rows, columns and cells (refmoves.mjs).
+// refmoves.xlsx, slicers.xlsx  sparklines, validation rules, notes; slicers and a timeline: what moves with rows,
+//                columns and cells (refmoves.mjs).
 // The zips are written with a fixed date, so the files only change when this script does.
 //
 // Layout: fixture-common.mjs (helpers, shared parts), probes-format.mjs (widths, General, fonts, fills, alignment,
@@ -33,7 +34,7 @@ import { fileURLToPath } from 'node:url';
 import { special } from './special.mjs';
 import { sparklines } from './sparklines.mjs';
 import { tables } from './tables.mjs';
-import { refmoves } from './refmoves.mjs';
+import { refmoves, slicerBook } from './refmoves.mjs';
 import { write, contentTypes, rels, RT, CT, DECL, X, R, ROOT_RELS, docProps, PROPS_CT, STYLES, esc, col, stringTable } from './fixture-common.mjs';
 import { widths, general, fonts, fills, align, numfmts, rowHeights } from './probes-format.mjs';
 import { formulas } from './probes-formulas.mjs';
@@ -161,4 +162,5 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   sparklines();
   tables();
   refmoves();
+  slicerBook();
 }

@@ -1,0 +1,372 @@
+[
+ {
+  "name": "start",
+  "step": {
+   "do": "none",
+   "range": "A1"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L20:M25"
+ },
+ {
+  "name": "insert row 1",
+  "step": {
+   "do": "insert",
+   "range": "1:1"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,2,0 18,0,12,0",
+   "Date": "oneCell 11,0,2,0 14,0,10,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B3:E15 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L21:M26"
+ },
+ {
+  "name": "insert rows 5:6 (inside the table and the slicers)",
+  "step": {
+   "do": "insert",
+   "range": "5:6"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E16 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L22:M27"
+ },
+ {
+  "name": "delete row 5 (inside the table and the slicers)",
+  "step": {
+   "do": "delete",
+   "range": "5:5"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E13 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L19:M24"
+ },
+ {
+  "name": "delete rows 2:14 (all of the table, the slicers' tops)",
+  "step": {
+   "do": "delete",
+   "range": "2:14"
+  },
+  "refused": null,
+  "anchors": {
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item"
+  ],
+  "slicers": [
+   "Date",
+   "Item"
+  ],
+  "table": null,
+  "pivot": "L7:M12"
+ },
+ {
+  "name": "delete rows 2:11 (all of the slicers)",
+  "step": {
+   "do": "delete",
+   "range": "2:11"
+  },
+  "refused": "Unable to get the Delete property of the Range class",
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L20:M25"
+ },
+ {
+  "name": "insert column A",
+  "step": {
+   "do": "insert",
+   "range": "A:A"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 16,0,1,0 19,0,11,0",
+   "Date": "oneCell 12,0,1,0 15,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "C2:F14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "M20:N25"
+ },
+ {
+  "name": "insert column C (inside the table, before Region)",
+  "step": {
+   "do": "insert",
+   "range": "C:C"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 5,523875,1,0 8,523875,11,0",
+   "Item": "oneCell 16,0,1,0 19,0,11,0",
+   "Date": "oneCell 12,0,1,0 15,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:F14 1:Date,5:Column1,2:Region,3:Item,4:Units",
+  "pivot": "M20:N25"
+ },
+ {
+  "name": "delete column B (the table's Date, the timeline's field)",
+  "step": {
+   "do": "delete",
+   "range": "B:B"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,85725,1,0 9,85725,11,0",
+   "Item": "oneCell 14,0,1,0 17,0,11,0",
+   "Date": "oneCell 10,0,1,0 13,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:D14 2:Region,3:Item,4:Units",
+  "pivot": "K20:L25"
+ },
+ {
+  "name": "delete column C (the table's Region, the slicer's column)",
+  "step": {
+   "do": "delete",
+   "range": "C:C"
+  },
+  "refused": null,
+  "anchors": {
+   "Item": "oneCell 14,0,1,0 17,0,11,0",
+   "Date": "oneCell 10,0,1,0 13,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item"
+  ],
+  "slicers": [
+   "Date",
+   "Item"
+  ],
+  "table": "B2:D14 1:Date,3:Item,4:Units",
+  "pivot": "K20:L25"
+ },
+ {
+  "name": "delete column D (the table's Item, the pivot slicer's field)",
+  "step": {
+   "do": "delete",
+   "range": "D:D"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 14,0,1,0 17,0,11,0",
+   "Date": "oneCell 10,0,1,0 13,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:D14 1:Date,2:Region,4:Units",
+  "pivot": "K20:L25"
+ },
+ {
+  "name": "delete columns G:I (all of the table slicer)",
+  "step": {
+   "do": "delete",
+   "range": "G:I"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 8,609600,11,0",
+   "Item": "oneCell 12,0,1,0 15,0,11,0",
+   "Date": "oneCell 8,0,1,0 11,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "I20:J25"
+ },
+ {
+  "name": "insert column H (inside the table slicer)",
+  "step": {
+   "do": "insert",
+   "range": "H:H"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 16,0,1,0 19,0,11,0",
+   "Date": "oneCell 12,0,1,0 15,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "M20:N25"
+ },
+ {
+  "name": "insert G5 shifting down (under the slicer's top)",
+  "step": {
+   "do": "insert",
+   "range": "G5",
+   "shift": "down"
+  },
+  "refused": null,
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L20:M25"
+ },
+ {
+  "name": "delete rows 21:22 (inside the pivot)",
+  "step": {
+   "do": "delete",
+   "range": "21:22"
+  },
+  "refused": "We can't make this change for the selected cells because it will affect a PivotTable. Use the field list to change the report. If you are trying to insert or delete cells, move the PivotTable and try again.",
+  "anchors": {
+   "Region": "absolute 6,0,1,0 9,0,11,0",
+   "Item": "oneCell 15,0,1,0 18,0,11,0",
+   "Date": "oneCell 11,0,1,0 14,0,9,0"
+  },
+  "caches": [
+   "NativeTimeline_Date",
+   "Slicer_Item",
+   "Slicer_Region table 1 column 2"
+  ],
+  "slicers": [
+   "Date",
+   "Item",
+   "Region"
+  ],
+  "table": "B2:E14 1:Date,2:Region,3:Item,4:Units",
+  "pivot": "L20:M25"
+ }
+]
