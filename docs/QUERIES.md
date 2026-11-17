@@ -82,6 +82,13 @@ queryTable part and the workbook's names; an M edit, the DataMashup part.
 
 ## What isn't possible here
 
+Power Query's engine is not supported in this control, as VBA isn't (docs/FIDELITY.md). This is a decision, not a gap
+to be filled. The editor handles the workbook's side of a query: it lists queries and connections, shows and changes
+a query's M so that Excel refreshes it as written, and writes the rows a refresh brings into the query's table. The
+data side is the host's, through `onRefreshQuery`, or Excel's. So M is never run here, the data model is never
+refreshed, and queries aren't added, deleted, renamed or loaded elsewhere. A file's M is also never run on opening,
+which keeps a workbook from fetching addresses its author chose. The items below say why each part is out of reach.
+
 - **Running M.** The editor doesn't evaluate Power Query's M: not even the simple steps (Csv.Document, Web.Contents
   through the host, Table.PromoteHeaders, Table.TransformColumnTypes, Table.SelectRows). Doing it means M's lexical
   grammar and expressions (let, each, records, lists, types, `#"..."` names, operators and their null rules) and each
