@@ -4,6 +4,10 @@
 import { unzipSync, zipSync, strFromU8, strToU8 } from 'fflate';
 import { parseXml, serializeXml, kids, NS, REL_TYPES, esc } from './xml.js';
 
+/** How much a package may unpack to in all (1 GB): far past any workbook a page can hold. */
+export const MAX_UNPACKED = 1024 * 1024 * 1024;
+const TOO_BIG = 'This file is too large to open here: it unpacks to more than 1 GB.';
+
 export class OpcPackage {
   constructor(files) {
     /** @type {Record<string, Uint8Array>} */
@@ -16,9 +20,18 @@ export class OpcPackage {
   static fromBytes(bytes) {
     const u8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
     let files;
+    // (A file whose parts say they unpack past MAX_UNPACKED in all isn't unpacked: a few kilobytes of crafted zip could
+    // otherwise ask for gigabytes. fflate makes each part's buffer the size its header gives, so this bounds memory.)
+    let total = 0;
+    const filter = (f) => {
+      total += f.originalSize;
+      if (total > MAX_UNPACKED) throw new Error(TOO_BIG);
+      return true;
+    };
     try {
-      files = unzipSync(u8);
+      files = unzipSync(u8, { filter });
     } catch (e) {
+      if (e.message === TOO_BIG) throw new Error(TOO_BIG);
       throw new Error('Not an Office Open XML file (could not unzip): ' + e.message);
     }
     if (!files['[Content_Types].xml']) throw new Error('Not an Office Open XML file: [Content_Types].xml missing');

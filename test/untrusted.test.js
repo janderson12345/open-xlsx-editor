@@ -92,6 +92,18 @@ test('drawing parts nested thousands deep are read as far as Excel would nest th
   assert.deepEqual(readObjects(wb, 0), []);
 });
 
+test('a workbook whose parts say they unpack past 1 GB is refused before anything is unpacked', () => {
+  const zip = zipSync({ '[Content_Types].xml': strToU8('<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"/>'), 'xl/a.xml': strToU8('<a/>') });
+  const dv = new DataView(zip.buffer, zip.byteOffset, zip.byteLength);
+  // (Each central directory entry's uncompressed size, at 24 past its signature, made 600 MB: 1.2 GB in all.)
+  for (let o = 0; o + 4 <= zip.length; o++) if (dv.getUint32(o, true) === 0x02014b50) dv.setUint32(o + 24, 600 * 1024 * 1024, true);
+  const started = Date.now();
+  assert.throws(() => OpcPackage.fromBytes(zip), /too large to open here/);
+  assert.ok(Date.now() - started < 500);
+  // (A real workbook opens as before.)
+  assert.ok(OpcPackage.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx'))).has('[Content_Types].xml'));
+});
+
 test('a query package that says it unpacks past 64 MB is not unpacked', () => {
   const m = 'section Section1;\nshared Q = 1;';
   const zip = zipSync({ 'Formulas/Section1.m': strToU8(m) });
