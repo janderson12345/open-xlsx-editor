@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.2
+
+- **Fix:** filter buttons, note marks and note boxes, and a list rule's button and input message are drawn at their
+  cells again. They were a row heading's width too far left, so a workbook with wide columns had its filter buttons
+  over the headings' text.
+- **Notes.** Show/Hide Note and Show All Notes are saved in the file, as Excel saves them, and Review > Notes > Convert
+  to Comments turns notes into threaded comments.
+- **Security:** a workbook whose parts say they unpack to more than 1 GB is refused before anything is unpacked.
+
 ## 0.8.1
 
 - **Pictures, shapes and icons are drawn** on the grid, in print and in PDF, at Excel's place and size. They can be
