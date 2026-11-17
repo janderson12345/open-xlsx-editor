@@ -2,9 +2,11 @@
 // comments part, its text the author's name in bold ("Avery Chen:") and the note's own text after a line break, both
 // in Tahoma 9; its box a shape in the sheet's VML drawing, hidden until the pointer rests on the cell; the parts,
 // relationships, content types and the sheet's legacyDrawing made when the sheet has none. Deleting a note removes its
-// comment and box (and a threaded comment's thread with it).
+// comment and box (and a threaded comment's thread with it). Show/Hide Note and Show All Notes write a note's shape
+// shown or hidden as Excel saves it (setNoteVisible, setAllNotesVisible).
 import { NS } from './xml.js';
 import { refName } from './refs.js';
+import { readNotes } from './notes.js';
 
 const REL = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
 const THREADED = 'http://schemas.microsoft.com/office/2017/10/relationships/threadedComment';
@@ -127,6 +129,57 @@ export function deleteNote(wb, si, r, c) {
   return found;
 }
 
+
+/** Whether a VML shape is the box of a note (or thread placeholder) on cell (r, c). */
+export const noteShapeAt = (shape, r, c) => /ObjectType="Note"/.test(shape) && new RegExp(`<x:Row>\\s*${r}\\s*</x:Row>`).test(shape) && new RegExp(`<x:Column>\\s*${c}\\s*</x:Column>`).test(shape);
+
+/** A note's VML shape shown always (`on`) or hidden until the pointer rests on its cell, as Excel writes it (measured
+ *  over COM, Comment.Visible: excel-notes-visible.ps1, test/notes-visible-excel.json): shown, `visibility:visible` in
+ *  its style and `<x:Visible/>` after its x:Column, on that line's indent; hidden, `visibility:hidden` and no
+ *  x:Visible, which is the shape Excel had before it was shown. Nothing else of it changes. */
+function shapeShown(shape, on) {
+  const want = on ? 'visible' : 'hidden';
+  let out = /visibility:\s*(?:visible|hidden|inherit|collapse)/.test(shape)
+    ? shape.replace(/visibility:\s*(?:visible|hidden|inherit|collapse)/, `visibility:${want}`)
+    : shape.replace(/(<v:shape\b[^>]*\sstyle=)(['"])([\s\S]*?)\2/, (m, a, q, s) => `${a}${q}${s}${s ? ';' : ''}visibility:${want}${q}`);
+  const has = /<x:Visible\b/.test(out);
+  if (!on && has) out = out.replace(/\s*<x:Visible\s*\/>|\s*<x:Visible>[^<]*<\/x:Visible>/g, '');
+  else if (on && has && !/<x:Visible\s*\/>|<x:Visible>\s*(?:True|1)?\s*<\/x:Visible>/i.test(out)) out = out.replace(/<x:Visible>[^<]*<\/x:Visible>/, '<x:Visible/>');
+  else if (on && !has) {
+    const col = /(\s*)<x:Column>[^<]*<\/x:Column>/.exec(out);
+    out = col ? out.slice(0, col.index + col[0].length) + `${col[1]}<x:Visible/>` + out.slice(col.index + col[0].length) : out.replace(/(\s*)<\/x:ClientData>/, '<x:Visible/>$1</x:ClientData>');
+  }
+  return out;
+}
+
+/** Show/Hide Note: cell (r, c)'s note on sheet si shown always (`on`) or hidden until the pointer rests on its cell,
+ *  written in its VML shape as Excel writes it. False when the cell has no note's shape, or it is so already. */
+export function setNoteVisible(wb, si, r, c, on) {
+  const vml = relOf(wb, wb.sheets[si].path, `${REL}/vmlDrawing`)?.target;
+  const text = vml && wb.pkg.text(vml);
+  if (!text) return false;
+  const next = text.replace(/<v:shape\b[\s\S]*?<\/v:shape>/g, (m) => (noteShapeAt(m, r, c) ? shapeShown(m, on) : m));
+  if (next === text) return false;
+  wb.pkg.setText(vml, next);
+  wb.edited = true;
+  return true;
+}
+
+/** Show All Notes: every note on every sheet shown (`on`) or every one hidden, each written as Show/Hide Note writes
+ *  it. Excel's Show All Notes (Application.DisplayCommentIndicator = xlCommentAndIndicator, measured over COM) saves
+ *  every note shown while it is on, and turning it off hides every note, one shown before too. The threads'
+ *  placeholders are left as they are. Returns how many notes changed. */
+export function setAllNotesVisible(wb, on) {
+  let n = 0;
+  wb.sheets.forEach((_, si) => {
+    for (const [key, note] of readNotes(wb, si)) {
+      if (note.kind !== 'note') continue;
+      const [r, c] = key.split(',').map(Number);
+      if (setNoteVisible(wb, si, r, c, on)) n++;
+    }
+  });
+  return n;
+}
 
 /** The comments part and VML drawing of sheet si, made when it has none (threadedit.js's placeholders go there too). */
 export { notesParts as notesPartsFor };

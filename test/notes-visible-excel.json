@@ -1,0 +1,430 @@
+{
+  "visible": {
+    "seen": {
+      "name": "Sheet1",
+      "notes": [
+        {
+          "cell": "B2",
+          "author": "Signed In",
+          "text": "Shown note",
+          "visible": true
+        },
+        {
+          "cell": "D4",
+          "author": "Signed In",
+          "text": "Hidden note",
+          "visible": false
+        },
+        {
+          "cell": "F6",
+          "author": "Signed In",
+          "text": "Shown then hidden",
+          "visible": false
+        }
+      ],
+      "threads": []
+    },
+    "parts": {
+      "[Content_Types].xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"vml\" ContentType=\"application/vnd.openxmlformats-officedocument.vmlDrawing\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartName=\"/xl/comments1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/></Types>",
+      "xl/_rels/workbook.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/></Relationships>",
+      "xl/worksheets/sheet1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{3F3EB303-A844-44E7-A949-9E94F063C695}\"><dimension ref=\"B2:F6\"/><sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><sheetData><row r=\"2\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/><row r=\"4\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/><row r=\"6\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/></sheetData><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><legacyDrawing r:id=\"rId1\"/></worksheet>",
+      "xl/drawings/vmlDrawing1.vml": "<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"1\"/>\r\n </o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype><v:shape id=\"_x0000_s1025\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:107.25pt;margin-top:7.5pt;width:108pt;height:59.25pt;z-index:1;\r\n  visibility:visible' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    2, 15, 0, 10, 4, 31, 4, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>1</x:Row>\r\n   <x:Column>1</x:Column>\r\n   <x:Visible/>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1026\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:203.25pt;margin-top:37.5pt;width:108pt;height:59.25pt;z-index:2;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    4, 15, 2, 10, 6, 31, 6, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>3</x:Row>\r\n   <x:Column>3</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1027\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:299.25pt;margin-top:67.5pt;width:108pt;height:59.25pt;z-index:3;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    6, 15, 4, 10, 8, 31, 8, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>5</x:Row>\r\n   <x:Column>5</x:Column>\r\n  </x:ClientData>\r\n </v:shape></xml>",
+      "xl/worksheets/_rels/sheet1.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments1.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing\" Target=\"../drawings/vmlDrawing1.vml\"/></Relationships>",
+      "xl/comments1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\"><authors><author>Signed In</author></authors><commentList><comment ref=\"B2\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{943107AB-B723-490E-B36E-07A5737F6A85}\"><text><r><rPr><b/><sz val=\"9\"/><color indexed=\"81\"/><rFont val=\"Tahoma\"/><charset val=\"1\"/></rPr><t>Shown note</t></r></text></comment><comment ref=\"D4\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{B38C9158-8834-47CA-956F-A8866C0CD2C0}\"><text><r><rPr><b/><sz val=\"9\"/><color indexed=\"81\"/><rFont val=\"Tahoma\"/><charset val=\"1\"/></rPr><t>Hidden note</t></r></text></comment><comment ref=\"F6\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{A173A412-CF3A-49C8-B29E-F1658D740373}\"><text><r><rPr><b/><sz val=\"9\"/><color indexed=\"81\"/><rFont val=\"Tahoma\"/><charset val=\"1\"/></rPr><t>Shown then hidden</t></r></text></comment></commentList></comments>"
+    }
+  },
+  "showall": {
+    "during": {
+      "name": "Sheet1",
+      "notes": [
+        {
+          "cell": "B2",
+          "author": "Signed In",
+          "text": "One",
+          "visible": true
+        },
+        {
+          "cell": "D4",
+          "author": "Signed In",
+          "text": "Two",
+          "visible": true
+        },
+        {
+          "cell": "F6",
+          "author": "Signed In",
+          "text": "Shown before",
+          "visible": true
+        }
+      ],
+      "threads": []
+    },
+    "afterPutBack": {
+      "name": "Sheet1",
+      "notes": [
+        {
+          "cell": "B2",
+          "author": "Signed In",
+          "text": "One",
+          "visible": false
+        },
+        {
+          "cell": "D4",
+          "author": "Signed In",
+          "text": "Two",
+          "visible": false
+        },
+        {
+          "cell": "F6",
+          "author": "Signed In",
+          "text": "Shown before",
+          "visible": false
+        }
+      ],
+      "threads": []
+    },
+    "parts": {
+      "[Content_Types].xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"vml\" ContentType=\"application/vnd.openxmlformats-officedocument.vmlDrawing\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartName=\"/xl/comments1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/></Types>",
+      "xl/_rels/workbook.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/></Relationships>",
+      "xl/worksheets/sheet1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{F320EA82-0607-4D84-B794-FA814BE32A4C}\"><dimension ref=\"B2:F6\"/><sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><sheetData><row r=\"2\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/><row r=\"4\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/><row r=\"6\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/></sheetData><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><legacyDrawing r:id=\"rId1\"/></worksheet>",
+      "xl/drawings/vmlDrawing1.vml": "<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"1\"/>\r\n </o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype><v:shape id=\"_x0000_s1025\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:107.25pt;margin-top:7.5pt;width:108pt;height:59.25pt;z-index:1;\r\n  visibility:visible' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    2, 15, 0, 10, 4, 31, 4, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>1</x:Row>\r\n   <x:Column>1</x:Column>\r\n   <x:Visible/>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1026\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:203.25pt;margin-top:37.5pt;width:108pt;height:59.25pt;z-index:2;\r\n  visibility:visible' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    4, 15, 2, 10, 6, 31, 6, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>3</x:Row>\r\n   <x:Column>3</x:Column>\r\n   <x:Visible/>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1027\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:299.25pt;margin-top:67.5pt;width:108pt;height:59.25pt;z-index:3;\r\n  visibility:visible' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    6, 15, 4, 10, 8, 31, 8, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>5</x:Row>\r\n   <x:Column>5</x:Column>\r\n   <x:Visible/>\r\n  </x:ClientData>\r\n </v:shape></xml>",
+      "xl/worksheets/_rels/sheet1.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments1.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing\" Target=\"../drawings/vmlDrawing1.vml\"/></Relationships>",
+      "xl/comments1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\"><authors><author>Signed In</author></authors><commentList><comment ref=\"B2\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{7E499536-8AFC-47C3-9AFF-82564E872972}\"><text><r><rPr><b/><sz val=\"9\"/><color indexed=\"81\"/><rFont val=\"Tahoma\"/><charset val=\"1\"/></rPr><t>One</t></r></text></comment><comment ref=\"D4\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{87AA8D0A-4C7D-40E8-B9E1-EF886CE581CC}\"><text><r><rPr><b/><sz val=\"9\"/><color indexed=\"81\"/><rFont val=\"Tahoma\"/><charset val=\"1\"/></rPr><t>Two</t></r></text></comment><comment ref=\"F6\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{CF9DB13C-CA5C-420E-8CBD-19F13EF1458A}\"><text><r><rPr><b/><sz val=\"9\"/><color indexed=\"81\"/><rFont val=\"Tahoma\"/><charset val=\"1\"/></rPr><t>Shown before</t></r></text></comment></commentList></comments>"
+    }
+  },
+  "convert": {
+    "before": [
+      {
+        "name": "Sheet1",
+        "notes": [
+          {
+            "cell": "B2",
+            "author": "Signed In",
+            "text": "First line\nSecond line",
+            "visible": false
+          },
+          {
+            "cell": "D4",
+            "author": "Signed In",
+            "text": "Shown one",
+            "visible": true
+          }
+        ],
+        "threads": [
+          {
+            "cell": "F6",
+            "items": [
+              {
+                "author": "Signed In",
+                "text": "A thread already",
+                "date": "11/16/2026 22:58:39"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Sheet2",
+        "notes": [
+          {
+            "cell": "C3",
+            "author": "Signed In",
+            "text": "On the second sheet",
+            "visible": false
+          }
+        ],
+        "threads": []
+      }
+    ],
+    "after": [
+      {
+        "name": "Sheet1",
+        "notes": [],
+        "threads": [
+          {
+            "cell": "B2",
+            "items": [
+              {
+                "author": "Signed In",
+                "text": "First line\nSecond line",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "D4",
+            "items": [
+              {
+                "author": "Signed In",
+                "text": "Shown one",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "F6",
+            "items": [
+              {
+                "author": "Signed In",
+                "text": "A thread already",
+                "date": "11/16/2026 22:58:39"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Sheet2",
+        "notes": [],
+        "threads": [
+          {
+            "cell": "C3",
+            "items": [
+              {
+                "author": "Signed In",
+                "text": "On the second sheet",
+                "date": ""
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "ranFrom": "2026-11-16T22:58:39",
+    "ranTo": "2026-11-16T22:58:39",
+    "parts": {
+      "[Content_Types].xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"vml\" ContentType=\"application/vnd.openxmlformats-officedocument.vmlDrawing\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/worksheets/sheet2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartName=\"/xl/comments1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/><Override PartName=\"/xl/threadedComments/threadedComment1.xml\" ContentType=\"application/vnd.ms-excel.threadedcomments+xml\"/><Override PartName=\"/xl/comments2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/><Override PartName=\"/xl/threadedComments/threadedComment2.xml\" ContentType=\"application/vnd.ms-excel.threadedcomments+xml\"/><Override PartName=\"/xl/persons/person.xml\" ContentType=\"application/vnd.ms-excel.person+xml\"/><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/></Types>",
+      "xl/_rels/workbook.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet2.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/><Relationship Id=\"rId5\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/person\" Target=\"persons/person.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/></Relationships>",
+      "xl/worksheets/sheet1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{072EF2E9-11A1-426C-ABEE-C443BB31EAC9}\"><dimension ref=\"B2:F6\"/><sheetViews><sheetView workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><sheetData><row r=\"2\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/><row r=\"4\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/><row r=\"6\" spans=\"2:6\" x14ac:dyDescent=\"0.25\"/></sheetData><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><legacyDrawing r:id=\"rId1\"/></worksheet>",
+      "xl/worksheets/sheet2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{78851753-3615-48D4-8563-C571E6402263}\"><dimension ref=\"C3\"/><sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><sheetData><row r=\"3\" spans=\"3:3\" x14ac:dyDescent=\"0.25\"/></sheetData><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><legacyDrawing r:id=\"rId1\"/></worksheet>",
+      "xl/drawings/vmlDrawing1.vml": "<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"1\"/>\r\n </o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype><v:shape id=\"_x0000_s1027\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:299.25pt;margin-top:67.5pt;width:108pt;height:59.25pt;z-index:1;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    6, 15, 4, 10, 8, 31, 8, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>5</x:Row>\r\n   <x:Column>5</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1028\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:107.25pt;margin-top:7.5pt;width:108pt;height:59.25pt;z-index:2;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    2, 15, 0, 10, 4, 31, 4, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>1</x:Row>\r\n   <x:Column>1</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1029\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:203.25pt;margin-top:37.5pt;width:108pt;height:59.25pt;z-index:3;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    4, 15, 2, 10, 6, 31, 6, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>3</x:Row>\r\n   <x:Column>3</x:Column>\r\n  </x:ClientData>\r\n </v:shape></xml>",
+      "xl/drawings/vmlDrawing2.vml": "<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"2\"/>\r\n </o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype><v:shape id=\"_x0000_s2050\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:155.25pt;margin-top:22.5pt;width:108pt;height:59.25pt;z-index:1;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    3, 15, 1, 10, 5, 31, 5, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>2</x:Row>\r\n   <x:Column>2</x:Column>\r\n  </x:ClientData>\r\n </v:shape></xml>",
+      "xl/worksheets/_rels/sheet1.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/threadedComment\" Target=\"../threadedComments/threadedComment1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments1.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing\" Target=\"../drawings/vmlDrawing1.vml\"/></Relationships>",
+      "xl/worksheets/_rels/sheet2.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/threadedComment\" Target=\"../threadedComments/threadedComment2.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments2.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing\" Target=\"../drawings/vmlDrawing2.vml\"/></Relationships>",
+      "xl/comments1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\"><authors><author>tc={E2381B64-9661-445B-928C-583B0A785D43}</author><author>tc={2282066A-720E-4E41-BA9A-83B77A73B9F5}</author><author>tc={0D6158E2-23C3-4630-B994-3257FC6E4C75}</author></authors><commentList><comment ref=\"B2\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{E2381B64-9661-445B-928C-583B0A785D43}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    First line\r\nSecond line</t></text></comment><comment ref=\"D4\" authorId=\"1\" shapeId=\"0\" xr:uid=\"{2282066A-720E-4E41-BA9A-83B77A73B9F5}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    Shown one</t></text></comment><comment ref=\"F6\" authorId=\"2\" shapeId=\"0\" xr:uid=\"{0D6158E2-23C3-4630-B994-3257FC6E4C75}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    A thread already</t></text></comment></commentList></comments>",
+      "xl/threadedComments/threadedComment1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<ThreadedComments xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\" xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><threadedComment ref=\"B2\" personId=\"{2E8BEA31-3A79-4267-916D-3AED6AF6D620}\" id=\"{E2381B64-9661-445B-928C-583B0A785D43}\"><text>First line\r\nSecond line</text></threadedComment><threadedComment ref=\"D4\" personId=\"{2E8BEA31-3A79-4267-916D-3AED6AF6D620}\" id=\"{2282066A-720E-4E41-BA9A-83B77A73B9F5}\"><text>Shown one</text></threadedComment><threadedComment ref=\"F6\" dT=\"2026-11-17T03:58:39.13\" personId=\"{83891BED-A059-4240-BA17-D24CB183EBAD}\" id=\"{0D6158E2-23C3-4630-B994-3257FC6E4C75}\"><text>A thread already</text></threadedComment></ThreadedComments>",
+      "xl/comments2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\"><authors><author>tc={7C81C93E-E906-4CB1-9617-AEF321692261}</author></authors><commentList><comment ref=\"C3\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{7C81C93E-E906-4CB1-9617-AEF321692261}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    On the second sheet</t></text></comment></commentList></comments>",
+      "xl/threadedComments/threadedComment2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<ThreadedComments xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\" xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><threadedComment ref=\"C3\" personId=\"{2E8BEA31-3A79-4267-916D-3AED6AF6D620}\" id=\"{7C81C93E-E906-4CB1-9617-AEF321692261}\"><text>On the second sheet</text></threadedComment></ThreadedComments>",
+      "xl/persons/person.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<personList xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\" xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><person displayName=\"Signed In\" id=\"{2E8BEA31-3A79-4267-916D-3AED6AF6D620}\" userId=\"Signed In\" providerId=\"None\"/><person displayName=\"Signed In\" id=\"{83891BED-A059-4240-BA17-D24CB183EBAD}\" userId=\"signed.in@example.com\" providerId=\"AD\"/></personList>"
+    }
+  },
+  "ours": {
+    "before": [
+      {
+        "name": "Notes",
+        "notes": [
+          {
+            "cell": "B2",
+            "author": "Avery Chen",
+            "text": "Avery Chen:\nCheck this total",
+            "visible": false
+          },
+          {
+            "cell": "G2",
+            "author": "Avery Chen",
+            "text": "Important:\nbold first line",
+            "visible": false
+          },
+          {
+            "cell": "D4",
+            "author": "Avery Chen",
+            "text": "Avery Chen:\nFirst line\nSecond line",
+            "visible": false
+          },
+          {
+            "cell": "G4",
+            "author": "Avery Chen",
+            "text": "Avery Chen:\nplain name",
+            "visible": false
+          },
+          {
+            "cell": "A6",
+            "author": "Sam Rivera",
+            "text": "Sam Rivera:\nA new one",
+            "visible": false
+          },
+          {
+            "cell": "G6",
+            "author": "Avery Chen",
+            "text": "Sam Rivera:\nanother name",
+            "visible": false
+          },
+          {
+            "cell": "F8",
+            "author": "Sam Rivera",
+            "text": "No name here",
+            "visible": false
+          },
+          {
+            "cell": "G8",
+            "author": "",
+            "text": "no author",
+            "visible": false
+          }
+        ],
+        "threads": [
+          {
+            "cell": "C3",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "Is this the right total?",
+                "date": "01/01/2026 04:30:00"
+              },
+              {
+                "author": "Sam Rivera",
+                "text": "Yes, checked against the invoice.",
+                "date": "01/02/2026 09:05:00"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Second",
+        "notes": [
+          {
+            "cell": "B3",
+            "author": "Sam Rivera",
+            "text": "Sam Rivera:\nOn the second sheet",
+            "visible": false
+          }
+        ],
+        "threads": []
+      }
+    ],
+    "after": [
+      {
+        "name": "Notes",
+        "notes": [],
+        "threads": [
+          {
+            "cell": "B2",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "Check this total",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "G2",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "Important:\nbold first line",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "C3",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "Is this the right total?",
+                "date": "01/01/2026 04:30:00"
+              },
+              {
+                "author": "Sam Rivera",
+                "text": "Yes, checked against the invoice.",
+                "date": "01/02/2026 09:05:00"
+              }
+            ]
+          },
+          {
+            "cell": "D4",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "First line\nSecond line",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "G4",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "plain name",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "A6",
+            "items": [
+              {
+                "author": "Sam Rivera",
+                "text": "A new one",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "G6",
+            "items": [
+              {
+                "author": "Avery Chen",
+                "text": "Sam Rivera:\nanother name",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "F8",
+            "items": [
+              {
+                "author": "Sam Rivera",
+                "text": "No name here",
+                "date": ""
+              }
+            ]
+          },
+          {
+            "cell": "G8",
+            "items": [
+              {
+                "author": "Author",
+                "text": "no author",
+                "date": ""
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Second",
+        "notes": [],
+        "threads": [
+          {
+            "cell": "B3",
+            "items": [
+              {
+                "author": "Sam Rivera",
+                "text": "On the second sheet",
+                "date": ""
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "parts": {
+      "[Content_Types].xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\"/><Default Extension=\"vml\" ContentType=\"application/vnd.openxmlformats-officedocument.vmlDrawing\"/><Default Extension=\"xml\" ContentType=\"application/xml\"/><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/worksheets/sheet2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/><Override PartName=\"/xl/theme/theme1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.theme+xml\"/><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/><Override PartName=\"/xl/sharedStrings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\"/><Override PartName=\"/xl/comments1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/><Override PartName=\"/xl/threadedComments/threadedComment1.xml\" ContentType=\"application/vnd.ms-excel.threadedcomments+xml\"/><Override PartName=\"/xl/comments2.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml\"/><Override PartName=\"/xl/threadedComments/threadedComment2.xml\" ContentType=\"application/vnd.ms-excel.threadedcomments+xml\"/><Override PartName=\"/xl/persons/person.xml\" ContentType=\"application/vnd.ms-excel.person+xml\"/><Override PartName=\"/docProps/core.xml\" ContentType=\"application/vnd.openxmlformats-package.core-properties+xml\"/><Override PartName=\"/docProps/app.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.extended-properties+xml\"/></Types>",
+      "xl/_rels/workbook.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme\" Target=\"theme/theme1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet2.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/><Relationship Id=\"rId6\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/person\" Target=\"persons/person.xml\"/><Relationship Id=\"rId5\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings\" Target=\"sharedStrings.xml\"/><Relationship Id=\"rId4\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/></Relationships>",
+      "xl/worksheets/sheet1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{00000000-0001-0000-0000-000000000000}\"><dimension ref=\"A1:G8\"/><sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><sheetData><row r=\"1\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"><c r=\"A1\" t=\"s\"><v>0</v></c><c r=\"B1\" t=\"s\"><v>1</v></c></row><row r=\"2\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"><c r=\"A2\" t=\"s\"><v>2</v></c><c r=\"B2\"><v>12</v></c></row><row r=\"3\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"><c r=\"A3\" t=\"s\"><v>3</v></c><c r=\"C3\"><v>30</v></c></row><row r=\"4\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"><c r=\"A4\" t=\"s\"><v>4</v></c><c r=\"D4\"><v>7</v></c></row><row r=\"5\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"><c r=\"A5\" t=\"s\"><v>5</v></c><c r=\"B5\"><v>1</v></c></row><row r=\"6\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"/><row r=\"8\" spans=\"1:7\" x14ac:dyDescent=\"0.25\"/></sheetData><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><legacyDrawing r:id=\"rId1\"/></worksheet>",
+      "xl/worksheets/sheet2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:xdr=\"http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac xr xr2 xr3\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\" xmlns:xr2=\"http://schemas.microsoft.com/office/spreadsheetml/2015/revision2\" xmlns:xr3=\"http://schemas.microsoft.com/office/spreadsheetml/2016/revision3\" xr:uid=\"{00000000-0001-0000-0100-000000000000}\"><dimension ref=\"B3\"/><sheetViews><sheetView workbookViewId=\"0\"/></sheetViews><sheetFormatPr defaultRowHeight=\"15\" x14ac:dyDescent=\"0.25\"/><sheetData><row r=\"3\" spans=\"2:2\" x14ac:dyDescent=\"0.25\"/></sheetData><pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/><legacyDrawing r:id=\"rId1\"/></worksheet>",
+      "xl/drawings/vmlDrawing1.vml": "<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"1\"/>\r\n </o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype><v:shape id=\"_x0000_s1026\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:155.25pt;margin-top:37.5pt;width:252pt;height:299.25pt;z-index:1;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    3, 15, 2, 10, 8, 31, 22, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>2</x:Row>\r\n   <x:Column>2</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1034\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:107.25pt;margin-top:7.5pt;width:108pt;height:59.25pt;z-index:2;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    2, 15, 0, 10, 4, 31, 4, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>1</x:Row>\r\n   <x:Column>1</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1035\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:347.25pt;margin-top:7.5pt;width:108pt;height:59.25pt;z-index:3;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    7, 15, 0, 10, 9, 31, 4, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>1</x:Row>\r\n   <x:Column>6</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1036\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:203.25pt;margin-top:37.5pt;width:108pt;height:59.25pt;z-index:4;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    4, 15, 2, 10, 6, 31, 6, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>3</x:Row>\r\n   <x:Column>3</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1037\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:347.25pt;margin-top:37.5pt;width:108pt;height:59.25pt;z-index:5;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    7, 15, 2, 10, 9, 31, 6, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>3</x:Row>\r\n   <x:Column>6</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1038\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:59.25pt;margin-top:67.5pt;width:108pt;height:59.25pt;z-index:6;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    1, 15, 4, 10, 3, 31, 8, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>5</x:Row>\r\n   <x:Column>0</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1039\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:347.25pt;margin-top:67.5pt;width:108pt;height:59.25pt;z-index:7;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    7, 15, 4, 10, 9, 31, 8, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>5</x:Row>\r\n   <x:Column>6</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1040\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:299.25pt;margin-top:97.5pt;width:108pt;height:59.25pt;z-index:8;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    6, 15, 6, 10, 8, 31, 10, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>7</x:Row>\r\n   <x:Column>5</x:Column>\r\n  </x:ClientData>\r\n </v:shape><v:shape id=\"_x0000_s1041\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:347.25pt;margin-top:97.5pt;width:108pt;height:59.25pt;z-index:9;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    7, 15, 6, 10, 9, 31, 10, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>7</x:Row>\r\n   <x:Column>6</x:Column>\r\n  </x:ClientData>\r\n </v:shape></xml>",
+      "xl/drawings/vmlDrawing2.vml": "<xml xmlns:v=\"urn:schemas-microsoft-com:vml\"\r\n xmlns:o=\"urn:schemas-microsoft-com:office:office\"\r\n xmlns:x=\"urn:schemas-microsoft-com:office:excel\">\r\n <o:shapelayout v:ext=\"edit\">\r\n  <o:idmap v:ext=\"edit\" data=\"2\"/>\r\n </o:shapelayout><v:shapetype id=\"_x0000_t202\" coordsize=\"21600,21600\" o:spt=\"202\"\r\n  path=\"m,l,21600r21600,l21600,xe\">\r\n  <v:stroke joinstyle=\"miter\"/>\r\n  <v:path gradientshapeok=\"t\" o:connecttype=\"rect\"/>\r\n </v:shapetype><v:shape id=\"_x0000_s2050\" type=\"#_x0000_t202\" style='position:absolute;\r\n  margin-left:107.25pt;margin-top:22.5pt;width:108pt;height:59.25pt;z-index:1;\r\n  visibility:hidden' fillcolor=\"infoBackground [80]\" strokecolor=\"none [81]\"\r\n  o:insetmode=\"auto\">\r\n  <v:fill color2=\"infoBackground [80]\"/>\r\n  <v:shadow color=\"none [81]\" obscured=\"t\"/>\r\n  <v:path o:connecttype=\"none\"/>\r\n  <v:textbox style='mso-direction-alt:auto'>\r\n   <div style='text-align:left'></div>\r\n  </v:textbox>\r\n  <x:ClientData ObjectType=\"Note\">\r\n   <x:MoveWithCells/>\r\n   <x:SizeWithCells/>\r\n   <x:Anchor>\r\n    2, 15, 1, 10, 4, 31, 5, 9</x:Anchor>\r\n   <x:AutoFill>False</x:AutoFill>\r\n   <x:Row>2</x:Row>\r\n   <x:Column>1</x:Column>\r\n  </x:ClientData>\r\n </v:shape></xml>",
+      "xl/worksheets/_rels/sheet1.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/threadedComment\" Target=\"../threadedComments/threadedComment1.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments1.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing\" Target=\"../drawings/vmlDrawing1.vml\"/></Relationships>",
+      "xl/worksheets/_rels/sheet2.xml.rels": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<Relationships xmlns=\"http://schemas.openxmlformats.org/package/2006/relationships\"><Relationship Id=\"rId3\" Type=\"http://schemas.microsoft.com/office/2017/10/relationships/threadedComment\" Target=\"../threadedComments/threadedComment2.xml\"/><Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments\" Target=\"../comments2.xml\"/><Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing\" Target=\"../drawings/vmlDrawing2.vml\"/></Relationships>",
+      "xl/comments1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\"><authors><author>tc={657F9AF8-CC40-460F-B41C-A0785A39F232}</author><author>tc={6AD05E8C-890C-4AFD-AB0D-0D82D4C5EA9C}</author><author>tc={6F1D3C2A-0B4E-4D7A-9C1E-2A3B4C5D6E7F}</author><author>tc={15350323-5B42-49E0-9A52-4A4CB456B9C5}</author><author>tc={0A712083-A437-4DC7-935D-0903735711FA}</author><author>tc={308607B0-7C79-4B71-BFA9-19AA20B018E6}</author><author>tc={10363BD3-6346-4EEA-A87D-71A97D7E1CE3}</author><author>tc={5C326455-A16D-4298-BD59-18230F789EF0}</author><author>tc={3694F408-5A3D-40C8-A634-DD03D1B772DF}</author></authors><commentList><comment ref=\"B2\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{657F9AF8-CC40-460F-B41C-A0785A39F232}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    Check this total</t></text></comment><comment ref=\"G2\" authorId=\"1\" shapeId=\"0\" xr:uid=\"{6AD05E8C-890C-4AFD-AB0D-0D82D4C5EA9C}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    Important:\r\nbold first line</t></text></comment><comment ref=\"C3\" authorId=\"2\" shapeId=\"0\" xr:uid=\"{00000000-0006-0000-0000-000002000000}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    Is this the right total?\r\nReply:\r\n    Yes, checked against the invoice.</t></text></comment><comment ref=\"D4\" authorId=\"3\" shapeId=\"0\" xr:uid=\"{15350323-5B42-49E0-9A52-4A4CB456B9C5}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    First line\r\nSecond line</t></text></comment><comment ref=\"G4\" authorId=\"4\" shapeId=\"0\" xr:uid=\"{0A712083-A437-4DC7-935D-0903735711FA}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    plain name</t></text></comment><comment ref=\"A6\" authorId=\"5\" shapeId=\"0\" xr:uid=\"{308607B0-7C79-4B71-BFA9-19AA20B018E6}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    A new one</t></text></comment><comment ref=\"G6\" authorId=\"6\" shapeId=\"0\" xr:uid=\"{10363BD3-6346-4EEA-A87D-71A97D7E1CE3}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    Sam Rivera:\r\nanother name</t></text></comment><comment ref=\"F8\" authorId=\"7\" shapeId=\"0\" xr:uid=\"{5C326455-A16D-4298-BD59-18230F789EF0}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    No name here</t></text></comment><comment ref=\"G8\" authorId=\"8\" shapeId=\"0\" xr:uid=\"{3694F408-5A3D-40C8-A634-DD03D1B772DF}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    no author</t></text></comment></commentList></comments>",
+      "xl/threadedComments/threadedComment1.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<ThreadedComments xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\" xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><threadedComment ref=\"B2\" personId=\"{8CDDD5E0-A7CD-497D-80F1-609B0CA33A7E}\" id=\"{657F9AF8-CC40-460F-B41C-A0785A39F232}\"><text>Check this total</text></threadedComment><threadedComment ref=\"G2\" personId=\"{8CDDD5E0-A7CD-497D-80F1-609B0CA33A7E}\" id=\"{6AD05E8C-890C-4AFD-AB0D-0D82D4C5EA9C}\"><text>Important:\r\nbold first line</text></threadedComment><threadedComment ref=\"C3\" dT=\"2026-01-01T09:30:00.00\" personId=\"{1A2B3C4D-5E6F-4A1B-8C2D-3E4F5A6B7C8D}\" id=\"{6F1D3C2A-0B4E-4D7A-9C1E-2A3B4C5D6E7F}\"><text>Is this the right total?</text></threadedComment><threadedComment ref=\"C3\" dT=\"2026-01-02T14:05:00.00\" personId=\"{9F8E7D6C-5B4A-4C3D-8E2F-1A0B9C8D7E6F}\" id=\"{2B3C4D5E-6F7A-4B8C-9D0E-1F2A3B4C5D6E}\" parentId=\"{6F1D3C2A-0B4E-4D7A-9C1E-2A3B4C5D6E7F}\"><text>Yes, checked against the invoice.</text></threadedComment><threadedComment ref=\"D4\" personId=\"{8CDDD5E0-A7CD-497D-80F1-609B0CA33A7E}\" id=\"{15350323-5B42-49E0-9A52-4A4CB456B9C5}\"><text>First line\r\nSecond line</text></threadedComment><threadedComment ref=\"G4\" personId=\"{8CDDD5E0-A7CD-497D-80F1-609B0CA33A7E}\" id=\"{0A712083-A437-4DC7-935D-0903735711FA}\"><text>plain name</text></threadedComment><threadedComment ref=\"A6\" personId=\"{25A3DDCD-0D5E-4E54-8FD2-CF8894589F9C}\" id=\"{308607B0-7C79-4B71-BFA9-19AA20B018E6}\"><text>A new one</text></threadedComment><threadedComment ref=\"G6\" personId=\"{8CDDD5E0-A7CD-497D-80F1-609B0CA33A7E}\" id=\"{10363BD3-6346-4EEA-A87D-71A97D7E1CE3}\"><text>Sam Rivera:\r\nanother name</text></threadedComment><threadedComment ref=\"F8\" personId=\"{25A3DDCD-0D5E-4E54-8FD2-CF8894589F9C}\" id=\"{5C326455-A16D-4298-BD59-18230F789EF0}\"><text>No name here</text></threadedComment><threadedComment ref=\"G8\" personId=\"{00000000-0000-0000-0000-000000000000}\" id=\"{3694F408-5A3D-40C8-A634-DD03D1B772DF}\"><text>no author</text></threadedComment></ThreadedComments>",
+      "xl/comments2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<comments xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"xr\" xmlns:xr=\"http://schemas.microsoft.com/office/spreadsheetml/2014/revision\"><authors><author>tc={34108FFC-53F6-4DC9-BA7C-762BA5C703A1}</author></authors><commentList><comment ref=\"B3\" authorId=\"0\" shapeId=\"0\" xr:uid=\"{34108FFC-53F6-4DC9-BA7C-762BA5C703A1}\"><text><t>[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\nComment:\r\n    On the second sheet</t></text></comment></commentList></comments>",
+      "xl/threadedComments/threadedComment2.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<ThreadedComments xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\" xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><threadedComment ref=\"B3\" personId=\"{25A3DDCD-0D5E-4E54-8FD2-CF8894589F9C}\" id=\"{34108FFC-53F6-4DC9-BA7C-762BA5C703A1}\"><text>On the second sheet</text></threadedComment></ThreadedComments>",
+      "xl/persons/person.xml": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n<personList xmlns=\"http://schemas.microsoft.com/office/spreadsheetml/2018/threadedcomments\" xmlns:x=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\"><person displayName=\"Avery Chen\" id=\"{8CDDD5E0-A7CD-497D-80F1-609B0CA33A7E}\" userId=\"Avery Chen\" providerId=\"None\"/><person displayName=\"Sam Rivera\" id=\"{25A3DDCD-0D5E-4E54-8FD2-CF8894589F9C}\" userId=\"Sam Rivera\" providerId=\"None\"/><person displayName=\"Sam Rivera\" id=\"{9F8E7D6C-5B4A-4C3D-8E2F-1A0B9C8D7E6F}\" userId=\"sam@example.com\" providerId=\"None\"/><person displayName=\"Avery Chen\" id=\"{1A2B3C4D-5E6F-4A1B-8C2D-3E4F5A6B7C8D}\" userId=\"avery@example.com\" providerId=\"None\"/></personList>"
+    }
+  }
+}

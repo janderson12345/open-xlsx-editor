@@ -19,7 +19,7 @@ const XR = 'xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/200
 export const PLACEHOLDER = '[Threaded comment]\r\n\r\nYour version of Excel allows you to read this threaded comment; however, any edits to it will get removed if the file is opened in a newer version of Excel. Learn more: https://go.microsoft.com/fwlink/?linkid=870924\r\n\r\n';
 
 /** Line breaks as Excel keeps them in comments: CR LF. */
-const crlf = (s) => String(s).replace(/\r?\n/g, '\r\n');
+export const crlf = (s) => String(s).replace(/\r?\n/g, '\r\n');
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const unesc = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
 const hex = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16).toUpperCase()).join('');
@@ -45,13 +45,7 @@ function personId(wb, who, mentioned = false) {
   // (Excel gave the mentioned person PeoplePicker whatever provider the file had for them: AD became PeoplePicker.)
   const providerId = mentioned ? 'PeoplePicker' : given.providerId || 'None';
   const pkg = wb.pkg;
-  let path = pkg.rels.find((r) => r.type === PERSON)?.target;
-  if (!path) {
-    path = 'xl/persons/person.xml';
-    pkg.setText(path, `${DECL}<personList xmlns="${TC_NS}" xmlns:x="${NS.x}"></personList>`);
-    pkg.addOverride(path, CT_PERSONS);
-    pkg.addRel(PERSON, 'persons/person.xml');
-  }
+  const path = personsPart(wb);
   const text = pkg.text(path);
   const picked = (el) => /\sproviderId="PeoplePicker"/.test(el);
   const found = [...text.matchAll(/<person\b[^>]*>/g)].find((m) => unesc(/displayName="([^"]*)"/.exec(m[0])?.[1] || '') === name && picked(m[0]) === (providerId === 'PeoplePicker'));
@@ -64,6 +58,19 @@ function personId(wb, who, mentioned = false) {
   if (after) pkg.setText(path, text.slice(0, after.index) + person + text.slice(after.index));
   else pkg.setText(path, /<personList\b[^>]*\/>/.test(text) ? text.replace(/<personList\b([^>]*)\/>/, `<personList$1>${person}</personList>`) : text.replace('</personList>', `${person}</personList>`));
   return id;
+}
+
+/** The workbook's persons part, made (empty) with its relationship and content type when it has none. */
+export function personsPart(wb) {
+  const pkg = wb.pkg;
+  let path = pkg.rels.find((r) => r.type === PERSON)?.target;
+  if (!path) {
+    path = 'xl/persons/person.xml';
+    pkg.setText(path, `${DECL}<personList xmlns="${TC_NS}" xmlns:x="${NS.x}"></personList>`);
+    pkg.addOverride(path, CT_PERSONS);
+    pkg.addRel(PERSON, 'persons/person.xml');
+  }
+  return path;
 }
 
 /** The workbook's people (its persons part): [{ id, name, userId, providerId }], for @mentions. */
@@ -97,7 +104,7 @@ function textAndMentions(wb, text, mentions = []) {
 }
 
 /** Sheet si's threadedComments part, made (empty) with its relationship when it has none. */
-function threadsPart(wb, si) {
+export function threadsPart(wb, si) {
   const pkg = wb.pkg;
   const sheet = wb.sheets[si].path;
   const have = relOf(pkg, sheet, THREADED)?.target;
@@ -120,7 +127,7 @@ function threadAt(xml, ref) {
 }
 
 /** The placeholder note of a thread for older versions of Excel: every comment and reply, indented. */
-function placeholderText(items) {
+export function placeholderText(items) {
   return PLACEHOLDER + items.map((x, i) => `${i ? 'Reply' : 'Comment'}:\r\n    ${crlf(x.text)}`).join('\r\n');
 }
 
@@ -150,14 +157,19 @@ function writePlaceholder(wb, si, r, c, top, items) {
     const block = Number(/<o:idmap\b[^>]*\sdata="(\d+)/.exec(shapes)?.[1] || 1);
     const ids = [...shapes.matchAll(/<v:shape\b[^>]*\sid="_x0000_s(\d+)"/g)].map((m) => Number(m[1]));
     const id = Math.max(block * 1024, ...ids) + 1;
-    const top0 = Math.max(0, r - 1);
-    // (Excel's box for B2 at 107.25pt, 7.5pt; for F6 at 299.25pt, 67.5pt: 48pt a column, 15pt a row of the defaults.)
-    const shape = `<v:shape id="_x0000_s${id}" type="#_x0000_t202" style='position:absolute;margin-left:${59.25 + c * 48}pt;margin-top:${Math.max(0, r * 15 - 7.5)}pt;width:108pt;height:59.25pt;z-index:${ids.length + 1};visibility:hidden' fillcolor="infoBackground [80]" strokecolor="none [81]" o:insetmode="auto">` +
-      `<v:fill color2="infoBackground [80]"/><v:shadow color="none [81]" obscured="t"/><v:path o:connecttype="none"/><v:textbox style='mso-direction-alt:auto'><div style='text-align:left'></div></v:textbox>` +
-      `<x:ClientData ObjectType="Note"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>${c + 1}, 15, ${top0}, 10, ${c + 3}, 31, ${top0 + 4}, 9</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>${r}</x:Row><x:Column>${c}</x:Column></x:ClientData></v:shape>`;
-    shapes = shapes.replace(/<\/xml>\s*$/, `${shape}</xml>`);
+    shapes = shapes.replace(/<\/xml>\s*$/, () => `${placeholderShape(id, ids.length + 1, r, c)}</xml>`);
     pkg.setText(vml, shapes);
   }
+}
+
+/** A thread placeholder's hidden box in the VML drawing: shape id `id`, z-index `z`, at Excel's place for a new
+ *  thread's on cell (r, c), a column right, three wide, four tall. */
+export function placeholderShape(id, z, r, c) {
+  const top0 = Math.max(0, r - 1);
+  // (Excel's box for B2 at 107.25pt, 7.5pt; for F6 at 299.25pt, 67.5pt: 48pt a column, 15pt a row of the defaults.)
+  return `<v:shape id="_x0000_s${id}" type="#_x0000_t202" style='position:absolute;margin-left:${59.25 + c * 48}pt;margin-top:${Math.max(0, r * 15 - 7.5)}pt;width:108pt;height:59.25pt;z-index:${z};visibility:hidden' fillcolor="infoBackground [80]" strokecolor="none [81]" o:insetmode="auto">` +
+    `<v:fill color2="infoBackground [80]"/><v:shadow color="none [81]" obscured="t"/><v:path o:connecttype="none"/><v:textbox style='mso-direction-alt:auto'><div style='text-align:left'></div></v:textbox>` +
+    `<x:ClientData ObjectType="Note"><x:MoveWithCells/><x:SizeWithCells/><x:Anchor>${c + 1}, 15, ${top0}, 10, ${c + 3}, 31, ${top0 + 4}, 9</x:Anchor><x:AutoFill>False</x:AutoFill><x:Row>${r}</x:Row><x:Column>${c}</x:Column></x:ClientData></v:shape>`;
 }
 
 /** A new thread on cell (r, c) of sheet si by `author` (Review > New Comment). Refused when the cell has a note or a
