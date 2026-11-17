@@ -16,7 +16,7 @@
 // A protected sheet's notes stay (Excel's ConvertComments left them, the other sheets converted).
 import { readNotes } from './notes.js';
 import { refName, parseRef } from './refs.js';
-import { notesPartsFor, noteShapeAt } from './noteedit.js';
+import { notesPartsFor, noteShapeCell } from './noteedit.js';
 import { newGuid, crlf, placeholderText, placeholderShape, threadsPart, personsPart } from './threadedit.js';
 
 const XR = 'xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="xr" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision"';
@@ -87,7 +87,8 @@ export function convertNotes(wb, { skip = () => false } = {}) {
     let tx = pkg.text(threads);
     for (const m of made) {
       const tops = [...tx.matchAll(/<threadedComment\b[^>]*>/g)].filter((t) => !/\sparentId="/.test(t[0])).map((t) => ({ index: t.index, ref: /\sref="([^"]+)"/.exec(t[0])?.[1] }));
-      const el = `<threadedComment ref="${m.ref}" personId="${m.person}" id="${m.id}"><text>${textXml(crlf(m.text))}</text></threadedComment>`;
+      // (The person's id may be the workbook's own, read from its persons part: escaped again, as any text from a file.)
+      const el = `<threadedComment ref="${m.ref}" personId="${esc(m.person)}" id="${m.id}"><text>${textXml(crlf(m.text))}</text></threadedComment>`;
       tx = insertByCell(tx, tops, el, m.ref, '</ThreadedComments>', 'ThreadedComments');
     }
     pkg.setText(threads, tx);
@@ -108,7 +109,8 @@ export function convertNotes(wb, { skip = () => false } = {}) {
     let vx = pkg.text(vml);
     const block = Number(/<o:idmap\b[^>]*\sdata="(\d+)/.exec(vx)?.[1] || 1);
     let id = Math.max(block * 1024, ...[...vx.matchAll(/<v:shape\b[^>]*\sid="_x0000_s(\d+)"/g)].map((t) => Number(t[1])));
-    vx = vx.replace(/<v:shape\b[\s\S]*?<\/v:shape>/g, (s) => (made.some((m) => noteShapeAt(s, m.r, m.c)) ? '' : s));
+    const gone = new Set(made.map((m) => `${m.r},${m.c}`));
+    vx = vx.replace(/<v:shape\b[\s\S]*?<\/v:shape>/g, (s) => (gone.has(noteShapeCell(s)) ? '' : s));
     const boxes = made.map((m) => placeholderShape(++id, 0, m.r, m.c)).join('');
     vx = vx.replace(/<\/xml>\s*$/, () => `${boxes}</xml>`);
     let z = 0;

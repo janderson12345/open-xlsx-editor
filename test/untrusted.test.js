@@ -104,6 +104,27 @@ test('a workbook whose parts say they unpack past 1 GB is refused before anythin
   assert.ok(OpcPackage.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx'))).has('[Content_Types].xml'));
 });
 
+test('Convert to Comments writes a person id from the file escaped, as one attribute', async () => {
+  const { readNotes } = await import('../src/ooxml/notes.js');
+  const { convertNotes } = await import('../src/ooxml/noteconvert.js');
+  const { personsPart, threadsPart } = await import('../src/ooxml/threadedit.js');
+  const { parseXml } = await import('../src/ooxml/xml.js');
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/notes.xlsx')));
+  const author = [...readNotes(wb, 0).values()].find((n) => n.kind === 'note' && n.author)?.author;
+  assert.ok(author, 'the fixture has a note with an author');
+  // (The workbook's own person for that author, its id crafted to end the attribute and add one.)
+  const path = personsPart(wb);
+  const name = author.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  wb.pkg.setText(path, wb.pkg.text(path).replace(/<\/personList>/, `<person displayName="${name}" id="x&quot; evil=&quot;1" userId="${name}" providerId="None"/></personList>`));
+  assert.ok(convertNotes(wb) > 0);
+  const xml = wb.pkg.text(threadsPart(wb, 0));
+  const doc = parseXml(xml);
+  const threads = [...doc.getElementsByTagName('threadedComment')];
+  assert.ok(threads.length > 0);
+  for (const t of threads) assert.equal(t.hasAttribute('evil'), false);
+  assert.ok(threads.some((t) => t.getAttribute('personId') === 'x" evil="1'));
+});
+
 test('a query package that says it unpacks past 64 MB is not unpacked', () => {
   const m = 'section Section1;\nshared Q = 1;';
   const zip = zipSync({ 'Formulas/Section1.m': strToU8(m) });

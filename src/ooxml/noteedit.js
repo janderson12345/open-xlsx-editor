@@ -172,13 +172,30 @@ export function setNoteVisible(wb, si, r, c, on) {
 export function setAllNotesVisible(wb, on) {
   let n = 0;
   wb.sheets.forEach((_, si) => {
-    for (const [key, note] of readNotes(wb, si)) {
-      if (note.kind !== 'note') continue;
-      const [r, c] = key.split(',').map(Number);
-      if (setNoteVisible(wb, si, r, c, on)) n++;
-    }
+    // (One pass over the drawing's shapes for all the sheet's notes, not one a note: a sheet of thousands stays quick.)
+    const cells = new Set([...readNotes(wb, si)].filter(([, note]) => note.kind === 'note').map(([key]) => key));
+    if (!cells.size) return;
+    const vml = relOf(wb, wb.sheets[si].path, `${REL}/vmlDrawing`)?.target;
+    const text = vml && wb.pkg.text(vml);
+    if (!text) return;
+    const next = text.replace(/<v:shape\b[\s\S]*?<\/v:shape>/g, (m) => {
+      const key = noteShapeCell(m);
+      if (!key || !cells.has(key)) return m;
+      const s = shapeShown(m, on);
+      if (s !== m) n++;
+      return s;
+    });
+    if (next !== text) { wb.pkg.setText(vml, next); wb.edited = true; }
   });
   return n;
+}
+
+/** The "r,c" of the cell a VML shape is the note (or thread placeholder) box of, or null. */
+export function noteShapeCell(shape) {
+  if (!/ObjectType="Note"/.test(shape)) return null;
+  const r = /<x:Row>\s*(\d+)\s*<\/x:Row>/.exec(shape);
+  const c = /<x:Column>\s*(\d+)\s*<\/x:Column>/.exec(shape);
+  return r && c ? `${Number(r[1])},${Number(c[1])}` : null;
 }
 
 /** The comments part and VML drawing of sheet si, made when it has none (threadedit.js's placeholders go there too). */
