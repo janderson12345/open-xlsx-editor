@@ -1910,7 +1910,8 @@
 }
 .oxe-filter-btn {
   position: absolute;
-  left: var(--oxe-x);
+  /* (Past the row headings, as everything over the cells: --oxe-x is from column A's left edge; 0 in the left panes.) */
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
   top: var(--oxe-y);
   width: 16px;
   height: 16px;
@@ -1981,7 +1982,7 @@
 }
 .oxe-note-mark {
   position: absolute;
-  left: calc(var(--oxe-x) - 6px);
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x) - 6px);
   top: var(--oxe-y);
   width: 0;
   height: 0;
@@ -1999,7 +2000,7 @@
 .oxe-note-box.oxe-note-sized { width: var(--oxe-nw); height: var(--oxe-nh); overflow: hidden; }
 .oxe-note-box {
   position: absolute;
-  left: var(--oxe-x);
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
   top: var(--oxe-y);
   width: 200px;
   box-sizing: border-box;
@@ -2225,7 +2226,7 @@
 }
 .oxe-dv-btn {
   position: absolute;
-  left: var(--oxe-x);
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
   top: var(--oxe-y);
   width: 17px;
   height: var(--oxe-h);
@@ -2238,7 +2239,7 @@
 }
 .oxe-dv-prompt {
   position: absolute;
-  left: var(--oxe-x);
+  left: calc(var(--oxe-rowhead-w) + var(--oxe-x));
   top: var(--oxe-y);
   max-width: 220px;
   padding: 4px 6px;
