@@ -1,7 +1,7 @@
 # Notes and comments
 
 How notes and threaded comments are shown (`src/ooxml/notes.js` reads them, `src/editor/notemarks.js` shows them).
-They are read only: their parts are saved byte for byte.
+What isn't changed here is saved byte for byte; how each change is written is below.
 
 ## How Excel 365 stores them
 
@@ -24,7 +24,8 @@ reply from Sam Rivera).
 - A small red triangle in the top-right corner of a cell with a note; a purple one for a comment thread, as Excel
   marks them.
 - Resting the pointer on the cell shows the note beside it (the author in bold, on Excel's yellow), or the thread:
-  each person's name, the date and the text. Show/Hide Note (the cell's menu, Review > Notes) keeps it open.
+  each person's name, the date and the text. Show/Hide Note (the cell's menu, Review > Notes) keeps a note's box
+  shown, saved in the file (below); a thread's, until the page closes.
 - A screen reader hears the note or thread as the cell's description (`aria-describedby`).
 
 ## Writing notes
@@ -54,14 +55,70 @@ thread left. `test/noteedit.test.js` covers the same in the unit tests.
 
 A note's box is drawn where its VML shape puts it, at its size: `x:Anchor`'s corners, each a column or row and a pixel
 offset into it (Excel's default for a new note: from the column right of the cell, 15px in, the row above, 10px down,
-to two columns and four rows on). A note whose shape has `x:Visible` (Excel's Show/Hide Note) is always shown. Review >
-Notes > Show All Notes shows every note's box, or hides them again; as Excel's, it is a view of the notes, not saved.
+to two columns and four rows on). A note whose shape has `x:Visible` is always shown, so a note shown in Excel or here
+opens shown.
+
+Show/Hide Note (`noteedit.js setNoteVisible`) writes it there, as Excel does. Measured over COM
+(`tools/excel-compare/excel-notes-visible.ps1`, `test/notes-visible-excel.json`): `Comment.Visible = True` on a new
+note, the workbook saved, changes two things in its VML shape, and nothing else:
+
+| | Hidden (Excel's new note) | Shown |
+|---|---|---|
+| The shape's style | `...;z-index:1;visibility:hidden` | `...;z-index:1;visibility:visible` |
+| `x:ClientData` | ends with `<x:Column>1</x:Column>` | `<x:Visible/>` after `x:Column`, on its own line |
+
+A note shown and hidden again is saved as it was before it was shown, byte for byte. Here the same: shown, the two
+changes (`<x:Visible/>` with x:Column's indent, so Excel's own shape comes out as Excel's); hidden, both taken back,
+which gives Excel's hidden shape. Each is one step of Undo. Excel set `Comment.Visible` on a protected sheet too, so it
+isn't refused here. A thread's box, and any box in a read-only workbook, is shown or hidden until the page closes.
+
+Review > Notes > Show All Notes is Excel's `Application.DisplayCommentIndicator = xlCommentAndIndicator`, measured the
+same way: while it is on, every note reads `Visible` and is saved shown (both changes above); turned off, every note is
+hidden, one shown before it was turned on too. So here Show All Notes shows every note in the workbook (on every sheet,
+as Excel's setting is for every workbook open), or when every one is shown already, hides them all, saved as Show/Hide
+Note writes them, one step of Undo. A thread's placeholder box isn't touched. (Excel's own button is that setting as far
+as COM shows; the button itself can't be pressed over COM.)
+
+Excel read back the workbooks written here (`notes-visible-ours.mjs`, `excel-notes-readback.ps1`,
+`test/notes-readback-excel.json`): B2 shown here read `Visible` True, D4 shown and hidden again False, and with Show
+All Notes both True. `test/notesvisible.test.js` shows and hides Excel's own shapes and gets Excel's files byte for
+byte; `test/notes-visible.mjs` checks it in the browser (a shown note saved and opened again opens shown).
+
+## Convert to Comments (`src/ooxml/noteconvert.js`)
+
+Review > Notes > Convert to Comments turns every note into a threaded comment, as Excel's does. Measured over COM with
+`Workbook.ConvertComments()` (`excel-notes-visible.ps1`), on a workbook Excel made (notes on two sheets, one shown, a
+thread already there) and on one written here (`notes-convert-ours.mjs`: nine notes by made-up people on two sheets,
+starting with the author's name in bold, the name not bold, another person's name, a bold "Important:", no name, or
+with no author at all, and a thread with a reply):
+
+| What | As Excel converts it |
+|---|---|
+| Which notes | Every note in the workbook, on every sheet, not only the active one. Threads there already stay as they are. A protected sheet's notes stay (ConvertComments left them, with no error). |
+| The text | The note's text, its first line dropped when it is the note's author's name and a colon ("Avery Chen:"), bold or not. "Sam Rivera:" on Avery Chen's note stays, and so does a bold "Important:". Line breaks CR LF. |
+| The author | A person by the note's author's name: `userId` the name, `providerId` None, one for each name and used again for the next note of that name. Not the person signed in, and not a person already there with that display name but another `userId`. New people come first in the persons part. A note with no author gets `personId` `{00000000-0000-0000-0000-000000000000}` and no person; Excel then reads its author as "Author". |
+| The date | None: the converted comment has no `dT` (Excel's `CommentThreaded.Date` reads empty). |
+| Order | The threads in the threadedComments part, and their placeholders in the comments part, by cell row by row, with the threads already there among them. The comments part's authors are just the `tc={id}` of its comments, in order. |
+| The boxes | Each note's VML shape removed and a thread placeholder's box added after the shapes there: a new thread's place and size (B2's at 107.25pt, 7.5pt), hidden even if the note was shown. Ids follow on from the drawing's highest (the removed notes' included), and every shape's z-index is numbered again 1, 2, ... in order. |
+
+Here it is done the same way, one step of Undo, a protected sheet left (unless Edit objects is allowed).
+`test/notesvisible.test.js` compares each part with Excel's, its new ids aside: the threads (cell, no date, person,
+text, reply), the placeholders, the authors, the persons part, and the VML drawing's shapes, ids and z-indexes
+included. Excel read the workbook
+converted here (`converted.xlsx`) exactly as it read its own conversion of the same workbook: every thread, author,
+text and reply, with no dates. `test/notes-visible.mjs` converts notes.xlsx in the browser and undoes it.
+
+Differences from Excel, all in parts the conversion doesn't need to touch: Excel saves every part again, so a thread
+placeholder already there gets CR LF and a box sized to its text, and one without an `xr:uid` gets one; here they stay
+byte for byte. Excel also reorders the people already in the persons part, by no rule found. COM can't show the
+button's own behaviour (whether Excel asks first, or what it does with no notes), so here it converts without asking,
+and with no notes it says "No notes to convert" and changes nothing. The text a note keeps when its first line is
+"Name: more text", on one line, wasn't measured; here it is kept whole.
 
 ## Not yet
 
-Show/Hide Note written to the shape (here it shows or hides the box for now, unsaved), and marks in frozen panes'
-cells drawn twice. Notes and threaded comments follow their cells when rows and columns are inserted or deleted, and
-when they are sorted, as Excel moves them (docs/ROWCOL.md).
+Marks in frozen panes' cells drawn twice; Previous and Next Note. Notes and threaded comments follow their cells when
+rows and columns are inserted or deleted, and when they are sorted, as Excel moves them (docs/ROWCOL.md).
 
 ## Writing threaded comments (`src/ooxml/threadedit.js`, `src/editor/threadbox.js`)
 

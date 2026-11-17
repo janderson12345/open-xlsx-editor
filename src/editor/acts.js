@@ -14,7 +14,8 @@ import { createOutlineActs, OUTLINE_ACTS } from './acts-outline.js';
 import { borderDrawing, DRAW_ACTS } from './drawborders.js';
 import { customFilterBox } from './filterbox.js';
 import { sortBox, filterBox, pickBox, validationBox } from './datadialogs.js';
-import { setNote, deleteNote } from '../ooxml/noteedit.js';
+import { setNote, deleteNote, setNoteVisible, setAllNotesVisible } from '../ooxml/noteedit.js';
+import { convertNotes } from '../ooxml/noteconvert.js';
 import { goToNames } from '../ooxml/goto.js';
 import { specialBox } from './specialbox.js';
 import { insertPivot, showFieldList } from './pivotbox.js';
@@ -200,8 +201,33 @@ export function createActs(env) {
       const s = editing().selection;
       return editing().run('sheetChange', (wb, si) => deleteNote(wb, si, s.ar, s.ac));
     }
-    if (name === 'showNote') { const s = editing().selection; return state.grid.toggleNote(s.ar, s.ac); }
-    if (name === 'showAllNotes') return state.grid.showAllNotes();
+    if (name === 'showNote') {
+      // (Show/Hide Note: written in the note's shape as Excel saves it, one step of Undo (noteedit.js setNoteVisible;
+      // Excel sets Comment.Visible on a protected sheet too, measured). A thread's box, and a note's in a read-only
+      // workbook, shown or hidden until the page closes.)
+      const s = editing().selection;
+      const n = readNotes(state.workbook, i).get(`${s.ar},${s.ac}`);
+      if (n?.kind !== 'note' || state.readOnly) return state.grid.toggleNote(s.ar, s.ac);
+      return editing().run('sheetChange', (wb, si) => setNoteVisible(wb, si, s.ar, s.ac, !n.visible));
+    }
+    if (name === 'showAllNotes') {
+      // (Show All Notes: every note in the workbook shown, or when all are, every one hidden, saved as Excel saves them
+      // while its Show All Notes is on or after it is turned off (noteedit.js setAllNotesVisible). Read-only, a view.)
+      if (state.readOnly) return state.grid.showAllNotes();
+      const wb = state.workbook;
+      const all = wb.sheets.flatMap((_, k) => [...readNotes(wb, k).values()].filter((n) => n.kind === 'note'));
+      if (!all.length) return false;
+      const on = !all.every((n) => n.visible);
+      return editing().run('sheetChange', (book) => setAllNotesVisible(book, on) > 0);
+    }
+    if (name === 'convertNotes') {
+      // (Review > Notes > Convert to Comments: every note in the workbook a threaded comment, as Excel's
+      // ConvertComments writes them (noteconvert.js); a protected sheet's notes left, as Excel left them. One step of
+      // Undo.)
+      const done = editing().run('sheetChange', (wb) => convertNotes(wb, { skip: (k) => !!protectionRefusal(wb, k, 'objects') }) > 0);
+      if (!done && !state.readOnly) announce('No notes to convert');
+      return done;
+    }
     if (name === 'validationBox') {
       // (Excel's Data Validation box, holding the active cell's rule; its answer made for the selection.)
       const s = editing().selection;

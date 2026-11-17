@@ -1,0 +1,193 @@
+{
+  "shown.xlsx": [
+    {
+      "name": "Notes",
+      "notes": [
+        {
+          "cell": "B2",
+          "author": "Avery Chen",
+          "text": "Avery Chen:\nCheck this total",
+          "visible": true
+        },
+        {
+          "cell": "D4",
+          "author": "Avery Chen",
+          "text": "Avery Chen:\nFirst line\nSecond line",
+          "visible": false
+        }
+      ],
+      "threads": [
+        {
+          "cell": "C3",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "Is this the right total?",
+              "date": "01/01/2026 04:30:00"
+            },
+            {
+              "author": "Sam Rivera",
+              "text": "Yes, checked against the invoice.",
+              "date": "01/02/2026 09:05:00"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "showall.xlsx": [
+    {
+      "name": "Notes",
+      "notes": [
+        {
+          "cell": "B2",
+          "author": "Avery Chen",
+          "text": "Avery Chen:\nCheck this total",
+          "visible": true
+        },
+        {
+          "cell": "D4",
+          "author": "Avery Chen",
+          "text": "Avery Chen:\nFirst line\nSecond line",
+          "visible": true
+        }
+      ],
+      "threads": [
+        {
+          "cell": "C3",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "Is this the right total?",
+              "date": "01/01/2026 04:30:00"
+            },
+            {
+              "author": "Sam Rivera",
+              "text": "Yes, checked against the invoice.",
+              "date": "01/02/2026 09:05:00"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "converted.xlsx": [
+    {
+      "name": "Notes",
+      "notes": [],
+      "threads": [
+        {
+          "cell": "B2",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "Check this total",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "G2",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "Important:\nbold first line",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "C3",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "Is this the right total?",
+              "date": "01/01/2026 04:30:00"
+            },
+            {
+              "author": "Sam Rivera",
+              "text": "Yes, checked against the invoice.",
+              "date": "01/02/2026 09:05:00"
+            }
+          ]
+        },
+        {
+          "cell": "D4",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "First line\nSecond line",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "G4",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "plain name",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "A6",
+          "items": [
+            {
+              "author": "Sam Rivera",
+              "text": "A new one",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "G6",
+          "items": [
+            {
+              "author": "Avery Chen",
+              "text": "Sam Rivera:\nanother name",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "F8",
+          "items": [
+            {
+              "author": "Sam Rivera",
+              "text": "No name here",
+              "date": ""
+            }
+          ]
+        },
+        {
+          "cell": "G8",
+          "items": [
+            {
+              "author": "Author",
+              "text": "no author",
+              "date": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Second",
+      "notes": [],
+      "threads": [
+        {
+          "cell": "B3",
+          "items": [
+            {
+              "author": "Sam Rivera",
+              "text": "On the second sheet",
+              "date": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
