@@ -112,7 +112,8 @@ export function readMashup(wb) {
   for (const path of Object.keys(wb.pkg.files).filter((p) => /^customXml\/item\d+\.xml$/.test(p))) {
     const { enc, bom, text } = decodeText(wb.pkg.files[path]);
     const m = /(<DataMashup\b[^>]*>)([\s\S]*?)(<\/DataMashup>)/.exec(text);
-    if (!m || !m[1].includes(MASHUP_NS)) continue;
+    // (The element's own namespace, its xmlns, is DataMashup's exactly.)
+    if (!m || /\sxmlns\s*=\s*(?:"([^"]*)"|'([^']*)')/.exec(m[1])?.slice(1).find((v) => v != null) !== MASHUP_NS) continue;
     try {
       const pieces = splitMashup(fromBase64(m[2]));
       if (!pieces) continue;

@@ -7,7 +7,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 
 const [from, to] = process.argv.slice(2);
 const j = JSON.parse(readFileSync(from, 'utf8').replace(/^\uFEFF/, ''));
-const unxml = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+// (In one pass, so that an escaped escape, &amp;lt;, comes out as the text &lt; and not as <.)
+const ENTITIES = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"' };
+const unxml = (s) => s.replace(/&(?:amp|lt|gt|quot);/g, (e) => ENTITIES[e]);
 const rels = Object.fromEntries([...j.rels.matchAll(/<Relationship ([^>]*)\/>/g)].map(([, a]) => {
   const at = (n) => (new RegExp(`${n}="([^"]*)"`).exec(a) || [])[1];
   return [at('Id'), { target: unxml(at('Target')), mode: at('TargetMode') || null }];

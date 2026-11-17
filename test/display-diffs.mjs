@@ -74,7 +74,18 @@ const pixels = await page.evaluate(async ({ png, where, rows, edges }) => {
   return out;
 }, { png: shot.toString('base64'), where, rows: RUNOVER.rows, edges: RUNOVER.edges - 1 });
 const screenWrong = pixels.filter(([r, k, line]) => line === want.has(`${r},${k}`)).map(([r, k, line]) => `row ${r + 1} edge ${k} ${line ? 'shown' : 'hidden'}`);
-check(!screenWrong.length && pixels.length === RUNOVER.rows * (RUNOVER.edges - 2), `on screen: the ${want.size} gridlines Excel leaves out under running-on text are left out, the other ${pixels.length - want.size} drawn (screenshot pixels)`, screenWrong.join('; '));
+// (How far text runs on is the font's own width: compared edge by edge on Windows, where the stand-ins for Aptos
+// Narrow measure as Excel's (231 of 231). Elsewhere, Linux CI among them, its stand-in is wider, and text that fits in
+// Excel can run on (row 18), so the lines left out are checked to be in rows with text, and some are left out.)
+const windows = process.platform === 'win32';
+if (windows) {
+  check(!screenWrong.length && pixels.length === RUNOVER.rows * (RUNOVER.edges - 2), `on screen: the ${want.size} gridlines Excel leaves out under running-on text are left out, the other ${pixels.length - want.size} drawn (screenshot pixels)`, screenWrong.join('; '));
+} else {
+  const runRows = new Set(await page.evaluate(() => [...window.oxe.workbook.sheet(window.oxe.sheetIndex).cells].filter(([, line]) => [...line.values()].some((x) => typeof x.v === 'string' && x.v !== '')).map(([r]) => r)));
+  const hidden = pixels.filter(([, , line]) => !line);
+  const stray = hidden.filter(([r]) => !runRows.has(r)).map(([r, k]) => `row ${r + 1} edge ${k}`);
+  check(pixels.length === RUNOVER.rows * (RUNOVER.edges - 2) && hidden.length > 0 && !stray.length, `on screen: ${hidden.length} gridlines left out, all in rows with text (not Windows: ${pixels.length - screenWrong.length} of ${pixels.length} edges as Excel's)`, stray.join('; '));
+}
 // In print (Gridlines: Print is on in the file): the printed vertical lines' rows, as Excel's PDF has them.
 await page.evaluate(() => window.oxe.preparePrint());
 const printed = await page.evaluate(({ rows }) => {
