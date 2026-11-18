@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Fix:** screen readers give each cell its own column's heading. NVDA in Edge and Chrome read column B's cells under
+  column C's heading, because a screen reader matches a cell to its heading by its place in the row. The heading row
+  now starts with the corner as each row starts with its number, and every column in view has a cell in each row.
+  Security review done (no problems found); held for the next release.
+
 ## 0.8.3
 
 - **open-metric-fonts 1.1.0.** `OMF_VERSION` is 1.1.0 and the README's setup steps serve that release, whose fonts
