@@ -6,6 +6,10 @@
   column C's heading, because a screen reader matches a cell to its heading by its place in the row. The heading row
   now starts with the corner as each row starts with its number, and every column in view has a cell in each row.
   Security review done (no problems found); held for the next release.
+- **Fix:** row heights Excel works out match it again on wrapped text. A formula's text result (such as
+  =CONCATENATE) and a word wider than its column now count, lines are counted at Excel's text widths, a merged title's
+  font counts toward its row, and a thick bottom border adds Excel's 0.75pt. A crosswalk workbook went from 41 to 60 of
+  60 rows as Excel's. Security review still to do before release.
 
 ## 0.8.3
 
