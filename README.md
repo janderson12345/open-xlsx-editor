@@ -173,18 +173,18 @@ Workbooks name Office fonts, and a browser draws only the fonts installed on the
 Aptos Narrow, the body font of Excel 365's default theme, isn't installed with Windows, macOS or Linux, so without
 help it is drawn in Calibri (or Carlito), which is close but not the same width; Tahoma, Verdana, Century Gothic,
 Garamond and the other Microsoft fonts are missing on most computers that aren't Windows ones. [open-metric-fonts](https://github.com/open-metric-fonts/open-metric-fonts)
-makes open (SIL OFL) fonts with exactly their character widths and line metrics, 151 families in release 1.0.1:
+makes open (SIL OFL) fonts with exactly their character widths and line metrics, 151 families in release 1.1.0:
 Morrow Sans Narrow for Aptos Narrow, Tamarack for Tahoma, Glade for Verdana, Compass for Century Gothic, Colines for
 Garamond and so on. The editor loads them from a folder your site serves, the same folder the Word editor
 (open-docx-editor) uses, so one copy serves every viewer of Office documents on the site:
 
 1. **Serve the open-metric-fonts web bundle once, in a folder named for its version.** The editor is made for release
-   `OMF_VERSION` (exported by the package; 1.0.1 now). The release's web bundle holds every package as
+   `OMF_VERSION` (exported by the package; 1.1.0 now). The release's web bundle holds every package as
    `<package>/files/<face>-<alphabet>.woff2`, as the editor looks for them (about 70 MB on disk, every family and
    alphabet; a browser downloads only the files a workbook needs).
 
    ```bash
-   curl -LO https://github.com/open-metric-fonts/open-metric-fonts/releases/download/v1.0.1/open-metric-fonts-web-1.0.1.zip
+   curl -LO https://github.com/open-metric-fonts/open-metric-fonts/releases/download/v1.1.0/open-metric-fonts-web-1.1.0.zip
    ```
 
    Check it against the release's `SHA256SUMS.txt` and its build attestation before use:
@@ -194,15 +194,15 @@ Garamond and so on. The editor loads them from a folder your site serves, the sa
    ```
 
    ```bash
-   gh attestation verify open-metric-fonts-web-1.0.1.zip --repo open-metric-fonts/open-metric-fonts
+   gh attestation verify open-metric-fonts-web-1.1.0.zip --repo open-metric-fonts/open-metric-fonts
    ```
 
    ```bash
-   unzip -q open-metric-fonts-web-1.0.1.zip && mkdir -p wwwroot/lib/fonts/omf/1.0.1 && cp -R open-metric-fonts-web-1.0.1/. wwwroot/lib/fonts/omf/1.0.1/
+   unzip -q open-metric-fonts-web-1.1.0.zip && mkdir -p wwwroot/lib/fonts/omf/1.1.0 && cp -R open-metric-fonts-web-1.1.0/. wwwroot/lib/fonts/omf/1.1.0/
    ```
 
    Or only the families you want, from npm with your other dependencies, pinned (`npm install --save-exact
-   @open-metric-fonts/morrow-sans@1.0.1 @open-metric-fonts/tamarack@1.0.1`; each font's package is named in
+   @open-metric-fonts/morrow-sans@1.1.0 @open-metric-fonts/tamarack@1.1.0`; each font's package is named in
    `src/editor/omf.js`), each copied to `<folder>/<package>/` by your build; a font whose package isn't there falls
    back as before. Serve `.woff2` as `font/woff2`; the folder's name carries the version, so it can be cached as
    immutable. A site that already serves the bundle for another viewer points this editor at that copy rather than
@@ -226,7 +226,7 @@ metrics (the twin's are the same) and the browser's from the twin's own. Without
 arrives, the stand-ins as before (Calibri for Aptos Narrow). `exportPdf` embeds the twins too (docs/PDF.md).
 
 Measured on this repository's Windows machine, for the fonts installed on it, against their twins served from the
-release 1.0.1 bundle:
+release 1.0.1 bundle (1.1.0 redraws some letters but keeps every width and line metric, so these still hold):
 
 - **Canvas widths in Chromium**: every face of the 66 installed families the release has a twin for, 174 faces as
   Chromium names them, each character of U+0020-007E and U+00A1-00FF at 100px and six cell-like strings at 11pt: 156
