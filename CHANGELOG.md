@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.3
+
+- **open-metric-fonts 1.1.0.** `OMF_VERSION` is 1.1.0 and the README's setup steps serve that release, whose fonts
+  are redrawn without the overlapping and badly spaced letters of 1.0.1. Letter widths and line metrics are unchanged,
+  so cells, rows and page breaks are the same; a site moves by serving the 1.1.0 bundle in the folder it names.
+- A weekly workflow opens an issue when open-metric-fonts has a newer release.
+- **Power Query** is recorded as unsupported, by decision, as VBA is: M isn't run in the editor and the data model
+  isn't refreshed. Queries are shown and their M changed here, and refreshed through the host (docs/QUERIES.md).
+
 ## 0.8.2
 
 - **Fix:** filter buttons, note marks and note boxes, and a list rule's button and input message are drawn at their
