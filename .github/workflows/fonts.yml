@@ -35,7 +35,9 @@ jobs:
           newest=$(printf '%s\n%s\n' "$ours" "$latest" | sort -V | tail -1)
           if [ "$newest" = "$ours" ]; then echo "up to date"; exit 0; fi
           title="open-metric-fonts $latest is out (the editor is on $ours)"
-          if gh issue list --repo "$REPO" --state open --search "\"open-metric-fonts\" in:title is out" --json title --jq '.[].title' | grep -qF "open-metric-fonts $latest is out"; then
+          # (The open issues' titles read whole first: grep -q stopping early in a pipe would fail it under pipefail.)
+          open_titles=$(gh issue list --repo "$REPO" --state open --search "\"open-metric-fonts\" in:title is out" --json title --jq '.[].title')
+          if grep -qF "open-metric-fonts $latest is out" <<< "$open_titles"; then
             echo "already open: $title"; exit 0
           fi
           body="open-metric-fonts $latest is released: https://github.com/open-metric-fonts/open-metric-fonts/releases/tag/v$latest
