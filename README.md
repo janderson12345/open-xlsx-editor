@@ -11,8 +11,8 @@ Open, edit and save Excel workbooks (.xlsx) in the browser. Plain JavaScript, no
 the page (it stays in your browser, nothing is uploaded).
 
 - **Looks like Excel.** The grid is laid out as Excel lays it out. Column widths, row heights, fonts, fills, borders,
-  number formats and conditional formatting are drawn as Excel draws them, and printing and PDF export follow Excel's
-  page setup. All of this is measured against Excel's own PDFs.
+  number formats, conditional formatting, charts, pictures and shapes are drawn as Excel draws them, and printing and
+  PDF export follow Excel's page setup. All of this is measured against Excel's own PDFs.
 - **Calculates like Excel.** 500 of Excel's 519 functions, dynamic arrays that spill as Excel 365's do, LET and
   LAMBDA, table references and 3D references. 1926 of 1926 test formulas give Excel's results.
 - **Edits like Excel.** Excel's ribbon (classic or simplified), its keys and its dialog boxes: Format Cells, Find and
@@ -33,13 +33,19 @@ the page (it stays in your browser, nothing is uploaded).
 This is version 0.x: the API may still change between minor versions. `docs/FEATURES.md` lists, ribbon tab by ribbon
 tab, what Excel does and what this editor does yet. The main things missing are:
 
-- opening .xlsb and .xls files;
-- running macros;
+- the grid ends 100 rows and 10 columns past the data, where Excel's goes on to row 1,048,576 and column XFD;
+- the Page Break Preview and Page Layout views, and split windows;
+- inserting pictures and shapes, and editing their text and format (they're drawn and can be moved, sized and deleted);
+- the 2016 chart kinds (waterfall, histogram, treemap and the like), and opening chart sheets;
+- editing headers and footers (they print as Excel prints them);
 - PivotTable filters, grouping and calculated fields;
-- the Spelling box;
-- Check Accessibility;
-- split windows;
-- 19 functions, including FORECAST.ETS.
+- opening .xlsb and .xls files;
+- the Spelling box and Check Accessibility;
+- 19 functions, including FORECAST.ETS (15 of them need an outside service, such as the CUBE functions).
+
+Not supported, by decision rather than missing: running, showing or editing macros (VBA), and running Power Query's M
+or refreshing the data model. Workbooks keep both byte for byte; a query's M can be shown and changed, and its rows
+come from your page through `onRefreshQuery` (docs/FIDELITY.md, docs/QUERIES.md).
 
 ## Install
 
