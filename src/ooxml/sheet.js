@@ -70,7 +70,9 @@ export function readSheet(doc, sst = []) {
     // (Its outline: outlineLevel 1 to 7, and collapsed on a summary row whose group is hidden; outline.js.)
     const level = outlineLevel(attr(rowEl, 'outlineLevel'));
     const collapsed = attr(rowEl, 'collapsed') === '1' || attr(rowEl, 'collapsed') === 'true';
-    if (ht != null || hidden || own || level || collapsed) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}) });
+    // (thickBot: a thick bottom border in the row, which Excel makes the row 0.75pt taller for; rowheights.js.)
+    const thickBot = attr(rowEl, 'thickBot') === '1' || attr(rowEl, 'thickBot') === 'true';
+    if (ht != null || hidden || own || level || collapsed || thickBot) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}), ...(thickBot ? { thickBot } : {}) });
     let c = -1;
     let line = null;
     for (const cEl of kids(rowEl, 'c', ns)) {

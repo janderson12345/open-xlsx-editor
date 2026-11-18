@@ -250,6 +250,12 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
 ## Open differences
 
 - The grid ends 100 rows and 10 columns past the used range; Excel's goes on to row 1,048,576 and column XFD.
+- Row heights Excel works out (rows without customHeight) count wrapped lines with the text 1.075 times as wide as the
+  canvas measures it (rowheights.js EXCEL_WRAP_WIDTH): Excel's own widths are whole pixels, most letters wider than
+  the canvas's and digits narrower (exactly 7px in Calibri 11). Measured over COM: a customer's crosswalk workbook,
+  60 of 60 rows as Excel's, and tools/excel-compare/rowfit-book.mjs's, 60 of 62 (test/rowfit.mjs). The two others
+  are identifiers of 17 characters, mostly digits, that just fit in Excel and take a line more here. No simple
+  per-character model (each width rounded, rounded up, digits apart, GDI's own advances) fitted both workbooks.
 - Printing (print area, print titles, scale, fit to pages, page breaks, headers and footers): docs/PRINT.md.
 
 ## Tried and dropped

@@ -6,26 +6,40 @@ import { fontRowPx, fontDescentPx } from './fonts.js';
 
 let ctx = null;
 /** The lines a wrapped text breaks into in `width` px: words greedily, broken at spaces and at line breaks, measured
- *  in the cell's font. Without a canvas (Node) only line breaks count. */
+ *  in the cell's font; a word wider than the cell broken where it reaches the edge, as Excel breaks it and the cell's
+ *  CSS draws it (overflow-wrap: break-word): RSES.C2.10.00001.001 in a 19-character column takes two lines. Without
+ *  a canvas (Node) only line breaks count. */
 export function wrapLines(text, font, width) {
   const paragraphs = String(text).replace(/\r/g, '').split('\n');
   if (typeof document === 'undefined') return paragraphs;
   ctx = ctx || document.createElement('canvas').getContext('2d');
   ctx.font = font;
+  const fits = (s) => ctx.measureText(s).width <= width;
   const out = [];
   for (const para of paragraphs) {
     let line = '';
     for (const word of para.split(' ')) {
       const next = line ? `${line} ${word}` : word;
-      if (line && ctx.measureText(next).width > width) {
-        out.push(line);
-        line = word;
-      } else line = next;
+      if (fits(next)) { line = next; continue; }
+      if (line) out.push(line);
+      line = word;
+      // (A word too wide for a line of its own: as many characters as fit on each line, at least one.)
+      while (!fits(line) && line.length > 1) {
+        let n = 1;
+        while (n < line.length && fits(line.slice(0, n + 1))) n++;
+        out.push(line.slice(0, n));
+        line = line.slice(n);
+      }
     }
     out.push(line);
   }
   return out;
 }
+
+/** How much wider Excel's text is than the canvas's when it breaks wrapped lines for a row's height: measured over COM
+ *  on a workbook of 58 wrapped rows in Calibri 11 (Range.RowHeight), every row Excel gave one more line needing 1.065 or
+ *  more and every row it didn't less than 1.09; 1.075, the middle. turnedPt's 1.0645 for turned text agrees. */
+export const EXCEL_WRAP_WIDTH = 1.075;
 
 /** How many lines a wrapped text takes in `width` px (wrapLines). */
 export const countLines = (text, font, width) => wrapLines(text, font, width).length;
@@ -74,7 +88,7 @@ export function turnedPt(text, rotation, font, linePt) {
 export function autoRowHeights(sheet, deco, cols) {
   const out = new Map();
   if (!deco) return out;
-  const merged = (r, c) => sheet.merges.some((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
+  const mergeOf = (r, c) => sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
   const rowPt = new Map(); // per cell format: one line's height in points
   const lineOf = (s) => {
     if (!rowPt.has(s)) { const d = deco(s); rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx) * 0.75); }
@@ -89,17 +103,27 @@ export function autoRowHeights(sheet, deco, cols) {
     let best = sheet.format.defaultRowHeight;
     if (sheet.rows.get(r)?.s) best = Math.max(best, lineOf(sheet.rows.get(r).s));
     for (const [c, cell] of line) {
-      if (merged(r, c)) continue;
       const s = cell.s || 0;
       const d = deco(s);
       if (!rowPt.has(s)) rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx) * 0.75);
+      // (A cell in a merged range on this row alone counts with its font's line, as Excel's 16pt title merged across
+      // A1:K1 makes its row 21pt (measured over COM); its wrapping doesn't. A range over several rows doesn't count.)
+      const m = mergeOf(r, c);
+      if (m) { if (m.r0 === m.r1) best = Math.max(best, rowPt.get(s)); continue; }
       let lines = 1;
-      if (d.align.wrap && cell.t === 's' && cell.v) lines = countLines(cell.v, d.font.css, cols.size(c) - 4);
+      // (Any text the cell shows wraps: a string, a formula's text result (t "str", as =CONCATENATE gives) or an inline
+      // string; before, only a string counted, so a formula's long text left its row a line tall.)
+      // (Lines counted as Excel breaks them: its text measures wider than the canvas's, so a line that just fits here
+      // goes on to the next in Excel; EXCEL_WRAP_WIDTH.)
+      if (d.align.wrap && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) lines = countLines(cell.v, d.font.css, (cols.size(c) - 4) / EXCEL_WRAP_WIDTH);
       best = Math.max(best, rowPt.get(s) * lines);
       // (Rich text: a run's larger font grows the row as Excel's does, a 16pt run in Aptos Narrow 11 to 21pt.)
       if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3) * 0.75);
       if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, rowPt.get(s)));
     }
+    // (A thick bottom border, thickBot: 0.75pt more, as Excel gives the 21pt title row above 21.75pt, 21 without the
+    // attribute (measured over COM). thickTop isn't measured.)
+    if (sheet.rows.get(r)?.thickBot) best += 0.75;
     out.set(r, best);
   }
   return out;
