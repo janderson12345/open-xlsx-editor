@@ -130,6 +130,13 @@
   width: var(--oxe-sheet-w);
   height: var(--oxe-h);
 }
+/* An empty cell in view (gridlayers.js drawRows): there for screen readers' count of the row's cells, drawing nothing. */
+.oxe-blank-cell {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
 .oxe-rowhead {
   position: sticky;
   left: var(--oxe-outline-w, 0px);

@@ -123,6 +123,10 @@ export function drawRows(st, win) {
     // (A merged range is drawn even when its top-left cell is empty: it hides the gridlines inside it.)
     for (const m of sheet.merges) if (m.r0 === r && m.c1 >= win.c0 && m.c0 <= win.c1) cells.push([m.r0, m.c0]);
     const seen = new Set();
+    // (This row's cells in view by column; and those drawn only for their look: a cell left of the view whose text runs
+    // on into it, a merged range from a row above or from a hidden column. Those are hidden from assistive technology.)
+    const byCol = new Map();
+    const looks = [];
     for (const [cr, cc] of cells) {
       if (seen.has(`${cr},${cc}`)) continue;
       seen.add(`${cr},${cc}`);
@@ -131,12 +135,26 @@ export function drawRows(st, win) {
       if (merge && (merge.r0 !== cr || merge.c0 !== cc)) continue;
       const cell = sheet.cells.get(cr)?.get(cc) || { t: 'n', v: null };
       if (cell.v == null && !merge && !(st.sel && st.sel.ar === cr && st.sel.ac === cc)) continue;
-      row.appendChild(cellElement(st, cr, cc, cell, sheet.cells.get(cr) || new Map(), win, top));
+      const el = cellElement(st, cr, cc, cell, sheet.cells.get(cr) || new Map(), win, top);
+      if (cr === r && cc >= win.c0 && cc <= win.c1 && st.cols.size(cc)) byCol.set(cc, el);
+      else looks.push(el);
     }
     // (The active cell is drawn even when it is empty, so that the grid can name it as its active descendant.)
     const sel = st.sel;
     if (sel && sel.ar === r && sel.ac >= win.c0 && sel.ac <= win.c1 && !seen.has(`${r},${sel.ac}`) && !mergeAt(st, r, sel.ac)) {
-      row.appendChild(cellElement(st, r, sel.ac, { t: 'n', v: null }, line || new Map(), win, top));
+      byCol.set(sel.ac, cellElement(st, r, sel.ac, { t: 'n', v: null }, line || new Map(), win, top));
+    }
+    for (const el of looks) { el.setAttribute('aria-hidden', 'true'); row.appendChild(el); }
+    // (One cell for each column in view, in column order, as the heading row has its headings: a screen reader matches
+    // a cell to its column's heading by its place in the row, not by aria-colindex (NVDA read column B's cells under
+    // C's heading). An empty cell, or one a merged range covers, is an empty gridcell that draws nothing.)
+    for (let c = win.c0; c <= win.c1; c++) {
+      if (!st.cols.size(c)) continue;
+      const el = byCol.get(c);
+      if (el) { row.appendChild(el); continue; }
+      const blank = div('oxe-blank-cell', 'gridcell');
+      blank.setAttribute('aria-colindex', String(c + 2));
+      row.appendChild(blank);
     }
     kids.push(row);
   }

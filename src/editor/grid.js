@@ -87,8 +87,11 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   const canvas = div('oxe-sheet');
   const colheads = div('oxe-colheads', 'row');
   colheads.setAttribute('aria-rowindex', '1');
-  const corner = div('oxe-corner');
-  corner.setAttribute('aria-hidden', 'true');
+  // (The corner is the heading of the row numbers' column: the heading row's first cell, as each row's first is its
+  // number, so that every column's heading has the same place in its row as the column's cells; drawRows.)
+  const corner = div('oxe-corner', 'columnheader');
+  corner.setAttribute('aria-colindex', '1');
+  corner.setAttribute('aria-label', 'Row');
   const lines = div('oxe-lines');
   lines.setAttribute('aria-hidden', 'true');
   // (Fills over the gridlines and under the text, borders over the text.)
@@ -129,6 +132,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
   const panes = { top: pane('oxe-pane-top'), left: pane('oxe-pane-left'), corner: pane('oxe-pane-corner') };
   panes.top.inner.prepend(panes.corner.wrap);
   const pinHeads = div('oxe-colheads-pin');
+  // (The frozen columns' headings drawn again to stay in place: for the eye only, the heading row having them already.)
+  pinHeads.setAttribute('aria-hidden', 'true');
   pinHeads.append(div('oxe-colheads-pin-inner'));
   // (The AutoFilter's buttons: over the cells, clickable, out of the tab order and hidden from assistive technology.)
   const filterLayer = div('oxe-filters');
