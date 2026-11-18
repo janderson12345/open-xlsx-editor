@@ -1,0 +1,48 @@
+name: Fonts
+
+# Weekly: whether open-metric-fonts has a release newer than the one the editor is made for (OMF_VERSION in
+# src/editor/omf.js). Its fonts are young and each release draws them better, so a newer one opens an issue (one at a
+# time) saying to move to it: README, Fonts, and tools/omf-map.py.
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+# (It reads the repository and the other project's public releases, and may only open an issue.)
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Compare with the latest open-metric-fonts release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          ours=$(sed -n "s/^export const OMF_VERSION = '\([0-9.]*\)';$/\1/p" src/editor/omf.js)
+          latest=$(gh release view --repo open-metric-fonts/open-metric-fonts --json tagName --jq .tagName)
+          latest=${latest#v}
+          # (Only plain versions go further: the tag comes from another repository.)
+          for v in "$ours" "$latest"; do
+            [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "not a version: '$v'"; exit 1; }
+          done
+          echo "editor: $ours, open-metric-fonts: $latest"
+          newest=$(printf '%s\n%s\n' "$ours" "$latest" | sort -V | tail -1)
+          if [ "$newest" = "$ours" ]; then echo "up to date"; exit 0; fi
+          title="open-metric-fonts $latest is out (the editor is on $ours)"
+          if gh issue list --repo "$REPO" --state open --search "\"open-metric-fonts\" in:title is out" --json title --jq '.[].title' | grep -qF "open-metric-fonts $latest is out"; then
+            echo "already open: $title"; exit 0
+          fi
+          body="open-metric-fonts $latest is released: https://github.com/open-metric-fonts/open-metric-fonts/releases/tag/v$latest
+
+          Move the editor to it (README, Fonts):
+          1. Download open-metric-fonts-web-$latest.zip and SHA256SUMS.txt; check them with sha256sum -c and gh attestation verify.
+          2. Regenerate src/editor/omf.js with tools/omf-map.py, and check what else changed than the version (widths or metrics changing would move layout).
+          3. Move the README's setup steps to $latest, and refresh the demo's demo/fonts/omf copy.
+          4. Run npm run ci, then release."
+          gh issue create --repo "$REPO" --title "$title" --body "$body"
