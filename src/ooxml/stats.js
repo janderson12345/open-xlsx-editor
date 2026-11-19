@@ -3,6 +3,7 @@
 // shown for a selection of two or more cells holding something; Count counts the cells that aren't empty, the others
 // take numbers only (not text, nor TRUE and FALSE); cells in hidden rows and columns are left out; with an error in
 // the selection only Count is given. Numbers are shown in the number format of the first cell with one.
+import { filledRows } from './sheetcells.js';
 import { formatCodeOf } from './styles.js';
 import { cellText } from './numfmt.js';
 
@@ -24,7 +25,7 @@ export function selectionStats(wb, si, sel) {
   let first = null;
   // (Several areas: each one's cells, a cell in two of them counted twice, as Excel's SUM((A2:B3,B3:C4)) and its
   // COUNTA count it, test/multirange-excel.json.)
-  for (const area of [...(sel.more || []), sel]) for (const [r, line] of sheet.cells) {
+  for (const area of [...(sel.more || []), sel]) for (const [r, line] of filledRows(sheet.cells)) {
     if (r < area.r0 || r > area.r1 || sheet.rows.get(r)?.hidden) continue;
     for (const [c, cell] of line) {
       if (c < area.c0 || c > area.c1 || cell.v == null || cell.v === '' || hiddenCol(c)) continue;

@@ -6,6 +6,7 @@
 // and typed with the file's name instead, [Book.xlsx]Sheet1!A1 (bookNames, bookIndexes). A part is read again only
 // when its bytes change, and written only when something changes in it, so a workbook's links not touched are kept
 // byte for byte.
+import { filledRows } from './sheetcells.js';
 import { parseXml, serializeXml, kids, kid, attr, NS } from './xml.js';
 import { refName, parseRef } from './refs.js';
 import { mapRefs, sheetPrefix, tokenize } from '../calc/tokens.js';
@@ -199,7 +200,7 @@ export function referencedCells(wb, index, limit = () => ({ maxRow: 0, maxCol: 0
   };
   wb.sheets.forEach((info, k) => {
     if (info.kind !== 'worksheet' || !info.path || !wb.pkg.has(info.path)) return;
-    for (const [, line] of wb.sheet(k).cells) for (const [, cell] of line) if (cell.f) scan(cell.f);
+    for (const [, line] of filledRows(wb.sheet(k).cells)) for (const [, cell] of line) if (cell.f) scan(cell.f);
   });
   for (const d of wb.definedNames) scan(d.text);
   return out;
@@ -420,7 +421,7 @@ export function breakLinkSteps(wb, index) {
   wb.sheets.forEach((info, k) => {
     if (info.kind !== 'worksheet' || !info.path || !wb.pkg.has(info.path)) return;
     const contents = [];
-    for (const [r, line] of wb.sheet(k).cells) {
+    for (const [r, line] of filledRows(wb.sheet(k).cells)) {
       for (const [c, cell] of line) {
         if (!cell.f || !cell.f.includes('[')) continue;
         let uses = false;

@@ -3,6 +3,7 @@
 // (several areas apart by spaces), a password hashed as a sheet's. On a protected sheet a range's cells change though
 // they are locked: one without a password at once, one with a password once it is unlocked, until the workbook is
 // opened again (Excel doesn't keep the unlocking). While the sheet is protected, no range is added or changed.
+import { frameOf } from './sheetcells.js';
 import { kid, kids, attr } from './xml.js';
 import { parseRange } from './refs.js';
 import { b64, hashPassword, passwordFits } from './passwords.js';
@@ -15,6 +16,8 @@ export const AFTER_PROTECTION = ['protectedRanges', 'scenarios', 'autoFilter', '
 
 const rootOf = (wb, si) => wb._part(si).doc.documentElement;
 const listOf = (wb, si) => { const root = rootOf(wb, si); return kid(root, 'protectedRanges', root.namespaceURI); };
+/** The list to read only: from the part's document without its cells (sheetcells.js frameOf). */
+const listRead = (wb, si) => { const root = frameOf(wb._part(si)).documentElement; return kid(root, 'protectedRanges', root.namespaceURI); };
 const touched = (wb, si) => { wb.dirty.add(wb.sheets[si].path); wb.edited = true; };
 const areasOf = (sqref) => String(sqref || '').split(/\s+/).map(parseRange).filter(Boolean);
 /** The ranges unlocked with their passwords this session, by sheet: not saved, as in Excel. */
@@ -27,7 +30,7 @@ const unlockedOf = (wb, si) => {
 /** Sheet si's Allow Edit Ranges, in order: [{ name, sqref, areas: [{ r0, c0, r1, c1 }], password: whether it has
  *  one, unlocked: whether its password was given this session }]. */
 export function editRanges(wb, si) {
-  const list = listOf(wb, si);
+  const list = listRead(wb, si);
   if (!list) return [];
   const unlocked = unlockedOf(wb, si);
   return kids(list, 'protectedRange', list.namespaceURI).map((el) => {
@@ -101,7 +104,7 @@ export function deleteEditRange(wb, si, name) {
 
 /** Unlock sheet si's range `name` with its `password` for this session: true, or false when it is wrong. */
 export function unlockEditRange(wb, si, name, password) {
-  const list = listOf(wb, si);
+  const list = listRead(wb, si);
   const el = list && kids(list, 'protectedRange', list.namespaceURI).find((x) => attr(x, 'name') === name);
   if (!el || !passwordFits(el, password)) return false;
   unlockedOf(wb, si).add(name);

@@ -48,7 +48,17 @@ function tagAt(u8, i, name) {
 export function hasFormulaWithoutResult(u8) {
   const open = find(u8, SHEET_DATA);
   if (open < 0) return false;
-  const close = find(u8, SHEET_DATA, open + SHEET_DATA.length);
+  // (Its closing tag, looked for from the part's end: the rows between aren't walked for it.)
+  let close = -1;
+  for (let i = u8.lastIndexOf(SLASH); i > open; i = u8.lastIndexOf(SLASH, i - 1)) {
+    if (u8[i - 1] !== LT) continue;
+    let k = i + 1;
+    while (k < u8.length && letter(u8[k])) k++;
+    const name = u8[k] === COLON ? k + 1 : i + 1;
+    let n = 0;
+    while (n < SHEET_DATA.length && u8[name + n] === SHEET_DATA[n]) n++;
+    if (n === SHEET_DATA.length) { close = name; break; }
+  }
   const end = close < 0 ? u8.length : close;
   for (let i = u8.indexOf(LT, open); i >= 0 && i < end; i = u8.indexOf(LT, i + 1)) {
     const after = tagAt(u8, i, F);

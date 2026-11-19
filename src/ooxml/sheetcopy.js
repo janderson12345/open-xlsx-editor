@@ -65,7 +65,7 @@ export function copySheet(wb, i, at = i + 1) {
   const oldRef = new RegExp(esc(sheetPrefix(source.name)), 'g');
   const fix = (t) => t.replace(oldRef, sheetPrefix(name));
   // (The source as it is now: its part may have changed since it was read.)
-  const now = wb._parsed.get(source) ? serializeXml(wb._part(from).doc) : pkg.text(source.path);
+  const now = wb._parsed.get(source) && wb._parsed.get(source).hasDoc !== false ? serializeXml(wb._part(from).doc) : pkg.text(source.path);
   let xml = now.replace(/xr:uid="\{[^}]*\}"/, `xr:uid="{${hex(8)}-${hex(4)}-${hex(4)}-${hex(4)}-${hex(12)}}"`).replace(/ tabSelected="1"/, '');
   const newRels = [];
   for (const r of pkg.readRels(source.path)) {

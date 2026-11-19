@@ -1,5 +1,6 @@
 // open-xlsx-editor: open .xlsx bytes in a page, show and edit them, save them back. The ribbon over a sheet at a time
 // in a virtualised grid, the sheet tabs under it (with their menu: insert, delete, rename, move, colour, hide, unhide).
+import { filledRows } from './ooxml/sheetcells.js';
 import { Workbook } from './ooxml/workbook.js';
 import { renderPrint } from './editor/print.js';
 import { createActs } from './editor/acts.js';
@@ -166,7 +167,7 @@ export function mountXlsxEditor(host, options = {}) {
     remove: async (i) => {
       const wb = state.workbook;
       // (Excel asks first when the sheet has something in it.)
-      const filled = wb.sheets[i].kind !== 'worksheet' || [...wb.sheet(i).cells.values()].some((line) => [...line.values()].some((c) => c.v != null || c.f != null));
+      const filled = wb.sheets[i].kind !== 'worksheet' || [...filledRows(wb.sheet(i).cells)].some(([, line]) => [...line.values()].some((c) => c.v != null || c.f != null));
       if (filled && await messageBox(root, 'This sheet will be permanently deleted. Do you want to continue?', ['Delete', 'Cancel']) !== 'Delete') return;
       editing().run('deleteSheet', i);
     },

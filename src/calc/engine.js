@@ -1,5 +1,6 @@
 // Recalculation: which formulas a change reaches, the order to work them out in (each after the formulas it reads),
 // and their results written back into the cells. Formulas Excel saved are trusted until something they read changes.
+import { filledRows } from '../ooxml/sheetcells.js';
 import { parseFormula } from './parse.js';
 import { evaluate, result, pick, dynamicResult } from './evaluate.js';
 import { place, release, spillOf, touched } from './spill.js';
@@ -52,7 +53,7 @@ export class Calc {
     this.moved = []; // spill ranges that grew, shrank or went since the last pass: what reads them works out again
     this.book.sheets.forEach((info, si) => {
       if (info.kind !== 'worksheet' || !info.path) return;
-      for (const [r, line] of this.book.sheet(si).cells) for (const [c, cell] of line) if (cell.f != null) this.add(si, r, c, cell);
+      for (const [r, line] of filledRows(this.book.sheet(si).cells)) for (const [c, cell] of line) if (cell.f != null) this.add(si, r, c, cell);
     });
   }
 

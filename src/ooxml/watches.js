@@ -1,6 +1,7 @@
 // The Watch Window's cells as Excel keeps them in the file (measured: Application.Watches.Add, then the file saved and
 // opened again): a sheet's <cellWatches> of <cellWatch r="B2"/>, in the order they were added, after pageMargins and
 // the rest of the page set-up, before ignoredErrors. A range is watched a cell at a time.
+import { frameOf } from './sheetcells.js';
 import { kid, kids, attr } from './xml.js';
 import { parseRef, refName } from './refs.js';
 
@@ -14,8 +15,8 @@ export function readWatches(wb) {
   const out = [];
   wb.sheets.forEach((info, si) => {
     if (info.kind !== 'worksheet' || !info.path) return;
-    const doc = docOf(wb, si);
-    const root = doc?.documentElement;
+    const part = wb._part(si);
+    const root = part && frameOf(part).documentElement;
     if (!root) return;
     for (const el of kids(kid(root, 'cellWatches', root.namespaceURI), 'cellWatch', root.namespaceURI)) {
       const p = parseRef(attr(el, 'r') || '');

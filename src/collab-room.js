@@ -12,6 +12,7 @@
 // Each editor keeps a shadow of what it last shared or took (collab-state.js's digest) and, after a change of its
 // own, writes what differs; what the others write it makes in its workbook with the same code its own commands use.
 // `st` is the shared state of one connection, as one object (collab.js makes it).
+import { frameOf } from './ooxml/sheetcells.js';
 import { LineSeq } from './collab-seq.js';
 import { contentsOf, digestSheet, sheetPrint, bookPrint, samePrint, sameContents, sameAttrs, writeRows, writeCols, writeFormat } from './collab-state.js';
 import { shiftRefs } from './calc/tokens.js';
@@ -306,7 +307,7 @@ export function reconcileSheets(st) {
 /** Sheet i's tab colour as setTabColor takes it ({ rgb } or { theme, tint }), or null. */
 export function tabColorOf(wb, i) {
   if (!isGrid(wb, i)) return null;
-  const root = wb._part(i).doc.documentElement;
+  const root = frameOf(wb._part(i)).documentElement;
   const pr = [...root.childNodes].find((n) => n.nodeType === 1 && n.localName === 'sheetPr');
   const el = pr && [...pr.childNodes].find((n) => n.nodeType === 1 && n.localName === 'tabColor');
   if (!el) return null;

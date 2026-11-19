@@ -1,6 +1,7 @@
 // Home > Clear as Excel does it (measured over COM, docs/FORMATS.md): Clear All empties the cells and takes their
 // formats away, Clear Contents empties them, Clear Formats takes the formats away; All and Formats also unmerge the
 // merged ranges inside. A selection that covers part of a merged range is refused, whichever it is.
+import { filledRows } from './sheetcells.js';
 import { cellsOf } from './formatops.js';
 
 export const CLEAR_REFUSAL = "We can't do that to a merged cell.";
@@ -27,7 +28,7 @@ export function clearChanges(wb, si, sel, what) {
   if (sheet.merges.some((m) => overlaps(m, area) && !inside(m, area))) return { error: CLEAR_REFUSAL };
   const out = { si, contents: [], styles: [], merges: sheet.merges, area };
   if (what !== 'formats') {
-    for (const [r, line] of sheet.cells) {
+    for (const [r, line] of filledRows(sheet.cells)) {
       if (r < area.r0 || r > area.r1) continue;
       for (const [c, cell] of line) if (c >= area.c0 && c <= area.c1 && (cell.v != null || cell.f != null)) out.contents.push({ r, c, value: null });
     }

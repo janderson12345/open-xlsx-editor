@@ -2,9 +2,9 @@
 // Saving rewrites only the sheets that were changed; every other part goes back byte for byte.
 import { OpcPackage } from './package.js';
 import { fileType, setFileType } from './filetype.js';
-import { kids, kid, attr, serializeXml, NS } from './xml.js';
+import { kids, kid, attr, serializeXml, parseXml, NS } from './xml.js';
 import { readSharedStrings, richRunsXml } from './strings.js';
-import { readSheet, readCell } from './sheet.js';
+import { readSheet, readSheetBytes, readCell } from './sheet.js';
 import { readStyles, fontFamily } from './styles.js';
 import { digitWidth } from './digitwidth.js';
 import { readTheme, resolveColor } from './theme.js';
@@ -26,6 +26,7 @@ import { setValidation as setValidationXml, addToRule, moveValidation } from './
 import { addConditional, clearConditional } from './cfedit.js';
 import { snapshotOf, restoreTo, writeResultTo } from './workbookstate.js';
 import { hasFormulaWithoutResult } from './formulascan.js';
+import { frameOf, filledRows } from './sheetcells.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
  *  `standalone="yes"`). */
@@ -35,6 +36,37 @@ function partText(doc, original) {
   const body = serializeXml(doc).replace(/^<\?xml[^?]*\?>\s*/, '');
   return decl ? `${decl[1]}\r\n${body}` : body;
 }
+
+/**
+ * A sheet read from its part's bytes (sheet.js readSheetBytes): its model, and its XML document, which is parsed
+ * only when asked for. Showing a sheet, working out its formulas and saving it unchanged never ask; an edit does,
+ * and has the whole document from then on, as every sheet had before. `frame` is the part's document without its
+ * cells (the whole one once parsed): what reads the views, columns, validations or the extLst reads that.
+ */
+export class SheetPart {
+  constructor(bytes, model, frame) {
+    this.bytes = bytes;
+    this.model = model;
+    this._frame = frame;
+    this._doc = null;
+  }
+
+  /** Whether the whole document has been parsed (an edit asked for it). */
+  get hasDoc() { return !!this._doc; }
+
+  get doc() {
+    if (!this._doc) {
+      this._doc = parseXml(new TextDecoder().decode(this.bytes));
+      this._frame = this.bytes = null;
+    }
+    return this._doc;
+  }
+
+  set doc(doc) { this._doc = doc; }
+
+  get frame() { return this._doc || this._frame; }
+}
+
 
 export class Workbook {
   /** @param {OpcPackage} pkg */
@@ -128,8 +160,14 @@ export class Workbook {
     if (!info) throw new Error(`no sheet ${i}`);
     if (!this._parsed.has(info)) {
       if (info.kind !== 'worksheet' || !info.path || !this.pkg.has(info.path)) throw new Error(`sheet "${info.name}" is not a worksheet`);
-      const doc = this.pkg.xml(info.path);
-      this._parsed.set(info, { doc, model: this._withMdw(readSheet(doc, this.sharedStrings)) });
+      // (Its cells scanned from the bytes, sheetscan.js; a part that can't be is parsed whole, as all were.)
+      const bytes = this.pkg.files[info.path];
+      const read = readSheetBytes(bytes, this.sharedStrings);
+      if (read) this._parsed.set(info, new SheetPart(bytes, this._withMdw(read.model), read.frame));
+      else {
+        const doc = this.pkg.xml(info.path);
+        this._parsed.set(info, { doc, model: this._withMdw(readSheet(doc, this.sharedStrings)) });
+      }
     }
     return this._parsed.get(info);
   }
@@ -165,7 +203,7 @@ export class Workbook {
     let at;
     if (this._parsed.has(info)) {
       // (Parsed, it may have been given a colour since.)
-      const root = this._parsed.get(info).doc.documentElement;
+      const root = frameOf(this._parsed.get(info)).documentElement;
       const el = kid(kid(root, 'sheetPr', root.namespaceURI), 'tabColor', root.namespaceURI);
       if (!el) return null;
       at = Object.fromEntries([...el.attributes].map((a) => [a.name, a.value]));
@@ -458,7 +496,7 @@ export class Workbook {
       // (A sheet not read yet whose every formula has its result, as Excel saves them, isn't parsed for this: its
       // bytes are scanned instead, formulascan.js. A sheet read already is looked at as it is.)
       if (!this._parsed.has(info) && this.pkg.files[info.path] && !hasFormulaWithoutResult(this.pkg.files[info.path])) return;
-      for (const [r, line] of this.sheet(si).cells) for (const [c, cell] of line) if (cell.f != null && cell.v == null) also.push({ si, r, c });
+      for (const [r, line] of filledRows(this.sheet(si).cells)) for (const [c, cell] of line) if (cell.f != null && cell.v == null) also.push({ si, r, c });
     });
     if (!also.length) return 0;
     const dirty = new Set(this.dirty);
@@ -474,7 +512,7 @@ export class Workbook {
   _unshare(i, si) {
     const model = this._part(i).model;
     const texts = new Map();
-    for (const [r, line] of model.cells) for (const [c, cell] of line) if (cell.shared === si) { texts.set(`${r}:${c}`, cell.f); delete cell.shared; }
+    for (const [r, line] of filledRows(model.cells)) for (const [c, cell] of line) if (cell.shared === si) { texts.set(`${r}:${c}`, cell.f); delete cell.shared; }
     unshareXml(this._part(i).doc, si, texts);
   }
 

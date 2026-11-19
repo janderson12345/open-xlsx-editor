@@ -5,6 +5,7 @@
 // everything else in the file as it was. In Node, set up a DOMParser/XMLSerializer first (setXmlImpl, as for the
 // Workbook). Excel has no tracked changes for cells, so edits are made directly; in an editor (`api.agent()`) each is
 // one step of its undo history.
+import { filledRows } from './ooxml/sheetcells.js';
 import { Workbook } from './ooxml/workbook.js';
 import { calculateBeforeSave } from './ooxml/calcmode.js';
 import { goToTarget, goToNames } from './ooxml/goto.js';
@@ -439,7 +440,7 @@ function lineIndex(axis, at) {
 /** The range from the first to the last cell with something in it ("A1:E9"), or null for an empty sheet. */
 function usedRange(sh) {
   let r0 = Infinity, c0 = Infinity, r1 = -1, c1 = -1;
-  for (const [r, line] of sh.cells) {
+  for (const [r, line] of filledRows(sh.cells)) {
     for (const [c, cell] of line) {
       if (cell.v == null && cell.f == null && cell.shared == null) continue;
       if (r < r0) r0 = r;

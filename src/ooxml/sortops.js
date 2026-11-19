@@ -2,6 +2,7 @@
 // as its A to Z button guesses the headers; docs/SORT.md). Rows (or, left to right, columns) are reordered by their
 // keys, ties kept in the order they were; each cell moves with its format (not its borders), a formula moved as a copy
 // moves it; cells outside reading the sorted ones aren't changed. Returns a step as clipops.js does: { si, contents, styles, merges }.
+import { filledRows } from './sheetcells.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { MAX_ROWS, MAX_COLS } from './refs.js';
 import { moveNotes } from './anchors.js';
@@ -212,7 +213,7 @@ export function sortChanges(wb, si, area, { keys, header = false, matchCase = fa
   const meets = (a) => a.r0 <= area.r1 && a.r1 >= area.r0 && a.c0 <= area.c1 && a.c1 >= area.c0;
   if (sheet.arrays.some(meets)) return { error: SORT_MESSAGES.array };
   // (A dynamic array's spill too, any part of it, its formula's cell in or not: Excel refuses, measured.)
-  for (const line of sheet.cells.values()) for (const cell of line.values()) if (cell.spill && meets(cell.spill)) return { error: SORT_MESSAGES.array };
+  for (const [, line] of filledRows(sheet.cells)) for (const cell of line.values()) if (cell.spill && meets(cell.spill)) return { error: SORT_MESSAGES.array };
   const block = mergedBlocks(sheet, area);
   if (!block) return { error: SORT_MESSAGES.merged };
   // (Lines are rows, or columns left to right; each unit is one line, or a merged range's height of them.)

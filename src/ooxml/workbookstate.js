@@ -17,7 +17,8 @@ export function snapshotOf(wb, { styles = false } = {}) {
     // (The sheets as they were, names, order and all, and the parsed ones by their ids: sheets added, renamed, moved
     // or deleted since are put back too.)
     sheets: wb.sheets.map((info) => ({ ...info })),
-    parsed: [...wb._parsed].map(([info, part]) => [info.sheetId, serializeXml(part.doc)]),
+    // (A sheet whose document hasn't been parsed, workbook.js SheetPart, hasn't been changed: the part itself is kept.)
+    parsed: [...wb._parsed].map(([info, part]) => (part.hasDoc === false ? [info.sheetId, null, part] : [info.sheetId, serializeXml(part.doc)])),
   };
 }
 
@@ -30,7 +31,9 @@ export function restoreTo(wb, snap) {
   const root = wb.doc.documentElement;
   const els = kids(kid(root, 'sheets', wb.ns), 'sheet', wb.ns);
   wb.sheets = snap.sheets.map((info) => withEl({ ...info }, els.find((el) => Number(attr(el, 'sheetId')) === info.sheetId) || null));
-  wb._parsed = new Map(snap.parsed.map(([id, text]) => {
+  wb._parsed = new Map(snap.parsed.map(([id, text, part]) => {
+    // (Unchanged then and still: as it is. Changed since: left out, and read again from the snapshot's bytes when asked for.)
+    if (text == null) return [part.hasDoc === false ? wb.sheets.find((s) => s.sheetId === id) : null, part];
     const doc = parseXml(text);
     return [wb.sheets.find((s) => s.sheetId === id), { doc, model: wb._withMdw(readSheet(doc, wb.sharedStrings)) }];
   }).filter(([info]) => info));

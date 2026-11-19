@@ -3,6 +3,7 @@
 // cell (entry.js: 007 a number, 50% a percentage, $1,234.50 currency, 1/2 a date, =1+2 a formula, TRUE a boolean,
 // #N/A an error), quotes letting a field hold commas, line breaks and "" for a quote. And a sheet saved as a CSV as
 // Excel's Save As CSV (UTF-8) and CSV write one.
+import { filledRows } from './sheetcells.js';
 import { zipSync, strToU8 } from 'fflate';
 import { Workbook } from './workbook.js';
 import { decodeText, splitDelimited, detectSeparator, importCells } from './textimport.js';
@@ -110,11 +111,11 @@ export function csvBytes(wb, si, { utf8 = true, kind = null, sep = null, encodin
 export function sheetText(wb, si, sep = ',') {
   const sh = wb.sheet(si);
   let c0 = Infinity;
-  for (const line of sh.cells.values()) for (const [c, cell] of line) if (cell.v != null && c < c0) c0 = c;
+  for (const [, line] of filledRows(sh.cells)) for (const [c, cell] of line) if (cell.v != null && c < c0) c0 = c;
   const lines = [];
   if (Number.isFinite(c0)) {
     let r0 = Infinity;
-    for (const [r, line] of sh.cells) if ([...line.values()].some((x) => x.v != null)) r0 = Math.min(r0, r);
+    for (const [r, line] of filledRows(sh.cells)) if ([...line.values()].some((x) => x.v != null)) r0 = Math.min(r0, r);
     for (let r = r0; r <= sh.maxRow; r++) {
       const out = [];
       for (let c = c0; c <= sh.maxCol; c++) {

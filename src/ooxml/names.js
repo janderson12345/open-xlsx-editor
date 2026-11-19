@@ -4,6 +4,7 @@
 // not a cell reference (A1 to XFD1048576) nor anything R1C1 reads (R, C, R2, C3, RC1, R1C1), nor TRUE or FALSE; 255
 // characters at most; one name per scope (the workbook, or a sheet). In the file they are sorted, capitals aside, a
 // built-in name (_xlnm.Print_Area) by its own name, and a sheet's name before the workbook's of the same name.
+import { filledRows } from './sheetcells.js';
 import { kids, kid } from './xml.js';
 import { colIndex, MAX_ROWS, MAX_COLS } from './refs.js';
 import { withEl } from './sheetops.js';
@@ -146,7 +147,7 @@ function renameInFormulas(wb, from, to, sheet) {
     // (A sheet with a name of its own the same: its formulas read that one, and stay.)
     if (sheet == null && findName(wb, from, si)) return;
     const changes = [];
-    for (const [r, line] of wb.sheet(si).cells) {
+    for (const [r, line] of filledRows(wb.sheet(si).cells)) {
       for (const [c, cell] of line) {
         if (cell.f == null || cell.f === '' || !cell.f.toLowerCase().includes(lower)) continue;
         let toks;
