@@ -1,32 +1,33 @@
 # Changelog
 
-## Unreleased
+## 0.9.0
 
 - **Fix:** screen readers give each cell its own column's heading. NVDA in Edge and Chrome read column B's cells under
   column C's heading, because a screen reader matches a cell to its heading by its place in the row. The heading row
   now starts with the corner as each row starts with its number, and every column in view has a cell in each row.
-  Security review done (no problems found); held for the next release.
 - **Fix:** row heights Excel works out match it again on wrapped text. A formula's text result (such as
   =CONCATENATE) and a word wider than its column now count, lines are counted at Excel's text widths, a merged title's
   font counts toward its row, and a thick bottom border adds Excel's 0.75pt. A crosswalk workbook went from 41 to 60 of
-  60 rows as Excel's. Security review still to do before release.
+  60 rows as Excel's.
 - **Faster opening:** only sheets with a formula saved without its result are parsed on opening (found by scanning
   their bytes); the rest wait until shown. Large workbooks whose other sheets are big open in seconds instead of up to
-  a minute. Security review still to do before release.
+  a minute.
 - **Fast sheet reading:** a sheet's cells are read straight from its bytes instead of a parsed XML tree, and rows of
   formatted empty cells are kept as bands. Workbooks whose sheet is formatted down to the last row (millions of empty
   styled cells) open in 3 to 5 seconds instead of 30 to 57, and in Node without running out of memory. A sheet's XML
-  is parsed only when it's first edited. Security review still to do before release.
+  is parsed only when it's first edited.
 - **Excel's own row heights and column widths** for the 25 fonts workbooks use most, measured at every half point
   from 6 to 36pt, instead of a formula that was a pixel off for most fonts below 11pt. Fixes Lato and Aptos Narrow 12
-  sheets whose columns were 11 to 12% off. Security review still to do before release.
+  sheets whose columns were 11 to 12% off.
 - **Fix:** a row of long wrapped text stops at 409.5pt, Excel's tallest row, instead of growing to thousands of
-  points. Security review still to do before release.
+  points.
 - **A sheet's standard row height is Excel's:** the stored default only when the file sets it, else the tallest font
   in the row's formatting, as Excel works it out. On 146 customer workbooks, rows that differ from Excel went from 995
-  to 102 and workbooks with every row exact from 68 to 95. Security review still to do before release.
+  to 102 and workbooks with every row exact from 68 to 95.
 - **Clearer refusals:** a workbook protected by rights management (a sensitivity label) says only Excel, signed in
-  with access, can open it; a damaged file is no longer called too large. Security review still to do before release.
+  with access, can open it; a damaged file is no longer called too large.
+- **Security:** a row height pass over a sheet whose rows of formatted empty cells alternate styles column by
+  column now looks each column's style up by binary search: a crafted sheet of such rows took billions of steps.
 
 ## 0.8.3
 

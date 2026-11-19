@@ -1,6 +1,6 @@
 {
   "name": "open-xlsx-editor",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "Open and edit .xlsx files in the browser. 100% JavaScript, no server, no Office.",
   "author": "open-xlsx-editor contributors",
   "repository": {
