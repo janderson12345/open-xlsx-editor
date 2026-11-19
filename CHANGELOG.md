@@ -22,6 +22,9 @@
   sheets whose columns were 11 to 12% off. Security review still to do before release.
 - **Fix:** a row of long wrapped text stops at 409.5pt, Excel's tallest row, instead of growing to thousands of
   points. Security review still to do before release.
+- **A sheet's standard row height is Excel's:** the stored default only when the file sets it, else the tallest font
+  in the row's formatting, as Excel works it out. On 146 customer workbooks, rows that differ from Excel went from 995
+  to 102 and workbooks with every row exact from 68 to 95. Security review still to do before release.
 - **Clearer refusals:** a workbook protected by rights management (a sensitivity label) says only Excel, signed in
   with access, can open it; a damaged file is no longer called too large. Security review still to do before release.
 
