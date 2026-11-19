@@ -57,7 +57,7 @@ export function rowDescents(sheet, deco) {
     let best = { row: -1, desc: 0 };
     for (const cell of line.values()) {
       const f = deco(cell.s || 0).font;
-      const row = fontRowPx(f.family, f.sizePx);
+      const row = fontRowPx(f.family, f.sizePx, f.bold);
       if (row > best.row) best = { row, desc: fontDescentPx(f.family, f.sizePx) };
     }
     out.set(r, best.desc);
@@ -67,7 +67,7 @@ export function rowDescents(sheet, deco) {
     let best = { row: -1, desc: 0 };
     for (let k = 0; k < runs.length; k += 3) {
       const f = deco(runs[k + 2] || 0).font;
-      const row = fontRowPx(f.family, f.sizePx);
+      const row = fontRowPx(f.family, f.sizePx, f.bold);
       if (row > best.row) best = { row, desc: fontDescentPx(f.family, f.sizePx) };
     }
     for (let r = r0; r <= r1; r++) out.set(r, best.desc);
@@ -102,7 +102,7 @@ export function autoRowHeights(sheet, deco, cols) {
   const mergeOf = (r, c) => sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
   const rowPt = new Map(); // per cell format: one line's height in points
   const lineOf = (s) => {
-    if (!rowPt.has(s)) { const d = deco(s); rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx) * 0.75); }
+    if (!rowPt.has(s)) { const d = deco(s); rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx, d.font.bold) * 0.75); }
     return rowPt.get(s);
   };
   // (A row with a format of its own, cells or not: its font's line, as Excel grows a row made 14pt to 18.75.)
@@ -141,7 +141,7 @@ export function autoRowHeights(sheet, deco, cols) {
     for (const [c, cell] of line) {
       const s = cell.s || 0;
       const d = deco(s);
-      if (!rowPt.has(s)) rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx) * 0.75);
+      if (!rowPt.has(s)) rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx, d.font.bold) * 0.75);
       // (A cell in a merged range on this row alone counts with its font's line, as Excel's 16pt title merged across
       // A1:K1 makes its row 21pt (measured over COM); its wrapping doesn't. A range over several rows doesn't count.)
       const m = mergeOf(r, c);
@@ -154,7 +154,7 @@ export function autoRowHeights(sheet, deco, cols) {
       if (d.align.wrap && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) lines = countLines(cell.v, d.font.css, (cols.size(c) - 4) / EXCEL_WRAP_WIDTH);
       best = Math.max(best, rowPt.get(s) * lines);
       // (Rich text: a run's larger font grows the row as Excel's does, a 16pt run in Aptos Narrow 11 to 21pt.)
-      if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3) * 0.75);
+      if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3, run.font.b ?? d.font.bold) * 0.75);
       if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, rowPt.get(s)));
     }
     // (A thick bottom border, thickBot: 0.75pt more, as Excel gives the 21pt title row above 21.75pt, 21 without the

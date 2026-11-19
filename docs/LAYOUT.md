@@ -256,6 +256,13 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
   60 of 60 rows as Excel's, and tools/excel-compare/rowfit-book.mjs's, 60 of 62 (test/rowfit.mjs). The two others
   are identifiers of 17 characters, mostly digits, that just fit in Excel and take a line more here. No simple
   per-character model (each width rounded, rounded up, digits apart, GDI's own advances) fitted both workbooks.
+- A font's row height and digit width are Excel's own for 25 fonts at every half point from 6 to 36pt
+  (ooxml/excelfonts.js, measured over COM by tools/excel-compare/excel-fontmetrics.ps1): Excel takes them from
+  Windows' rendering of the font at the size in whole pixels, and neither GDI's line height plus a margin nor any
+  formula of the font's metrics gave them (the best of 144 tried, 45 of 121). Against Excel on 146 customer
+  workbooks, rows all as Excel's in 68 (56 before), columns in 145 (141). Still open: the sheet's standard height,
+  the least a row of cells takes. It is the stored defaultRowHeight here, which most sheets match; but Excel can
+  work out a lower one (12.75pt for a sheet stored at 13.8 with a Lato Normal style), not yet understood.
 - Printing (print area, print titles, scale, fit to pages, page breaks, headers and footers): docs/PRINT.md.
 
 ## Tried and dropped

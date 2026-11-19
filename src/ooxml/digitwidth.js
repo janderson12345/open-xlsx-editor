@@ -5,6 +5,7 @@
 // hinted glyphs, which a browser can't read; the font's own digits at the size in pixels, rounded, give the same for
 // 32 of the 36 installed fonts measured (Calibri 8 and 14, Arial 14 and Times New Roman 10 are a pixel off), so the
 // measured table comes first and the browser's measure (setDigitMeasure) for any other font.
+import { excelFontMetric } from './excelfonts.js';
 
 /** Excel's maximum digit widths by typeface (lower case) and size in points (measured). */
 export const MEASURED_MDW = {
@@ -44,7 +45,8 @@ const cache = new Map();
 export function digitWidth(family, size = 11) {
   const name = String(family || 'Calibri').toLowerCase();
   const pt = Number(size) || 11;
-  return MEASURED_MDW[name]?.[pt] || deriveDigitWidth(family, pt);
+  // (Excel's table of the fonts workbooks use at every half point, excelfonts.js, then the older one, then derived.)
+  return excelFontMetric(name, pt, 'mdw') || MEASURED_MDW[name]?.[pt] || deriveDigitWidth(family, pt);
 }
 
 /** The maximum digit width worked out from the font alone (not Excel's table): the browser's measure of 0-9 at the

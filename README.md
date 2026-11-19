@@ -250,11 +250,13 @@ release 1.0.1 bundle (1.1.0 redraws some letters but keeps every width and line 
   and what AutoFit picks, so these match too. `exportPdf` with the twin embedded: large.xlsx's 100,000 cells all
   within 1px in width too, and the ten fixtures 99.9% (95.0% when it drew Aptos Narrow in Calibri; docs/PDF.md).
 
+Row heights and column widths for the 25 fonts workbooks use most (Calibri, Arial, Aptos Narrow, Times New Roman,
+Tahoma, Verdana, Lato and others, and the old names Excel stands in for, such as Helv and MS Sans Serif) are Excel's
+own, measured at every half point from 6 to 36pt (`src/ooxml/excelfonts.js`), whether the font is drawn or its twin.
+
 Not yet:
-- Row heights: a row sized to its font takes the font's metrics from `src/engine/metrics.js` (read from a Windows
-  machine's fonts), else Calibri's (for Aptos Narrow that gives Excel's 15pt). The families not in that table get
-  Calibri's row height even when drawn in their twin; the twin's metrics, the original's, aren't used for it yet,
-  as that hasn't been measured against Excel.
+- Row heights for fonts outside that table come from the font's metrics in `src/engine/metrics.js`, else Calibri's,
+  by a formula that can be a pixel off.
 - A face the family doesn't have (Tahoma's italic) is slanted by the browser, as for an installed font; `exportPdf`
   draws it upright.
 

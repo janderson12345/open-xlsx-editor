@@ -119,11 +119,12 @@ for (const f of fonts) {
 }
 check(!wrongWidths.length && fonts.length === 7, `column headings as wide as Excel's columns for ${fonts.length} Normal fonts (mdw 6 to 16)`, wrongWidths.join('; '));
 await page.screenshot({ path: `${outDir}/display-mdw.png` });
-// A typeface and size Excel's table lacks (Georgia 13): the browser's measure of 0-9 at 17.33px, rounded, is used.
-await open('mdw-georgia.xlsx', book({ font: ['Georgia', 13], cells: [['A1', 1]] }));
+// A typeface Excel's tables lack (Constantia 13; Georgia, used before, is measured now: ooxml/excelfonts.js): the
+// browser's measure of 0-9 at 17.33px, rounded, is used.
+await open('mdw-constantia.xlsx', book({ font: ['Constantia', 13], cells: [['A1', 1]] }));
 const derived = await page.evaluate(() => {
   const ctx = document.createElement('canvas').getContext('2d');
-  ctx.font = `${(13 * 96) / 72}px "Georgia", sans-serif`;
+  ctx.font = `${(13 * 96) / 72}px "Constantia", sans-serif`;
   const widest = Math.max(...'0123456789'.split('').map((d) => ctx.measureText(d).width));
   return { mdw: window.oxe.workbook.mdw, canvas: Math.round(widest), head: Math.round(document.querySelector('.oxe-colhead').getBoundingClientRect().width) };
 });

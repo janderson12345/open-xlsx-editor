@@ -3,6 +3,7 @@
 // then a generic family. And each font's line height for celltext.js.
 import metrics from '../engine/metrics.js';
 import { omfEntry, omfFamily } from './omffonts.js';
+import { excelFontMetric } from '../ooxml/excelfonts.js';
 
 /** Free fonts drawn to the same metrics as Office's. Aptos Narrow (the body font of Excel 365's default theme since
  *  2023) isn't installed with Windows (Office keeps it in its own cloud-font cache, out of browsers' reach); its
@@ -161,11 +162,14 @@ export const extraPadPx = (sizePx) => Math.max(0, 0.13 * (sizePx - 44 / 3));
 /** A font's Windows descent in px (where Excel's baseline sits above a row's bottom, plus BASELINE_ABOVE_DESCENT). */
 export const fontDescentPx = (name, sizePx) => fontMetrics(name, sizePx).wd;
 
-/** A font's row height in px, the height Excel gives a row of it (and the pitch of its wrapped lines): its line,
- *  the larger of Windows ascent + descent and hhea ascent + descent + gap, plus 1.6px and 0.035 of its size, rounded.
- *  Fitted on Excel's PDF of test/fixtures/rows.xlsx: Calibri 11, 14, 20, 36 (15, 18.75, 26.25, 46.5pt), Cambria 20
- *  (25.5), Times New Roman 16 (20.25), Arial 14 (18), all exact; a fit, not Excel's own formula. */
-export function fontRowPx(name, sizePx) {
+/** A font's row height in px, the height Excel gives a row of it (and the pitch of its wrapped lines). Excel's own,
+ *  measured over COM for the fonts workbooks use, 6pt to 36pt by half points (ooxml/excelfonts.js; `bold` for a
+ *  bold font, a few of whose rows differ). Other fonts and sizes: its line, the larger of Windows ascent + descent
+ *  and hhea ascent + descent + gap, plus 1.6px and 0.035 of its size, rounded, a fit on Excel's PDF of
+ *  test/fixtures/rows.xlsx at 11pt and up that drifts below 11pt (54 of 154 of the table's sizes before it). */
+export function fontRowPx(name, sizePx, bold = false) {
+  const measured = excelFontMetric(name, sizePx * 0.75, bold ? 'bold' : 'row');
+  if (measured) return measured;
   const key = name.toLowerCase();
   const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   return Math.round(Math.max(m.win[0] + m.win[1], m.line) * sizePx + 1.6 + 0.035 * sizePx);
