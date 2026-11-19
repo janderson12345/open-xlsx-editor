@@ -20,6 +20,8 @@
 - **Excel's own row heights and column widths** for the 25 fonts workbooks use most, measured at every half point
   from 6 to 36pt, instead of a formula that was a pixel off for most fonts below 11pt. Fixes Lato and Aptos Narrow 12
   sheets whose columns were 11 to 12% off. Security review still to do before release.
+- **Fix:** a row of long wrapped text stops at 409.5pt, Excel's tallest row, instead of growing to thousands of
+  points. Security review still to do before release.
 - **Clearer refusals:** a workbook protected by rights management (a sensitivity label) says only Excel, signed in
   with access, can open it; a damaged file is no longer called too large. Security review still to do before release.
 
