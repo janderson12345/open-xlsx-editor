@@ -6,7 +6,8 @@ import { parseXml, serializeXml, kids, NS, REL_TYPES, esc } from './xml.js';
 
 /** How much a package may unpack to in all (1 GB): far past any workbook a page can hold. */
 export const MAX_UNPACKED = 1024 * 1024 * 1024;
-const TOO_BIG = 'This file is too large to open here: it unpacks to more than 1 GB.';
+// (A damaged zip whose directory gives sizes that make no sense is refused by the same check: both said here.)
+const TOO_BIG = "This file can't be opened here: it is damaged, or it unpacks to more than 1 GB.";
 
 export class OpcPackage {
   constructor(files) {

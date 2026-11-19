@@ -16,10 +16,11 @@ export const ENCRYPTION_MESSAGES = {
   needed: 'This workbook is protected with a password.',
   wrong: "The password you supplied is not correct. Verify that the CAPS LOCK key is off and be sure to use the correct capitalization.",
   unsupported: "This workbook is encrypted in a way that can't be opened here (only Excel 2010 and later's encryption can).",
+  rights: 'This workbook is protected by rights management (a sensitivity label or Information Rights Management). Only Microsoft Excel, signed in with an account that has access to it, can open it.',
   damaged: 'The encrypted workbook is damaged: its contents do not match its integrity check.',
 };
 
-/** A refusal to open an encrypted workbook: `reason` 'needed', 'wrong', 'unsupported' or 'damaged'. */
+/** A refusal to open an encrypted workbook: `reason` 'needed', 'wrong', 'unsupported', 'rights' or 'damaged'. */
 export class PasswordError extends Error {
   constructor(reason) {
     super(ENCRYPTION_MESSAGES[reason]);
@@ -97,6 +98,9 @@ const ivFor = (kd, extra) => fit(kd.hash(concat(kd.salt, extra)), kd.blockSize);
  */
 export function decryptWorkbook(file, password) {
   const streams = readCompoundFile(file);
+  // (Rights management, a sensitivity label or IRM: its package is encrypted to an organisation's accounts, a
+  // DRMEncrypted transform in its data spaces, not to a password. Customers' workbooks tied to an agency's sign-in.)
+  if ([...streams.keys()].some((k) => /DRMEncrypted/i.test(k))) throw new PasswordError('rights');
   const infoBytes = streams.get('EncryptionInfo');
   const pkg = streams.get('EncryptedPackage');
   if (!infoBytes || !pkg) throw new PasswordError('unsupported');

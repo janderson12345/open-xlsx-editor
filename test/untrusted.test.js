@@ -98,7 +98,7 @@ test('a workbook whose parts say they unpack past 1 GB is refused before anythin
   // (Each central directory entry's uncompressed size, at 24 past its signature, made 600 MB: 1.2 GB in all.)
   for (let o = 0; o + 4 <= zip.length; o++) if (dv.getUint32(o, true) === 0x02014b50) dv.setUint32(o + 24, 600 * 1024 * 1024, true);
   const started = Date.now();
-  assert.throws(() => OpcPackage.fromBytes(zip), /too large to open here/);
+  assert.throws(() => OpcPackage.fromBytes(zip), /damaged, or it unpacks to more than 1 GB/);
   assert.ok(Date.now() - started < 500);
   // (A real workbook opens as before.)
   assert.ok(OpcPackage.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx'))).has('[Content_Types].xml'));

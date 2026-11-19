@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { readCompoundFile, writeCompoundFile, isCompoundFile } from '../src/ooxml/cfb.js';
-import { decryptWorkbook, encryptWorkbook, dataSpaces, PasswordError } from '../src/ooxml/encryption.js';
+import { decryptWorkbook, encryptWorkbook, dataSpaces, PasswordError, ENCRYPTION_MESSAGES } from '../src/ooxml/encryption.js';
 import { Workbook } from '../src/ooxml/workbook.js';
 import { cellAt } from '../src/ooxml/sheet.js';
 
@@ -55,6 +55,20 @@ test('a workbook encrypted with a password opens with it, and is refused without
   const info = streams.get('EncryptionInfo');
   info[0] = 3; // (version 3.x: the older "standard" encryption)
   assert.equal(reason(() => decryptWorkbook(writeCompoundFile(streams), 'Test-pass 1')), 'unsupported');
+});
+
+test('a workbook protected by rights management (a DRMEncrypted transform, no password) says so', () => {
+  // (Its data spaces as IRM and sensitivity labels write them: the package encrypted to an organisation's accounts.)
+  const streams = new Map([
+    ['\u0006DataSpaces/Version', new Uint8Array(12)],
+    ['\u0006DataSpaces/DataSpaceMap', new Uint8Array(16)],
+    ['\u0006DataSpaces/TransformInfo/DRMEncryptedTransform/\u0006Primary', new Uint8Array(32)],
+    ['EncryptedPackage', new Uint8Array(64)],
+  ]);
+  const file = writeCompoundFile(streams);
+  assert.equal(reason(() => decryptWorkbook(file)), 'rights');
+  assert.equal(reason(() => decryptWorkbook(file, 'any password')), 'rights');
+  assert.match(ENCRYPTION_MESSAGES.rights, /rights management/);
 });
 
 test('an encrypted workbook opens, is edited and saves encrypted with its password; setPassword changes it', () => {
