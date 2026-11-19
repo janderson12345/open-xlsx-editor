@@ -41,7 +41,8 @@ export const EXCEL_FONTS = {
 
 /** The measured entry `key` ('row', 'bold' or 'mdw') of font `name` at `pt` (to the nearest half point), or null. */
 export function excelFontMetric(name, pt, key) {
-  const f = EXCEL_FONTS[String(name || '').toLowerCase()];
+  const lower = String(name || '').toLowerCase();
+  const f = Object.hasOwn(EXCEL_FONTS, lower) ? EXCEL_FONTS[lower] : null; // (not Object's own constructor or __proto__)
   if (!f || !(pt >= EXCEL_FONT_FROM && pt <= EXCEL_FONT_TO)) return null;
   const v = f[key][Math.round((pt - EXCEL_FONT_FROM) * 2)];
   return v || null;
@@ -50,7 +51,8 @@ export function excelFontMetric(name, pt, key) {
 /** Font `name`'s line at `pt`, bold or italic or both: { row, desc } in pixels, the height of a row of it and the
  *  descent Excel counts for it, or null when it isn't measured. */
 export function excelFontLine(name, pt, bold, italic) {
-  const f = EXCEL_FONTS[String(name || '').toLowerCase()];
+  const lower = String(name || '').toLowerCase();
+  const f = Object.hasOwn(EXCEL_FONTS, lower) ? EXCEL_FONTS[lower] : null; // (not Object's own constructor or __proto__)
   if (!f || !(pt >= EXCEL_FONT_FROM && pt <= EXCEL_FONT_TO)) return null;
   const at = Math.round((pt - EXCEL_FONT_FROM) * 2);
   const rows = (italic && (bold ? f.boldItalic : f.italic)) || (bold ? f.bold : f.row);

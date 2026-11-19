@@ -230,7 +230,8 @@ export function excelWidths(name, px, bold = false, italic = false) {
     more = SMALL[style].more[at];
     width = (code) => (code >= FIRST && code <= LAST ? s.charCodeAt((code - FIRST) * n + at) - 48 : -1);
   } else {
-    const table = WIDTHS[String(name).toLowerCase()];
+    const lower = String(name).toLowerCase();
+    const table = Object.hasOwn(WIDTHS, lower) ? WIDTHS[lower] : null; // (not Object's own constructor or __proto__)
     if (!table || size > PX_TO) return null;
     const at = size - PX_FROM;
     const w = decode(table[style] ?? (bold ? table.bold : null) ?? table.regular);

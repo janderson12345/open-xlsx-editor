@@ -150,6 +150,45 @@ test('a query package that says it unpacks past 64 MB is not unpacked', () => {
   assert.deepEqual(readMashup(wb)?.queries.map((q) => q.name), ['Q']);
 });
 
+test("a font named constructor or __proto__ is a font Windows hasn't, not one of Object's own properties", async () => {
+  // (The font tables were looked up by the name in the file as it stood: fontStack threw for these names, and so did
+  // opening a workbook that used one.)
+  const { windowsHasFont, fontLinePx, fontRowPx } = await import('../src/editor/fonts.js');
+  const { excelWidths } = await import('../src/ooxml/excelwidths.js');
+  const { excelFontMetric, excelFontLine } = await import('../src/ooxml/excelfonts.js');
+  const unknown = 'Nofont Xyz';
+  const wb = Workbook.fromBytes(new Uint8Array(fs.readFileSync('test/fixtures/basic.xlsx')));
+  const si = wb.addSheet(wb.sheets.length, 'Names');
+  wb.setCell(si, 'A1', 'a wrapped line of text, long enough to take a few lines in a narrow column');
+  const sheet = wb.sheet(si);
+  const rowOf = (family) => autoRowHeights(sheet, () => ({ font: { family, sizePx: 44 / 3, bold: false, italic: true, css: '' }, align: { wrap: true } }), { size: () => 64 }).get(0);
+  for (const name of ['constructor', '__proto__', 'toString', 'hasOwnProperty', 'valueOf']) {
+    assert.equal(fontStack(name), `${name}, sans-serif`);
+    assert.equal(windowsHasFont(name), false);
+    assert.deepEqual([fontRowPx(name, 15), fontLinePx(name, 15, true, false, true)], [fontRowPx(unknown, 15), fontLinePx(unknown, 15, true, false, true)]);
+    assert.deepEqual([excelWidths(name, 15, true, true), excelFontMetric(name, 11, 'row'), excelFontLine(name, 11, false, false)], [null, null, null]);
+    assert.equal(rowOf(name), rowOf(unknown));
+  }
+});
+
+test('wrapped cells of crafted long words and long runs of spaces are sized at once', async () => {
+  // (A word too wide for its column was cut a character at a time, the line measured again for each, and the spaces
+  // after it walked over again at each cut: a million characters, which a file zips to a few KB, took minutes; and a
+  // rich text of 300,000 runs overflowed the stack working out their italic allowance.)
+  const { excelLineCount, wrapLines } = await import('../src/editor/rowheights.js');
+  const font = { family: 'Calibri', sizePx: 44 / 3, bold: false, italic: false, roman: false, css: '11pt Calibri' };
+  const started = Date.now();
+  // (Past the 32,767 characters a cell holds in Excel nothing is measured.)
+  assert.equal(excelLineCount(`${'W'.repeat(500000)}${' '.repeat(500000)}`, font, 64), excelLineCount('W'.repeat(32767), font, 64));
+  assert.equal(excelLineCount(`${'W'.repeat(16000)}${' '.repeat(16000)}x`, font, 64), excelLineCount(`${'W'.repeat(16000)} x`, font, 64));
+  assert.equal(excelLineCount('i'.repeat(1000000), font, 1790), 77);
+  assert.equal(wrapLines(`${'W'.repeat(500000)} x`, '11pt Calibri', 64).length, 1);
+  const runs = Array.from({ length: 300000 }, (_, k) => ({ text: 'ab', font: { name: 'Calibri', size: 11, b: false, i: k % 2 === 0 } }));
+  assert.ok(excelLineCount('ab'.repeat(300000).slice(0, 32767), font, 64, 0, runs) > 1);
+  assert.ok(excelLineCount('ab'.repeat(16000), font, 64, 0, runs.slice(0, 16000)) > 1);
+  assert.ok(Date.now() - started < 3000, `took ${Date.now() - started} ms`);
+});
+
 test('rows of formatted empty cells alternating styles across every column are sized at once', () => {
   // (200 rows, each 16,384 empty cells of two styles in turn, 8,192 runs, every row a little different so none are
   // one band: counting each band's empty columns run by run took 200 x 16,384 x 8,192 steps.)

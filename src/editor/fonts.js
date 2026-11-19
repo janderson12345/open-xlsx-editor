@@ -20,6 +20,9 @@ const STAND_INS = {
   'times new roman': ['Liberation Serif', 'Tinos'],
   'courier new': ['Liberation Mono', 'Cousine'],
 };
+// (A table looked up by a font name from the file gives only its own entries: a font named constructor or __proto__
+// isn't one of Object's, which made opening the workbook throw.)
+const own = (table, key) => (Object.hasOwn(table, key) ? table[key] : undefined);
 const SERIF = /^(cambria|times|georgia|garamond|book antiqua|palatino|constantia|aptos serif|century)/i;
 const MONO = /^(courier|consolas|lucida console|aptos mono|cascadia)/i;
 
@@ -33,7 +36,7 @@ const quote = (name) => (/^[\w-]+$/.test(name) ? name : `'${String(name).replace
 export function fontStack(name) {
   const generic = SERIF.test(name) ? 'serif' : MONO.test(name) ? 'monospace' : 'sans-serif';
   const twin = omfFamily(name);
-  return [name, ...(twin ? [twin] : []), ...(STAND_INS[name.toLowerCase()] || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
+  return [name, ...(twin ? [twin] : []), ...(own(STAND_INS, name.toLowerCase()) || []), generic].map((n) => (n === generic ? n : quote(n))).join(', ');
 }
 
 /** Where Excel's baseline sits above the cell's bottom edge, beyond the Windows descent of the font the browser draws,
@@ -93,7 +96,7 @@ function twinMetrics(name) {
   const entry = omfEntry(name);
   if (!entry || hasFont(name)) return null;
   const served = omfFamily(name);
-  const installed = (STAND_INS[name.toLowerCase()] || []).find((s) => /^morrow /i.test(s));
+  const installed = (own(STAND_INS, name.toLowerCase()) || []).find((s) => /^morrow /i.test(s));
   return (served && hasFont(served)) || (installed && hasFont(installed)) ? entry[1] : null;
 }
 
@@ -106,13 +109,13 @@ function fontMetrics(name, sizePx) {
   // (A metric twin drawn: the Office font's own metrics for where Excel puts the text, those the browser places the
   // twin by for where it goes.)
   const twin = twinMetrics(name);
-  const m = twin || metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
+  const m = twin || own(metrics, key) || (own(STAND_INS, key) || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   const wa = m.win[0] * sizePx;
   const wd = m.win[1] * sizePx;
   // (A font with USE_TYPO_METRICS set placed by its typo ascent and descent, as the Morrow fonts are; installed ones
   // with it, Bahnschrift, Cascadia, and the other twins with it, by the same rule, not measured against Excel.)
   const [ca, cd] = m.typo?.[3] ? [m.typo[0] * sizePx, m.typo[1] * sizePx] : [wa, wd];
-  return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: twin || metrics[key] ? BASELINE_ABOVE_DESCENT : BASELINE_STAND_IN[key] ?? BASELINE_ABOVE_DESCENT };
+  return { wa, wd, ar: Math.round(ca), dr: Math.round(cd), base: twin || own(metrics, key) ? BASELINE_ABOVE_DESCENT : own(BASELINE_STAND_IN, key) ?? BASELINE_ABOVE_DESCENT };
 }
 
 /** Where Chromium puts the baseline in a line box of L px: floor((L - (ascent + descent)) / 2) + ascent below its top,
@@ -164,7 +167,7 @@ export const fontDescentPx = (name, sizePx) => fontMetrics(name, sizePx).wd;
 
 /** Whether Windows has the font, as far as is known here (its metrics or a stand-in's): one it hasn't Excel lays out
  *  in Arial, or in Times New Roman for a font of the roman family (fontRowPx; Windows' own stand-ins, as Helvetica's). */
-export const windowsHasFont = (name) => { const key = String(name).toLowerCase(); return !!(metrics[key] || STAND_INS[key]); };
+export const windowsHasFont = (name) => { const key = String(name).toLowerCase(); return !!(own(metrics, key) || own(STAND_INS, key)); };
 
 /** A font's row height in px, the height Excel gives a row of it (and the pitch of its wrapped lines). Excel's own,
  *  measured over COM for the fonts workbooks use, 6pt to 36pt by half points (ooxml/excelfonts.js; `bold` for a
@@ -179,11 +182,11 @@ export function fontRowPx(name, sizePx, bold = false, roman = false) {
   const measured = excelFontMetric(name, sizePx * 0.75, bold ? 'bold' : 'row');
   if (measured) return measured;
   const key = name.toLowerCase();
-  if (!metrics[key] && !STAND_INS[key]) {
+  if (!own(metrics, key) && !own(STAND_INS, key)) {
     const instead = excelFontMetric(roman ? 'Times New Roman' : 'Arial', sizePx * 0.75, bold ? 'bold' : 'row');
     if (instead) return instead;
   }
-  const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
+  const m = own(metrics, key) || (own(STAND_INS, key) || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   return Math.round(Math.max(m.win[0] + m.win[1], m.line) * sizePx + 1.6 + 0.035 * sizePx);
 }
 

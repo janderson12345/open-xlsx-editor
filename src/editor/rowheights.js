@@ -12,9 +12,10 @@ let ctx = null;
 /** The lines a wrapped text breaks into in `width` px: words greedily, broken at spaces and at line breaks, measured
  *  in the cell's font; a word wider than the cell broken where it reaches the edge, as Excel breaks it and the cell's
  *  CSS draws it (overflow-wrap: break-word): RSES.C2.10.00001.001 in a 19-character column takes two lines. Without
- *  a canvas (Node) only line breaks count. */
+ *  a canvas (Node) only line breaks count. Text past what a cell holds in Excel (EXCEL_MAX_CHARS) isn't laid out. */
 export function wrapLines(text, font, width) {
-  const paragraphs = String(text).replace(/\r/g, '').split('\n');
+  const whole = String(text).replace(/\r/g, '');
+  const paragraphs = (whole.length > EXCEL_MAX_CHARS ? whole.slice(0, EXCEL_MAX_CHARS) : whole).split('\n');
   if (typeof document === 'undefined') return paragraphs;
   ctx = ctx || document.createElement('canvas').getContext('2d');
   ctx.font = font;
@@ -26,14 +27,17 @@ export function wrapLines(text, font, width) {
       const next = line ? `${line} ${word}` : word;
       if (fits(next)) { line = next; continue; }
       if (line) out.push(line);
-      line = word;
-      // (A word too wide for a line of its own: as many characters as fit on each line, at least one.)
-      while (!fits(line) && line.length > 1) {
-        let n = 1;
-        while (n < line.length && fits(line.slice(0, n + 1))) n++;
-        out.push(line.slice(0, n));
-        line = line.slice(n);
+      // (A word too wide for a line of its own: as many characters as fit on each line, at least one, found by
+      // longestFit. Going up a character at a time, and measuring the rest of the word each line, made a crafted
+      // word of a million characters take minutes to draw.)
+      let at = 0;
+      while (word.length - at > 1) {
+        const n = longestFit(word.length - at, (k) => fits(word.slice(at, at + k)));
+        if (n === word.length - at) break; // (the rest fits: longestFit gives all of it only when it fits)
+        out.push(word.slice(at, at + n));
+        at += n;
       }
+      line = word.slice(at);
     }
     out.push(line);
   }
@@ -49,6 +53,9 @@ export const MAX_ROW_PT = 409.5;
  *  row Excel gave one more line needing 1.065 or more and every row it didn't less than 1.09; 1.075, the middle.
  *  turnedPt's 1.0645 for turned text agrees. */
 export const EXCEL_WRAP_WIDTH = 1.075;
+
+/** The most characters a cell holds in Excel; wrapped text past it isn't measured (excelLines, wrapLines). */
+export const EXCEL_MAX_CHARS = 32767;
 
 /** How many lines a wrapped text takes in `width` px (wrapLines). */
 export const countLines = (text, font, width) => wrapLines(text, font, width).length;
@@ -74,12 +81,29 @@ export function breakLines(text, fits) {
   return breakSpans(s, fits).map(([a, b]) => s.slice(a, b));
 }
 
-/** breakLines' lines as [from, to] in `s` (no carriage returns in it). */
+/** The most of `m` characters, 1 at least, that `fits(k)` says fit, `fits` being true up to some k and false from
+ *  there: found by doubling, then halving, in about 2 log k tries, each measuring at most twice what fits. (Going up a
+ *  character at a time measured a cut word's line once a character: a word of a million characters that measure no
+ *  width, a crafted cell, took minutes.) */
+export function longestFit(m, fits) {
+  let lo = 1;
+  let hi = m;
+  for (let step = 1; lo < m; step *= 2) {
+    const next = Math.min(m, lo + step);
+    if (!fits(next)) { hi = next - 1; break; }
+    lo = next;
+  }
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (fits(mid)) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+
+/** breakLines' lines as [from, to] in `s` (no carriage returns in it). `fits(a, b)` is true for b up to some point
+ *  and false from there, as a line grows only wider. */
 function breakSpans(s, fits) {
-  const hung = (a, b) => {
-    while (b > a && s[b - 1] === ' ') b--;
-    return b > a && s[b - 1] === '-' ? b - 1 : b;
-  };
   const out = [];
   let from = 0;
   const paras = s.split('\n');
@@ -89,16 +113,22 @@ function breakSpans(s, fits) {
     let b = from;
     for (const word of para.match(WORDS) || []) {
       const end = b + word.length;
-      if (fits(a, hung(a, end))) { b = end; continue; }
+      // (Where the word's spaces at the end begin, found once: a line counts without them and without one hyphen
+      // before them, `hung`. Walking back over them at each cut cost a word of many spaces their number a line.)
+      let t = end;
+      while (t > from && s[t - 1] === ' ') t--;
+      const hung = (x) => (t > x ? (s[t - 1] === '-' ? t - 1 : t) : x);
+      if (fits(a, hung(a))) { b = end; continue; }
       if (b > a) out.push([a, b]);
       a = b;
       b = end;
-      while (!fits(a, hung(a, b))) {
-        let e = b;
-        while (e > a && s[e - 1] === ' ') e--;
+      // (A word too wide for a line: cut where it reaches the edge, a character at least, until what is left fits.)
+      for (;;) {
+        const e = Math.max(t, a);
         if (e - a <= 1) break;
-        let k = 1;
-        while (a + k < e && fits(a, a + k + 1)) k++;
+        const k = longestFit(e - a, (j) => fits(a, a + j));
+        // (What is left fits when what fits reaches past it; measured to be sure, as k is 1 when nothing fits.)
+        if (a + k >= hung(a) && fits(a, hung(a))) break;
         out.push([a, a + k]);
         a += k;
       }
@@ -147,7 +177,11 @@ function otherWidth(ch, css, px) {
  *  bold or an italic that Windows makes up of Small Fonts under 8pt: 1px bold, 5 italic, 6 both at 7pt.
  *  Without a canvas (Node) a font the table hasn't counts line breaks only. */
 function excelLines(text, font, colPx, indentPx, runs) {
-  const s = String(text).replace(/\r/g, '');
+  // (No more than a cell can hold in Excel, 32,767 characters, is measured: a crafted file's longer text is laid out
+  // as far as that, its rich-text runs aside.)
+  const whole = String(text).replace(/\r/g, '');
+  const s = whole.length > EXCEL_MAX_CHARS ? whole.slice(0, EXCEL_MAX_CHARS) : whole;
+  if (s !== whole) runs = null;
   const width = colPx - indentPx;
   // (A font Windows hasn't is laid out in Arial, a roman one in Times New Roman, as its rows are: fontRowPx.)
   const widths = (name, roman, px, bold, italic) => excelWidths(name, px, bold, italic) || (windowsHasFont(name) ? null : excelWidths(roman ? 'Times New Roman' : 'Arial', px, bold, italic));
@@ -174,14 +208,16 @@ function excelLines(text, font, colPx, indentPx, runs) {
       starts = [];
       let at = 0;
       parts.forEach((part, k) => { starts.push(at); fill(at, at + part.length, tables[k]); at += part.length; });
-      extra = Math.max(...tables.map((t) => t.more));
+      extra = tables.reduce((most, t) => Math.max(most, t.more), 0);
     }
   }
   if (!starts) fill(0, s.length, own);
   const pad = 2 * Math.ceil(own.digit / 4);
+  // (The widths summed from the start, so a stretch's width is one subtraction however long it is.)
+  const upTo = new Float64Array(s.length + 1);
+  for (let i = 0; i < s.length; i++) upTo[i + 1] = upTo[i] + cw[i];
   const spans = breakSpans(s, (a, b) => {
-    let sum = b > a ? extra : 0;
-    for (let i = a; i < b; i++) { sum += cw[i]; if (sum + pad + 3 > width) return false; }
+    const sum = (b > a ? extra : 0) + upTo[b] - upTo[a];
     return sum + pad + Math.max(3, Math.ceil(sum / 28)) <= width;
   });
   return { count: spans.length, spans: starts && spans, starts };
