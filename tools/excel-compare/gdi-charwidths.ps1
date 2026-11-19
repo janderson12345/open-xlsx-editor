@@ -4,8 +4,9 @@
 # CreateFont at its size in whole pixels (a point is 4/3 px, rounded: 11pt is 15px), characters 32 to 255 read with
 # GetCharWidth32. Office's cloud fonts (Aptos, Aptos Narrow, Lato: %LOCALAPPDATA%\Microsoft\FontCache\4\CloudFonts)
 # are loaded for this process only, nothing installed. A font Windows doesn't have (GetTextFace gives another
-# name) is left out.
-# Not in use: wrapping at these widths was tried and set aside (docs/LAYOUT.md, Tried and dropped).
+# name) is left out. Under 8pt (10px and less) Excel lays every font out in Windows' bitmap font Small Fonts
+# (excel-wrapwidths.ps1 measured it): its widths at 5 to 10px are written as "small fonts".
+# charwidths-table.mjs makes src/ooxml/excelwidths.js of the result.
 # usage: pwsh tools/excel-compare/gdi-charwidths.ps1 <out.json>
 param([Parameter(Mandatory)][string]$Out)
 $ErrorActionPreference = 'Stop'
@@ -56,6 +57,19 @@ try {
     }
     if ($entry) { $res[$f.ToLower()] = $entry }
   }
+  $small = [ordered]@{}
+  for ($px = 5; $px -le 10; $px++) {
+    $h = [Gdi]::CreateFontW(-$px, 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 0, 0, 'Small Fonts')
+    $old = [Gdi]::SelectObject($dc, $h)
+    $face = New-Object System.Text.StringBuilder 64
+    [void][Gdi]::GetTextFaceW($dc, 64, $face)
+    $w = New-Object int[] 224
+    [void][Gdi]::GetCharWidth32W($dc, 32, 255, $w)
+    [void][Gdi]::SelectObject($dc, $old); [void][Gdi]::DeleteObject($h)
+    if ($face.ToString() -ne 'Small Fonts') { throw "Small Fonts: Windows gives $($face.ToString())" }
+    $small["$px"] = $w
+  }
+  $res['small fonts'] = [ordered]@{ px = $small }
 } finally { [void][Gdi]::ReleaseDC([IntPtr]::Zero, $dc) }
 [IO.File]::WriteAllText($Out, ($res | ConvertTo-Json -Depth 5 -Compress), (New-Object System.Text.UTF8Encoding $false))
 "$($res.Count) fonts"

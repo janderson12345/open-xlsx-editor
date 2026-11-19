@@ -18,15 +18,13 @@ await page.waitForFunction(() => window.oxe.fileName === 'rowfit.xlsx');
 await page.waitForTimeout(300);
 const ours = await page.evaluate((n) => { const { rows } = window.oxe.grid.geometry(); return Array.from({ length: n }, (_, r) => rows.size(r) * 0.75); }, excel.length);
 const off = ours.map((pt, r) => [r + 1, pt, excel[r]]).filter(([, a, b]) => Math.abs(a - b) > 0.5);
-// (The documented difference, docs/LAYOUT.md: rows 32 and 45's 17-character identifiers, mostly digits, just fit on
-// one line in Excel, whose digits are exactly 7px; counted at EXCEL_WRAP_WIDTH they take two here.)
-const KNOWN = new Set([32, 45]);
-const unexpected = off.filter(([r]) => !KNOWN.has(r));
-// (Exact on Windows, whose Calibri the lines are counted in. Elsewhere, Linux CI among them, Calibri's stand-in is
-// wider and some text wraps a line or two sooner, so rows are checked to be no shorter than Excel's, at most two lines
-// taller, and most of them Excel's.)
+// (All 62 since lines are counted at Windows' whole-pixel widths and Excel's margin, rowheights.js excelLineCount:
+// rows 32 and 45's 17-character identifiers, mostly digits, just fit on one line in Excel, whose digits are exactly
+// 7px, and took two when counted at the canvas's widths.)
+// (Exact on Windows. Elsewhere, Linux CI among them, a character the width table hasn't is measured in Calibri's
+// stand-in, so rows are checked to be no shorter than Excel's, at most two lines taller, and most of them Excel's.)
 if (process.platform === 'win32') {
-  check(!unexpected.length, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's, the others the documented ${[...KNOWN].join(' and ')}`, unexpected.slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));
+  check(!off.length, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's`, off.slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));
 } else {
   const wrong = off.filter(([, a, b]) => a < b - 0.5 || a > b + 30.5);
   check(!wrong.length && off.length <= excel.length / 4, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's, the rest at most two lines taller (not Windows: Calibri's stand-in is wider)`, (wrong.length ? wrong : off).slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));

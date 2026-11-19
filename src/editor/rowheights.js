@@ -5,7 +5,8 @@
 // own format or else their column's (the Normal style's in a column without one): standardRowHeight.
 import { filledRows } from '../ooxml/sheetcells.js';
 import { MAX_COLS } from '../ooxml/refs.js';
-import { fontRowPx, fontDescentPx } from './fonts.js';
+import { fontRowPx, fontDescentPx, windowsHasFont } from './fonts.js';
+import { excelWidths } from '../ooxml/excelwidths.js';
 
 let ctx = null;
 /** The lines a wrapped text breaks into in `width` px: words greedily, broken at spaces and at line breaks, measured
@@ -43,13 +44,170 @@ export function wrapLines(text, font, width) {
  *  rows of 5 customer workbooks did in Excel where they grew to 3,765pt here. */
 export const MAX_ROW_PT = 409.5;
 
-/** How much wider Excel's text is than the canvas's when it breaks wrapped lines for a row's height: measured over COM
- *  on a workbook of 58 wrapped rows in Calibri 11 (Range.RowHeight), every row Excel gave one more line needing 1.065 or
- *  more and every row it didn't less than 1.09; 1.075, the middle. turnedPt's 1.0645 for turned text agrees. */
+/** How much wider Excel's text is than the canvas's when it breaks wrapped lines for a row's height, for a font
+ *  excelwidths.js hasn't: measured over COM on a workbook of 58 wrapped rows in Calibri 11 (Range.RowHeight), every
+ *  row Excel gave one more line needing 1.065 or more and every row it didn't less than 1.09; 1.075, the middle.
+ *  turnedPt's 1.0645 for turned text agrees. */
 export const EXCEL_WRAP_WIDTH = 1.075;
 
 /** How many lines a wrapped text takes in `width` px (wrapLines). */
 export const countLines = (text, font, width) => wrapLines(text, font, width).length;
+
+/** The words Excel keeps whole when it wraps: a word ends after its spaces, or after a hyphen and the spaces that
+ *  follow it. Nothing else is a place to break: not a slash, a comma, a full stop, a bracket, an en or an em dash. */
+const WORDS = /[^ -]*(?:-? +|-)|[^ -]+$/g;
+
+/** The lines Excel breaks a wrapped `text` into, as strings; `fits(a, b)` says whether characters a to b (b not
+ *  included) of the text, carriage returns taken out, fit on a line. Measured over COM (tools/excel-compare/
+ *  excel-wrapwidths.ps1: rows AutoFit at every column width from 12 to 420px, 64 sentences in 16 fonts and 58 strings
+ *  of hyphens, spaces and punctuation, every line count Excel's from a column of 15px up):
+ *  - words go on a line while they fit, and the line's width is counted without the spaces it ends with and without
+ *    one hyphen before them: "TENTATIVE -" is a line where "TENTATIVE" fits, and of 20 hyphens 19 are counted;
+ *  - spaces a line begins with count ("  indented" is wider), as do spaces between its words;
+ *  - a word too wide for a line of its own is cut where it reaches the edge, a character at least, its hyphen counted
+ *    like any character there, and the words after it go on along its last piece;
+ *  - a line break makes a line, an empty one too ("abc\n\n" is three lines), but for one case: after a line that is
+ *    one space alone, a last line that is empty or spaces isn't counted ("abc\n \n" and "abc\n \n  " are two lines
+ *    and " \n" one; "abc\n  \n", with two spaces, is three). Text pasted from elsewhere often ends so. */
+export function breakLines(text, fits) {
+  const s = String(text).replace(/\r/g, '');
+  return breakSpans(s, fits).map(([a, b]) => s.slice(a, b));
+}
+
+/** breakLines' lines as [from, to] in `s` (no carriage returns in it). */
+function breakSpans(s, fits) {
+  const hung = (a, b) => {
+    while (b > a && s[b - 1] === ' ') b--;
+    return b > a && s[b - 1] === '-' ? b - 1 : b;
+  };
+  const out = [];
+  let from = 0;
+  const paras = s.split('\n');
+  if (paras.length > 1 && paras[paras.length - 2] === ' ' && /^ *$/.test(paras[paras.length - 1])) paras.pop();
+  for (const para of paras) {
+    let a = from;
+    let b = from;
+    for (const word of para.match(WORDS) || []) {
+      const end = b + word.length;
+      if (fits(a, hung(a, end))) { b = end; continue; }
+      if (b > a) out.push([a, b]);
+      a = b;
+      b = end;
+      while (!fits(a, hung(a, b))) {
+        let e = b;
+        while (e > a && s[e - 1] === ' ') e--;
+        if (e - a <= 1) break;
+        let k = 1;
+        while (a + k < e && fits(a, a + k + 1)) k++;
+        out.push([a, a + k]);
+        a += k;
+      }
+    }
+    out.push([a, b]);
+    from += para.length + 1;
+  }
+  return out;
+}
+
+const otherWidths = new Map();
+/** The width of a character excelwidths.js hasn't (outside printable ASCII), in whole pixels: the canvas's, rounded;
+ *  without a canvas (Node) half the font's size, the whole of it from the CJK blocks on. */
+function otherWidth(ch, css, px) {
+  if (typeof document === 'undefined') return Math.round(ch.charCodeAt(0) >= 0x2e80 ? px : px / 2);
+  const key = `${css}\n${ch}`;
+  let w = otherWidths.get(key);
+  if (w === undefined) {
+    ctx = ctx || document.createElement('canvas').getContext('2d');
+    ctx.font = css;
+    w = Math.round(ctx.measureText(ch).width);
+    if (otherWidths.size > 20000) otherWidths.clear();
+    otherWidths.set(key, w);
+  }
+  return w;
+}
+
+/** The lines Excel breaks a wrapped cell's text into when it works out the row's height, in a column `colPx` wide
+ *  (less `indentPx` of indent): { count, spans, starts }, `spans` the lines as [from, to] in the text and `starts`
+ *  where each rich-text run begins in it (both null when the text isn't measured run by run). `font` is the cell format's ({ family, sizePx, bold, roman, css },
+ *  cellstyles.js); `runs` a rich text's ([{ text, font }], strings.js), each measured in its own font.
+ *  Excel measures in the whole pixels Windows gives each character (excelwidths.js; Small Fonts' under 8pt, and one
+ *  pixel more a line in its made-up bold), and a line fits when
+ *      width + 2 x ceil(digit / 4) + max(3, ceil(width / 28)) <= the column's pixels,
+ *  `digit` being the width of 0 in the cell's font: 7px of margin up to 84px of text in Calibri 11, a pixel more
+ *  for every 28px from there (20 digits, 140px, fit in 149; 100 in 729), 9px to begin with in Calibri 14 to 18, 11 in
+ *  20 and 24. Measured over COM (excel-wrapwidths.ps1): the narrowest column that keeps 2 to 100 of one character on
+ *  a line, for 95 characters in 9 fonts and 3 characters in some 50, each Excel's to the pixel; alignment left, centre
+ *  or right changes nothing, and an indent level takes 9px (Calibri 11, Times New Roman 12 and Book Antiqua 12 bold).
+ *  Before, lines were counted at the canvas's widths times EXCEL_WRAP_WIDTH in the column less 4px, right for most
+ *  rows but a line out for long sentences in wide columns and for headings in narrow ones; a font the table hasn't
+ *  (or a size over 36pt) is still counted so, and one Windows hasn't in Arial's widths. Italic is counted at the
+ *  upright widths (not measured). Without a canvas (Node) a font the table hasn't counts line breaks only. */
+function excelLines(text, font, colPx, indentPx, runs) {
+  const s = String(text).replace(/\r/g, '');
+  const width = colPx - indentPx;
+  // (A font Windows hasn't is laid out in Arial, a roman one in Times New Roman, as its rows are: fontRowPx.)
+  const face = (name, roman) => (windowsHasFont(name) ? name : roman ? 'Times New Roman' : 'Arial');
+  const own = excelWidths(face(font.family, font.roman), font.sizePx, font.bold);
+  if (!own) {
+    if (typeof document === 'undefined') return { count: s.split('\n').length, spans: null, starts: null };
+    ctx = ctx || document.createElement('canvas').getContext('2d');
+    ctx.font = font.css;
+    const limit = (width - 4) / EXCEL_WRAP_WIDTH;
+    return { count: breakSpans(s, (a, b) => ctx.measureText(s.slice(a, b)).width <= limit).length, spans: null, starts: null };
+  }
+  // (Each character's width, in its run's font when the runs make up the text and the table has every font.)
+  const cw = new Uint16Array(s.length);
+  let extra = own.small && font.bold ? 1 : 0;
+  const fill = (from, to, table) => {
+    for (let i = from; i < to; i++) { const w = table.width(s.charCodeAt(i)); cw[i] = w < 0 ? otherWidth(s[i], font.css, font.sizePx) : w; }
+  };
+  const parts = runs && runs.map((r) => String(r.text).replace(/\r/g, ''));
+  let starts = null;
+  if (parts && parts.join('') === s) {
+    const tables = runs.map((r) => (r.font ? excelWidths(r.font.name && !r.font.scheme ? face(r.font.name, false) : face(font.family, font.roman), r.font.size ? (r.font.size * 4) / 3 : font.sizePx, r.font.b ?? font.bold) : own));
+    if (tables.every(Boolean)) {
+      starts = [];
+      let at = 0;
+      parts.forEach((part, k) => { starts.push(at); fill(at, at + part.length, tables[k]); at += part.length; });
+      extra = 0;
+    }
+  }
+  if (!starts) fill(0, s.length, own);
+  const pad = 2 * Math.ceil(own.digit / 4);
+  const spans = breakSpans(s, (a, b) => {
+    let sum = b > a ? extra : 0;
+    for (let i = a; i < b; i++) { sum += cw[i]; if (sum + pad + 3 > width) return false; }
+    return sum + pad + Math.max(3, Math.ceil(sum / 28)) <= width;
+  });
+  return { count: spans.length, spans: starts && spans, starts };
+}
+
+/** How many lines Excel breaks a wrapped cell's text into (excelLines). */
+export const excelLineCount = (text, font, colPx, indentPx = 0, runs = null) => excelLines(text, font, colPx, indentPx, runs).count;
+
+/** The height in points Excel gives a wrapped cell's text: its lines (excelLines) times `linePt`, the line of the
+ *  cell's font; a rich text's, each line as tall as the tallest of the runs on it, `runPt(run)` giving a run's line
+ *  (measured over COM, Rows.AutoFit at every column width from 40 to 400px: "Quarterly Review Totals" in Calibri 12
+ *  bold followed by 36 characters at 10pt is 15.75pt for each line with a 12pt character on it and 12.75pt for each
+ *  line of 10pt alone, and a 16pt run after 10pt text makes only its own lines 21pt). */
+export function excelWrapPt(text, font, linePt, colPx, indentPx = 0, runs = null, runPt = null) {
+  const { count, spans, starts } = excelLines(text, font, colPx, indentPx, runs);
+  if (!spans || !runPt) return count * linePt;
+  const lineOf = (r) => (runs[r].font ? runPt(runs[r]) : linePt);
+  let pt = 0;
+  let r = 0;
+  for (const [a, b] of spans) {
+    // (The run the line begins in, then every run that begins on it with a character of its own: one pass over the
+    // runs for all the lines.)
+    while (r + 1 < starts.length && starts[r + 1] <= a) r++;
+    let tallest = lineOf(r);
+    for (let q = r + 1; q < starts.length && starts[q] < b; q++) {
+      if ((q + 1 < starts.length ? starts[q + 1] : Infinity) > starts[q]) tallest = Math.max(tallest, lineOf(q));
+    }
+    pt += tallest;
+  }
+  return pt;
+}
 
 /** Each row's baseline: the Windows descent (px) of the tallest font among its cells (styled empty ones count), for
  *  every row with cells. Excel puts all the bottom-aligned text of a row on that one baseline (its PDF of rows.xlsx:
@@ -222,16 +380,19 @@ export function autoRowHeights(sheet, deco, cols) {
       // A1:K1 makes its row 21pt (measured over COM); its wrapping doesn't. A range over several rows doesn't count.)
       const m = mergeOf(r, c);
       if (m) { if (m.r0 === m.r1) best = Math.max(best, pt); continue; }
-      let lines = 1;
+      let wrapped = pt;
       // (Any text the cell shows wraps: a string, a formula's text result (t "str", as =CONCATENATE gives) or an inline
       // string; before, only a string counted, so a formula's long text left its row a line tall.)
-      // (Lines counted as Excel breaks them: its text measures wider than the canvas's, so a line that just fits here
-      // goes on to the next in Excel; EXCEL_WRAP_WIDTH.)
+      // (Lines counted as Excel breaks them, at Windows' whole-pixel widths and Excel's margin: excelLineCount. An
+      // indent level takes 9px of the column, none when the text is centred.)
       // (A hidden column's text doesn't wrap: Excel gives it its font's one line, where counting it at no width made
       // a line of each character, 390pt rows of 5 customer workbooks that Excel has at 30 to 72.)
-      if (d.align.wrap && cols.size(c) > 0 && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) lines = countLines(cell.v, d.font.css, (cols.size(c) - 4) / EXCEL_WRAP_WIDTH);
-      best = Math.max(best, pt * lines);
-      // (Rich text: a run's larger font grows the row as Excel's does, a 16pt run in Aptos Narrow 11 to 21pt.)
+      // (A rich text's run in a larger font grows the lines it is on, as Excel's does: a 16pt run in Aptos Narrow 11
+      // makes a row of one line 21pt.)
+      const runPt = (run) => (run.font.size || run.font.name || run.font.b != null ? fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, run.font.size ? (run.font.size * 4) / 3 : d.font.sizePx, run.font.b ?? d.font.bold) * 0.75 : pt);
+      if (d.align.wrap && cols.size(c) > 0 && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) wrapped = excelWrapPt(cell.v, d.font, pt, cols.size(c), d.align.indent && d.align.horizontal !== 'center' ? d.align.indent * 9 : 0, cell.runs, runPt);
+      best = Math.max(best, wrapped);
+      // (Not wrapped, or not measured run by run: a run's larger font still counts, with its one line at least.)
       if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3, run.font.b ?? d.font.bold) * 0.75);
       if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, pt));
     }

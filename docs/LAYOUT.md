@@ -172,6 +172,42 @@ otate`). General alignment of turned text goes by the angle, not the
   Republic of China calendar without its calendar id), 上午/下午 is AM/PM, other locale tags change nothing. `e` alone is
   the year and `g` nothing, as in Excel. The locale is the editor's (`docs/LOCALE.md`).
 
+- **Wrapped lines** (*measured*, `tools/excel-compare/excel-wrapwidths.ps1` on `wrapwidths-cases.mjs`'s made-up cases,
+  `test/wrapbreaks-excel.json`, `test/wrapwidths-excel.json`; `src/editor/rowheights.js` excelLineCount). Where Excel
+  breaks wrapped text when it works out a row's height, measured in Excel 365 itself over COM: a text alone in a cell,
+  its row AutoFit at every column width, and the width at which the height changes read off.
+  - *Widths.* Excel measures in the whole pixels Windows (GDI) gives each character at the font's size in whole
+    pixels (11pt is 15px): the narrowest column that keeps 20 of one character on a line, for each of 95 characters in
+    9 fonts, gives the table of `gdi-charwidths.ps1` character for character (`src/ooxml/excelwidths.js`, 24 fonts,
+    regular and bold, 11 to 48px; 177KB, 21KB gzipped). No kerning, no DirectWrite widths: AVAVAVAVAV and ToToToToTo
+    are the sums of their letters. Under 8pt (10px and less) every font is laid out in Windows' bitmap font Small
+    Fonts (Calibri 6, 6.5, 7 and 7.5, Arial 5 to 7.5 and Times New Roman 7 all have its widths at 7 to 10px, 1 narrower
+    than the other digits), and its bold a pixel more a character and one more a line (20 digits in Arial 7, Calibri
+    6 and 7.5 bold; other characters not measured). A font Windows hasn't is
+    laid out in Arial (Helvetica), as its rows are.
+  - *Margin.* A line fits when `width + 2 x ceil(digit / 4) + max(3, ceil(width / 28)) <= the column's pixels`, digit
+    being the width of 0 in the cell's font (not the Normal style's). In Calibri 11 that is 7px up to 84px of text
+    and a pixel more for every 28px from there: 10 digits (70px) fit in 77px, 20 in 149, 40 in 294, 100 in 729. The
+    first part is the column's padding less one: 4 up to a digit of 8px (Calibri 8 to 12, Arial 8 to 10), 6 to 12px
+    (Calibri 14 to 18, Arial 12 and 14, Verdana 10 bold), 8 to 16 (Calibri 20 and 24), 10 and 12 in Calibri 28 and 36.
+    Measured for 2 to 80 of 0, i and W in some 50 fonts and sizes from 8 to 36pt, each to the pixel. The fixed 10px
+    tried before is what this comes to at 168px of text, which is why it fitted one workbook and no other.
+  - *Breaks.* A word ends after its spaces, or after a hyphen and the spaces that follow it; nothing else is a place
+    to break (not / , . ; : ( ) ? _ + \ | nor an en or em dash). A line's width is counted without the spaces it ends
+    with and without one hyphen before them ("TENTATIVE -" fits where "TENTATIVE" does; of 20 hyphens 19 count); spaces
+    it begins with count. A word wider than a line is cut where it reaches the edge and the next words go on along
+    its last piece. A line break makes a line, an empty one too, but after a line that is one space alone a last line
+    that is empty or spaces isn't counted ("abc\n \n" is two lines, "abc\n\n" three): text pasted from elsewhere
+    often ends so, and two customer rows were a line tall for it.
+  - *What changes nothing:* alignment left, centre or right; bold beyond its own widths. An indent level takes 9px
+    (Calibri 11, Times New Roman 12, Book Antiqua 12 bold; Arial 10 came out otherwise and isn't worked out).
+  - *Rich text.* Each run is measured in its own font, and each line is as tall as the tallest run on it: Book
+    Antiqua 12 bold followed by 10pt is 16.5pt for a line with a 12pt character on it and 13.5 for a line of 10pt
+    alone (seven texts, every width from 40 to 400px).
+  164 texts (64 sentences in 16 fonts, 100 strings a rule each) at every width from 15 to 400px, 63,304 rows: all
+  Excel's line counts but a-b-c-d-e-f-g-h in a column of 15 or 16px, narrower than a letter and its margin
+  (`test/wrapbreaks.test.js`, in Node: no browser is asked for a width in these fonts).
+
 ## Where it stands
 
 The generated fixtures, Excel 365 and Edge on Windows (runs in `..\runs\fixtures`; general.xlsx joined at run 4):
@@ -250,15 +286,22 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
 ## Open differences
 
 - The grid ends 100 rows and 10 columns past the used range; Excel's goes on to row 1,048,576 and column XFD.
-- Row heights Excel works out (rows without customHeight) count wrapped lines with the text 1.075 times as wide as the
-  canvas measures it (rowheights.js EXCEL_WRAP_WIDTH): Excel's own widths are whole pixels, most letters wider than
-  the canvas's and digits narrower (exactly 7px in Calibri 11). Measured over COM: a customer's crosswalk workbook,
-  60 of 60 rows as Excel's, and tools/excel-compare/rowfit-book.mjs's, 60 of 62 (test/rowfit.mjs). The two others
-  are identifiers of 17 characters, mostly digits, that just fit in Excel and take a line more here. No simple
-  per-character model (each width rounded, rounded up, digits apart, GDI's own advances) fitted both workbooks
-  (see Tried and dropped). Wrapped text in a hidden column counts as one line, as in Excel. Against Excel on 146
-  customer workbooks, 98 rows of 9,429 differ (50 by 1px, 48 by a line or more, nearly all long wrapped text), and
-  99 workbooks have every row as Excel's.
+- Row heights Excel works out (rows without customHeight) count wrapped lines as Excel breaks them (Rules in use,
+  Wrapped lines). tools/excel-compare/rowfit-book.mjs's workbook: 62 of 62 rows (test/rowfit.mjs; 60 before). Against
+  Excel on 146 customer workbooks, 59 rows of 9,429 differ (98 before: 50 by 1px and 48 by a line or more), 110
+  workbooks have every row as Excel's (99), 39 rows put right and none made wrong. What is left:
+  - 56 rows a pixel or two out, not a line. One cause is now known and not yet worked out: in a font smaller
+    than the Normal style's, Excel's rows of two lines and more are a pixel taller than their lines (9 lines of
+    Calibri 10, 12.75pt each, are 115.5pt, not 114.75; so are Calibri 8 and 9, Arial 8, 9 bold and 10 and Tahoma 10;
+    Verdana 9 two pixels), while a row of one line is not. A rich text with a 10pt run in Calibri 12 has it too.
+  - 3 rows a line or more out, all three a heading in Book Antiqua 12 bold followed by a 10pt italic run:
+    italic is counted at the upright widths, and an italic face has widths of its own, Book Antiqua's much
+    narrower (10 italic texts in 5 fonts over COM: a line out at 1 column width in 10 to 3). The table would need
+    italic and bold italic, twice its size.
+  - A font excelwidths.js hasn't, or a size over 36pt, is counted at the canvas's widths times 1.075 in the column
+    less 4px (EXCEL_WRAP_WIDTH), as every font was before; characters outside printable ASCII at the canvas's
+    width, rounded.
+  - Wrapped text in a hidden column counts as one line, as in Excel.
 - A font's row height and digit width are Excel's own for 25 fonts at every half point from 6 to 36pt
   (ooxml/excelfonts.js, measured over COM by tools/excel-compare/excel-fontmetrics.ps1): Excel takes them from
   Windows' rendering of the font at the size in whole pixels, and neither GDI's line height plus a margin nor any
@@ -280,14 +323,12 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
 
 ## Tried and dropped
 
-- **Wrapped lines at Windows' whole-pixel character widths** (2026-11-19). The width Windows (GDI) gives each
-  printable ASCII character of 24 fonts, regular and bold, at every pixel size from 8 to 48 (6 to 36pt), measured by
-  tools/excel-compare/gdi-charwidths.ps1 (Office's cloud fonts Aptos, Aptos Narrow and Lato loaded for that process
-  only) and made a table by tools/excel-compare/charwidths-table.mjs; a line fits when the sum of its characters' widths
-  is at most the column's width less 10px. On rowfit-book.mjs's workbook all 62 rows were Excel's (the 10px margin
-  is the only one that fits its 62, 134 and 315px columns), but on 146 customer workbooks it put 27 rows right and 26
-  wrong, 101 rows off against 98 without it. The rows it got wrong are mostly long sentences in wide columns that
-  Excel breaks a few pixels sooner, and short bold headings it breaks later. Neither a margin growing with the
-  column, a scale on the widths, wider spaces, a margin for bold apart, sheet zoom, indent nor heights stored in the
-  file explains them. Set aside, not shipped: the scripts are kept for a later look; the table (190KB, 22KB gzipped)
-  is not in src.
+- **Wrapped lines at Windows' whole-pixel character widths less a fixed 10px** (2026-11-19). The widths were right
+  (they are Excel's, character for character: Rules in use, Wrapped lines) and the margin wrong. With a line fitting
+  when the sum of its characters' widths is at most the column's width less 10px, rowfit-book.mjs's workbook had all
+  62 rows as Excel's, but 146 customer workbooks had 27 rows put right and 26 made wrong. Fitted against all 2,636
+  wrapped rows, neither a margin growing with the column, a scale on the widths, wider spaces nor a margin for bold
+  apart did better, because three things were missing that only measuring in Excel showed: the margin grows with
+  the text on the line and begins at 7px, a hyphen is a place to break and doesn't count at a line's end, and under
+  8pt the font is Small Fonts. Also ruled out then and since: sheet zoom, heights stored in the file, alignment,
+  kerning and DirectWrite's fractional widths.

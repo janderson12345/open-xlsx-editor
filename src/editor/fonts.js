@@ -162,6 +162,10 @@ export const extraPadPx = (sizePx) => Math.max(0, 0.13 * (sizePx - 44 / 3));
 /** A font's Windows descent in px (where Excel's baseline sits above a row's bottom, plus BASELINE_ABOVE_DESCENT). */
 export const fontDescentPx = (name, sizePx) => fontMetrics(name, sizePx).wd;
 
+/** Whether Windows has the font, as far as is known here (its metrics or a stand-in's): one it hasn't Excel lays out
+ *  in Arial, or in Times New Roman for a font of the roman family (fontRowPx; Windows' own stand-ins, as Helvetica's). */
+export const windowsHasFont = (name) => { const key = String(name).toLowerCase(); return !!(metrics[key] || STAND_INS[key]); };
+
 /** A font's row height in px, the height Excel gives a row of it (and the pitch of its wrapped lines). Excel's own,
  *  measured over COM for the fonts workbooks use, 6pt to 36pt by half points (ooxml/excelfonts.js; `bold` for a
  *  bold font, a few of whose rows differ). Other fonts and sizes: its line, the larger of Windows ascent + descent

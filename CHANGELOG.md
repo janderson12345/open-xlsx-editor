@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Fix:** rows of wrapped text break their lines where Excel does. Lines are measured in the whole-pixel character
+  widths Windows gives Excel, with Excel's own margin (7px for a short line in Calibri 11, a pixel more for every
+  28px of text past 84), a hyphen is a place to break, and the spaces or hyphen a line ends with don't count toward
+  its width. Under 8pt text is measured in Small Fonts, as Excel draws it; rich text is measured run by run, each
+  line as tall as its tallest run. Measured in Excel itself at every column width. Against Excel on 146 customer
+  workbooks, rows that differ went from 98 to 59 of 9,429 (rows a line or more out: 48 to 3), with none made
+  wrong. Security review still to do before release.
 - **Fix:** wrapped text in a hidden column no longer makes its row hundreds of points tall. It was counted at no width,
   a line for each character; Excel gives it one line. Five rows of customer workbooks at 390pt are Excel's 30 to 72pt
   again. Security review still to do before release.

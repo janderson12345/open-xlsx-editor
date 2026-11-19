@@ -257,9 +257,10 @@ own, measured at every half point from 6 to 36pt (`src/ooxml/excelfonts.js`), wh
 Not yet:
 - Row heights for fonts outside that table come from the font's metrics in `src/engine/metrics.js`, else Calibri's,
   by a formula that can be a pixel off.
-- Rows of long wrapped text whose height Excel works out: about 1 in 50 takes a line more or less than in Excel,
-  because where Excel breaks a line isn't yet known exactly (`docs/LAYOUT.md`, Open differences). Against Excel on
-  146 customer workbooks, 9,331 of 9,429 rows are as Excel's.
+- Rows of wrapped text whose height Excel works out break their lines as Excel does for the 24 fonts measured
+  (`docs/LAYOUT.md`, Wrapped lines); other fonts, italics and sizes over 36pt can take a line more or less. In a
+  font smaller than the workbook's own, a row of several lines is a pixel shorter than Excel's. Against Excel on 146
+  customer workbooks, 9,370 of 9,429 rows are as Excel's.
 - A face the family doesn't have (Tahoma's italic) is slanted by the browser, as for an installed font; `exportPdf`
   draws it upright.
 
