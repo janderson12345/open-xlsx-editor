@@ -179,7 +179,9 @@ otate`). General alignment of turned text goes by the angle, not the
   - *Widths.* Excel measures in the whole pixels Windows (GDI) gives each character at the font's size in whole
     pixels (11pt is 15px): the narrowest column that keeps 20 of one character on a line, for each of 95 characters in
     9 fonts, gives the table of `gdi-charwidths.ps1` character for character (`src/ooxml/excelwidths.js`, 24 fonts,
-    regular, bold, italic and bold italic, 11 to 48px; 294KB, 30KB gzipped). No kerning, no DirectWrite widths:
+    regular, bold, italic and bold italic, 11 to 48px; 73KB, 21KB gzipped). It stores each character's widths as a
+    base width times the size, rounded, and the 8% of widths hinting moves off that (written out they were 294KB,
+    29KB gzipped; `charwidths-table.mjs` checks they decode to the measurement). No kerning, no DirectWrite widths:
     AVAVAVAVAV and ToToToToTo are the sums of their letters. Under 8pt (10px and less) every font is laid out in
     Windows' bitmap font Small Fonts (Calibri 6, 6.5, 7 and 7.5, Arial 5 to 7.5 and Times New Roman 7 all have its
     widths at 7 to 10px, 1 narrower than the other digits). A font Windows hasn't is laid out in Arial (Helvetica),
