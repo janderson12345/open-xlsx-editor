@@ -13,6 +13,10 @@
 - **Faster opening:** only sheets with a formula saved without its result are parsed on opening (found by scanning
   their bytes); the rest wait until shown. Large workbooks whose other sheets are big open in seconds instead of up to
   a minute. Security review still to do before release.
+- **Fast sheet reading:** a sheet's cells are read straight from its bytes instead of a parsed XML tree, and rows of
+  formatted empty cells are kept as bands. Workbooks whose sheet is formatted down to the last row (millions of empty
+  styled cells) open in 3 to 5 seconds instead of 30 to 57, and in Node without running out of memory. A sheet's XML
+  is parsed only when it's first edited. Security review still to do before release.
 
 ## 0.8.3
 
