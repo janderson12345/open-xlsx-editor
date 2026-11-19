@@ -18,7 +18,8 @@ await page.waitForFunction(() => window.oxe.fileName === 'rowfit.xlsx');
 await page.waitForTimeout(300);
 const ours = await page.evaluate((n) => { const { rows } = window.oxe.grid.geometry(); return Array.from({ length: n }, (_, r) => rows.size(r) * 0.75); }, excel.length);
 const off = ours.map((pt, r) => [r + 1, pt, excel[r]]).filter(([, a, b]) => Math.abs(a - b) > 0.5);
-// (All 62 since lines are counted at Windows' whole-pixel widths and Excel's margin, rowheights.js excelLineCount:
+// (Rows 64 on have a rule of rowheights.js each: MORE_ROWS in rowfit-book.mjs.)
+// (All of them since lines are counted at Windows' whole-pixel widths and Excel's margin, rowheights.js excelLineCount:
 // rows 32 and 45's 17-character identifiers, mostly digits, just fit on one line in Excel, whose digits are exactly
 // 7px, and took two when counted at the canvas's widths.)
 // (Exact on Windows. Elsewhere, Linux CI among them, a character the width table hasn't is measured in Calibri's

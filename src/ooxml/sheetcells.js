@@ -23,17 +23,18 @@ export const outlineLevel = (v) => Math.max(0, Math.min(7, Math.trunc(Number(v))
 
 /** A row's entry in the model's `rows` from its attributes' values (null: absent), or null when it says nothing:
  *  { ht (points), hidden, customHeight, s (its own format: `s` with customFormat, as Excel writes a formatted row),
- *  level and collapsed (its outline, outline.js), thickBot (a thick bottom border in the row, which Excel makes the
- *  row 0.75pt taller for; rowheights.js) }. */
-export function rowEntry(ht, hiddenAt, customFormat, sAt, levelAt, collapsedAt, thickBotAt, customHeight) {
+ *  level and collapsed (its outline, outline.js), thickBot and thickTop (a thick bottom or top border in the row,
+ *  for each of which Excel makes the row 0.75pt taller; rowheights.js) }. */
+export function rowEntry(ht, hiddenAt, customFormat, sAt, levelAt, collapsedAt, thickBotAt, customHeight, thickTopAt = null) {
   const on = (v) => v === '1' || v === 'true';
   const hidden = on(hiddenAt);
   const own = on(customFormat) ? Number(sAt || 0) : 0;
   const level = outlineLevel(levelAt);
   const collapsed = on(collapsedAt);
   const thickBot = on(thickBotAt);
-  if (!(ht != null || hidden || own || level || collapsed || thickBot)) return null;
-  return { ht: ht == null ? null : Number(ht), hidden, customHeight: customHeight === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}), ...(thickBot ? { thickBot } : {}) };
+  const thickTop = on(thickTopAt);
+  if (!(ht != null || hidden || own || level || collapsed || thickBot || thickTop)) return null;
+  return { ht: ht == null ? null : Number(ht), hidden, customHeight: customHeight === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}), ...(thickBot ? { thickBot } : {}), ...(thickTop ? { thickTop } : {}) };
 }
 
 /** What kind of formula a cell holds, from its `f` element's attributes (t, si, ref; null: absent). A shared formula

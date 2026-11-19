@@ -5,10 +5,15 @@
 - **Fix:** rows of wrapped text break their lines where Excel does. Lines are measured in the whole-pixel character
   widths Windows gives Excel, with Excel's own margin (7px for a short line in Calibri 11, a pixel more for every
   28px of text past 84), a hyphen is a place to break, and the spaces or hyphen a line ends with don't count toward
-  its width. Under 8pt text is measured in Small Fonts, as Excel draws it; rich text is measured run by run, each
-  line as tall as its tallest run. Measured in Excel itself at every column width. Against Excel on 146 customer
-  workbooks, rows that differ went from 98 to 59 of 9,429 (rows a line or more out: 48 to 3), with none made
-  wrong. Security review still to do before release.
+  its width. Under 8pt text is measured in Small Fonts, as Excel draws it; italics have their own widths; rich text
+  is measured run by run, each line as tall as its tallest run. Measured in Excel itself at every column width.
+  Security review still to do before release.
+- **Fix:** rows are the pixel taller that Excel makes them for text in a font smaller than the workbook's own. Excel
+  sets all bottom-aligned text of a row on one baseline, so a cell takes its lines and what the row's deepest
+  descent has over its own font's: five lines of Calibri 10 in a Calibri 11 workbook are 86px, not 85, and a cell of
+  Arial 12 makes its row 21px. A thick top border adds 0.75pt as a thick bottom one does, also on a row without
+  cells. Against Excel on 146 customer workbooks, with the fix above: rows that differ went from 98 to 9 of 9,429,
+  workbooks with every row as Excel's from 99 to 142, none made wrong. Security review still to do before release.
 - **Fix:** wrapped text in a hidden column no longer makes its row hundreds of points tall. It was counted at no width,
   a line for each character; Excel gives it one line. Five rows of customer workbooks at 390pt are Excel's 30 to 72pt
   again. Security review still to do before release.

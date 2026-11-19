@@ -111,7 +111,7 @@ export function applyCellStyles(root, workbook) {
     // (The font as canvas text measures it, for counting wrapped lines: rowheights.js.)
     const fontCss = `${f.i ? 'italic ' : ''}${f.b ? 'bold ' : ''}${sizePx}px ${fontStack(family)}`;
     const sup = f.vertAlign === 'superscript' ? 'oxe-sup' : f.vertAlign === 'subscript' ? 'oxe-sub' : null;
-    return { fill, fillClass: `oxe-f${i}`, sides, diag, sup, align: xf.align, code: formatCodeOf(styles, i), font: { family, sizePx, bold: !!f.b, roman: !!f.roman && family === f.name, css: fontCss } };
+    return { fill, fillClass: `oxe-f${i}`, sides, diag, sup, align: xf.align, code: formatCodeOf(styles, i), font: { family, sizePx, bold: !!f.b, italic: !!f.i, roman: !!f.roman && family === f.name, css: fontCss } };
   });
   setSheet(root, css.join('\n'));
   const valid = (s) => (s < styles.cellXfs.length ? s : 0);

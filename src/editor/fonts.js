@@ -3,7 +3,7 @@
 // then a generic family. And each font's line height for celltext.js.
 import metrics from '../engine/metrics.js';
 import { omfEntry, omfFamily } from './omffonts.js';
-import { excelFontMetric } from '../ooxml/excelfonts.js';
+import { excelFontMetric, excelFontLine } from '../ooxml/excelfonts.js';
 
 /** Free fonts drawn to the same metrics as Office's. Aptos Narrow (the body font of Excel 365's default theme since
  *  2023) isn't installed with Windows (Office keeps it in its own cloud-font cache, out of browsers' reach); its
@@ -185,4 +185,16 @@ export function fontRowPx(name, sizePx, bold = false, roman = false) {
   }
   const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   return Math.round(Math.max(m.win[0] + m.win[1], m.line) * sizePx + 1.6 + 0.035 * sizePx);
+}
+
+/** A font's line as Excel counts it in a row's height: { row, desc } in px, the height of a row of it (fontRowPx) and
+ *  its descent, for the font upright, bold, italic or both. Excel's own for the fonts measured (ooxml/excelfonts.js:
+ *  rows of 6 and 7 lines under a Normal font of Calibri 36, tools/excel-compare/excel-wraprows.ps1), where an italic
+ *  can be a pixel taller than its upright (Arial 14: 25px for 24) and a descent a pixel more than Windows' own
+ *  (Book Antiqua, Verdana, Segoe UI, Lato and six more); a font Windows hasn't takes Arial's or Times New Roman's,
+ *  as its rows do; any other font its row and its Windows descent rounded. */
+export function fontLinePx(name, sizePx, bold = false, roman = false, italic = false) {
+  const pt = sizePx * 0.75;
+  const measured = excelFontLine(name, pt, bold, italic) || (windowsHasFont(name) ? null : excelFontLine(roman ? 'Times New Roman' : 'Arial', pt, bold, italic));
+  return measured || { row: fontRowPx(name, sizePx, bold, roman), desc: Math.round(fontDescentPx(name, sizePx)) };
 }

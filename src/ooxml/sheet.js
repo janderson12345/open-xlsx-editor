@@ -52,7 +52,7 @@ function readSheetData(root, ns, sst) {
   for (const rowEl of kids(kid(root, 'sheetData', ns), 'row', ns)) {
     // (`r` may be left out: rows and cells then follow on from the one before.)
     r = attr(rowEl, 'r') ? Number(attr(rowEl, 'r')) - 1 : r + 1;
-    const entry = rowEntry(attr(rowEl, 'ht'), attr(rowEl, 'hidden'), attr(rowEl, 'customFormat'), attr(rowEl, 's'), attr(rowEl, 'outlineLevel'), attr(rowEl, 'collapsed'), attr(rowEl, 'thickBot'), attr(rowEl, 'customHeight'));
+    const entry = rowEntry(attr(rowEl, 'ht'), attr(rowEl, 'hidden'), attr(rowEl, 'customFormat'), attr(rowEl, 's'), attr(rowEl, 'outlineLevel'), attr(rowEl, 'collapsed'), attr(rowEl, 'thickBot'), attr(rowEl, 'customHeight'), attr(rowEl, 'thickTop'));
     if (entry) rows.set(r, entry);
     let c = -1;
     let line = null;

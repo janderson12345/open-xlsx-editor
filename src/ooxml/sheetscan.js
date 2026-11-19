@@ -336,6 +336,7 @@ function scan(u8, at, sst, banded, parseIs) {
     let level = null;
     let collapsed = null;
     let thickBot = null;
+    let thickTop = null;
     let customHeight = null;
     let rowR = -2;
     let any = false;
@@ -343,7 +344,7 @@ function scan(u8, at, sst, banded, parseIs) {
       const n = n1 - n0;
       if (n === 1) {
         if (u8[n0] === 0x72) { rowR = digits(); if (rowR < 1) { rowR = -2; rAt = text(v0, v1, true); } } else if (u8[n0] === 0x73) sAt = text(v0, v1, true);
-      } else if (n === 2) { if (isName('ht')) { ht = text(v0, v1, true); any = true; } } else if (n === 6) { if (isName('hidden')) { hidden = text(v0, v1, true); any = true; } } else if (n === 8) { if (isName('thickBot')) { thickBot = text(v0, v1, true); any = true; } } else if (n === 9) { if (isName('collapsed')) { collapsed = text(v0, v1, true); any = true; } } else if (n === 12) {
+      } else if (n === 2) { if (isName('ht')) { ht = text(v0, v1, true); any = true; } } else if (n === 6) { if (isName('hidden')) { hidden = text(v0, v1, true); any = true; } } else if (n === 8) { if (isName('thickBot')) { thickBot = text(v0, v1, true); any = true; } else if (isName('thickTop')) { thickTop = text(v0, v1, true); any = true; } } else if (n === 9) { if (isName('collapsed')) { collapsed = text(v0, v1, true); any = true; } } else if (n === 12) {
         if (isName('customFormat')) { customFormat = text(v0, v1, true); any = true; } else if (isName('outlineLevel')) { level = text(v0, v1, true); any = true; } else if (isName('customHeight')) customHeight = text(v0, v1, true);
       }
     }
@@ -352,7 +353,7 @@ function scan(u8, at, sst, banded, parseIs) {
     // (Bands take rows in order, each once.)
     if (banded && !(r > before && Number.isInteger(r))) throw UNORDERED;
     if (any) {
-      const entry = rowEntry(ht, hidden, customFormat, sAt, level, collapsed, thickBot, customHeight);
+      const entry = rowEntry(ht, hidden, customFormat, sAt, level, collapsed, thickBot, customHeight, thickTop);
       if (entry) rows.set(r, entry);
     }
     i = tagClose;

@@ -179,12 +179,19 @@ otate`). General alignment of turned text goes by the angle, not the
   - *Widths.* Excel measures in the whole pixels Windows (GDI) gives each character at the font's size in whole
     pixels (11pt is 15px): the narrowest column that keeps 20 of one character on a line, for each of 95 characters in
     9 fonts, gives the table of `gdi-charwidths.ps1` character for character (`src/ooxml/excelwidths.js`, 24 fonts,
-    regular and bold, 11 to 48px; 177KB, 21KB gzipped). No kerning, no DirectWrite widths: AVAVAVAVAV and ToToToToTo
-    are the sums of their letters. Under 8pt (10px and less) every font is laid out in Windows' bitmap font Small
-    Fonts (Calibri 6, 6.5, 7 and 7.5, Arial 5 to 7.5 and Times New Roman 7 all have its widths at 7 to 10px, 1 narrower
-    than the other digits), and its bold a pixel more a character and one more a line (20 digits in Arial 7, Calibri
-    6 and 7.5 bold; other characters not measured). A font Windows hasn't is
-    laid out in Arial (Helvetica), as its rows are.
+    regular, bold, italic and bold italic, 11 to 48px; 294KB, 30KB gzipped). No kerning, no DirectWrite widths:
+    AVAVAVAVAV and ToToToToTo are the sums of their letters. Under 8pt (10px and less) every font is laid out in
+    Windows' bitmap font Small Fonts (Calibri 6, 6.5, 7 and 7.5, Arial 5 to 7.5 and Times New Roman 7 all have its
+    widths at 7 to 10px, 1 narrower than the other digits). A font Windows hasn't is laid out in Arial (Helvetica),
+    as its rows are.
+  - *Italic, and bold under 8pt.* An italic face has widths of its own (16 of the 24 fonts; Windows slants the
+    others, widths unchanged), Book Antiqua's a good deal narrower than its upright. And an italic line counts some
+    pixels more than its characters, in `width` below: in Calibri 2px up to 11pt, 3 at 12pt, 4 at 16pt, 9 at 36pt,
+    a pixel either way in other fonts (the narrowest column for five italic zeros in each of 25 fonts, regular and
+    bold, at each half point from 8 to 36pt, `test/italiclines-excel.json`, kept by font and pixel size). The bold
+    and the italic Windows makes up of Small Fonts count their overhang the same way: 1px bold, 5 italic, 6 both at
+    7pt. 2 to 40 of five characters in 14 italic fonts, 420 columns, each to the pixel
+    (`test/wrapitalic-excel.json`), and 10 italic sentences at every width from 40 to 300px.
   - *Margin.* A line fits when `width + 2 x ceil(digit / 4) + max(3, ceil(width / 28)) <= the column's pixels`, digit
     being the width of 0 in the cell's font (not the Normal style's). In Calibri 11 that is 7px up to 84px of text
     and a pixel more for every 28px from there: 10 digits (70px) fit in 77px, 20 in 149, 40 in 294, 100 in 729. The
@@ -199,14 +206,43 @@ otate`). General alignment of turned text goes by the angle, not the
     its last piece. A line break makes a line, an empty one too, but after a line that is one space alone a last line
     that is empty or spaces isn't counted ("abc\n \n" is two lines, "abc\n\n" three): text pasted from elsewhere
     often ends so, and two customer rows were a line tall for it.
-  - *What changes nothing:* alignment left, centre or right; bold beyond its own widths. An indent level takes 9px
-    (Calibri 11, Times New Roman 12, Book Antiqua 12 bold; Arial 10 came out otherwise and isn't worked out).
+  - *What changes nothing:* alignment left, centre or right. An indent level takes 9px (Calibri 11 regular and bold,
+    Arial 10, Times New Roman 12 and Book Antiqua 12 bold, one and three levels, every width from 40 to 300px).
   - *Rich text.* Each run is measured in its own font, and each line is as tall as the tallest run on it: Book
     Antiqua 12 bold followed by 10pt is 16.5pt for a line with a 12pt character on it and 13.5 for a line of 10pt
     alone (seven texts, every width from 40 to 400px).
   164 texts (64 sentences in 16 fonts, 100 strings a rule each) at every width from 15 to 400px, 63,304 rows: all
   Excel's line counts but a-b-c-d-e-f-g-h in a column of 15 or 16px, narrower than a letter and its margin
   (`test/wrapbreaks.test.js`, in Node: no browser is asked for a width in these fonts).
+
+- **A row's height from its lines** (*measured*, `tools/excel-compare/excel-wraprows.ps1`, `wraprows-table.mjs`,
+  `test/fontlines-excel.json`, `test/wraprows-excel.json`; `src/editor/rowheights.js` rowOf, `fonts.js` fontLinePx).
+  Excel sets the last line of every bottom-aligned cell of a row on one baseline, with the deepest of those cells'
+  descents below it. So a cell takes its lines and what that deepest descent has over its own font's:
+  `max over cells of (lines x the font's row + deepest descent - the font's descent)`, in pixels, the empty cells
+  counting with their fonts (the Normal style's for the ones the file doesn't hold). Under a Normal font of Calibri
+  11, whose descent is 4px: five lines of Calibri 10 (17px a line, descent 3) are 86px, not 85; a cell of Arial 12
+  (20px, descent 3), empty or not, wrapped or not, makes its row 21px; beside an empty Calibri 20 cell (descent 7)
+  the five lines are 89px. With the whole row formatted Calibri 10 they are 85, and under a Normal font of Arial 10
+  (descent 3) too.
+  - *Only text at the bottom.* A cell aligned to the top, the middle, justified or distributed takes its lines
+    alone, and its descent is no part of the deepest (five lines of Calibri 10: 85px; beside a top-aligned Calibri
+    20 cell, 86).
+  - *The descents* are Excel's own, measured as the lines are: rows of 6 and 7 lines of each of 25 fonts, regular,
+    bold, italic and bold italic, at each half point from 6 to 36pt under a Normal font of Calibri 36 (12,200
+    rows). 7 lines less 6 is the font's line, the row height already in the table for regular and bold in all 25
+    fonts; what 6 lines have over 6 times the line is the Normal font's descent less the font's. They are Windows' tmDescent
+    in 14 fonts and a pixel more at some sizes in ten (Book Antiqua, Verdana, Segoe UI, Lato, Trebuchet MS, Arial
+    Narrow, Arial Black, Century Gothic, Helv, MS Sans Serif), so Excel's are kept. An italic's line is a pixel
+    taller than its upright in six fonts (Arial 14: 25px for 24; Book Antiqua, Courier New, Century Gothic).
+  - *Thick borders.* A thick bottom border in the row (thickBot) is 0.75pt more, and a thick top border (thickTop)
+    as much again: a one-line Calibri 11 row is 21px with either on a cell and 22 with both, and a row with the
+    attribute and no cell at all has it too.
+  1, 2, 3 and 5 lines of 6 fonts from 6 to 16pt under Normal fonts of Calibri 8, 11 and 14 and Arial 10: 1,056 of
+  1,056 rows (`test/wrapbreaks.test.js`). End to end in the browser, `tools/excel-compare/rowfit-book.mjs`'s workbook
+  has a row for each of these and of the wrapped-line rules, 84 of 84 as Excel opens it (`test/rowfit.mjs`).
+  Not worked out: top-aligned text beside a bottom-aligned cell of a deeper font is a pixel taller in Excel (86px
+  for the five lines beside an empty Calibri 20 cell).
 
 ## Where it stands
 
@@ -286,21 +322,22 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
 ## Open differences
 
 - The grid ends 100 rows and 10 columns past the used range; Excel's goes on to row 1,048,576 and column XFD.
-- Row heights Excel works out (rows without customHeight) count wrapped lines as Excel breaks them (Rules in use,
-  Wrapped lines). tools/excel-compare/rowfit-book.mjs's workbook: 62 of 62 rows (test/rowfit.mjs; 60 before). Against
-  Excel on 146 customer workbooks, 59 rows of 9,429 differ (98 before: 50 by 1px and 48 by a line or more), 110
-  workbooks have every row as Excel's (99), 39 rows put right and none made wrong. What is left:
-  - 56 rows a pixel or two out, not a line. One cause is now known and not yet worked out: in a font smaller
-    than the Normal style's, Excel's rows of two lines and more are a pixel taller than their lines (9 lines of
-    Calibri 10, 12.75pt each, are 115.5pt, not 114.75; so are Calibri 8 and 9, Arial 8, 9 bold and 10 and Tahoma 10;
-    Verdana 9 two pixels), while a row of one line is not. A rich text with a 10pt run in Calibri 12 has it too.
-  - 3 rows a line or more out, all three a heading in Book Antiqua 12 bold followed by a 10pt italic run:
-    italic is counted at the upright widths, and an italic face has widths of its own, Book Antiqua's much
-    narrower (10 italic texts in 5 fonts over COM: a line out at 1 column width in 10 to 3). The table would need
-    italic and bold italic, twice its size.
-  - A font excelwidths.js hasn't, or a size over 36pt, is counted at the canvas's widths times 1.075 in the column
-    less 4px (EXCEL_WRAP_WIDTH), as every font was before; characters outside printable ASCII at the canvas's
-    width, rounded.
+- Row heights Excel works out (rows without customHeight) follow the two rules above (Rules in use: Wrapped lines,
+  A row's height from its lines). Against Excel on 146 customer workbooks, 9 rows of 9,429 differ (98 before the
+  rules: 50 by 1px and 48 by a line or more; 59 with the wrapped-line rules alone), 142 workbooks have every row as
+  Excel's (99 before), 89 rows put right and none made wrong. What is left:
+  - 7 rows 1px out, in two fonts the tables haven't (Bell MT 12 and Open Sans 9). A font ooxml/excelfonts.js and
+    ooxml/excelwidths.js haven't, or a size over 36pt, has its row from the font's metrics, its descent Windows'
+    rounded, and its lines counted at the canvas's widths times 1.075 in the column less 4px (EXCEL_WRAP_WIDTH), as
+    every font was before; characters outside printable ASCII at the canvas's width, rounded. Another font is added
+    by putting it in the lists of excel-fontmetrics.ps1, gdi-charwidths.ps1, wraprows-table.mjs and
+    wrapwidths-cases.mjs and measuring again.
+  - 2 rows a line or more out (93.75pt here, 63.75 in Excel): a heading in Book Antiqua 12 bold with a 10pt italic
+    run in a column of 127px. The same text and fonts in a new workbook are 94.5pt in Excel from 110 to 127px and
+    64.5 from 129px on, as worked out here at every width: the files store 63.75 for those rows and Excel shows
+    what is stored until something makes it work the row out again. Not a difference in the rules.
+  - Top-aligned text beside a bottom-aligned cell of a deeper font (a pixel taller in Excel), and a column narrower
+    than a character and its margin, are not worked out.
   - Wrapped text in a hidden column counts as one line, as in Excel.
 - A font's row height and digit width are Excel's own for 25 fonts at every half point from 6 to 36pt
   (ooxml/excelfonts.js, measured over COM by tools/excel-compare/excel-fontmetrics.ps1): Excel takes them from

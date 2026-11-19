@@ -6,16 +6,22 @@
 #   -Mode narrowest: for each case the narrowest column that keeps it on one line, by halving: written as
 #     { excel, cases: [{ ..., px }] }. Of n of one character that is n x its width + Excel's margin, which gives the
 #     character's width and the margin both (docs/LAYOUT.md).
+# A workbook holds some 500 fonts at most, so the cases go 300 to a workbook.
 # An invisible instance, macros disabled for it only, nothing opened or saved, no keys sent.
 # usage: node tools/excel-compare/wrapwidths-cases.mjs <cases.json>
 #        pwsh tools/excel-compare/excel-wrapwidths.ps1 <cases.json> <out.json> [-Mode narrowest] [-From 15] [-To 400]
 param([Parameter(Mandatory)][string]$In, [Parameter(Mandatory)][string]$Out, [ValidateSet('scan', 'narrowest')][string]$Mode = 'scan', [int]$From = 15, [int]$To = 400, [int]$Max = 1790)
 $ErrorActionPreference = 'Stop'
-$cases = @([IO.File]::ReadAllText((Resolve-Path $In).Path, [Text.Encoding]::UTF8) | ConvertFrom-Json)
+$all = @([IO.File]::ReadAllText((Resolve-Path $In).Path, [Text.Encoding]::UTF8) | ConvertFrom-Json)
 $x = New-Object -ComObject Excel.Application
 $x.Visible = $false; $x.DisplayAlerts = $false
 $x.AutomationSecurity = 3
 try {
+  $res = [ordered]@{ excel = $x.Version }
+  $list = @()
+  # (A workbook holds some 500 fonts at most, so the cases go 300 to a workbook.)
+  for ($at = 0; $at -lt $all.Count; $at += 300) {
+  $cases = @($all[$at..([math]::Min($all.Count, $at + 300) - 1)])
   $wb = $x.Workbooks.Add()
   $ws = $wb.Worksheets.Item(1)
   $normal = $wb.Styles.Item('Normal').Font
@@ -42,8 +48,6 @@ try {
   $allRows = $ws.Range($ws.Cells.Item(1, 1), $ws.Cells.Item($count, 1)).EntireRow
   # (A column's width in characters for a width in pixels; a double, or COM takes a whole number as an Int32.)
   function Chars($px) { return [double](($px - 5) / 7) }
-  $res = [ordered]@{ excel = $x.Version }
-  $list = @()
   if ($Mode -eq 'scan') {
     $res.from = $From; $res.to = $To
     $heights = @(); foreach ($c in $cases) { $heights += , (New-Object System.Collections.ArrayList) }
@@ -81,11 +85,12 @@ try {
     }
     for ($i = 1; $i -le $count; $i++) { $c = $cases[$i - 1]; $list += [ordered]@{ text = $c.text; font = $c.font; size = $c.size; bold = [bool]$c.bold; italic = [bool]$c.italic; px = $hi[$i] } }
   }
-  $res.cases = $list
   $wb.Close($false)
+  }
+  $res.cases = $list
   # (UTF-8 without a byte order mark, which Windows PowerShell's Set-Content would add.)
   [IO.File]::WriteAllText($Out, ($res | ConvertTo-Json -Compress -Depth 6) + "`n", (New-Object Text.UTF8Encoding $false))
-  Write-Output "$count cases, $Mode, Excel $($x.Version)"
+  Write-Output "$($all.Count) cases, $Mode, Excel $($x.Version)"
 } finally {
   $x.Quit()
   [void][Runtime.InteropServices.Marshal]::ReleaseComObject($x)

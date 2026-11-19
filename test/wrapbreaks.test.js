@@ -2,18 +2,21 @@ import './setup.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { breakLines, excelLineCount, excelWrapPt, MAX_ROW_PT } from '../src/editor/rowheights.js';
+import { breakLines, excelLineCount, excelWrapPt, rowOf, MAX_ROW_PT } from '../src/editor/rowheights.js';
 import { excelWidths } from '../src/ooxml/excelwidths.js';
-import { fontRowPx } from '../src/editor/fonts.js';
+import { fontRowPx, fontLinePx } from '../src/editor/fonts.js';
 
 // Excel 365 over COM (tools/excel-compare/excel-wrapwidths.ps1 on wrapwidths-cases.mjs's made-up cases): rows AutoFit
 // at every column width from 15 to 400px (wrapbreaks-excel.json: a pair [px, pt] where the height changes), and the
 // narrowest column that keeps 2 to 100 of one character on a line (wrapwidths-excel.json).
 const SCAN = JSON.parse(fs.readFileSync('test/wrapbreaks-excel.json', 'utf8'));
 const NARROWEST = JSON.parse(fs.readFileSync('test/wrapwidths-excel.json', 'utf8')).cases;
-const fontOf = (c) => ({ family: c.font, sizePx: (c.size * 4) / 3, bold: c.bold, css: '' });
-/** The height in points of a row holding the case alone, in a workbook whose Normal style is Calibri 11 (15pt). */
-const rowPt = (c, colPx) => Math.min(MAX_ROW_PT, Math.max(15, excelLineCount(c.text, fontOf(c), colPx) * fontRowPx(c.font, (c.size * 4) / 3, c.bold) * 0.75));
+const fontOf = (c) => ({ family: c.font, sizePx: (c.size * 4) / 3, bold: c.bold, italic: !!c.italic, css: '' });
+/** A cell's part in a row's height (rowOf): `lines` lines of a font, at the cell's bottom. */
+const part = (font, size, bold, italic, lines) => { const l = fontLinePx(font, (size * 4) / 3, bold, false, italic); return { pt: lines * l.row * 0.75, desc: l.desc, bottom: true }; };
+const NORMAL = part('Calibri', 11, false, false, 1);
+/** The height in points of a row holding the case alone, in a workbook whose Normal style is Calibri 11. */
+const rowPt = (c, colPx) => Math.min(MAX_ROW_PT, rowOf([NORMAL, part(c.font, c.size, c.bold, !!c.italic, excelLineCount(c.text, fontOf(c), colPx))]));
 
 test("wrapped rows are Excel's height at every column width from 15 to 400px", () => {
   let rows = 0;
@@ -25,11 +28,7 @@ test("wrapped rows are Excel's height at every column width from 15 to 400px", (
       rows++;
       const ours = rowPt(c, px);
       const excel = c.heights[k][1];
-      // (In a font smaller than the Normal one Excel's rows of two lines and more are a pixel taller than their
-      // lines, two in Verdana 9: 9 lines of Calibri 10, 12.75pt each, are 115.5pt. Not worked out here yet
-      // (docs/LAYOUT.md), so such a row counts as Excel's when it is that much under.)
-      const small = c.size < 11 && ours > 15 && ours < MAX_ROW_PT && excel - ours === (c.font === 'Verdana' ? 1.5 : 0.75);
-      if (ours !== excel && !small) off.push(`${c.font} ${c.size}${c.bold ? ' bold' : ''} ${JSON.stringify(c.text)} at ${px}px: ${ours} (Excel ${excel})`);
+      if (ours !== excel) off.push(`${c.font} ${c.size}${c.bold ? ' bold' : ''} ${JSON.stringify(c.text)} at ${px}px: ${ours} (Excel ${excel})`);
     }
   }
   assert.equal(SCAN.cases.length, 164);
@@ -148,4 +147,61 @@ test("a rich text's lines are each as tall as the tallest run on them", () => {
   const calibri = { family: 'Calibri', sizePx: 44 / 3, bold: false, css: '' };
   assert.equal(excelWrapPt('0000 0000', calibri, 15, 40), 30);
   assert.equal(excelWrapPt('0000 0000', calibri, 15, 40, 0, [{ text: 'x', font: null }], () => 99), 30);
+});
+
+test("an italic's lines break where Excel's do: its own widths and what its line takes beyond them", () => {
+  const cases = JSON.parse(fs.readFileSync('test/wrapitalic-excel.json', 'utf8')).cases;
+  let checked = 0;
+  for (const c of cases) {
+    if (c.px <= 13 || excelLineCount(c.text, fontOf(c), 1790) > 1) continue;
+    checked++;
+    assert.equal(excelLineCount(c.text, fontOf(c), c.px), 1, `${c.font} ${c.size}${c.bold ? ' bold' : ''} italic ${c.text[0]} x ${c.text.length} in ${c.px}px`);
+    assert.equal(excelLineCount(c.text, fontOf(c), c.px - 1), 2, `${c.font} ${c.size}${c.bold ? ' bold' : ''} italic ${c.text[0]} x ${c.text.length} in ${c.px - 1}px`);
+  }
+  assert.ok(checked > 400, String(checked));
+  // (Five italic zeros in each font, regular and bold, at each half point from 8 to 36pt: the allowance itself.)
+  const lines = JSON.parse(fs.readFileSync('test/italiclines-excel.json', 'utf8'));
+  let n = 0;
+  for (const [font, v] of Object.entries(lines.fonts)) {
+    for (const style of ['italic', 'boldItalic']) {
+      v[style].forEach((px, k) => {
+        const f = { family: font, sizePx: ((lines.from + k / 2) * 4) / 3, bold: style === 'boldItalic', italic: true, css: '' };
+        n++;
+        assert.equal(excelLineCount(lines.text, f, px), 1, `${font} ${style} ${lines.from + k / 2}pt in ${px}px`);
+        assert.equal(excelLineCount(lines.text, f, px - 1), 2, `${font} ${style} ${lines.from + k / 2}pt in ${px - 1}px`);
+      });
+    }
+  }
+  assert.equal(n, 25 * 2 * 57);
+});
+
+test("a row is its lines and what the row's deepest descent has over the font's, as Excel's under four Normal fonts", () => {
+  const data = JSON.parse(fs.readFileSync('test/wraprows-excel.json', 'utf8'));
+  let n = 0;
+  for (const set of data.sets) {
+    const [, name, size] = set.normal.match(/^(.*) ([\d.]+)$/);
+    const normal = part(name, Number(size), false, false, 1);
+    assert.equal(rowOf([normal]), set.standard, `the standard row of ${set.normal}`);
+    for (const [font, pt, lines, excel] of set.rows) {
+      n++;
+      assert.equal(rowOf([normal, part(font, pt, false, false, lines)]), excel, `${lines} lines of ${font} ${pt} under ${set.normal}`);
+    }
+  }
+  assert.equal(n, 4 * 264);
+});
+
+test('only text at the bottom of its cell takes the deepest descent; a font the table has not takes its own', () => {
+  const ten = part('Calibri', 10, false, false, 5);
+  // (Five lines of Calibri 10, 17px each, descent 3, under Calibri 11's 4: 86px; aligned to the top 85; beside an
+  // empty Calibri 20 cell, descent 7, 89; beside that cell aligned to the top, 86.)
+  assert.equal(rowOf([NORMAL, ten]), 86 * 0.75);
+  assert.equal(rowOf([NORMAL, { ...ten, bottom: false }]), 85 * 0.75);
+  assert.equal(rowOf([NORMAL, ten, part('Calibri', 20, false, false, 1)]), 89 * 0.75);
+  assert.equal(rowOf([NORMAL, ten, { ...part('Calibri', 20, false, false, 1), bottom: false }]), 86 * 0.75);
+  // (An italic can be taller than its upright: Arial 14, 24px upright and 25 italic.)
+  assert.deepEqual(fontLinePx('Arial', (14 * 4) / 3, false, false, true), { row: 25, desc: 5 });
+  assert.equal(fontLinePx('Arial', (14 * 4) / 3).row, 24);
+  // (A font Windows hasn't is Arial, a roman one Times New Roman.)
+  assert.deepEqual(fontLinePx('No Such Font', 16), fontLinePx('Arial', 16));
+  assert.deepEqual(fontLinePx('No Such Font', 16, false, true), fontLinePx('Times New Roman', 16));
 });
