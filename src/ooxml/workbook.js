@@ -25,6 +25,7 @@ import { isCompoundFile, decryptWorkbook, encryptWorkbook } from './encryption.j
 import { setValidation as setValidationXml, addToRule, moveValidation } from './dvedit.js';
 import { addConditional, clearConditional } from './cfedit.js';
 import { snapshotOf, restoreTo, writeResultTo } from './workbookstate.js';
+import { hasFormulaWithoutResult } from './formulascan.js';
 
 /** A part's XML text with the original's XML declaration in front (serialisers drop or rewrite it, and Excel writes
  *  `standalone="yes"`). */
@@ -454,6 +455,9 @@ export class Workbook {
     const also = [];
     this.sheets.forEach((info, si) => {
       if (info.kind !== 'worksheet' || !info.path) return;
+      // (A sheet not read yet whose every formula has its result, as Excel saves them, isn't parsed for this: its
+      // bytes are scanned instead, formulascan.js. A sheet read already is looked at as it is.)
+      if (!this._parsed.has(info) && this.pkg.files[info.path] && !hasFormulaWithoutResult(this.pkg.files[info.path])) return;
       for (const [r, line] of this.sheet(si).cells) for (const [c, cell] of line) if (cell.f != null && cell.v == null) also.push({ si, r, c });
     });
     if (!also.length) return 0;
