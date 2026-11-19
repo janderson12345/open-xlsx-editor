@@ -13,6 +13,8 @@ import { readObjects, GROUP_DEPTH } from '../src/ooxml/drawobjects.js';
 import { customPaths } from '../src/ooxml/presets.js';
 import { readMashup } from '../src/ooxml/queries.js';
 import { fontStack } from '../src/editor/fonts.js';
+import { SheetCells } from '../src/ooxml/sheetcells.js';
+import { autoRowHeights } from '../src/editor/rowheights.js';
 
 // Text a workbook, the clipboard or a pattern brings, handled so it can't change what the code does: the security
 // review of the November merges.
@@ -146,4 +148,19 @@ test('a query package that says it unpacks past 64 MB is not unpacked', () => {
   dv.setUint32(cd + 24, strToU8(m).length, true);
   wb.pkg.files['customXml/item1.xml'] = mashup();
   assert.deepEqual(readMashup(wb)?.queries.map((q) => q.name), ['Q']);
+});
+
+test('rows of formatted empty cells alternating styles across every column are sized at once', () => {
+  // (200 rows, each 16,384 empty cells of two styles in turn, 8,192 runs, every row a little different so none are
+  // one band: counting each band's empty columns run by run took 200 x 16,384 x 8,192 steps.)
+  const cells = new SheetCells();
+  const runs = [];
+  for (let c = 0; c < 16384; c++) runs.push(c, c, c % 2);
+  for (let r = 0; r < 200; r++) { runs[2] = r % 2 ? 1 : 0; runs[5] = r % 3 ? 1 : 0; runs[8] = r; cells.addBlankRow(r, runs, runs.length); }
+  const sheet = { cells, rows: new Map(), cols: [], merges: [], format: { defaultRowHeight: 15 } };
+  const deco = () => ({ font: { family: 'Calibri', sizePx: 44 / 3, bold: false, css: '11pt Calibri' }, align: {} });
+  const started = Date.now();
+  const out = autoRowHeights(sheet, deco, { size: () => 64 });
+  assert.ok(Date.now() - started < 3000, `took ${Date.now() - started} ms`);
+  assert.equal(out.size, 200);
 });

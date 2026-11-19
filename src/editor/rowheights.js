@@ -175,7 +175,19 @@ export function autoRowHeights(sheet, deco, cols) {
     let count = 0;
     let tallest = 0;
     for (let k = 0; k < runs.length; k += 3) { count += runs[k + 1] - runs[k] + 1; tallest = Math.max(tallest, lineOf(runs[k + 2] || 0)); }
-    const inRuns = (c) => { for (let k = 0; k < runs.length; k += 3) if (c >= runs[k] && c <= runs[k + 1]) return true; return false; };
+    // (The runs are in column order, as sheetscan.js makes them, so a binary search: a crafted band of thousands of
+    // runs, met column by column for all 16,384, would otherwise cost runs x columns for every band.)
+    const inRuns = (c) => {
+      let lo = 0;
+      let hi = runs.length / 3 - 1;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        if (c < runs[mid * 3]) hi = mid - 1;
+        else if (c > runs[mid * 3 + 1]) lo = mid + 1;
+        else return true;
+      }
+      return false;
+    };
     const least = emptyCellsPt(columns, count, inRuns);
     const merged = sheet.merges.filter((m) => m.r1 >= r0 && m.r0 <= r1);
     for (let r = r0; r <= r1; r++) {
