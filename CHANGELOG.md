@@ -17,6 +17,11 @@
   formatted empty cells are kept as bands. Workbooks whose sheet is formatted down to the last row (millions of empty
   styled cells) open in 3 to 5 seconds instead of 30 to 57, and in Node without running out of memory. A sheet's XML
   is parsed only when it's first edited. Security review still to do before release.
+- **Excel's own row heights and column widths** for the 25 fonts workbooks use most, measured at every half point
+  from 6 to 36pt, instead of a formula that was a pixel off for most fonts below 11pt. Fixes Lato and Aptos Narrow 12
+  sheets whose columns were 11 to 12% off. Security review still to do before release.
+- **Clearer refusals:** a workbook protected by rights management (a sensitivity label) says only Excel, signed in
+  with access, can open it; a damaged file is no longer called too large. Security review still to do before release.
 
 ## 0.8.3
 
