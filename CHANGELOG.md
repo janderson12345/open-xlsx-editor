@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.9.1
 
 - **Security:** a workbook whose font is named constructor, __proto__ or another of JavaScript's own object
   property names opens: the font tables were looked up by the name as it stood, and the lookup threw, so the
