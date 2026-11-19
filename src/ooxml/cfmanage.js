@@ -4,6 +4,7 @@
 // number them again); a rule given priority p comes before the rule that had it, every rule from p on one later; a rule
 // sent last takes one more than the last; Stop If True is the rule's attribute; a rule given other ranges moves to a
 // conditionalFormatting of its own just after the one it was in. Edit Rule: see editRule.
+import { frameOf } from './sheetcells.js';
 import { kids, kid } from './xml.js';
 import { rangeName, parseRange } from './refs.js';
 import { addConditional, addPresetDxf, cfRuleXml, ruleElement } from './cfedit.js';
@@ -64,7 +65,7 @@ export function moveRule(wb, si, p, to) {
 }
 
 /** The rules of sheet si in priority order: their priorities (to name them by). */
-export const rulePriorities = (wb, si) => rulesOf(wb._part(si).doc).map((x) => x.priority).sort((a, b) => a - b);
+export const rulePriorities = (wb, si) => rulesOf(frameOf(wb._part(si))).map((x) => x.priority).sort((a, b) => a - b);
 
 /** Stop If True on or off for the rule of priority `p` (an attribute after the priority, as Excel orders them). */
 export function setStopIfTrue(wb, si, p, on) {

@@ -3,23 +3,15 @@
 // changes only the elements it has to and everything not modelled (conditional formats, validations, extLst...) stays
 // where it was.
 import { readOutlinePr } from './outline.js';
-import { kids, kid, attr } from './xml.js';
+import { kids, kid, attr, parseXml } from './xml.js';
 import { parseRef, parseRange, MAX_COLS } from './refs.js';
 import { stringItemText, stringItemRuns } from './strings.js';
-import { shiftFormula } from '../calc/tokens.js';
+import { makeCell, withRuns, outlineLevel, rowEntry, formulaKind } from './sheetcells.js';
+import { findSheetData, scanSheetData } from './sheetscan.js';
 import { readColor } from './styles.js';
 import { readExtRules, readDataBar, readIconSet, extIdOf } from './cfext.js';
 import { readSparklines } from './sparklines.js';
 import { readFilterColumn } from './filtermore.js';
-
-/** A cell as stored: `t` its type (n number, s string, b boolean, e error, str formula text, d ISO date), `v` its
- *  value (null for a cell that only carries a style), `s` its style (an index into cellXfs), `f` its formula text.
- *  readSheet adds, where they apply: `shared` (the index of the shared formula the cell belongs to; `f` is then its
- *  own text, worked out from the group's first cell), `array` (an array formula's range, on its first cell) and
- *  `dataTable`. */
-const makeCell = (t, v, s, f) => ({ t, v, s, f });
-/** A text cell's rich-text runs (strings.js stringItemRuns), kept as `runs` for drawing it. */
-const withRuns = (cell, runs) => (runs ? Object.assign(cell, { runs }) : cell);
 
 /** Read one `c` element's value, resolving shared strings. */
 export function readCell(c, ns, sst) {
@@ -43,15 +35,12 @@ export function lineStyle(sheet, r, c) {
   return sheet.rows.get(r)?.s || sheet.cols.find((x) => c >= x.min && c <= x.max)?.style || 0;
 }
 
-/** The sheet's model from its parsed XML and the workbook's shared strings. */
-/** An outline level as Excel allows it, 0 to 7 (a file's larger or negative one kept in range: outline.js MAX_LEVEL). */
-const outlineLevel = (v) => Math.max(0, Math.min(7, Math.trunc(Number(v)) || 0));
 /** A col element's min or max as a 0-based column within the sheet. */
 const colIndex = (v) => Math.max(0, Math.min(MAX_COLS - 1, (Math.trunc(Number(v)) || 1) - 1));
 
-export function readSheet(doc, sst = []) {
-  const root = doc.documentElement;
-  const ns = root.namespaceURI;
+/** The cells of a parsed sheet's sheetData: { cells, rows, arrays, maxRow, maxCol } (sheetscan.js reads the same
+ *  from the part's bytes; test/sheetscan.test.js holds the two to the same answer). */
+function readSheetData(root, ns, sst) {
   /** @type {Map<number, Map<number, ReturnType<typeof makeCell>>>} */
   const cells = new Map();
   const rows = new Map(); // row -> { ht (points), hidden, customHeight }
@@ -63,16 +52,8 @@ export function readSheet(doc, sst = []) {
   for (const rowEl of kids(kid(root, 'sheetData', ns), 'row', ns)) {
     // (`r` may be left out: rows and cells then follow on from the one before.)
     r = attr(rowEl, 'r') ? Number(attr(rowEl, 'r')) - 1 : r + 1;
-    const ht = attr(rowEl, 'ht');
-    const hidden = attr(rowEl, 'hidden') === '1' || attr(rowEl, 'hidden') === 'true';
-    // (A row's own format: `s` with customFormat, as Excel writes a formatted row.)
-    const own = attr(rowEl, 'customFormat') === '1' || attr(rowEl, 'customFormat') === 'true' ? Number(attr(rowEl, 's') || 0) : 0;
-    // (Its outline: outlineLevel 1 to 7, and collapsed on a summary row whose group is hidden; outline.js.)
-    const level = outlineLevel(attr(rowEl, 'outlineLevel'));
-    const collapsed = attr(rowEl, 'collapsed') === '1' || attr(rowEl, 'collapsed') === 'true';
-    // (thickBot: a thick bottom border in the row, which Excel makes the row 0.75pt taller for; rowheights.js.)
-    const thickBot = attr(rowEl, 'thickBot') === '1' || attr(rowEl, 'thickBot') === 'true';
-    if (ht != null || hidden || own || level || collapsed || thickBot) rows.set(r, { ht: ht == null ? null : Number(ht), hidden, customHeight: attr(rowEl, 'customHeight') === '1', ...(own ? { s: own } : {}), ...(level ? { level } : {}), ...(collapsed ? { collapsed } : {}), ...(thickBot ? { thickBot } : {}) });
+    const entry = rowEntry(attr(rowEl, 'ht'), attr(rowEl, 'hidden'), attr(rowEl, 'customFormat'), attr(rowEl, 's'), attr(rowEl, 'outlineLevel'), attr(rowEl, 'collapsed'), attr(rowEl, 'thickBot'), attr(rowEl, 'customHeight'));
+    if (entry) rows.set(r, entry);
     let c = -1;
     let line = null;
     for (const cEl of kids(rowEl, 'c', ns)) {
@@ -80,12 +61,22 @@ export function readSheet(doc, sst = []) {
       c = at ? at.c : c + 1;
       if (!line) cells.set(r, (line = new Map()));
       const cell = readCell(cEl, ns, sst);
-      if (cell.f != null) formulaKind(cell, kid(cEl, 'f', ns), r, c, shared, arrays, attr(cEl, 'cm') != null);
+      if (cell.f != null) { const fEl = kid(cEl, 'f', ns); formulaKind(cell, attr(fEl, 't'), attr(fEl, 'si'), attr(fEl, 'ref'), r, c, shared, arrays, attr(cEl, 'cm') != null); }
       line.set(c, cell);
       if (c > maxCol) maxCol = c;
     }
     if (line && r > maxRow) maxRow = r;
   }
+  return { cells, rows, arrays, maxRow, maxCol };
+}
+
+/** The sheet's model from its parsed XML and the workbook's shared strings. `data`: its cells already read from the
+ *  part's bytes (readSheetBytes), `doc` then being the part around them. */
+export function readSheet(doc, sst = [], data = null) {
+  const root = doc.documentElement;
+  const ns = root.namespaceURI;
+  const { cells, rows, arrays } = data || (data = readSheetData(root, ns, sst));
+  let { maxRow, maxCol } = data;
   const cols = [];
   for (const colsEl of kids(root, 'cols', ns)) {
     for (const col of kids(colsEl, 'col', ns)) {
@@ -228,28 +219,6 @@ function readView(view, ns) {
   };
 }
 
-/** What kind of formula a cell holds. A shared formula is written out on its group's first cell only (the one with
- *  `ref`); the others read it as moved to where they are. */
-function formulaKind(cell, fEl, r, c, shared, arrays, dynamic = false) {
-  const t = attr(fEl, 't');
-  if (t === 'shared') {
-    const si = attr(fEl, 'si');
-    cell.shared = Number(si);
-    if (cell.f !== '') shared.set(si, { r, c, text: cell.f });
-    else if (shared.has(si)) {
-      const first = shared.get(si);
-      try { cell.f = shiftFormula(first.text, r - first.r, c - first.c); } catch { /* (left '': not worked out) */ }
-    }
-  } else if (t === 'array' && dynamic) {
-    // (Excel 365's dynamic array formula, its cell metadata marking it: the range it spilled into, not a fixed array.)
-    cell.dynamic = true;
-    cell.spill = parseRange(attr(fEl, 'ref')) || { r0: r, c0: c, r1: r, c1: c };
-  } else if (t === 'array') {
-    cell.array = parseRange(attr(fEl, 'ref')) || { r0: r, c0: c, r1: r, c1: c };
-    arrays.push(cell.array);
-  } else if (t === 'dataTable') cell.dataTable = true;
-}
-
 /** Paper sizes by `paperSize` code, in inches (ECMA-376 Part 1, 18.3.1.63): only the common ones so far. */
 const PAPER = { 1: [8.5, 11], 3: [11, 17], 5: [8.5, 14], 7: [7.25, 10.5], 8: [11.69, 16.54], 9: [8.27, 11.69], 11: [5.83, 8.27], 13: [7.17, 10.12] };
 
@@ -300,3 +269,24 @@ function readPageSetup(root, ns) {
 /** A cell of the model, or null. */
 export const cellAt = (sheet, r, c) => sheet.cells.get(r)?.get(c) || null;
 
+
+/**
+ * A worksheet part read from its bytes: its cells by scanning them (sheetscan.js), the rest by parsing the part
+ * without its sheetData, which is small whatever the sheet holds. { model, frame (that parsed rest: the part's
+ * document with an empty sheetData) }, or null when the part has to be parsed whole (readSheet on its document).
+ * `compact`: how many formatted empty cells it takes to keep them as bands (sheetcells.js), Infinity for never.
+ */
+export function readSheetBytes(u8, sst = [], { compact } = {}) {
+  const at = findSheetData(u8);
+  if (!at) return null;
+  const parseIs = (xml) => {
+    const frag = parseXml(at.rootOpen + xml + at.rootClose).documentElement;
+    const ns = frag.namespaceURI;
+    return [stringItemText(kid(frag, 'is', ns), ns), stringItemRuns(kid(frag, 'is', ns), ns)];
+  };
+  const data = scanSheetData(u8, at, sst, { ...(compact == null ? {} : { compact }), parseIs });
+  if (!data) return null;
+  const decoder = new TextDecoder();
+  const frame = parseXml(`${decoder.decode(u8.subarray(0, at.start))}<${at.prefix}sheetData/>${decoder.decode(u8.subarray(at.end))}`);
+  return { model: readSheet(frame, sst, data), frame };
+}

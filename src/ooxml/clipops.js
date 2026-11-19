@@ -1,6 +1,7 @@
 // Copy, cut and paste, as Excel does them (measured over COM, docs/CLIPBOARD.md). A copy is a snapshot of cells:
 // their values, formulas, formats and merged ranges. Pasting returns what changes, sheet by sheet, for the editor to
 // apply and undo as one step: [{ si, contents: [{ r, c, value } or { r, c, formula }], styles: [{ r, c, s }], merges }].
+import { filledRows } from './sheetcells.js';
 import { shiftFormula, moveRefs, transposeFormula, sheetPrefix } from '../calc/tokens.js';
 import { entryChanges } from './entry.js';
 import { cellsOf } from './formatops.js';
@@ -246,7 +247,7 @@ export function pasteCut(wb, si, sel, clip) {
   wb.sheets.forEach((info, k) => {
     if (info.kind !== 'worksheet' || !info.path || !wb.pkg.has(info.path)) return;
     const sheet = wb.sheet(k);
-    for (const [r, line] of sheet.cells) {
+    for (const [r, line] of filledRows(sheet.cells)) {
       for (const [c, cell] of line) {
         if (!cell.f) continue;
         if (k === clip.si && r >= clip.rect.r0 && r <= clip.rect.r1 && c >= clip.rect.c0 && c <= clip.rect.c1) continue;

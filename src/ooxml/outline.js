@@ -5,6 +5,7 @@
 // (hidden="1", a column also width 0 unless it has a width of its own) and marks the summary line collapsed="1", which
 // Excel writes even on a row with nothing else. sheetFormatPr's outlineLevelRow and outlineLevelCol hold the deepest
 // level. Excel refuses an eighth level and Ungroup of lines that aren't grouped.
+import { filledRows } from './sheetcells.js';
 import { kids, kid, attr } from './xml.js';
 import { setColumns, setSheetFormat, pxWidth } from './sizes.js';
 import { pinRefs, forgetRows } from './sheetedit.js';
@@ -329,7 +330,7 @@ export function autoOutline(wb, si) {
   const pr = sheet.outline || { below: true, right: true };
   const spans = { row: [], col: [] };
   const col = (s) => [...s].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
-  for (const [r, line] of sheet.cells) {
+  for (const [r, line] of filledRows(sheet.cells)) {
     for (const [c, cell] of line) {
       if (!cell.f) continue;
       const refs = [...cell.f.toUpperCase().matchAll(/\$?([A-Z]{1,3})\$?(\d+):\$?([A-Z]{1,3})\$?(\d+)/g)].map((m) => ({ c0: col(m[1]), r0: Number(m[2]) - 1, c1: col(m[3]), r1: Number(m[4]) - 1 }));

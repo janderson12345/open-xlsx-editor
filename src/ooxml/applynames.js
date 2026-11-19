@@ -13,6 +13,7 @@
 //   column: =C3 in C6, South). This comes before a name of the cell itself (=B2 in H2 with Qty =$B$2 and Amounts
 //   =$B$2:$B$5: Amounts); without a row and a column, the cell's own name.
 // - Text in quotes, names already there and everything else stay as typed.
+import { filledRows } from './sheetcells.js';
 import { tokenize, areaText } from '../calc/tokens.js';
 import { namesOnSheet } from './names.js';
 import { colName } from './refs.js';
@@ -90,7 +91,7 @@ export function applyNamesSteps(wb, si, sel, names, opts = {}) {
   const whole = sel.r0 === sel.r1 && sel.c0 === sel.c1;
   const inArray = (r, c) => sheet.arrays?.some((a) => inside(a, r, c));
   const contents = [];
-  for (const [r, line] of sheet.cells) {
+  for (const [r, line] of filledRows(sheet.cells)) {
     if (!whole && (r < sel.r0 || r > sel.r1)) continue;
     for (const [c, cell] of line) {
       if (!whole && (c < sel.c0 || c > sel.c1)) continue;

@@ -10,6 +10,7 @@
 //                      one row or column the formula reads, in that row or column;
 // 'unlockedFormula'    a formula in a cell whose format isn't locked.
 // A sheet's ignoredErrors (Excel's Ignore Error) turn a rule off for their cells. The names are ignoredError's.
+import { frameOf, filledRows, cellCount } from './sheetcells.js';
 import { kid, kids, attr } from './xml.js';
 import { textToNumber } from '../calc/values.js';
 import { parseFormula } from '../calc/parse.js';
@@ -98,7 +99,8 @@ function inconsistent(cells, r, c, f) {
 
 /** The sheet's ignoredErrors: rule => [ranges]. */
 function ignored(wb, si) {
-  const doc = wb._part(si)?.doc;
+  const part = wb._part(si);
+  const doc = part && frameOf(part);
   const out = new Map();
   if (!doc) return out;
   const root = doc.documentElement;
@@ -118,12 +120,11 @@ export function errorFlags(wb, si, limit = 200000) {
   const out = new Map();
   const sheet = wb.sheet(si);
   if (!sheet) return out;
-  let n = 0;
-  for (const line of sheet.cells.values()) n += line.size;
-  if (n > limit) return out;
+  if (cellCount(sheet.cells) > limit) return out;
   const skip = ignored(wb, si);
   const off = (rule, r, c) => skip.get(rule)?.some((g) => r >= g.r0 && r <= g.r1 && c >= g.c0 && c <= g.c1);
-  for (const [r, line] of sheet.cells) {
+  // (Rows of formatted empty cells alone, sheetcells.js, have nothing to flag.)
+  for (const [r, line] of filledRows(sheet.cells)) {
     for (const [c, cell] of line) {
       const rules = [];
       if (cell.f != null) {

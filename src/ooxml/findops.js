@@ -3,6 +3,7 @@
 // (Values). Search goes from the cell after the active one, by rows or by columns, round to the start; * and ? are
 // wildcards, ~ takes the next character as it is. A replacement is entered as if typed (a number becomes a number,
 // "=..." a formula); in a formula it is plain text, so A1 to B9 also makes A10 B90, as in Excel.
+import { filledRows } from './sheetcells.js';
 import { readNotes } from './notes.js';
 import { cellDisplay } from './numfmt.js';
 import { formatCodeOf } from './styles.js';
@@ -52,7 +53,7 @@ function matchesIn(wb, si, re, opts) {
       if ((n.kind === 'thread') === (opts.lookIn === 'comments') && re.test(text)) { const [r, c] = key.split(',').map(Number); out.push({ si, r, c }); }
     }
   } else {
-    for (const [r, line] of wb.sheet(si).cells) {
+    for (const [r, line] of filledRows(wb.sheet(si).cells)) {
       for (const [c, cell] of line) if (filledCell(cell) && re.test(searchText(wb, si, cell, opts.lookIn)) && formatMatches(wb, cell, opts.findFormat)) out.push({ si, r, c });
     }
   }

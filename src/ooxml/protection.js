@@ -4,6 +4,7 @@
 // selection the other way round (selectLockedCells="1": locked cells can't be selected), and a password as Excel 2013
 // and later keep it: SHA-512 of a 16-byte salt and the password (UTF-16), hashed again 100,000 times with the round's
 // number after it, in base64.
+import { frameOf } from './sheetcells.js';
 import { kid, attr } from './xml.js';
 import { b64, hashPassword, passwordFits } from './passwords.js';
 import { inOpenRange, AFTER_PROTECTION as AFTER } from './editranges.js';
@@ -26,8 +27,7 @@ const on = (v) => v === '1' || v === 'true';
 /** Sheet si's protection: null when it isn't protected, else { allow: { formatCells, ... }, selectLocked,
  *  selectUnlocked, objects, scenarios, password: whether one is set }. */
 export function sheetProtection(wb, si) {
-  const { doc } = wb._part(si);
-  const root = doc.documentElement;
+  const root = frameOf(wb._part(si)).documentElement;
   const el = kid(root, 'sheetProtection', root.namespaceURI);
   if (!el || !on(attr(el, 'sheet'))) return null;
   const allow = Object.fromEntries(ALLOWS.map((k) => [k, attr(el, k) === '0' || attr(el, k) === 'false']));

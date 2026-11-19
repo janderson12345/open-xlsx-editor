@@ -2,6 +2,7 @@
 // says (Excel's PDF of test/fixtures/rows.xlsx: a stored ht of 30 printed at 15pt, ht 10 with a 20pt font at 26.25pt):
 // a cell's font's row height (fonts.js fontRowPx), times its lines when wrapped, never less than the sheet's default.
 // Styled empty cells count; merged cells don't.
+import { filledRows } from '../ooxml/sheetcells.js';
 import { fontRowPx, fontDescentPx } from './fonts.js';
 
 let ctx = null;
@@ -52,7 +53,7 @@ export const countLines = (text, font, width) => wrapLines(text, font, width).le
 export function rowDescents(sheet, deco) {
   const out = new Map();
   if (!deco) return out;
-  for (const [r, line] of sheet.cells) {
+  for (const [r, line] of filledRows(sheet.cells)) {
     let best = { row: -1, desc: 0 };
     for (const cell of line.values()) {
       const f = deco(cell.s || 0).font;
@@ -60,6 +61,16 @@ export function rowDescents(sheet, deco) {
       if (row > best.row) best = { row, desc: fontDescentPx(f.family, f.sizePx) };
     }
     out.set(r, best.desc);
+  }
+  // (Rows of formatted empty cells kept as bands, sheetcells.js: one answer for a band's rows, from its runs.)
+  for (const { r0, r1, runs } of sheet.cells.bands || []) {
+    let best = { row: -1, desc: 0 };
+    for (let k = 0; k < runs.length; k += 3) {
+      const f = deco(runs[k + 2] || 0).font;
+      const row = fontRowPx(f.family, f.sizePx);
+      if (row > best.row) best = { row, desc: fontDescentPx(f.family, f.sizePx) };
+    }
+    for (let r = r0; r <= r1; r++) out.set(r, best.desc);
   }
   return out;
 }
@@ -95,8 +106,33 @@ export function autoRowHeights(sheet, deco, cols) {
     return rowPt.get(s);
   };
   // (A row with a format of its own, cells or not: its font's line, as Excel grows a row made 14pt to 18.75.)
-  const rows = new Set(sheet.cells.keys());
-  for (const [r, x] of sheet.rows) if (x.s) rows.add(r);
+  // (Rows of formatted empty cells kept as bands, sheetcells.js, are worked out from their runs below, not made.)
+  const rows = new Set();
+  for (const [r] of filledRows(sheet.cells)) rows.add(r);
+  for (const [r, x] of sheet.rows) if (x.s && !sheet.cells.blankRuns?.(r)) rows.add(r);
+  for (const { r0, r1, runs } of sheet.cells.bands || []) {
+    let tallest = sheet.format.defaultRowHeight;
+    for (let k = 0; k < runs.length; k += 3) tallest = Math.max(tallest, lineOf(runs[k + 2] || 0));
+    const merged = sheet.merges.filter((m) => m.r1 >= r0 && m.r0 <= r1);
+    for (let r = r0; r <= r1; r++) {
+      const own = sheet.rows.size ? sheet.rows.get(r) : null;
+      if (own?.customHeight) continue;
+      let best = tallest;
+      if (merged.some((m) => r >= m.r0 && r <= m.r1)) {
+        // (An empty cell in a merged range counts as any cell does: with its font's line on a range of one row.)
+        best = sheet.format.defaultRowHeight;
+        for (let k = 0; k < runs.length; k += 3) {
+          for (let c = runs[k]; c <= runs[k + 1]; c++) {
+            const m = mergeOf(r, c);
+            if (!m || m.r0 === m.r1) best = Math.max(best, lineOf(runs[k + 2] || 0));
+          }
+        }
+      }
+      if (own?.s) best = Math.max(best, lineOf(own.s));
+      if (own?.thickBot) best += 0.75;
+      out.set(r, best);
+    }
+  }
   for (const r of rows) {
     if (sheet.rows.get(r)?.customHeight) continue;
     const line = sheet.cells.get(r) || new Map();

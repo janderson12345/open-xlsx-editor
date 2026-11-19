@@ -10,6 +10,7 @@
 //
 // Inserting and deleting cells (the rest of their columns shifting down or up, or of their rows right or left) is the
 // same change limited to a band of columns (or rows): changeLines's `band`, docs/ROWCOL.md.
+import { filledRows } from './sheetcells.js';
 import { kids, kid, attr } from './xml.js';
 import { parseRef, refName, parseRange, rangeName, MAX_ROWS, MAX_COLS } from './refs.js';
 import { readSheet } from './sheet.js';
@@ -75,7 +76,7 @@ function check(wb, si, axis, at, n, band) {
   if (n > 0) {
     const last = axis === 'row' ? model.maxRow : model.maxCol;
     const limit = axis === 'row' ? MAX_ROWS : MAX_COLS;
-    const filled = [...model.cells].some(([r, line]) => [...line].some(([c, cell]) => (axis === 'row' ? r : c) >= limit - n && inBand(r, c) && (cell.v != null || cell.f != null)));
+    const filled = [...filledRows(model.cells)].some(([r, line]) => [...line].some(([c, cell]) => (axis === 'row' ? r : c) >= limit - n && inBand(r, c) && (cell.v != null || cell.f != null)));
     if (last >= at && filled) throw new SheetError(ROWCOL_MESSAGES.offSheet);
   }
   return model.merges.filter((m) => splitBy(m, axis, at, band));
@@ -349,7 +350,7 @@ export function changeLines(wb, si, axis, at, n, band = null, { unmerge = false 
   extendRules(doc, axis, at, n, band);
   finishFormats(doc, formats);
   // (Sparklines whose data is all deleted go, on any sheet.)
-  for (const [other, part] of wb._parsed) if (dropDeadSparklines(part.doc)) wb.dirty.add(other.path);
+  for (const [other, part] of wb._parsed) if (part.model.sparklines?.length && dropDeadSparklines(part.doc)) wb.dirty.add(other.path);
   // (Lines inserted into a collapsed group open it: its summary's collapsed goes, as Excel's does.)
   if (n > 0 && !band) openJoined(doc, axis, at, n, format);
   // Notes with their cells; pictures, charts and shapes with whole lines (not when cells shift, as in Excel).

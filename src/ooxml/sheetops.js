@@ -3,6 +3,7 @@
 // source that names the sheet; a delete turns references to it into #REF! (in the file, the whole reference, as Excel
 // writes it) and takes away the names that belong to it. Names that belong to a sheet follow it (localSheetId), as do
 // the workbook's active and first tab. What Excel does here was measured over COM (docs/SHEETS.md).
+import { filledRows } from './sheetcells.js';
 import { kid, kids, attr, serializeXml, REL_TYPES } from './xml.js';
 import { renameSheetRefs, spanSheetRefs } from '../calc/tokens.js';
 
@@ -138,7 +139,7 @@ export function mapFormulas(wb, map, { name, target = -1, shared = false, rename
     const here = info.name;
     if (shared) {
       const groups = new Set();
-      for (const line of model.cells.values()) {
+      for (const [, line] of filledRows(model.cells)) {
         for (const cell of line.values()) if (cell.shared != null && (si === target || map(cell.f, here) !== cell.f)) groups.add(cell.shared);
       }
       for (const g of groups) wb._unshare(si, g);
@@ -159,7 +160,7 @@ export function mapFormulas(wb, map, { name, target = -1, shared = false, rename
       const next = loc ? map(loc, here) : loc;
       if (next !== loc) { el.setAttribute('location', next); dirty = true; }
     }
-    for (const [r, line] of model.cells) {
+    for (const [r, line] of filledRows(model.cells)) {
       for (const [c, cell] of line) {
         if (cell.f == null || cell.f === '') continue;
         const next = map(cell.f, here);

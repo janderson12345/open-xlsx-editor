@@ -8,6 +8,7 @@
 //   their cells (as R1C1 writes them); text is compared without regard to case.
 // - Precedents and Dependents: of the selected cells, on this sheet; direct only or all levels.
 // Excel lists the ranges found in an order of its own; here they go top to bottom, left to right (the same cells).
+import { filledRows } from './sheetcells.js';
 import { shiftFormula } from '../calc/tokens.js';
 import { readNotes } from './notes.js';
 import { MAX_ROWS, MAX_COLS } from './refs.js';
@@ -28,7 +29,9 @@ const clip = (a, b) => {
 /** The sheet's used range: its first to its last cell with anything (a value, a formula or a format) or a merge. */
 export function usedRange(sheet) {
   let r0 = Infinity; let c0 = Infinity; let r1 = -1; let c1 = -1;
-  for (const [r, line] of sheet.cells) for (const c of line.keys()) { r0 = Math.min(r0, r); r1 = Math.max(r1, r); c0 = Math.min(c0, c); c1 = Math.max(c1, c); }
+  for (const [r, line] of filledRows(sheet.cells)) for (const c of line.keys()) { r0 = Math.min(r0, r); r1 = Math.max(r1, r); c0 = Math.min(c0, c); c1 = Math.max(c1, c); }
+  // (Rows of formatted empty cells kept as bands, sheetcells.js: their rows and their runs' first and last columns.)
+  for (const b of sheet.cells.bands || []) { r0 = Math.min(r0, b.r0); r1 = Math.max(r1, b.r1); c0 = Math.min(c0, b.runs[0]); c1 = Math.max(c1, b.runs[b.runs.length - 2]); }
   for (const m of sheet.merges) { r0 = Math.min(r0, m.r0); r1 = Math.max(r1, m.r1); c0 = Math.min(c0, m.c0); c1 = Math.max(c1, m.c1); }
   return r1 < 0 ? null : { r0, c0, r1, c1 };
 }

@@ -2,6 +2,7 @@
 // <hyperlinks> of <hyperlink ref>, an address outside the workbook as a relationship of the sheet (r:id, its Target
 // with TargetMode="External"), a place in the workbook as `location` ('Sheet2'!B5 or a defined name), with `display`
 // and `tooltip` when they were given.
+import { frameOf } from './sheetcells.js';
 import { NS, kids, attr } from './xml.js';
 import { parseRange, refName } from './refs.js';
 import { clearHyperlinks } from './clearparts.js';
@@ -21,7 +22,7 @@ export const decodeAddress = (t) => String(t).replace(/%(20|5b|5d|7b|7d|5e|25)/g
 /** Sheet si's hyperlinks: [{ range: { r0, c0, r1, c1 }, address (outside the workbook) or null, location (in it) or
  *  null, display, tooltip }], in the file's order. */
 export function readHyperlinks(wb, si) {
-  const { doc } = wb._part(si);
+  const doc = frameOf(wb._part(si));
   const ns = doc.documentElement.namespaceURI;
   const list = doc.getElementsByTagNameNS(ns, 'hyperlinks')[0];
   if (!list) return [];

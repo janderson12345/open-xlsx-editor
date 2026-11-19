@@ -1,5 +1,6 @@
 // The cells as the grid and print draw them: a cell's element (its text as shown, aligned, wrapped, running on into
 // empty neighbours, indented, in its format's classes), merged ranges, and numbers too wide for their column as #s.
+import { filledRows } from '../ooxml/sheetcells.js';
 import { fontDescentPx } from './fonts.js';
 import { inSelection } from './selection.js';
 import { cellDisplay } from '../ooxml/numfmt.js';
@@ -354,7 +355,7 @@ export function fitNumbers(container) {
 export function columnFitWidth(st, c) {
     if (!fitCtx) fitCtx = document.createElement('canvas').getContext('2d');
     let widest = 0;
-    for (const [r, line] of st.sheet.cells) {
+    for (const [r, line] of filledRows(st.sheet.cells)) {
       const cell = line.get(c);
       if (!cell || cell.v == null || mergeAt(st, r, c)) continue;
       const look = st.deco ? st.deco(cell.s || 0) : null;

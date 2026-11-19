@@ -3,6 +3,7 @@
 // outline), the sheet's defaults. Everything else in the workbook (merges, rules, tables, names, drawings, the styles
 // part's other lists, other parts) is summed up in a fingerprint: a change there isn't shared piece by piece, and
 // collab.js shares the whole workbook instead.
+import { frameOf } from './ooxml/sheetcells.js';
 import { kids, kid, attr, serializeXml } from './ooxml/xml.js';
 import { pinRefs, forgetRows } from './ooxml/sheetedit.js';
 import { setColumns, setSheetFormat } from './ooxml/sizes.js';
@@ -64,7 +65,7 @@ export function digestSheet(wb, si) {
 /** What a sheet part holds besides its digest (and its view, each editor's own): its XML, for comparing. */
 const SHEET_SKIP = new Set(['sheetData', 'cols', 'sheetFormatPr', 'dimension', 'sheetViews']);
 export function sheetPrint(wb, si) {
-  const root = wb._part(si).doc.documentElement;
+  const root = frameOf(wb._part(si)).documentElement;
   let out = '';
   for (const n of root.childNodes) {
     if (n.nodeType !== 1 || SHEET_SKIP.has(n.localName)) continue;
