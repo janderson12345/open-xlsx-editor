@@ -10,6 +10,9 @@
   =CONCATENATE) and a word wider than its column now count, lines are counted at Excel's text widths, a merged title's
   font counts toward its row, and a thick bottom border adds Excel's 0.75pt. A crosswalk workbook went from 41 to 60 of
   60 rows as Excel's. Security review still to do before release.
+- **Faster opening:** only sheets with a formula saved without its result are parsed on opening (found by scanning
+  their bytes); the rest wait until shown. Large workbooks whose other sheets are big open in seconds instead of up to
+  a minute. Security review still to do before release.
 
 ## 0.8.3
 
