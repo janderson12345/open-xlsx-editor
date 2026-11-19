@@ -24,7 +24,7 @@ export interface SheetModel {
   rows: Map<number, { ht: number | null; hidden: boolean; customHeight: boolean }>;
   cols: { min: number; max: number; width: number | null; hidden: boolean; style: number }[];
   merges: Range[];
-  format: { defaultRowHeight: number; defaultColWidth: number | null; baseColWidth: number | null };
+  format: { defaultRowHeight: number; customHeight: boolean; defaultColWidth: number | null; baseColWidth: number | null };
   showGridLines: boolean;
   /** The row and column headings shown (View > Headings). */
   showHeadings: boolean;

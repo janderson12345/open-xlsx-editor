@@ -260,9 +260,19 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
   (ooxml/excelfonts.js, measured over COM by tools/excel-compare/excel-fontmetrics.ps1): Excel takes them from
   Windows' rendering of the font at the size in whole pixels, and neither GDI's line height plus a margin nor any
   formula of the font's metrics gave them (the best of 144 tried, 45 of 121). Against Excel on 146 customer
-  workbooks, rows all as Excel's in 68 (56 before), columns in 145 (141). Still open: the sheet's standard height,
-  the least a row of cells takes. It is the stored defaultRowHeight here, which most sheets match; but Excel can
-  work out a lower one (12.75pt for a sheet stored at 13.8 with a Lato Normal style), not yet understood.
+  workbooks, rows all as Excel's in 68 (56 before), columns in 145 (141).
+- The sheet's standard height (Excel's Worksheet.StandardHeight, an empty row's and the least a row of cells takes;
+  editor/rowheights.js standardRowHeight): sheetFormatPr's defaultRowHeight counts only with customHeight="1".
+  Without it Excel never reads the number (a file saved on a screen at 125% stores 14.4 for Calibri 11's 15, at 150%
+  14.5) and works it out as any row's height: the tallest font among the row's 16,384 cells, the ones the file
+  doesn't hold with their column's format, the Normal style's where the column has none. So a sheet whose every
+  column is styled Calibri 6 has 8.25pt rows, one with five columns of Calibri 20 (hidden or not) 26.25pt rows; a
+  row made with a format of its own counts that format's font instead of its columns'. Measured over COM on 240
+  workbooks storing 10 to 21.9pt and on tools/excel-compare/stdheight-book.mjs's 14 (test/stdheight.mjs). A font
+  Windows doesn't have takes Times New Roman's rows for <family val="1"/> (roman), else Arial's, measured 6 to 36pt
+  regular and bold ("Baskerville", which Windows lacks, and a made-up name). Against Excel on 146
+  customer workbooks, rows off 995 before, 102 after (1px off: 783, 50), rows all as Excel's in 95 (68), none worse;
+  most of what is left is long wrapped text.
 - Printing (print area, print titles, scale, fit to pages, page breaks, headers and footers): docs/PRINT.md.
 
 ## Tried and dropped

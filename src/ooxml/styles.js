@@ -72,6 +72,8 @@ export function readFont(el, ns) {
     strike: !!onOff(kid(el, 'strike', ns)),
     color: readColor(kid(el, 'color', ns)),
     vertAlign: val('vertAlign') || null, // 'superscript', 'subscript' or null
+    // (The font's family, 1 roman: which installed font Windows draws it with when it is missing, fonts.js fontRowPx.)
+    ...(val('family') === '1' ? { roman: true } : {}),
   };
 }
 

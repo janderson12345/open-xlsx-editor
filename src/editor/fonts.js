@@ -166,11 +166,19 @@ export const fontDescentPx = (name, sizePx) => fontMetrics(name, sizePx).wd;
  *  measured over COM for the fonts workbooks use, 6pt to 36pt by half points (ooxml/excelfonts.js; `bold` for a
  *  bold font, a few of whose rows differ). Other fonts and sizes: its line, the larger of Windows ascent + descent
  *  and hhea ascent + descent + gap, plus 1.6px and 0.035 of its size, rounded, a fit on Excel's PDF of
- *  test/fixtures/rows.xlsx at 11pt and up that drifts below 11pt (54 of 154 of the table's sizes before it). */
-export function fontRowPx(name, sizePx, bold = false) {
+ *  test/fixtures/rows.xlsx at 11pt and up that drifts below 11pt (54 of 154 of the table's sizes before it). A font
+ *  Windows doesn't have (no metrics, no stand-in) is drawn in another, and its rows are that one's: Times New Roman's
+ *  for a font of the roman family (`roman`, <family val="1"/>), else Arial's, every half point from 6 to 36pt
+ *  (measured over COM: "Baskerville", which is not Baskerville Old Face, and a made-up name, with family 1, 2 and
+ *  none). */
+export function fontRowPx(name, sizePx, bold = false, roman = false) {
   const measured = excelFontMetric(name, sizePx * 0.75, bold ? 'bold' : 'row');
   if (measured) return measured;
   const key = name.toLowerCase();
+  if (!metrics[key] && !STAND_INS[key]) {
+    const instead = excelFontMetric(roman ? 'Times New Roman' : 'Arial', sizePx * 0.75, bold ? 'bold' : 'row');
+    if (instead) return instead;
+  }
   const m = metrics[key] || (STAND_INS[key] || []).map((s) => metrics[s.toLowerCase()]).find(Boolean) || metrics.calibri;
   return Math.round(Math.max(m.win[0] + m.win[1], m.line) * sizePx + 1.6 + 0.035 * sizePx);
 }

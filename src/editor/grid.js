@@ -473,8 +473,8 @@ export function createGrid(host, { sheet, label = 'Sheet', looks = {}, readOnly 
       const merged = (c) => st.sheet.merges.some((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
       if (!line || ![...line].some(([c, cell]) => cell.v != null && !merged(c) && st.deco?.(cell.s || 0)?.align?.wrap)) return null;
       const sheet = { ...st.sheet, rows: new Map([...st.sheet.rows].map(([k, x]) => [k, k === r ? { ...x, customHeight: false } : x])) };
-      const pt = autoRowHeights(sheet, st.deco, sheetGeometry(st.sheet).cols).get(r);
-      return pt > st.sheet.format.defaultRowHeight ? Math.round(pt * 4) / 4 : null;
+      const auto = autoRowHeights(sheet, st.deco, sheetGeometry(st.sheet).cols);
+      return auto.get(r) > auto.standard ? Math.round(auto.get(r) * 4) / 4 : null;
     },
     /** The sheet read again (rows or columns inserted or deleted, or undone): drawn where the view is. */
     setModel(next) {

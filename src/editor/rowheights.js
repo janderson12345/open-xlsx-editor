@@ -1,8 +1,10 @@
 // The row heights Excel works out itself. A row without customHeight is as tall as its tallest cell, whatever `ht`
 // says (Excel's PDF of test/fixtures/rows.xlsx: a stored ht of 30 printed at 15pt, ht 10 with a 20pt font at 26.25pt):
-// a cell's font's row height (fonts.js fontRowPx), times its lines when wrapped, never less than the sheet's default.
-// Styled empty cells count; merged cells don't.
+// a cell's font's row height (fonts.js fontRowPx), times its lines when wrapped. Styled empty cells count; merged cells
+// don't. And every one of the row's 16,384 cells counts, the ones the file doesn't hold too, with the font of the row's
+// own format or else their column's (the Normal style's in a column without one): standardRowHeight.
 import { filledRows } from '../ooxml/sheetcells.js';
+import { MAX_COLS } from '../ooxml/refs.js';
 import { fontRowPx, fontDescentPx } from './fonts.js';
 
 let ctx = null;
@@ -61,7 +63,7 @@ export function rowDescents(sheet, deco) {
     let best = { row: -1, desc: 0 };
     for (const cell of line.values()) {
       const f = deco(cell.s || 0).font;
-      const row = fontRowPx(f.family, f.sizePx, f.bold);
+      const row = fontRowPx(f.family, f.sizePx, f.bold, f.roman);
       if (row > best.row) best = { row, desc: fontDescentPx(f.family, f.sizePx) };
     }
     out.set(r, best.desc);
@@ -71,7 +73,7 @@ export function rowDescents(sheet, deco) {
     let best = { row: -1, desc: 0 };
     for (let k = 0; k < runs.length; k += 3) {
       const f = deco(runs[k + 2] || 0).font;
-      const row = fontRowPx(f.family, f.sizePx, f.bold);
+      const row = fontRowPx(f.family, f.sizePx, f.bold, f.roman);
       if (row > best.row) best = { row, desc: fontDescentPx(f.family, f.sizePx) };
     }
     for (let r = r0; r <= r1; r++) out.set(r, best.desc);
@@ -97,73 +99,131 @@ export function turnedPt(text, rotation, font, linePt) {
   return Math.max(linePt, px * 0.75);
 }
 
-/** Heights in points for the rows Excel sizes: Map(row -> pt), for rows with cells and no customHeight. `deco(s)`
- *  gives a cell format's font ({ family, sizePx, css }) and alignment (cellstyles.js); `cols` the screen columns,
- *  whose widths wrapped lines are counted in (less the cell's 2px padding each side). */
+/** One line's height in points for each cell format, from `deco` (cellstyles.js), kept. */
+function linesOf(deco) {
+  const rowPt = new Map();
+  return (s) => {
+    if (!rowPt.has(s)) { const d = deco(s); rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx, d.font.bold, d.font.roman) * 0.75); }
+    return rowPt.get(s);
+  };
+}
+
+/** The sheet's 16,384 columns as stretches of one format each, tallest font first: [{ min, max, pt }], a `<col>`
+ *  with its style's line, the columns between with the Normal style's (cell format 0). */
+function columnLines(sheet, lineOf) {
+  const out = [];
+  let next = 0;
+  for (const col of [...(sheet.cols || [])].sort((a, b) => a.min - b.min)) {
+    if (col.max < next) continue;
+    const min = Math.max(col.min, next);
+    if (min > next) out.push({ min: next, max: min - 1, pt: lineOf(0) });
+    out.push({ min, max: col.max, pt: lineOf(col.style || 0) });
+    next = col.max + 1;
+  }
+  if (next < MAX_COLS) out.push({ min: next, max: MAX_COLS - 1, pt: lineOf(0) });
+  return out.sort((a, b) => b.pt - a.pt);
+}
+
+/** The tallest line among the columns a row holds no cell in (`count` cells, `has(c)`): what the cells the file
+ *  doesn't hold make the row, 0 when it holds all 16,384. */
+function emptyCellsPt(columns, count, has) {
+  for (const seg of columns) {
+    if (seg.max - seg.min + 1 > count) return seg.pt;
+    for (let c = seg.min; c <= seg.max; c++) if (!has(c)) return seg.pt;
+  }
+  return 0;
+}
+
+/** The sheet's standard row height in points (Excel's Worksheet.StandardHeight): the height of a row the file says
+ *  nothing about, and the least a row of cells without a format of its own takes. Measured over COM on 240 workbooks
+ *  storing 10 to 21.9pt under Calibri 11 and Arial 10, and 17 more with column styles (tools/excel-compare/
+ *  stdheight-book.mjs holds the cases): sheetFormatPr's defaultRowHeight counts only with customHeight="1" (20 stays
+ *  20, 10 stays 10). Without it Excel never reads the number (a file saved on a screen at 125% stores 14.4 for
+ *  Calibri 11's 15, at 150% 14.5) and works the height out as any row's: the tallest font among the row's 16,384
+ *  cells, each empty one with its column's format, the Normal style's where the column has none. So it is the Normal
+ *  font's line, unless every column has a style of smaller fonts (all Calibri 6: 8.25pt; all but one: 15) or some
+ *  column, hidden or not, a taller one (five columns of Calibri 20: 26.25). Without `deco` the stored number. */
+export function standardRowHeight(sheet, deco) {
+  if (!deco || sheet.format.customHeight) return sheet.format.defaultRowHeight;
+  return columnLines(sheet, linesOf(deco))[0].pt;
+}
+
+/** Heights in points for the rows Excel sizes: Map(row -> pt), for rows with cells and no customHeight, and the
+ *  sheet's standard height (standardRowHeight) as the map's `standard`, for every other row. `deco(s)` gives a cell
+ *  format's font ({ family, sizePx, css }) and alignment (cellstyles.js); `cols` the screen columns, whose widths
+ *  wrapped lines are counted in (less the cell's 2px padding each side).
+ *  A row's least height is its empty cells': the font of its own format when it has one (a row made Calibri 6 with
+ *  nothing in it is 8.25pt under a Normal style of Calibri 11, measured over COM), else the tallest font among the
+ *  columns it holds no cell in (emptyCellsPt); sheetFormatPr's defaultRowHeight is no part of it, with customHeight
+ *  or without (a row element without `ht` in a sheet stored at 20pt with customHeight is 15pt). */
 export function autoRowHeights(sheet, deco, cols) {
   const out = new Map();
   if (!deco) return out;
   const mergeOf = (r, c) => sheet.merges.find((m) => r >= m.r0 && r <= m.r1 && c >= m.c0 && c <= m.c1);
-  const rowPt = new Map(); // per cell format: one line's height in points
-  const lineOf = (s) => {
-    if (!rowPt.has(s)) { const d = deco(s); rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx, d.font.bold) * 0.75); }
-    return rowPt.get(s);
-  };
+  const lineOf = linesOf(deco);
+  const columns = columnLines(sheet, lineOf);
+  const stored = !!sheet.format.customHeight;
+  out.standard = stored ? sheet.format.defaultRowHeight : columns[0].pt;
   // (A row with a format of its own, cells or not: its font's line, as Excel grows a row made 14pt to 18.75.)
   // (Rows of formatted empty cells kept as bands, sheetcells.js, are worked out from their runs below, not made.)
+  // (With a stored standard height, customHeight, every row the file has an element for is worked out: Excel gives
+  // such a row its fonts' height, not the stored one.)
   const rows = new Set();
   for (const [r] of filledRows(sheet.cells)) rows.add(r);
-  for (const [r, x] of sheet.rows) if (x.s && !sheet.cells.blankRuns?.(r)) rows.add(r);
+  for (const [r, x] of sheet.rows) if ((x.s || stored) && !sheet.cells.blankRuns?.(r)) rows.add(r);
   for (const { r0, r1, runs } of sheet.cells.bands || []) {
-    let tallest = sheet.format.defaultRowHeight;
-    for (let k = 0; k < runs.length; k += 3) tallest = Math.max(tallest, lineOf(runs[k + 2] || 0));
+    let count = 0;
+    let tallest = 0;
+    for (let k = 0; k < runs.length; k += 3) { count += runs[k + 1] - runs[k] + 1; tallest = Math.max(tallest, lineOf(runs[k + 2] || 0)); }
+    const inRuns = (c) => { for (let k = 0; k < runs.length; k += 3) if (c >= runs[k] && c <= runs[k + 1]) return true; return false; };
+    const least = emptyCellsPt(columns, count, inRuns);
     const merged = sheet.merges.filter((m) => m.r1 >= r0 && m.r0 <= r1);
     for (let r = r0; r <= r1; r++) {
       const own = sheet.rows.size ? sheet.rows.get(r) : null;
       if (own?.customHeight) continue;
-      let best = tallest;
+      let cells = tallest;
       if (merged.some((m) => r >= m.r0 && r <= m.r1)) {
         // (An empty cell in a merged range counts as any cell does: with its font's line on a range of one row.)
-        best = sheet.format.defaultRowHeight;
+        cells = 0;
         for (let k = 0; k < runs.length; k += 3) {
           for (let c = runs[k]; c <= runs[k + 1]; c++) {
             const m = mergeOf(r, c);
-            if (!m || m.r0 === m.r1) best = Math.max(best, lineOf(runs[k + 2] || 0));
+            if (!m || m.r0 === m.r1) cells = Math.max(cells, lineOf(runs[k + 2] || 0));
           }
         }
       }
-      if (own?.s) best = Math.max(best, lineOf(own.s));
+      let best = Math.max(cells, own?.s ? lineOf(own.s) : least);
       if (own?.thickBot) best += 0.75;
       out.set(r, Math.min(best, MAX_ROW_PT));
     }
   }
   for (const r of rows) {
-    if (sheet.rows.get(r)?.customHeight) continue;
+    const own = sheet.rows.get(r);
+    if (own?.customHeight) continue;
     const line = sheet.cells.get(r) || new Map();
-    let best = sheet.format.defaultRowHeight;
-    if (sheet.rows.get(r)?.s) best = Math.max(best, lineOf(sheet.rows.get(r).s));
+    let best = own?.s ? lineOf(own.s) : emptyCellsPt(columns, line.size, (c) => line.has(c));
     for (const [c, cell] of line) {
       const s = cell.s || 0;
       const d = deco(s);
-      if (!rowPt.has(s)) rowPt.set(s, fontRowPx(d.font.family, d.font.sizePx, d.font.bold) * 0.75);
+      const pt = lineOf(s);
       // (A cell in a merged range on this row alone counts with its font's line, as Excel's 16pt title merged across
       // A1:K1 makes its row 21pt (measured over COM); its wrapping doesn't. A range over several rows doesn't count.)
       const m = mergeOf(r, c);
-      if (m) { if (m.r0 === m.r1) best = Math.max(best, rowPt.get(s)); continue; }
+      if (m) { if (m.r0 === m.r1) best = Math.max(best, pt); continue; }
       let lines = 1;
       // (Any text the cell shows wraps: a string, a formula's text result (t "str", as =CONCATENATE gives) or an inline
       // string; before, only a string counted, so a formula's long text left its row a line tall.)
       // (Lines counted as Excel breaks them: its text measures wider than the canvas's, so a line that just fits here
       // goes on to the next in Excel; EXCEL_WRAP_WIDTH.)
       if (d.align.wrap && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) lines = countLines(cell.v, d.font.css, (cols.size(c) - 4) / EXCEL_WRAP_WIDTH);
-      best = Math.max(best, rowPt.get(s) * lines);
+      best = Math.max(best, pt * lines);
       // (Rich text: a run's larger font grows the row as Excel's does, a 16pt run in Aptos Narrow 11 to 21pt.)
       if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3, run.font.b ?? d.font.bold) * 0.75);
-      if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, rowPt.get(s)));
+      if (d.align.rotation && cell.v != null) best = Math.max(best, turnedPt(String(cell.v), d.align.rotation, d.font.css, pt));
     }
     // (A thick bottom border, thickBot: 0.75pt more, as Excel gives the 21pt title row above 21.75pt, 21 without the
     // attribute (measured over COM). thickTop isn't measured.)
-    if (sheet.rows.get(r)?.thickBot) best += 0.75;
+    if (own?.thickBot) best += 0.75;
     out.set(r, Math.min(best, MAX_ROW_PT));
   }
   return out;

@@ -107,7 +107,7 @@ export function readSheet(doc, sst = [], data = null) {
     merges,
     /** The ranges of array formulas (their cells can't be changed one at a time). */
     arrays,
-    format: { defaultRowHeight: num('defaultRowHeight') ?? 15, defaultColWidth: num('defaultColWidth'), baseColWidth: num('baseColWidth') },
+    format: { defaultRowHeight: num('defaultRowHeight') ?? 15, customHeight: !!fp && (attr(fp, 'customHeight') === '1' || attr(fp, 'customHeight') === 'true'), defaultColWidth: num('defaultColWidth'), baseColWidth: num('baseColWidth') },
     showGridLines: !view || attr(view, 'showGridLines') !== '0',
     showHeadings: !view || attr(view, 'showRowColHeaders') !== '0',
     ...readView(view, ns),
