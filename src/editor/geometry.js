@@ -41,7 +41,9 @@ export function sheetGeometry(sheet, { print = false, normalFamily, auto = null,
   }
   // (Show Formulas draws every column twice as wide, its width as saved unchanged: Excel's 54.75 points to 109.5.)
   if (sheet.showFormulas) for (const [c, px] of colSizes) colSizes.set(c, px * 2);
-  const rows = new Axis(rowCount, rowPx(sheet.format.defaultRowHeight), rowSizes);
+  // (Every other row: the sheet's standard height as Excel works it out, rowheights.js standardRowHeight, which the
+  // stored defaultRowHeight is only with customHeight.)
+  const rows = new Axis(rowCount, rowPx(auto?.standard ?? sheet.format.defaultRowHeight), rowSizes);
   const cols = new Axis(colCount, colPx(defaultColPx(sheet.format, mdw)) * (sheet.showFormulas ? 2 : 1), colSizes);
   // (View > Headings off: no room for them, as in Excel; showHeadings is undefined in a model made by hand.)
   const heads = sheet.showHeadings !== false;

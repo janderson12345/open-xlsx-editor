@@ -62,3 +62,27 @@ test("a row grows for its own format's font and a rich-text run's, as Excel's: 1
   assert.equal(h.get(6), 18.75);
   assert.equal(h.get(0), 21);
 });
+
+// Measured over COM (tools/excel-compare/stdheight-book.mjs, test/stdheight.mjs for the browser): a font Windows
+// doesn't have is drawn in Times New Roman (family 1, roman) or Arial, and its rows are theirs.
+test("a missing font's rows are Times New Roman's (roman family) or Arial's, as Excel's", async () => {
+  const { fontRowPx } = await import('../src/editor/fonts.js');
+  const px = (pt) => (pt * 4) / 3;
+  assert.deepEqual([10, 11, 14, 20].map((pt) => fontRowPx('Nofont Xyz', px(pt), false, true)), [10, 11, 14, 20].map((pt) => fontRowPx('Times New Roman', px(pt))));
+  assert.deepEqual([10, 11, 14, 20].map((pt) => fontRowPx('Nofont Xyz', px(pt))), [10, 11, 14, 20].map((pt) => fontRowPx('Arial', px(pt))));
+  assert.equal(fontRowPx('Baskerville', px(10), false, true), 17);
+});
+
+test("the standard row height: stored only with customHeight, else the tallest of the columns' fonts (Excel's StandardHeight over COM)", async () => {
+  const { standardRowHeight } = await import('../src/editor/rowheights.js');
+  const { fontRowPx } = await import('../src/editor/fonts.js');
+  const sizes = [11, 6, 20];
+  const deco = (s) => ({ font: { family: 'Calibri', sizePx: (sizes[s] * 4) / 3 }, align: {} });
+  const sheet = (format, cols = []) => ({ format: { defaultRowHeight: 15, customHeight: false, ...format }, cols });
+  assert.equal(fontRowPx('Calibri', (11 * 4) / 3) * 0.75, 15);
+  assert.equal(standardRowHeight(sheet({ defaultRowHeight: 14.4 }), deco), 15);
+  assert.equal(standardRowHeight(sheet({ defaultRowHeight: 20, customHeight: true }), deco), 20);
+  assert.equal(standardRowHeight(sheet({}, [{ min: 0, max: 16383, style: 1 }]), deco), 8.25);
+  assert.equal(standardRowHeight(sheet({}, [{ min: 0, max: 16382, style: 1 }]), deco), 15);
+  assert.equal(standardRowHeight(sheet({}, [{ min: 0, max: 4, style: 2 }]), deco), 26.25);
+});
