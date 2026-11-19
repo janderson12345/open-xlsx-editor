@@ -24,5 +24,8 @@ const KNOWN = new Set([32, 45]);
 const unexpected = off.filter(([r]) => !KNOWN.has(r));
 check(!unexpected.length, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's, the others the documented ${[...KNOWN].join(' and ')}`, unexpected.slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));
 check(Math.abs(ours[0] - 21.75) < 0.5, 'the merged 16pt title row with a thick bottom border: 21.75pt, as Excel', String(ours[0]));
+// (Row 63: some hundred wrapped lines, which Excel stops at its tallest row, 409.5pt; it grew to thousands before.)
+const tall = await page.evaluate(() => window.oxe.grid.geometry().rows.size(62) * 0.75);
+check(tall === 409.5, 'a wrapped text taller than a row can be: 409.5pt, Excel\'s tallest row', String(tall));
 
 await finish();

@@ -37,6 +37,10 @@ export function wrapLines(text, font, width) {
   return out;
 }
 
+/** The tallest a row can be in Excel, in points (409.5): a row whose wrapped text would take more stops there, as 18
+ *  rows of 5 customer workbooks did in Excel where they grew to 3,765pt here. */
+export const MAX_ROW_PT = 409.5;
+
 /** How much wider Excel's text is than the canvas's when it breaks wrapped lines for a row's height: measured over COM
  *  on a workbook of 58 wrapped rows in Calibri 11 (Range.RowHeight), every row Excel gave one more line needing 1.065 or
  *  more and every row it didn't less than 1.09; 1.075, the middle. turnedPt's 1.0645 for turned text agrees. */
@@ -130,7 +134,7 @@ export function autoRowHeights(sheet, deco, cols) {
       }
       if (own?.s) best = Math.max(best, lineOf(own.s));
       if (own?.thickBot) best += 0.75;
-      out.set(r, best);
+      out.set(r, Math.min(best, MAX_ROW_PT));
     }
   }
   for (const r of rows) {
@@ -160,7 +164,7 @@ export function autoRowHeights(sheet, deco, cols) {
     // (A thick bottom border, thickBot: 0.75pt more, as Excel gives the 21pt title row above 21.75pt, 21 without the
     // attribute (measured over COM). thickTop isn't measured.)
     if (sheet.rows.get(r)?.thickBot) best += 0.75;
-    out.set(r, best);
+    out.set(r, Math.min(best, MAX_ROW_PT));
   }
   return out;
 }

@@ -34,6 +34,9 @@ export function rowfitRows() {
   return out;
 }
 
+/** Row 63's text: the word list 40 times over, about 4,700 characters. */
+export const LONG_TEXT = Array.from({ length: 40 }, () => WORDS.join(' ')).join(' ');
+
 /** The .xlsx's bytes. */
 export function rowfitBook() {
   const cells = [];
@@ -48,6 +51,8 @@ export function rowfitBook() {
       : `<c r="B${x.r}" s="1" t="inlineStr"><is><t>${esc(x.b)}</t></is></c>`;
     cells.push(`<row r="${x.r}" ht="28.8"><c r="A${x.r}" t="inlineStr"><is><t>Row ${x.r}</t></is></c>${b}<c r="H${x.r}" s="1" t="inlineStr"><is><t>${esc(x.h)}</t></is></c></row>`);
   }
+  // (Row 63: a wrapped text of some hundred lines, taller than Excel lets a row be: it stops at 409.5pt.)
+  cells.push(`<row r="63"><c r="A63" t="inlineStr"><is><t>Row 63</t></is></c><c r="H63" s="1" t="inlineStr"><is><t>${esc(LONG_TEXT)}</t></is></c></row>`);
   const cols = '<cols><col min="1" max="1" width="12" customWidth="1"/><col min="2" max="2" width="19.109375" customWidth="1"/>'
     + '<col min="3" max="3" width="8.88671875" customWidth="1"/><col min="8" max="8" width="45" customWidth="1"/></cols>';
   const files = {
