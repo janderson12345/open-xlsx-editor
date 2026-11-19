@@ -22,7 +22,15 @@ const off = ours.map((pt, r) => [r + 1, pt, excel[r]]).filter(([, a, b]) => Math
 // one line in Excel, whose digits are exactly 7px; counted at EXCEL_WRAP_WIDTH they take two here.)
 const KNOWN = new Set([32, 45]);
 const unexpected = off.filter(([r]) => !KNOWN.has(r));
-check(!unexpected.length, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's, the others the documented ${[...KNOWN].join(' and ')}`, unexpected.slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));
+// (Exact on Windows, whose Calibri the lines are counted in. Elsewhere, Linux CI among them, Calibri's stand-in is
+// wider and some text wraps a line or two sooner, so rows are checked to be no shorter than Excel's, at most two lines
+// taller, and most of them Excel's.)
+if (process.platform === 'win32') {
+  check(!unexpected.length, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's, the others the documented ${[...KNOWN].join(' and ')}`, unexpected.slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));
+} else {
+  const wrong = off.filter(([, a, b]) => a < b - 0.5 || a > b + 30.5);
+  check(!wrong.length && off.length <= excel.length / 4, `row heights: ${excel.length - off.length} of ${excel.length} rows as Excel's, the rest at most two lines taller (not Windows: Calibri's stand-in is wider)`, (wrong.length ? wrong : off).slice(0, 8).map(([r, a, b]) => `row ${r}: ${a} (Excel ${b})`).join('; '));
+}
 check(Math.abs(ours[0] - 21.75) < 0.5, 'the merged 16pt title row with a thick bottom border: 21.75pt, as Excel', String(ours[0]));
 // (Row 63: some hundred wrapped lines, which Excel stops at its tallest row, 409.5pt; it grew to thousands before.)
 const tall = await page.evaluate(() => window.oxe.grid.geometry().rows.size(62) * 0.75);
