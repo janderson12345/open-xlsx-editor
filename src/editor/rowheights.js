@@ -227,7 +227,9 @@ export function autoRowHeights(sheet, deco, cols) {
       // string; before, only a string counted, so a formula's long text left its row a line tall.)
       // (Lines counted as Excel breaks them: its text measures wider than the canvas's, so a line that just fits here
       // goes on to the next in Excel; EXCEL_WRAP_WIDTH.)
-      if (d.align.wrap && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) lines = countLines(cell.v, d.font.css, (cols.size(c) - 4) / EXCEL_WRAP_WIDTH);
+      // (A hidden column's text doesn't wrap: Excel gives it its font's one line, where counting it at no width made
+      // a line of each character, 390pt rows of 5 customer workbooks that Excel has at 30 to 72.)
+      if (d.align.wrap && cols.size(c) > 0 && (cell.t === 's' || cell.t === 'str' || cell.t === 'inlineStr') && cell.v) lines = countLines(cell.v, d.font.css, (cols.size(c) - 4) / EXCEL_WRAP_WIDTH);
       best = Math.max(best, pt * lines);
       // (Rich text: a run's larger font grows the row as Excel's does, a 16pt run in Aptos Narrow 11 to 21pt.)
       if (cell.runs) for (const run of cell.runs) if (run.font?.size) best = Math.max(best, fontRowPx(run.font.name && !run.font.scheme ? run.font.name : d.font.family, (run.font.size * 4) / 3, run.font.b ?? d.font.bold) * 0.75);

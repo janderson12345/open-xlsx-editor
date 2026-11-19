@@ -255,7 +255,10 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
   the canvas's and digits narrower (exactly 7px in Calibri 11). Measured over COM: a customer's crosswalk workbook,
   60 of 60 rows as Excel's, and tools/excel-compare/rowfit-book.mjs's, 60 of 62 (test/rowfit.mjs). The two others
   are identifiers of 17 characters, mostly digits, that just fit in Excel and take a line more here. No simple
-  per-character model (each width rounded, rounded up, digits apart, GDI's own advances) fitted both workbooks.
+  per-character model (each width rounded, rounded up, digits apart, GDI's own advances) fitted both workbooks
+  (see Tried and dropped). Wrapped text in a hidden column counts as one line, as in Excel. Against Excel on 146
+  customer workbooks, 98 rows of 9,429 differ (50 by 1px, 48 by a line or more, nearly all long wrapped text), and
+  99 workbooks have every row as Excel's.
 - A font's row height and digit width are Excel's own for 25 fonts at every half point from 6 to 36pt
   (ooxml/excelfonts.js, measured over COM by tools/excel-compare/excel-fontmetrics.ps1): Excel takes them from
   Windows' rendering of the font at the size in whole pixels, and neither GDI's line height plus a margin nor any
@@ -277,4 +280,14 @@ box isn't in the PDF export (it is in browser print); SmartArt, slicers, ink and
 
 ## Tried and dropped
 
-(Nothing yet.)
+- **Wrapped lines at Windows' whole-pixel character widths** (2026-11-19). The width Windows (GDI) gives each
+  printable ASCII character of 24 fonts, regular and bold, at every pixel size from 8 to 48 (6 to 36pt), measured by
+  tools/excel-compare/gdi-charwidths.ps1 (Office's cloud fonts Aptos, Aptos Narrow and Lato loaded for that process
+  only) and made a table by tools/excel-compare/charwidths-table.mjs; a line fits when the sum of its characters' widths
+  is at most the column's width less 10px. On rowfit-book.mjs's workbook all 62 rows were Excel's (the 10px margin
+  is the only one that fits its 62, 134 and 315px columns), but on 146 customer workbooks it put 27 rows right and 26
+  wrong, 101 rows off against 98 without it. The rows it got wrong are mostly long sentences in wide columns that
+  Excel breaks a few pixels sooner, and short bold headings it breaks later. Neither a margin growing with the
+  column, a scale on the widths, wider spaces, a margin for bold apart, sheet zoom, indent nor heights stored in the
+  file explains them. Set aside, not shipped: the scripts are kept for a later look; the table (190KB, 22KB gzipped)
+  is not in src.

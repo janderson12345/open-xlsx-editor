@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Fix:** wrapped text in a hidden column no longer makes its row hundreds of points tall. It was counted at no width,
+  a line for each character; Excel gives it one line. Five rows of customer workbooks at 390pt are Excel's 30 to 72pt
+  again. Security review still to do before release.
+
 ## 0.9.0
 
 - **Fix:** screen readers give each cell its own column's heading. NVDA in Edge and Chrome read column B's cells under

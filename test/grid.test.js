@@ -43,6 +43,10 @@ test('automatic row heights: tallest font, styled empty cells count, stored ht w
   assert.deepEqual([1, 4, 11, 16, 17, 18].map((r) => h.get(r)), [15, 26.25, 26.25, 15, 26.25, 45]);
   const d = rowDescents(sheet, deco);
   assert.ok(d.get(10) > d.get(2)); // (the mixed row sits on the 20pt baseline)
+  // (In hidden columns the three-line text is one line, as Excel gives wrapped text in a hidden column: counted at no
+  // width it took a line a character, 390pt rows of customer workbooks that Excel has at 30 to 72.)
+  const hidden = autoRowHeights(sheet, deco, { size: () => 0 });
+  assert.deepEqual([4, 18].map((r) => hidden.get(r)), [26.25, 15]);
 });
 
 test("a row grows for its own format's font and a rich-text run's, as Excel's: 14pt to 18.75, a 16pt run to 21 (measured over COM)", async () => {
